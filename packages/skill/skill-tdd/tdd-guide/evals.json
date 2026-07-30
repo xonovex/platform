@@ -15,7 +15,7 @@
       "id": 2,
       "prompt": "When I'm doing TDD, when should I reach for triangulation versus just writing the implementation directly?",
       "assertions": [
-        "States that triangulation is a fallback / last resort, used only when you cannot yet see the general solution — not the default or canonical TDD move.",
+        "States that triangulation is a fallback / last resort, used only when you cannot yet see the general solution, not the default or canonical TDD move.",
         "States that obvious implementation and/or fake it are used far more often, and that if you can already see how to remove the duplication you should write the general solution directly instead of adding a second example just to justify it."
       ]
     },
@@ -31,7 +31,7 @@
       "id": 4,
       "prompt": "A colleague says London-style (mockist) TDD is the modern, correct way to do TDD and that classical/Detroit-style is outdated. Should I default all my tests to mockist?",
       "assertions": [
-        "States that neither classical nor mockist is more modern or a universal default — it is a per-situation design choice, not a correctness upgrade.",
+        "States that neither classical nor mockist is more modern or a universal default. It is a per-situation design choice, not a correctness upgrade.",
         "Describes the tradeoff: mockist tests assert expected calls and couple to the implementation/collaboration (breaking on internal refactors), while classical tests assert the result/state and survive internal refactoring with better integration coverage."
       ]
     }

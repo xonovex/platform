@@ -1,6 +1,6 @@
 # Markdown Handoffs
 
-A handoff exists only at a cold boundary — a session or role ends and context is not
+A handoff exists only at a cold boundary: a session or role ends and context is not
 retained. Operations that chain inside one warm session pass results directly and
 need none of this. A handoff is placement into a native system the receiving side
 already reads: a file, ticket, comment, or pull request.

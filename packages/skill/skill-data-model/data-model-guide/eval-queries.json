@@ -1,24 +1,24 @@
 [
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: runtime typed-object/property schema, data-driven types"
   },
   {
-    "query": "entities in our scene need to point at each other, but pointers break when I save and reload — what should I store instead so links survive serialization?",
+    "query": "entities in our scene need to point at each other, but pointers break when I save and reload. What should I store instead so links survive serialization?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: reference objects by stable id/GUID instead of pointers"
   },
   {
-    "query": "when I delete a material that meshes still reference, the app crashes — how should deletes behave so the references don't dangle?",
+    "query": "when I delete a material that meshes still reference, the app crashes. How should deletes behave so the references don't dangle?",
     "should_trigger": true,
     "split": "train",
     "rationale": "ownership vs weak reference, delete -> resolve to null"
   },
   {
-    "query": "the property panel and the viewport both need to refresh when the model changes, but I don't want to rescan everything every frame — what's the right way to observe edits?",
+    "query": "the property panel and the viewport both need to refresh when the model changes, but I don't want to rescan everything every frame. What's the right way to observe edits?",
     "should_trigger": true,
     "split": "train",
     "rationale": "change notification: events / dirty flags / version polling"
@@ -30,19 +30,19 @@
     "rationale": "transactional edits grouped into one undo step + redo stack"
   },
   {
-    "query": "old project files stop opening every time we add a field to the format — how do we version the save format and load old files into the new schema?",
+    "query": "old project files stop opening every time we add a field to the format. How do we version the save format and load old files into the new schema?",
     "should_trigger": true,
     "split": "train",
     "rationale": "serialization versioning + migration of old files"
   },
   {
-    "query": "the render thread reads the scene while the editor thread edits it and we get tearing — I want readers to see a consistent version without locking on every read",
+    "query": "the render thread reads the scene while the editor thread edits it and we get tearing. I want readers to see a consistent version without locking on every read",
     "should_trigger": true,
     "split": "train",
     "rationale": "immutable / copy-on-write snapshots published atomically for readers"
   },
   {
-    "query": "our particle update loop reads position and velocity from a 96-byte struct and stalls on cache misses — restructure the layout for the hot loop",
+    "query": "our particle update loop reads position and velocity from a 96-byte struct and stalls on cache misses: restructure the layout for the hot loop",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: cache/layout optimization -> data-oriented-design-guide"
@@ -78,7 +78,7 @@
     "rationale": "validation negative: plain serialization of a fixed struct, no model/schema/versioning"
   },
   {
-    "query": "I want prefabs in my editor: edit a template object and have all placed copies update, but each copy can tweak individual properties and keep those tweaks — how do I store and resolve that?",
+    "query": "I want prefabs in my editor: edit a template object and have all placed copies update, but each copy can tweak individual properties and keep those tweaks. How do I store and resolve that?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "prototypes: prototype/instance inheritance, per-property override, read-through resolution, edit propagation"
@@ -90,19 +90,19 @@
     "rationale": "validation positive: prototypes override bitmask + inherited/instantiated/removed sub-objects, delta serialization"
   },
   {
-    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code. How should I structure the thing they're editing",
     "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own, and how to keep that flexible if I switch to peer-to-peer later",
     "rationale": "near miss owned by game-networking-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data. How should we structure the two forms so editing and loading don't fight each other",
     "rationale": "near miss owned by asset-pipeline-guide",
     "should_trigger": false,
     "split": "validation"

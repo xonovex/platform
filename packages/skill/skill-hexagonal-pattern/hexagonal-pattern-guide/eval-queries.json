@@ -6,13 +6,13 @@
     "rationale": "ports-and-adapters: driven adapter behind a core-owned port"
   },
   {
-    "query": "where should the repository interface live \u2014 in the core or in the database layer?",
+    "query": "where should the repository interface live, in the core or in the database layer?",
     "should_trigger": true,
     "split": "train",
     "rationale": "the port belongs to the core (dependency rule)"
   },
   {
-    "query": "my service class imports the ORM and the HTTP framework directly \u2014 how do I keep the domain clean?",
+    "query": "my service class imports the ORM and the HTTP framework directly. How do I keep the domain clean?",
     "should_trigger": true,
     "split": "train",
     "rationale": "dependencies must point inward; adapters on the outside"
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "our notification code has grown into a mess \u2014 channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"

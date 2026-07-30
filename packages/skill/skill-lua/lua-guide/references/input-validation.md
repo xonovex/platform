@@ -1,6 +1,6 @@
 # input-validation: Input Validation
 
-Validate argument type and range at function start with `assert(cond, message)` — Lua is dynamically typed, so `assert` gives an early, descriptive failure.
+Validate argument type and range at function start with `assert(cond, message)`: Lua is dynamically typed, so `assert` gives an early, descriptive failure.
 
 ```lua
 function M.clamp(value, min, max)

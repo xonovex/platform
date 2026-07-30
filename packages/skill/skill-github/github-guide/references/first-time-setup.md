@@ -32,7 +32,7 @@ gh auth login                                    # interactive (default)
 
 The default is the **browser / device-code** flow, not a token paste. Answer **GitHub.com vs Other** (for GHES pass `--hostname ghe.example.com`), pick **HTTPS or SSH** for the git protocol, and answer **yes** to authenticate git so `gh` becomes the git credential helper. The token lands in the OS keyring.
 
-Headless interactive setup — read a classic PAT without echoing or storing it in a scratch file:
+Headless interactive setup: read a classic PAT without echoing or storing it in a scratch file:
 
 ```bash
 IFS= read -r -s -p "GitHub classic PAT: " GITHUB_CLASSIC_PAT
@@ -41,12 +41,12 @@ printf '%s' "$GITHUB_CLASSIC_PAT" | gh auth login --with-token
 unset GITHUB_CLASSIC_PAT
 ```
 
-Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow) — inject it as `GH_TOKEN` from a secret store. In CI, configure `GH_TOKEN` in the runner's secret mechanism and validate that it exists without printing it: `: "${GH_TOKEN:?inject GH_TOKEN through the CI secret store}"`.
+Do NOT feed a fine-grained PAT to `--with-token` (its per-resource scoping confuses that flow): inject it as `GH_TOKEN` from a secret store. In CI, configure `GH_TOKEN` in the runner's secret mechanism and validate that it exists without printing it: `: "${GH_TOKEN:?inject GH_TOKEN through the CI secret store}"`.
 
 ## 3. Git protocol
 
 - HTTPS: if you authenticated by token/env rather than the browser flow, git-over-HTTPS will not use `gh` until you run `gh auth setup-git`.
-- SSH: `gh auth login --git-protocol ssh` lets `gh` generate and upload a key (needs `admin:public_key` / `write:public_key`, which the browser flow requests but a hand-rolled `--with-token` PAT will not have — then use `--skip-ssh-key` and upload manually).
+- SSH: `gh auth login --git-protocol ssh` lets `gh` generate and upload a key (needs `admin:public_key` / `write:public_key`, which the browser flow requests but a hand-rolled `--with-token` PAT will not have, then use `--skip-ssh-key` and upload manually).
 
 ```bash
 gh auth setup-git                                # make gh the git credential helper (HTTPS, token login)
@@ -61,12 +61,12 @@ gh repo clone OWNER/REPO
 ## 5. Verify with a read call
 
 ```bash
-gh auth status                                   # exits 1 on an auth problem — a good CI gate
+gh auth status                                   # exits 1 on an auth problem: a good CI gate
 gh api user -q '.login'                          # real REST read
 gh api graphql -f query='query{viewer{login}}'   # real GraphQL read
 ```
 
-`gh auth status` exits non-zero on auth problems, but with `--json` it exits 0 even when broken — back it with a real read call.
+`gh auth status` exits non-zero on auth problems, but with `--json` it exits 0 even when broken: back it with a real read call.
 
 ## Enterprise (GHES)
 

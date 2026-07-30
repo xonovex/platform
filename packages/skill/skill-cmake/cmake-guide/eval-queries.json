@@ -48,7 +48,7 @@
     "split": "validation"
   },
   {
-    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them. How do we restructure so the platform stuff lives in one place",
     "rationale": "near miss owned by cross-platform-guide",
     "should_trigger": false,
     "split": "train"
@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
+    "query": "I need to find connected gamepads on Linux and read their button presses. How do I enumerate /dev/input and tell a controller apart from a keyboard",
     "rationale": "near miss owned by cross-platform-guide",
     "should_trigger": false,
     "split": "train"

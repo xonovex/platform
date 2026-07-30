@@ -179,7 +179,7 @@
         "source": "local",
         "path": "./packages/skill/skill-command"
       },
-      "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files (slash commands)",
+      "description": "Xonovex Command skill: author, merge, simplify reusable user-invocable prompt files (slash commands)",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -530,7 +530,7 @@
         "source": "local",
         "path": "./packages/skill/skill-llmstxt"
       },
-      "description": "Xonovex llms.txt skill — author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification",
+      "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -777,7 +777,7 @@
         "source": "local",
         "path": "./packages/skill/skill-skill"
       },
-      "description": "Xonovex Skill skill — author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure",
+      "description": "Xonovex Skill skill: author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

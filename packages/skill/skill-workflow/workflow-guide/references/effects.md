@@ -61,10 +61,10 @@ blocked result that names `apply` as the retry boundary.
 
 Classify each attempted effect:
 
-- **planned** — included in preview but not attempted
-- **applied** — verified in observed state
-- **failed** — rejected or known not to have occurred
-- **unknown** — submission may have happened but the observed outcome is unavailable
+- **planned**: included in preview but not attempted
+- **applied**: verified in observed state
+- **failed**: rejected or known not to have occurred
+- **unknown**: submission may have happened but the observed outcome is unavailable
 
 Never report total success when any effect failed or remains unknown. Reconcile unknown
 effects before retrying, reusing the same idempotency key when the provider supports

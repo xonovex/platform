@@ -17,8 +17,8 @@ description: "Use when writing or editing POSIX shell or Bash automation. Trigge
 
 ## Gotchas
 
-- Unquoted variables word-split and glob-expand — `cp $file dest/` silently breaks on filenames with spaces; quote everything
-- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail` — combine `set -euo pipefail` at the top
+- Unquoted variables word-split and glob-expand: `cp $file dest/` silently breaks on filenames with spaces; quote everything
+- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail`: combine `set -euo pipefail` at the top
 
 ## Progressive disclosure
 

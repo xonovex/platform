@@ -9,14 +9,14 @@
 
 ## Spec Constraints
 
-Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md — re-check after edits.
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md: re-check after edits.
 
 ## Skill Types
 
-- **Guideline** — coding conventions, style rules, framework patterns
-- **Workflow** — multi-step procedures with validation gates
-- **Capability** — task-specific automation with bundled scripts
-- **Processor** — transforms input to output
+- **Guideline**: coding conventions, style rules, framework patterns
+- **Workflow**: multi-step procedures with validation gates
+- **Capability**: task-specific automation with bundled scripts
+- **Processor**: transforms input to output
 
 These are authoring shapes, not metadata classifications. Choose the shape that best
 fits the skill's single concern.
@@ -25,8 +25,8 @@ fits the skill's single concern.
 
 1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type (guideline skills: see [guideline-skills.md](guideline-skills.md))
 2. **Fetch Source**: Fetch URLs from the web; read local files; mine conversation/task context
-3. **Extract Content**: Requirements, procedures, rules, gotchas, examples, edge cases — whatever the type calls for
-4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content — see [evaluating-triggers.md](evaluating-triggers.md), [evaluating-outputs.md](evaluating-outputs.md)
+3. **Extract Content**: Requirements, procedures, rules, gotchas, examples, edge cases, whatever the type calls for
+4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content, see [evaluating-triggers.md](evaluating-triggers.md), [evaluating-outputs.md](evaluating-outputs.md)
 5. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
 6. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items) and a routing-first description (see [writing-descriptions.md](writing-descriptions.md)); include a Gotchas section for non-obvious env-specific facts
 7. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables (see [using-scripts.md](using-scripts.md)), `assets/` for templates
@@ -67,9 +67,9 @@ description: "Use when {task}. Triggers on {patterns}."
 ## Content Rules
 
 - SKILL.md: 3-7 essentials, a Gotchas section, and one representative example only when it materially clarifies a non-obvious default or format; workflow operation references may carry the example instead
-- Reference files: full explanations, multiple examples, rationale; one topic each — don't restate when/why to read the file itself (its load-when trigger lives in the SKILL.md progressive-disclosure list); pointing to other references with a "read when" trigger is fine
+- Reference files: full explanations, multiple examples, rationale; one topic each. Don't restate when/why to read the file itself (its load-when trigger lives in the SKILL.md progressive-disclosure list); pointing to other references with a "read when" trigger is fine
 - Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
-- Match specificity to fragility — prescriptive only when consistency is required
+- Match specificity to fragility: prescriptive only when consistency is required
 - Mine non-obvious facts/corrections into a **Gotchas** section
 - Keep discovery frontmatter harness-neutral; descriptions own routing and manifests contain only exact installation dependencies
 

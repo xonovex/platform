@@ -5,7 +5,7 @@ Handle expected failures explicitly so `-e` doesn't abort; scope any `set +e` ti
 ```sh
 set -euo pipefail
 
-if ! command_that_might_fail; then      # expected failure — doesn't trip -e
+if ! command_that_might_fail; then      # expected failure: doesn't trip -e
     log "handled"
 fi
 

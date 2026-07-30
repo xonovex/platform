@@ -22,11 +22,11 @@ glyph_atlas_t *a = atlas_get(font_name, point_size, monitor_dpi);
 
 ## Counter-Example
 
-A fixed-resolution kiosk or console UI on a single known display doesn't need per-monitor machinery — a single compile-time scale is enough. Per-monitor handling is for desktop apps spanning mixed-DPI displays.
+A fixed-resolution kiosk or console UI on a single known display doesn't need per-monitor machinery. A single compile-time scale is enough. Per-monitor handling is for desktop apps spanning mixed-DPI displays.
 
 ## Gotcha
 
-`SetThreadDpiAwarenessContext()` is thread-local, not global, and behaves surprisingly — set process awareness up front and don't rely on per-thread context for global state.
+`SetThreadDpiAwarenessContext()` is thread-local, not global, and behaves surprisingly: set process awareness up front and don't rely on per-thread context for global state.
 
 ## Related
 

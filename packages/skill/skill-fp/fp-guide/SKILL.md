@@ -13,5 +13,5 @@ description: "Use when writing functional-style code or reviewing for FP cleanli
 
 ## Gotchas
 
-- Closures over mutable state look pure but aren't — referential transparency requires both inputs and captured environment to be immutable
-- Partial application order matters — `flip` exists because curry direction is opinionated, not arbitrary
+- Closures over mutable state look pure but aren't: referential transparency requires both inputs and captured environment to be immutable
+- Partial application order matters: `flip` exists because curry direction is opinionated, not arbitrary

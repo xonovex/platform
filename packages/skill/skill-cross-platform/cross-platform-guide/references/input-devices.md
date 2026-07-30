@@ -45,9 +45,9 @@ typedef struct axis_map_t {
 ## Gotchas
 
 - Raw `eventN` numbers are reassigned across reboots and replugs; key persistent bindings off the stable `by-id`/`by-path` symlink, not the numeric node.
-- A device node existing does not mean it is the device you want — a keyboard, mouse, and gamepad all appear under `/dev/input`; confirm the capability bits (e.g. `BTN_GAMEPAD`) before treating it as a gamepad.
+- A device node existing does not mean it is the device you want: a keyboard, mouse, and gamepad all appear under `/dev/input`; confirm the capability bits (e.g. `BTN_GAMEPAD`) before treating it as a gamepad.
 - Hard-coding a deadzone ignores the per-device `flat` value the kernel already reports; read it and normalize per axis or sticks will drift or feel dead.
-- A single physical control is not always one engine item: a hat axis splits 1:2 into two directions and X/Y axes fold 2:1 into one stick vector — only a mapping table expresses all cases without conditional sprawl.
+- A single physical control is not always one engine item: a hat axis splits 1:2 into two directions and X/Y axes fold 2:1 into one stick vector, only a mapping table expresses all cases without conditional sprawl.
 - Blocking `read()` on a device fd stalls the frame; open non-blocking and gate the read on `select`/`poll`.
 - Missing hotplug means controllers plugged in after launch never appear; watch the device directory for additions and removals, do not enumerate once at startup.
 - Axis raw ranges differ per device and are often not symmetric; normalize using the queried min/max, never assume `[-32768, 32767]`.

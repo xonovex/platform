@@ -12,11 +12,11 @@ its public argument contract stable.
 
 ## Arguments
 
-- `command-file` (required) — exact command to distill.
-- `--owner-skill` (optional) — exact guide that owns the procedure.
-- `--owner-plugin` (optional) — distribution plugin for the owner guide.
-- `--operation` (optional) — operation/reference within the owner skill.
-- `--dry-run` (optional) — preview command, skill, and manifest changes.
+- `command-file` (required): exact command to distill.
+- `--owner-skill` (optional): exact guide that owns the procedure.
+- `--owner-plugin` (optional): distribution plugin for the owner guide.
+- `--operation` (optional): operation/reference within the owner skill.
+- `--dry-run` (optional): preview command, skill, and manifest changes.
 
 ## Content boundary
 

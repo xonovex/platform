@@ -6,7 +6,7 @@ Bake render state into immutable pipeline-state objects that are precompiled and
 
 ## Rationale
 
-On an explicit API the full graphics state — shaders, blend, depth/stencil, rasterizer, vertex input, attachment formats — is frozen into one pipeline object at creation, so first use of an uncompiled pipeline stalls the frame and pipelines must be built and cached during load, not on demand. Grouping bindings by how often they change (per-frame, per-material, per-draw) rebinds only the groups that actually changed. (Each API names this differently — descriptor sets, root parameters/descriptor tables, argument buffers, bind groups — but the frequency model is the same.) The bind-a-group-per-draw model bottlenecks with many materials; a bindless model declares one huge resource array, uploads handles once, and indexes it by an integer passed per draw — collapsing thousands of binds into one. Inline constants carry tiny data (a transform index, a few floats) directly in the command stream with no binding update — the cheapest path for data that changes every draw.
+On an explicit API the full graphics state: shaders, blend, depth/stencil, rasterizer, vertex input, attachment formats. Is frozen into one pipeline object at creation, so first use of an uncompiled pipeline stalls the frame and pipelines must be built and cached during load, not on demand. Grouping bindings by how often they change (per-frame, per-material, per-draw) rebinds only the groups that actually changed. (Each API names this differently: descriptor sets, root parameters/descriptor tables, argument buffers, bind groups, but the frequency model is the same.) The bind-a-group-per-draw model bottlenecks with many materials; a bindless model declares one huge resource array, uploads handles once, and indexes it by an integer passed per draw. Collapsing thousands of binds into one. Inline constants carry tiny data (a transform index, a few floats) directly in the command stream with no binding update: the cheapest path for data that changes every draw.
 
 ## Techniques
 
@@ -45,11 +45,11 @@ for (material m : materials) {
 ## Gotchas
 
 - First use of an uncompiled pipeline compiles synchronously and hitches; build and warm the cache at load, and persist the driver cache blob across runs.
-- Changing any baked state (a blend mode, an attachment format) needs a different pipeline — there is no partial state change; plan the permutation set, see [references/shader-system.md](./shader-system.md).
+- Changing any baked state (a blend mode, an attachment format) needs a different pipeline. There is no partial state change; plan the permutation set, see [references/shader-system.md](./shader-system.md).
 - Bindless needs the API's descriptor-indexing/bindless capability and non-uniform indexing qualifiers in the shader; a divergent index without the qualifier is undefined.
-- Inline-constant space is small and shared across stages; overflowing the guaranteed minimum is not portable — keep it to indices and a few scalars.
-- Binding-group pool sizing is fixed at pool creation in some APIs; underestimating exhausts the pool mid-frame — size for the worst case or use a growable strategy.
-- A binding written while the GPU may still read it (without update-after-bind) is a data race — gate updates on the frame fence, see [references/synchronization.md](./synchronization.md).
+- Inline-constant space is small and shared across stages; overflowing the guaranteed minimum is not portable: keep it to indices and a few scalars.
+- Binding-group pool sizing is fixed at pool creation in some APIs; underestimating exhausts the pool mid-frame: size for the worst case or use a growable strategy.
+- A binding written while the GPU may still read it (without update-after-bind) is a data race: gate updates on the frame fence, see [references/synchronization.md](./synchronization.md).
 
 ## Related
 

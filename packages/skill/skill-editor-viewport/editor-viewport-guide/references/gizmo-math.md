@@ -2,7 +2,7 @@
 
 ### Guideline
 
-Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis — never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
+Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis, never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
 
 ### How to Apply
 
@@ -63,10 +63,10 @@ vec2_t gizmo_axis_intersection(vec3_t world_pos, vec3_t axis, vec2_t cursor_px,
 
 ### Gotchas
 
-- The 3D-mouse-ray approach (set cursor z to 0/1, intersect with the axis) is a skew-line distance minimization, not a projection; it drifts and sends the object backward at steep angles — project in 2D screen space instead.
+- The 3D-mouse-ray approach (set cursor z to 0/1, intersect with the axis) is a skew-line distance minimization, not a projection; it drifts and sends the object backward at steep angles: project in 2D screen space instead.
 - Applying the absolute projected parameter as the position snaps the object to the cursor on frame one; always subtract the drag-start parameter and apply only the delta.
 - The line-line denominator `1 - (u·v)^2` goes to zero as the axis nears parallel with the view ray; guard with `uv*uv > 1 - 1e-5f` and return a no-op.
-- The 2D projection divides by `u·u`; a near-zero-length screen-space axis (axis seen edge-on) makes it blow up — guard with `uu < 1e-5f`.
+- The 2D projection divides by `u·u`; a near-zero-length screen-space axis (axis seen edge-on) makes it blow up: guard with `uu < 1e-5f`.
 - Forgetting perspective divide (`x/=w, y/=w, z/=w`) when going to/from clip space puts the screen-space line in the wrong place and the projection silently drifts.
 - A handle that is not distance-scaled shrinks to sub-pixel at distance and becomes unclickable; scale geometry by camera distance for constant on-screen size.
 - Skipping the inverse-parent-rotation step in local mode applies a world delta to a local position and the object slides along the wrong axes under a rotated parent.

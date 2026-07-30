@@ -29,8 +29,8 @@ git -C ../<worktree>-feature-<name> config branch.<branch>.mergeBackTo <source-b
 
 ## Gotchas
 
-- The `<worktree>-feature-<name>` dir pattern is what merge/abandon/cleanup detect — non-conforming names break the workflow
+- The `<worktree>-feature-<name>` dir pattern is what merge/abandon/cleanup detect: non-conforming names break the workflow
 - `branch.<branch>.mergeBackTo` is a custom key this workflow sets and reads; Git ignores it and provides no built-in behavior
-- `mergeBackTo` is the only record of the source branch — without it `worktree-merge` can't find where to merge back
-- A branch can't be checked out in two worktrees at once — use a different source branch or move the existing worktree
+- `mergeBackTo` is the only record of the source branch, without it `worktree-merge` can't find where to merge back
+- A branch can't be checked out in two worktrees at once: use a different source branch or move the existing worktree
 - Creating the worktree does not start feature implementation or publish the branch

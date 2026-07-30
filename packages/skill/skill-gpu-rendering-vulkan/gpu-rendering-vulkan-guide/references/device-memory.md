@@ -6,7 +6,7 @@ Query `VkPhysicalDeviceMemoryProperties`, allocate a few large `VkDeviceMemory` 
 
 ## Rationale
 
-Vulkan exposes memory as types (each a heap + property-flag combination) you select explicitly; the driver does not place resources for you. `vkAllocateMemory` count is capped by `maxMemoryAllocationCount` (often ~4096) and each call is slow, so one allocation per resource fails at scale — sub-allocate from large blocks instead, the same arena/pool principle as memory-management-guide and the strategy described in gpu-rendering-guide (gpu-memory-strategy). `DEVICE_LOCAL` memory is the fast GPU path but usually lacks `HOST_VISIBLE`, so the CPU cannot write it directly; static data is therefore written into a `HOST_VISIBLE | HOST_COHERENT` staging buffer and copied on a queue into the device-local resource. Each `VkImage`/`VkBuffer` reports its own `VkMemoryRequirements` (size, alignment, allowed `memoryTypeBits`); placement must satisfy that alignment, and buffer↔image co-placement must respect `bufferImageGranularity`.
+Vulkan exposes memory as types (each a heap + property-flag combination) you select explicitly; the driver does not place resources for you. `vkAllocateMemory` count is capped by `maxMemoryAllocationCount` (often ~4096) and each call is slow, so one allocation per resource fails at scale: sub-allocate from large blocks instead, the same arena/pool principle as memory-management-guide and the strategy described in gpu-rendering-guide (gpu-memory-strategy). `DEVICE_LOCAL` memory is the fast GPU path but usually lacks `HOST_VISIBLE`, so the CPU cannot write it directly; static data is therefore written into a `HOST_VISIBLE | HOST_COHERENT` staging buffer and copied on a queue into the device-local resource. Each `VkImage`/`VkBuffer` reports its own `VkMemoryRequirements` (size, alignment, allowed `memoryTypeBits`); placement must satisfy that alignment, and buffer↔image co-placement must respect `bufferImageGranularity`.
 
 ## Techniques
 
@@ -48,11 +48,11 @@ vkCmdCopyBufferToImage(cmd, stage.buffer, image,
 
 ## Gotchas
 
-- `maxMemoryAllocationCount` is small; per-resource `vkAllocateMemory` works in a demo then fails in a real scene — sub-allocate from the start.
-- `DEVICE_LOCAL`-only memory has no host pointer; `vkMapMemory` on it fails — write through staging.
+- `maxMemoryAllocationCount` is small; per-resource `vkAllocateMemory` works in a demo then fails in a real scene: sub-allocate from the start.
+- `DEVICE_LOCAL`-only memory has no host pointer; `vkMapMemory` on it fails: write through staging.
 - Without `HOST_COHERENT`, a written-but-unflushed range is not visible to the GPU; coherent memory skips flush/invalidate but can be slower for the GPU to read.
 - Ignoring `req.alignment` or `bufferImageGranularity` produces a valid bind that corrupts neighboring resources on some hardware.
-- A staging buffer reused before its copy's fence signals overwrites in-flight upload data — recycle staging by frame fence, see [references/commands-and-swapchain.md](./commands-and-swapchain.md).
+- A staging buffer reused before its copy's fence signals overwrites in-flight upload data: recycle staging by frame fence, see [references/commands-and-swapchain.md](./commands-and-swapchain.md).
 
 ## Related
 

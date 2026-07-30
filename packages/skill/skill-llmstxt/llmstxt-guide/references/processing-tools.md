@@ -6,8 +6,8 @@
 
 Per the spec, two variants are produced:
 
-- **`llms-ctx.txt`** — expansion of `/llms.txt` **without** the `## Optional` URLs (shorter context)
-- **`llms-ctx-full.txt`** — expansion **with** the `## Optional` URLs (full context)
+- **`llms-ctx.txt`**: expansion of `/llms.txt` **without** the `## Optional` URLs (shorter context)
+- **`llms-ctx-full.txt`**: expansion **with** the `## Optional` URLs (full context)
 
 Both are single Markdown files containing:
 
@@ -29,7 +29,7 @@ llms_txt2ctx https://example.com/llms.txt > llms-ctx.txt
 llms_txt2ctx --optional https://example.com/llms.txt > llms-ctx-full.txt
 ```
 
-Exact CLI flags depend on the tool version — `--help` is authoritative.
+Exact CLI flags depend on the tool version: `--help` is authoritative.
 
 ## What the Tool Does
 
@@ -45,24 +45,24 @@ Exact CLI flags depend on the tool version — `--help` is authoritative.
 
 Some projects serve the expanded variants directly so callers don't have to run the tool:
 
-- `/llms.txt` — curated index (links)
-- `/llms-ctx.txt` — pre-expanded short variant
-- `/llms-ctx-full.txt` — pre-expanded full variant
-- `/llms-full.txt` — informal single-file dump (community convention, not spec)
+- `/llms.txt`: curated index (links)
+- `/llms-ctx.txt`: pre-expanded short variant
+- `/llms-ctx-full.txt`: pre-expanded full variant
+- `/llms-full.txt`: informal single-file dump (community convention, not spec)
 
-Pre-hosting is convenient when the docs change infrequently — generate on build, deploy alongside.
+Pre-hosting is convenient when the docs change infrequently: generate on build, deploy alongside.
 
 ## Distinction: `llms-ctx-full.txt` vs `llms-full.txt`
 
-- **`llms-ctx-full.txt`** — spec output of expanding `/llms.txt` + its linked mirrors (including Optional)
-- **`llms-full.txt`** — informal single-file dump of all docs; **not** part of the spec
+- **`llms-ctx-full.txt`**: spec output of expanding `/llms.txt` + its linked mirrors (including Optional)
+- **`llms-full.txt`**: informal single-file dump of all docs; **not** part of the spec
 
 Don't use the names interchangeably.
 
 ## Gotchas
 
-- A broken `.md` mirror surfaces as a missing section in `llms-ctx.txt` — verify all linked URLs `200 OK` before generating
-- Re-fetching every link on every build is slow for large doc sets — cache by `ETag` / `Last-Modified` and invalidate per file
-- The short variant (`llms-ctx.txt`) only differs from the full one by the `## Optional` section — if you didn't mark anything Optional, the two files are identical
-- Hosting only the expanded variants without the source `/llms.txt` loses the curated structure tooling expects to find — always serve `/llms.txt` itself
-- Re-naming `## Optional` to `## Extra` or similar means processors won't recognize it — the short variant will include those URLs anyway, breaking the short-context promise
+- A broken `.md` mirror surfaces as a missing section in `llms-ctx.txt`: verify all linked URLs `200 OK` before generating
+- Re-fetching every link on every build is slow for large doc sets: cache by `ETag` / `Last-Modified` and invalidate per file
+- The short variant (`llms-ctx.txt`) only differs from the full one by the `## Optional` section, if you didn't mark anything Optional, the two files are identical
+- Hosting only the expanded variants without the source `/llms.txt` loses the curated structure tooling expects to find, always serve `/llms.txt` itself
+- Re-naming `## Optional` to `## Extra` or similar means processors won't recognize it. The short variant will include those URLs anyway, breaking the short-context promise

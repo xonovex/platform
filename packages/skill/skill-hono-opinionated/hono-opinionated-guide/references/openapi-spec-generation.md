@@ -1,6 +1,6 @@
 # openapi-spec-generation: Generate the Spec with app.doc()
 
-Register the spec endpoint with `app.doc(path, metadata)` on an `OpenAPIHono` app — it builds `paths` from the registered routes. Never hand-maintain a static OpenAPI document or the `paths` object. Supply only the top-level metadata: `openapi` version, `info`, optional `servers`.
+Register the spec endpoint with `app.doc(path, metadata)` on an `OpenAPIHono` app: it builds `paths` from the registered routes. Never hand-maintain a static OpenAPI document or the `paths` object. Supply only the top-level metadata: `openapi` version, `info`, optional `servers`.
 
 ```typescript
 app.doc("/openapi.json", {

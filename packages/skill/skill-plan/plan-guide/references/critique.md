@@ -4,10 +4,10 @@ Review an inline plan or an exact provider-native plan reference without changin
 
 ## Lenses
 
-- **Red-team** — attack essential assumptions and unproven dependencies.
-- **Pre-mortem** — assume delivery failed and trace likely causes to planning choices.
-- **Falsify** — find concrete inputs, scales, sequences, environments, or recovery cases the plan misses.
-- **Steelman** — identify the smallest change that would strengthen a weak section.
+- **Red-team**: attack essential assumptions and unproven dependencies.
+- **Pre-mortem**: assume delivery failed and trace likely causes to planning choices.
+- **Falsify**: find concrete inputs, scales, sequences, environments, or recovery cases the plan misses.
+- **Steelman**: identify the smallest change that would strengthen a weak section.
 
 ## Core Workflow
 

@@ -1,10 +1,10 @@
 # Sources
 
-> The "application / class / method-level" smell grouping (as in the Wikipedia "Code smell" article) is editorial and weakly sourced — it is **not** used as a citation of record here. Smell membership follows the peer-reviewed design-problem taxonomy below; class-vs-method is cited only as a detection-granularity dimension.
+> The "application / class / method-level" smell grouping (as in the Wikipedia "Code smell" article) is editorial and weakly sourced. It is **not** used as a citation of record here. Smell membership follows the peer-reviewed design-problem taxonomy below; class-vs-method is cited only as a detection-granularity dimension.
 
 ## Code-smell taxonomy (design-problem families)
 
-- **Title:** Mäntylä, Vanhanen & Lassenius — "A Taxonomy and an Initial Empirical Study of Bad Smells in Code" (IEEE ICSM 2003; extended in Empirical Software Engineering 11(3), 2006), the five-family grouping (Bloaters / OO-Abusers / Change-Preventers / Dispensables / Couplers) over Fowler & Beck's "Refactoring" Ch. 3 "Bad Smells in Code"
+- **Title:** Mäntylä, Vanhanen & Lassenius, "A Taxonomy and an Initial Empirical Study of Bad Smells in Code" (IEEE ICSM 2003; extended in Empirical Software Engineering 11(3), 2006), the five-family grouping (Bloaters / OO-Abusers / Change-Preventers / Dispensables / Couplers) over Fowler & Beck's "Refactoring" Ch. 3 "Bad Smells in Code"
 - **URLs:**
   - https://mmantyla.github.io/BadCodeSmellsTaxonomy
   - https://martinfowler.com/books/refactoring.html
@@ -17,7 +17,7 @@
 
 ## Detection granularity (class vs method)
 
-- **Title:** Arcelli Fontana et al. — "Comparing and Experimenting Machine Learning Techniques for Code Smell Detection" (Empirical Software Engineering, 2016); Lanza & Marinescu — "Object-Oriented Metrics in Practice" (Springer, 2006) metric-based detection strategies
+- **Title:** Arcelli Fontana et al., "Comparing and Experimenting Machine Learning Techniques for Code Smell Detection" (Empirical Software Engineering, 2016); Lanza & Marinescu, "Object-Oriented Metrics in Practice" (Springer, 2006) metric-based detection strategies
 - **URLs:**
   - https://link.springer.com/article/10.1007/s10664-015-9378-4
   - https://link.springer.com/book/10.1007/3-540-39538-5
@@ -55,7 +55,7 @@
 
 ## Supplementary smells (outside the original catalog)
 
-- **Title:** Robert C. Martin — "Clean Code" Ch. 17 "Smells and Heuristics" (G5 Duplication, G25 Magic Numbers, F1 Too Many Arguments); Liskov & Wing — "A Behavioral Notion of Subtyping" (ACM TOPLAS, 1994), the Liskov Substitution Principle behind Refused Bequest and downcasting
+- **Title:** Robert C. Martin, "Clean Code" Ch. 17 "Smells and Heuristics" (G5 Duplication, G25 Magic Numbers, F1 Too Many Arguments); Liskov & Wing, "A Behavioral Notion of Subtyping" (ACM TOPLAS, 1994), the Liskov Substitution Principle behind Refused Bequest and downcasting
 - **URLs:**
   - https://www.oreilly.com/library/view/clean-code-a/9780136083238/chapter17.xhtml
   - https://dl.acm.org/doi/10.1145/197320.197383

@@ -18,7 +18,7 @@
     "split": "train"
   },
   {
-    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+    "query": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required, use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
     "rationale": "output-eval task also exercises this skill's routing boundary",
     "should_trigger": true,
     "split": "train"

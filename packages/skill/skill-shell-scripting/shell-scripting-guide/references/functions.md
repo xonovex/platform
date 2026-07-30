@@ -1,6 +1,6 @@
 # functions: Function Best Practices
 
-Declare every function-local variable `local` to avoid polluting global scope. `return` a status code (0 success, non-zero failure) — never `exit` from a helper. A predicate function is just its test: `is_file() { [ -f "$1" ]; }`.
+Declare every function-local variable `local` to avoid polluting global scope. `return` a status code (0 success, non-zero failure), never `exit` from a helper. A predicate function is just its test: `is_file() { [ -f "$1" ]; }`.
 
 ```sh
 process_file() {

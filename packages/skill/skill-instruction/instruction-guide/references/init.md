@@ -4,7 +4,7 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Core Workflow
 
-1. Verify no AGENTS.md exists (abort if present — use sync or simplify instead)
+1. Verify no AGENTS.md exists (abort if present: use sync or simplify instead)
 2. Scan structure, configs, code patterns, git history
 3. Generate AGENTS.md in standard format → preview or write → report
 
@@ -12,7 +12,7 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ### Configs
 
-`package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`, `go.mod`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml` — detect project type (TypeScript, Go, C, Python, Rust), extract build/test commands, entry points, exports
+`package.json`, `moon.yml`, `CMakeLists.txt`, `Dockerfile`, `go.mod`, `tsconfig.json`, `Cargo.toml`, `pyproject.toml`: detect project type (TypeScript, Go, C, Python, Rust), extract build/test commands, entry points, exports
 
 ### Structure
 
@@ -20,11 +20,11 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Output Format
 
-`# Title` (humanized dir name, e.g. `agent-operator-go` → `Agent Operator Go`) + flat bullet list — no `##` headings, no prose
+`# Title` (humanized dir name, e.g. `agent-operator-go` → `Agent Operator Go`) + flat bullet list, no `##` headings, no prose
 
-- Backtick-wrap commands/files/keys; `—` for descriptions, `→` for workflow chains
+- Backtick-wrap commands/files/keys; `:` for descriptions, `→` for workflow chains
 - Parenthetical file lists: `(main.tf, vars)`; dash-separated examples: `- local, staging`
-- Subdirectory bullets: `` `<dir>/` `` — description (key files) - examples
+- Subdirectory bullets, `` `<dir>/` ``: description (key files) - examples
 - **Include** ("anything you'd tell a new teammate"):
   - Build / test / lint commands (agents will **execute** these)
   - Setup instructions and dependencies
@@ -44,7 +44,7 @@ Generate a concise AGENTS.md for a directory by scanning its structure, config f
 
 ## Gotchas
 
-- A directory with only boilerplate code (no caveats, no non-obvious config) should NOT get an AGENTS.md — empty docs are worse than no docs
+- A directory with only boilerplate code (no caveats, no non-obvious config) should NOT get an AGENTS.md: empty docs are worse than no docs
 - Subdirectories that share a structure should use a `<name>/` placeholder pattern rather than enumerating every dir
-- Commands listed in AGENTS.md get **executed** by the agent — a stale `npm test` command wastes turns; verify before committing
-- If a subproject already has an AGENTS.md, init writes a nested one — closest-wins precedence makes it scope-specific, not a duplicate of the root
+- Commands listed in AGENTS.md get **executed** by the agent. A stale `npm test` command wastes turns; verify before committing
+- If a subproject already has an AGENTS.md, init writes a nested one: closest-wins precedence makes it scope-specific, not a duplicate of the root

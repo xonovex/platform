@@ -19,9 +19,9 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 
 ## Gotchas
 
-- `target_link_libraries` scope matters: PRIVATE = consumers don't see it, INTERFACE = no compile, PUBLIC = both — wrong scope leaks transitive deps
+- `target_link_libraries` scope matters: PRIVATE = consumers don't see it, INTERFACE = no compile, PUBLIC = both. Wrong scope leaks transitive deps
 - `find_package` may use PATHS or HINTS but ignores both if a config file is on a system path; use `<Pkg>_ROOT` env var to force-locate
-- Generator expressions (`$<CONFIG:Debug>`) only evaluate at build time — debugging by `message()` won't show their final values
+- Generator expressions (`$<CONFIG:Debug>`) only evaluate at build time: debugging by `message()` won't show their final values
 - `CMAKE_INSTALL_PREFIX` is captured at configure time; changing it after first config requires a clean reconfigure
 
 ## Progressive disclosure

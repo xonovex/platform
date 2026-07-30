@@ -1,6 +1,6 @@
 ---
 name: kiro-guide
-description: "Use when configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. Triggers on .kiro/hooks JSON, SessionStart, UserPromptSubmit, PreToolUse, PreTaskExec, file events, exit-code blocking, workspace roots, generated-hook review, hook testing, enable/disable, or Kiro onboarding — even when the user doesn't say 'Kiro hook'."
+description: "Use when configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. Triggers on .kiro/hooks JSON, SessionStart, UserPromptSubmit, PreToolUse, PreTaskExec, file events, exit-code blocking, workspace roots, generated-hook review, hook testing, enable/disable, or Kiro onboarding, even when the user doesn't say 'Kiro hook'."
 ---
 
 # Kiro Hooks

@@ -96,7 +96,7 @@
     "split": "validation"
   },
   {
-    "query": "fix the failing assertion in user.spec.ts \u2014 it expects 200 but we return 204",
+    "query": "fix the failing assertion in user.spec.ts: it expects 200 but we return 204",
     "rationale": "fixing a failing Vitest assertion",
     "should_trigger": true,
     "split": "validation"

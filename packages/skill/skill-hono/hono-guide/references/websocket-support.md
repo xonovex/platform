@@ -1,6 +1,6 @@
 # websocket-support: WebSocket Server Setup
 
-`createNodeWebSocket({app})` from `@hono/node-ws` returns methods that depend on `this`. Keep the whole object and call `wsHelpers.injectWebSocket(server)` on it — destructuring `injectWebSocket` loses the binding. The `upgradeWebSocket` factory is safe to destructure.
+`createNodeWebSocket({app})` from `@hono/node-ws` returns methods that depend on `this`. Keep the whole object and call `wsHelpers.injectWebSocket(server)` on it: destructuring `injectWebSocket` loses the binding. The `upgradeWebSocket` factory is safe to destructure.
 
 ```typescript
 import {serve} from "@hono/node-server";

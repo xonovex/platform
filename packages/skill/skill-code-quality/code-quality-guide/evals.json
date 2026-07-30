@@ -28,7 +28,7 @@
     },
     {
       "id": 4,
-      "prompt": "Run a code-smell audit over this module and summarize what you find. Don't change anything yet — I just want to know what's there.\n\n```ts\nexport function parseA(s: string) { /* ~10 lines */ }\nexport function parseB(s: string) { /* near-identical to parseA */ }\nfunction legacyNormalize(s: string) { /* defined, never referenced */ }\nclass ReportManager {\n  // 26 methods spanning formatting, persistence, email, and metrics\n}\n```",
+      "prompt": "Run a code-smell audit over this module and summarize what you find. Don't change anything yet. I just want to know what's there.\n\n```ts\nexport function parseA(s: string) { /* ~10 lines */ }\nexport function parseB(s: string) { /* near-identical to parseA */ }\nfunction legacyNormalize(s: string) { /* defined, never referenced */ }\nclass ReportManager {\n  // 26 methods spanning formatting, persistence, email, and metrics\n}\n```",
       "assertions": [
         "Reports findings without producing a rewritten/fixed version of the module (stays read-only)",
         "Groups or labels each finding by a severity level (e.g. high/medium/low) and/or a category, rather than a flat unranked list"

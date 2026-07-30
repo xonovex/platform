@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Treat data movement through the cache hierarchy — not arithmetic — as the dominant cost, and lay out data so the bytes you touch arrive together in cache lines.
+Treat data movement through the cache hierarchy, not arithmetic, as the dominant cost, and lay out data so the bytes you touch arrive together in cache lines.
 
 ## Rationale
 
@@ -30,7 +30,7 @@ CPU compute throughput has grown far faster than memory latency (the "memory wal
 1. Estimate bytes-touched-per-line for your hot loop; if you read 8 of 64 bytes per record, ~87% of memory traffic is wasted.
 2. Shrink records and split cold fields so more useful elements fit per line and the working set drops a cache level.
 3. Make access linear so the hardware prefetcher hides compulsory-miss latency.
-4. Confirm with a profiler — cache-miss counts, not instruction counts.
+4. Confirm with a profiler: cache-miss counts, not instruction counts.
 
 ## Example
 

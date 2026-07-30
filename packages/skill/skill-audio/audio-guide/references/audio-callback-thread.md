@@ -6,7 +6,7 @@ Treat the OS audio callback (or the dedicated render thread that feeds it) as a 
 
 ## Rationale
 
-The device drains its buffer at a constant rate; if the next block isn't ready it replays stale samples or silence, and an audio underrun is immediately and harshly audible — far worse than a dropped render frame. The callback runs on a high-priority thread scheduled just ahead of the device, so any unbounded operation can stall it past the deadline.
+The device drains its buffer at a constant rate; if the next block isn't ready it replays stale samples or silence, and an audio underrun is immediately and harshly audible: far worse than a dropped render frame. The callback runs on a high-priority thread scheduled just ahead of the device, so any unbounded operation can stall it past the deadline.
 
 ## How to Apply
 

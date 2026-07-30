@@ -1,98 +1,98 @@
 [
   {
-    "query": "{realistic should-trigger prompt — names the technology directly}",
+    "query": "{realistic should-trigger prompt: names the technology directly}",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct mention"
   },
   {
-    "query": "{realistic should-trigger prompt — describes the task without naming the technology}",
+    "query": "{realistic should-trigger prompt: describes the task without naming the technology}",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit trigger"
   },
   {
-    "query": "{realistic should-trigger prompt — includes a file path or context cue}",
+    "query": "{realistic should-trigger prompt: includes a file path or context cue}",
     "should_trigger": true,
     "split": "train",
     "rationale": "context-based trigger"
   },
   {
-    "query": "{realistic should-trigger prompt — uses casual phrasing or a typo}",
+    "query": "{realistic should-trigger prompt: uses casual phrasing or a typo}",
     "should_trigger": true,
     "split": "train",
     "rationale": "casual phrasing"
   },
   {
-    "query": "{realistic should-trigger prompt — buries this work in a multi-step task}",
+    "query": "{realistic should-trigger prompt: buries this work in a multi-step task}",
     "should_trigger": true,
     "split": "train",
     "rationale": "buried in larger task"
   },
   {
-    "query": "{realistic should-trigger prompt — validation phrasing names the technology}",
+    "query": "{realistic should-trigger prompt: validation phrasing names the technology}",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — explicit"
+    "rationale": "validation positive: explicit"
   },
   {
-    "query": "{realistic should-trigger prompt — validation phrasing implies the technology}",
+    "query": "{realistic should-trigger prompt: validation phrasing implies the technology}",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — implicit"
+    "rationale": "validation positive: implicit"
   },
   {
-    "query": "{realistic should-trigger prompt — validation phrasing covers an edge case}",
+    "query": "{realistic should-trigger prompt: validation phrasing covers an edge case}",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — edge case"
+    "rationale": "validation positive: edge case"
   },
   {
-    "query": "{near-miss prompt — shares keywords but belongs to a different skill}",
+    "query": "{near-miss prompt: shares keywords but belongs to a different skill}",
     "should_trigger": false,
     "split": "train",
     "rationale": "keyword overlap, different intent"
   },
   {
-    "query": "{near-miss prompt — uses an adjacent technology instead}",
+    "query": "{near-miss prompt: uses an adjacent technology instead}",
     "should_trigger": false,
     "split": "train",
     "rationale": "adjacent technology"
   },
   {
-    "query": "{near-miss prompt — uses related terminology in another context}",
+    "query": "{near-miss prompt: uses related terminology in another context}",
     "should_trigger": false,
     "split": "train",
     "rationale": "terminology overlap"
   },
   {
-    "query": "{near-miss prompt — asks only for a general concept owned elsewhere}",
+    "query": "{near-miss prompt: asks only for a general concept owned elsewhere}",
     "should_trigger": false,
     "split": "train",
     "rationale": "general concept, different owner"
   },
   {
-    "query": "{near-miss prompt — names the technology but requests an unrelated operation}",
+    "query": "{near-miss prompt: names the technology but requests an unrelated operation}",
     "should_trigger": false,
     "split": "train",
     "rationale": "technology mention, different intent"
   },
   {
-    "query": "{near-miss prompt — validation phrasing points to the closest sibling skill}",
+    "query": "{near-miss prompt: validation phrasing points to the closest sibling skill}",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — sibling owner"
+    "rationale": "validation negative: sibling owner"
   },
   {
-    "query": "{near-miss prompt — validation phrasing overlaps terminology only}",
+    "query": "{near-miss prompt: validation phrasing overlaps terminology only}",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — terminology overlap"
+    "rationale": "validation negative: terminology overlap"
   },
   {
-    "query": "{near-miss prompt — validation phrasing requests a different deliverable}",
+    "query": "{near-miss prompt: validation phrasing requests a different deliverable}",
     "should_trigger": false,
     "split": "validation",
-    "rationale": "validation negative — different deliverable"
+    "rationale": "validation negative: different deliverable"
   }
 ]

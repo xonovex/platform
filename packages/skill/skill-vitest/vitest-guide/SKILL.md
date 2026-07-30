@@ -5,7 +5,7 @@ description: "Use when writing or editing Vitest 3+ tests in TypeScript. Trigger
 
 # Vitest Testing Guidelines
 
-For framework-independent test design — Arrange-Act-Assert, FIRST, and choosing/naming test doubles — see **testing-guide**; this guide covers only Vitest-specific mechanics.
+For framework-independent test design: Arrange-Act-Assert, FIRST, and choosing/naming test doubles, see **testing-guide**; this guide covers only Vitest-specific mechanics.
 
 ## Requirements
 
@@ -21,9 +21,9 @@ For framework-independent test design — Arrange-Act-Assert, FIRST, and choosin
 
 ## Gotchas
 
-- Vitest transforms (`vite-node`) differ from Jest — `__dirname`/`__filename` work in CommonJS but not ESM tests without polyfills
-- `vi.spyOn` returns the spy; `vi.fn` creates a new mock — confusing them passes type checks but breaks call-tracking assertions
-- `expect.assertions(n)` in async tests catches missed awaits — without it, a forgotten `await` lets the test pass spuriously
+- Vitest transforms (`vite-node`) differ from Jest: `__dirname`/`__filename` work in CommonJS but not ESM tests without polyfills
+- `vi.spyOn` returns the spy; `vi.fn` creates a new mock: confusing them passes type checks but breaks call-tracking assertions
+- `expect.assertions(n)` in async tests catches missed awaits, without it, a forgotten `await` lets the test pass spuriously
 - Watch mode caches module graphs; changing `vitest.config.ts` requires a full restart to pick up new transforms
 
 ## Progressive disclosure

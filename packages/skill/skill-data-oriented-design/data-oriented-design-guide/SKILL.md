@@ -28,14 +28,14 @@ description: "Use when designing or refactoring performance-critical data layout
 ## Memory
 
 - **Handles, not pointers** - Reference by index/handle into relocatable, stable arrays (swap-remove, free lists, indirection tables), see [references/handles-and-indices.md](references/handles-and-indices.md)
-- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general — see **memory-management-guide**
+- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general, see **memory-management-guide**
 
 ## Gotchas
 
-- SoA only wins when loops touch a subset of fields; full-record access can favor AoS — measure both.
+- SoA only wins when loops touch a subset of fields; full-record access can favor AoS: measure both.
 - The hardware prefetcher tracks linear strides; randomizing your index order silently disables it.
-- Padding for alignment trades memory for throughput — on cache-bound loads, the smaller packed layout can still win.
-- A counter you cache as a raw pointer dangles if its backing array reallocates — hand out indices into a stable block, or pointers into a non-relocating pool.
+- Padding for alignment trades memory for throughput, on cache-bound loads, the smaller packed layout can still win.
+- A counter you cache as a raw pointer dangles if its backing array reallocates: hand out indices into a stable block, or pointers into a non-relocating pool.
 
 ## Progressive Disclosure
 

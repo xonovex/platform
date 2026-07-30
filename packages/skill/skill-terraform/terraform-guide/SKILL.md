@@ -18,10 +18,10 @@ description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on 
 
 ## Gotchas
 
-- State file (`terraform.tfstate`) contains secrets in plaintext — store it remotely with encryption and backend-native locking (S3 `use_lockfile = true`; Azure Blob lease locking)
-- `lifecycle { prevent_destroy = true }` blocks `terraform destroy` for that resource — useful for prod, painful in CI/test envs
-- `terraform refresh` updates state from real infra but doesn't show what changed — use `terraform plan -refresh-only` to preview drift
-- Provider version pinning lives in `required_providers`, not the resource block — unpinned providers break on minor upgrades
+- State file (`terraform.tfstate`) contains secrets in plaintext: store it remotely with encryption and backend-native locking (S3 `use_lockfile = true`; Azure Blob lease locking)
+- `lifecycle { prevent_destroy = true }` blocks `terraform destroy` for that resource: useful for prod, painful in CI/test envs
+- `terraform refresh` updates state from real infra but doesn't show what changed: use `terraform plan -refresh-only` to preview drift
+- Provider version pinning lives in `required_providers`, not the resource block: unpinned providers break on minor upgrades
 
 ## Progressive disclosure
 

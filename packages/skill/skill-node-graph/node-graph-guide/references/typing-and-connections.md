@@ -42,7 +42,7 @@ void resolve_pins(node_t *n, const graph_t *g) {
 ## Gotchas
 
 - A variant pin left unresolved (nothing wired yet) has no concrete type; a downstream type check against it must report "unresolved", not "compatible".
-- Silent coercion between CPU and GPU payloads hides an upload or a readback — costs that dominate a frame; force an explicit conversion node.
+- Silent coercion between CPU and GPU payloads hides an upload or a readback: costs that dominate a frame; force an explicit conversion node.
 - A conversion node is still a node with a validity hash; an upload/readback is cacheable, so do not re-run it when its input is unchanged (see evaluation-and-compilation.md).
 - Without a central registry of "blessed" types, hand-added input/output types drift and two graphs disagree on what a type means; register types as data.
 

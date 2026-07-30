@@ -20,9 +20,9 @@ description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. T
 
 ## Gotchas
 
-- `ANALYZE` updates planner statistics — bulk inserts without re-analyzing produce stale plans and full scans
-- `JSONB` supports indexing (GIN); `JSON` doesn't — pick JSONB unless you specifically need preserved formatting
-- Most DDL participates in transactions, but commands such as `CREATE INDEX CONCURRENTLY` cannot run inside a transaction block — check every migration operation before wrapping the whole file
+- `ANALYZE` updates planner statistics: bulk inserts without re-analyzing produce stale plans and full scans
+- `JSONB` supports indexing (GIN); `JSON` doesn't: pick JSONB unless you specifically need preserved formatting
+- Most DDL participates in transactions, but commands such as `CREATE INDEX CONCURRENTLY` cannot run inside a transaction block: check every migration operation before wrapping the whole file
 - Prefer SQL-standard `GENERATED ... AS IDENTITY` for new auto-generated keys because its sequence relationship and override rules are declared on the column; `SERIAL`/`BIGSERIAL` remain supported PostgreSQL shorthand, not deprecated syntax
 
 ## Progressive disclosure

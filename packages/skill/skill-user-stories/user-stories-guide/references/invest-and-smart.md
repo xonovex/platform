@@ -1,15 +1,15 @@
 # user-stories: INVEST Stories and SMART Tasks
 
-INVEST checks one story; SMART checks the tasks a ready story is broken into. A story that fails an INVEST letter is a signal to negotiate, split, or clarify — not to ship.
+INVEST checks one story; SMART checks the tasks a ready story is broken into. A story that fails an INVEST letter is a signal to negotiate, split, or clarify, not to ship.
 
 ## INVEST (the story)
 
-- **I — Independent** — minimize and manage dependencies, or schedule around them. This is scheduling independence, not coupling theory (owned by **connascence-guide**).
-- **N — Negotiable** — not a fixed contract; details co-created in conversation.
-- **V — Valuable** — value the customer can see (not "add a payments table").
-- **E — Estimable** — understood well enough to size and rank.
-- **S — Small** — a few days up to ~two weeks, finishable within a sprint.
-- **T — Testable** — a test can confirm it is done.
+- **I: Independent**: minimize and manage dependencies, or schedule around them. This is scheduling independence, not coupling theory (owned by **connascence-guide**).
+- **N: Negotiable**, not a fixed contract; details co-created in conversation.
+- **V: Valuable**: value the customer can see (not "add a payments table").
+- **E: Estimable**: understood well enough to size and rank.
+- **S: Small**: a few days up to ~two weeks, finishable within a sprint.
+- **T: Testable**: a test can confirm it is done.
 
 Fails **Small** or **Estimable** → split (see [splitting-spidr.md](splitting-spidr.md), [splitting-flowchart.md](splitting-flowchart.md)).
 
@@ -22,7 +22,7 @@ INVEST governs the story (customer value); SMART governs its tasks (engineering 
 ## Example
 
 ```
-BAD  (fails Independent, Valuable, Small — a horizontal component):
+BAD  (fails Independent, Valuable, Small: a horizontal component):
   As a developer, I want to build the payments database schema
     so that we can store charges later.
 GOOD (passes INVEST):
@@ -32,5 +32,5 @@ GOOD (passes INVEST):
 
 ## Cross-references
 
-- The 3 Cs view of the same story — [three-cs.md](three-cs.md).
-- Coupling theory behind **Independent** — **connascence-guide**.
+- The 3 Cs view of the same story: [three-cs.md](three-cs.md).
+- Coupling theory behind **Independent**: **connascence-guide**.

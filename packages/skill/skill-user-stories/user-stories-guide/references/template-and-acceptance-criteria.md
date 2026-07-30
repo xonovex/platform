@@ -4,17 +4,17 @@
 As a [type of user], I want [goal / capability], so that [reason / business value].
 ```
 
-- **As a** — the user role (a person, not a system component).
-- **I want** — **what** the user needs, expressed as a capability, not an implementation (no screens/tables/endpoints).
-- **so that** — the **why**: motivation and business value. Most often dropped, and the part that lets you challenge, reprioritize, or drop the story.
+- **As a**: the user role (a person, not a system component).
+- **I want**: **what** the user needs, expressed as a capability, not an implementation (no screens/tables/endpoints).
+- **so that**: the **why**: motivation and business value. Most often dropped, and the part that lets you challenge, reprioritize, or drop the story.
 
-The template forces What and Why while keeping How open — exactly what makes a story **Negotiable**. A story whose "I want" names a mechanism ("I want a Redis cache") has smuggled the How into the What. The template is a **conversation starter, not a mandatory format**: no method prescribes a fixed story format, and a one-line note can be a fine story when context is shared.
+The template forces What and Why while keeping How open: exactly what makes a story **Negotiable**. A story whose "I want" names a mechanism ("I want a Redis cache") has smuggled the How into the What. The template is a **conversation starter, not a mandatory format**: no method prescribes a fixed story format, and a one-line note can be a fine story when context is shared.
 
 ## Acceptance criteria
 
 The Confirmation from the 3 Cs (see [three-cs.md](three-cs.md)) written down.
 
-Criteria CAN be expressed as Given-When-Then (owned by **bdd-guide**); designing the tests themselves — levels, doubles, structure — is owned by **testing-guide**. This skill stops at "criteria exist".
+Criteria CAN be expressed as Given-When-Then (owned by **bdd-guide**); designing the tests themselves: levels, doubles, structure: is owned by **testing-guide**. This skill stops at "criteria exist".
 
 ## Example
 
@@ -31,5 +31,5 @@ Acceptance criteria:
 
 ## Cross-references
 
-- The Card and Confirmation the template and criteria realize — [three-cs.md](three-cs.md).
-- Given-When-Then for automation — **bdd-guide**; test design behind the criteria — **testing-guide**.
+- The Card and Confirmation the template and criteria realize: [three-cs.md](three-cs.md).
+- Given-When-Then for automation: **bdd-guide**; test design behind the criteria, **testing-guide**.

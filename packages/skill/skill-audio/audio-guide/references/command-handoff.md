@@ -13,7 +13,7 @@ Voice-state ownership stays entirely on the audio thread; commands are self-cont
 1. Define a small tagged-union command type carrying everything the audio thread needs to act without dereferencing game-side memory (voice handle, target gain matrix, pitch, source pointer into a preallocated/immutable asset).
 2. Use an SPSC ring sized for the worst-case burst of commands per block; the game thread pushes, the audio thread pops. (See lock-free-guide for the ring, indices, and memory ordering.)
 3. At the start of each render block, drain all pending commands and apply them to the voice pool, then mix. Never apply commands mid-mix.
-4. If the queue is full, drop or coalesce on the producer side (e.g. keep only the latest set-gain for a voice) rather than blocking — blocking the game thread is acceptable, blocking the audio thread never is, and an unbounded queue reintroduces allocation.
+4. If the queue is full, drop or coalesce on the producer side (e.g. keep only the latest set-gain for a voice) rather than blocking: blocking the game thread is acceptable, blocking the audio thread never is, and an unbounded queue reintroduces allocation.
 5. For data too large to copy into a command (a decoded clip, a long buffer), pass a pointer to immutable, preallocated memory that outlives the voice; the audio thread reads it but never frees it.
 
 ## Example
@@ -50,9 +50,9 @@ static void apply_commands(voice_pool_t *pool, spsc_ring_t *cmds) {
 ## Gotchas
 
 - Commands must be value-complete; a command that points at game-thread-mutable state reintroduces the data race the queue was meant to remove.
-- A full queue must not block the consumer (audio thread); decide the producer-side policy up front (drop, coalesce, or grow a preallocated bound) — never `malloc` a bigger queue from either thread.
+- A full queue must not block the consumer (audio thread); decide the producer-side policy up front (drop, coalesce, or grow a preallocated bound), never `malloc` a bigger queue from either thread.
 - Applying commands mid-block makes a voice's parameters change partway through the samples, smearing the ramp; drain to a clean point, then mix.
-- A "set parameter" command should set the ramp target, not the live value — applying it as an instant change clicks (see mixing-and-buffers).
+- A "set parameter" command should set the ramp target, not the live value: applying it as an instant change clicks (see mixing-and-buffers).
 - This is strictly one producer and one consumer; if multiple game threads can post audio commands, you need an MPSC queue, not SPSC (see lock-free-guide), or funnel them through one thread first.
 - A stale voice handle (the slot was recycled) must be detected by generation and ignored; otherwise a late set-gain hits an unrelated new sound.
 

@@ -1,6 +1,6 @@
 # docker-multistage: Moon Docker Scaffold Pattern
 
-Use `moon docker scaffold <project>` in a skeleton stage, then `moon docker prune` after the build. Scaffold output lands in `.moon/docker/workspace` (config/manifests) and `.moon/docker/sources` (source files) — copy `workspace` before `npm ci`, `sources` after, so dependency layers cache independently of source changes.
+Use `moon docker scaffold <project>` in a skeleton stage, then `moon docker prune` after the build. Scaffold output lands in `.moon/docker/workspace` (config/manifests) and `.moon/docker/sources` (source files): copy `workspace` before `npm ci`, `sources` after, so dependency layers cache independently of source changes.
 
 ```dockerfile
 FROM base AS skeleton

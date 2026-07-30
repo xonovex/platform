@@ -26,11 +26,11 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 
 ## Gotchas
 
-- Structural typing means `{ a: string }` accepts `{ a: string, b: number }` silently — explicit `satisfies` is the way to catch unintended extras
-- `as` casts bypass the type system without check — prefer narrowing functions (type predicates) over casts
-- `type` vs `interface`: interfaces merge across declarations, types don't — `declare global { interface Window { … } }` works, `type Window = …` doesn't
-- `unknown` is the safer `any` — but it doesn't propagate; narrowing once doesn't carry across assignments
-- Module resolution depends on `tsconfig` `moduleResolution` (`bundler` vs `node16` vs `nodenext`) — wrong choice silently breaks deep imports
+- Structural typing means `{ a: string }` accepts `{ a: string, b: number }` silently: explicit `satisfies` is the way to catch unintended extras
+- `as` casts bypass the type system without check: prefer narrowing functions (type predicates) over casts
+- `type` vs `interface`: interfaces merge across declarations, types don't. `declare global { interface Window { ... } }` works, `type Window = ...` doesn't
+- `unknown` is the safer `any`, but it doesn't propagate; narrowing once doesn't carry across assignments
+- Module resolution depends on `tsconfig` `moduleResolution` (`bundler` vs `node16` vs `nodenext`): wrong choice silently breaks deep imports
 
 ## Progressive disclosure
 

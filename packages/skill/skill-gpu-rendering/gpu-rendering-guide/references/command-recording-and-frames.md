@@ -6,7 +6,7 @@ Record GPU work into command streams allocated from a context owned by one threa
 
 ## Rationale
 
-Command-recording memory is not thread-safe and cannot be freed per-stream cheaply; the efficient model is one recording context per thread per frame slot, recording into it, submitting, then resetting the whole context in O(1) once the GPU is done — enforced by a per-slot fence the submission signals on completion, waited before the CPU reuses that slot's context, command memory, bindings, and ring-buffer ranges. Keep a small number of frame slots in flight: the CPU records slot i while the GPU executes slot i-1. Recording is the parallelizable part of a frame — split passes across threads, each writing a secondary stream with its own context, then have one primary stream execute them in order. The swapchain ties it together: acquire an image (waiting a queue-side signal), render, present (waiting render-done), and gate the slot's next reuse on its fence.
+Command-recording memory is not thread-safe and cannot be freed per-stream cheaply; the efficient model is one recording context per thread per frame slot, recording into it, submitting, then resetting the whole context in O(1) once the GPU is done: enforced by a per-slot fence the submission signals on completion, waited before the CPU reuses that slot's context, command memory, bindings, and ring-buffer ranges. Keep a small number of frame slots in flight: the CPU records slot i while the GPU executes slot i-1. Recording is the parallelizable part of a frame: split passes across threads, each writing a secondary stream with its own context, then have one primary stream execute them in order. The swapchain ties it together: acquire an image (waiting a queue-side signal), render, present (waiting render-done), and gate the slot's next reuse on its fence.
 
 ## Techniques
 
@@ -50,8 +50,8 @@ void draw_frame(uint64_t frame) {
 
 ## Gotchas
 
-- Recording into (or resetting) a context whose previous submission's fence has not signaled corrupts in-flight GPU work — always gate reuse on the slot fence.
-- Sharing one recording context across threads is a data race; contexts are externally synchronized — one context per thread.
+- Recording into (or resetting) a context whose previous submission's fence has not signaled corrupts in-flight GPU work, always gate reuse on the slot fence.
+- Sharing one recording context across threads is a data race; contexts are externally synchronized. One context per thread.
 - The swapchain can return out-of-date/suboptimal on resize; recreate the swapchain and dependent targets, do not present into a stale image.
 - Without a sort key, GPU order _is_ the order commands were recorded, so multi-threaded recording forces threads to coordinate their relative ordering; a per-command key lets each thread record obliviously and the order is sorted out after the join.
 

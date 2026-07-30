@@ -37,10 +37,10 @@ allocator principle behind device memory see memory-management-guide.
 ## Gotchas
 
 - `vkAllocateMemory` is hard-capped (`maxMemoryAllocationCount`, often ~4096) and slow; sub-allocate from a few large blocks. The architecture rationale is in gpu-rendering-guide.
-- A `VkImageMemoryBarrier2` that omits the layout transition, or uses `oldLayout` that does not match the image's current layout, is undefined behavior — track current layout per image/subresource.
-- A `VkDescriptorSet` updated while the GPU may still read it (without `UPDATE_AFTER_BIND`) is a data race — gate on the frame `VkFence`.
+- A `VkImageMemoryBarrier2` that omits the layout transition, or uses `oldLayout` that does not match the image's current layout, is undefined behavior: track current layout per image/subresource.
+- A `VkDescriptorSet` updated while the GPU may still read it (without `UPDATE_AFTER_BIND`) is a data race: gate on the frame `VkFence`.
 - Binding a `VkPipeline` whose dynamic state you forgot to set (e.g. `vkCmdSetViewport`) draws nothing or validation-errors; declare every dynamic state you rely on.
-- Ignoring `VK_ERROR_OUT_OF_DATE_KHR`/`VK_SUBOPTIMAL_KHR` from acquire/present leaves a stale swapchain after resize — recreate it.
+- Ignoring `VK_ERROR_OUT_OF_DATE_KHR`/`VK_SUBOPTIMAL_KHR` from acquire/present leaves a stale swapchain after resize: recreate it.
 
 ## Progressive Disclosure
 

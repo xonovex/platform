@@ -6,7 +6,7 @@ Represent every piece of tool/editor state as a typed object whose shape is desc
 
 ## Rationale
 
-A central model must notify/undo/serialize/copy/diff generically over every object without knowing each type at compile time. Ordinary C structs force hand-written per-struct code that breaks when a field is added; data-driven types let one generic engine handle all types and let new types/properties be added at runtime (from a file or plugin) without recompiling. Cost: one indirection per property access — negligible at editor rates.
+A central model must notify/undo/serialize/copy/diff generically over every object without knowing each type at compile time. Ordinary C structs force hand-written per-struct code that breaks when a field is added; data-driven types let one generic engine handle all types and let new types/properties be added at runtime (from a file or plugin) without recompiling. Cost: one indirection per property access: negligible at editor rates.
 
 ## Techniques
 
@@ -58,7 +58,7 @@ typedef struct { float x, y; char *name; } node_t; // not data-driven
 
 ## Gotchas
 
-- A generic value store costs an indirection per access — fine for editor edits, wrong for per-frame simulation iteration (that wants tight typed arrays instead).
+- A generic value store costs an indirection per access: fine for editor edits, wrong for per-frame simulation iteration (that wants tight typed arrays instead).
 - Property indices must stay stable for the lifetime of a session; renaming or reordering properties without a migration map invalidates instance data.
 - Defaults are part of the schema: changing a default silently changes the meaning of every unset instance unless presence is tracked.
 

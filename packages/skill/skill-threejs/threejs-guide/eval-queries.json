@@ -48,7 +48,7 @@
     "split": "validation"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "query": "make this client component server-rendered if possible. It's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
@@ -66,13 +66,13 @@
     "split": "train"
   },
   {
-    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none. How should we figure out what's under the cursor",
     "rationale": "near miss owned by editor-viewport-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker: split it",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"

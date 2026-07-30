@@ -21,13 +21,13 @@ Code summaries include:
 
 ### Unique (keep)
 
-caveats, gotchas, non-obvious constraints, style rules, or architectural decisions not inferable from reading the code — things an agent would miss even after reading `package.json`, `moon.yml`, and source files
+caveats, gotchas, non-obvious constraints, style rules, or architectural decisions not inferable from reading the code: things an agent would miss even after reading `package.json`, `moon.yml`, and source files
 
 ## Standardization
 
 ### Format
 
-`# Title` (humanized dir name) + flat bullet list — no `##` headings, no prose paragraphs
+`# Title` (humanized dir name) + flat bullet list, no `##` headings, no prose paragraphs
 
 - Convert prose → bullet points; remove redundant descriptions and predictable guideline links
 - Remove bullets that summarize code (an agent can read the code itself)
@@ -44,4 +44,4 @@ caveats, gotchas, non-obvious constraints, style rules, or architectural decisio
 ## Gotchas
 
 - A 100-line AGENTS.md that only restates code is _more_ redundant than a 5-line one with a real gotcha
-- Don't merge AGENTS.md files across distant subdirs — colocate signal with the code it applies to
+- Don't merge AGENTS.md files across distant subdirs: colocate signal with the code it applies to

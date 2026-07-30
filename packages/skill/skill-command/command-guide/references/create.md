@@ -13,15 +13,15 @@ to one owning skill.
 
 ## Arguments
 
-- `description` (required) — what the caller wants the command to accomplish.
-- `--name` (optional) — kebab-case command name.
-- `--owner-skill` (optional) — exact guide that owns the procedure.
-- `--owner-plugin` (optional) — distribution plugin for the owner skill when the
+- `description` (required). What the caller wants the command to accomplish.
+- `--name` (optional): kebab-case command name.
+- `--owner-skill` (optional): exact guide that owns the procedure.
+- `--owner-plugin` (optional): distribution plugin for the owner skill when the
   harness supports declared command dependencies.
-- `--operation` (optional) — operation/reference name within the owner skill.
-- `--interactive` (optional) — ask about arguments and delegation choices.
-- `--dry-run` (optional) — print every proposed artifact without writing.
-- `--force` (optional) — replace one exact existing command only after preview.
+- `--operation` (optional): operation/reference name within the owner skill.
+- `--interactive` (optional): ask about arguments and delegation choices.
+- `--dry-run` (optional): print every proposed artifact without writing.
+- `--force` (optional): replace one exact existing command only after preview.
 
 ## Core workflow
 

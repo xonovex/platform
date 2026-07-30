@@ -16,7 +16,7 @@ Exit codes:
     1 = FAIL (one or more errors, or warnings under --strict)
     2 = usage error / file not found
 
-Read-only — never modifies files.
+Read-only, never modifies files.
 """
 
 from __future__ import annotations
@@ -167,17 +167,17 @@ def check_loader_quoting(fm_raw: str, report: Report) -> None:
             continue
         rest = m.group("rest")
         if len(rest) < 2 or rest[0] not in ("'", '"'):
-            continue  # unquoted or block scalar — the loader handles it
+            continue  # unquoted or block scalar: the loader handles it
         quote = rest[0]
         if not rest.endswith(quote):
-            continue  # multiline / unterminated on this line — cannot judge naively
+            continue  # multiline / unterminated on this line: cannot judge naively
         key = raw_line.split(":", 1)[0].strip()
         if quote == "'" and "''" in rest:
             report.add_fail(
                 f"frontmatter: '{key}' uses single-quote '' escaping, which the skill "
                 "loader's parser does not support (it reads the tail as an unknown "
                 "attribute). Use a double-quoted scalar with literal apostrophes, e.g. "
-                "\"… doesn't say 'TDD'.\""
+                "\"... doesn't say 'TDD'.\""
             )
             flagged = True
         elif rest.count(quote) != 2:
@@ -266,28 +266,28 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
             report.add_pass(f"description: {desc_len} chars (under 1024)")
 
         if re.match(r"^\s*use (this skill )?when", desc, re.IGNORECASE):
-            report.add_pass("description: imperative phrasing ('Use when…')")
+            report.add_pass("description: imperative phrasing ('Use when...')")
         else:
             report.add_warn(
-                "description: does not start with 'Use when…' / 'Use this skill when…' — "
+                "description: does not start with 'Use when...' / 'Use this skill when...', "
                 "agents may not trigger reliably"
             )
 
         if re.search(r"triggers? on", desc, re.IGNORECASE):
-            report.add_pass("description: includes trigger contexts ('Triggers on…')")
+            report.add_pass("description: includes trigger contexts ('Triggers on...')")
         else:
             report.add_warn(
-                "description: missing 'Triggers on…' — agents lose the trigger keyword list"
+                "description: missing 'Triggers on...': agents lose the trigger keyword list"
             )
 
         if re.search(r"even when the user doesn'?t", desc, re.IGNORECASE):
             report.add_pass(
                 "description: includes non-obvious-trigger clause "
-                "('even when the user doesn't say…')"
+                "('even when the user doesn't say...')"
             )
         else:
             report.add_warn(
-                "description: no 'even when the user doesn't say…' clause — "
+                "description: no 'even when the user doesn't say...' clause, "
                 "may miss implicit triggers"
             )
 
@@ -301,12 +301,12 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
                 "description: routing uses positive triggers without other skill names"
             )
 
-    # description: XML tags (platform spec) — warn, since descriptions legitimately
+    # description: XML tags (platform spec): warn, since descriptions legitimately
     # reference component/generic syntax (e.g. `<motion.*>`, `<T>`) that regex can't
     # distinguish from a real XML tag.
     if isinstance(desc, str) and re.search(r"<[^>]+>", desc):
         report.add_warn(
-            "description: contains angle-bracket markup (`<…>`) — fine if it's a "
+            "description: contains angle-bracket markup (`<...>`): fine if it's a "
             "component/generic reference, otherwise remove the XML tag"
         )
 
@@ -394,7 +394,7 @@ def check_body(body: str, report: Report) -> None:
         report.add_pass("content: '## Gotchas' section present")
     else:
         report.add_warn(
-            "content: no '## Gotchas' section — non-obvious env-specific facts have no home"
+            "content: no '## Gotchas' section: non-obvious env-specific facts have no home"
         )
 
 
@@ -410,7 +410,7 @@ def check_references(body: str, skill_dir: Path, report: Report) -> None:
     placeholder = 0
 
     for ref in refs:
-        # Skip placeholder paths (contain <…> or {…})
+        # Skip placeholder paths (contain <...> or {...})
         if "<" in ref or "{" in ref:
             placeholder += 1
             continue
@@ -438,7 +438,7 @@ def check_references(body: str, skill_dir: Path, report: Report) -> None:
     # @references prefix (defeats progressive disclosure)
     if "@references/" in body:
         report.add_fail(
-            "references: '@references/' prefix found — strips progressive disclosure "
+            "references: '@references/' prefix found: strips progressive disclosure "
             "(use plain 'references/')"
         )
     else:
@@ -459,12 +459,12 @@ def check_references(body: str, skill_dir: Path, report: Report) -> None:
             if missing > 0:
                 report.add_warn(
                     f"references: {missing} of {len(pd_lines)} link(s) in Progressive "
-                    "Disclosure lack a 'Load when…' trigger"
+                    "Disclosure lack a 'Load when...' trigger"
                 )
             else:
                 report.add_pass(
                     f"references: all {len(pd_lines)} link(s) in Progressive Disclosure "
-                    "carry a 'Load when…' trigger"
+                    "carry a 'Load when...' trigger"
                 )
 
 
@@ -491,7 +491,7 @@ def check_reference_tocs(skill_dir: Path, report: Report) -> None:
         return
     if missing:
         report.add_warn(
-            "references: file(s) >200 lines lack a '## Contents' table of contents — "
+            "references: file(s) >200 lines lack a '## Contents' table of contents, "
             + ", ".join(missing)
         )
     else:
@@ -507,7 +507,7 @@ def check_harness_neutrality(body: str, report: Report) -> None:
         for line_no, line in enumerate(body.splitlines(), start=1):
             if re.search(pattern, line):
                 report.add_fail(
-                    f"harness-neutrality: {label} — line {line_no}: {line.strip()[:80]}"
+                    f"harness-neutrality: {label}, line {line_no}: {line.strip()[:80]}"
                 )
                 hits += 1
     if hits == 0:

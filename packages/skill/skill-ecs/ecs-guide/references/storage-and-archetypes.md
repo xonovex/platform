@@ -13,7 +13,7 @@ Bitmask typing makes "which entities does this system touch?" a cheap superset m
 1. Assign each component type a bit. An entity's _type_ is the OR of its component bits.
 2. Bucket entities by type; within a bucket, store each component in its own contiguous array (SoA), parallel-indexed.
 3. A system declares a required mask; it runs over every bucket whose type is a superset of that mask, walking the co-located arrays.
-4. Adding/removing a component changes the entity's type — move its data to the new bucket. Treat this as an occasional structural edit, not a per-frame operation.
+4. Adding/removing a component changes the entity's type: move its data to the new bucket. Treat this as an occasional structural edit, not a per-frame operation.
 5. Keep components plain data; put behavior in systems so the same layout serves any number of systems.
 
 ## Example
@@ -32,7 +32,7 @@ for (uint32_t i = 0; i < m.count; ++i)
 
 ## Counter-Example
 
-A tiny world (a handful of entities, e.g. UI singletons or top-level managers) gains nothing from archetype bucketing — a struct of fields is clearer. Archetype storage pays off when "where there is one, there are many."
+A tiny world (a handful of entities, e.g. UI singletons or top-level managers) gains nothing from archetype bucketing: a struct of fields is clearer. Archetype storage pays off when "where there is one, there are many."
 
 ## Related
 

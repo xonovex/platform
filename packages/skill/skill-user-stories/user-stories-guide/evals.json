@@ -22,7 +22,7 @@
       "id": 3,
       "prompt": "Write the acceptance criteria for this user story: 'As a user, I want to reset my password so that I can regain access to my account.'",
       "assertions": [
-        "The acceptance criteria include at least one boundary/limit case, at least one error/invalid-input case, AND at least one visible UI/state-change check — not only the happy-path success scenario."
+        "The acceptance criteria include at least one boundary/limit case, at least one error/invalid-input case, AND at least one visible UI/state-change check, not only the happy-path success scenario."
       ]
     },
     {

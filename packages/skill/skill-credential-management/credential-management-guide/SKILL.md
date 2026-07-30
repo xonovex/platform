@@ -1,6 +1,6 @@
 ---
 name: credential-management-guide
-description: "Use when choosing, storing, injecting, rotating, revoking, or responding to exposure of machine-to-machine credentials and secrets — the tokens a service, workload, or CI job presents to another system. Triggers on API tokens, PATs, client secrets, keychains, secret managers, masked CI variables, workload identity federation, OIDC, `.env` secret handling, credential rotation, or leaked credentials, even when the user doesn't say 'credential management' and names only a provider-specific token."
+description: "Use when choosing, storing, injecting, rotating, revoking, or responding to exposure of machine-to-machine credentials and secrets: the tokens a service, workload, or CI job presents to another system. Triggers on API tokens, PATs, client secrets, keychains, secret managers, masked CI variables, workload identity federation, OIDC, `.env` secret handling, credential rotation, or leaked credentials, even when the user doesn't say 'credential management' and names only a provider-specific token."
 ---
 
 # Credential Management Guidelines

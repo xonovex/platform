@@ -1,6 +1,6 @@
 [
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: SIMD variant + naming convention in systems lib"
@@ -24,7 +24,7 @@
     "rationale": "embedded alignment work"
   },
   {
-    "query": "rename modules to follow our snake_case_subsystem.c convention — there's a few stragglers in src/net/",
+    "query": "rename modules to follow our snake_case_subsystem.c convention: there's a few stragglers in src/net/",
     "should_trigger": true,
     "split": "train",
     "rationale": "strict file naming"
@@ -42,7 +42,7 @@
     "rationale": "embedded layout audit, doesn't say 'C'"
   },
   {
-    "query": "I'm writing a Defold game in C — physics/collision needs vectors and quaternions",
+    "query": "I'm writing a Defold game in C: physics/collision needs vectors and quaternions",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: should match c99-game-opinionated-guide"
@@ -60,7 +60,7 @@
     "rationale": "near-miss: C++, all C99 skills should skip"
   },
   {
-    "query": "open this CMakeLists.txt — the C standard isn't being set right",
+    "query": "open this CMakeLists.txt: the C standard isn't being set right",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: CMake config, should match cmake-guide"
@@ -78,25 +78,25 @@
     "rationale": "systems DSP"
   },
   {
-    "query": "make our pixel buffer struct hot-friendly — split the metadata fields out",
+    "query": "make our pixel buffer struct hot-friendly: split the metadata fields out",
     "should_trigger": true,
     "split": "train",
     "rationale": "DOD intent without naming it"
   },
   {
-    "query": "the embedded build complains about VLAs — can you switch the parser to fixed-size?",
+    "query": "the embedded build complains about VLAs: can you switch the parser to fixed-size?",
     "should_trigger": true,
     "split": "train",
     "rationale": "embedded constraint"
   },
   {
-    "query": "I'm porting our DSP routines to a STM32 — what's our convention for buffer ownership?",
+    "query": "I'm porting our DSP routines to a STM32. What's our convention for buffer ownership?",
     "should_trigger": true,
     "split": "train",
     "rationale": "caller-owns-memory in embedded port"
   },
   {
-    "query": "review the file naming under src/comms/ — looks inconsistent with the rest",
+    "query": "review the file naming under src/comms/: looks inconsistent with the rest",
     "should_trigger": true,
     "split": "validation",
     "rationale": "strict file naming, generic phrasing"
@@ -114,37 +114,37 @@
     "rationale": "wrong language pair"
   },
   {
-    "query": "review my Cargo.toml — is this idiomatic Rust 2024?",
+    "query": "review my Cargo.toml: is this idiomatic Rust 2024?",
     "should_trigger": false,
     "split": "validation",
     "rationale": "wrong language"
   },
   {
-    "query": "editing one header in our C engine triggers a near-full rebuild and compiles are crawling — how should I restructure headers and includes to fix incremental build times?",
+    "query": "editing one header in our C engine triggers a near-full rebuild and compiles are crawling. How should I restructure headers and includes to fix incremental build times?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "physical-design: no header-includes-header rule, one header per system, opaque handles, acyclic deps"
   },
   {
-    "query": "I want my C engine to be a set of DLLs that register capabilities and discover each other at runtime by name instead of linking against each other — how do I structure the interfaces?",
+    "query": "I want my C engine to be a set of DLLs that register capabilities and discover each other at runtime by name instead of linking against each other. How do I structure the interfaces?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "plugin-architecture: string-keyed registry of plain-C function-pointer interfaces, runtime discovery"
   },
   {
-    "query": "we need to call our C library from Lua and C# — how should I shape the C API so it's easy to bind and generate wrappers for, and what should I avoid?",
+    "query": "we need to call our C library from Lua and C#. How should I shape the C API so it's easy to bind and generate wrappers for, and what should I avoid?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "cross-language-api: portable C subset, flat data, call-scoped pointers, spec-generated bindings"
   },
   {
-    "query": "our entity structs in sim/ store node_t* pointers to each other and it breaks when the pool array grows — and we can't serialize the graph. how should we reference between them?",
+    "query": "our entity structs in sim/ store node_t* pointers to each other and it breaks when the pool array grows, and we can't serialize the graph. how should we reference between them?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "handles-and-indices: index/generational-handle references over raw pointers for relocatable, serializable structures"
   },
   {
-    "query": "the parser in src/cfg/ calls strlen and strtok all over a big buffer and load time is terrible — how should I restructure string handling?",
+    "query": "the parser in src/cfg/ calls strlen and strtok all over a big buffer and load time is terrible. How should I restructure string handling?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "cross-skill string routing: c99-guide owns length-carrying views and bounded builders; this overlay adds caller-owned storage"

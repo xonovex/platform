@@ -31,10 +31,10 @@ Engine-agnostic architecture for a software audio mixer: a real-time render thre
 
 ## Gotchas
 
-- An underrun is instantly, harshly audible: one first-touch page fault inside the callback and you get a click or dropout — pre-touch every buffer and voice state at init, don't merely preallocate.
+- An underrun is instantly, harshly audible: one first-touch page fault inside the callback and you get a click or dropout. Pre-touch every buffer and voice state at init, don't merely preallocate.
 - Snapping any gain (start, stop, volume, pan, steal) inserts a step into the waveform that clicks; ramp every coefficient over tens of milliseconds, and keep ramping a stopping voice to zero before freeing its slot.
 - Integer mixing overflows and wraps to a loud burst; accumulate in float so many loud voices coexist, then scale to fit at the end.
-- A "stopped" voice still occupies its slot until its fade completes, so the free count lags — size the pool for that overlap, not just steady state.
+- A "stopped" voice still occupies its slot until its fade completes, so the free count lags: size the pool for that overlap, not just steady state.
 - Accumulating a voice's fractional read position in `float` drifts a long sound out of tune; keep the cursor in `double` or fixed-point.
 - A full command queue must never block the audio thread and must never `malloc` a bigger one; pick a producer-side drop/coalesce policy up front.
 - Sizing the queue-ahead too tight starves on ordinary scheduler jitter and high-latency USB/Bluetooth devices; too loose adds latency you can hear in interactive sounds.

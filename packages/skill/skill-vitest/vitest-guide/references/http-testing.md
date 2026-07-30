@@ -1,6 +1,6 @@
 # http-testing: HTTP Status Assertions
 
-Assert the exact status the middleware sends. Hono `cors()` returns **204** (no body) for an OPTIONS preflight — not 200. Drive routes with `app.request()`; no live server needed.
+Assert the exact status the middleware sends. Hono `cors()` returns **204** (no body) for an OPTIONS preflight, not 200. Drive routes with `app.request()`; no live server needed.
 
 ```typescript
 it("handles CORS preflight", async () => {

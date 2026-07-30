@@ -32,11 +32,11 @@
 ## Refresh Workflow
 
 1. Re-fetch `https://llmstxt.org/` and `https://llmstxt.org/index.md`
-2. Diff against the prior pull — look for new sections, changed grammar, new processor tool conventions
+2. Diff against the prior pull: look for new sections, changed grammar, new processor tool conventions
 3. Update SKILL.md and the relevant references
 4. Re-fetch `https://llmstxt.org/llms.txt` to keep the canonical example in `examples.md` current
 5. Bump **Last reviewed** dates above
 
 ## Related (not direct sources, mentioned in this skill)
 
-- `https://hono.dev/llms-full.txt` — example of the informal `llms-full.txt` community convention (single-file dump), not the spec. Mentioned in `examples.md` and `processing-tools.md`.
+- `https://hono.dev/llms-full.txt`: example of the informal `llms-full.txt` community convention (single-file dump), not the spec. Mentioned in `examples.md` and `processing-tools.md`.

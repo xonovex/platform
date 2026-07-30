@@ -2,7 +2,7 @@
 
 ## Test-first cycle, the two rules, the test list, green-bar strategies
 
-- **Title:** Kent Beck — "Test-Driven Development by Example" (Addison-Wesley, 2002)
+- **Title:** Kent Beck, "Test-Driven Development by Example" (Addison-Wesley, 2002)
 - **URL:** https://www2.cs.uh.edu/~rsingh/documents/software_design/TDD.pdf
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -12,7 +12,7 @@
   - `SKILL.md` → Essentials / Gotchas / Example
 - **Aspects extracted:**
   - The red-green-refactor mantra and the two rules (write production code only to pass a failing test; eliminate duplication); the "clean code that works" goal
-  - Green-bar strategies — Fake It, Obvious Implementation, Triangulation — and refactoring driven by removing the duplication created to go green
+  - Green-bar strategies: Fake It, Obvious Implementation, Triangulation: and refactoring driven by removing the duplication created to go green
   - The test list / to-do list worked one item at a time
 
 ## Triangulation as a fallback, not the default
@@ -28,7 +28,7 @@
 
 ## Classical vs mockist TDD as a design style
 
-- **Title:** Martin Fowler — "Mocks Aren't Stubs"
+- **Title:** Martin Fowler, "Mocks Aren't Stubs"
 - **URL:** https://martinfowler.com/articles/mocksArentStubs.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -40,7 +40,7 @@
 
 ## Arrange-Act-Assert (the shape of the test the cycle produces)
 
-- **Title:** Bill Wake — "3A: Arrange, Act, Assert" (xp123)
+- **Title:** Bill Wake, "3A: Arrange, Act, Assert" (xp123)
 - **URL:** https://xp123.com/articles/3a-arrange-act-assert/
 - **Last reviewed:** 2026-06-27
 - **Used for:**

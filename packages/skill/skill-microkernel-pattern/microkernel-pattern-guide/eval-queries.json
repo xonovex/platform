@@ -6,7 +6,7 @@
     "rationale": "core + plug-ins + registry; open/closed"
   },
   {
-    "query": "adding a backend means editing a giant switch in three files \u2014 make it so a new one plugs in without touching the core",
+    "query": "adding a backend means editing a giant switch in three files: make it so a new one plugs in without touching the core",
     "should_trigger": true,
     "split": "train",
     "rationale": "open/closed via registry, not a central switch"
@@ -72,19 +72,19 @@
     "split": "train"
   },
   {
-    "query": "our notification code has grown into a mess \u2014 channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
     "rationale": "near miss owned by orthogonal-pattern-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm building the core document store for our level editor \u2014 objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles \u2014 the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
@@ -96,7 +96,7 @@
     "split": "validation"
   },
   {
-    "query": "should the storage backend be picked at compile time with build flags, or at runtime from config \u2014 and how does that change the wiring?",
+    "query": "should the storage backend be picked at compile time with build flags, or at runtime from config, and how does that change the wiring?",
     "rationale": "binding time for a swappable backend is a plug-in selection decision",
     "should_trigger": true,
     "split": "validation"

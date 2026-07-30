@@ -2,7 +2,7 @@
 
 ## Guideline
 
-For large element counts (particles, agents, cloth), keep the simulation state resident in GPU storage buffers, advance it with compute dispatches, and let the GPU drive its own draw/dispatch counts via indirect arguments — so the CPU never enumerates elements or stalls on readback.
+For large element counts (particles, agents, cloth), keep the simulation state resident in GPU storage buffers, advance it with compute dispatches, and let the GPU drive its own draw/dispatch counts via indirect arguments, so the CPU never enumerates elements or stalls on readback.
 
 ## Rationale
 
@@ -11,7 +11,7 @@ A CPU simulation that uploads results every frame is bounded by upload bandwidth
 ## How to Apply
 
 1. Lay out element state as typed channels in storage buffers, SoA per channel, sized `capacity × stride`; treat the buffer as a ring so a spawn overwrites the oldest element instead of failing.
-2. Split the work into event-triggered stages: `init` (once), `spawn` (on demand), `update` (per frame) — each a compute dispatch over the active range.
+2. Split the work into event-triggered stages: `init` (once), `spawn` (on demand), `update` (per frame). Each a compute dispatch over the active range.
 3. Advance per-element lifetime by the frame delta inside `update`; cull dead elements by compaction or by tracking a live count on the GPU.
 4. Keep the live-element count in a GPU buffer and use it as the argument to an indirect dispatch/draw; never read it back to size CPU-side dispatches.
 5. Double-buffer state that needs last-frame values (e.g. previous position for velocity), ping-ponging read/write buffers across frames.
@@ -36,15 +36,15 @@ void update(uint id : SV_DispatchThreadID) {
     pos_curr[id] += velocity(id) * delta_time;
     live_count.InterlockedAdd(0, 1);      // GPU counts its own work
 }
-// CPU side: DispatchIndirect / DrawIndirect read their counts from live_count — fixed CPU command.
+// CPU side: DispatchIndirect / DrawIndirect read their counts from live_count, fixed CPU command.
 ```
 
 ## Gotchas
 
-- Absolute indexing into the ring while another stage writes the same slots is a read/write hazard — separate stages with a barrier, or index relative to the active range.
+- Absolute indexing into the ring while another stage writes the same slots is a read/write hazard: separate stages with a barrier, or index relative to the active range.
 - Reading any per-element result back to the CPU reintroduces the stall you moved to the GPU to avoid; consume results on the GPU (indirect draw) instead.
 - A draw command that hardcodes a vertex count can't scale procedurally; source counts from the GPU-side live count.
-- Ring overwrite means a spawn never fails but silently evicts the oldest element when `count > capacity` — size capacity for the worst case you care about.
+- Ring overwrite means a spawn never fails but silently evicts the oldest element when `count > capacity`: size capacity for the worst case you care about.
 - CPU-side rate spawning defeats the model for high rates; push spawn events into a GPU buffer the spawn dispatch consumes.
 
 ## Related

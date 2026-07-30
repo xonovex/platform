@@ -1,6 +1,6 @@
 # textures: Texture Loading and Configuration
 
-Set `NoColorSpace` on data textures (normal/roughness/metalness/AO) — they encode vectors, not color; use power-of-2 dimensions and enable mipmaps.
+Set `NoColorSpace` on data textures (normal/roughness/metalness/AO): they encode vectors, not color; use power-of-2 dimensions and enable mipmaps.
 
 ```javascript
 const normalTex = loader.load("normal.jpg");

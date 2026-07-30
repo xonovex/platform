@@ -16,14 +16,14 @@
       "prompt": "Add click-to-select to our 3D scene editor: when the user clicks in the viewport, select whatever object is under the cursor. The scene contains GPU-skinned characters, alpha-cut foliage cards, and voxel terrain. Describe the approach and the key implementation details.",
       "assertions": [
         "Picking renders each object's stable id into a GPU buffer/target and reads back the pixel under the cursor, rather than CPU ray-casting against physics shapes / bounding volumes / a BVH",
-        "The GPU-to-CPU read-back is asynchronous — the request is queued and the result consumed a frame or two later — not a synchronous same-frame read that stalls the pipeline"
+        "The GPU-to-CPU read-back is asynchronous. The request is queued and the result consumed a frame or two later, not a synchronous same-frame read that stalls the pipeline"
       ]
     },
     {
       "id": 3,
       "prompt": "We need a crisp, constant-width selection outline around selected objects in our editor viewport, and there must be a visible cue when a selected object is hidden behind other geometry. The renderer uses temporal anti-aliasing (TAA). How should we render the outline?",
       "assertions": [
-        "The outline is produced by edge-detecting a selection id target — comparing each pixel's id to its neighbors' ids in a fullscreen pass — rather than by edge-detecting the depth buffer or scaling/extruding geometry",
+        "The outline is produced by edge-detecting a selection id target: comparing each pixel's id to its neighbors' ids in a fullscreen pass, rather than by edge-detecting the depth buffer or scaling/extruding geometry",
         "When the selected object is occluded, the outline's alpha is dimmed rather than discarded/dropped",
         "To avoid outline shimmer under TAA, the closest selection depth is taken over a small neighborhood before comparing against scene depth (not a direct single-tap depth compare)"
       ]

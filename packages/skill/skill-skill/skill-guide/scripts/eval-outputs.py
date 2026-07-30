@@ -39,7 +39,7 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --gen-timeout S / GEN_TIMEOUT=S    per-generation timeout in seconds (default: 600)
     --workspace DIR / WORKSPACE=DIR    workspace base dir (default: "<skill>-workspace")
     --eval-cwd DIR / EVAL_CWD=DIR      working dir for generation runs (default: current dir;
-                                       must be where the skill resolves — installed plugin / project)
+                                       must be where the skill resolves: installed plugin / project)
     --plugin-dir PATH / PLUGIN_DIR=PATH
                                        target-only local plugin directory
     --max-budget-usd N / MAX_BUDGET_USD=N  hard per-generation spend cap (default/max: 0.10)
@@ -48,7 +48,7 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
 
 Method (mirrors SkillsBench / skill-creator 2.0):
     - Each eval runs in two arms, vanilla (Skill disallowed) and skill-augmented,
-      in a fresh isolated `claude -p` context — no state bleeds between runs.
+      in a fresh isolated `claude -p` context, no state bleeds between runs.
     - Generation uses stream-json so the runner records both the final result
       (text + token usage + duration) AND whether the target skill actually fired.
     - Grading is reference-guided, binary PASS/FAIL per assertion, via an
@@ -439,7 +439,7 @@ assertion independently.
 Rules:
 - Binary verdict per assertion: passed = true or false. No partial credit.
 - Cite concrete evidence: quote the response or name the specific gap.
-- No benefit of the doubt — vagueness, omission, or a hedge is FAIL.
+- No benefit of the doubt: vagueness, omission, or a hedge is FAIL.
 - Judge ONLY against the assertion. Ignore response length, tone, and style.
 - If the response lacks the information to decide, mark FAIL, evidence "insufficient".
 - Use the EXPECTED OUTPUT only as a reference for what success looks like; the \

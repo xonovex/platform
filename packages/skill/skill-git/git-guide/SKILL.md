@@ -37,13 +37,13 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 
 ## Gotchas
 
-- `git pull` is `fetch` + `merge` — on a shared branch this creates spurious merge commits; prefer `pull --rebase` or `fetch` then explicit merge
-- Detached HEAD: committing in this state silently loses commits when you `checkout` away — note the SHA or branch immediately
-- Hooks in `.git/hooks/` are not version-controlled — share via `core.hooksPath` pointing at a tracked directory
+- `git pull` is `fetch` + `merge`, on a shared branch this creates spurious merge commits; prefer `pull --rebase` or `fetch` then explicit merge
+- Detached HEAD: committing in this state silently loses commits when you `checkout` away. Note the SHA or branch immediately
+- Hooks in `.git/hooks/` are not version-controlled: share via `core.hooksPath` pointing at a tracked directory
 - A feature `worktree-merge` integrates a branch into its **parent** branch; landing on the mainline goes through push + PR + CI review, never a direct local merge to `main`
-- Merge, abandon, and cleanup are separate operations — none may silently perform another
-- Long-lived feature branches drift and conflict — keep them short-lived; integrate work spanning sessions incrementally behind feature flags / branch-by-abstraction
-- Deleting a worktree directory by hand leaves a stale admin entry — run `git worktree prune`; and each worktree needs its own dependency install (`node_modules` is not shared across worktrees)
+- Merge, abandon, and cleanup are separate operations, none may silently perform another
+- Long-lived feature branches drift and conflict: keep them short-lived; integrate work spanning sessions incrementally behind feature flags / branch-by-abstraction
+- Deleting a worktree directory by hand leaves a stale admin entry: run `git worktree prune`; and each worktree needs its own dependency install (`node_modules` is not shared across worktrees)
 
 ## Progressive Disclosure
 

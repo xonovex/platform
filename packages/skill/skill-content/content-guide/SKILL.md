@@ -1,6 +1,6 @@
 ---
 name: content-guide
-description: "Use when authoring or rewriting multilingual articles, news, travel and destination/venue guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells — even when the user doesn't say 'content'."
+description: "Use when authoring or rewriting multilingual articles, news, travel and destination/venue guides, or other structured-frontmatter content. Triggers on prompts about bilingual / multilingual content, CEFR B1-B2 readability targets, content frontmatter shape, language register, editorial web research, humanizing AI-generated prose, or stripping AI writing tells, even when the user doesn't say 'content'."
 ---
 
 # Content Creation Guidelines
@@ -11,18 +11,18 @@ Tenant-agnostic: these patterns apply to any structured multilingual content. Do
 
 ## Core Principles
 
-- **Research first** — verify with web search and web fetch; triangulate facts across ≥3 sources
-- **Bilingual content** — support multiple languages with CEFR proficiency levels (default B1-B2)
-- **Structured format** — exact structure with proper frontmatter; one file per language
-- **Natural language** — short sentences, plain words, no emojis (unless the medium expects them)
-- **Paraphrase, never copy** — verbatim text fails plagiarism checks and reads stiff
+- **Research first**: verify with web search and web fetch; triangulate facts across ≥3 sources
+- **Bilingual content**: support multiple languages with CEFR proficiency levels (default B1-B2)
+- **Structured format**: exact structure with proper frontmatter; one file per language
+- **Natural language**: short sentences, plain words, no emojis (unless the medium expects them)
+- **Paraphrase, never copy**: verbatim text fails plagiarism checks and reads stiff
 
 ## Gotchas
 
-- A single source isn't triangulation — require ≥3 credible sources before drafting factual content
-- Hours / prices / contact details rot quickly — note research date so a future refresh knows what to re-verify
-- Multi-language versions must agree on facts — produce one source language, then translate; don't re-research per language
-- Removing every em dash or every "however" is over-correction — regularity is the AI tell, not the punctuation
+- A single source isn't triangulation: require ≥3 credible sources before drafting factual content
+- Hours / prices / contact details rot quickly: note research date so a future refresh knows what to re-verify
+- Multi-language versions must agree on facts: produce one source language, then translate; don't re-research per language
+- Removing every em dash or every "however" is over-correction: regularity is the AI tell, not the punctuation
 
 ## Progressive Disclosure
 

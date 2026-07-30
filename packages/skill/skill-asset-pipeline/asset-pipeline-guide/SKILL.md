@@ -1,6 +1,6 @@
 ---
 name: asset-pipeline-guide
-description: "Use when designing the asset pipeline of a tool or game engine — turning authored sources (FBX, glTF, PNG, WAV, shaders) into runtime-ready data: importers/compilers per asset type, a deterministic compile/cook step, content-addressed caching keyed by a hash of inputs and settings, dependency tracking so an edit reimports only what changed, platform-specific output, and live hot-reloading. Triggers on import, cook/bake, asset/build cache, reimport, dependency invalidation, file watcher, hot-reload of textures/meshes/materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'."
+description: "Use when designing the asset pipeline of a tool or game engine, turning authored sources (FBX, glTF, PNG, WAV, shaders) into runtime-ready data: importers/compilers per asset type, a deterministic compile/cook step, content-addressed caching keyed by a hash of inputs and settings, dependency tracking so an edit reimports only what changed, platform-specific output, and live hot-reloading. Triggers on import, cook/bake, asset/build cache, reimport, dependency invalidation, file watcher, hot-reload of textures/meshes/materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'."
 ---
 
 # Asset pipeline Guidelines
@@ -35,13 +35,13 @@ An asset pipeline turns editable authored sources into runtime-ready data and ke
 
 ## Gotchas
 
-- A "deterministic" compiler that hashes a struct with padding bytes, or iterates a hash map in pointer order, produces a different hash per run and silently defeats the cache — hash canonical content, not raw memory.
+- A "deterministic" compiler that hashes a struct with padding bytes, or iterates a hash map in pointer order, produces a different hash per run and silently defeats the cache: hash canonical content, not raw memory.
 - Forgetting that settings are inputs means changing the compression preset does not bust the cache; the user keeps seeing the old cooked texture and blames the importer.
-- If the dependency record is incomplete (a compiler reads an included shader header it never reported), an edit to that header reimports nothing and ships stale runtime data — under-reporting dependencies is worse than over-reporting.
+- If the dependency record is incomplete (a compiler reads an included shader header it never reported), an edit to that header reimports nothing and ships stale runtime data: under-reporting dependencies is worse than over-reporting.
 - Caching the heavy step is the point; adding a cache to a node whose compute is cheaper than the hash and lookup makes iteration slower, not faster.
-- A content hash that includes an absolute path, build host name, or timestamp is no longer content-addressed — two machines cooking the same source get different keys and can never share the cache.
+- A content hash that includes an absolute path, build host name, or timestamp is no longer content-addressed. Two machines cooking the same source get different keys and can never share the cache.
 - Hot-reload that frees the old resource immediately can crash a frame already submitted with the old handle; retire old versions behind the in-flight fence, not on swap.
-- Letting the editable hierarchy be mutated in ways the source format can't express makes reimport ambiguous about who is authoritative — keep the structural shape immutable and confine edits to overrides on instances.
+- Letting the editable hierarchy be mutated in ways the source format can't express makes reimport ambiguous about who is authoritative: keep the structural shape immutable and confine edits to overrides on instances.
 - A least-common-denominator intermediate silently drops format-specific data (vertex colors, custom attributes); provide a typed extension slot so importers can carry data the generic schema lacks.
 
 ## Progressive Disclosure

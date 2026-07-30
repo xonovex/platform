@@ -9,7 +9,7 @@ Engine-agnostic architecture for a visual node-based graph that authors and non-
 
 ## Requirements
 
-- A reflectable typed object/data store the graph serializes into (nodes, connections, per-node settings, interface), so the editor, evaluator, and tools all read the same definition — see data-model-guide.
+- A reflectable typed object/data store the graph serializes into (nodes, connections, per-node settings, interface), so the editor, evaluator, and tools all read the same definition, see data-model-guide.
 - A node-type registry that plugins can extend with new node kinds and new wire data types without modifying the core.
 
 ## Essentials
@@ -43,7 +43,7 @@ Engine-agnostic architecture for a visual node-based graph that authors and non-
 ## Gotchas
 
 - A node only caches correctly when its validity hash folds in every input that changes its output; an input read but left out of the hash yields stale reuse with no error.
-- Flattening cannot express recursion — a subgraph that (transitively) contains itself inlines forever and overflows the stack; detect cycles before inlining.
+- Flattening cannot express recursion: a subgraph that (transitively) contains itself inlines forever and overflows the stack; detect cycles before inlining.
 - An unwired input silently using its stored default is convenient but hides missing connections; distinguish "deliberately constant" from "forgot to wire" in the UI.
 - Polymorphic pins resolved from neighbors can leave a graph in a half-typed state mid-edit; re-resolve and re-validate affected wires on every connect/disconnect, not just on evaluate.
 - Editing the editor graph and re-flattening per evaluation is correct but wasteful; cache the compiled/flattened result and invalidate it only when the source graph changes.

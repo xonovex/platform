@@ -34,6 +34,6 @@ Valid reduction range: 30-60%.
 
 ## Gotchas
 
-- Tech names look like noise but are essential — don't strip `moon` / `Terraform` / `Flux` even if a generic verb works
+- Tech names look like noise but are essential: don't strip `moon` / `Terraform` / `Flux` even if a generic verb works
 - Removing a code block looks like progress until you realize it was the only place a command was documented
-- "Already minimal" usually means <15 lines, but a 30-line file dense with gotchas is also already minimal — measure signal, not just length
+- "Already minimal" usually means <15 lines, but a 30-line file dense with gotchas is also already minimal: measure signal, not just length

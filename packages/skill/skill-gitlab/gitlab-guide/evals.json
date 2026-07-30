@@ -4,7 +4,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I have a GitLab merge request (iid 128) in project group/project. Write a bash snippet using glab that posts an inline review comment anchored to line 42 of src/api/users.go — a line that was ADDED in this MR — by calling the raw Discussions REST API (not the glab convenience subcommand), and make sure the comment actually attaches to the diff rather than floating on the Overview tab.",
+      "prompt": "I have a GitLab merge request (iid 128) in project group/project. Write a bash snippet using glab that posts an inline review comment anchored to line 42 of src/api/users.go: a line that was ADDED in this MR, by calling the raw Discussions REST API (not the glab convenience subcommand), and make sure the comment actually attaches to the diff rather than floating on the Overview tab.",
       "assertions": [
         "The position object sets all three of base_sha, start_sha, and head_sha (fetched from the MR diff_refs or versions endpoint)",
         "It sets position new_line (for the added line) and both old_path and new_path, and does NOT set old_line for the added line",

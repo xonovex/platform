@@ -1,6 +1,6 @@
 # Build & warnings policy
 
-An opinionated overlay on **c99-guide**'s build-and-warnings policy. Apply **c99-guide** for the shared foundation — pinning strict ISO C99 with `C_EXTENSIONS OFF`, re-exposing POSIX through `_XOPEN_SOURCE=700`, suppressing the intentional-ZII `-Wmissing-field-initializers` / `-Wmissing-braces` pair, and keeping an ASan/UBSan debug preset. This overlay adds only the house-style deltas: the strict-C99 helper, the library-vs-application warning split, and the snprintf-truncation check.
+An opinionated overlay on **c99-guide**'s build-and-warnings policy. Apply **c99-guide** for the shared foundation: pinning strict ISO C99 with `C_EXTENSIONS OFF`, re-exposing POSIX through `_XOPEN_SOURCE=700`, suppressing the intentional-ZII `-Wmissing-field-initializers` / `-Wmissing-braces` pair, and keeping an ASan/UBSan debug preset. This overlay adds only the house-style deltas: the strict-C99 helper, the library-vs-application warning split, and the snprintf-truncation check.
 
 ## Centralize strict C99 in one helper
 
@@ -8,7 +8,7 @@ Wrap **c99-guide**'s strict-C99 + explicit-POSIX setup in a single `strict_c(tar
 
 ## Unused symbols are library surface, not defects
 
-A library's warning policy differs from an application's. For library code, `-Werror` on correctness warnings, but relax the whole unused-_symbol_ family (a library legitimately carries interface-mandated parameters, header-defined reflection/mapping tables, and `_DEFAULT` helpers its own TUs never reference). Keep **`-Wunused-value`** — a discarded computation is a real bug — as a hard error:
+A library's warning policy differs from an application's. For library code, `-Werror` on correctness warnings, but relax the whole unused-_symbol_ family (a library legitimately carries interface-mandated parameters, header-defined reflection/mapping tables, and `_DEFAULT` helpers its own TUs never reference). Keep **`-Wunused-value`**. A discarded computation is a real bug, as a hard error:
 
 ```
 -Werror -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable -Wno-unused-function

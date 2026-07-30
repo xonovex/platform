@@ -16,7 +16,7 @@ Infer `<type>` from changed files (default `chore` if nothing matches):
 | Small modifications in `src/`             | `fix`      |
 | Large changeset across many files         | `refactor` |
 
-Types: `chore`, `feat`, `fix`, `docs`, `refactor`, `test`, `ci`. Format `<type>: <description>` — lowercase, no footers. Precedence: user-specified type > detected > `chore`.
+Types: `chore`, `feat`, `fix`, `docs`, `refactor`, `test`, `ci`. Format `<type>: <description>`: lowercase, no footers. Precedence: user-specified type > detected > `chore`.
 
 ## Commit and push
 
@@ -37,6 +37,6 @@ Add LoginFlow with email validation and TOTP verification.
 
 ## Gotchas
 
-- Auto-detecting `refactor` on a wide changeset often misses a more specific intent (`feat` / `fix`) — interactive mode is safer for very large diffs
+- Auto-detecting `refactor` on a wide changeset often misses a more specific intent (`feat` / `fix`): interactive mode is safer for very large diffs
 - `-o ci.skip` skips CI on the push; drop it when you actually want CI to run
-- Default mode commits without asking — risky on dirty trees with mixed-intent changes; pre-stage or use interactive mode
+- Default mode commits without asking: risky on dirty trees with mixed-intent changes; pre-stage or use interactive mode

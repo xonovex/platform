@@ -27,7 +27,7 @@ void end_pane(ui_o *ui, uint64_t my_id) {
 
 ## Counter-Example
 
-A UI with no keyboard interaction (pure mouse tool palette) needs neither responder chains nor trickling — hover/active ids suffice.
+A UI with no keyboard interaction (pure mouse tool palette) needs neither responder chains nor trickling: hover/active ids suffice.
 
 ## Gotcha
 

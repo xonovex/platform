@@ -1,11 +1,11 @@
 ---
 name: testing-guide
-description: "Use when writing or reviewing a single good test independent of any framework — structuring it as Arrange-Act-Assert / Four-Phase, meeting FIRST, naming it, choosing and naming the right test double (Dummy / Stub / Spy / Mock / Fake), deciding what to mock and what not to, telling state from behaviour verification, and spotting test smells. Triggers on test double, mock vs stub vs fake vs spy, what should I mock, over-mocking, AAA, FIRST, fragile/flaky/obscure test, Object Mother, Test Data Builder, fixture setup — even when the user doesn't say 'testing'."
+description: "Use when writing or reviewing a single good test independent of any framework: structuring it as Arrange-Act-Assert / Four-Phase, meeting FIRST, naming it, choosing and naming the right test double (Dummy / Stub / Spy / Mock / Fake), deciding what to mock and what not to, telling state from behaviour verification, and spotting test smells. Triggers on test double, mock vs stub vs fake vs spy, what should I mock, over-mocking, AAA, FIRST, fragile/flaky/obscure test, Object Mother, Test Data Builder, fixture setup, even when the user doesn't say 'testing'."
 ---
 
 # Writing a Single Good Test
 
-How to structure, name, populate, and verify one test — and how to pick the right test double — independent of any framework. It governs the shape of an individual test, not the rhythm in which you write tests.
+How to structure, name, populate, and verify one test, and how to pick the right test double: independent of any framework. It governs the shape of an individual test, not the rhythm in which you write tests.
 
 ## Essentials
 
@@ -23,23 +23,23 @@ How to structure, name, populate, and verify one test — and how to pick the ri
 - AAA is three phases, not four. Explicit Teardown belongs to the Four-Phase Test and is usually unnecessary for a true unit test.
 - A Spy is not a Mock: a Spy passively records calls for the test to assert later; a Mock owns the expectations itself and fails on an unexpected or missing call.
 - A Fake is not a Stub: a Fake has a real, working, shortcut implementation (an in-memory store); a Stub only returns hard-coded answers with no logic.
-- A test that needs many doubles or asserts on internal calls is a coupling signal — fix the production design, and take the coupling diagnosis to **connascence-guide**, not a bigger fixture.
+- A test that needs many doubles or asserts on internal calls is a coupling signal: fix the production design, and take the coupling diagnosis to **connascence-guide**, not a bigger fixture.
 - FIRST's "I" (Independent / Isolated) and "S" (Self-validating / Self-verifying) both circulate; same intent, neither spelling is wrong.
 
 ## Example
 
 ```ts
-// Arrange — one Dummy, one Stub, one Spy, one Mock, one Fake
+// Arrange: one Dummy, one Stub, one Spy, one Mock, one Fake
 const auditId = "ignored"; // Dummy: fills the signature, never read
 const fares = stubFare({cityCenter: 1250}); // Stub: canned answer (Responder)
 const receipts = spyReceipts(); // Spy: records each send(...)
 const gateway = mockGateway().expect("charge", 1250, "EUR"); // Mock: command expectation
 const cards = inMemoryCardStore(); // Fake: real but shortcut storage
 
-// Act — exactly one action
+// Act: exactly one action
 const confirmation = chargeRide(trip, gateway, receipts, fares, cards, auditId);
 
-// Assert — state first, then the one behaviour expectation
+// Assert: state first, then the one behaviour expectation
 expect(confirmation.status).toBe("paid"); // state verification
 expect(receipts.sent).toHaveLength(1); // spy: outcome, not call order
 gateway.verify(); // behaviour verification of the command

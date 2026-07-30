@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Route every mutation through the model so it can record what changed and tell interested parties — via change events, dirty flags, and dependency-driven recomputation.
+Route every mutation through the model so it can record what changed and tell interested parties, via change events, dirty flags, and dependency-driven recomputation.
 
 ## Rationale
 
@@ -36,7 +36,7 @@ if (model->version != view->last_seen_version) {
 ## Gotchas
 
 - Without coalescing, a loop that sets one property N times emits N events; dedupe per `(object, property)`.
-- Pull-based readers can miss an intermediate value entirely (it changed and changed back between polls) — fine for "latest state" views, wrong if you need every transition.
+- Pull-based readers can miss an intermediate value entirely (it changed and changed back between polls): fine for "latest state" views, wrong if you need every transition.
 - Dependency tracking is only correct if every input read is recorded; a hidden global read that isn't tracked yields stale derived values.
 
 ## Related

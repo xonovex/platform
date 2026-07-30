@@ -1,6 +1,6 @@
 # new-hooks: React 19 Hooks
 
-React 19 hooks for forms, optimistic updates, and promise/context reading — replace manual state with built-in pending states, error handling, and progressive enhancement.
+React 19 hooks for forms, optimistic updates, and promise/context reading: replace manual state with built-in pending states, error handling, and progressive enhancement.
 
 ## Example
 

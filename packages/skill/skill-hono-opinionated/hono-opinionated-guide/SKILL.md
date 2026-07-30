@@ -1,11 +1,11 @@
 ---
 name: hono-opinionated-guide
-description: "Use when editing Hono APIs that follow the opinionated style — inline OpenAPI handlers, explicit router selection (LinearRouter / RegExpRouter), sync handlers where possible, bodyLimit middleware. A focused overlay that covers only house-style decisions, not generic Hono usage. Triggers on `.ts` files with `OpenAPIHono`, inline route schemas, and prompts about router perf, payload limits, or sync-vs-async handlers, even when the user doesn't say 'opinionated'."
+description: "Use when editing Hono APIs that follow the opinionated style: inline OpenAPI handlers, explicit router selection (LinearRouter / RegExpRouter), sync handlers where possible, bodyLimit middleware. A focused overlay that covers only house-style decisions, not generic Hono usage. Triggers on `.ts` files with `OpenAPIHono`, inline route schemas, and prompts about router perf, payload limits, or sync-vs-async handlers, even when the user doesn't say 'opinionated'."
 ---
 
 # Hono Opinionated Guidelines
 
-An overlay on **hono-guide**. Apply **hono-guide** for all generic Hono work — application structure, validation/type safety, middleware patterns and combination, error handling, cookies, security, WebSockets, context storage, platform runtimes. This skill adds only the opinionated decisions on top.
+An overlay on **hono-guide**. Apply **hono-guide** for all generic Hono work: application structure, validation/type safety, middleware patterns and combination, error handling, cookies, security, WebSockets, context storage, platform runtimes. This skill adds only the opinionated decisions on top.
 
 ## Requirements
 
@@ -44,7 +44,7 @@ export function createApp() {
 ## Gotchas
 
 - Router hierarchy: parent routes inherit middleware; mounting a sub-router with `.route()` runs the parent middleware first
-- Picking the router (RegExpRouter / SmartRouter / TrieRouter / PatternRouter) is a startup decision — switching requires testing all routes
+- Picking the router (RegExpRouter / SmartRouter / TrieRouter / PatternRouter) is a startup decision: switching requires testing all routes
 
 ## Progressive disclosure
 

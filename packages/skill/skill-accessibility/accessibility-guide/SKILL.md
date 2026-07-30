@@ -9,12 +9,12 @@ Make accessibility a versioned, testable quality and governance concern without 
 
 ## Essentials
 
-- **Pin the target** — record the standard, version, level, applicable criteria, exact subject revision, environments, and user journeys, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
-- **Design with affected users** — include perceivable, operable, understandable, and robust outcomes from discovery through content and interaction design, see [references/design-and-implementation.md](references/design-and-implementation.md)
-- **Layer the evidence** — combine deterministic inspection, automated checks, keyboard and zoom testing, representative assistive technology, and qualified human review, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
-- **Publish criterion outcomes** — report pass, fail, not-applicable, and not-tested with origins, limitations, findings, gaps, freshness, and native references, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
-- **Govern exceptions and drift** — scope, own, expire, review, remediate, reassess, and retire accessibility decisions, see [references/governance-and-operations.md](references/governance-and-operations.md)
-- **Keep tools in their lane** — platform skills own implementation APIs; scanners and agents provide evidence but never accountable conformance by themselves
+- **Pin the target**: record the standard, version, level, applicable criteria, exact subject revision, environments, and user journeys, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
+- **Design with affected users**: include perceivable, operable, understandable, and robust outcomes from discovery through content and interaction design, see [references/design-and-implementation.md](references/design-and-implementation.md)
+- **Layer the evidence**: combine deterministic inspection, automated checks, keyboard and zoom testing, representative assistive technology, and qualified human review, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
+- **Publish criterion outcomes**: report pass, fail, not-applicable, and not-tested with origins, limitations, findings, gaps, freshness, and native references, see [references/assessment-and-evidence.md](references/assessment-and-evidence.md)
+- **Govern exceptions and drift**: scope, own, expire, review, remediate, reassess, and retire accessibility decisions, see [references/governance-and-operations.md](references/governance-and-operations.md)
+- **Keep tools in their lane**: platform skills own implementation APIs; scanners and agents provide evidence but never accountable conformance by themselves
 
 ## Gotchas
 

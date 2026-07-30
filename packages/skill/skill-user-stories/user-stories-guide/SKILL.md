@@ -1,6 +1,6 @@
 ---
 name: user-stories-guide
-description: "Use when writing, evaluating, splitting, or refining user stories — applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting-pattern flowchart, and refining the backlog into ready items. Triggers on user story, INVEST, story splitting, SPIDR, vertical slice, walking skeleton, acceptance criteria, 'As a... I want... so that...', 3 Cs, backlog refinement / grooming, SMART tasks — even when the user doesn't say 'user story'."
+description: "Use when writing, evaluating, splitting, or refining user stories: applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting-pattern flowchart, and refining the backlog into ready items. Triggers on user story, INVEST, story splitting, SPIDR, vertical slice, walking skeleton, acceptance criteria, 'As a... I want... so that...', 3 Cs, backlog refinement / grooming, SMART tasks, even when the user doesn't say 'user story'."
 ---
 
 # User Stories
@@ -17,11 +17,11 @@ A user story is a placeholder for a conversation about user value, not a specifi
 
 ## Gotchas
 
-- A walking skeleton is **production code with tests** linking the main components end to end — not a throwaway prototype or a research spike.
+- A walking skeleton is **production code with tests** linking the main components end to end, not a throwaway prototype or a research spike.
 - Never split horizontally ("build the DB", "build the API", "build the UI"); those are tasks/components. Every story is a thin **vertical** slice.
 - A Spike yields **knowledge, not shippable value**, so it is a last-resort move, not itself a vertically-sliced story.
-- The template is a conversation starter, not a mandatory format — no method prescribes a fixed story format.
-- Acceptance criteria can later be written as Given-When-Then for automation — that notation is owned by **bdd-guide**.
+- The template is a conversation starter, not a mandatory format, no method prescribes a fixed story format.
+- Acceptance criteria can later be written as Given-When-Then for automation. That notation is owned by **bdd-guide**.
 - Backlog refinement is an **ongoing** activity, not a fixed weekly "grooming meeting"; sizing is the Developers' responsibility.
 
 ## Example

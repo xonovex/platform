@@ -5,7 +5,7 @@ description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {sco
 
 # {Topic} Guidelines
 
-<!-- ## Requirements is language/framework-only — delete it for general / pattern / process skills. -->
+<!-- ## Requirements is language/framework-only: delete it for general / pattern / process skills. -->
 
 ## Requirements
 
@@ -22,7 +22,7 @@ description: "Use when {writing | reviewing | editing | scaffolding} {Tech} {sco
 
 ## Gotchas
 
-- {Non-obvious env-specific fact #1 — something a fresh reader could not infer from the official docs}
+- {Non-obvious env-specific fact #1: something a fresh reader could not infer from the official docs}
 - {Non-obvious env-specific fact #2}
 - {Common mistake to avoid, with the one-line reason}
 

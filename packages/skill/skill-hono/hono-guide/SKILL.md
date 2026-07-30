@@ -1,6 +1,6 @@
 ---
 name: hono-guide
-description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScript. Triggers on `.ts` files with `hono` or `@hono/*` imports, route handlers, middleware, and prompts about validation, error handling, WebSockets, CORS, or building an HTTP API in Hono — even when the user doesn't say 'Hono'."
+description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScript. Triggers on `.ts` files with `hono` or `@hono/*` imports, route handlers, middleware, and prompts about validation, error handling, WebSockets, CORS, or building an HTTP API in Hono, even when the user doesn't say 'Hono'."
 ---
 
 # Hono Coding Guidelines
@@ -36,10 +36,10 @@ export function createApp() {
 
 ## Gotchas
 
-- `c.req.valid('json')` is typed by inference only when `zValidator` is chained inline on the route; an imported base-`Context` controller sees `any`, so cast there — but that cast is unchecked and can hide schema drift
-- Middleware runs in the order it's registered — auth before routes, error handlers last; ordering bugs cause silent 200s on protected routes
-- `env(c)` is the portable way to read env vars across runtimes — `process.env` works on Node but not Workers/Deno
-- WebSocket helpers capture `this` from the closing object — assigning the handler to a variable loses the binding
+- `c.req.valid('json')` is typed by inference only when `zValidator` is chained inline on the route; an imported base-`Context` controller sees `any`, so cast there, but that cast is unchecked and can hide schema drift
+- Middleware runs in the order it's registered: auth before routes, error handlers last; ordering bugs cause silent 200s on protected routes
+- `env(c)` is the portable way to read env vars across runtimes: `process.env` works on Node but not Workers/Deno
+- WebSocket helpers capture `this` from the closing object: assigning the handler to a variable loses the binding
 
 ## Progressive disclosure
 

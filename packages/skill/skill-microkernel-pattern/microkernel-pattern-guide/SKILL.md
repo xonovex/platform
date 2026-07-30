@@ -1,11 +1,11 @@
 ---
 name: microkernel-pattern-guide
-description: "Use when building an extensible system: a minimal core plus interchangeable plug-ins selected through a registry — the microkernel / plug-in architecture. Triggers on plugin/extension-point/registry design, adding a backend or driver without editing the core, open/closed extension, capability negotiation and fail-closed / secure-by-default gating, binding time (compile vs load vs run-time), dependency-injection vs service-locator wiring, lazy activation, or versioning a plug-in contract — even when the user doesn't say 'microkernel' and only says 'plugin architecture'."
+description: "Use when building an extensible system: a minimal core plus interchangeable plug-ins selected through a registry. The microkernel / plug-in architecture. Triggers on plugin/extension-point/registry design, adding a backend or driver without editing the core, open/closed extension, capability negotiation and fail-closed / secure-by-default gating, binding time (compile vs load vs run-time), dependency-injection vs service-locator wiring, lazy activation, or versioning a plug-in contract, even when the user doesn't say 'microkernel' and only says 'plugin architecture'."
 ---
 
 # Microkernel (Plug-in) Architecture
 
-A minimal core plus independent plug-ins, selected through a registry — extend the system by adding a plug-in, never by editing the core.
+A minimal core plus independent plug-ins, selected through a registry: extend the system by adding a plug-in, never by editing the core.
 
 ## Essentials
 
@@ -18,11 +18,11 @@ A minimal core plus independent plug-ins, selected through a registry — extend
 
 ## Gotchas
 
-- A microkernel is not "just a hexagon" — it adds an _open, registered_ plug-in set plus extensibility machinery; ports/adapters is only the substrate (hexagonal-pattern-guide).
-- Passing the registry into business logic is the service-locator anti-pattern — hidden dependencies, runtime not-found errors, untestable; resolve at the root and inject the plug-in.
-- A churning plug-in contract forces edits across every plug-in — the open/closed violation wearing an interface; keep the contract narrow and versioned.
-- The capability gate must name no concrete plug-in — fail-closed on a self-declared guarantee, or a new plug-in can violate an invariant silently.
-- The OS microkernel and this architecture pattern share a name, not a definition — keep the two senses separate, see [references/metapatterns-lens.md](references/metapatterns-lens.md).
+- A microkernel is not "just a hexagon". It adds an _open, registered_ plug-in set plus extensibility machinery; ports/adapters is only the substrate (hexagonal-pattern-guide).
+- Passing the registry into business logic is the service-locator anti-pattern: hidden dependencies, runtime not-found errors, untestable; resolve at the root and inject the plug-in.
+- A churning plug-in contract forces edits across every plug-in: the open/closed violation wearing an interface; keep the contract narrow and versioned.
+- The capability gate must name no concrete plug-in: fail-closed on a self-declared guarantee, or a new plug-in can violate an invariant silently.
+- The OS microkernel and this architecture pattern share a name, not a definition: keep the two senses separate, see [references/metapatterns-lens.md](references/metapatterns-lens.md).
 
 ## Example
 

@@ -38,4 +38,4 @@ error_t load_file(const char *path, char **out, size_t *len) {
 }
 ```
 
-For a single small result, return it (or a `{bool ok; T value;}` struct) by value instead of an out-param — reserve out-params for multiple or large results, see [references/value-types.md](./value-types.md).
+For a single small result, return it (or a `{bool ok; T value;}` struct) by value instead of an out-param: reserve out-params for multiple or large results, see [references/value-types.md](./value-types.md).

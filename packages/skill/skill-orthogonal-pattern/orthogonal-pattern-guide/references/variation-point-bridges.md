@@ -11,9 +11,9 @@ combined/html-email          # bad: a new pseudo-axis for one pairing
 ```
 
 - A bridge touches exactly the variants involved in one `requires` or `excludes` rule.
-- Place it in the variant that needs the other axis’s capability.
+- Place it in the variant that needs the other axis's capability.
 - Keep both axis roots unaware of concrete leaves.
-- Exchange neutral data or capabilities across the bridge; do not reach into another leaf’s internals.
+- Exchange neutral data or capabilities across the bridge; do not reach into another leaf's internals.
 - Keep the full cross-product in configuration. Do not hand-code a module for every pair.
 
 If every variant needs the same behavior, it is cross-cutting rather than a bridge. If many combinations require bespoke glue, the axes may be incorrectly split.

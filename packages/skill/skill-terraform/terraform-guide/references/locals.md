@@ -19,4 +19,4 @@ locals {
 }
 ```
 
-- Avoid `timestamp()` / `uuid()` in locals used by resource arguments — they change every plan and force perpetual diffs.
+- Avoid `timestamp()` / `uuid()` in locals used by resource arguments: they change every plan and force perpetual diffs.

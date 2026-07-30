@@ -1,7 +1,7 @@
 # Execute
 
-Execute carries out work that was already specified. It expects an antecedent — a
-plan, an accepted request, a recorded decision, or review feedback — and its job is to
+Execute carries out work that was already specified. It expects an antecedent: a
+plan, an accepted request, a recorded decision, or review feedback, and its job is to
 realize that antecedent, not to decide what the work should be.
 
 When no antecedent exists, Execute is the wrong operation. Producing the specification

@@ -6,9 +6,9 @@ The local-git steps before opening a PR / MR. Driving the host (opening the PR, 
 git push -u origin <branch>        # publish and set upstream in one step
 ```
 
-- Pushing does **not** open a PR / MR, and opening one does not push — do both, in order.
+- Pushing does **not** open a PR / MR, and opening one does not push: do both, in order.
 - Nothing committed ahead of the base → nothing to push or open; say so.
-- An SSH push may print a "post-quantum key exchange" line — informational, not an error.
+- An SSH push may print a "post-quantum key exchange" line: informational, not an error.
 
 ## Rebase onto the base so the diff is just this change
 

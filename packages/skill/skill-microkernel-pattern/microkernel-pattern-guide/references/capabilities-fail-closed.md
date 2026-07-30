@@ -2,9 +2,9 @@
 
 The core gates on a plug-in's declared capabilities, never on which plug-in it is. A plug-in lacking a required capability is rejected with zero core edits.
 
-- **Complete mediation** — the same generic check runs for every plug-in, no bypass, nothing grandfathered.
+- **Complete mediation**: the same generic check runs for every plug-in, no bypass, nothing grandfathered.
 
-**Declarative beats imperative** — the plug-in states capabilities as inert data the core reads (`ch.Capabilities()`), not code the core trusts to self-certify (`ch.AssertEncrypted()`). Data cannot lie by side effect; trusted imperative code can claim a capability it does not honor.
+**Declarative beats imperative**: the plug-in states capabilities as inert data the core reads (`ch.Capabilities()`), not code the core trusts to self-certify (`ch.AssertEncrypted()`). Data cannot lie by side effect; trusted imperative code can claim a capability it does not honor.
 
 ```go
 type Capability string // Encrypted, Bulk, Ordered

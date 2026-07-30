@@ -10,7 +10,7 @@ When a decision depends on a control that hasn't been issued yet this frame (occ
 2. At frame end, promote `next_hover` → `hover`. Controls read `hover` (last frame's resolved value) this frame.
 3. Track a layer for overlays (`next_hover_layer`) so a lower layer can't steal input from an overlay drawn above it.
 4. Apply the same delay to focus transitions: Tab sets `focus_on_next`; the _next_ control to render claims focus. Shift-Tab records `tab_focus_on_id = last_id` and takes effect next frame.
-5. Beware events that create a control which then reacts to the creating event — defer that reaction a frame too.
+5. Beware events that create a control which then reacts to the creating event: defer that reaction a frame too.
 
 ## Example
 
@@ -25,7 +25,7 @@ ui->next_hover = 0;
 
 ## Counter-Example
 
-State that is fully determined the moment it's computed (a click on a control already known to be hovered) needs no delay — only look-ahead-dependent decisions do.
+State that is fully determined the moment it's computed (a click on a control already known to be hovered) needs no delay, only look-ahead-dependent decisions do.
 
 ## Related
 

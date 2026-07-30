@@ -35,7 +35,7 @@ for (uint32_t i = 0; i < n; ++i) {
 
 ## Counter-Example
 
-A system that genuinely needs random access across the whole world (a global solver, a spatial query) won't fit the linear-walk shape — give it its own acceleration structure rather than forcing it through the component loop.
+A system that genuinely needs random access across the whole world (a global solver, a spatial query) won't fit the linear-walk shape: give it its own acceleration structure rather than forcing it through the component loop.
 
 ## Related
 

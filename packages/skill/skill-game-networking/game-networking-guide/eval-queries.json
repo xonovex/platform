@@ -1,6 +1,6 @@
 [
   {
-    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own — and how to keep that flexible if I switch to peer-to-peer later",
+    "query": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own, and how to keep that flexible if I switch to peer-to-peer later",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: topology + per-object authority, topology-as-config -> topology-and-authority.md"
@@ -30,7 +30,7 @@
     "rationale": "direct: whole-blob default vs per-field layout description -> state-replication.md"
   },
   {
-    "query": "A new client just connected mid-match and its world is garbage — I'm only sending the per-frame changes. What am I missing?",
+    "query": "A new client just connected mid-match and its world is garbage: I'm only sending the per-frame changes. What am I missing?",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: delta needs a baseline; new connection needs a full snapshot first -> delta-and-snapshots.md"
@@ -108,25 +108,25 @@
     "rationale": "near-miss: GPU frame graph -> gpu-rendering-guide, not networking"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "query": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
     "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code. How should I structure the thing they're editing",
     "rationale": "near miss owned by node-graph-guide",
     "should_trigger": false,
     "split": "validation"

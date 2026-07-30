@@ -1,6 +1,6 @@
 ---
 name: hexagonal-pattern-guide
-description: "Use when isolating an application or domain core from its I/O and delivery mechanisms behind interfaces — hexagonal / ports-and-adapters / clean / onion architecture. Triggers on decoupling the domain from the database/UI/framework, driving (primary) vs driven (secondary) adapters, dependency inversion / the dependency rule ('depend on an interface, not the implementation'), a composition root wiring adapters to ports, swapping a real adapter for a fake in tests, or keeping business logic free of infrastructure — even when the user doesn't say 'hexagonal' and says 'ports and adapters' or 'clean architecture'."
+description: "Use when isolating an application or domain core from its I/O and delivery mechanisms behind interfaces: hexagonal / ports-and-adapters / clean / onion architecture. Triggers on decoupling the domain from the database/UI/framework, driving (primary) vs driven (secondary) adapters, dependency inversion / the dependency rule ('depend on an interface, not the implementation'), a composition root wiring adapters to ports, swapping a real adapter for a fake in tests, or keeping business logic free of infrastructure, even when the user doesn't say 'hexagonal' and says 'ports and adapters' or 'clean architecture'."
 ---
 
 # Hexagonal Architecture (Ports and Adapters)
@@ -16,9 +16,9 @@ Isolate the domain core behind ports it owns, so every I/O and delivery mechanis
 
 ## Gotchas
 
-- The hexagon isn't six of anything — it just signals "many ports", not a top/bottom layering.
-- Ports-and-adapters is not the microkernel pattern — hexagonal isolates the domain behind a usually-fixed set of ports; an open, _registered_ plug-in set is microkernel-pattern-guide. They share the adapter mechanism, nothing more.
-- If a unit test needs a real database or network, the boundary leaked — narrow the port or invert the dependency.
+- The hexagon isn't six of anything. It just signals "many ports", not a top/bottom layering.
+- Ports-and-adapters is not the microkernel pattern: hexagonal isolates the domain behind a usually-fixed set of ports; an open, _registered_ plug-in set is microkernel-pattern-guide. They share the adapter mechanism, nothing more.
+- If a unit test needs a real database or network, the boundary leaked: narrow the port or invert the dependency.
 
 ## Example
 
@@ -30,7 +30,7 @@ type OrderService struct{ repo Repository } // depends on the port, not Postgres
 
 // driven adapter (outside): a PostgresRepository implementation of the port
 // driving adapter (outside): an HTTP handler that calls OrderService
-// test: an InMemoryRepository fake — no database
+// test: an InMemoryRepository fake, no database
 ```
 
 ## Progressive Disclosure

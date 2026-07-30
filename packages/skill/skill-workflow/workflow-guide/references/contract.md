@@ -10,7 +10,7 @@ Ground truth: every operation, skill, and entry point obeys every clause below.
    point must not require a catalog change, nor the reverse; stream-shaped work
    (continuous input, no single subject) gets its own entry point, never a forced
    operation.
-2. **Warm and cold boundaries.** Operations chain freely inside one warm session — one
+2. **Warm and cold boundaries.** Operations chain freely inside one warm session: one
    agent, unbroken context. A handoff is required only at a cold boundary: a session or
    role ends and context is not retained. A handoff is placement into a native system:
    a file, ticket, comment, or pull request the receiver already reads.

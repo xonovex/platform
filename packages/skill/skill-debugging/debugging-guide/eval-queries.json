@@ -1,6 +1,6 @@
 [
   {
-    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "query": "our exporter crashes opening the second project but the first one is fine, where do I even start",
     "should_trigger": true,
     "split": "train",
     "rationale": "systematic debugging: establish a repro, step before the crash -> scientific-debugging.md / reproduction-and-bisection.md"
@@ -12,7 +12,7 @@
     "rationale": "freed-memory fill pattern at a mapped address = use-after-free -> scientific-debugging.md"
   },
   {
-    "query": "the packaging command crashes but it's slow — can you help me find a smaller way to trigger it",
+    "query": "the packaging command crashes but it's slow: can you help me find a smaller way to trigger it",
     "should_trigger": true,
     "split": "train",
     "rationale": "shrink to a minimal deterministic repro -> reproduction-and-bisection.md"
@@ -24,7 +24,7 @@
     "rationale": "git bisect on a deterministic repro -> reproduction-and-bisection.md"
   },
   {
-    "query": "stop the team from chasing the same buffer-overwrite class of bug — what design would make it crash instantly at the bad write instead",
+    "query": "stop the team from chasing the same buffer-overwrite class of bug. What design would make it crash instantly at the bad write instead",
     "should_trigger": true,
     "split": "train",
     "rationale": "end-of-page allocator prevents the overwrite class -> bug-taxonomy.md / instrumentation-and-checks.md"
@@ -36,7 +36,7 @@
     "rationale": "flailing vs hypothesis-driven debugging -> scientific-debugging.md"
   },
   {
-    "query": "this bug only shows up once an hour and I can't catch it in the debugger — how do I make it reproducible",
+    "query": "this bug only shows up once an hour and I can't catch it in the debugger. How do I make it reproducible",
     "should_trigger": true,
     "split": "train",
     "rationale": "intermittent: stress to raise rate, circular log, record/replay -> determinism-and-replay.md"
@@ -96,13 +96,13 @@
     "rationale": "near-miss: data layout for performance -> data-oriented-design-guide"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"

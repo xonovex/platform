@@ -1,6 +1,6 @@
 # role-based-access: Role-Based Access Control (RBAC)
 
-Grant privileges to roles (readonly/readwrite/admin), then assign roles to users — never grant directly to users. `ALTER DEFAULT PRIVILEGES` is required so future tables inherit grants; readwrite also needs `USAGE ON … SEQUENCES` for `nextval` on serial/identity columns.
+Grant privileges to roles (readonly/readwrite/admin), then assign roles to users, never grant directly to users. `ALTER DEFAULT PRIVILEGES` is required so future tables inherit grants; readwrite also needs `USAGE ON ... SEQUENCES` for `nextval` on serial/identity columns.
 
 ```sql
 CREATE ROLE app_readwrite;

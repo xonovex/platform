@@ -29,7 +29,7 @@ void *project_alloc_aligned(size_t alignment, size_t size) {
 
 ## Gotchas
 
-- An aligned type in an array only stays aligned when its size is a whole multiple of the requested alignment — add explicit padding where necessary.
+- An aligned type in an array only stays aligned when its size is a whole multiple of the requested alignment: add explicit padding where necessary.
 - `malloc` guarantees alignment suitable for fundamental types, not arbitrary SIMD or cache-line over-alignment; use the platform allocator paired with the guarded alignment macro.
 - `posix_memalign` requires a power-of-two alignment that is also a multiple of `sizeof(void *)`; validate dynamic values before calling it.
 

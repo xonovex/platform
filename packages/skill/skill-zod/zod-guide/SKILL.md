@@ -1,6 +1,6 @@
 ---
 name: zod-guide
-description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements — even when the user doesn't say 'Zod'."
+description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements, even when the user doesn't say 'Zod'."
 ---
 
 # Zod Coding Guidelines
@@ -18,8 +18,8 @@ description: "Use when defining or editing Zod 4.0+ schemas for runtime validati
 
 ## Gotchas
 
-- `optional()` makes a field accept `undefined`; `nullable()` accepts `null` — they're orthogonal, combine with `.nullish()` for both
-- Refinements (`.refine`) don't narrow the output type — TypeScript still sees the broader input type unless you pair with `.transform`
+- `optional()` makes a field accept `undefined`; `nullable()` accepts `null`. They're orthogonal, combine with `.nullish()` for both
+- Refinements (`.refine`) don't narrow the output type: TypeScript still sees the broader input type unless you pair with `.transform`
 
 ## Progressive Disclosure
 

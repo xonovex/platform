@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Choose the layout by how the hot loop accesses fields — AoS when you touch most fields of one record at a time, SoA when you stream one or few fields across many records, AoSoA when you need both cache and SIMD efficiency.
+Choose the layout by how the hot loop accesses fields: AoS when you touch most fields of one record at a time, SoA when you stream one or few fields across many records, AoSoA when you need both cache and SIMD efficiency.
 
 ## Rationale
 
@@ -36,7 +36,7 @@ typedef struct { float x[N], y[N], z[N], vx[N], vy[N], vz[N]; int hp[N]; } soa_t
 soa_t soa;
 for (size_t i = 0; i < N; i++) soa.x[i] += soa.vx[i]; // pure stream, no waste
 
-// AoSoA: tiles of W lanes — cache-local block, SIMD-contiguous lanes
+// AoSoA: tiles of W lanes: cache-local block, SIMD-contiguous lanes
 typedef struct { float x[W], y[W], z[W], vx[W], vy[W], vz[W]; } block_t;
 block_t aosoa[N / W];
 for (size_t b = 0; b < N / W; b++)
@@ -47,7 +47,7 @@ for (size_t b = 0; b < N / W; b++)
 ## Gotchas
 
 - SoA is not free: more arrays to allocate, parallel indices to keep consistent, worse for whole-record random access.
-- Do not convert to SoA on faith — verify the loop actually reads a subset of fields, or it can be a pessimization.
+- Do not convert to SoA on faith: verify the loop actually reads a subset of fields, or it can be a pessimization.
 
 ## Related
 

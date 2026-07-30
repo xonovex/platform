@@ -5,7 +5,7 @@ description: "Use when architecting real-time multiplayer networking for a game 
 
 # Game networking Guidelines
 
-API-agnostic architecture for real-time multiplayer over an unreliable network: how participants are modeled and who owns state, what to put on the wire, and how reliability is layered on UDP. This skill replicates a typed world — see **data-model-guide** for the object/id model, **ecs-guide** for the component model, and **data-oriented-design-guide** for packing wire data.
+API-agnostic architecture for real-time multiplayer over an unreliable network: how participants are modeled and who owns state, what to put on the wire, and how reliability is layered on UDP. This skill replicates a typed world, see **data-model-guide** for the object/id model, **ecs-guide** for the component model, and **data-oriented-design-guide** for packing wire data.
 
 ## Essentials
 
@@ -32,12 +32,12 @@ API-agnostic architecture for real-time multiplayer over an unreliable network: 
 
 ## Gotchas
 
-- A component being replicable does nothing unless the object instance is also flagged for replication — the most common "nothing syncs" bug is a missing object flag.
+- A component being replicable does nothing unless the object instance is also flagged for replication. The most common "nothing syncs" bug is a missing object flag.
 - Choosing reliable-ordered delivery for everything recreates TCP head-of-line blocking over UDP: one dropped packet stalls everything queued behind it.
-- Pipes are one-way — forgetting the return pipe means the other node literally cannot reply.
+- Pipes are one-way: forgetting the return pipe means the other node literally cannot reply.
 - The connection handshake must be idempotent: a re-sent request (because the response was lost) has to return "accepted," not open a second pipe.
 - In-process local delivery never drops or reorders, so loss/reorder bugs stay hidden until you inject adverse conditions or test against a real socket.
-- "Deliver all, allow duplicates" guarantees arrival, not uniqueness — handlers must tolerate seeing the same packet twice.
+- "Deliver all, allow duplicates" guarantees arrival, not uniqueness: handlers must tolerate seeing the same packet twice.
 - Two nodes that both believe they own the same object will fight; authority must be singular per object.
 
 ## Progressive Disclosure

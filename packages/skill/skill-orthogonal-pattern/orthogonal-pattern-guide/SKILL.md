@@ -1,6 +1,6 @@
 ---
 name: orthogonal-pattern-guide
-description: "Use when deciding how to decompose a system into modules or packages along independent variation axes, and where each concern's boundary belongs. Triggers on shared-core plus per-variant leaves, package-by-feature vs package-by-layer, sibling naming symmetry, parallel consumers that should mirror the same concepts, cross-axis constraints, cross-cutting concerns that are not axes, false modularity, or a module tree that feels tangled — even when the user doesn't say 'orthogonal'."
+description: "Use when deciding how to decompose a system into modules or packages along independent variation axes, and where each concern's boundary belongs. Triggers on shared-core plus per-variant leaves, package-by-feature vs package-by-layer, sibling naming symmetry, parallel consumers that should mirror the same concepts, cross-axis constraints, cross-cutting concerns that are not axes, false modularity, or a module tree that feels tangled, even when the user doesn't say 'orthogonal'."
 ---
 
 # Orthogonal Axes
@@ -9,12 +9,12 @@ Decompose around independent decisions likely to change. An axis names the quest
 
 ## Essentials
 
-- **Find independent decisions** — derive axes from what can vary separately, not execution steps, see [references/finding-axes.md](references/finding-axes.md)
-- **Separate commonality from variability** — keep only truly shared rules at the axis root and put each answer in a leaf, see [references/commonality-variability.md](references/commonality-variability.md)
-- **Make the tree reveal the model** — use one directory per axis and bare, symmetric variant names, see [references/applying-the-layout.md](references/applying-the-layout.md), [references/naming-symmetry.md](references/naming-symmetry.md)
-- **Localize cross-axis constraints** — place exceptional two-axis glue in the dependent variant, see [references/variation-point-bridges.md](references/variation-point-bridges.md)
-- **Distinguish cross-cutting concerns** — apply concerns that touch every selection once around the composed operation, see [references/cross-cutting-concerns.md](references/cross-cutting-concerns.md)
-- **Align ownership and change** — a change to one concept should stay inside one axis and one owner, see [references/boundary-alignment.md](references/boundary-alignment.md)
+- **Find independent decisions**: derive axes from what can vary separately, not execution steps, see [references/finding-axes.md](references/finding-axes.md)
+- **Separate commonality from variability**: keep only truly shared rules at the axis root and put each answer in a leaf, see [references/commonality-variability.md](references/commonality-variability.md)
+- **Make the tree reveal the model**: use one directory per axis and bare, symmetric variant names, see [references/applying-the-layout.md](references/applying-the-layout.md), [references/naming-symmetry.md](references/naming-symmetry.md)
+- **Localize cross-axis constraints**: place exceptional two-axis glue in the dependent variant, see [references/variation-point-bridges.md](references/variation-point-bridges.md)
+- **Distinguish cross-cutting concerns**: apply concerns that touch every selection once around the composed operation, see [references/cross-cutting-concerns.md](references/cross-cutting-concerns.md)
+- **Align ownership and change**: a change to one concept should stay inside one axis and one owner, see [references/boundary-alignment.md](references/boundary-alignment.md)
 
 ## Handoffs
 

@@ -2,15 +2,15 @@
 
 ## Guideline
 
-Resample every source to the mixer's internal rate by reading it with a fractional, per-voice playback step and interpolating between source samples; one knob — the step size — gives both rate conversion and pitch/speed control.
+Resample every source to the mixer's internal rate by reading it with a fractional, per-voice playback step and interpolating between source samples; one knob: the step size: gives both rate conversion and pitch/speed control.
 
 ## Rationale
 
-Real fractional positions land between stored samples, so interpolate — linear is cheap and usually adequate, higher-order kernels (Hermite/cubic) when fidelity matters. Per-voice steps let each sound have its own pitch without touching the others.
+Real fractional positions land between stored samples, so interpolate: linear is cheap and usually adequate, higher-order kernels (Hermite/cubic) when fidelity matters. Per-voice steps let each sound have its own pitch without touching the others.
 
 ## How to Apply
 
-1. Define a sampler callback per source type: given a fractional offset and a count, it fills a mixer-rate buffer — `(user_data, offset, out, n, mix_rate)`. WAV, synth, and stream sources all hide behind this one signature.
+1. Define a sampler callback per source type: given a fractional offset and a count, it fills a mixer-rate buffer, `(user_data, offset, out, n, mix_rate)`. WAV, synth, and stream sources all hide behind this one signature.
 2. Maintain a fractional read cursor per voice. Advance it by `step = (src_rate / mix_rate) * pitch` each output sample; `pitch` is the per-voice speed/pitch control.
 3. Interpolate at the fractional position: linear blend of the two bracketing source samples for the default path; swap in a cubic/Hermite kernel only where the quality is worth the cost.
 4. Keep DSP per-voice and bounded: pitch via step, gain/pan via the mix matrix; defer reverb and shared effect buses to a separate, fixed-cost post-mix stage.
@@ -42,7 +42,7 @@ uint32_t wav_sample(const void *ud, double offset, float *out,
 ## Gotchas
 
 - Linear interpolation is a cheap default but rolls off highs and adds aliasing on big pitch-ups; reach for a cubic/Hermite or band-limited kernel only where the artifact is audible, not everywhere.
-- Pitching a voice up makes it consume source samples faster, so it ends sooner — couple the read cursor to the loop/length logic or a sped-up loop will glitch at its seam.
+- Pitching a voice up makes it consume source samples faster, so it ends sooner: couple the read cursor to the loop/length logic or a sped-up loop will glitch at its seam.
 - Accumulating the fractional position with `float` drifts over long sounds; keep the cursor in `double` (or fixed-point) so minutes-long sources stay in tune.
 - Pitch-up reads past the source faster than pitch-1; always range-check the bracketing index, especially the `i0 + 1` neighbor at the very end of the buffer.
 - Resampling on the audio thread is fine as long as it stays bounded and allocation-free; do not lazily allocate a scratch buffer there (see the callback contract).

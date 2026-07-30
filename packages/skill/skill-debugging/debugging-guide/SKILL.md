@@ -28,9 +28,9 @@ Systematic, hypothesis-driven debugging of native/low-level software, plus desig
 
 ## Gotchas
 
-- "Access violation" / "segfault" is about an unmapped address, not permissions or threading — it almost always means a garbage or dangling pointer was dereferenced.
+- "Access violation" / "segfault" is about an unmapped address, not permissions or threading. It almost always means a garbage or dangling pointer was dereferenced.
 - A bug that lands "in the same spot every time" is a reasonable but unproven 100% repro; if it later "disappears," revise the assumption rather than trusting it.
-- Bisect lies when the repro is flaky or GOOD/BAD is mis-tagged, and incremental builds can mislead — force clean rebuilds and only bisect a deterministic repro.
+- Bisect lies when the repro is flaky or GOOD/BAD is mis-tagged, and incremental builds can mislead: force clean rebuilds and only bisect a deterministic repro.
 - Adding validation that only re-reports what the debugger already showed you (e.g. "this pointer was freed") buys nothing; instrument to surface the fault _earlier or where it is cheaper to act on_, not to restate it.
 - Reaching for "compiler bug" before ruling out your own undefined behavior is almost always wrong; test another compiler/opt level and inspect the assembly first.
 

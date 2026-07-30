@@ -30,7 +30,7 @@ General principles for allocating, owning, and freeing memory in manual-memory o
 
 - Bump allocation has no bounds safety unless you check capacity; always assert/return on overflow.
 - Two owners means double-free or leak; decide ownership explicitly, don't infer it.
-- Pointers into a growing/reset allocation dangle — prefer offsets/handles across a boundary (a virtual-memory reserve/commit block is the exception: it never moves).
+- Pointers into a growing/reset allocation dangle. Prefer offsets/handles across a boundary (a virtual-memory reserve/commit block is the exception: it never moves).
 
 ## Progressive Disclosure
 

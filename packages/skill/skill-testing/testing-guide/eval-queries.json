@@ -12,7 +12,7 @@
     "rationale": "what-to-mock decision: value objects are a do-not-mock case owned here"
   },
   {
-    "query": "this test asserts on every internal call and breaks on every refactor \u2014 is that over-mocking?",
+    "query": "this test asserts on every internal call and breaks on every refactor: is that over-mocking?",
     "should_trigger": true,
     "split": "train",
     "rationale": "over-mocking / behaviour-vs-state verification and the Fragile-Test symptom"
@@ -24,13 +24,13 @@
     "rationale": "AAA structure and FIRST qualities are owned concepts"
   },
   {
-    "query": "my fixture setup is a mess of canned objects \u2014 should I use a Test Data Builder or an Object Mother?",
+    "query": "my fixture setup is a mess of canned objects: should I use a Test Data Builder or an Object Mother?",
     "should_trigger": true,
     "split": "train",
     "rationale": "fixture-creation patterns owned here"
   },
   {
-    "query": "name this test and split it \u2014 it verifies five things at once",
+    "query": "name this test and split it: it verifies five things at once",
     "should_trigger": true,
     "split": "validation",
     "rationale": "test naming plus the Eager Test smell, both owned here"
@@ -42,13 +42,13 @@
     "rationale": "stub sub-kinds and state-vs-behaviour verification owned here"
   },
   {
-    "query": "this test is flaky and obscure \u2014 what smell is it and how do I fix it?",
+    "query": "this test is flaky and obscure. What smell is it and how do I fix it?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "Erratic and Obscure test smells owned here"
   },
   {
-    "query": "when in the cycle should I write the failing test \u2014 before or after the production code?",
+    "query": "when in the cycle should I write the failing test, before or after the production code?",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: test-first rhythm / red-green-refactor is owned by tdd-guide, not the shape of a single test"
@@ -84,7 +84,7 @@
     "rationale": "near-miss: classical-vs-mockist as a development/design style is owned by tdd-guide"
   },
   {
-    "query": "these two modules feel way too tightly coupled \u2014 tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "query": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
     "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "validation"

@@ -15,9 +15,9 @@ Each source is one `##` section. Use the **docs** form for a framework/library's
   - {Topic 2} → `references/{topic-2}.md`
   - {Topic 3} → `references/{topic-3}.md`
 
-## {Concept / source name — for a cited book, paper, or article}
+## {Concept / source name, for a cited book, paper, or article}
 
-- **Title:** {Author(s) — "Work Title" (publisher / venue, year)}
+- **Title:** {Author(s), "Work Title" (publisher / venue, year)}
 - **URL:** {https://example.com}
 - **Last reviewed:** {YYYY-MM-DD}
 - **Used for:**

@@ -10,18 +10,18 @@ inventory.
 
 These orderings recur across domains. Read them as shapes, not as a required sequence.
 
-- **Scoping** — Decide settles the open questions, then a planning guide produces the
+- **Scoping**: Decide settles the open questions, then a planning guide produces the
   plan itself. Slicing an increment is the same shape: Decide the split, then Validate
   the agreed examples independently.
-- **Building** — Execute realizes an antecedent against the implementation guides;
+- **Building**: Execute realizes an antecedent against the implementation guides;
   Validate evaluates the acceptance criteria as a separate invocation.
-- **Authoring** — Create produces the artifact, Revise applies feedback, Publish
+- **Authoring**: Create produces the artifact, Revise applies feedback, Publish
   persists it. A manifest, an article, and a catalog entry share this shape.
-- **Delivering** — Review the change, then Publish it through the provider and release
+- **Delivering**: Review the change, then Publish it through the provider and release
   guides. Review never approves and never publishes.
-- **Failing** — Execute reproduces the problem; when the repro does not hold, Abandon
+- **Failing**: Execute reproduces the problem; when the repro does not hold, Abandon
   records the partial state and the retry boundary instead of guessing.
-- **Isolating** — workspace create to isolate, merge to integrate, cleanup as its own
+- **Isolating**: workspace create to isolate, merge to integrate, cleanup as its own
   later step.
 
 ## Invariants

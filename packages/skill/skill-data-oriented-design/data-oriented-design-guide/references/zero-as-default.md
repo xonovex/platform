@@ -26,7 +26,7 @@ if (b != NO_BONE) ...                                    // forget it once -> si
 
 ## Counter-Example
 
-This only works where the domain has a natural "nothing/neutral" case. Where `0` is a legitimate value (a temperature, a signed offset, an external API that treats `0` as a reserved/invalid handle), don't overload it — use an explicit presence flag or an out-of-domain sentinel instead.
+This only works where the domain has a natural "nothing/neutral" case. Where `0` is a legitimate value (a temperature, a signed offset, an external API that treats `0` as a reserved/invalid handle), don't overload it: use an explicit presence flag or an out-of-domain sentinel instead.
 
 ## Related
 

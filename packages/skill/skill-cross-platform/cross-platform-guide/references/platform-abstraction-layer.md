@@ -2,13 +2,13 @@
 
 ## Guideline
 
-Route every operating-system and windowing call through one narrow abstraction interface — a struct of function pointers (or a header whose implementation is selected at build time) — and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
+Route every operating-system and windowing call through one narrow abstraction interface: a struct of function pointers (or a header whose implementation is selected at build time), and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
 
 ## How to Apply
 
 1. Carve the OS surface into cohesive interfaces by concern: one for general OS services (threading, fibers, time, filesystem, file-system change monitoring), one for windowing, one for clipboard/selection, one for input sources, one for the audio backend.
 2. Express each as a struct of function pointers (so the same header compiles on every target) or as a header with a build-time-selected `.c`; expose only the abstract types callers need, never raw OS handles.
-3. Have application/engine/renderer code take the interface by pointer and call through it — never call an OS API or include an OS header outside a backend file.
+3. Have application/engine/renderer code take the interface by pointer and call through it, never call an OS API or include an OS header outside a backend file.
 4. Provide a default stub backend that satisfies the interface with no-ops / sane defaults so the whole program links and runs before any real platform code exists.
 5. Implement one backend per platform in its own translation unit (e.g. `os.linux.c`, `os.win32.c`, `os.web.c`); the build picks exactly one.
 6. When the OS lacks a concept the interface assumes (e.g. relative mouse motion, a single system clipboard), emulate it inside the backend so the contract still holds for callers.
@@ -16,7 +16,7 @@ Route every operating-system and windowing call through one narrow abstraction i
 ## Example
 
 ```c
-// os.h — one abstract interface, identical on every platform.
+// os.h: one abstract interface, identical on every platform.
 struct os_api {
     // threading / fibers / time
     os_thread_t (*create_thread)(os_thread_fn *fn, void *ud);
@@ -41,10 +41,10 @@ uint64_t t = os_api->now();          // resolves to os.linux.c / os.win32.c / os
 
 ## Gotchas
 
-- A backend that leaks a raw OS handle (HWND, file descriptor, X connection) through the interface re-couples callers to one platform — keep the type opaque and convert at the boundary.
+- A backend that leaks a raw OS handle (HWND, file descriptor, X connection) through the interface re-couples callers to one platform: keep the type opaque and convert at the boundary.
 - The interface must be designed before the first backend, not reverse-engineered from one platform, or its shape silently bakes in that platform's assumptions (e.g. assuming one global clipboard, or that the OS reports relative mouse motion).
 - Stubs that return plausible-but-wrong values (success when unimplemented) hide missing functionality; return an explicit "unimplemented" signal so gaps surface during bring-up.
-- Splitting the surface too finely produces dozens of one-function interfaces and ceremony; too coarsely produces a god-interface no backend can fill incrementally — group by the subsystem that ships together.
+- Splitting the surface too finely produces dozens of one-function interfaces and ceremony; too coarsely produces a god-interface no backend can fill incrementally: group by the subsystem that ships together.
 - Some platforms have no native concept the interface names (relative mouse delta, multiple selections vs one clipboard); the backend must emulate it (e.g. track last mouse position to synthesize deltas) rather than push the gap up to callers.
 
 ## Related

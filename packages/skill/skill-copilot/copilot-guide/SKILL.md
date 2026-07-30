@@ -1,6 +1,6 @@
 ---
 name: copilot-guide
-description: "Use when configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. Triggers on .github/hooks, ~/.copilot/hooks, policy.d, preToolUse, permissionRequest, agentStop, command/HTTP/prompt handlers, cloud sandbox differences, plugin.json, repository trust, disableAllHooks, or Copilot onboarding — even when the user doesn't say 'Copilot hook'."
+description: "Use when configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. Triggers on .github/hooks, ~/.copilot/hooks, policy.d, preToolUse, permissionRequest, agentStop, command/HTTP/prompt handlers, cloud sandbox differences, plugin.json, repository trust, disableAllHooks, or Copilot onboarding, even when the user doesn't say 'Copilot hook'."
 ---
 
 # GitHub Copilot Hooks and Policy

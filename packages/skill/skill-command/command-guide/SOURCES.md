@@ -10,7 +10,7 @@
   - YAML frontmatter fields: `description`, `allowed-tools`, `argument-hint`, `model`, `disable-model-invocation`
   - `$ARGUMENTS`, `$1`, `$2` argument substitution
   - `` !`cmd` `` inline shell execution
-  - Skill / command merger in v2.1.101 — skill wins on name collision
+  - Skill / command merger in v2.1.101: skill wins on name collision
 
 ## Codex: Plugins, Skills, and Custom Prompts
 
@@ -60,7 +60,7 @@
 - **Used for:** `references/harness-formats.md` → Gemini CLI matrix row, Body language axis, Namespacing axis, Inline shell axis, Migration Notes
 - **Aspects extracted:**
   - `.gemini/commands/<name>.toml` (project) and `~/.gemini/commands/` (user) locations
-  - **TOML schema** (outlier — all other harnesses use Markdown + YAML frontmatter): required `prompt` (multiline triple-quoted string), optional `description`
+  - **TOML schema** (outlier, all other harnesses use Markdown + YAML frontmatter): required `prompt` (multiline triple-quoted string), optional `description`
   - `{{args}}` substitution
   - `!{cmd}` inline shell execution
   - Subdirectory → colon namespace (`git/commit.toml` → `/git:commit`)
@@ -91,7 +91,7 @@
   - `read:` field to preload conventions / context files
   - `--load <file>` to execute a file of `/commands` on launch
   - Model `alias:` shortcuts
-  - Aider does NOT support user-defined `/<name>` slash commands — confirmed gap
+  - Aider does NOT support user-defined `/<name>` slash commands: confirmed gap
 
 ## Cline: Rules / Workflows
 

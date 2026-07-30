@@ -2,7 +2,7 @@
 
 ## INVEST and SMART
 
-- **Title:** Bill Wake — "INVEST in Good Stories, and SMART Tasks" (xp123.com, 2003)
+- **Title:** Bill Wake, "INVEST in Good Stories, and SMART Tasks" (xp123.com, 2003)
 - **URL:** https://xp123.com/articles/invest-in-good-stories-and-smart-tasks/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -12,7 +12,7 @@
 
 ## The 3 Cs
 
-- **Title:** Ron Jeffries — "Essential XP: Card, Conversation, Confirmation" (ronjeffries.com, 2001)
+- **Title:** Ron Jeffries, "Essential XP: Card, Conversation, Confirmation" (ronjeffries.com, 2001)
 - **URL:** https://ronjeffries.com/xprog/articles/expcardconversationconfirmation/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -22,7 +22,7 @@
 
 ## The story template
 
-- **Title:** Mike Cohn — "What Is a User Story Template and Why Does It Work So Well?" (Mountain Goat Software)
+- **Title:** Mike Cohn. "What Is a User Story Template and Why Does It Work So Well?" (Mountain Goat Software)
 - **URL:** https://www.mountaingoatsoftware.com/blog/why-the-three-part-user-story-template-works-so-well
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -32,7 +32,7 @@
 
 ## User stories (canonical book)
 
-- **Title:** Mike Cohn — "User Stories Applied: For Agile Software Development" (Addison-Wesley, 2004)
+- **Title:** Mike Cohn, "User Stories Applied: For Agile Software Development" (Addison-Wesley, 2004)
 - **URL:** https://www.mountaingoatsoftware.com/books/user-stories-applied
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -40,9 +40,9 @@
 - **Aspects extracted:**
   - The canonical generalization of user stories; the template, the application of INVEST, and the conversation-over-documentation framing
 
-## Splitting — SPIDR
+## Splitting: SPIDR
 
-- **Title:** Mike Cohn — "Five Simple but Powerful Ways to Split User Stories" (Mountain Goat Software)
+- **Title:** Mike Cohn, "Five Simple but Powerful Ways to Split User Stories" (Mountain Goat Software)
 - **URL:** https://www.mountaingoatsoftware.com/blog/five-simple-but-powerful-ways-to-split-user-stories
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -50,9 +50,9 @@
 - **Aspects extracted:**
   - The SPIDR model (Spike, Path, Interface, Data, Rules) with worked examples; "I" is Interface (singular); Spike as the last-resort, knowledge-only move
 
-## Splitting — the flowchart
+## Splitting: the flowchart
 
-- **Title:** Richard Lawrence / Humanizing Work — "The Humanizing Work Guide to Splitting User Stories"
+- **Title:** Richard Lawrence / Humanizing Work. "The Humanizing Work Guide to Splitting User Stories"
 - **URL:** https://www.humanizingwork.com/the-humanizing-work-guide-to-splitting-user-stories/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -60,9 +60,9 @@
 - **Aspects extracted:**
   - The splitting-pattern flowchart; the nine patterns (Workflow Steps, Operations/CRUD, Business Rule Variations, Variations in Data, Data Entry Methods, Major Effort, Simple/Complex, Deferred Performance/NFRs, Break Out a Spike); the preconditions; the two evaluation rules
 
-## Vertical slicing — the walking skeleton
+## Vertical slicing: the walking skeleton
 
-- **Title:** Alistair Cockburn — "Crystal Clear" / "Writing Effective Use Cases" (Walking Skeleton), via the c2 wiki
+- **Title:** Alistair Cockburn, "Crystal Clear" / "Writing Effective Use Cases" (Walking Skeleton), via the c2 wiki
 - **URL:** https://wiki.c2.com/?WalkingSkeleton
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -72,7 +72,7 @@
 
 ## Backlog refinement
 
-- **Title:** Ken Schwaber & Jeff Sutherland — "The Scrum Guide" (2020)
+- **Title:** Ken Schwaber & Jeff Sutherland, "The Scrum Guide" (2020)
 - **URL:** https://scrumguides.org/scrum-guide.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**

@@ -1,6 +1,6 @@
 [
   {
-    "query": "my sound randomly cuts out with a little pop when the frame rate dips — the mixing happens in a callback that sometimes grabs a mutex",
+    "query": "my sound randomly cuts out with a little pop when the frame rate dips: the mixing happens in a callback that sometimes grabs a mutex",
     "should_trigger": true,
     "split": "train",
     "rationale": "audio underrun from a lock on the callback path -> audio-callback-thread.md"
@@ -12,7 +12,7 @@
     "rationale": "latency vs buffer size, queue-ahead vs starvation -> audio-callback-thread.md"
   },
   {
-    "query": "when I change a sound's volume there's an audible click — I just set the new value each frame",
+    "query": "when I change a sound's volume there's an audible click: I just set the new value each frame",
     "should_trigger": true,
     "split": "train",
     "rationale": "gain must be ramped, not snapped -> mixing-and-buffers.md"
@@ -24,7 +24,7 @@
     "rationale": "integer overflow on mix; accumulate in float and scale to fit -> mixing-and-buffers.md"
   },
   {
-    "query": "I have a 22 kHz wav and my mixer runs at 44.1 kHz — how do I play it back at the right speed, and can I also pitch it up an octave?",
+    "query": "I have a 22 kHz wav and my mixer runs at 44.1 kHz. How do I play it back at the right speed, and can I also pitch it up an octave?",
     "should_trigger": true,
     "split": "train",
     "rationale": "sample-rate conversion + pitch via step -> resampling-and-dsp.md"
@@ -36,7 +36,7 @@
     "rationale": "fixed voice pool and voice stealing -> voice-management.md"
   },
   {
-    "query": "my game thread sets a playing sound's position directly while the mixer reads it and I get garbage — how should the two threads communicate?",
+    "query": "my game thread sets a playing sound's position directly while the mixer reads it and I get garbage. How should the two threads communicate?",
     "should_trigger": true,
     "split": "train",
     "rationale": "command handoff, value messages, audio thread owns state -> command-handoff.md"
@@ -66,13 +66,13 @@
     "rationale": "near-miss: data layout -> data-oriented-design-guide"
   },
   {
-    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating — what work is safe to do in there?",
+    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating. What work is safe to do in there?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "real-time callback contract, bounded work -> audio-callback-thread.md"
   },
   {
-    "query": "panning and 3d positioning a voice — is there one structure that covers volume and channel routing together?",
+    "query": "panning and 3d positioning a voice: is there one structure that covers volume and channel routing together?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "per-voice gain matrix m[ic][oc] -> mixing-and-buffers.md"
@@ -96,13 +96,13 @@
     "rationale": "near-miss: high-level async/pool usage, not real-time audio"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"

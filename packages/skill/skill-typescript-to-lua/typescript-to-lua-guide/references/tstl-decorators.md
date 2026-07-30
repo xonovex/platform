@@ -2,10 +2,10 @@
 
 Control Lua code generation with TSTL JSDoc annotations:
 
-- `/** @luaTable */` — interface compiles to a raw Lua table (no wrapper).
-- `/** @luaIterator */` — generator usable directly in Lua `for ... in`.
-- `/** @noSelf */` — function/method omits the implicit `self` parameter.
-- `/** @pureVirtual */` — marks an abstract method with no body.
+- `/** @luaTable */`: interface compiles to a raw Lua table (no wrapper).
+- `/** @luaIterator */`: generator usable directly in Lua `for ... in`.
+- `/** @noSelf */`: function/method omits the implicit `self` parameter.
+- `/** @pureVirtual */`: marks an abstract method with no body.
 
 ```typescript
 /** @luaTable */

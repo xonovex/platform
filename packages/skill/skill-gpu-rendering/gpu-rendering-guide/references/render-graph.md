@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Express a frame as a graph of passes that each declare which resources they read and write, and let the graph derive execution order, insert barriers and image-layout transitions, prune unused passes, and alias transient render targets whose lifetimes do not overlap — instead of hand-sequencing barriers and managing target memory by hand.
+Express a frame as a graph of passes that each declare which resources they read and write, and let the graph derive execution order, insert barriers and image-layout transitions, prune unused passes, and alias transient render targets whose lifetimes do not overlap, instead of hand-sequencing barriers and managing target memory by hand.
 
 ## Rationale
 
@@ -20,7 +20,7 @@ Hand-managed barriers are the single largest source of correctness bugs and sile
 ## Example
 
 ```c
-// Declarative pass setup — the pass states intent, not barriers or ordering.
+// Declarative pass setup: the pass states intent, not barriers or ordering.
 // (Neutral pseudocode; concrete API calls live in the per-API skill.)
 rg_handle depth = rg_create_image(g, &(rg_image_desc){.format = DEPTH32F, .transient = true});
 rg_handle gbuf  = rg_create_image(g, &(rg_image_desc){.format = RGBA8,    .transient = true});
@@ -44,11 +44,11 @@ rg_execute(g, cmd);
 
 ## Gotchas
 
-- The graph can only insert a correct barrier for usage it was told about; a pass that touches a resource it did not declare gets no barrier and corrupts silently — declare every read and write.
-- Aliasing requires non-overlapping lifetimes; if a "transient" target is read after the graph reused its memory, you get garbage — mark anything that must persist as non-transient.
+- The graph can only insert a correct barrier for usage it was told about; a pass that touches a resource it did not declare gets no barrier and corrupts silently: declare every read and write.
+- Aliasing requires non-overlapping lifetimes; if a "transient" target is read after the graph reused its memory, you get garbage: mark anything that must persist as non-transient.
 - An aliased resource's contents are undefined on first use in its new lifetime; always fully overwrite (or clear) before reading.
 - Per-frame graph rebuild must be cheap (arena-allocated, no global heap churn) or it eats the frame it is meant to schedule.
-- Async-compute and multi-queue edges need queue-ownership transfers and cross-queue waits, not just intra-queue barriers — the graph must model the queue, see [references/synchronization.md](./synchronization.md).
+- Async-compute and multi-queue edges need queue-ownership transfers and cross-queue waits, not just intra-queue barriers. The graph must model the queue, see [references/synchronization.md](./synchronization.md).
 
 ## Related
 

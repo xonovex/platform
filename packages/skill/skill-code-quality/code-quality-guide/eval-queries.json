@@ -1,18 +1,18 @@
 [
   {
-    "query": "harden the user-service module — it's full of `any` and swallowed errors, just tell me what to fix",
+    "query": "harden the user-service module: it's full of `any` and swallowed errors, just tell me what to fix",
     "should_trigger": true,
     "split": "train",
     "rationale": "robustness audit: type safety + error handling, read-only findings"
   },
   {
-    "query": "find simplification opportunities in src/ — duplicates and dead code, don't change anything yet",
+    "query": "find simplification opportunities in src/: duplicates and dead code, don't change anything yet",
     "should_trigger": true,
     "split": "train",
     "rationale": "simplicity audit: duplicates + dead code, read-only"
   },
   {
-    "query": "these two API handlers do the same thing slightly differently — which should be the reference and where do they drift?",
+    "query": "these two API handlers do the same thing slightly differently. Which should be the reference and where do they drift?",
     "should_trigger": true,
     "split": "train",
     "rationale": "alignment/consistency audit between two implementations"
@@ -24,7 +24,7 @@
     "rationale": "harden: code smells + validation gaps"
   },
   {
-    "query": "which of our dependencies are unused or redundant — report only, no removals",
+    "query": "which of our dependencies are unused or redundant: report only, no removals",
     "should_trigger": true,
     "split": "train",
     "rationale": "simplify: unused dependencies, read-only"
@@ -78,7 +78,7 @@
     "split": "validation"
   },
   {
-    "query": "these two modules feel way too tightly coupled — tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "query": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
     "rationale": "near miss owned by connascence-guide",
     "should_trigger": false,
     "split": "train"

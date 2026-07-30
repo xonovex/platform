@@ -10,7 +10,7 @@ The editor graph carries subgraph wrappers, interface nodes, comments, and indir
 
 ## How to Apply
 
-1. Treat compilation as a pre-pass: produce a flattened node/connection list with all editor-only constructs (subgraph wrappers, interface nodes) removed — see subgraphs-and-functions.md for flattening.
+1. Treat compilation as a pre-pass: produce a flattened node/connection list with all editor-only constructs (subgraph wrappers, interface nodes) removed, see subgraphs-and-functions.md for flattening.
 2. Build the dependency DAG from the connections and topologically sort it to get evaluation order.
 3. Evaluate in order: for each node, gather resolved inputs (wired value or stored default), run its evaluate callback, publish its outputs.
 4. For each output, compute `validity_hash = hash(node_settings, input_hashes...)`; carry it on the value traveling the wire.
@@ -51,12 +51,12 @@ void evaluate(const compiled_graph_t *cg) {     // cg is flat + topologically so
 
 ## Gotchas
 
-- The hash must fold in _every_ input that affects the output; an input read but omitted from the hash produces stale reuse with no error — the worst kind of caching bug.
-- Topological sort assumes a DAG; a cycle (often introduced by a bad subgraph inline) has no valid order — detect and reject cycles at compile.
+- The hash must fold in _every_ input that affects the output; an input read but omitted from the hash produces stale reuse with no error: the worst kind of caching bug.
+- Topological sort assumes a DAG; a cycle (often introduced by a bad subgraph inline) has no valid order: detect and reject cycles at compile.
 - Re-flattening and re-sorting on every evaluation is correct but throws away the win; cache the compiled form and invalidate only on source change.
 - Caching everything wastes memory; reserve caches for genuinely heavy nodes and let cheap nodes recompute.
-- Evaluation cost is contextual — an offline bake tolerates what a per-frame runtime graph cannot; tune cache aggressiveness to where the graph runs.
-- The evaluator publishes values but does not schedule emitted work (a draw call, a compute dispatch); the owning system does that — see gpu-rendering-guide.
+- Evaluation cost is contextual: an offline bake tolerates what a per-frame runtime graph cannot; tune cache aggressiveness to where the graph runs.
+- The evaluator publishes values but does not schedule emitted work (a draw call, a compute dispatch); the owning system does that, see gpu-rendering-guide.
 
 ## Related
 

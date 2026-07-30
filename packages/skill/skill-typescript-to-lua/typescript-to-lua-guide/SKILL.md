@@ -5,7 +5,7 @@ description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (g
 
 # TypeScript-to-Lua Coding Guidelines
 
-The output is Lua. For Lua runtime semantics and idioms — module pattern, coroutines, metatables, error handling, string building — apply **lua-guide**; for hot-path tuning of the generated code apply **lua-opinionated-guide**. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
+The output is Lua. For Lua runtime semantics and idioms: module pattern, coroutines, metatables, error handling, string building. Apply **lua-guide**; for hot-path tuning of the generated code apply **lua-opinionated-guide**. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
 
 ## Requirements
 
@@ -20,11 +20,11 @@ The output is Lua. For Lua runtime semantics and idioms — module pattern, coro
 
 ## Gotchas
 
-- Not all TypeScript features translate — generators, `for-await-of`, dynamic `import()`, and BigInt are unsupported or partially supported
-- Translation is source-to-source; runtime semantics follow Lua, not JS — `0` and `""` are truthy in Lua, falsy in JS
-- Lua's table indexing (1-based, no `length` for holes) replaces JS arrays — pass-through types abstract this but iteration order changes
-- Importing JS-only libraries silently fails at translation — only `@types` packages with Lua-runtime equivalents work
-- `tstlc` is the CLI; build configs are different from `tsc` — sharing a `tsconfig.json` with web projects requires careful `compilerOptions` split
+- Not all TypeScript features translate: generators, `for-await-of`, dynamic `import()`, and BigInt are unsupported or partially supported
+- Translation is source-to-source; runtime semantics follow Lua, not JS: `0` and `""` are truthy in Lua, falsy in JS
+- Lua's table indexing (1-based, no `length` for holes) replaces JS arrays: pass-through types abstract this but iteration order changes
+- Importing JS-only libraries silently fails at translation, only `@types` packages with Lua-runtime equivalents work
+- `tstlc` is the CLI; build configs are different from `tsc`: sharing a `tsconfig.json` with web projects requires careful `compilerOptions` split
 
 ## Progressive disclosure
 

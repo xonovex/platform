@@ -1,6 +1,6 @@
 ---
 name: codex-guide
-description: "Use when configuring Codex hooks, plugins, skills, config layers, or managed requirements. Triggers on hooks.json, config.toml, requirements.toml, SessionStart, PreToolUse, PermissionRequest, SubagentStart, Stop, plugin-bundled hooks, hook trust hashes, concurrent commands, skipped prompt/agent handlers, or Codex guardrail coverage — even when the user doesn't say 'Codex hook'."
+description: "Use when configuring Codex hooks, plugins, skills, config layers, or managed requirements. Triggers on hooks.json, config.toml, requirements.toml, SessionStart, PreToolUse, PermissionRequest, SubagentStart, Stop, plugin-bundled hooks, hook trust hashes, concurrent commands, skipped prompt/agent handlers, or Codex guardrail coverage, even when the user doesn't say 'Codex hook'."
 ---
 
 # Codex Hooks and Guardrails

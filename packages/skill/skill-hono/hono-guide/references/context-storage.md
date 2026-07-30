@@ -1,6 +1,6 @@
 # context-storage: Access Context Globally with AsyncLocalStorage
 
-Apply `contextStorage()` middleware early, then call `getContext()` from a service layer to read Context without parameter drilling. Use sparingly — explicit parameters are more testable. On Cloudflare Workers enable the `nodejs_compat` flag.
+Apply `contextStorage()` middleware early, then call `getContext()` from a service layer to read Context without parameter drilling. Use sparingly: explicit parameters are more testable. On Cloudflare Workers enable the `nodejs_compat` flag.
 
 ```typescript
 import {contextStorage, getContext} from "hono/context-storage";

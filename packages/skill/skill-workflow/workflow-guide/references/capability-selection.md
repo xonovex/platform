@@ -29,11 +29,11 @@ because it has canonical identity fields.
 
 ## Required and Preferred Needs
 
-- **Caller-declared required need unavailable** — block before effects and name the
+- **Caller-declared required need unavailable**: block before effects and name the
   missing capability, reason, and recovery action.
-- **Caller-declared preferred need unavailable** — continue only when a safe baseline
+- **Caller-declared preferred need unavailable**: continue only when a safe baseline
   remains useful; report degraded coverage and its consequence.
-- **No specialist needed** — proceed with baseline reasoning without manufacturing a
+- **No specialist needed**: proceed with baseline reasoning without manufacturing a
   dependency.
 
 If two installed descriptions fit equally well and the request does not distinguish

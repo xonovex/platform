@@ -3,7 +3,7 @@
     "query": "open a merge request against main with glab on this GitLab repo",
     "should_trigger": true,
     "split": "train",
-    "rationale": "create MR via glab — core op"
+    "rationale": "create MR via glab: core op"
   },
   {
     "query": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
@@ -18,7 +18,7 @@
     "rationale": "position-anchored discussion via POST /discussions"
   },
   {
-    "query": "my inline MR comment came back as a plain note instead of attaching to the diff — what's wrong with the position SHAs?",
+    "query": "my inline MR comment came back as a plain note instead of attaching to the diff. What's wrong with the position SHAs?",
     "should_trigger": true,
     "split": "train",
     "rationale": "DiffNote downgrade / three-SHA position model"
@@ -36,7 +36,7 @@
     "rationale": "withhold approval / unresolved threads gating"
   },
   {
-    "query": "what token scope does glab need to create a merge request and post comments — is read_api enough?",
+    "query": "what token scope does glab need to create a merge request and post comments: is read_api enough?",
     "should_trigger": true,
     "split": "train",
     "rationale": "api vs read_api scope question"

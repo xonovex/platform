@@ -51,25 +51,25 @@
     "query": "ship this package to the registry and skip it if already published",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — idempotent publish"
+    "rationale": "validation positive: idempotent publish"
   },
   {
     "query": "validate publish-readiness of these packages before the release job",
     "should_trigger": true,
     "split": "validation",
-    "rationale": "validation positive — publish-check"
+    "rationale": "validation positive: publish-check"
   },
   {
     "query": "bump every dependent package and tag the release version",
     "should_trigger": false,
     "split": "train",
-    "rationale": "validation negative — owned by versioning-guide"
+    "rationale": "validation negative: owned by versioning-guide"
   },
   {
     "query": "add a new dependency to package.json",
     "should_trigger": false,
     "split": "train",
-    "rationale": "validation negative — package.json edit, not publishing"
+    "rationale": "validation negative: package.json edit, not publishing"
   },
   {
     "query": "Write a shell/Node routine that publishes the npm package described by the current package.json, but only if that exact name@version is not already on the registry (so re-running it in CI is safe). Show the command(s) and the skip logic.",

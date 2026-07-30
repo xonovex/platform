@@ -33,7 +33,7 @@
       "id": 4,
       "prompt": "We're bringing our Windows/MSVC C game up on Linux for the first time. Behind our platform interface we still need to implement windowing, input, threading/time/filesystem, and audio. What order should we tackle these in, and what toolchain issues should we expect?",
       "assertions": [
-        "Recommends working in interactivity order — window/graphics first, then input, then general OS services, then audio — stubbing each interface first, rather than alphabetical/arbitrary order",
+        "Recommends working in interactivity order: window/graphics first, then input, then general OS services, then audio. Stubbing each interface first, rather than alphabetical/arbitrary order",
         "Warns that the stricter/different compiler's new warnings are usually real latent bugs to fix at the root (e.g. changing K&R `void f()` to `void f(void)`, unused vars, declaration mismatches) rather than suppressing them",
         "Adds the new target as its own CI matrix entry so it doesn't regress silently on later portable-code edits"
       ]

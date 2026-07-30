@@ -1,11 +1,11 @@
 ---
 name: lua-opinionated-guide
-description: "Use when tuning performance-critical Lua hot paths — the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'."
+description: "Use when tuning performance-critical Lua hot paths: the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'."
 ---
 
 # Lua Opinionated Guidelines (Performance Tuning)
 
-A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamentals — module pattern, local variables, metatables, coroutines, input validation, error handling, string building, idioms. This skill adds only hot-path tuning: the tunings especially benefit LuaJIT, and the same principles still help vanilla Lua 5.4.
+A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamentals: module pattern, local variables, metatables, coroutines, input validation, error handling, string building, idioms. This skill adds only hot-path tuning: the tunings especially benefit LuaJIT, and the same principles still help vanilla Lua 5.4.
 
 ## Requirements
 
@@ -19,7 +19,7 @@ A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamen
 
 ## Gotchas
 
-- Apply hot-path tuning only where profiling shows a need — don't over-engineer with FFI arrays or SIMD-style tricks beyond what was asked
+- Apply hot-path tuning only where profiling shows a need: don't over-engineer with FFI arrays or SIMD-style tricks beyond what was asked
 
 ## Progressive disclosure
 

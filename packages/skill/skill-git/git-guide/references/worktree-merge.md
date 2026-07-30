@@ -22,8 +22,8 @@ Squashed commits from <worktree>/feature/<feature-name>"
 
 ## Gotchas
 
-- Uncommitted changes in the feature worktree silently ride along in some merge strategies — confirm clean first
-- `--squash` loses individual commit history — pick it only when commit-by-commit replay isn't valuable
-- A preview based on stale remote state is incomplete — report when fetch was not authorized or available
-- Skipping the rebase produces stale-base merges when collaborating — it is required, not optional
+- Uncommitted changes in the feature worktree silently ride along in some merge strategies: confirm clean first
+- `--squash` loses individual commit history: pick it only when commit-by-commit replay isn't valuable
+- A preview based on stale remote state is incomplete: report when fetch was not authorized or available
+- Skipping the rebase produces stale-base merges when collaborating: it is required, not optional
 - Never remove a worktree or branch during merge, whether the merge succeeds or fails

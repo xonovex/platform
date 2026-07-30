@@ -72,7 +72,7 @@
     "split": "train"
   },
   {
-    "query": "my entities are just getters and setters with all the logic in services \u2014 is that proper domain modelling?",
+    "query": "my entities are just getters and setters with all the logic in services: is that proper domain modelling?",
     "rationale": "near miss owned by ddd-guide",
     "should_trigger": false,
     "split": "train"

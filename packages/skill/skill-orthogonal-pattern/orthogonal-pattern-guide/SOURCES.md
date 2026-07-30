@@ -1,6 +1,6 @@
 # Sources
 
-## The Pragmatic Programmer — orthogonality
+## The Pragmatic Programmer: orthogonality
 
 - **URL:** https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/
 - **Last reviewed:** 2026-06-27
@@ -9,7 +9,7 @@
 - **Aspects extracted:**
   - Orthogonality, decoupling, the cross-product design space → `references/finding-axes.md`
 
-## SOLID / Clean Architecture — single responsibility as an axis of change, screaming architecture
+## SOLID / Clean Architecture: single responsibility as an axis of change, screaming architecture
 
 - **URL:** https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html
 - **Last reviewed:** 2026-06-27
@@ -19,7 +19,7 @@
   - The "axis of change" reading of SRP → `references/finding-axes.md`
   - Package-by-axis/feature vs package-by-layer (screaming architecture) → `references/applying-the-layout.md`
 
-## Software product lines — commonality / variability analysis
+## Software product lines: commonality / variability analysis
 
 - **URL:** https://www.sei.cmu.edu/library/software-product-lines-collection/
 - **Last reviewed:** 2026-06-27
@@ -28,7 +28,7 @@
 - **Aspects extracted:**
   - Commonality vs variability, variation points, the shared kernel → `references/commonality-variability.md`, `references/variation-point-bridges.md`
 
-## Design Patterns — Strategy and Bridge
+## Design Patterns: Strategy and Bridge
 
 - **URL:** https://en.wikipedia.org/wiki/Bridge_pattern
 - **Last reviewed:** 2026-06-27

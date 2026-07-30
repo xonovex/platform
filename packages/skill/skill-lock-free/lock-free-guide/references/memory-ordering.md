@@ -10,12 +10,12 @@ The ordering argument tells the compiler and CPU how much reordering is forbidde
 
 ## The orderings
 
-- `memory_order_relaxed` — atomicity and per-object modification order only; no cross-variable ordering.
-- `memory_order_acquire` — on a load; no reads/writes _after_ it can be hoisted before it. Pairs with a release to receive published data.
-- `memory_order_release` — on a store; no reads/writes _before_ it can sink after it. Pairs with an acquire to publish data.
-- `memory_order_acq_rel` — for read-modify-write (e.g. `fetch_add`, `compare_exchange`): the load half is acquire, the store half is release.
-- `memory_order_seq_cst` — acquire/release _plus_ membership in a single total order over all seq_cst operations, agreed on by all threads. The default for the non-`_explicit` calls. Needed for things like Dekker/Peterson-style symmetric flag handshakes where two threads store-then-load different variables.
-- `memory_order_consume` — intended as a cheaper acquire limited to data-dependent reads. Effectively deprecated: every real compiler promotes it to acquire. Do not use; write acquire.
+- `memory_order_relaxed`: atomicity and per-object modification order only; no cross-variable ordering.
+- `memory_order_acquire`: on a load; no reads/writes _after_ it can be hoisted before it. Pairs with a release to receive published data.
+- `memory_order_release`: on a store; no reads/writes _before_ it can sink after it. Pairs with an acquire to publish data.
+- `memory_order_acq_rel`: for read-modify-write (e.g. `fetch_add`, `compare_exchange`): the load half is acquire, the store half is release.
+- `memory_order_seq_cst`: acquire/release _plus_ membership in a single total order over all seq_cst operations, agreed on by all threads. The default for the non-`_explicit` calls. Needed for things like Dekker/Peterson-style symmetric flag handshakes where two threads store-then-load different variables.
+- `memory_order_consume`: intended as a cheaper acquire limited to data-dependent reads. Effectively deprecated: every real compiler promotes it to acquire. Do not use; write acquire.
 
 ## Standalone fences
 

@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Bridge the renderer and the editor with a thin, render-pipeline-agnostic API: the editor describes what it wants with plain old data (transforms, colors, ids), and a viewport layer translates that into passes, draws, and read-backs — so editor code never touches command buffers, constant buffers, or pipeline state, and a single feature can serve many viewports at once.
+Bridge the renderer and the editor with a thin, render-pipeline-agnostic API: the editor describes what it wants with plain old data (transforms, colors, ids), and a viewport layer translates that into passes, draws, and read-backs, so editor code never touches command buffers, constant buffers, or pipeline state, and a single feature can serve many viewports at once.
 
 ## Rationale
 
@@ -10,7 +10,7 @@ If editor code reaches directly into the renderer, every pipeline change ripples
 
 ## How to Apply
 
-1. Define a per-feature POD descriptor the editor fills in (e.g. a grid's transform/cell-size/color, a selection set of ids) — no handles to GPU resources, no pipeline knobs.
+1. Define a per-feature POD descriptor the editor fills in (e.g. a grid's transform/cell-size/color, a selection set of ids), no handles to GPU resources, no pipeline knobs.
 2. Expose one `render`/`update` entry point per feature that takes the descriptor plus opaque renderer context handles and does all the buffer writes and draw-call issuing internally.
 3. Create per-viewport instances of stateful features (picking, highlight) with explicit `create`/`destroy`; never share mutable viewport state through globals.
 4. Split CPU-side bookkeeping (`update_cpu`: consume read-backs, queue requests) from GPU-side scheduling (`update_gpu`: clear, fill constant buffers, queue passes), called once per frame.
@@ -41,7 +41,7 @@ void       picking_update_gpu(picking_o *p, cmd_buf_o *cmd); // clear, fill cbuf
 
 ## Gotchas
 
-- Reaching from editor code into command/constant buffers couples tools to one backend and breaks on every pipeline change — keep the seam to plain data + opaque handles.
+- Reaching from editor code into command/constant buffers couples tools to one backend and breaks on every pipeline change: keep the seam to plain data + opaque handles.
 - Overlays drawn before tone-mapping inherit HDR/exposure and look wrong; composite after post in sRGB so colors match the UI.
 - Sharing picking/highlight state across viewports through a global produces cross-viewport bleed; instantiate per viewport with `create`/`destroy`.
 - Doing all work in one per-frame function couples read-back consumption to GPU scheduling; split `update_cpu` from `update_gpu`.

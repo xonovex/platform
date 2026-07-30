@@ -16,12 +16,12 @@ The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exi
 4. Run all checks (frontmatter, body, references, content quality, harness neutrality)
 5. When repository context is available, validate registration, paired manifests, exact hard dependencies, and named handoffs
 6. Report pass/fail with file:line evidence and remediation hints
-7. Read-only — never modify files
+7. Read-only, never modify files
 
 ## Frontmatter Checks
 
 - `name` present, 1-64 chars, matches `^[a-z0-9]+(-[a-z0-9]+)*$`, does not use a reserved word (`anthropic`/`claude`) except the catalog's explicit `claude-code-guide` product adapter, has no XML tags, and equals the parent directory name
-- `description` present, 1-1024 chars (warns on `<…>` angle-bracket markup — fine for component/generic references)
+- `description` present, 1-1024 chars (warns on `<...>` angle-bracket markup: fine for component/generic references)
 - `description` starts with imperative cue ("Use when...", "Use this skill when...")
 - `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")
 - `description` positively distinguishes the relevant user intent or context where adjacent skills share trigger words; it does not use skip/out-of-scope clauses or name other skills
@@ -53,17 +53,17 @@ The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exi
 
 These patterns are advisory during local exploration and fail the repository's strict CI mode until resolved. See [instruction-patterns.md](instruction-patterns.md).
 
-- Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`) — consider adding one
-- Output-producing skill without an output template — consider adding one
-- Fragile edits / destructive operations without a validation loop or plan-validate-execute pattern — consider adding one
+- Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`): consider adding one
+- Output-producing skill without an output template: consider adding one
+- Fragile edits / destructive operations without a validation loop or plan-validate-execute pattern: consider adding one
 
 ## Harness Neutrality Checks
 
-- No proprietary tool / function names from any agent harness — describe the capability instead
-- No vendor model IDs or model names — describe the role (e.g. "exploration agent")
-- No hardcoded vendor-namespaced paths — use placeholders like `<skills-dir>/`, `<commands-dir>/`
+- No proprietary tool / function names from any agent harness: describe the capability instead
+- No vendor model IDs or model names: describe the role (e.g. "exploration agent")
+- No hardcoded vendor-namespaced paths: use placeholders like `<skills-dir>/`, `<commands-dir>/`
 - No vendor-prefixed frontmatter keys
-- No vendor-specific instruction filenames — use `AGENTS.md` (the open standard)
+- No vendor-specific instruction filenames: use `AGENTS.md` (the open standard)
 
 ## Composition Checks
 

@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Synchronize everything explicitly with the right primitive for the relationship: resource barriers for dependencies within a queue (scoped source/destination stage+access plus image-layout transitions), cross-queue waits to order work between submissions and across queues, a monotonic timeline value for counter-style waits, and fences for GPU→CPU completion — scoping each to exactly the work that must wait, neither more nor less.
+Synchronize everything explicitly with the right primitive for the relationship: resource barriers for dependencies within a queue (scoped source/destination stage+access plus image-layout transitions), cross-queue waits to order work between submissions and across queues, a monotonic timeline value for counter-style waits, and fences for GPU→CPU completion. Scoping each to exactly the work that must wait, neither more nor less.
 
 ## Rationale
 
-An explicit API guarantees no ordering between commands unless you ask for it: a write in one pass is not visible to a read in the next, and an image is not in a usable layout, until a barrier says so. The barrier names a source scope (stages that must finish, access made available) and a destination scope (stages that must wait, access made visible), plus any layout transition. Scope tightness is the whole game: too broad (everything → everything) is always correct but drains the pipeline; too narrow is a hazard that produces garbage or a hang, often only on some hardware. Barriers only order work inside one queue; crossing queues (graphics→compute, or to the presentation engine) needs a queue-side wait — a GPU-side ordering between submissions (binary semaphore in Vulkan/WebGPU, a fence value in D3D12). A monotonic timeline value generalizes this to a counter so one object expresses many waits and supports wait-before-signal. Fences are the only GPU→CPU signal — the CPU blocks on one to know a frame's resources are free to reuse or that readback has landed.
+An explicit API guarantees no ordering between commands unless you ask for it: a write in one pass is not visible to a read in the next, and an image is not in a usable layout, until a barrier says so. The barrier names a source scope (stages that must finish, access made available) and a destination scope (stages that must wait, access made visible), plus any layout transition. Scope tightness is the whole game: too broad (everything → everything) is always correct but drains the pipeline; too narrow is a hazard that produces garbage or a hang, often only on some hardware. Barriers only order work inside one queue; crossing queues (graphics→compute, or to the presentation engine) needs a queue-side wait: a GPU-side ordering between submissions (binary semaphore in Vulkan/WebGPU, a fence value in D3D12). A monotonic timeline value generalizes this to a counter so one object expresses many waits and supports wait-before-signal. Fences are the only GPU→CPU signal. The CPU blocks on one to know a frame's resources are free to reuse or that readback has landed.
 
 ## Techniques
 
@@ -43,10 +43,10 @@ queue_present(present, swapchain, idx, /*wait*/ render_done);
 
 ## Gotchas
 
-- A correct-but-broad barrier (everything → everything, or a full memory barrier per draw) serializes the GPU and silently tanks throughput — scope to the real producer/consumer.
-- Under-synchronizing (a missing barrier between write and read) is a hazard that may "work" on the hardware you tested and corrupt on another — rely on validation/sync-validation layers, not luck.
+- A correct-but-broad barrier (everything → everything, or a full memory barrier per draw) serializes the GPU and silently tanks throughput: scope to the real producer/consumer.
+- Under-synchronizing (a missing barrier between write and read) is a hazard that may "work" on the hardware you tested and corrupt on another: rely on validation/sync-validation layers, not luck.
 - A layout transition is mandatory even when the data is ready; using an image in the wrong layout is undefined behavior.
-- Cross-queue waits order GPU work but do not make memory available/visible the way a barrier does within a queue — you often still need both at a queue boundary.
+- Cross-queue waits order GPU work but do not make memory available/visible the way a barrier does within a queue. You often still need both at a queue boundary.
 - Forgetting a queue-ownership transfer for a resource shared across queues corrupts it on at least one queue; use a transfer or a concurrent/shared mode.
 
 ## Related

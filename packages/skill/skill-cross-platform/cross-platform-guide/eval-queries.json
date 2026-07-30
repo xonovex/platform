@@ -1,6 +1,6 @@
 [
   {
-    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them — how do we restructure so the platform stuff lives in one place",
+    "query": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them. How do we restructure so the platform stuff lives in one place",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: concentrate OS access behind one abstraction interface, no scattered #ifdef -> platform-abstraction-layer.md"
@@ -12,55 +12,55 @@
     "rationale": "direct: function-pointer OS interface with per-platform backends -> platform-abstraction-layer.md"
   },
   {
-    "query": "we're bringing our game engine up on Linux for the first time — what order should I implement things and how do I keep it building while half the platform layer is missing",
+    "query": "we're bringing our game engine up on Linux for the first time. What order should I implement things and how do I keep it building while half the platform layer is missing",
     "should_trigger": true,
     "split": "train",
     "rationale": "porting-strategy: interactivity order (window->input->os->audio), stub-first so it keeps linking"
   },
   {
-    "query": "the new compiler is throwing a ton of unused-variable warnings and complaining about void foo() declarations that the old build never cared about — is the new toolchain just stricter or are these real",
+    "query": "the new compiler is throwing a ton of unused-variable warnings and complaining about void foo() declarations that the old build never cared about: is the new toolchain just stricter or are these real",
     "should_trigger": true,
     "split": "train",
     "rationale": "porting-strategy: toolchain/compiler-strictness differences are real latent bugs, void f(void)"
   },
   {
-    "query": "after switching one of our build targets to 32-bit pointers our hash tables and memcmp comparisons started failing — why would pointer width break struct comparisons",
+    "query": "after switching one of our build targets to 32-bit pointers our hash tables and memcmp comparisons started failing. Why would pointer width break struct comparisons",
     "should_trigger": true,
     "split": "train",
     "rationale": "porting-strategy / web-wasm: 32-bit pointers change struct padding, breaking hash/memcmp; widen keys, re-pad"
   },
   {
-    "query": "I compiled our C app to wasm with emscripten but the tab just freezes — our main loop is a while(running){tick();} and it never gives control back to the browser",
+    "query": "I compiled our C app to wasm with emscripten but the tab just freezes: our main loop is a while(running){tick();} and it never gives control back to the browser",
     "should_trigger": true,
     "split": "train",
     "rationale": "web-wasm: blocking native loop hangs the tab; use emscripten_set_main_loop cooperative callback"
   },
   {
-    "query": "in our emscripten build fopen returns null for assets that load fine natively — how am I supposed to read data files in the browser",
+    "query": "in our emscripten build fopen returns null for assets that load fine natively. How am I supposed to read data files in the browser",
     "should_trigger": true,
     "split": "train",
     "rationale": "web-wasm: async I/O, preload into virtual FS (--preload-file) or fetch at runtime"
   },
   {
-    "query": "our renderer is Vulkan but browsers only give me WebGL — I don't want to rewrite the whole backend, can I just get the 2D UI drawing on screen in the browser",
+    "query": "our renderer is Vulkan but browsers only give me WebGL. I don't want to rewrite the whole backend, can I just get the 2D UI drawing on screen in the browser",
     "should_trigger": true,
     "split": "train",
     "rationale": "web-wasm: map the UI/2D draw stream down to GL ES, expand compact verts on CPU, defer 3D"
   },
   {
-    "query": "I need to find connected gamepads on Linux and read their button presses — how do I enumerate /dev/input and tell a controller apart from a keyboard",
+    "query": "I need to find connected gamepads on Linux and read their button presses. How do I enumerate /dev/input and tell a controller apart from a keyboard",
     "should_trigger": true,
     "split": "validation",
     "rationale": "input-devices: evdev enumeration, by-id symlinks, BTN_GAMEPAD capability probe"
   },
   {
-    "query": "my controller's analog sticks drift at rest and the dpad shows up as a single axis — how do I read the deadzone and split the hat into directions",
+    "query": "my controller's analog sticks drift at rest and the dpad shows up as a single axis. How do I read the deadzone and split the hat into directions",
     "should_trigger": true,
     "split": "validation",
     "rationale": "input-devices: per-axis flat deadzone via EVIOCGABS, 1:2 hat->dpad mapping table"
   },
   {
-    "query": "controllers plugged in after my game launches never get picked up — I only scan devices once at startup, how do I detect hotplug",
+    "query": "controllers plugged in after my game launches never get picked up. I only scan devices once at startup, how do I detect hotplug",
     "should_trigger": true,
     "split": "validation",
     "rationale": "input-devices: hotplug via watching the device directory for changes, not a one-time enumerate"
@@ -102,7 +102,7 @@
     "rationale": "validation positive: input as a backend behind the input-source interface -> input-devices.md + platform-abstraction-layer.md"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
@@ -120,7 +120,7 @@
     "split": "validation"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"

@@ -22,7 +22,7 @@
 
 ## Virtual memory reserve/commit
 
-- **URL:** OS virtual-memory APIs — `mmap`/`mprotect` (POSIX), `VirtualAlloc` (Windows); reserve-then-commit growable-array technique
+- **URL:** OS virtual-memory APIs: `mmap`/`mprotect` (POSIX), `VirtualAlloc` (Windows); reserve-then-commit growable-array technique
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Allocation strategy
@@ -31,7 +31,7 @@
 
 ## Ownership & lifetimes
 
-- **URL:** Ownership models as in RAII (C++) and the Rust ownership/borrow model — https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html
+- **URL:** Ownership models as in RAII (C++) and the Rust ownership/borrow model: https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Ownership, Essentials
@@ -46,7 +46,7 @@
   - `SKILL.md` → Allocation strategy
   - Practical virtual-memory techniques built on address-space reservation
 - **Aspects extracted:**
-  - "Virtual Memory Tricks" — reserve cheap address space vs commit physical, cap-free never-moving arrays, page-aligned growth to cut fragmentation, gapless ring buffer via double-mapping, end-of-page bounds-checking allocator → `references/virtual-memory.md`
+  - "Virtual Memory Tricks": reserve cheap address space vs commit physical, cap-free never-moving arrays, page-aligned growth to cut fragmentation, gapless ring buffer via double-mapping, end-of-page bounds-checking allocator → `references/virtual-memory.md`
 
 ## Guide-level synthesis
 

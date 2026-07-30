@@ -14,24 +14,24 @@ Community packages exist (snap, dnf, pacman, nixpkgs) but may lag the official r
 ## 2. Authenticate
 
 ```bash
-# gitlab.com — run inside a repo so glab auto-detects the instance from the git remote
+# gitlab.com: run inside a repo so glab auto-detects the instance from the git remote
 glab auth login
 
-# self-managed / Dedicated — --hostname is REQUIRED or glab silently targets gitlab.com
+# self-managed / Dedicated: --hostname is REQUIRED or glab silently targets gitlab.com
 glab auth login --hostname gitlab.example.com
 ```
 
 Pick a flow at the prompt:
 
-- **Web** (browser) — default interactive.
-- **`--device`** — OAuth device flow (needs GitLab 17.9+), ideal for headless / SSH sessions.
-- **Headless interactive** — read the token with a hidden prompt, then `printf '%s' "$GITLAB_PAT" | glab auth login --hostname H --stdin --use-keyring`; unset the variable immediately afterward. In CI, inject `GITLAB_TOKEN` from the runner's secret store instead of creating a token file.
+- **Web** (browser): default interactive.
+- **`--device`**: OAuth device flow (needs GitLab 17.9+), ideal for headless / SSH sessions.
+- **Headless interactive**: read the token with a hidden prompt, then `printf '%s' "$GITLAB_PAT" | glab auth login --hostname H --stdin --use-keyring`; unset the variable immediately afterward. In CI, inject `GITLAB_TOKEN` from the runner's secret store instead of creating a token file.
 
-Add `--use-keyring` to store the token in the OS keyring instead of plaintext `~/.config/glab-cli/config.yml`. Token scopes and types are in [auth.md](auth.md) — at minimum the token needs `api` and `write_repository` for full read/write use, or `read_api` for read-only.
+Add `--use-keyring` to store the token in the OS keyring instead of plaintext `~/.config/glab-cli/config.yml`. Token scopes and types are in [auth.md](auth.md), at minimum the token needs `api` and `write_repository` for full read/write use, or `read_api` for read-only.
 
 ## 3. Choose protocols (separate per-host settings)
 
-`git_protocol` (how git clones/pushes) and `api_protocol` (how glab calls the API) are independent — a working ssh clone does NOT imply API calls work.
+`git_protocol` (how git clones/pushes) and `api_protocol` (how glab calls the API) are independent. A working ssh clone does NOT imply API calls work.
 
 ```bash
 glab config set -h gitlab.example.com git_protocol ssh
@@ -51,8 +51,8 @@ glab repo clone 12345678                   # or by numeric project ID
 
 ```bash
 glab auth status                                   # logged-in user, host, REST /api/v4/ + GraphQL endpoints, protocols
-glab api user                                      # GET /api/v4/user — confirms the token identity
+glab api user                                      # GET /api/v4/user: confirms the token identity
 glab mr list --assignee=@me -R group/project       # review smoke test
 ```
 
-Run `glab auth status` immediately before any write to confirm the intended identity on the intended host — a stale env token silently acts as the wrong user (env tokens override stored config, see [auth.md](auth.md)).
+Run `glab auth status` immediately before any write to confirm the intended identity on the intended host: a stale env token silently acts as the wrong user (env tokens override stored config, see [auth.md](auth.md)).

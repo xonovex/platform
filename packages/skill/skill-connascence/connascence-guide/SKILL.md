@@ -1,11 +1,11 @@
 ---
 name: connascence-guide
-description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength — even when the user doesn't say 'connascence' and only says 'tightly coupled'."
+description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength, even when the user doesn't say 'connascence' and only says 'tightly coupled'."
 ---
 
 # Connascence: a Precise Coupling Vocabulary
 
-Grade a seam by naming its worst coupling and its strongest connascence, then weaken or localize it — "tight/loose" is unactionable.
+Grade a seam by naming its worst coupling and its strongest connascence, then weaken or localize it: "tight/loose" is unactionable.
 
 ## Essentials
 
@@ -17,10 +17,10 @@ Grade a seam by naming its worst coupling and its strongest connascence, then we
 
 ## Gotchas
 
-- "Tightly coupled" is not actionable — name the connascence form and the coupling rung, then you know the fix.
+- "Tightly coupled" is not actionable: name the connascence form and the coupling rung, then you know the fix.
 - Strong connascence is fine _inside_ one module; it's only a problem _across_ a boundary (rule of locality).
-- Law of Demeter is a heuristic, not a law — pure data pipelines are a deliberate exception; it targets reaching through a stranger to depend on or mutate its internals.
-- Coupling and cohesion trade off — splitting a module to "loosen coupling" can shred its cohesion; grade both before cutting.
+- Law of Demeter is a heuristic, not a law: pure data pipelines are a deliberate exception; it targets reaching through a stranger to depend on or mutate its internals.
+- Coupling and cohesion trade off: splitting a module to "loosen coupling" can shred its cohesion; grade both before cutting.
 
 ## Example
 
@@ -28,7 +28,7 @@ Grade a seam by naming its worst coupling and its strongest connascence, then we
 SEAM   a billing function reaches into an Order's private `total` field
 GRADE  content coupling (reaches internals) + connascence of meaning across a boundary
 FIX    Order exposes a neutral `amountDue()` value (rule of degree → data coupling);
-       billing reads the value — agreement is now named, local, and weak
+       billing reads the value: agreement is now named, local, and weak
 ```
 
 ## Progressive Disclosure

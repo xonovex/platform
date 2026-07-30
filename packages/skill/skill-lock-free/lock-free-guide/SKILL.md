@@ -43,11 +43,11 @@ description: "Use when writing or reviewing shared-memory concurrent code: atomi
 
 ## Gotchas
 
-- A successful CAS proves only that the bit pattern matched — not that nothing happened in between (ABA); pointers reused after free defeat it.
-- `volatile` is not atomic and gives no ordering — it never makes concurrent C correct; use `_Atomic`/`atomic_*`.
-- `compare_exchange_weak` may fail spuriously even when the value matches — only ever use it inside a retry loop.
-- Removing a node from a lock-free list does not mean no other thread is still dereferencing it — freeing too early is a use-after-free.
-- Two unrelated atomics on the same cache line still contend (false sharing) — alignment, not correctness, but it can erase all your scaling.
+- A successful CAS proves only that the bit pattern matched, not that nothing happened in between (ABA); pointers reused after free defeat it.
+- `volatile` is not atomic and gives no ordering. It never makes concurrent C correct; use `_Atomic`/`atomic_*`.
+- `compare_exchange_weak` may fail spuriously even when the value matches, only ever use it inside a retry loop.
+- Removing a node from a lock-free list does not mean no other thread is still dereferencing it: freeing too early is a use-after-free.
+- Two unrelated atomics on the same cache line still contend (false sharing): alignment, not correctness, but it can erase all your scaling.
 
 ## Progressive Disclosure
 

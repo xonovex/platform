@@ -9,7 +9,7 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 
 ## Requirements
 
-- Target an explicit, low-level API where the app owns memory, synchronization, and pipeline state — not a driver that hides them.
+- Target an explicit, low-level API where the app owns memory, synchronization, and pipeline state, not a driver that hides them.
 - Assume validation/debug layers and a frame debugger are available during development.
 
 ## Essentials
@@ -26,7 +26,7 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 - **Command recording** - One recording context per thread per frame, multi-threaded record, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 - **Sort keys** - A 64-bit key per command decouples GPU submission order from CPU record order; merge worker streams and sort before submit, see [references/command-recording-and-frames.md](references/command-recording-and-frames.md)
 - **Programmable vertex fetch** - Pull vertices from storage buffers behind a loader interface instead of fixed-function input; skin in-shader from an indirected influence list, see [references/vertex-assembly-skinning.md](references/vertex-assembly-skinning.md)
-- **GPU-resident simulation** - Keep large element state in GPU buffers, advance with compute, and drive draws from a GPU-tracked count via indirect args — no CPU enumeration or readback, see [references/gpu-compute-simulation.md](references/gpu-compute-simulation.md)
+- **GPU-resident simulation** - Keep large element state in GPU buffers, advance with compute, and drive draws from a GPU-tracked count via indirect args, no CPU enumeration or readback, see [references/gpu-compute-simulation.md](references/gpu-compute-simulation.md)
 
 ## Resources
 
@@ -48,12 +48,12 @@ API-agnostic architecture for a low-level GPU renderer. The concepts hold across
 ## Gotchas
 
 - A barrier scoped too broadly (everything → everything) is correct but serializes the GPU; scope stage/access to what actually waits.
-- Forgetting an image-layout transition is undefined behavior even when the data is "obviously" ready — layout is part of the contract, not a hint.
+- Forgetting an image-layout transition is undefined behavior even when the data is "obviously" ready: layout is part of the contract, not a hint.
 - One allocation per resource exhausts the (small, capped) device allocation limit and is slow; sub-allocate from large blocks.
 - Host-coherent memory skips explicit flush/invalidate but is not free; large dynamic data still wants a device-local copy via staging.
-- Recording into a per-frame context whose previous submission's fence has not signaled corrupts in-flight GPU work — gate reuse on the fence.
+- Recording into a per-frame context whose previous submission's fence has not signaled corrupts in-flight GPU work: gate reuse on the fence.
 - Re-using a transient target the graph aliased to another lifetime, then reading it later, returns garbage; lifetimes must not overlap.
-- Applying a display transfer function twice (an automatic sRGB backbuffer plus your own HDR encode) double-darkens and loses precision in the shadows — encode exactly once.
+- Applying a display transfer function twice (an automatic sRGB backbuffer plus your own HDR encode) double-darkens and loses precision in the shadows: encode exactly once.
 - Reading GPU-simulation results back to the CPU each frame reintroduces the full pipeline stall you went to the GPU to avoid; consume them on the GPU via indirect draw.
 
 ## Progressive Disclosure

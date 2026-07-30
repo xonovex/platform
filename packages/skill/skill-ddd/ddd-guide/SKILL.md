@@ -1,6 +1,6 @@
 ---
 name: ddd-guide
-description: "Use when finding and naming domain boundaries and modelling inside them — establishing a ubiquitous language, drawing bounded contexts and a context map, protecting a model with an anti-corruption layer, and applying the tactical building blocks (entity, value object, aggregate + root, domain event, repository, domain/application service). Triggers on ubiquitous language, bounded context, context map, anti-corruption layer, aggregate / aggregate root, entity vs value object, domain event, repository, strategic vs tactical design, anemic domain model — even when the user doesn't say 'DDD'."
+description: "Use when finding and naming domain boundaries and modelling inside them: establishing a ubiquitous language, drawing bounded contexts and a context map, protecting a model with an anti-corruption layer, and applying the tactical building blocks (entity, value object, aggregate + root, domain event, repository, domain/application service). Triggers on ubiquitous language, bounded context, context map, anti-corruption layer, aggregate / aggregate root, entity vs value object, domain event, repository, strategic vs tactical design, anemic domain model, even when the user doesn't say 'DDD'."
 ---
 
 # Domain-Driven Design
@@ -21,7 +21,7 @@ Find the boundaries in a domain, name everything inside them rigorously, and mod
 - A bounded context is not a microservice or a subdomain: it is a solution-space model boundary; a subdomain is a problem-space area; a service is a deployment unit. They often align but are not the same thing.
 - Ubiquitous language is not "a glossary". It only counts when the agreed terms live in the model AND the code; a wiki nobody compiles against is not a ubiquitous language.
 - A thin ORM/DAO wrapper is not a repository, and an upstream-API client is not an anti-corruption layer: a repository hands out whole aggregate roots and is persistence-ignorant; an ACL translates foreign concepts both directions, not just forwards calls.
-- Code-level coupling metrics belong to **connascence-guide**, class/inheritance mechanics to **oop-guide**, and undo/serialization machinery to **data-model-guide** — DDD names the domain boundaries, not those.
+- Code-level coupling metrics belong to **connascence-guide**, class/inheritance mechanics to **oop-guide**, and undo/serialization machinery to **data-model-guide**: DDD names the domain boundaries, not those.
 
 ## Example
 

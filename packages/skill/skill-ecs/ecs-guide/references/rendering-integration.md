@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Let rendering-relevant components implement renderer-facing interfaces, cull once per viewer into a visibility bitmask, and extend the render graph by injecting modules — rather than walking a scene graph or pushing draw calls per object.
+Let rendering-relevant components implement renderer-facing interfaces, cull once per viewer into a visibility bitmask, and extend the render graph by injecting modules, rather than walking a scene graph or pushing draw calls per object.
 
 ## Rationale
 
@@ -31,7 +31,7 @@ for_each_camera(c) for_each_object(o) { o->lod = pick_lod(o, c); draw(o, c); }
 
 ## Counter-Example
 
-A single-camera, low-object-count tool view doesn't need bitmask visibility or multi-viewer machinery — a straight cull-and-draw is clearer. The bitmask model earns its keep with multiple simultaneous viewers.
+A single-camera, low-object-count tool view doesn't need bitmask visibility or multi-viewer machinery. A straight cull-and-draw is clearer. The bitmask model earns its keep with multiple simultaneous viewers.
 
 ## Related
 

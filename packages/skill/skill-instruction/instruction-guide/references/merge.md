@@ -12,11 +12,11 @@ Discovery accepts AGENTS.md paths or directories (`services/api` → `services/a
 
 ### Preserve (CRITICAL)
 
-section order, project tech names (`moon`, `npm`, `Terraform`, etc.), paths/directories, command syntax, integration docs, dependencies, notation style (arrows/parens), spacing, terminology — all project context
+section order, project tech names (`moon`, `npm`, `Terraform`, etc.), paths/directories, command syntax, integration docs, dependencies, notation style (arrows/parens), spacing, terminology: all project context
 
 ### Extract from source
 
-organizational patterns only (section grouping, hierarchy, workflow presentation, integration docs, structure styles) — never the content: rewrite with target's tech names → insert in existing sections → match formatting exactly
+organizational patterns only (section grouping, hierarchy, workflow presentation, integration docs, structure styles), never the content: rewrite with target's tech names → insert in existing sections → match formatting exactly
 
 ### Style matching
 
@@ -36,6 +36,6 @@ warn if >30% content added; abort if style confidence <85% or project context at
 
 ## Gotchas
 
-- **Pattern ≠ content** — if you copy the bullet text verbatim instead of the structural pattern, you've ported the wrong thing
-- A target's tech names are sacred — `npm install` doesn't become `gradle build` just because the source uses Gradle
-- Style confidence below 85% usually means the target has too much manual customization to safely overwrite — bail out and ask
+- **Pattern ≠ content**: if you copy the bullet text verbatim instead of the structural pattern, you've ported the wrong thing
+- A target's tech names are sacred: `npm install` doesn't become `gradle build` just because the source uses Gradle
+- Style confidence below 85% usually means the target has too much manual customization to safely overwrite: bail out and ask

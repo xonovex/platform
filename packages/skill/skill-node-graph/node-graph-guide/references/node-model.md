@@ -6,11 +6,11 @@ Model the graph as plain serialized data (a node list, a connection list, and pe
 
 ## Rationale
 
-The terminal-node split matters because the graph computes values but does not decide when or where they run — an output node exposes a result (an image, a draw call, a buffer) that an owning system later schedules.
+The terminal-node split matters because the graph computes values but does not decide when or where they run: an output node exposes a result (an image, a draw call, a buffer) that an owning system later schedules.
 
 ## How to Apply
 
-1. Store the graph as a typed object with at least: a node list, a connection list, per-node data/settings, and (optionally) comments — see data-model-guide for the store itself.
+1. Store the graph as a typed object with at least: a node list, a connection list, per-node data/settings, and (optionally) comments, see data-model-guide for the store itself.
 2. Define each node as a typed object that declares named input pins and named output pins, each pin carrying a type identity.
 3. Represent a connection as `(from_node, from_output_pin) -> (to_node, to_input_pin)`.
 4. Let unwired inputs fall back to a stored constant (see authoring-and-introspection.md) so literals need no node.
@@ -52,7 +52,7 @@ typedef struct graph_t {
 ## Gotchas
 
 - Node `id`s must be stable across edits, because connections reference nodes by id; reusing an id after delete silently rewires.
-- A wire data type is itself data — register it so plugins can introduce new payloads (e.g. a particle buffer, an SDF volume) the core never hard-codes.
+- A wire data type is itself data: register it so plugins can introduce new payloads (e.g. a particle buffer, an SDF volume) the core never hard-codes.
 - The graph computes results but does not run them; if no owning system reads an output node, its work never executes (see evaluation-and-compilation.md).
 
 ## Related

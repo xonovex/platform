@@ -14,7 +14,7 @@ description: "Use when writing or editing Docker images and Compose files for pr
 
 ## Gotchas
 
-- Multi-stage builds need explicit `COPY --from=<stage>` — forgetting it copies the whole heavy stage into the final image
+- Multi-stage builds need explicit `COPY --from=<stage>`: forgetting it copies the whole heavy stage into the final image
 - `ENTRYPOINT` + `CMD` interact: `CMD` provides default args to `ENTRYPOINT`; overriding `CMD` from `docker run` drops them, not appends
 
 ## Progressive disclosure

@@ -6,7 +6,7 @@ Play every sound through a voice drawn from a fixed-size, preallocated pool; cap
 
 ## Rationale
 
-When the game wants one more sound than the pool holds, something must lose — "least important / quietest / oldest" beats refusing to play. Rank by explicit priority first, loudness/age only as tiebreakers. Because cutting a voice instantly clicks, a slot frees only once its gain has ramped to zero, not the moment you stop it.
+When the game wants one more sound than the pool holds, something must lose: "least important / quietest / oldest" beats refusing to play. Rank by explicit priority first, loudness/age only as tiebreakers. Because cutting a voice instantly clicks, a slot frees only once its gain has ramped to zero, not the moment you stop it.
 
 ## How to Apply
 
@@ -51,7 +51,7 @@ static int32_t voice_alloc(voice_pool_t *p, uint16_t prio) {
 - A "stopped" voice still occupies its slot until its ramp completes, so the effective free count lags the logical one; size the pool for the ramp overlap, not just steady state.
 - Returning a pointer into the pool invites use-after-recycle; hand out an opaque handle with a generation counter and validate it before every operation.
 - Stealing the wrong voice (e.g. always the oldest) cuts important long sounds like music under a flurry of footsteps; rank by explicit priority first, loudness/age only as tiebreakers.
-- Off-thread "play" requests must arrive via the command queue, not by mutating the pool directly — the audio thread owns voice state (see command-handoff).
+- Off-thread "play" requests must arrive via the command queue, not by mutating the pool directly. The audio thread owns voice state (see command-handoff).
 
 ## Related
 

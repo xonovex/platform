@@ -1,11 +1,11 @@
 ---
 name: code-review-guide
-description: "Use when writing, structuring, or labelling code-review feedback on a pull or merge request — Conventional Comments labels (praise / nitpick / suggestion / issue / question / thought / chore / todo), the blocking vs non-blocking vs if-minor decorations, pairing one top-level summary with line-anchored inline comments, cross-linking the summary to its details instead of 'see comment 3', and verifying each claim against an authoritative source before asserting it. Platform-independent review craft. Triggers on PR / MR review, leaving review comments, blocking / non-blocking, nit, severity, request-changes vs approve, or a review summary — even when the user doesn't say 'code review'."
+description: "Use when writing, structuring, or labelling code-review feedback on a pull or merge request: Conventional Comments labels (praise / nitpick / suggestion / issue / question / thought / chore / todo), the blocking vs non-blocking vs if-minor decorations, pairing one top-level summary with line-anchored inline comments, cross-linking the summary to its details instead of 'see comment 3', and verifying each claim against an authoritative source before asserting it. Platform-independent review craft. Triggers on PR / MR review, leaving review comments, blocking / non-blocking, nit, severity, request-changes vs approve, or a review summary, even when the user doesn't say 'code review'."
 ---
 
-# Code-review feedback — quick reference
+# Code-review feedback: quick reference
 
-Host-independent review-comment craft. **Every comment states its type and its urgency — a reader must never guess whether it blocks the merge.** Review operations return findings inline and never post, edit, resolve, or persist them. A separate Publish operation may select a matching host skill for delivery.
+Host-independent review-comment craft. **Every comment states its type and its urgency: a reader must never guess whether it blocks the merge.** Review operations return findings inline and never post, edit, resolve, or persist them. A separate Publish operation may select a matching host skill for delivery.
 
 ## Essentials
 
@@ -19,16 +19,16 @@ Host-independent review-comment craft. **Every comment states its type and its u
 
 ## Gotchas
 
-- Referencing another comment by ordinal ("see comment 3") is meaningless to the reader — they see no numbering. Link to it, or restate the point. If your host cannot link, keep each comment self-contained.
+- Referencing another comment by ordinal ("see comment 3") is meaningless to the reader. They see no numbering. Link to it, or restate the point. If your host cannot link, keep each comment self-contained.
 - Marking everything `(blocking)` dilutes the signal until nothing reads as urgent. Reserve blocking for genuine merge gates; most feedback is non-blocking.
 - `question` and `thought` are inherently non-blocking and rarely need a decoration; adding `(blocking)` to a question is a contradiction.
 - A "before merge" verdict belongs once in the summary, not repeated in every inline comment.
 - Keep each comment self-contained, especially if you may edit it later. If comment A says "see comment B" and B is reworded or removed, A is left dangling.
 - Suggested-code blocks must compile against the real APIs. A confidently wrong snippet is worse than prose; verify component / function signatures first (this is where a framework skill, e.g. a design-system guide, composes in).
-- AI-generated findings and AI-written code are not self-verifying — the human reviewer must actively evaluate each, not rubber-stamp; adversarial AI review complements, never replaces, human judgement on the merge decision.
+- AI-generated findings and AI-written code are not self-verifying. The human reviewer must actively evaluate each, not rubber-stamp; adversarial AI review complements, never replaces, human judgement on the merge decision.
 - Loading a host skill during Review to post or resolve findings silently changes the operation and is out of scope.
 
-## Example — a labelled inline comment, and a summary that links to it
+## Example: a labelled inline comment, and a summary that links to it
 
 Inline, on the exact line:
 
@@ -52,10 +52,10 @@ Top-level summary, pointing at the detail rather than renumbering it:
 
 ## Progressive Disclosure
 
-Each reference is a trigger — read it only when the user's intent matches; do not preload everything.
+Each reference is a trigger: read it only when the user's intent matches; do not preload everything.
 
 - Read [references/conventional-comments.md](references/conventional-comments.md) - Load when choosing a label or decoration, mapping severity to whether it gates merge, or wanting the full label list and the machine-parseable shape.
 - Read [references/review-structure.md](references/review-structure.md) - Load when structuring a whole review (summary vs inline), ordering by priority, cross-linking comments, verifying claims before posting, or setting tone and matching a repo's writing style.
-- Read [references/findings-schema.md](references/findings-schema.md) - Load when producing or refining structured findings — the canonical findings JSON contract and new-file line anchoring.
+- Read [references/findings-schema.md](references/findings-schema.md) - Load when producing or refining structured findings: the canonical findings JSON contract and new-file line anchoring.
 - Read [references/review-analyze.md](references/review-analyze.md) - Load when turning a branch diff into structured findings (correctness then quality, anchoring, the effort dial, comparing against prior findings).
 - Read [references/review-refine.md](references/review-refine.md) - Load when refining findings before posting (keep / reword / relabel / re-anchor / merge / split / drop, label discipline, stop-after-each-pass).

@@ -5,9 +5,9 @@ procedure owner.
 
 ## Arguments
 
-- `prompt-file` (required) — exact command file to simplify.
-- `--dry-run` (optional) — preview without writing.
-- `--target-reduction` (optional) — target reduction percentage; defaults to 50,
+- `prompt-file` (required): exact command file to simplify.
+- `--dry-run` (optional): preview without writing.
+- `--target-reduction` (optional): target reduction percentage; defaults to 50,
   range 30-70.
 
 ## Core workflow

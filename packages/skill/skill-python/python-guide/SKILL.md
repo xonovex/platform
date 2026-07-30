@@ -20,9 +20,9 @@ description: "Use when writing or editing Python 3.12+ for APIs, data processing
 
 ## Gotchas
 
-- Mutable default arguments (`def f(x=[]):`) share state across calls — use `None` and assign inside
-- The GIL serializes pure-Python execution — threads only help on I/O; CPU-bound work needs `multiprocessing` or compiled extensions
-- `is` checks identity, not equality — small-int caching means `a is b` works for `1` but fails for `300`
+- Mutable default arguments (`def f(x=[]):`) share state across calls: use `None` and assign inside
+- The GIL serializes pure-Python execution: threads only help on I/O; CPU-bound work needs `multiprocessing` or compiled extensions
+- `is` checks identity, not equality: small-int caching means `a is b` works for `1` but fails for `300`
 - `__init__.py` is no longer required for packages (PEP 420), but mixing namespace and regular packages causes silent import-shadowing bugs
 
 ## Progressive disclosure

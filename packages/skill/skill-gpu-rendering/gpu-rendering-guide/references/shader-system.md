@@ -6,7 +6,7 @@ Treat shaders as a build artifact: author in a source language, compile to a bin
 
 ## Rationale
 
-Runtime source compilation is slow, pulls a full compiler into the shipping binary, and defers syntax errors to the draw call. Offline compilation to a binary intermediate moves errors to build time and lets the pipeline cache key on stable bytecode. Reflecting that binary for resource bindings, inline-constant ranges, and vertex inputs keeps the layout single-sourced from the shader instead of hand-duplicated in host code and silently drifting. Variants matter because real shaders branch on features (shadows, skinning, fog): a uniform branch evaluated per fragment wastes the GPU, so compile specialized permutations and pick one at bind time — but each combination multiplies build time and pipeline count, so trade permutations against an ubershader that branches on a constant for cold paths.
+Runtime source compilation is slow, pulls a full compiler into the shipping binary, and defers syntax errors to the draw call. Offline compilation to a binary intermediate moves errors to build time and lets the pipeline cache key on stable bytecode. Reflecting that binary for resource bindings, inline-constant ranges, and vertex inputs keeps the layout single-sourced from the shader instead of hand-duplicated in host code and silently drifting. Variants matter because real shaders branch on features (shadows, skinning, fog): a uniform branch evaluated per fragment wastes the GPU, so compile specialized permutations and pick one at bind time, but each combination multiplies build time and pipeline count, so trade permutations against an ubershader that branches on a constant for cold paths.
 
 ## Techniques
 
@@ -17,7 +17,7 @@ Runtime source compilation is slow, pulls a full compiler into the shipping bina
 - **Pipeline key** - Key the pipeline cache on (shader modules + render state: blend, depth, raster, formats); identical keys share one compiled pipeline.
 - **Hot-reload** - Watch shader source mtimes; on change recompile, validate, then rebuild every pipeline whose key references the changed module and swap them in at a frame boundary.
 - **Caching** - Persist compiled bytecode and the driver's pipeline cache blob to disk so cold start skips recompilation.
-- **Declarative composition** - Author shaders as composable declarations (named resource/constant `imports`, code blocks, state blocks) that merge by rule — code concatenated in order, state last-write-wins — and generate `load_<const>()` / `get_<resource>()` accessors and the interpolator structs automatically, so authoring is decoupled from the binding API. Build a library of stackable declarations rather than monolithic shaders.
+- **Declarative composition** - Author shaders as composable declarations (named resource/constant `imports`, code blocks, state blocks) that merge by rule: code concatenated in order, state last-write-wins, and generate `load_<const>()` / `get_<resource>()` accessors and the interpolator structs automatically, so authoring is decoupled from the binding API. Build a library of stackable declarations rather than monolithic shaders.
 - **System-bitmask variant selection** - Give each optional feature/"system" a unique bit; the set of active systems forms a bitmask that selects the precompiled variant in O(1), instead of a string/hash lookup recomputed on every state change.
 
 ## Example
@@ -43,8 +43,8 @@ pipeline pso = pipeline_cache_get_or_build(cache, &key);       // disk-backed ca
 
 ## Gotchas
 
-- The permutation count is combinatorial: N independent feature flags is 2^N modules and 2^N build/pipeline entries — gate rarely-toggled features behind an ubershader branch instead.
-- Reflection reports what the bytecode declares; an unused binding optimized away by the compiler vanishes from reflection, so layouts built purely from reflection can mismatch a hand-written host struct — make the shader the source of truth, not both.
+- The permutation count is combinatorial: N independent feature flags is 2^N modules and 2^N build/pipeline entries. Gate rarely-toggled features behind an ubershader branch instead.
+- Reflection reports what the bytecode declares; an unused binding optimized away by the compiler vanishes from reflection, so layouts built purely from reflection can mismatch a hand-written host struct: make the shader the source of truth, not both.
 - First use of an uncached pipeline compiles synchronously and stalls the frame; warm the cache at load and persist the driver blob, see [references/binding-model.md](./binding-model.md).
 - Hot-reload must rebuild pipelines and swap at a safe frame boundary, never mid-recording into an in-flight command stream.
 - Compile-time/specialization constants resolve at pipeline-creation time, not draw time; changing one still requires a new pipeline.

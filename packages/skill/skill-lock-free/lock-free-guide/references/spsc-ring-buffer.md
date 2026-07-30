@@ -2,7 +2,7 @@
 
 ## Guideline
 
-For exactly one producer thread and one consumer thread, use a bounded ring buffer with plain atomic head/tail indices and acquire/release ordering — no CAS, no locks.
+For exactly one producer thread and one consumer thread, use a bounded ring buffer with plain atomic head/tail indices and acquire/release ordering, no CAS, no locks.
 
 ## Rationale
 
@@ -50,7 +50,7 @@ bool spsc_pop(spsc_ring_t *r, void **out) {
 
 - Use free-running indices (never reset to 0) and unsigned subtraction for fullness/emptiness; this is wrap-safe and avoids the "is it full or empty?" ambiguity of equal head==tail.
 - The `release` on `tail` pairs with the consumer's `acquire` on `tail`: that is what makes the slot write visible before the item is consumed. Swap either to relaxed and you have a data race on `slots`.
-- Strictly one producer and one consumer. Two producers racing on `tail` corrupt it — that needs the MPSC or MPMC design.
+- Strictly one producer and one consumer. Two producers racing on `tail` corrupt it: that needs the MPSC or MPMC design.
 
 ## Related
 

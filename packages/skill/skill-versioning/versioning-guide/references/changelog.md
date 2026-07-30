@@ -2,10 +2,10 @@
 
 Turn the commits behind a version bump into a changelog entry, prepended newest-first.
 
-## Pick One Convention — and Be Faithful
+## Pick One Convention, and Be Faithful
 
-- **Keep a Changelog** — a `# Changelog` title with `## [x.y.z] - YYYY-MM-DD` sections, an `## [Unreleased]` area, and six change groups: Added, Changed, Deprecated, Removed, Fixed, Security. Human-curated — do **not** paste raw git logs.
-- **Changesets-style** — a `# <package-name>` title with bare `## x.y.z` sections and `### Major Changes` / `### Minor Changes` / `### Patch Changes` groups, each entry a commit/PR-linked bullet. A single release can carry all three groups because each change declares its own level.
+- **Keep a Changelog**: a `# Changelog` title with `## [x.y.z] - YYYY-MM-DD` sections, an `## [Unreleased]` area, and six change groups: Added, Changed, Deprecated, Removed, Fixed, Security. Human-curated: do **not** paste raw git logs.
+- **Changesets-style**: a `# <package-name>` title with bare `## x.y.z` sections and `### Major Changes` / `### Minor Changes` / `### Patch Changes` groups, each entry a commit/PR-linked bullet. A single release can carry all three groups because each change declares its own level.
 - Choose the one the repo already uses; don't blend them.
 
 ## Deriving Entries From Commits
@@ -15,8 +15,8 @@ Turn the commits behind a version bump into a changelog entry, prepended newest-
 
 ## Bullet Format (Changesets-style)
 
-- Authentic form: ``- [#PR](…/pull/PR) [`hash`](…/commit/hash) Thanks [@login](https://github.com/login)! - <description>``.
-- The author is the **PR-author login**, not the git commit author name — a display name like `Jane Doe` produces a 404 profile link. Resolve the handle, or omit the author link.
+- Authentic form: ``- [#PR](<repo>/pull/PR) [`hash`](<repo>/commit/hash) Thanks [@login](https://github.com/login)! - <description>``.
+- The author is the **PR-author login**, not the git commit author name: a display name like `Jane Doe` produces a 404 profile link. Resolve the handle, or omit the author link.
 - Group dependency updates under the matching level as their own bullets, e.g. a `- Updated dependencies` line with nested `  - name@version` sub-bullets.
 
 ## Prepend, Don't Append
@@ -25,6 +25,6 @@ Turn the commits behind a version bump into a changelog entry, prepended newest-
 
 ## Gotchas
 
-- Deriving one heading level from the version delta files every commit under a single group — a trivial `docs:` can land under `### Major Changes`. Bucket by each change's declared level when you can.
-- A placeholder like `- Version bump` belongs to no convention — prefer an honest "no user-facing changes" note only when the entry is truly empty.
-- "Don't dump git logs" is the whole point of a changelog — summarize intent, not every commit subject.
+- Deriving one heading level from the version delta files every commit under a single group: a trivial `docs:` can land under `### Major Changes`. Bucket by each change's declared level when you can.
+- A placeholder like `- Version bump` belongs to no convention: prefer an honest "no user-facing changes" note only when the entry is truly empty.
+- "Don't dump git logs" is the whole point of a changelog: summarize intent, not every commit subject.

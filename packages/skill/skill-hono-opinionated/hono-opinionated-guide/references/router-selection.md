@@ -2,7 +2,7 @@
 
 Pass an explicit `router` to the `Hono` constructor based on deployment (the default `SmartRouter` picks at runtime).
 
-- **RegExpRouter** (`hono/router/reg-exp-router`) — fastest throughput (single compiled regex); use for high-throughput persistent servers.
+- **RegExpRouter** (`hono/router/reg-exp-router`): fastest throughput (single compiled regex); use for high-throughput persistent servers.
 
 ```typescript
 import {Hono} from "hono";

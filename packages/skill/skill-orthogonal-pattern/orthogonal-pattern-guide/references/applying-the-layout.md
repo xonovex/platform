@@ -15,7 +15,7 @@ document-processing/
 1. Name the independent decisions without moving files.
 2. Assign every existing file to one axis or mark it cross-cutting.
 3. Create one axis directory and move its variant-specific code into symmetric leaves.
-4. Move only universally shared contracts to that axis’s `shared/`.
+4. Move only universally shared contracts to that axis's `shared/`.
 5. Localize genuine two-axis exceptions as bridges.
 6. Repeat one axis at a time, keeping the system working after each move.
 7. Remove catch-all `utils` or layer directories after their contents have clear owners.

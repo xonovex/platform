@@ -1,6 +1,6 @@
 ---
 name: data-model-guide
-description: "Use when designing a central in-memory data model / object database for a tool, editor, or engine: typed objects with properties, stable cross-references and sub-object ownership, change notification, undo/redo, and serialization. Triggers on prompts about a runtime object/property schema, referencing objects by stable id/GUID, observing/notifying changes, transactional edits and undo history, save/load with versioning/migration, or copy-on-write snapshots — even when the user doesn't name a specific model."
+description: "Use when designing a central in-memory data model / object database for a tool, editor, or engine: typed objects with properties, stable cross-references and sub-object ownership, change notification, undo/redo, and serialization. Triggers on prompts about a runtime object/property schema, referencing objects by stable id/GUID, observing/notifying changes, transactional edits and undo history, save/load with versioning/migration, or copy-on-write snapshots, even when the user doesn't name a specific model."
 ---
 
 # Data-Model Guidelines
@@ -21,7 +21,7 @@ description: "Use when designing a central in-memory data model / object databas
 
 - **Strong = owning sub-object** - A parent owns its sub-objects; deleting the parent deletes them, see [references/references-and-ownership.md](references/references-and-ownership.md)
 - **Local vs global ids** - Local ids inside a file, GUIDs for cross-file/cross-session links, see [references/references-and-ownership.md](references/references-and-ownership.md)
-- **Identity vs role** - A GUID names a fixed identity; a name/path names a role that late-binds — default to GUIDs, see [references/references-and-ownership.md](references/references-and-ownership.md)
+- **Identity vs role** - A GUID names a fixed identity; a name/path names a role that late-binds: default to GUIDs, see [references/references-and-ownership.md](references/references-and-ownership.md)
 
 ## Prototypes & overrides
 
@@ -42,11 +42,11 @@ description: "Use when designing a central in-memory data model / object databas
 
 ## Gotchas
 
-- An undo entry that captured a pointer/index breaks once storage moves — capture ids and values, not addresses.
+- An undo entry that captured a pointer/index breaks once storage moves: capture ids and values, not addresses.
 - External side effects (file writes, network) are not undoable; keep them out of the transactional journal.
-- A loader that rejects unknown fields cannot open older OR newer files — migrate forward and ignore-or-preserve unknowns.
-- Overriding a sub-object in an instance gives it a new id, so references to the prototype's original silently miss — resolve references through the override, don't store the new id everywhere.
-- Allowing computed overrides (a property defined as an expression over the prototype's value) drags evaluation order and cycles into the data model — keep overrides concrete values.
+- A loader that rejects unknown fields cannot open older OR newer files: migrate forward and ignore-or-preserve unknowns.
+- Overriding a sub-object in an instance gives it a new id, so references to the prototype's original silently miss: resolve references through the override, don't store the new id everywhere.
+- Allowing computed overrides (a property defined as an expression over the prototype's value) drags evaluation order and cycles into the data model: keep overrides concrete values.
 
 ## Progressive Disclosure
 

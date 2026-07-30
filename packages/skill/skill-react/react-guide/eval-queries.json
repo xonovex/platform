@@ -1,6 +1,6 @@
 [
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "query": "make this client component server-rendered if possible. It's just fetching the user's recent orders",
     "should_trigger": true,
     "split": "train",
     "rationale": "RSC migration, doesn't say 'React'"
@@ -24,19 +24,19 @@
     "rationale": "React 19 idiom, no name"
   },
   {
-    "query": "Form submission in checkout/page.tsx is double-firing — can you wire up useFormStatus properly",
+    "query": "Form submission in checkout/page.tsx is double-firing: can you wire up useFormStatus properly",
     "should_trigger": true,
     "split": "train",
     "rationale": "Form Actions"
   },
   {
-    "query": "fetch the user's posts inside a use() call instead of useEffect — we want it to suspend",
+    "query": "fetch the user's posts inside a use() call instead of useEffect: we want it to suspend",
     "should_trigger": true,
     "split": "train",
     "rationale": "use() hook intent"
   },
   {
-    "query": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change — fix it",
+    "query": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change: fix it",
     "should_trigger": true,
     "split": "train",
     "rationale": "perf / memoization, doesn't say 'React'"
@@ -78,7 +78,7 @@
     "rationale": "direct React 19 Compiler"
   },
   {
-    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker: split it",
     "should_trigger": true,
     "split": "validation",
     "rationale": "RSC client/server boundary"
@@ -90,13 +90,13 @@
     "rationale": "useOptimistic intent"
   },
   {
-    "query": "page transition feels janky — i think the Suspense fallback is showing too much",
+    "query": "page transition feels janky: i think the Suspense fallback is showing too much",
     "should_trigger": true,
     "split": "validation",
     "rationale": "Suspense, casual phrasing"
   },
   {
-    "query": "we just upgraded to 19 — what does our memo wrapper look like with the compiler enabled",
+    "query": "we just upgraded to 19. What does our memo wrapper look like with the compiler enabled",
     "should_trigger": true,
     "split": "validation",
     "rationale": "React 19 + Compiler"
@@ -108,7 +108,7 @@
     "rationale": "wrong framework"
   },
   {
-    "query": "the legacy class components in old/ don't have lifecycle types — just leave them, I'm deleting them next sprint",
+    "query": "the legacy class components in old/ don't have lifecycle types, just leave them, I'm deleting them next sprint",
     "should_trigger": false,
     "split": "validation",
     "rationale": "near-miss: legacy with no modernization intent"
@@ -120,7 +120,7 @@
     "rationale": "near-miss: Astro/MDX, not React component work"
   },
   {
-    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
+    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs. What's a good approach?",
     "rationale": "validation near miss owned by imgui-guide",
     "should_trigger": false,
     "split": "validation"

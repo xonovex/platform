@@ -2,11 +2,11 @@
 
 ## Guideline
 
-You cannot optimize what you do not measure — drive every layout change with a profiler and hardware counters, comparing before/after on representative data.
+You cannot optimize what you do not measure: drive every layout change with a profiler and hardware counters, comparing before/after on representative data.
 
 ## Rationale
 
-DOD claims are about the hardware (cache misses, prefetch, vectorization), and intuition about the hardware is unreliable: the bottleneck is frequently not where it "should" be, and a layout that looks faster can be slower. Worse, asymptotic complexity hides constant factors and memory behavior — an O(n log n) tree can lose to an O(n²) array scan at realistic n because the array streams while the tree chases pointers. Only measurement on real inputs distinguishes a real win from a plausible-sounding regression.
+DOD claims are about the hardware (cache misses, prefetch, vectorization), and intuition about the hardware is unreliable: the bottleneck is frequently not where it "should" be, and a layout that looks faster can be slower. Worse, asymptotic complexity hides constant factors and memory behavior: an O(n log n) tree can lose to an O(n²) array scan at realistic n because the array streams while the tree chases pointers. Only measurement on real inputs distinguishes a real win from a plausible-sounding regression.
 
 ## Techniques
 
@@ -44,7 +44,7 @@ double bench(void (*run)(void *), void *ctx, int reps) {
 
 ## Gotchas
 
-- Benchmarking on tiny data that fits in L1 hides the very misses you are optimizing — use realistic working-set sizes.
+- Benchmarking on tiny data that fits in L1 hides the very misses you are optimizing: use realistic working-set sizes.
 - Compiler optimizations can elide a benchmark whose result is unused; consume the output (e.g. accumulate and print) to prevent dead-code elimination.
 - A single run is noise; report a stable statistic and pin frequency scaling where possible.
 

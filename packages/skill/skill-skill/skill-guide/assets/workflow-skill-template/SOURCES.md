@@ -4,7 +4,7 @@ Keep this file for every catalog skill. Use the external-source form when the wo
 
 ## {Source name}
 
-- **Title:** {Author(s) — "Work Title" (publisher / venue, year)} {— omit for a pure docs URL}
+- **Title:** {Author(s), "Work Title" (publisher / venue, year)} {omit for a pure docs URL}
 - **URL:** {https://example.com}
 - For a versioned surface, add `Version` plus either `Content SHA256` for web-only documentation or `Checkout` + `Commit` + `Watch` for a repository source.
 - **Last reviewed:** {YYYY-MM-DD}
@@ -14,7 +14,7 @@ Keep this file for every catalog skill. Use the external-source form when the wo
 - **Aspects extracted:**
   - {the specific claim / pattern this source backs}
 
-## {Repository-original workflow name — use instead of the source block above}
+## {Repository-original workflow name: use instead of the source block above}
 
 - **Provenance:** {Repository-original procedure distilled from maintained project practice}
 - **References:** all

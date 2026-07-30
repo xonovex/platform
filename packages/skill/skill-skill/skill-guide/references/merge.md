@@ -24,7 +24,7 @@ Frontmatter, section order, bullet format, voice/tone, code style, reference fil
 
 ### Spec ceilings (CRITICAL)
 
-Target `description` ≤1024 chars after merge; target body <500 lines / ~5000 tokens — push overflow to `references/` with explicit load-when triggers
+Target `description` ≤1024 chars after merge; target body <500 lines / ~5000 tokens: push overflow to `references/` with explicit load-when triggers
 
 ### Extract from source
 
@@ -56,4 +56,4 @@ Accept SKILL.md paths or names (e.g., `typescript-guide` → `<skills-dir>/types
 
 ## Safety
 
-Recommend git commit, never modify frontmatter `name:` and preserve target `description:` triggering quality (imperative "Use when…", trigger contexts, ≤1024 chars), preserve all target content (add only), preview before writing, reject duplicate registrations or dangling named handoffs, warn if >40% added or body would exceed 500 lines, abort if style confidence <80%
+Recommend git commit, never modify frontmatter `name:` and preserve target `description:` triggering quality (imperative "Use when...", trigger contexts, ≤1024 chars), preserve all target content (add only), preview before writing, reject duplicate registrations or dangling named handoffs, warn if >40% added or body would exceed 500 lines, abort if style confidence <80%

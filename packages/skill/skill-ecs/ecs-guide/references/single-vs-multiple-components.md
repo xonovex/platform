@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Allow at most one instance of a given component type per entity. Represent "many of a thing" with child entities or a single list-holding component — not by attaching the same component type twice.
+Allow at most one instance of a given component type per entity. Represent "many of a thing" with child entities or a single list-holding component, not by attaching the same component type twice.
 
 ## Rationale
 
-Multiple instances force addressing by an (entity, type, instance-id) triplet instead of (entity, type): per-instance ids, hot-loop lookup indirection, and ambiguity (two `mass` and three `position` components — which pairs with which?). You also lose "_the_ position of an entity." Single-instance typing keeps matched arrays co-located and lookup-free.
+Multiple instances force addressing by an (entity, type, instance-id) triplet instead of (entity, type): per-instance ids, hot-loop lookup indirection, and ambiguity (two `mass` and three `position` components, which pairs with which?). You also lose "_the_ position of an entity." Single-instance typing keeps matched arrays co-located and lookup-free.
 
 ## How to Apply
 
@@ -18,7 +18,7 @@ Multiple instances force addressing by an (entity, type, instance-id) triplet in
 ## Example
 
 ```c
-// Bad: two light components on one entity — which one is "the" light? needs instance ids
+// Bad: two light components on one entity. Which one is "the" light? needs instance ids
 add_component(e, light_component);
 add_component(e, light_component); // ambiguous, forces (entity,type,id) addressing
 
@@ -29,7 +29,7 @@ struct lights_component_t { light_t *lights; uint32_t count; }; // list-componen
 
 ## Counter-Example
 
-Frameworks that center on per-instance scripting (e.g. several independent "behavior" scripts on one object) sometimes accept multiple instances deliberately — but they pay the id/lookup/coupling cost described above. Know you are buying that cost.
+Frameworks that center on per-instance scripting (e.g. several independent "behavior" scripts on one object) sometimes accept multiple instances deliberately, but they pay the id/lookup/coupling cost described above. Know you are buying that cost.
 
 ## Related
 

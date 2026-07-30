@@ -1,6 +1,6 @@
 # performance-tips: Lua/JIT Performance Shaping
 
-Shape TS source so generated Lua stays JIT-friendly. Define all table fields upfront — adding fields after creation changes table shape and deoptimizes LuaJIT; use `readonly` factory functions. Cache global lookups (`const sqrt = Math.sqrt`) in locals, use numeric `for` loops over `for-of`, and pre-allocate with `new Array<number>(n)` instead of growing via `push`. Reuse scratch allocations in hot paths. The JIT "why" lives in **lua-opinionated-guide**.
+Shape TS source so generated Lua stays JIT-friendly. Define all table fields upfront: adding fields after creation changes table shape and deoptimizes LuaJIT; use `readonly` factory functions. Cache global lookups (`const sqrt = Math.sqrt`) in locals, use numeric `for` loops over `for-of`, and pre-allocate with `new Array<number>(n)` instead of growing via `push`. Reuse scratch allocations in hot paths. The JIT "why" lives in **lua-opinionated-guide**.
 
 ```typescript
 // FAST: stable shape, all fields set in factory

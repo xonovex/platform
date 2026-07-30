@@ -1,6 +1,6 @@
 ---
 name: react-guide
-description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler — even when the user doesn't say 'React'."
+description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler, even when the user doesn't say 'React'."
 ---
 
 # React Coding Guidelines
@@ -80,11 +80,11 @@ function App({children}) {
 
 ## Gotchas
 
-- Stale closures in `useEffect` — captured state from the render that scheduled the effect, not the current state; use refs or include in deps
-- List keys must be stable AND unique — index keys cause re-mounts on reorder, generated keys cause re-mounts every render
-- `useMemo`/`useCallback` aren't free — the comparison + bookkeeping costs more than re-running cheap computations
+- Stale closures in `useEffect`: captured state from the render that scheduled the effect, not the current state; use refs or include in deps
+- List keys must be stable AND unique: index keys cause re-mounts on reorder, generated keys cause re-mounts every render
+- `useMemo`/`useCallback` aren't free. The comparison + bookkeeping costs more than re-running cheap computations
 - Controlled vs uncontrolled inputs: passing `value` without `onChange` warns; switching mid-lifetime is silently buggy
-- Server Components can't use state/effects/event handlers — the boundary is `'use client'`; mis-marking causes runtime errors only
+- Server Components can't use state/effects/event handlers. The boundary is `'use client'`; mis-marking causes runtime errors only
 
 ## Progressive Disclosure
 

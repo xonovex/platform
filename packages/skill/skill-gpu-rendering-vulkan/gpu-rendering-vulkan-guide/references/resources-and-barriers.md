@@ -6,7 +6,7 @@ Create `VkImage`/`VkBuffer` with the right usage flags and views (`VkImageView`/
 
 ## Rationale
 
-Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) that must match the next use — sampling needs `SHADER_READ_ONLY_OPTIMAL`, rendering needs `COLOR_ATTACHMENT_OPTIMAL`, a copy destination needs `TRANSFER_DST_OPTIMAL`, presenting needs `PRESENT_SRC_KHR` — and the only way to change it (and to make a prior write visible to a later read) is a pipeline barrier. The barrier's masks define the dependency: `src` is the producer stages/access that must complete and be made available; `dst` is the consumer stages/access that wait and to which it is made visible. The agnostic model (why scopes must be tight, the producer/consumer framing) is in gpu-rendering-guide (synchronization).
+Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) that must match the next use: sampling needs `SHADER_READ_ONLY_OPTIMAL`, rendering needs `COLOR_ATTACHMENT_OPTIMAL`, a copy destination needs `TRANSFER_DST_OPTIMAL`, presenting needs `PRESENT_SRC_KHR`, and the only way to change it (and to make a prior write visible to a later read) is a pipeline barrier. The barrier's masks define the dependency: `src` is the producer stages/access that must complete and be made available; `dst` is the consumer stages/access that wait and to which it is made visible. The agnostic model (why scopes must be tight, the producer/consumer framing) is in gpu-rendering-guide (synchronization).
 
 ## Techniques
 
@@ -19,9 +19,9 @@ Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) 
 ## Gotchas
 
 - `oldLayout` must equal the image's actual current layout (or be `UNDEFINED` to discard); a mismatch is undefined behavior the validation layers usually catch.
-- A missing barrier between a write and a dependent read is a hazard that may pass on your GPU and corrupt elsewhere — run synchronization validation.
+- A missing barrier between a write and a dependent read is a hazard that may pass on your GPU and corrupt elsewhere: run synchronization validation.
 - `VK_ACCESS_2_SHADER_READ_BIT` is broad; prefer the specific `SHADER_SAMPLED_READ`/`SHADER_STORAGE_READ` bits where available.
-- A queue-family release without a matching acquire (or vice versa) corrupts the resource on one queue — the pair must match exactly.
+- A queue-family release without a matching acquire (or vice versa) corrupts the resource on one queue: the pair must match exactly.
 
 ## Related
 

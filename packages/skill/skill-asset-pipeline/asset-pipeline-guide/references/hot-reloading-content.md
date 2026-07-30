@@ -2,17 +2,17 @@
 
 ## Guideline
 
-Watch source files for changes, recompile only the affected dependency closure in the background, then publish the new runtime resource and atomically repoint references — retiring the old version only once no in-flight work still reads it — so content updates while the running application stays live.
+Watch source files for changes, recompile only the affected dependency closure in the background, then publish the new runtime resource and atomically repoint references: retiring the old version only once no in-flight work still reads it, so content updates while the running application stays live.
 
 ## Rationale
 
-The hard part of hot-reload is the swap: runtime data may be referenced by code already mid-frame, so freeing the old resource the instant the new one is ready can crash work submitted against the old handle. The safe pattern is publish-then-retire — build the new version fully off to the side (never mutate the live resource in place), repoint references atomically (handle swap or generation bump), and defer freeing the old version until in-flight work referencing it completes, gated by the same fence/frame-in-flight boundary the renderer already tracks.
+The hard part of hot-reload is the swap: runtime data may be referenced by code already mid-frame, so freeing the old resource the instant the new one is ready can crash work submitted against the old handle. The safe pattern is publish-then-retire: build the new version fully off to the side (never mutate the live resource in place), repoint references atomically (handle swap or generation bump), and defer freeing the old version until in-flight work referencing it completes, gated by the same fence/frame-in-flight boundary the renderer already tracks.
 
 ## How to Apply
 
 1. Run a file watcher over the source tree; on a change event, map the changed file to the assets that depend on it via the dependency graph.
 2. Queue the affected closure onto the same async compile path used offline; content hashing means unchanged outputs are no-ops and only genuinely stale data recompiles.
-3. Build the new runtime resource fully off to the side before exposing it — never mutate the live resource in place.
+3. Build the new runtime resource fully off to the side before exposing it, never mutate the live resource in place.
 4. Publish atomically: swap the handle (or bump a generation/version) so new readers pick up the new resource on their next access, while readers already holding the old pointer finish safely.
 5. Retire the old version behind the in-flight boundary: only free it once the last frame/command that could reference it has completed (e.g. past the renderer's frames-in-flight fence), not at the moment of swap.
 6. Coalesce rapid successive saves (debounce the watcher) so a burst of edits triggers one recompile-and-swap rather than a storm.
@@ -46,7 +46,7 @@ void on_cooked(pipeline_t *p, asset_id_t id, runtime_texture_t *fresh) {
 - A non-debounced watcher fires several events per save (editors write temp-then-rename), causing redundant recompiles and visible churn; coalesce events before queuing.
 - Blocking the frame loop on the recompile defeats the purpose; the cook must run on a background pool, and the swap must be a cheap atomic publish.
 - Hot-reload that bypasses the cache/dependency path can recook the world on every save; route live edits through the same closure-and-hash machinery as offline builds.
-- Reload safety also depends on the consuming code tolerating a swapped pointer between accesses — the discipline of writing such reloadable code lives in c99-opinionated-guide.
+- Reload safety also depends on the consuming code tolerating a swapped pointer between accesses: the discipline of writing such reloadable code lives in c99-opinionated-guide.
 
 ## Related
 

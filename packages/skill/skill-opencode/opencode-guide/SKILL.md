@@ -1,6 +1,6 @@
 ---
 name: opencode-guide
-description: "Use when configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding — even when the user doesn't say 'OpenCode plugin'."
+description: "Use when configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. Triggers on .opencode/plugins, opencode.json plugin packages, tool.execute.before/after, permission.asked, session events, file events, shell.env, custom tools, sequential plugin load order, Bun dependency install, plugin trust, or OpenCode onboarding, even when the user doesn't say 'OpenCode plugin'."
 ---
 
 # OpenCode Plugins and Events

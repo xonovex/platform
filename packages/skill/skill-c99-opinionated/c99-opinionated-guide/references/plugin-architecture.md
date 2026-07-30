@@ -1,12 +1,12 @@
 # plugin-architecture: Plugins and a Runtime Interface Registry
 
-Build the system as many small, independently-loadable plugins that talk only through a central registry of named interfaces — each interface a plain-C struct of function pointers registered under a unique string id — so components discover each other at runtime with zero compile-time coupling and the core stays tiny. Plain C is deliberate: it has a stable de-facto ABI (C++ does not), so plugins from different compilers stay binary-compatible.
+Build the system as many small, independently-loadable plugins that talk only through a central registry of named interfaces: each interface a plain-C struct of function pointers registered under a unique string id, so components discover each other at runtime with zero compile-time coupling and the core stays tiny. Plain C is deliberate: it has a stable de-facto ABI (C++ does not), so plugins from different compilers stay binary-compatible.
 
 ## How to Apply
 
-1. Define the registry: `add(name, iface)`, `remove(iface)`, `first(name)`, `next(prev)` — a string-keyed multimap of interface pointers.
-2. Express each capability as a struct of function pointers plus a unique string-id constant and docs, all in one plain-C header (no header-to-header includes — see [references/physical-design.md](./physical-design.md)).
-3. On load, a plugin fills in its interface struct and `add()`s it under its id; on unload it `remove()`s it (this is also the hot-reload hook — see [references/hot-reload.md](./hot-reload.md)).
+1. Define the registry: `add(name, iface)`, `remove(iface)`, `first(name)`, `next(prev)`: a string-keyed multimap of interface pointers.
+2. Express each capability as a struct of function pointers plus a unique string-id constant and docs, all in one plain-C header (no header-to-header includes, see [references/physical-design.md](./physical-design.md)).
+3. On load, a plugin fills in its interface struct and `add()`s it under its id; on unload it `remove()`s it (this is also the hot-reload hook, see [references/hot-reload.md](./hot-reload.md)).
 4. To use a capability, `first()` it by id and call through the table; treat a missing interface as an optional dependency, not a link error.
 5. Make extension points "register another implementation of interface X": iterate `first`/`next` to invoke all providers (tests, importers, exporters) without the core knowing them.
 6. Version interfaces by id (append a version to the name, or add a version field) so a plugin can ask for the exact shape it understands.
@@ -38,10 +38,10 @@ if (c) c->compress(dst, src, n);               // optional dependency: handle ab
 
 ## Gotchas
 
-- A cached interface pointer dangles after the providing plugin is unloaded/reloaded — re-fetch from the registry after a reload, never stash it across that boundary (see [references/hot-reload.md](./hot-reload.md)).
+- A cached interface pointer dangles after the providing plugin is unloaded/reloaded: re-fetch from the registry after a reload, never stash it across that boundary (see [references/hot-reload.md](./hot-reload.md)).
 - String-id typos fail silently as "interface not found"; centralize the id in a `#define` next to the struct and use that constant everywhere.
-- C++ interfaces break this — no stable ABI across compilers; keep the _interface_ plain C even if the _implementation_ is C++.
-- `first()` returning the most-recently-added (or first) implementation makes order matter when only one is expected — design for either "exactly one" or "iterate all," and document which.
+- C++ interfaces break this, no stable ABI across compilers; keep the _interface_ plain C even if the _implementation_ is C++.
+- `first()` returning the most-recently-added (or first) implementation makes order matter when only one is expected: design for either "exactly one" or "iterate all," and document which.
 - The registry is global mutable state; register during init and treat the interface tables as immutable afterwards to avoid races with running plugins.
 
 ## Related

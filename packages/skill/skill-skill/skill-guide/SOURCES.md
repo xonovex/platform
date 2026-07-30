@@ -10,7 +10,7 @@
   - `references/instruction-patterns.md` → all sections
   - `references/guideline-skills.md` → patterns
 - **Aspects extracted:**
-  - "Start from real expertise" — extracting from hands-on tasks and project artifacts → influenced `create.md` workflow and `extract-from-codebase.md`
+  - "Start from real expertise": extracting from hands-on tasks and project artifacts → influenced `create.md` workflow and `extract-from-codebase.md`
   - "Spending context wisely" → "Add only what the agent lacks; omit what it knows" rule in Content Rules
   - "Aim for moderate detail" → 3-7 essentials guideline in `create.md` output structure
   - "Match specificity to fragility" → Content Rules
@@ -103,7 +103,7 @@
   - `references/composability.md` → entire file
   - `references/catalog-audit.md` → entire file
 - **Aspects extracted:**
-  - "Composable by design" — a skill should work well alongside others, not assume it is the only capability → Design-to-coexist principle and one-owner-per-concept rule
+  - "Composable by design": a skill should work well alongside others, not assume it is the only capability → Design-to-coexist principle and one-owner-per-concept rule
   - Progressive disclosure as token budget (metadata ~100 tokens → SKILL.md → references on demand) → progressive-disclosure budget note and routing-first descriptions
   - General → language → framework tiering as the composition model → `composability.md` tiered model and `catalog-audit.md` owner-selection
 

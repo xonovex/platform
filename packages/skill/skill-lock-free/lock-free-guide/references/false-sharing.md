@@ -6,7 +6,7 @@ Give each hot per-thread or independently-written atomic field its own cache lin
 
 ## Rationale
 
-Coherence works at cache-line granularity, not per-variable. When two threads write _distinct_ variables that share one line, the line ping-pongs between cores — silent serialization that can erase all scaling. Pad/align each independently-written field to a full `CACHE_LINE_SIZE` line (64 B on x86-64; 128 B on Apple silicon and some ARM/POWER); verify with a profiler (perf c2c, VTune) rather than padding blindly.
+Coherence works at cache-line granularity, not per-variable. When two threads write _distinct_ variables that share one line, the line ping-pongs between cores: silent serialization that can erase all scaling. Pad/align each independently-written field to a full `CACHE_LINE_SIZE` line (64 B on x86-64; 128 B on Apple silicon and some ARM/POWER); verify with a profiler (perf c2c, VTune) rather than padding blindly.
 
 ## Example
 
@@ -36,7 +36,7 @@ typedef struct {
 
 ## Gotchas
 
-- `_Alignas` on a struct field aligns the field, but an _array_ of such structs only stays line-aligned if the struct's size is a whole multiple of the line — the explicit `pad` guarantees that (and aligns the whole struct via the `_Alignas` member).
+- `_Alignas` on a struct field aligns the field, but an _array_ of such structs only stays line-aligned if the struct's size is a whole multiple of the line: the explicit `pad` guarantees that (and aligns the whole struct via the `_Alignas` member).
 - `malloc` does not guarantee cache-line alignment; for line-aligned dynamic buffers use `aligned_alloc(CACHE_LINE_SIZE, n)`.
 - Many runtimes already line-align their per-worker queues and per-CPU counters; follow the existing padding pattern in your codebase rather than inventing a new one.
 

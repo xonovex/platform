@@ -30,7 +30,7 @@
 - **Aspects extracted:**
   - Six change-type headings, `[x.y.z] - YYYY-MM-DD` / Unreleased format, "don't dump git logs"
 
-## Changesets — config options
+## Changesets: config options
 
 - **URL:** https://github.com/changesets/changesets/blob/main/docs/config-file-options.md
 - **Last reviewed:** 2026-06-28
@@ -39,16 +39,16 @@
 - **Aspects extracted:**
   - Internal-dependency range-update rule (`updateInternalDependencies` patch/minor; out-of-range default vs the experimental `updateInternalDependents: always`), `bumpVersionsWithWorkspaceProtocolOnly`, `linked` / `fixed` groups
 
-## Changesets — changelog-github format
+## Changesets: changelog-github format
 
 - **URL:** https://github.com/changesets/changesets/tree/main/packages/changelog-github
 - **Last reviewed:** 2026-06-28
 - **Used for:**
   - `references/changelog.md` → Bullet Format
 - **Aspects extracted:**
-  - The `- [#PR](…/pull/PR) [\`hash\`](…/commit/hash) Thanks [@login](…)! - <description>` bullet, attributing the PR-author login rather than the git commit author name
+  - The `- [#PR](<repo>/pull/PR) [\`hash\`](<repo>/commit/hash) Thanks [@login](https://github.com/login)! - <description>` bullet, attributing the PR-author login rather than the git commit author name
 
-## Changesets — changelog grouping
+## Changesets: changelog grouping
 
 - **URL:** https://github.com/changesets/changesets/blob/main/docs/detailed-explanation.md
 - **Last reviewed:** 2026-06-28

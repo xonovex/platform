@@ -12,7 +12,7 @@ destination/
 Use these placement tests:
 
 - Every variant needs it unchanged → axis `shared/`.
-- Only one variant needs it → that variant’s leaf.
+- Only one variant needs it → that variant's leaf.
 - A subset needs similar code → tolerate duplication until the common rule is stable; do not make unrelated variants depend on it.
 - The root names a concrete variant or branches on its name → variability leaked upward.
 - One leaf imports a sibling → either move a genuinely universal contract to `shared/` or revisit the axis.

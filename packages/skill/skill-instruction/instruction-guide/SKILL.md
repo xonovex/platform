@@ -1,6 +1,6 @@
 ---
 name: instruction-guide
-description: "Use when authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. Triggers on edits to `AGENTS.md` and on prompts about bootstrapping fresh instructions, refreshing stale docs to match the filesystem, condensing verbose files, deduping across the repo, or porting organizational patterns from another project — even when the user doesn't say 'instructions' or 'AGENTS.md'."
+description: "Use when authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. Triggers on edits to `AGENTS.md` and on prompts about bootstrapping fresh instructions, refreshing stale docs to match the filesystem, condensing verbose files, deduping across the repo, or porting organizational patterns from another project, even when the user doesn't say 'instructions' or 'AGENTS.md'."
 ---
 
 # Project Instruction Guidelines
@@ -9,28 +9,28 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 
 ## Core Principles
 
-- **Open standard** — AGENTS.md is the cross-harness format read by many agent harnesses; keep content harness-neutral
-- **README for agents** — operational detail (commands, conventions, gotchas) belongs in AGENTS.md; human-onboarding prose belongs in README.md
-- **Teammate heuristic** — "anything you'd tell a new teammate" belongs here; anything you'd tell a casual visitor belongs in README
-- **Nested precedence** — for monorepos, the AGENTS.md closest to the edited file wins; place subproject-specific guidance in subdirectories
-- **Commands are executable** — agents auto-run programmatic checks listed in AGENTS.md; treat command examples as instructions, not just docs
-- **Advisory scope** — AGENTS.md communicates project guidance; it does not itself execute automation
-- **Preserve Project Context** — never modify technology names, paths, or commands
-- **Match Style and Voice** — maintain the target file's formatting and terminology
-- **Structure Integrity** — keep section order and hierarchy intact; preview changes (dry-run) before applying
-- **Signal Over Volume** — keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
-- **Deletion-first editing** — a simplify or consolidate pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **skill-guide** owns this rule
-- **Living documentation** — update alongside project changes (sync operation)
+- **Open standard**: AGENTS.md is the cross-harness format read by many agent harnesses; keep content harness-neutral
+- **README for agents**: operational detail (commands, conventions, gotchas) belongs in AGENTS.md; human-onboarding prose belongs in README.md
+- **Teammate heuristic**: "anything you'd tell a new teammate" belongs here; anything you'd tell a casual visitor belongs in README
+- **Nested precedence**: for monorepos, the AGENTS.md closest to the edited file wins; place subproject-specific guidance in subdirectories
+- **Commands are executable**: agents auto-run programmatic checks listed in AGENTS.md; treat command examples as instructions, not just docs
+- **Advisory scope**: AGENTS.md communicates project guidance; it does not itself execute automation
+- **Preserve Project Context**: never modify technology names, paths, or commands
+- **Match Style and Voice**: maintain the target file's formatting and terminology
+- **Structure Integrity**: keep section order and hierarchy intact; preview changes (dry-run) before applying
+- **Signal Over Volume**: keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
+- **Deletion-first editing**: a simplify or consolidate pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **skill-guide** owns this rule
+- **Living documentation**: update alongside project changes (sync operation)
 
 ## Gotchas
 
-- AGENTS.md files that restate code are worse than no doc — they rot when the code changes
+- AGENTS.md files that restate code are worse than no doc. They rot when the code changes
 - Tech names look like noise but are essential; never substitute generics for `moon` / `Terraform` / `npm`
-- Root AGENTS.md is the project entry-point doc — never auto-delete even if it looks thin
-- Manual descriptions in Subdirectories often encode info the filesystem can't (purpose, owner, status) — preserve verbatim during sync
-- Nested AGENTS.md aren't duplicates — they're scope-specific overrides; never merge a subproject's file into the root
+- Root AGENTS.md is the project entry-point doc, never auto-delete even if it looks thin
+- Manual descriptions in Subdirectories often encode info the filesystem can't (purpose, owner, status): preserve verbatim during sync
+- Nested AGENTS.md aren't duplicates. They're scope-specific overrides; never merge a subproject's file into the root
 - Build / test commands listed in AGENTS.md will be **executed** by agents; broken commands waste agent turns
-- "Always do X" in AGENTS.md enforces nothing — the model may not comply and may never load the file; capitalizing MUST adds no executor, and the failure is silent because the rule never ran
+- "Always do X" in AGENTS.md enforces nothing. The model may not comply and may never load the file; capitalizing MUST adds no executor, and the failure is silent because the rule never ran
 
 ## Progressive Disclosure
 

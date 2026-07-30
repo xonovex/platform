@@ -16,6 +16,6 @@ it never commits, resets, removes, tags, pushes, or changes provider state.
 
 ## Gotchas
 
-- Abandoning without recording _why_ the approach failed loses the learning — always capture it with the recovery revision
+- Abandoning without recording _why_ the approach failed loses the learning, always capture it with the recovery revision
 - Do not create a safety commit or tag: even a preservation-oriented write exceeds the Abandon operation
 - Do not treat a request to abandon as authorization to discard or clean up work

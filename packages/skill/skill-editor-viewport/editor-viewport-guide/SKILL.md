@@ -29,7 +29,7 @@ The interactive seam where a real-time renderer meets an editor: picking what th
 
 ## Picking and selection
 
-- **Async readback** - Queue the id read after the frame; consume it a frame or two later — the latency is invisible, see [references/object-picking.md](references/object-picking.md)
+- **Async readback** - Queue the id read after the frame; consume it a frame or two later. The latency is invisible, see [references/object-picking.md](references/object-picking.md)
 - **Closest-wins, locked** - Use an atomic min on depth plus a tiny spinlock to keep the id consistent with the winning depth, see [references/object-picking.md](references/object-picking.md)
 - **Gather-based edge detect** - Sample a neighborhood of the id target with `Gather`; alpha rises where neighbor ids differ, see [references/selection-highlighting.md](references/selection-highlighting.md)
 - **Dim, don't drop, when occluded** - Compare selection depth (max over a few taps, to survive jitter) against scene depth and dim hidden outline, see [references/selection-highlighting.md](references/selection-highlighting.md)
@@ -43,10 +43,10 @@ The interactive seam where a real-time renderer meets an editor: picking what th
 
 ## Gotchas
 
-- A 3D "mouse ray" built by assigning arbitrary z to the cursor and intersecting it with the axis is a skew-line distance problem, not a projection — it sends objects backward at steep camera angles; project in 2D screen space instead.
+- A 3D "mouse ray" built by assigning arbitrary z to the cursor and intersecting it with the axis is a skew-line distance problem, not a projection. It sends objects backward at steep camera angles; project in 2D screen space instead.
 - Reading the id pixel synchronously stalls the GPU pipeline; queue an async read-back and accept the one-to-two-frame delay.
 - Comparing the selection depth directly against a jittered (TAA) scene depth makes the outline shimmer; take the closest depth over a small neighborhood before comparing.
-- With reverse-Z, "closest" is the maximum depth, not the minimum — flip your `min`/`max` and atomic comparisons accordingly.
+- With reverse-Z, "closest" is the maximum depth, not the minimum: flip your `min`/`max` and atomic comparisons accordingly.
 - A naive id write (depth test then store) races between threads; without an atomic-min plus lock the stored id can belong to a farther surface than the stored depth.
 - Letting each component draw and hit-test its own gizmo duplicates code and drifts behavior; keep gizmo rendering/interaction central and let components supply only transform get/set.
 - Applying the absolute projected parameter as the position (instead of the delta from drag-start) snaps the object to the cursor on the first frame; always subtract the start value.

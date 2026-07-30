@@ -12,7 +12,7 @@ SIMD processes N lanes per instruction, but only when each lane's input is conti
 
 - **SoA columns enable contiguous loads** - Store each field in its own array; the inner loop over the array becomes a sequence of aligned vector loads/ops/stores.
 - **Pad count to SIMD width** - Round the element count up to a multiple of the lane count and process full vectors; mask or ignore the padding lanes, avoiding a scalar remainder loop.
-- **Alignment (16/32/64B)** - Align column base addresses to the vector width: 16B for SSE/NEON (4 floats), 32B for AVX (8 floats), 64B for AVX-512 (16 floats) — and 64B also aligns to a cache line.
+- **Alignment (16/32/64B)** - Align column base addresses to the vector width: 16B for SSE/NEON (4 floats), 32B for AVX (8 floats), 64B for AVX-512 (16 floats), and 64B also aligns to a cache line.
 - **AoSoA for cache + SIMD** - Tile width = lane count: each tile is one (or a few) vector(s) and sits in one cache line, giving both locality and vectorizability.
 - **Batch of N** - Structure the algorithm to consume N lanes at a time; keep per-lane control flow uniform (no divergent branches) so the vector stays full.
 
@@ -43,7 +43,7 @@ typedef struct { float x, y, out; char tag; } rec_t; // stride 16B, gathered
 
 - Padding lanes must hold safe values (e.g. 0) so they cannot produce NaN/inf, div-by-zero, or out-of-range side effects.
 - Alignment is necessary but not sufficient: divergent per-lane branches, dependent loads, or aliasing can still block vectorization.
-- Aligned allocation is separate from struct alignment — `malloc` only guarantees max-align; use an aligned allocator for over-aligned columns.
+- Aligned allocation is separate from struct alignment: `malloc` only guarantees max-align; use an aligned allocator for over-aligned columns.
 
 ## Related
 

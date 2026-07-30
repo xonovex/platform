@@ -4,13 +4,13 @@ Merge compatible public-contract elements while preserving one procedure owner.
 
 ## Arguments
 
-- `target` (required) — target command file.
-- `source` (required) — source command file.
-- `--aspects <aspects>` (optional) — arguments, delegation, metadata, or
+- `target` (required): target command file.
+- `source` (required): source command file.
+- `--aspects <aspects>` (optional): arguments, delegation, metadata, or
   owner-skill procedure.
-- `--percentage <percent>` (optional) — intensity 10-100; defaults to 50.
-- `--interactive` (optional) — ask about incompatible contracts.
-- `--dry-run` (optional) — preview without modifying.
+- `--percentage <percent>` (optional): intensity 10-100; defaults to 50.
+- `--interactive` (optional): ask about incompatible contracts.
+- `--dry-run` (optional): preview without modifying.
 
 ## Core workflow
 

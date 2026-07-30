@@ -1,6 +1,6 @@
 # typescript-config: tsconfig for Tests
 
-Add `test` and `vitest.config.ts` to tsconfig `include` or TypeScript won't type-check them. `references` paths are relative from the current package — count `..` levels against the real directory structure (verify with `ls`, test with `tsc --build`).
+Add `test` and `vitest.config.ts` to tsconfig `include` or TypeScript won't type-check them. `references` paths are relative from the current package: count `..` levels against the real directory structure (verify with `ls`, test with `tsc --build`).
 
 ```json
 {

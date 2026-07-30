@@ -21,7 +21,7 @@ Raw pointers pin objects to fixed addresses, so the backing storage cannot be re
 ```c
 typedef struct { uint32_t index, generation; } handle_t;
 
-// Bad: raw pointer — dangles after the array reallocs or the slot is freed.
+// Bad: raw pointer: dangles after the array reallocs or the slot is freed.
 entity_t *cached = &items[i]; // grow() moves items[] -> cached now invalid
 
 // Indirection table: stable handle + dense data, both. O(1) deref and remove.

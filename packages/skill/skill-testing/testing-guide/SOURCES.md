@@ -2,7 +2,7 @@
 
 ## Test-double taxonomy, Four-Phase Test, and test smells
 
-- **Title:** Gerard Meszaros — "xUnit Test Patterns: Refactoring Test Code" (Addison-Wesley, 2007) / xunitpatterns.com
+- **Title:** Gerard Meszaros, "xUnit Test Patterns: Refactoring Test Code" (Addison-Wesley, 2007) / xunitpatterns.com
 - **URLs:**
   - http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html
   - https://www.informit.com/articles/article.aspx?p=1398624
@@ -18,11 +18,11 @@
   - The Test Double umbrella term and the five kinds (Dummy / Stub / Spy / Mock / Fake) and the continuum caveat
   - Responder vs Saboteur stubs; indirect input (Stub) vs indirect output (Spy / Mock); Fake as an alternative implementation
   - The Four-Phase Test (Setup / Exercise / Verify / Teardown), its relationship to Arrange-Act-Assert, and teardown usually being unnecessary for unit tests
-  - Test smells — Obscure Test, Mystery Guest, Eager Test, Fragile Test (Sensitive Equality, Indirect Testing), Erratic Test — and how smells cause other smells
+  - Test smells: Obscure Test, Mystery Guest, Eager Test, Fragile Test (Sensitive Equality, Indirect Testing), Erratic Test, and how smells cause other smells
 
 ## Definitions of the doubles and state vs behaviour verification
 
-- **Title:** Martin Fowler — "Mocks Aren't Stubs"
+- **Title:** Martin Fowler, "Mocks Aren't Stubs"
 - **URL:** https://martinfowler.com/articles/mocksArentStubs.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -34,7 +34,7 @@
 
 ## Arrange-Act-Assert
 
-- **Title:** Bill Wake — "3A: Arrange, Act, Assert" (xp123)
+- **Title:** Bill Wake, "3A: Arrange, Act, Assert" (xp123)
 - **URL:** https://xp123.com/articles/3a-arrange-act-assert/
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -44,7 +44,7 @@
 
 ## The FIRST qualities
 
-- **Title:** Tim Ottinger & Brett Schuchert — "FIRST" (in Robert C. Martin (ed.), "Clean Code", ch. 9, p. 132)
+- **Title:** Tim Ottinger & Brett Schuchert, "FIRST" (in Robert C. Martin (ed.), "Clean Code", ch. 9, p. 132)
 - **URL:** https://medium.com/pragmatic-programmers/unit-tests-are-first-fast-isolated-repeatable-self-verifying-and-timely-a83e8070698e
 - **Last reviewed:** 2026-06-27
 - **Used for:**
@@ -54,7 +54,7 @@
 
 ## Fixture-creation patterns
 
-- **Title:** Nat Pryce — "Test Data Builders: an alternative to the Object Mother pattern" (2007)
+- **Title:** Nat Pryce, "Test Data Builders: an alternative to the Object Mother pattern" (2007)
 - **URL:** http://www.natpryce.com/articles/000714.html
 - **Last reviewed:** 2026-06-27
 - **Used for:**

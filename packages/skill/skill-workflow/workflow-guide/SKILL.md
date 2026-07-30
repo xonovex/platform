@@ -12,29 +12,29 @@ architecture these operations implement is in
 
 ## Core Principles
 
-- **One operation** — perform only the requested operation; never infer a lifecycle or
+- **One operation**: perform only the requested operation; never infer a lifecycle or
   silently chain the next one
-- **Explicit subject** — act on the supplied inline subject, path, or opaque native
+- **Explicit subject**: act on the supplied inline subject, path, or opaque native
   reference without inventing missing identity or revision data
-- **Cold-boundary handoffs** — chain freely inside one session; produce a handoff only
+- **Cold-boundary handoffs**: chain freely inside one session; produce a handoff only
   when a session or role ends, in the shape
   [references/handoffs.md](references/handoffs.md) defines
-- **Decisions carry anchors** — record what was decided, why, and where in the code, so
+- **Decisions carry anchors**: record what was decided, why, and where in the code, so
   a later session can find it
-- **Soft capability selection** — choose relevant installed skills from the subject and
+- **Soft capability selection**: choose relevant installed skills from the subject and
   their routing descriptions; keep this general skill free of concrete domain
   dependencies
-- **Dependency-first composition** — load each selected guide's exact manifest
+- **Dependency-first composition**: load each selected guide's exact manifest
   dependencies before the guide itself, once per operation
-- **Operation boundary wins** — use only the part of a selected procedure that fits the
+- **Operation boundary wins**: use only the part of a selected procedure that fits the
   requested effect and persistence boundary; block when that procedure cannot be
   separated from a broader effect
-- **Visible boundaries** — report degraded coverage, blockers, evidence, and every
+- **Visible boundaries**: report degraded coverage, blockers, evidence, and every
   planned or observed effect instead of hiding uncertainty
-- **Authority stays explicit** — see [references/governance.md](references/governance.md)
-- **Workspace resources stay separate** — workspace operations manage isolation and
+- **Authority stays explicit**: see [references/governance.md](references/governance.md)
+- **Workspace resources stay separate**: workspace operations manage isolation and
   integration resources, not the work performed inside them
-- **No operation, no command** — a request that fits no operation gets none; a freeform
+- **No operation, no command**: a request that fits no operation gets none; a freeform
   session is the sanctioned way to work outside this catalog
 
 ## Operation Procedure
@@ -75,32 +75,32 @@ Do not force empty headings or serialize the result into a fixed envelope.
 
 ## Core Operations
 
-- **Create** — produce a new inline result without publishing it — see
+- **Create**: produce a new inline result without publishing it, see
   [references/create.md](references/create.md)
-- **Review** — return evidence-linked findings without changing the subject — see
+- **Review**: return evidence-linked findings without changing the subject, see
   [references/review.md](references/review.md)
-- **Revise** — produce a traceable successor while preserving the source — see
+- **Revise**: produce a traceable successor while preserving the source, see
   [references/revise.md](references/revise.md)
-- **Decide** — record one descriptive outcome without granting authority — see
+- **Decide**: record one descriptive outcome without granting authority, see
   [references/decide.md](references/decide.md)
-- **Execute** — carry out previously specified work under an explicit effect mode — see
+- **Execute**: carry out previously specified work under an explicit effect mode, see
   [references/execute.md](references/execute.md)
-- **Validate** — evaluate binding criteria independently with evidence — see
+- **Validate**: evaluate binding criteria independently with evidence, see
   [references/validate.md](references/validate.md)
-- **Publish** — persist one exact result to one explicit destination — see
+- **Publish**: persist one exact result to one explicit destination, see
   [references/publish.md](references/publish.md)
-- **Abandon** — return the reason, partial state, and retry boundary — see
+- **Abandon**: return the reason, partial state, and retry boundary, see
   [references/abandon.md](references/abandon.md)
 
 ## Workspace Operations
 
-- **Workspace create** — create only the named isolated workspace resources — see
+- **Workspace create**: create only the named isolated workspace resources, see
   [references/workspace-create.md](references/workspace-create.md)
-- **Workspace merge** — validate and integrate without cleanup — see
+- **Workspace merge**: validate and integrate without cleanup, see
   [references/workspace-merge.md](references/workspace-merge.md)
-- **Workspace abandon** — record abandonment without mutation — see
+- **Workspace abandon**: record abandonment without mutation, see
   [references/workspace-abandon.md](references/workspace-abandon.md)
-- **Workspace cleanup** — preview and remove only exact named resources — see
+- **Workspace cleanup**: preview and remove only exact named resources, see
   [references/workspace-cleanup.md](references/workspace-cleanup.md)
 
 ## Gotchas

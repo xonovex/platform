@@ -1,6 +1,6 @@
 ---
 name: lua-guide
-description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, configuration. Triggers on `.lua` files and prompts about module patterns, local scoping, metatables, coroutines, error handling, even when the user doesn't say 'Lua'."
+description: "Use when editing general-purpose Lua 5.4+: modules, scripts, configuration. Triggers on `.lua` files and prompts about module patterns, local scoping, metatables, coroutines, error handling, even when the user doesn't say 'Lua'."
 ---
 
 # Lua Coding Guidelines
@@ -21,8 +21,8 @@ description: "Use when editing general-purpose Lua 5.4+ — modules, scripts, co
 
 - Arrays are 1-indexed; a `nil` hole breaks the `#` length operator (it stops at the first nil)
 - Tables are both array and hash; mixing them is fine but iteration order isn't guaranteed for the hash part
-- `/` always returns a float; use `//` for integer floor division — `total // per_page`, not `math.floor(total / per_page)`
-- Variables are global by default unless declared `local` — forgetting `local` in a loop counter leaks into the surrounding scope
+- `/` always returns a float; use `//` for integer floor division: `total // per_page`, not `math.floor(total / per_page)`
+- Variables are global by default unless declared `local`: forgetting `local` in a loop counter leaks into the surrounding scope
 
 ## Progressive disclosure
 

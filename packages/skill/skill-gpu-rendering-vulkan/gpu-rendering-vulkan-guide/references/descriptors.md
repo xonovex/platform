@@ -6,7 +6,7 @@ Describe shader resource access with `VkDescriptorSetLayout`s grouped by update 
 
 ## Rationale
 
-A `VkDescriptorSetLayout` declares the bindings (type, count, stage flags) a set provides; a `VkDescriptorSet` is concrete storage allocated from a `VkDescriptorPool`. Grouping bindings by how often they change — set 0 per-frame, set 1 per-material, set 2 per-draw — means `vkCmdBindDescriptorSets` rebinds only what changed. The bind-a-set-per-draw model bottlenecks with many materials; `VK_EXT_descriptor_indexing` with `UPDATE_AFTER_BIND` lets one giant descriptor array hold every texture, the shader indexing it by a handle passed per draw (`nonuniformEXT` when divergent) — collapsing thousands of binds into one. Push constants carry a small block (`maxPushConstantsSize`, guaranteed ≥128 bytes) inline in the command buffer with no descriptor write, the cheapest path for a transform index or a few scalars. The architecture rationale (frequency grouping, bindless, inline constants) is in gpu-rendering-guide (binding-model).
+A `VkDescriptorSetLayout` declares the bindings (type, count, stage flags) a set provides; a `VkDescriptorSet` is concrete storage allocated from a `VkDescriptorPool`. Grouping bindings by how often they change: set 0 per-frame, set 1 per-material, set 2 per-draw. Means `vkCmdBindDescriptorSets` rebinds only what changed. The bind-a-set-per-draw model bottlenecks with many materials; `VK_EXT_descriptor_indexing` with `UPDATE_AFTER_BIND` lets one giant descriptor array hold every texture, the shader indexing it by a handle passed per draw (`nonuniformEXT` when divergent): collapsing thousands of binds into one. Push constants carry a small block (`maxPushConstantsSize`, guaranteed ≥128 bytes) inline in the command buffer with no descriptor write, the cheapest path for a transform index or a few scalars. The architecture rationale (frequency grouping, bindless, inline constants) is in gpu-rendering-guide (binding-model).
 
 ## Techniques
 
@@ -41,12 +41,12 @@ for (material *m = materials; m < end; m++) {
 
 ## Gotchas
 
-- A `VkDescriptorSet` updated with `vkUpdateDescriptorSets` while the GPU may still read it (without `UPDATE_AFTER_BIND`) is a data race — gate updates on the frame `VkFence`, see [references/commands-and-swapchain.md](./commands-and-swapchain.md).
+- A `VkDescriptorSet` updated with `vkUpdateDescriptorSets` while the GPU may still read it (without `UPDATE_AFTER_BIND`) is a data race: gate updates on the frame `VkFence`, see [references/commands-and-swapchain.md](./commands-and-swapchain.md).
 - Pool sizes are fixed at creation; size for worst case × frames-in-flight or use one pool per frame slot reset with `vkResetDescriptorPool`.
-- Bindless requires the descriptor-indexing feature enabled at device creation _and_ `nonuniformEXT` for divergent indices — a divergent index without it is undefined.
-- Push-constant space is small and shared across stages; exceeding `maxPushConstantsSize` (or overlapping stage ranges) is invalid — keep it tiny.
+- Bindless requires the descriptor-indexing feature enabled at device creation _and_ `nonuniformEXT` for divergent indices. A divergent index without it is undefined.
+- Push-constant space is small and shared across stages; exceeding `maxPushConstantsSize` (or overlapping stage ranges) is invalid: keep it tiny.
 - The pipeline layout's set layouts and push-constant ranges must match the shader's declared bindings exactly, or binding silently targets the wrong resource.
-- A bindless array index freed and immediately reused while a prior frame's command buffer still references the slot samples the wrong resource — release bind points through fence-gated deferred deletion, and reserve a slot of fallback resources so a "null" handle reads something valid.
+- A bindless array index freed and immediately reused while a prior frame's command buffer still references the slot samples the wrong resource: release bind points through fence-gated deferred deletion, and reserve a slot of fallback resources so a "null" handle reads something valid.
 - The bindless descriptor-array sizes you request may exceed the device's `maxDescriptorSet*` / `maxPerStageDescriptor*` limits; query and clamp (or log) rather than assuming a fixed 512K.
 
 ## Related

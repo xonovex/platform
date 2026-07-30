@@ -24,9 +24,9 @@ Architecture for a data-oriented ECS: how entities and components are stored, ho
 ## Gotchas
 
 - Mirroring ECS state to an external system in a batch pass leaves a one-frame out-of-sync window: a 100 km/h car moves a full meter at 30 Hz, so a raycast fired before the mirror pass misses it. Order dependent passes accordingly.
-- Adding or removing a component moves the entity's data to a different type bucket — cheap per entity, but doing it every frame (e.g. a "Changing" tag component) churns memory and shrinks batches.
+- Adding or removing a component moves the entity's data to a different type bucket: cheap per entity, but doing it every frame (e.g. a "Changing" tag component) churns memory and shrinks batches.
 - Cross-component lookups by id in a hot loop defeat the whole point; co-locate the data instead so the match needs no indirection.
-- The render graph can only be extended _before_ execution; extra viewers (shadows, reflections) are generated _during_ execution and fold into the viewer array — don't try to register them up front.
+- The render graph can only be extended _before_ execution; extra viewers (shadows, reflections) are generated _during_ execution and fold into the viewer array: don't try to register them up front.
 
 ## Example
 

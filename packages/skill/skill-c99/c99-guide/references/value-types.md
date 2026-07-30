@@ -20,9 +20,9 @@ vec3_t r = vec3_add(vec3_add(a, b), c);   /* reads like the math it is */
 
 Value returns do not replace every out-param:
 
-- **Multiple heterogeneous results** — return a named result struct, or keep out-params if the callee is the natural owner of the writes.
-- **Large results / caller-owned storage** — when the result is big or the caller must own the buffer, write through a caller-provided pointer (the caller-owns-memory style). Returning a 4 KB struct by value just to copy it is the wrong trade.
-- **Status code + payload** — return the status enum and fill the payload through a checked out-param; this is the dominant pattern once a function can fail several distinct ways, see [references/error-handling.md](./error-handling.md).
+- **Multiple heterogeneous results**: return a named result struct, or keep out-params if the callee is the natural owner of the writes.
+- **Large results / caller-owned storage**: when the result is big or the caller must own the buffer, write through a caller-provided pointer (the caller-owns-memory style). Returning a 4 KB struct by value just to copy it is the wrong trade.
+- **Status code + payload**: return the status enum and fill the payload through a checked out-param; this is the dominant pattern once a function can fail several distinct ways, see [references/error-handling.md](./error-handling.md).
 
 The bias: a single small result → return it by value; anything heavier → status code + out-param.
 

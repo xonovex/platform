@@ -7,7 +7,7 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 ## Requirements
 
-- **Overlay on c99-guide** - This guide carries only the game/engine opinionated decisions; for generic C99 idioms — `const`-correctness, designated initializers (ZII), fixed-width types, value-oriented APIs, and baseline error/return patterns — follow **c99-guide**
+- **Overlay on c99-guide** - This guide carries only the game/engine opinionated decisions; for generic C99 idioms: `const`-correctness, designated initializers (ZII), fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **c99-guide**
 
 ## Math
 
@@ -29,8 +29,8 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 ## Gotchas
 
-- Vertex packing order matters for GPU upload — pack tightly and match the shader's attribute layout, not the C struct's natural padding
-- Quaternion math is sensitive to normalization drift — re-normalize after long chains of multiplications
+- Vertex packing order matters for GPU upload: pack tightly and match the shader's attribute layout, not the C struct's natural padding
+- Quaternion math is sensitive to normalization drift: re-normalize after long chains of multiplications
 - Tagged unions with a sentinel `TYPE_INVALID = 0` save initialization bugs; designated initializers default fields to zero
 - Builder patterns in C99 work via opaque structs + functions; never expose mutable struct fields across the public boundary
 

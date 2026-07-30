@@ -6,10 +6,10 @@ Pin the standard, version, conformance level, organizational additions, exact su
 
 For each criterion, use one outcome:
 
-- `pass` — sufficient current evidence supports the criterion for the declared scope;
-- `fail` — a reproducible barrier or unmet requirement exists;
-- `not-applicable` — the criterion does not apply, with a criterion-specific reason and review;
-- `not-tested` — evidence is missing, stale, inconclusive, inaccessible, or outside the completed assessment.
+- `pass`: sufficient current evidence supports the criterion for the declared scope;
+- `fail`: a reproducible barrier or unmet requirement exists;
+- `not-applicable`: the criterion does not apply, with a criterion-specific reason and review;
+- `not-tested`: evidence is missing, stale, inconclusive, inaccessible, or outside the completed assessment.
 
 Never turn missing evidence into `pass` or `not-applicable`.
 

@@ -10,10 +10,10 @@ Classify every concurrent algorithm by its progress guarantee, and only pay for 
 
 ## Techniques
 
-- **Blocking:** progress requires another thread to act (release a lock). A preempted, crashed, or paged-out lock holder halts everyone — deadlock, livelock, priority inversion, convoying all live here.
+- **Blocking:** progress requires another thread to act (release a lock). A preempted, crashed, or paged-out lock holder halts everyone: deadlock, livelock, priority inversion, convoying all live here.
 - **Obstruction-free:** a thread makes progress if it runs in isolation (no contention). Weakest non-blocking class; can livelock under contention without a helping/backoff scheme.
 - **Lock-free (system-wide progress):** out of all contending threads, _at least one_ always completes in a bounded number of steps. Individual threads may starve (their CAS keeps losing), but the system never stalls. No lock is held, so a stalled thread never blocks others.
-- **Wait-free (per-thread progress):** _every_ thread completes in a bounded number of its own steps, regardless of others. Strongest guarantee — no starvation, bounded worst-case latency. Usually needs helping schemes or fetch-add-style primitives; often slower in the common case.
+- **Wait-free (per-thread progress):** _every_ thread completes in a bounded number of its own steps, regardless of others. Strongest guarantee, no starvation, bounded worst-case latency. Usually needs helping schemes or fetch-add-style primitives; often slower in the common case.
 - **Containment:** wait-free ⊃ lock-free ⊃ obstruction-free ⊃ blocking. A wait-free algorithm is also lock-free, etc.
 
 ## When each matters
