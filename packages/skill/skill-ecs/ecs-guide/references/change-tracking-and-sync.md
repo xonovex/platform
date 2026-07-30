@@ -6,23 +6,23 @@ When a stateful external system (physics, renderer, audio) must mirror ECS data,
 
 ## Rationale
 
-The ECS stores raw batch-iteration data and does not inherently know "what changed"; the external system needs creation/modification/deletion told to it explicitly. Brute force (a filter-and-batch system pushing every matching entity) is the simplest correct approach and cache-friendly. Cleverer schemes trade simplicity for speed — most dangerously callbacks, which fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
+Brute force (a filter-and-batch system pushing every matching entity) is the simplest correct approach and cache-friendly. Callbacks are the dangerous alternative: they fire outside the declared read/write dependencies and therefore break the parallel scheduler (and can recurse).
 
 ## How to Apply
 
 1. Start with **brute force**: a system that runs over all matching entities and pushes their state to the external system (`setGlobalPose(...)`).
-2. If only a few of many change per frame, add per-component **dirty/version flags**, or a hierarchical tree of version flags for O(log N) skipping of unchanged subtrees.
-3. Need polling without push? Maintain **change lists** per component/type that systems drain — this preserves automatic parallelization via declared read/write locks.
+2. If only a few of many change per frame, add per-component **dirty/version flags**.
+3. Need polling without push? Maintain **change lists** per component/type that systems drain: this preserves automatic parallelization via declared read/write locks.
 4. For lifecycle only (creation/teardown), callbacks are acceptable; for general propagation they are not.
 5. Sequence dependent passes so the mirror runs _before_ anything that raycasts/queries the external system this frame.
 
 ## Five strategies, ranked by when to reach for them
 
-- **Brute force (+ dirty flags)** — default. Simple, parallel-safe, cache-friendly.
-- **Change lists** — when many sequential mirror passes benefit from polling instead of re-scanning.
-- **"Changing" tag component** — add a temporary tag on mutation so a normal filtered system processes only changed entities; remove the tag after N idle frames. Costs entity-type proliferation and memory rearrangement; apply selectively (e.g. only Transform).
-- **Orchestration** — a higher-level system explicitly notifies the external one. Only when special knowledge meaningfully simplifies the case; doesn't fit generic plugin engines.
-- **Callbacks/observer** — lifecycle hooks only. Breaks parallelism and can recurse; avoid for propagation.
+- **Brute force (+ dirty flags)**: default. Simple, parallel-safe, cache-friendly.
+- **Change lists**: when many sequential mirror passes benefit from polling instead of re-scanning.
+- **"Changing" tag component**: add a temporary tag on mutation so a normal filtered system processes only changed entities; remove the tag after N idle frames. Costs entity-type proliferation and memory rearrangement; apply selectively (e.g. only Transform).
+- **Orchestration**: a higher-level system explicitly notifies the external one. Only when special knowledge meaningfully simplifies the case; doesn't fit generic plugin engines.
+- **Callbacks/observer**: lifecycle hooks only. Breaks parallelism and can recurse; avoid for propagation.
 
 ## Example
 
@@ -37,7 +37,7 @@ register_callback(transform_type, on_changed); // fires mid-frame, bypasses read
 
 ## Counter-Example
 
-A turn-based or event-sparse game where almost nothing moves per frame may legitimately skip brute force in favor of change lists or orchestration from the start — there the per-frame scan, not the external call, is the waste.
+A turn-based or event-sparse game where almost nothing moves per frame may legitimately skip brute force in favor of change lists or orchestration from the start. There the per-frame scan, not the external call, is the waste.
 
 ## Gotcha
 

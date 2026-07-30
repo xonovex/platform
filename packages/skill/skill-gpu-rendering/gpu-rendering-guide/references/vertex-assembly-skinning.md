@@ -2,17 +2,17 @@
 
 ## Guideline
 
-Fetch vertex data yourself from storage buffers in the shader (programmable vertex pull) behind a small loader interface, instead of binding fixed-function vertex input; this lets one shader read any packing, any channel set, and any vertex — which is what makes flexible GPU skinning and morph targets fall out cleanly.
+Fetch vertex data yourself from storage buffers in the shader (programmable vertex pull) behind a small loader interface, instead of binding fixed-function vertex input; this lets one shader read any packing, any channel set, and any vertex: which is what makes flexible GPU skinning and morph targets fall out cleanly.
 
 ## Rationale
 
-The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Manual pull from byte-addressable storage buffers removes both limits: one shader supports many packings/quantizations through an abstract loader (`load_position()`, `load_normal()`, …) that hides offsets and strides, reads _any_ vertex or the index buffer from any stage, and skips channels a mesh lacks. Skinning then needs no special vertex format — the shader also reads bone influences and matrices and blends, and variable bone-per-vertex counts waste no space because the influence list is indirected, not padded to a fixed maximum.
+The fixed-function input assembler ties a pipeline to one rigid vertex layout and only ever hands the shader _its own_ vertex. Manual pull from byte-addressable storage buffers removes both limits: one shader supports many packings/quantizations through an abstract loader (`load_position()`, `load_normal()`, ...) that hides offsets and strides, reads _any_ vertex or the index buffer from any stage, and skips channels a mesh lacks. Skinning then needs no special vertex format. The shader also reads bone influences and matrices and blends, and variable bone-per-vertex counts waste no space because the influence list is indirected, not padded to a fixed maximum.
 
 ## How to Apply
 
 1. Store vertex streams in storage/byte-address buffers; describe each mesh with active-channel bitflags plus per-channel offset and stride, and a vertex count.
-2. Expose a loader context the shader calls (`load_position(i)`, `load_texcoord0(i)`, …) so material shaders are independent of packing; return sensible defaults for absent channels.
-3. For skinning, pack each vertex's influence reference as one word — a count plus an offset into a shared influence buffer of `{bone_index, weight}` pairs — instead of fixed N bones per vertex.
+2. Expose a loader context the shader calls (`load_position(i)`, `load_texcoord0(i)`, ...) so material shaders are independent of packing; return sensible defaults for absent channels.
+3. For skinning, pack each vertex's influence reference as one word: a count plus an offset into a shared influence buffer of `{bone_index, weight}` pairs, instead of fixed N bones per vertex.
 4. Linear-blend skin in the vertex shader: loop the influences, accumulate `weight * bone_matrix * position` (and the matrix's rotation for normals/tangents).
 5. Ping-pong the bone-matrix buffer between frames (current + previous) so you can output motion vectors from skinned previous positions.
 6. Let skinning register as a named shader system that rendering discovers after culling, so it composes with materials without hard coupling.
@@ -39,10 +39,10 @@ vec3 skin_position(uint vtx) {
 
 ## Gotchas
 
-- Manual fetch bypasses any format conversion the input assembler would do — you must decode/normalize packed/quantized data yourself in the loader.
+- Manual fetch bypasses any format conversion the input assembler would do. You must decode/normalize packed/quantized data yourself in the loader.
 - Forgetting to skin the normal/tangent (only the position) breaks lighting on animated meshes; skin the basis with the matrix's rotation part.
 - A fixed bone-count vertex format wastes memory on low-influence vertices and clips high-influence ones; indirect the influence list.
-- Motion vectors need _previous-frame_ skinned positions — keep last frame's bone matrices, don't recompute from current.
+- Motion vectors need _previous-frame_ skinned positions: keep last frame's bone matrices, don't recompute from current.
 - Compute-skinning once into a buffer (vs re-skinning in every pass) pays off when a mesh is drawn many times per frame (shadow + depth + color); skinning in the vertex shader re-does the work per pass.
 
 ## Related

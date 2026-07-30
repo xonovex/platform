@@ -2,7 +2,7 @@
 
 ## Guideline
 
-Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU) — typically by routing only the 2D/UI path — and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
+Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU), typically by routing only the 2D/UI path, and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
 
 ## Toolchain and Serving
 
@@ -50,7 +50,7 @@ There is no synchronous blocking file/network read in the browser. Two strategie
 
 ## Memory Model
 
-Pointers are 32-bit, which changes `sizeof(struct)` wherever a pointer sits inside one — re-audit struct padding, hashing, and `memcmp` (see porting-strategy). The heap is a single contiguous buffer; enable `ALLOW_MEMORY_GROWTH=1` to let it expand past the initial size. Crucially, all requested memory is actually committed, so virtual-memory tricks that reserve a huge address range and commit lazily do not work — replace a reserve-then-commit allocator with a fixed, bounded allocation on the web build.
+Pointers are 32-bit, which changes `sizeof(struct)` wherever a pointer sits inside one: re-audit struct padding, hashing, and `memcmp` (see porting-strategy). The heap is a single contiguous buffer; enable `ALLOW_MEMORY_GROWTH=1` to let it expand past the initial size. Crucially, all requested memory is actually committed, so virtual-memory tricks that reserve a huge address range and commit lazily do not work: replace a reserve-then-commit allocator with a fixed, bounded allocation on the web build.
 
 ```c
 #if defined(PLATFORM_WEB)
@@ -81,17 +81,17 @@ EM_BOOL on_mouse(int type, const EmscriptenMouseEvent *e, void *ud) {
 
 ## Linking
 
-Web builds are statically linked — there is no native dynamic-plugin loader by default. Code that normally loads subsystems as plugins now links them all into one binary, which surfaces duplicate symbols: every plugin defining `load_plugin()` or a global API pointer collides. The pragmatic fix is `#if defined(PLATFORM_WEB)` guards to drop the duplicates; the principled fix is to support the toolchain's `dlopen` so plugins load as on native. Some browser APIs are partial: callbacks that link on one browser may fail to link on another (e.g. touch callbacks), so test on each target browser, not just one.
+Web builds are statically linked. There is no native dynamic-plugin loader by default. Code that normally loads subsystems as plugins now links them all into one binary, which surfaces duplicate symbols: every plugin defining `load_plugin()` or a global API pointer collides. The pragmatic fix is `#if defined(PLATFORM_WEB)` guards to drop the duplicates; the principled fix is to support the toolchain's `dlopen` so plugins load as on native. Some browser APIs are partial: callbacks that link on one browser may fail to link on another (e.g. touch callbacks), so test on each target browser, not just one.
 
 ### Gotchas
 
-- A blocking `while (running)` loop hangs the tab; the browser owns the frame clock — you must yield via the main-loop callback every frame.
+- A blocking `while (running)` loop hangs the tab; the browser owns the frame clock: you must yield via the main-loop callback every frame.
 - 32-bit pointers change struct padding silently, breaking any hash/`memcmp` that assumed a 64-bit layout; widen keys and re-pad for the web build.
-- Reserve-then-commit virtual-memory allocators do not work — Emscripten commits everything requested; switch to a bounded fixed allocator on web.
+- Reserve-then-commit virtual-memory allocators do not work: Emscripten commits everything requested; switch to a bounded fixed allocator on web.
 - `ALLOW_MEMORY_GROWTH` lets the heap grow but invalidates cached raw pointers into the heap on a growth event in some glue configurations; re-fetch base pointers rather than caching them across allocations.
 - Assets are not on a real disk: a `fopen` that "works natively" returns nothing in the browser unless the file was preloaded into the virtual FS or fetched asynchronously first.
 - Static-linking everything that was a plugin creates duplicate-symbol collisions (`load_plugin`, global API pointers); guard or properly `dlopen`, don't ignore the linker.
-- Browser API coverage differs per browser; a callback that links in one may produce link errors in another — CI must build/run on each target browser.
+- Browser API coverage differs per browser; a callback that links in one may produce link errors in another: CI must build/run on each target browser.
 
 ### Related
 

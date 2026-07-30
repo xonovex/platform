@@ -2,26 +2,25 @@
 
 ## Guideline
 
-Make edits transactional — record either the inverse of each operation or a before/after snapshot of what changed into an undo journal, group the operations of one user action into a single transaction, and maintain a redo stack so undone transactions can be re-applied.
+Make edits transactional: record either the inverse of each operation or a before/after snapshot of what changed into an undo journal, group the operations of one user action into a single transaction, and maintain a redo stack so undone transactions can be re-applied.
 
 ## Rationale
 
-Undo only works if every state-changing edit is captured. Recording inverses (or before/after values) makes undo pure data: pop the last transaction, apply its inverses, push onto redo. Grouping into transactions matters because one action ("move three nodes") is many writes — the user expects one Ctrl+Z to undo all of them. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
+Undo only works if every state-changing edit is captured. Recording inverses (or before/after values) makes undo pure data: pop the last transaction, apply its inverses, push onto redo. Grouping into transactions matters because one action ("move three nodes") is many writes: the user expects one Ctrl+Z to undo all of them. Tying the transaction boundary to the change-notification commit keeps undo, notification, and persistence consistent.
 
 ## Techniques
 
 - **Inverse operations** - For each mutation, record an operation that exactly reverses it: `set(id, prop, old)` inverts `set(id, prop, new)`; `delete` inverts `create`. Undo applies inverses in reverse order.
 - **Before/after snapshots** - Alternatively store the property's old value (for undo) and new value (for redo). Simpler than authoring inverses, at the cost of storing both values; cheap for scalar properties, expensive for large buffers.
-- **Transactions** - Open a transaction at the start of a user action, record every mutation into it, commit at the end. The whole transaction is one undo step. Empty transactions are discarded.
 - **Undo / redo stacks** - Commit pushes the transaction onto the undo stack. Undo pops it, applies inverses, pushes it onto the redo stack. Any new edit clears the redo stack (you cannot redo into a branch you've diverged from).
 - **Bounding history** - Cap the undo stack by count or by memory; drop the oldest transactions. For large-buffer edits, store deltas or only the changed region rather than whole copies.
-- **Undoable vs not** - Pure model mutations are undoable. External side effects — file writes, network calls, spawning a process — are not; keep them out of the journal or make them idempotent and re-issue on redo deliberately.
+- **Undoable vs not** - Pure model mutations are undoable. External side effects: file writes, network calls, spawning a process. Are not; keep them out of the journal or make them idempotent and re-issue on redo deliberately.
 - **Save & undo scope (document model)** - Decide the save model and pair the undo model to it, and be opinionated rather than offering several behind flags: (1) per-asset save/revert pairs with **per-asset undo stacks**; (2) project-wide save/revert pairs with a **single project-wide undo stack**; (3) automatic persistence (no explicit save). Per-asset stacks make cross-document operations (find/replace across many files) painful to undo; a single project stack can surprise users by undoing edits in an unrelated document. Collaboration reintroduces the need for per-user stacks. Prefer resolving inter-document relationships at runtime over persisting them.
 
 ## How to Apply
 
 1. Wrap each user action in `txn_begin` / `txn_commit`; route all mutations through the model so they land in the open transaction.
-2. For every mutation, append an entry capturing object id, property, and old (and new) value — ids and values, never pointers or indices.
+2. For every mutation, append an entry capturing object id, property, and old (and new) value: ids and values, never pointers or indices.
 3. Undo: pop the undo stack, apply inverses in reverse order, push onto redo. Redo: the mirror.
 4. On any fresh edit, clear the redo stack; enforce the history bound after commit.
 
@@ -53,12 +52,12 @@ edit_t broken = { .target_ptr = obj_ptr }; // dangles on undo of a delete
 
 ## Gotchas
 
-- An edit entry that stored a pointer or array index breaks the moment storage moves or an object is recreated — capture the stable id and the value.
+- An edit entry that stored a pointer or array index breaks the moment storage moves or an object is recreated: capture the stable id and the value.
 - Forgetting to clear the redo stack on a new edit lets a redo re-apply a stale operation onto diverged state, corrupting the model.
 - Side effects (writing a file, sending a request) cannot be undone by replaying inverses; either exclude them or model them explicitly so redo re-issues them on purpose.
 - Whole-buffer snapshots for large `buffer`/`array` properties blow up history memory; store region deltas and bound the stack.
 - Transaction boundaries should match user intent: too fine and one click takes many undos; too coarse and unrelated edits undo together.
-- A single project-wide undo stack will undo across documents the user wasn't looking at, with no visual cue; per-document stacks make a cross-document edit impossible to undo atomically. Neither is free — choose deliberately per the save model, don't expose both.
+- A single project-wide undo stack will undo across documents the user wasn't looking at, with no visual cue; per-document stacks make a cross-document edit impossible to undo atomically. Neither is free: choose deliberately per the save model, don't expose both.
 
 ## Related
 

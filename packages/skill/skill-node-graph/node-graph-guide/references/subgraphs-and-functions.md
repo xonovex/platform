@@ -10,7 +10,7 @@ A subgraph is a graph stored inside a node of its parent. The parent treats it a
 
 ### Rationale
 
-Encapsulation is how a node graph scales past a screenful. Defining the interface as data (display name + id + type hash) means one definition drives the UI, connection validity, and serialization — the parent's subgraph node and the inner Input/Output nodes are both generated from it, so they cannot disagree. Flattening at compile time is the key move: rather than teach the evaluator to recurse into subgraphs, a pre-pass copies every real node and connection into flat lists, skips the wrapper/Input/Output nodes, and patches the wires that crossed the boundary so they connect directly to the inner nodes — the evaluator then needs no subgraph awareness. Promoting a subgraph to an asset turns "a reusable block" into "a function": many parent graphs hold a subgraph node pointing at the asset, get an instance, and may override individual inner nodes locally — edit the asset and every instance updates, while local tweaks stay local.
+Encapsulation is how a node graph scales past a screenful. Defining the interface as data (display name + id + type hash) means one definition drives the UI, connection validity, and serialization: the parent's subgraph node and the inner Input/Output nodes are both generated from it, so they cannot disagree. Flattening at compile time is the key move: rather than teach the evaluator to recurse into subgraphs, a pre-pass copies every real node and connection into flat lists, skips the wrapper/Input/Output nodes, and patches the wires that crossed the boundary so they connect directly to the inner nodes. The evaluator then needs no subgraph awareness. Promoting a subgraph to an asset turns "a reusable block" into "a function": many parent graphs hold a subgraph node pointing at the asset, get an instance, and may override individual inner nodes locally. Edit the asset and every instance updates, while local tweaks stay local.
 
 ### How to Apply
 
@@ -18,13 +18,13 @@ Encapsulation is how a node graph scales past a screenful. Defining the interfac
 2. Make the subgraph node generate one connector per interface input/output; double-click opens the contained graph.
 3. Inside the subgraph, use Input and Output nodes that generate their connectors from the interface; give each a `+` connector that adds a new interface entry when something is wired to it.
 4. To build a subgraph from a selection: place a subgraph node at the selection's center, cut the selected nodes and their internal connections into it, and use the wires that crossed the selection boundary ("dangling" connections) to derive sensible inputs and outputs; replace those boundary wires in the parent with wires to the new subgraph node, and spawn matching Input/Output nodes inside.
-5. To compile: run a flatten pre-pass that adds all nodes and connections to flat lists _except_ subgraph, Input, and Output nodes; on a subgraph node, recurse into its contents and patch the dangling boundary connections onto the parent's wires. Feed the flattened result to the evaluator (see evaluation-and-compilation.md) — the only evaluator change is to consume the flattened form.
+5. To compile: run a flatten pre-pass that adds all nodes and connections to flat lists _except_ subgraph, Input, and Output nodes; on a subgraph node, recurse into its contents and patch the dangling boundary connections onto the parent's wires. Feed the flattened result to the evaluator (see evaluation-and-compilation.md). The only evaluator change is to consume the flattened form.
 6. To make a function graph: create an asset wrapping the subgraph, instance the asset's object into each subgraph node, and allow per-instance overrides (move/change/remove inner nodes) layered on the asset.
 
 ### Example
 
 ```c
-// Interface stored on the graph object — drives both the wrapper node's pins
+// Interface stored on the graph object: drives both the wrapper node's pins
 // and the inner Input/Output nodes. (Conceptually like a function signature.)
 typedef struct graph_iface_entry_t {
     const char *display_name;  // UI label
@@ -56,7 +56,7 @@ void flatten_graph(const graph_t *g, flat_graph_t *out) {
 
 ### Gotchas
 
-- Flattening cannot express recursion; a self-containing subgraph inlines without end and overflows the stack — detect the cycle and refuse before inlining.
+- Flattening cannot express recursion; a self-containing subgraph inlines without end and overflows the stack: detect the cycle and refuse before inlining.
 - The interface id, not the display name, is the connection target; renaming for the UI must not change the id, or every wire to that pin breaks.
 - Boundary ("dangling") wires are the only signal for what the inputs/outputs should be; mis-detecting which wires cross the selection produces a wrong interface.
 - Without a central list of "blessed" types, manually added interface inputs/outputs drift in type and two instances of the same function graph diverge.

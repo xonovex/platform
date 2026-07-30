@@ -6,14 +6,14 @@ Use the narrowest atomic primitive that expresses the operation; for conditional
 
 ## Rationale
 
-Atomic read-modify-write (RMW) ops are the only way to update shared state without a lock while keeping it consistent. A plain load-then-store is two operations and races; an RMW is one indivisible step. CAS is the universal primitive — it can build any other RMW — but it must be written as a loop because another thread may win the race between your read and your write.
+Atomic read-modify-write (RMW) ops are the only way to update shared state without a lock while keeping it consistent. A plain load-then-store is two operations and races; an RMW is one indivisible step. CAS is the universal primitive. It can build any other RMW, but it must be written as a loop because another thread may win the race between your read and your write.
 
 ## Primitives (`<stdatomic.h>`)
 
-- `atomic_load` / `atomic_store` — single indivisible read or write.
-- `atomic_exchange` — store new, return old, atomically (an unconditional swap; the basis of the MPSC tail update).
-- `atomic_fetch_add` / `_sub` / `_or` / `_and` / `_xor` — atomic arithmetic/bitwise, returning the prior value. Prefer these over a CAS loop when they fit: they are wait-free on most ISAs (x86 `lock xadd`), whereas a CAS loop is only lock-free.
-- `atomic_compare_exchange_weak(obj, &expected, desired)` / `_strong` — if `*obj == expected`, set it to `desired` and return true; else write the current value into `expected` and return false.
+- `atomic_load` / `atomic_store`: single indivisible read or write.
+- `atomic_exchange`: store new, return old, atomically (an unconditional swap; the basis of the MPSC tail update).
+- `atomic_fetch_add` / `_sub` / `_or` / `_and` / `_xor`: atomic arithmetic/bitwise, returning the prior value. Prefer these over a CAS loop when they fit: they are wait-free on most ISAs (x86 `lock xadd`), whereas a CAS loop is only lock-free.
+- `atomic_compare_exchange_weak(obj, &expected, desired)` / `_strong`, if `*obj == expected`, set it to `desired` and return true; else write the current value into `expected` and return false.
 
 ## weak vs strong, spurious failure
 
@@ -33,7 +33,7 @@ int atomic_apply(atomic_int *p, int (*f)(int)) {
         // weak: spurious failure just spins us once more.
         // acq_rel on success: this RMW publishes/consumes around the update.
         // On failure, compare_exchange writes the current value back into
-        // `expected`, so the next f() runs on fresh state — no manual reload.
+        // `expected`, so the next f() runs on fresh state, no manual reload.
     } while (!atomic_compare_exchange_weak_explicit(
                  p, &expected, desired,
                  memory_order_acq_rel, memory_order_acquire));
@@ -41,7 +41,7 @@ int atomic_apply(atomic_int *p, int (*f)(int)) {
 }
 ```
 
-The failure-ordering argument (the last one) must not be stronger than the success ordering and must not be a release order — `memory_order_acquire` or `relaxed` are the usual choices.
+The failure-ordering argument (the last one) must not be stronger than the success ordering and must not be a release order: `memory_order_acquire` or `relaxed` are the usual choices.
 
 ## LL/SC vs CAS
 

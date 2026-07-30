@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-asset-pipeline",
   "version": "5.1.0",
+  "description": "Xonovex Asset pipeline skills",
   "private": true,
   "type": "module",
   "keywords": [

@@ -19,7 +19,7 @@ The hardware prefetcher detects constant-stride access and fetches lines ahead o
 ## Example
 
 ```c
-// Bad: linked list — each step is a dependent load to a random heap address.
+// Bad: linked list: each step is a dependent load to a random heap address.
 typedef struct node { int v; struct node *next; } node_t;
 long sum_list(const node_t *h) {
   long s = 0;
@@ -27,7 +27,7 @@ long sum_list(const node_t *h) {
   return s;
 }
 
-// Good: packed array, constant stride — prefetcher streams ahead.
+// Good: packed array, constant stride: prefetcher streams ahead.
 long sum_array(const int *v, size_t n) {
   long s = 0;
   for (size_t i = 0; i < n; i++) s += v[i];            // latency hidden
@@ -37,7 +37,7 @@ long sum_array(const int *v, size_t n) {
 
 ## Gotchas
 
-- Linked structures can still be fine if nodes are pool-allocated in traversal order and rarely re-linked — it is the random heap addresses, not the "list" concept, that hurts.
+- Linked structures can still be fine if nodes are pool-allocated in traversal order and rarely re-linked. It is the random heap addresses, not the "list" concept, that hurts.
 - Indexing by a generational handle is sequential-friendly only if the underlying array is itself traversed in order; random handle lookups are still random.
 
 ## Related

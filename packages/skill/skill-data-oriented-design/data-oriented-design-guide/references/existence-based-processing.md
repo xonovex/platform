@@ -6,7 +6,7 @@ Process every item that exists together by grouping items by type or state, so p
 
 ## Rationale
 
-The principle "the absence of a thing is a thing": instead of every item carrying a flag the hot loop must branch on, store items in collections defined by their state — membership in a collection _is_ the flag. This removes the per-item branch (no misprediction stalls, no wasted work skipping dead items) and turns a heterogeneous, branch-laden loop into several homogeneous, branch-free loops. The loop also only touches live data, shrinking the working set.
+The principle "the absence of a thing is a thing": instead of every item carrying a flag the hot loop must branch on, store items in collections defined by their state. Membership in a collection _is_ the flag. This removes the per-item branch (no misprediction stalls, no wasted work skipping dead items) and turns a heterogeneous, branch-laden loop into several homogeneous, branch-free loops. The loop also only touches live data, shrinking the working set.
 
 ## Techniques
 

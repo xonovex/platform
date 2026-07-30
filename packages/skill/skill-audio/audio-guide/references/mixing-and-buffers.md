@@ -6,7 +6,7 @@ Mix in a single internal format (deinterleaved 32-bit float, fixed internal samp
 
 ## Rationale
 
-A float accumulator's 23-bit mantissa matches 24-bit integer precision while tolerating sums far outside [-1, 1] without the wraparound that destroys an integer mix — so you can add many voices and decide loudness afterward. Routing each input channel to each output channel through a gain matrix `m[ic][oc]` generalizes volume, panning, and spatialization into one operation that also vectorizes cleanly. The dangerous part is discontinuity: instantaneously changing a gain (start, stop, volume jump, pan snap) inserts a step into the waveform the ear hears as a click, so every coefficient change must be ramped across samples, not applied at once.
+A float accumulator's 23-bit mantissa matches 24-bit integer precision while tolerating sums far outside [-1, 1] without the wraparound that destroys an integer mix, so you can add many voices and decide loudness afterward. Routing each input channel to each output channel through a gain matrix `m[ic][oc]` generalizes volume, panning, and spatialization into one operation that also vectorizes cleanly. The dangerous part is discontinuity: instantaneously changing a gain (start, stop, volume jump, pan snap) inserts a step into the waveform the ear hears as a click, so every coefficient change must be ramped across samples, not applied at once.
 
 ## How to Apply
 
@@ -40,7 +40,7 @@ static inline float ramp(float cur, float target) {
 
 ## Gotchas
 
-- Snapping a gain to its new value between blocks is the most common click source; the fix is to ramp, and to keep ramping a "stopping" voice all the way to zero before you actually free it — never cut it dead.
+- Snapping a gain to its new value between blocks is the most common click source; the fix is to ramp, and to keep ramping a "stopping" voice all the way to zero before you actually free it, never cut it dead.
 - Interleaved I/O is the device's format, not the mixer's: mix planar, interleave only at the final conversion, or the per-channel inner loops stop vectorizing and the gain matrix gets awkward.
 - Integer mixing overflows silently and wraps to a loud burst; float accumulation is what lets multiple loud voices coexist until you decide how to fit them.
 - A `restrict` pointer that secretly aliases the accumulator produces wrong sums under optimization with no warning; ping-pong read/write buffers so source and destination are provably distinct.

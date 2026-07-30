@@ -6,13 +6,13 @@
     "rationale": "direct: concrete VkImageMemoryBarrier2 masks + layout transition + vkCmdPipelineBarrier2"
   },
   {
-    "query": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels — how do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
+    "query": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels. How do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: Vulkan device-memory types/heaps, allocation cap, sub-allocation, alignment"
   },
   {
-    "query": "I want one giant sampler2D array the shader indexes by an integer — how do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
+    "query": "I want one giant sampler2D array the shader indexes by an integer. How do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: Vulkan bindless via descriptor indexing / UPDATE_AFTER_BIND + nonuniformEXT"
@@ -42,13 +42,13 @@
     "rationale": "direct: Vulkan command pools, swapchain acquire/present, fence per frame"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks when we reorder — I want passes to just declare what they read and write and have ordering and transitions derived, conceptually",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks when we reorder. I want passes to just declare what they read and write and have ordering and transitions derived, conceptually",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: API-agnostic render-graph architecture -> gpu-rendering-guide, no Vk* how-to"
   },
   {
-    "query": "what's the general model for grouping bindings by update frequency and why does bindless help — no specific API, just the architecture",
+    "query": "what's the general model for grouping bindings by update frequency and why does bindless help, no specific API, just the architecture",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: agnostic binding-model concept -> gpu-rendering-guide"
@@ -78,7 +78,7 @@
     "rationale": "validation positive: Vulkan pipeline + dynamic state + pipeline cache + dynamic rendering formats"
   },
   {
-    "query": "explain the conceptual difference between device-local and host-visible GPU memory tiers and when to stage uploads — keep it API-neutral",
+    "query": "explain the conceptual difference between device-local and host-visible GPU memory tiers and when to stage uploads: keep it API-neutral",
     "should_trigger": false,
     "split": "train",
     "rationale": "validation negative: agnostic gpu-memory-strategy -> gpu-rendering-guide, no Vk* specifics"
@@ -90,13 +90,13 @@
     "rationale": "validation negative: high-level web 3D, not Vulkan"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"

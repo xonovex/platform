@@ -1,30 +1,30 @@
 [
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: render/frame graph deriving order + barriers from declared reads/writes, API-neutral"
   },
   {
-    "query": "we have a g-buffer, an SSAO target, and a bloom mip chain all alive at once and VRAM is tight — can we reuse the same memory for targets that aren't used at the same time",
+    "query": "we have a g-buffer, an SSAO target, and a bloom mip chain all alive at once and VRAM is tight: can we reuse the same memory for targets that aren't used at the same time",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: transient render-target aliasing by disjoint lifetime, no API named"
   },
   {
-    "query": "every time we use a new material the frame hitches for a few ms; I think it's compiling the graphics state on first draw — how do we get rid of the stall",
+    "query": "every time we use a new material the frame hitches for a few ms; I think it's compiling the graphics state on first draw. How do we get rid of the stall",
     "should_trigger": true,
     "split": "train",
     "rationale": "architecture: precompiled + cached pipeline-state objects, warm the cache, API-neutral"
   },
   {
-    "query": "we're calling the allocator once per texture and once per mesh and it falls over on big levels — restructure how we hand out GPU memory",
+    "query": "we're calling the allocator once per texture and once per mesh and it falls over on big levels: restructure how we hand out GPU memory",
     "should_trigger": true,
     "split": "train",
     "rationale": "gpu-memory-strategy: sub-allocate from few large blocks, allocation-count cap, strategy not API calls"
   },
   {
-    "query": "the CPU and GPU keep stalling on each other each frame; we have one set of uniform buffers and one command pool shared across frames — fix the frame pacing",
+    "query": "the CPU and GPU keep stalling on each other each frame; we have one set of uniform buffers and one command pool shared across frames: fix the frame pacing",
     "should_trigger": true,
     "split": "train",
     "rationale": "frames-in-flight: per-frame resource sets + fence so CPU doesn't outrun GPU"
@@ -36,7 +36,7 @@
     "rationale": "bindless binding model indexed by handle, frequency grouping; concept not one API"
   },
   {
-    "query": "how should I think about the stage and access scopes plus a layout transition needed to read a render target right after writing it as a color attachment — what's the general model",
+    "query": "how should I think about the stage and access scopes plus a layout transition needed to read a render target right after writing it as a color attachment. What's the general model",
     "should_trigger": true,
     "split": "train",
     "rationale": "synchronization model: producer/consumer barrier scopes + image-layout transition, conceptual"
@@ -66,13 +66,13 @@
     "rationale": "near-miss: CPU-only data layout -> data-oriented-design-guide"
   },
   {
-    "query": "how do I architect uploads of static GPU-resident data versus dynamic per-frame data — staging into a device-local tier for one, a persistent-mapped ring for the other",
+    "query": "how do I architect uploads of static GPU-resident data versus dynamic per-frame data: staging into a device-local tier for one, a persistent-mapped ring for the other",
     "should_trigger": true,
     "split": "train",
     "rationale": "validation positive: gpu-memory-strategy tiers + staging + ring buffer, API-neutral"
   },
   {
-    "query": "I want to record draw calls from several worker threads at once and then submit them in order — how should I structure per-thread per-frame recording contexts",
+    "query": "I want to record draw calls from several worker threads at once and then submit them in order. How should I structure per-thread per-frame recording contexts",
     "should_trigger": true,
     "split": "train",
     "rationale": "validation positive: per-thread contexts, primary/secondary, multi-threaded recording, conceptual"
@@ -96,13 +96,13 @@
     "rationale": "vertex-assembly-skinning: programmable vertex pull behind a loader, custom packing, morph targets"
   },
   {
-    "query": "our characters animate but the bone count per vertex varies a lot and a fixed 4-bone vertex format wastes memory — how should I store skin influences and do the blend on the GPU",
+    "query": "our characters animate but the bone count per vertex varies a lot and a fixed 4-bone vertex format wastes memory. How should I store skin influences and do the blend on the GPU",
     "should_trigger": true,
     "split": "validation",
     "rationale": "vertex-assembly-skinning: indirected influence list (count+offset), in-shader linear blend skinning"
   },
   {
-    "query": "we have a million particles and uploading them every frame and reading results back is killing us — I want the whole simulation to live on the GPU and drive its own draw count",
+    "query": "we have a million particles and uploading them every frame and reading results back is killing us. I want the whole simulation to live on the GPU and drive its own draw count",
     "should_trigger": true,
     "split": "validation",
     "rationale": "gpu-compute-simulation: GPU-resident state, compute update, indirect draw from GPU-tracked count"
@@ -114,19 +114,19 @@
     "rationale": "validation positive: gpu-compute-simulation event-triggered stages, ring buffer, no readback"
   },
   {
-    "query": "I'm adding HDR10 output — which swapchain color space and format do I pick, and where do I apply the Rec.2020 conversion and PQ curve relative to tone mapping and UI?",
+    "query": "I'm adding HDR10 output: which swapchain color space and format do I pick, and where do I apply the Rec.2020 conversion and PQ curve relative to tone mapping and UI?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "hdr-output: PQ/Rec.2020 swapchain, linear pipeline, own final color-space + transfer encode"
   },
   {
-    "query": "my HDR image looks washed out and dim and the UI text blends wrong — I think I'm double-applying a transfer function with an sRGB backbuffer",
+    "query": "my HDR image looks washed out and dim and the UI text blends wrong: I think I'm double-applying a transfer function with an sRGB backbuffer",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: hdr-output encode-once, paper-white scaling, no auto-sRGB backbuffer for HDR"
   },
   {
-    "query": "tune my CPU SoA particle update loop to stop missing cache — no GPU involved",
+    "query": "tune my CPU SoA particle update loop to stop missing cache, no GPU involved",
     "should_trigger": false,
     "split": "train",
     "rationale": "near-miss: CPU-only data layout -> data-oriented-design-guide, not GPU simulation"
@@ -138,13 +138,13 @@
     "split": "validation"
   },
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
     "rationale": "near miss owned by memory-management-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "query": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
     "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"

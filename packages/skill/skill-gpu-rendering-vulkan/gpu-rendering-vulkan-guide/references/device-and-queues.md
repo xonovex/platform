@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Create a `VkInstance`, select a `VkPhysicalDevice`, create a logical `VkDevice` with the queues you need, and pick queue families by capability — a graphics family, and where the hardware exposes them a dedicated async-compute and a dedicated transfer family — requesting only the features/extensions you use.
+Create a `VkInstance`, select a `VkPhysicalDevice`, create a logical `VkDevice` with the queues you need, and pick queue families by capability: a graphics family, and where the hardware exposes them a dedicated async-compute and a dedicated transfer family. Requesting only the features/extensions you use.
 
 ## Rationale
 
-Vulkan has no implicit context: every object hangs off a `VkDevice`, which is created from a chosen `VkPhysicalDevice`, which is enumerated from the `VkInstance`. Queue families are how the hardware advertises which engines can run which work; a family with `VK_QUEUE_GRAPHICS_BIT` can do everything, but a dedicated `VK_QUEUE_TRANSFER_BIT`-only family runs DMA copies on a separate engine that overlaps graphics, and a compute-only family enables async compute that overlaps the graphics pipeline. You must request queues at device-creation time (you cannot add them later), and you must enable features (`VkPhysicalDeviceFeatures2` chain) and extensions explicitly — the architecture reason for owning all of this is in gpu-rendering-guide.
+Vulkan has no implicit context: every object hangs off a `VkDevice`, which is created from a chosen `VkPhysicalDevice`, which is enumerated from the `VkInstance`. Queue families are how the hardware advertises which engines can run which work; a family with `VK_QUEUE_GRAPHICS_BIT` can do everything, but a dedicated `VK_QUEUE_TRANSFER_BIT`-only family runs DMA copies on a separate engine that overlaps graphics, and a compute-only family enables async compute that overlaps the graphics pipeline. You must request queues at device-creation time (you cannot add them later), and you must enable features (`VkPhysicalDeviceFeatures2` chain) and extensions explicitly. The architecture reason for owning all of this is in gpu-rendering-guide.
 
 ## How to Apply
 
@@ -45,8 +45,8 @@ VkQueue gfx_q; vkGetDeviceQueue(dev, gfx, 0, &gfx_q);
 
 ## Gotchas
 
-- A queue family that reports `GRAPHICS` may be the only one; do not assume a dedicated transfer/compute family exists — fall back to the graphics family.
-- Present support is per (family × surface), not a device-wide property — query it with `vkGetPhysicalDeviceSurfaceSupportKHR`, and the present family may differ from graphics.
+- A queue family that reports `GRAPHICS` may be the only one; do not assume a dedicated transfer/compute family exists: fall back to the graphics family.
+- Present support is per (family × surface), not a device-wide property: query it with `vkGetPhysicalDeviceSurfaceSupportKHR`, and the present family may differ from graphics.
 - Features must be enabled at device creation; using `descriptorIndexing` or `timelineSemaphore` without enabling it is undefined and validation-flagged.
 - A resource used on two different queue families needs an ownership transfer, see [references/resources-and-barriers.md](./resources-and-barriers.md).
 

@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Use the right Vulkan primitive for each relationship: pipeline barriers for in-queue hazards (covered in resources-and-barriers), binary `VkSemaphore` for queue→queue and swapchain ordering, timeline `VkSemaphore` for monotonic counter waits that the CPU can also wait on, and `VkFence` for GPU→CPU completion — wiring waits and signals through `VkSubmitInfo2`/`vkQueueSubmit2` scoped to exactly the work that must wait.
+Use the right Vulkan primitive for each relationship: pipeline barriers for in-queue hazards (covered in resources-and-barriers), binary `VkSemaphore` for queue→queue and swapchain ordering, timeline `VkSemaphore` for monotonic counter waits that the CPU can also wait on, and `VkFence` for GPU→CPU completion. Wiring waits and signals through `VkSubmitInfo2`/`vkQueueSubmit2` scoped to exactly the work that must wait.
 
 ## Rationale
 
-Vulkan orders nothing across submissions or queues unless you ask. A binary `VkSemaphore` is a GPU-side handoff: one `vkQueueSubmit2` signals it, the next waits on it — used for swapchain acquire→render→present and for async-compute handoff. A timeline `VkSemaphore` is a 64-bit counter: you wait for value ≥ N and signal value N, so one object expresses many dependencies, supports wait-before-signal, and `vkWaitSemaphores` lets the CPU wait too — often retiring per-frame fences. A `VkFence` is the only GPU→CPU signal: the CPU blocks in `vkWaitForFences` to know a frame slot's command buffers, descriptors, and ring ranges are free to reuse, or that readback has landed. With synchronization2, semaphore waits/signals carry a `stageMask` so the wait is scoped to the stage that actually depends. The agnostic model is in gpu-rendering-guide (synchronization).
+Vulkan orders nothing across submissions or queues unless you ask. A binary `VkSemaphore` is a GPU-side handoff: one `vkQueueSubmit2` signals it, the next waits on it. Used for swapchain acquire→render→present and for async-compute handoff. A timeline `VkSemaphore` is a 64-bit counter: you wait for value ≥ N and signal value N, so one object expresses many dependencies, supports wait-before-signal, and `vkWaitSemaphores` lets the CPU wait too, often retiring per-frame fences. A `VkFence` is the only GPU→CPU signal: the CPU blocks in `vkWaitForFences` to know a frame slot's command buffers, descriptors, and ring ranges are free to reuse, or that readback has landed. With synchronization2, semaphore waits/signals carry a `stageMask` so the wait is scoped to the stage that actually depends. The agnostic model is in gpu-rendering-guide (synchronization).
 
 ## Techniques
 
@@ -41,8 +41,8 @@ vkWaitSemaphores(dev, &(VkSemaphoreWaitInfo){.sType = VK_STRUCTURE_TYPE_SEMAPHOR
 ## Gotchas
 
 - A binary `VkSemaphore` must be waited exactly once per signal; signaling one already pending-signal (or waiting an unsignaled one with nothing to signal it) deadlocks.
-- A wait `stageMask` of `ALL_COMMANDS` defeats overlap — scope it to the consuming stage (e.g. image-available waited at `COLOR_ATTACHMENT_OUTPUT`).
-- Semaphores order GPU work but do not perform the memory availability/visibility a barrier does within a queue — you still need barriers at a queue boundary, see [references/resources-and-barriers.md](./resources-and-barriers.md).
+- A wait `stageMask` of `ALL_COMMANDS` defeats overlap: scope it to the consuming stage (e.g. image-available waited at `COLOR_ATTACHMENT_OUTPUT`).
+- Semaphores order GPU work but do not perform the memory availability/visibility a barrier does within a queue. You still need barriers at a queue boundary, see [references/resources-and-barriers.md](./resources-and-barriers.md).
 - `vkWaitForFences` on the frame you just submitted (instead of the slot you are about to reuse) collapses frames-in-flight into a full stall.
 - A timeline value must only increase; signaling a value ≤ the current counter is invalid.
 

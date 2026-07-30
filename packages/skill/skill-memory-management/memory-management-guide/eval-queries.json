@@ -1,6 +1,6 @@
 [
   {
-    "query": "make our particle system stop calling malloc per particle — hand it a buffer it just fills",
+    "query": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
     "should_trigger": true,
     "split": "train",
     "rationale": "caller-owns-memory / non-allocating API"
@@ -60,7 +60,7 @@
     "rationale": "near-miss: GC-managed runtime owns lifetimes"
   },
   {
-    "query": "we keep fragmenting the heap — can you route the level's allocations through one arena that frees on level unload",
+    "query": "we keep fragmenting the heap: can you route the level's allocations through one arena that frees on level unload",
     "should_trigger": true,
     "split": "validation",
     "rationale": "arena, lifetime-by-phase"
@@ -78,7 +78,7 @@
     "rationale": "near-miss: hot/cold layout -> data-oriented-design-guide"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "query": "our exporter crashes opening the second project but the first one is fine, where do I even start",
     "rationale": "near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
@@ -98,6 +98,12 @@
   {
     "query": "I want to tag every allocation with file and line and check the counter is zero on shutdown to catch leaks",
     "rationale": "validation near miss owned by debugging-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the render thread needs to feed the device exactly one fixed block each time without ever allocating. What work is safe to do in there?",
+    "rationale": "near miss owned by audio-guide",
     "should_trigger": false,
     "split": "validation"
   }

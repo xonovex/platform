@@ -1,0 +1,104 @@
+[
+  {
+    "query": "which gh CLI flags call a GitHub REST endpoint directly, and how do I page through the results?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "provider request mechanics belong to github-guide"
+  },
+  {
+    "query": "Where should our developers keep API tokens on macOS, Linux, Windows, and WSL, and how should scripts retrieve them?",
+    "should_trigger": true,
+    "rationale": "provider-neutral local credential storage and retrieval",
+    "split": "train"
+  },
+  {
+    "query": "Replace this long-lived CI cloud secret with OIDC and make sure forked pull requests cannot assume the role.",
+    "should_trigger": true,
+    "rationale": "workload identity and CI trust boundaries",
+    "split": "train"
+  },
+  {
+    "query": "Design a rotation runbook for a PAT used by five services, including overlap, verification, and revocation.",
+    "should_trigger": true,
+    "rationale": "multi-consumer credential rotation lifecycle",
+    "split": "train"
+  },
+  {
+    "query": "A token appeared in CI logs yesterday. What do we revoke first, what evidence do we preserve, and when do we rewrite git history?",
+    "should_trigger": true,
+    "rationale": "credential exposure response",
+    "split": "train"
+  },
+  {
+    "query": "Is a gitignored .env file good enough for local secrets, or should this CLI use the OS keychain?",
+    "should_trigger": true,
+    "rationale": "local plaintext fallback versus secret store",
+    "split": "train"
+  },
+  {
+    "query": "Create a lifecycle inventory for client secrets with owners, consumers, expiry, audit source, and revocation path.",
+    "should_trigger": true,
+    "rationale": "credential lifecycle governance",
+    "split": "validation"
+  },
+  {
+    "query": "Our service reads one API token from a cloud secret manager. Define least-privilege access, version adoption, and rollback during rotation.",
+    "should_trigger": true,
+    "rationale": "production secret-manager consumption",
+    "split": "validation"
+  },
+  {
+    "query": "Review this pipeline for accidental secret exposure through command arguments, shell tracing, child processes, and unreliable masking.",
+    "should_trigger": true,
+    "rationale": "secret delivery and log exposure",
+    "split": "validation"
+  },
+  {
+    "query": "Which fine-grained GitHub PAT permissions are required to resolve a pull-request review thread?",
+    "should_trigger": false,
+    "rationale": "exact token scopes belong to github-guide",
+    "split": "train"
+  },
+  {
+    "query": "Why does glab target gitlab.com instead of our self-managed host, and which environment variables should I set?",
+    "should_trigger": false,
+    "rationale": "GitLab host and token variables belong to gitlab-guide",
+    "split": "train"
+  },
+  {
+    "query": "Show the header and cheapest GitLab API endpoint for verifying that my personal access token works.",
+    "should_trigger": false,
+    "rationale": "provider request mechanics belong to gitlab-guide",
+    "split": "train"
+  },
+  {
+    "query": "Configure a Kubernetes ServiceAccount and RBAC so one pod can read a single decrypted secret.",
+    "should_trigger": false,
+    "rationale": "cluster RBAC and secret wiring belong to kubernetes-guide",
+    "split": "train"
+  },
+  {
+    "query": "Encrypt application fields in PostgreSQL and design envelope encryption with a KMS-backed data key.",
+    "should_trigger": false,
+    "rationale": "application cryptography is outside machine credential lifecycle",
+    "split": "train"
+  },
+  {
+    "query": "list this repository open pull requests with gh and filter them by review state",
+    "should_trigger": false,
+    "rationale": "provider CLI mechanics belong to github-guide",
+    "split": "validation"
+  },
+  {
+    "query": "define a GitLab CI job that runs only on protected branches and publishes a build artifact",
+    "should_trigger": false,
+    "rationale": "provider pipeline mechanics belong to gitlab-guide",
+    "split": "validation"
+  },
+  {
+    "query": "Choose Argon2 parameters and password-reset rules for end-user account passwords.",
+    "should_trigger": false,
+    "rationale": "human password authentication is outside machine credential management",
+    "split": "validation"
+  }
+]

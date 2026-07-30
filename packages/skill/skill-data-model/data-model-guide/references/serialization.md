@@ -11,14 +11,13 @@ Saved files outlive the code that wrote them; the in-memory schema changes (prop
 ## Techniques
 
 - **Stable on-disk schema** - Define the file layout explicitly and independently of the in-memory layout. Tag the file with a format version. Treat the on-disk property names/ids as a contract.
-- **Versioning + migration** - On load, read the version; if older, run the chain of migration steps (`v1→v2→v3…`) that each transform the prior layout into the next. New code reads only the current schema; migrations bridge the gap.
-- **References by id** - Owned sub-objects serialize inline under their owner; weak references serialize as the target's id/GUID. On load, write objects first, then resolve ids — an id pointing at a missing object loads as null, mirroring runtime delete semantics.
-- **Text vs binary** - Text (JSON/structured text) diffs and merges well and is human-inspectable — good for source-controlled project files. Binary is compact and fast — good for caches, large buffers, and runtime assets. Models often save text for authoring and binary for shipping.
+- **References by id** - Owned sub-objects serialize inline under their owner; weak references serialize as the target's id/GUID. On load, write objects first, then resolve ids: an id pointing at a missing object loads as null, mirroring runtime delete semantics.
+- **Text vs binary** - Text (JSON/structured text) diffs and merges well and is human-inspectable: good for source-controlled project files. Binary is compact and fast: good for caches, large buffers, and runtime assets. Models often save text for authoring and binary for shipping.
 - **Deterministic output** - Emit properties and objects in a stable order (by property index, by id), normalize floats/whitespace, and avoid embedding timestamps or hash-ordered maps. Two saves of the same model must be byte-identical so version control shows only real changes.
 - **Partial / streaming load** - For large models, write a table of contents / per-object offsets so the loader can map or stream objects on demand instead of reading the whole file. Lazy-resolve references as objects are paged in.
 - **Unknown fields** - A forward-and-backward tolerant loader skips properties it doesn't recognize (and ideally preserves them on resave) rather than failing, so a newer file opens in older code without data loss.
-- **Changes vs snapshots (save games)** - For mutable runtime state, persist member-level _changes_ (deltas) tracked since creation rather than full snapshots — much smaller, but anything not reported before the save is lost. POD records can use a default (zero-initialized) serializer; non-POD records supply their own serialize/deserialize callbacks. Mark what is persistent declaratively (e.g. in the editor) rather than baking it into every system.
-- **Re-spawn from asset references** - When content originates from an asset, save only a reference to the asset plus the local overrides, and re-spawn the hierarchy from the _current_ asset on load. Saves shrink, and content patches apply automatically — but you must keep every asset version that older saves still reference, and structural changes to an asset hierarchy can break the UUID matching that re-maps overridden children.
+- **Changes vs snapshots (save games)** - For mutable runtime state, persist member-level _changes_ (deltas) tracked since creation rather than full snapshots: much smaller, but anything not reported before the save is lost. POD records can use a default (zero-initialized) serializer; non-POD records supply their own serialize/deserialize callbacks. Mark what is persistent declaratively (e.g. in the editor) rather than baking it into every system.
+- **Re-spawn from asset references** - When content originates from an asset, save only a reference to the asset plus the local overrides, and re-spawn the hierarchy from the _current_ asset on load. Saves shrink, and content patches apply automatically, but you must keep every asset version that older saves still reference, and structural changes to an asset hierarchy can break the UUID matching that re-maps overridden children.
 - **ABI-stable struct evolution** - For versioned API/data structs that must stay binary-compatible: append new fields only at the _end_, never reorder or retype existing ones, and reuse explicitly zero-initialized reserved bytes. A leading `uint32_t size` field lets a callee version-detect a struct passed by pointer. Request an exact major version, accept higher minor/patch; for a breaking change introduce a new struct and support both for a while rather than mutating the old one.
 
 ## How to Apply
@@ -59,11 +58,11 @@ if (prop_unknown) return false; // brittle: loses cross-version compatibility
 - A loader that hard-fails on an unrecognized property cannot open newer files; skip-and-preserve unknowns instead of rejecting.
 - Migrations must be ordered and idempotent per step; a missing or out-of-order step silently mis-reads old data as if it were current.
 - Non-deterministic output (map iteration order, embedded timestamps, unnormalized floats) produces spurious diffs and defeats version control review.
-- References to objects absent from the file must load as null, not as a fabricated or dangling target — match runtime delete semantics.
+- References to objects absent from the file must load as null, not as a fabricated or dangling target: match runtime delete semantics.
 - Binary formats are fragile across struct/layout/endianness changes; version them as strictly as text, or restrict binary to regenerable caches.
 - A change-tracking save loses any mutation not reported before the save point; ensure every persistent edit flows through the tracking path, or the loaded state silently differs from what the user saw.
 - "Reserved, must be zero" struct bytes are unenforceable (Hyrum's Law): callers will pass garbage and break future reuse. A leading `size` field is the more reliable way to evolve a by-pointer struct.
-- You cannot freely replace an asset that older saves point to — re-spawning from a structurally-changed asset can leave saved overrides orphaned or mis-mapped.
+- You cannot freely replace an asset that older saves point to: re-spawning from a structurally-changed asset can leave saved overrides orphaned or mis-mapped.
 
 ## Related
 

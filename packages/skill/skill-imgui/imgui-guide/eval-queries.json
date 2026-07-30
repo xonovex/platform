@@ -1,12 +1,12 @@
 [
   {
-    "query": "I'm writing an immediate-mode GUI and my hover highlight flickers between two overlapping panels — how should I decide which control the mouse is over?",
+    "query": "I'm writing an immediate-mode GUI and my hover highlight flickers between two overlapping panels. How should I decide which control the mouse is over?",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: immediate-mode occlusion/hover resolved via frame delay (last-drawn wins)"
   },
   {
-    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound — how do I get the whole UI down to one draw call?",
+    "query": "our editor UI pushes tens of thousands of rectangles to the GPU every frame and it's bandwidth-bound. How do I get the whole UI down to one draw call?",
     "should_trigger": true,
     "split": "train",
     "rationale": "direct: primitive buffers + index encoding + single draw call"
@@ -18,19 +18,19 @@
     "rationale": "direct: responder chain, scope stack, event trickling, tab order"
   },
   {
-    "query": "I want to drag an item from one panel and drop it onto another panel in my tool — what's the cleanest way to track the drag across windows?",
+    "query": "I want to drag an item from one panel and drop it onto another panel in my tool. What's the cleanest way to track the drag across windows?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: data-model-first drag-and-drop, global drag id, cross-window"
   },
   {
-    "query": "text in my tool looks blurry on a 4K laptop and crisp on the external monitor when I drag the window across — how should I handle per-monitor scaling?",
+    "query": "text in my tool looks blurry on a 4K laptop and crisp on the external monitor when I drag the window across. How should I handle per-monitor scaling?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: per-monitor DPI, virtual coords, DPI-keyed font atlas"
   },
   {
-    "query": "two of my list rows share the same hover state and interaction jumps between them — how should controls be identified each frame?",
+    "query": "two of my list rows share the same hover state and interaction jumps between them. How should controls be identified each frame?",
     "should_trigger": true,
     "split": "train",
     "rationale": "implicit: stable unique ids, id-stack scoping, no position-derived ids"
@@ -54,7 +54,7 @@
     "rationale": "validation positive: immediate-mode state model, what persists vs recomputed"
   },
   {
-    "query": "a keyboard shortcut creates a popup that then immediately reacts to the same keypress that opened it — how do I stop that?",
+    "query": "a keyboard shortcut creates a popup that then immediately reacts to the same keypress that opened it. How do I stop that?",
     "should_trigger": true,
     "split": "train",
     "rationale": "validation positive: event ordering / one-frame delay for event-created controls"
@@ -72,7 +72,7 @@
     "rationale": "validation negative: ECS/data layout -> ecs-guide / data-oriented-design-guide"
   },
   {
-    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs — what's a good approach?",
+    "query": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs. What's a good approach?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "localization: hash source string as key, swappable localizer, extraction tool, pseudo-loc"
@@ -84,13 +84,13 @@
     "rationale": "localization: pseudo-localization (gibberish) mode padded longer to catch unmarked strings + expansion"
   },
   {
-    "query": "people keep telling me an immediate-mode GUI can't support a screen reader — how do I expose my widgets to assistive tech and keyboard-only users?",
+    "query": "people keep telling me an immediate-mode GUI can't support a screen reader. How do I expose my widgets to assistive tech and keyboard-only users?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "accessibility: per-frame side semantic list registered while drawing, bridged to platform a11y APIs"
   },
   {
-    "query": "I want my editor's controls to be drivable by an automation/UI-test harness that can find a button by label and inject clicks — how do I structure that in my IMGUI?",
+    "query": "I want my editor's controls to be drivable by an automation/UI-test harness that can find a button by label and inject clicks. How do I structure that in my IMGUI?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "validation positive: accessibility automation surface (find_control + virtual input) from the side list"
@@ -102,13 +102,13 @@
     "rationale": "near-miss: web content localization, not an immediate-mode UI string system -> not this skill"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "query": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
     "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"

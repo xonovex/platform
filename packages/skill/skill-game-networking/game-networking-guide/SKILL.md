@@ -5,21 +5,20 @@ description: "Use when architecting real-time multiplayer networking for a game 
 
 # Game networking Guidelines
 
-API-agnostic architecture for real-time multiplayer over an unreliable network: how participants are modeled and who owns state, what to put on the wire, and how reliability is layered on UDP. This skill replicates a typed world — see **data-model-guide** for the object/id model, **ecs-guide** for the component model, and **data-oriented-design-guide** for packing wire data.
+API-agnostic architecture for real-time multiplayer over an unreliable network: how participants are modeled and who owns state, what to put on the wire, and how reliability is layered on UDP. This skill replicates a typed world, see **data-model-guide** for the object/id model, **ecs-guide** for the component model, and **data-oriented-design-guide** for packing wire data.
 
 ## Essentials
 
 - **Nodes form a graph, topology is data** - Model each participant as a simulation bound to an address; keep client/server-vs-peer and accept/own/replicate as per-node config, not baked-in protocol, see [references/topology-and-authority.md](references/topology-and-authority.md)
 - **One owner per object** - Exactly one node is the source of truth for a networked object and replicates it; others apply received updates read-only, see [references/topology-and-authority.md](references/topology-and-authority.md)
 - **Replicate opted-in state** - Replication is a per-component capability plus a per-object flag; the owner watches for changes and sends only to interested nodes, see [references/state-replication.md](references/state-replication.md)
-- **Delta to the in-sync, snapshot to the new** - Stream per-frame changes to nodes that have a baseline; send a full snapshot to a freshly connected node, see [references/delta-and-snapshots.md](references/delta-and-snapshots.md)
 - **Guarantee per packet type, over UDP** - Open one-way pipes between nodes; tag every payload with a type that carries its delivery guarantee (unreliable / ordered / reliable), see [references/transport-and-channels.md](references/transport-and-channels.md)
 
 ## Replicating world state
 
 - **Two-level opt-in** - A component declares whether/how it replicates; each object must also be flagged, or nothing is sent, see [references/state-replication.md](references/state-replication.md)
 - **Cheap default, optimize by description** - Default to a whole-component blob; supply a field layout and per-field watch cadence to send only changed members, see [references/state-replication.md](references/state-replication.md)
-- **Baselines and acks** - A delta is meaningless without the receiver's baseline; reuse the save/load apply path and watch ack/out-of-order counts, see [references/delta-and-snapshots.md](references/delta-and-snapshots.md)
+- **Baselines and acks** - Reuse the save/load apply path for replication and watch ack/out-of-order counts, see [references/delta-and-snapshots.md](references/delta-and-snapshots.md)
 
 ## Transport and channels
 
@@ -33,13 +32,12 @@ API-agnostic architecture for real-time multiplayer over an unreliable network: 
 
 ## Gotchas
 
-- A component being replicable does nothing unless the object instance is also flagged for replication — the most common "nothing syncs" bug is a missing object flag.
+- A component being replicable does nothing unless the object instance is also flagged for replication. The most common "nothing syncs" bug is a missing object flag.
 - Choosing reliable-ordered delivery for everything recreates TCP head-of-line blocking over UDP: one dropped packet stalls everything queued behind it.
-- A delta applied without its baseline silently corrupts the receiver's world; a newly connected node must get a full snapshot before any delta.
-- Pipes are one-way — forgetting the return pipe means the other node literally cannot reply.
+- Pipes are one-way: forgetting the return pipe means the other node literally cannot reply.
 - The connection handshake must be idempotent: a re-sent request (because the response was lost) has to return "accepted," not open a second pipe.
 - In-process local delivery never drops or reorders, so loss/reorder bugs stay hidden until you inject adverse conditions or test against a real socket.
-- "Deliver all, allow duplicates" guarantees arrival, not uniqueness — handlers must tolerate seeing the same packet twice.
+- "Deliver all, allow duplicates" guarantees arrival, not uniqueness: handlers must tolerate seeing the same packet twice.
 - Two nodes that both believe they own the same object will fight; authority must be singular per object.
 
 ## Progressive Disclosure

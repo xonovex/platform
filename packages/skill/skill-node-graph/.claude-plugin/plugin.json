@@ -2,7 +2,8 @@
   "name": "xonovex-skill-node-graph",
   "version": "5.1.0",
   "description": "Xonovex Node graph skills",
-  "author": {"name": "Xonovex"},
-  "skills": ["./node-graph-guide"],
-  "dependencies": ["xonovex-skill-data-model"]
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./node-graph-guide"]
 }

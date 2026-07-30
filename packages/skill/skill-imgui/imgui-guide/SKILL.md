@@ -15,7 +15,7 @@ Architecture for an immediate-mode GUI: the UI is re-issued every frame from app
 ## Essentials
 
 - **One draw call** - Pack all widgets into compact primitive buffers and synthesize vertices in the shader; encode clip and texture so no state switches are needed, see [references/draw-batching.md](references/draw-batching.md)
-- **Stable unique IDs** - Key hover, active, focus, drag, and tab order by per-control id — the substitute for retained widget objects, see [references/ids-and-state.md](references/ids-and-state.md)
+- **Stable unique IDs** - Key hover, active, focus, drag, and tab order by per-control id: the substitute for retained widget objects, see [references/ids-and-state.md](references/ids-and-state.md)
 - **Frame delay resolves ordering** - Immediate mode can't see later controls; defer hover/focus decisions one frame so the last-drawn control wins, see [references/frame-delay.md](references/frame-delay.md)
 - **Process events in end\_\*(), consume by clearing** - Trickle keyboard events through a responder chain; one event per frame, see [references/events-and-focus.md](references/events-and-focus.md)
 - **Drag-and-drop is a data operation** - Hold a single global drag id; the drop is a data-model mutation, not UI plumbing, see [references/drag-and-drop.md](references/drag-and-drop.md)
@@ -24,17 +24,17 @@ Architecture for an immediate-mode GUI: the UI is re-issued every frame from app
 ## Localization & Accessibility
 
 - **Hash the source string as the key** - Wrap visible text in `LOCALIZE(...)`, resolve per frame through a swappable localizer that falls back to the source string, and audit coverage with a pseudo-localization mode, see [references/localization.md](references/localization.md)
-- **Build a side semantic tree while drawing** - As each control is drawn, register its role/label/rect/state into a per-frame list, then expose that list to platform accessibility APIs and automation — immediate mode does not preclude a screen-reader-visible tree, see [references/accessibility.md](references/accessibility.md)
+- **Build a side semantic tree while drawing** - As each control is drawn, register its role/label/rect/state into a per-frame list, then expose that list to platform accessibility APIs and automation: immediate mode does not preclude a screen-reader-visible tree, see [references/accessibility.md](references/accessibility.md)
 
 ## Gotchas
 
-- Immediate mode cannot know whether a control drawn _later_ this frame will occlude the current one — resolve hover with a one-frame delay (compute `next_hover`, promote at frame end) so the topmost/last-drawn control wins.
+- Immediate mode cannot know whether a control drawn _later_ this frame will occlude the current one: resolve hover with a one-frame delay (compute `next_hover`, promote at frame end) so the topmost/last-drawn control wins.
 - An input event can create a new control mid-frame that then reacts to the very event that created it; a one-frame delay is sometimes the only clean fix.
-- Two controls sharing an id silently merge their hover/active/focus state — derive ids from a stable source (data object id, loop index folded into a scope), never from screen position.
+- Two controls sharing an id silently merge their hover/active/focus state: derive ids from a stable source (data object id, loop index folded into a scope), never from screen position.
 - `SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)` must run _before_ any window is created, and DPI must be part of the font-atlas cache key or text renders blurry.
 - Drop targets must consume the mouse-release _before_ the end-of-frame step that cancels a drag, or valid drops are lost.
-- Hashing the source string as a localization key means editing the English copy silently orphans the existing translation — treat string edits as re-translation work, and run pseudo-localization to catch unmarked strings.
-- A control drawn but not registered into the accessibility list is invisible to assistive tech; one registered but not drawn is a ghost — build the side list in lockstep with drawing, and actually feed it to the platform accessibility API.
+- Hashing the source string as a localization key means editing the English copy silently orphans the existing translation: treat string edits as re-translation work, and run pseudo-localization to catch unmarked strings.
+- A control drawn but not registered into the accessibility list is invisible to assistive tech; one registered but not drawn is a ghost: build the side list in lockstep with drawing, and actually feed it to the platform accessibility API.
 
 ## Example
 

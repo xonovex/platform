@@ -6,13 +6,13 @@ Store objects that own variable-length child lists in fixed-size bulk arrays plu
 
 ## Rationale
 
-"An object with a list of children" naively becomes a pointer to a heap-allocated growable array per object — one allocation per object, scattered across memory, opaque to the profiler, and a cache miss on every traversal. Holding the child data in a second bulk array and linking fixed-size chunks by index keeps everything contiguous, makes allocation a free-list pop, and lets you tune the layout to the access pattern. The trade-off is explicit: chunking gives up O(1) random indexing for O(n/chunk) traversal and pays internal fragmentation proportional to chunk size, so choose the representation from how the data is actually read.
+"An object with a list of children" naively becomes a pointer to a heap-allocated growable array per object. One allocation per object, scattered across memory, opaque to the profiler, and a cache miss on every traversal. Holding the child data in a second bulk array and linking fixed-size chunks by index keeps everything contiguous, makes allocation a free-list pop, and lets you tune the layout to the access pattern. The trade-off is explicit: chunking gives up O(1) random indexing for O(n/chunk) traversal and pays internal fragmentation proportional to chunk size, so choose the representation from how the data is actually read.
 
 ## How to Apply
 
-1. Known small upper bound? Use a **capped fixed array** inline in the struct (`uint32_t children[8]`) — simplest, but wastes space if the cap is loose and must handle overflow. (Safe to raise a cap later in runtime code; not in a file format.)
-2. Unbounded growth? Use a **chunked allocator**: hold child indices in fixed-size chunks linked by index, stored in a separate bulk array. Size the chunk to fill a cache line — e.g. 14 × 32-bit indices + 2 link indices = 64 bytes.
-3. Many-directional relational queries? Use **linked-list siblings** (`first_child`, `prev/next_sibling`) — good for bidirectional traversal, worse for straight iteration (pointer chasing).
+1. Known small upper bound? Use a **capped fixed array** inline in the struct (`uint32_t children[8]`): simplest, but wastes space if the cap is loose and must handle overflow. (Safe to raise a cap later in runtime code; not in a file format.)
+2. Unbounded growth? Use a **chunked allocator**: hold child indices in fixed-size chunks linked by index, stored in a separate bulk array. Size the chunk to fill a cache line, e.g. 14 × 32-bit indices + 2 link indices = 64 bytes.
+3. Many-directional relational queries? Use **linked-list siblings** (`first_child`, `prev/next_sibling`): good for bidirectional traversal, worse for straight iteration (pointer chasing).
 4. Strings as identifiers? **Intern** them into one buffer + hash table so equal strings share one pointer and comparison is pointer equality (ref-count only if you must delete).
 5. Prefer bulk arrays + an app-specific allocator over a generic growable container for object pools.
 
@@ -31,7 +31,7 @@ struct object { const char *name;  // interned: compare by pointer
 
 ## Counter-Example
 
-If children are read by frequent random index (`children[k]`) rather than full traversal, the chunked layout's O(n/chunk) walk is the wrong trade — a capped or contiguous array preserves O(1) indexing. Pick the structure from the dominant access.
+If children are read by frequent random index (`children[k]`) rather than full traversal, the chunked layout's O(n/chunk) walk is the wrong trade: a capped or contiguous array preserves O(1) indexing. Pick the structure from the dominant access.
 
 ## Related
 

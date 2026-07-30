@@ -6,14 +6,14 @@ A library never allocates; the caller provides all storage and the library opera
 
 ## Rationale
 
-When the caller owns the memory it picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, batch processing needs no per-item allocation, and the library is embeddable with no allocator dependency. Serialization/relocation become the caller's responsibility.
+The caller picks the strategy (stack, pool, arena, virtual-memory block), there is nothing to leak, and the library is embeddable with no allocator dependency.
 
 ## How to Apply
 
 1. Init functions bind library state to caller-provided arrays + a capacity, not to internally-malloc'd memory.
 2. Operations check capacity/bounds and return a status code on overflow instead of growing.
 3. Complex operations that need scratch space take a caller-provided work buffer (often sized via a `*_req()` query).
-4. Return values are status codes or indices/handles — never ownership of a new allocation the caller must remember to free.
+4. Return values are status codes or indices/handles, never ownership of a new allocation the caller must remember to free.
 
 ## Example
 
@@ -31,14 +31,14 @@ status_t entity_add(entity_system_t *s, float x, float y) {
   return STATUS_OK;
 }
 
-// Bad: hidden allocation — who frees it? leaks on error paths, allocator on hot path.
+// Bad: hidden allocation. Who frees it? leaks on error paths, allocator on hot path.
 float *make_buffer(size_t n) { return malloc(n * sizeof(float)); }
 ```
 
 ## Gotchas
 
 - A `*_req()` size query must stay in lockstep with the code that consumes the buffer; a mismatch is a buffer overflow.
-- "Caller owns" is a whole-API contract — one function that secretly allocates breaks the leak-free guarantee for everyone.
+- "Caller owns" is a whole-API contract. One function that secretly allocates breaks the leak-free guarantee for everyone.
 
 ## Related
 

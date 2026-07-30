@@ -2,18 +2,18 @@
 
 ## Guideline
 
-To drive an HDR display, present to a wide-gamut swapchain — PQ-encoded Rec.2020 at ≥10-bit, or extended-linear scRGB at FP16 — keep the entire scene pipeline in linear, scene-referred light, and convert to the display's primaries and transfer function yourself in one final pass scaled to the display's real peak luminance. Never rely on an automatic sRGB backbuffer for HDR.
+To drive an HDR display, present to a wide-gamut swapchain: PQ-encoded Rec.2020 at ≥10-bit, or extended-linear scRGB at FP16. Keep the entire scene pipeline in linear, scene-referred light, and convert to the display's primaries and transfer function yourself in one final pass scaled to the display's real peak luminance. Never rely on an automatic sRGB backbuffer for HDR.
 
 ## Rationale
 
-SDR bakes in three assumptions — Rec.709 primaries, 8-bit storage, sRGB transfer — none of which hold for HDR, which needs wider primaries (Rec.2020), at least 10-bit (or FP16) to avoid banding across the larger range, and a transfer function (PQ/ST2084 or HLG) mapping code values to _absolute_ luminance in nits. Two things force you to own the final encode rather than delegate to a hardware sRGB backbuffer: blending must happen in linear light, but an auto-transfer backbuffer blends _after_ the curve (wrong, and it mismatches OS-native UI text); and you must map to the display's actual peak nits, because almost no panel reaches PQ's 10,000-nit ceiling. Doing linear → primaries → transfer in one explicit pass keeps blending linear, applies the transfer exactly once, and gives the paper-white scaling knob.
+SDR bakes in three assumptions: Rec.709 primaries, 8-bit storage, sRGB transfer, none of which hold for HDR, which needs wider primaries (Rec.2020), at least 10-bit (or FP16) to avoid banding across the larger range, and a transfer function (PQ/ST2084 or HLG) mapping code values to _absolute_ luminance in nits. Two things force you to own the final encode rather than delegate to a hardware sRGB backbuffer: blending must happen in linear light, but an auto-transfer backbuffer blends _after_ the curve (wrong, and it mismatches OS-native UI text); and you must map to the display's actual peak nits, because almost no panel reaches PQ's 10,000-nit ceiling. Doing linear → primaries → transfer in one explicit pass keeps blending linear, applies the transfer exactly once, and gives the paper-white scaling knob.
 
 ## How to Apply
 
 1. Query the surface's supported color spaces/formats; detect HDR capability rather than assuming it.
 2. Choose a swapchain config: PQ + a 10-bit-per-channel packed format (e.g. `A2B10G10R10`) for HDR10, or extended-linear + `RGBA16F` for scRGB. Use 8-bit sRGB only for the SDR path.
 3. Render the scene in linear light into an FP16 target; do lighting, post, color grading, and tone mapping there.
-4. Composite UI in the same linear space — convert sRGB-authored UI colors to linear exactly once on the way in.
+4. Composite UI in the same linear space: convert sRGB-authored UI colors to linear exactly once on the way in.
 5. Final output pass: linear → CIE-XYZ → output primaries via a 3×3 matrix → apply the display's transfer function (sRGB, or PQ for HDR10).
 6. Scale luminance by a paper-white / reference-white level expressed against the display's measured peak nits, not PQ's 10,000-nit maximum.
 
@@ -40,9 +40,9 @@ vec3 encode_hdr10(vec3 linear_rec709, float paper_white_nits, float peak_nits) {
 ## Gotchas
 
 - Color-conversion matrices published online are usually row-major; a column-major renderer must transpose them or every color shifts.
-- Applying a transfer function twice (e.g. an sRGB backbuffer on top of your own encode) loses precision — round-tripping sRGB→linear→sRGB in FP visibly errors in the darkest code values. Encode exactly once.
+- Applying a transfer function twice (e.g. an sRGB backbuffer on top of your own encode) loses precision: round-tripping sRGB→linear→sRGB in FP visibly errors in the darkest code values. Encode exactly once.
 - Feeding PQ the unscaled 10,000-nit range makes everything look washed out and dim; scale to the panel's real peak.
-- An automatic sRGB backbuffer cannot be used for correct linear UI blending and does not match OS-native text rendering — own the composite.
+- An automatic sRGB backbuffer cannot be used for correct linear UI blending and does not match OS-native text rendering: own the composite.
 - 8-bit storage with Rec.2020 primaries bands badly; 10-bit is the floor for PQ output.
 - Calibration needs measured hardware (colorimeter); unit-test the conversion matrices and GPU readbacks for correctness, but trust a meter for final tuning.
 

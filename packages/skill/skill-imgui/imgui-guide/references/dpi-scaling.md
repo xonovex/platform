@@ -2,11 +2,7 @@
 
 ## Guideline
 
-The application owns DPI scaling, not the OS. Lay out the UI in virtual coordinates (1:1 at 100% / 96 DPI), apply the per-monitor scale at the edges (vertex shader and rect conversion), and key the font atlas by DPI so text stays sharp.
-
-## Rationale
-
-Letting the OS bitmap-rescale a high-DPI window blurs everything. Owning the scale keeps the immediate-mode core DPI-unaware (virtual coordinates) while vector primitives, text, thumbnails, and viewports each scale correctly. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
+The application owns DPI scaling, not the OS. Lay out the UI in virtual coordinates (1:1 at 100% / 96 DPI), apply the per-monitor scale at the edges (vertex shader and rect conversion), and key the font atlas by DPI so text stays sharp. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
 
 ## How to Apply
 
@@ -26,11 +22,11 @@ glyph_atlas_t *a = atlas_get(font_name, point_size, monitor_dpi);
 
 ## Counter-Example
 
-A fixed-resolution kiosk or console UI on a single known display doesn't need per-monitor machinery — a single compile-time scale is enough. Per-monitor handling is for desktop apps spanning mixed-DPI displays.
+A fixed-resolution kiosk or console UI on a single known display doesn't need per-monitor machinery. A single compile-time scale is enough. Per-monitor handling is for desktop apps spanning mixed-DPI displays.
 
 ## Gotcha
 
-`SetThreadDpiAwarenessContext()` is thread-local, not global, and behaves surprisingly — set process awareness up front and don't rely on per-thread context for global state.
+`SetThreadDpiAwarenessContext()` is thread-local, not global, and behaves surprisingly: set process awareness up front and don't rely on per-thread context for global state.
 
 ## Related
 

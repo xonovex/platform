@@ -4,13 +4,9 @@
 
 Store the UI as compact, tightly-packed primitive definitions and let the vertex shader synthesize vertices from a metadata-carrying index buffer, so the whole UI submits in a single draw call with no state switches.
 
-## Rationale
-
-Storing one ~20-byte primitive instead of ~48 bytes of expanded vertices, and encoding everything the GPU needs (primitive type, corner, clip, texture) into the data, lets a single shader and a single draw call render tens of thousands of rectangles without per-state churn.
-
 ## How to Apply
 
-1. Write primitives into a shared buffer with **no common stride** — a rectangle and a glyph can differ in size; pack each tightly.
+1. Write primitives into a shared buffer with **no common stride**: a rectangle and a glyph can differ in size; pack each tightly.
 2. Encode each index as 32 bits: low 24 bits = byte offset into the primitive buffer, top 8 bits = primitive type (6 bits) + corner id (2 bits). The vertex shader reads the primitive at that offset and synthesizes the corner vertex, bypassing the fixed-function input assembler.
 3. Avoid extra draw calls: use **bindless textures** instead of atlasing, handle textured and untextured primitives in one shader, and **encode the clip rectangle's offset into each primitive** (CPU culls, GPU clips) rather than issuing scissor draws.
 4. Render overlays (popups, menus) into a separate buffer, then append it to the main buffer at submit time, offsetting overlay indices by the main buffer's current index count.
@@ -28,7 +24,7 @@ struct rect_t { float x, y, w, h; uint8_t col[4]; uint32_t clip_offset; }; // ~2
 
 ## Counter-Example
 
-A UI with a handful of elements (a debug overlay, a splash) doesn't need primitive-buffer compaction — expanded vertices are fine. The technique earns its complexity when primitive counts reach the thousands.
+A UI with a handful of elements (a debug overlay, a splash) doesn't need primitive-buffer compaction: expanded vertices are fine. The technique earns its complexity when primitive counts reach the thousands.
 
 ## Related
 

@@ -6,7 +6,7 @@ Design from the real data and its statistics, modeling each system as a bulk tra
 
 ## Rationale
 
-The principle "where there is one, there are many": singletons are rare in real workloads — you almost always have arrays of the same thing. Object-oriented modeling optimizes the single instance (encapsulation, virtual dispatch, per-object state) and pessimizes the common case of processing thousands. Thinking in transforms makes the data and its access pattern primary, which is exactly what the hardware rewards. It also clarifies what work actually exists: you read the input statistics ("how many, how often, what distribution") and design the layout around them.
+The principle "where there is one, there are many": singletons are rare in real workloads. You almost always have arrays of the same thing. Object-oriented modeling optimizes the single instance (encapsulation, virtual dispatch, per-object state) and pessimizes the common case of processing thousands. Thinking in transforms makes the data and its access pattern primary, which is exactly what the hardware rewards. It also clarifies what work actually exists: you read the input statistics ("how many, how often, what distribution") and design the layout around them.
 
 ## Techniques
 
@@ -14,16 +14,16 @@ The principle "where there is one, there are many": singletons are rare in real 
 - **One function, many items** - Replace `thing.update()` called per object with `update_all(things, n)` that loops internally. The per-call overhead, branch prediction, and instruction cache all improve.
 - **Separate the three jobs** - Reading input, transforming, writing output are distinct phases; keep them as separate linear passes rather than interleaving them per object.
 - **Design around the statistics** - Most entities idle, most rays miss, most cells are empty: lay out for the common case and handle the rare case as a separate, smaller stream.
-- **Data first, code second** - Decide the layout from how data is produced and consumed, then write the code that fits it — not the reverse.
+- **Data first, code second** - Decide the layout from how data is produced and consumed, then write the code that fits it, not the reverse.
 
 ## Example
 
 ```c
-// Bad: OO model — virtual update per object, scattered state, one at a time.
+// Bad: OO model: virtual update per object, scattered state, one at a time.
 class Entity { public: virtual void update(float dt) = 0; };
 for (Entity *e : entities) e->update(dt); // dispatch + pointer chase per item
 
-// Good: transform model — homogeneous stream in, stream out.
+// Good: transform model: homogeneous stream in, stream out.
 typedef struct { vec3 pos; vec3 vel; } body_t; // a "row"
 static void integrate(const body_t *in, body_t *out, size_t n, float dt) {
   for (size_t i = 0; i < n; i++) {        // one transform, many rows
@@ -35,7 +35,7 @@ static void integrate(const body_t *in, body_t *out, size_t n, float dt) {
 
 ## Gotchas
 
-- Resist hiding the loop behind a per-item method — that reintroduces dispatch and kills batching.
+- Resist hiding the loop behind a per-item method: that reintroduces dispatch and kills batching.
 
 ## Related
 

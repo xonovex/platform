@@ -1,6 +1,6 @@
 # Sources
 
-## Dmitry Vyukov — 1024cores
+## Dmitry Vyukov: 1024cores
 
 - **URL:** https://www.1024cores.net/ (canonical home of the lock-free/wait-free articles; the older `sites.google.com/site/1024cores/home` mirror is superseded)
 - **Last reviewed:** 2026-05-27
@@ -27,7 +27,7 @@
   - `memory_order_*` semantics and fences → `references/memory-ordering.md`
   - Atomic load/store/RMW, `compare_exchange_weak`/`_strong`, spurious failure → `references/atomics-and-cas.md`
 
-## Maurice Herlihy & Nir Shavit — The Art of Multiprocessor Programming
+## Maurice Herlihy & Nir Shavit: The Art of Multiprocessor Programming
 
 - **URL:** https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-1 (2nd ed.)
 - **Last reviewed:** 2026-05-27
@@ -38,7 +38,7 @@
   - Treiber stack and the ABA problem → `references/lock-free-stack.md`, `references/aba-problem.md`
   - Spinlocks, TTAS, exponential backoff, MCS/CLH queue locks → `references/locks-and-backoff.md`
 
-## Paul E. McKenney — Is Parallel Programming Hard, And, If So, What Can You Do About It?
+## Paul E. McKenney: Is Parallel Programming Hard, And, If So, What Can You Do About It?
 
 - **URL:** https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html
 - **Last reviewed:** 2026-05-27
@@ -56,8 +56,8 @@
   - `SKILL.md` → Reclamation & scaling
   - Practical engine concurrency patterns
 - **Aspects extracted:**
-  - "Fiber based job system" — fibers yield instead of blocking a worker → `references/scalable-architecture.md`
-  - "Multi-Threading The Truth" — immutable snapshots / atomic version swap for read-mostly data → `references/safe-memory-reclamation.md`
+  - "Fiber based job system": fibers yield instead of blocking a worker → `references/scalable-architecture.md`
+  - "Multi-Threading The Truth": immutable snapshots / atomic version swap for read-mostly data → `references/safe-memory-reclamation.md`
 
 ## Guide-level synthesis
 

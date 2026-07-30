@@ -1,11 +1,9 @@
 {
   "name": "@xonovex/skill-game-networking",
   "version": "5.1.0",
+  "description": "Xonovex Game networking skills",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@xonovex/skill-data-model": "5.1.0"
-  },
   "keywords": [
     "xonovex",
     "skill",

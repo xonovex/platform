@@ -9,11 +9,7 @@ Engine-agnostic architecture for a software audio mixer: a real-time render thre
 
 ## Essentials
 
-- **The callback is hard real-time** - No locks, allocations, blocking, or syscalls on the audio path; bounded work per block, see [references/audio-callback-thread.md](references/audio-callback-thread.md)
 - **Mix in float, ramp every gain** - Accumulate voices in deinterleaved float through a gain matrix; never snap a gain or you click, see [references/mixing-and-buffers.md](references/mixing-and-buffers.md)
-- **One step does resample + pitch** - Read each source with a fractional, per-voice playback step and interpolate, see [references/resampling-and-dsp.md](references/resampling-and-dsp.md)
-- **Fixed voice pool** - Preallocate `MAX_VOICES`; cap concurrency, steal by priority, ramp before reusing a slot, see [references/voice-management.md](references/voice-management.md)
-- **Talk to the audio thread by message** - Post immutable commands through an SPSC ring; the audio thread owns voice state, see [references/command-handoff.md](references/command-handoff.md)
 
 ## The render path
 
@@ -35,10 +31,10 @@ Engine-agnostic architecture for a software audio mixer: a real-time render thre
 
 ## Gotchas
 
-- An underrun is instantly, harshly audible: one lock the game thread holds, one `malloc` slow path, or one first-touch page fault inside the callback and you get a click or dropout — far worse than a dropped render frame.
+- An underrun is instantly, harshly audible: one first-touch page fault inside the callback and you get a click or dropout. Pre-touch every buffer and voice state at init, don't merely preallocate.
 - Snapping any gain (start, stop, volume, pan, steal) inserts a step into the waveform that clicks; ramp every coefficient over tens of milliseconds, and keep ramping a stopping voice to zero before freeing its slot.
 - Integer mixing overflows and wraps to a loud burst; accumulate in float so many loud voices coexist, then scale to fit at the end.
-- A "stopped" voice still occupies its slot until its fade completes, so the free count lags — size the pool for that overlap, not just steady state.
+- A "stopped" voice still occupies its slot until its fade completes, so the free count lags: size the pool for that overlap, not just steady state.
 - Accumulating a voice's fractional read position in `float` drifts a long sound out of tune; keep the cursor in `double` or fixed-point.
 - A full command queue must never block the audio thread and must never `malloc` a bigger one; pick a producer-side drop/coalesce policy up front.
 - Sizing the queue-ahead too tight starves on ordinary scheduler jitter and high-latency USB/Bluetooth devices; too loose adds latency you can hear in interactive sounds.

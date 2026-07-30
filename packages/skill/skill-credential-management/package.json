@@ -1,0 +1,17 @@
+{
+  "name": "@xonovex/skill-credential-management",
+  "version": "5.1.0",
+  "description": "Xonovex credential lifecycle skills",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "credentials",
+    "secrets"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

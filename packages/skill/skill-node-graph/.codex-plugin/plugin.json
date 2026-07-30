@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./node-graph-guide",
-  "dependencies": ["xonovex-skill-data-model"]
+  "skills": "./node-graph-guide"
 }

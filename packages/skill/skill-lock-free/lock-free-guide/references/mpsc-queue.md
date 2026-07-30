@@ -2,7 +2,7 @@
 
 ## Guideline
 
-For many producers feeding one consumer, use an intrusive MPSC queue: producers publish with a single atomic exchange on the tail; the consumer walks `next` pointers — no CAS, no per-node allocation in the queue itself.
+For many producers feeding one consumer, use an intrusive MPSC queue: producers publish with a single atomic exchange on the tail; the consumer walks `next` pointers, no CAS, no per-node allocation in the queue itself.
 
 ## Rationale
 
@@ -11,8 +11,8 @@ The expensive part of a concurrent queue is the producer-side contention. Replac
 ## How it works
 
 1. Nodes are intrusive (caller embeds a `next` field) and the queue is initialized with a dummy "stub" node so it is never empty internally.
-2. `enqueue`: set the node's `next` to NULL, atomically swap it into `tail` (release), then link the _previous_ tail's `next` to the new node. Between the swap and the link the queue is momentarily inconsistent — the chain has a transient gap.
-3. `dequeue` (consumer only): follow `head->next`; if it's NULL the queue may be empty _or_ a producer is mid-enqueue (the gap) — report empty and retry later.
+2. `enqueue`: set the node's `next` to NULL, atomically swap it into `tail` (release), then link the _previous_ tail's `next` to the new node. Between the swap and the link the queue is momentarily inconsistent. The chain has a transient gap.
+3. `dequeue` (consumer only): follow `head->next`; if it's NULL the queue may be empty _or_ a producer is mid-enqueue (the gap). Report empty and retry later.
 
 ## Example
 
@@ -60,7 +60,7 @@ mpsc_node_t *mpsc_dequeue(mpsc_queue_t *q) {
 
 - The transient gap means `dequeue` can spuriously return NULL while the queue is non-empty; treat NULL as "nothing _right now_", never as a permanent empty signal.
 - It is wait-free for _producers_ but only lock-free for the _consumer_: a producer descheduled inside the gap stalls the consumer until it resumes. Acceptable for a single trusted consumer; never expose two consumers.
-- The returned node is the _old_ head/stub; the freshly enqueued payload lives in the node it pointed to. Many implementations copy the payload out of `next` and recycle the old node as the new stub — be consistent about which node carries the data.
+- The returned node is the _old_ head/stub; the freshly enqueued payload lives in the node it pointed to. Many implementations copy the payload out of `next` and recycle the old node as the new stub: be consistent about which node carries the data.
 
 ## Related
 

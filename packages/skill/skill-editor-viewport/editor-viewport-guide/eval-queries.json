@@ -1,6 +1,6 @@
 [
   {
-    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none. How should we figure out what's under the cursor",
     "should_trigger": true,
     "split": "train",
     "rationale": "object-picking: render ids and read back the pixel under the cursor instead of CPU ray-casting proxies"
@@ -12,7 +12,7 @@
     "rationale": "object-picking: queue an async read-back consumed a frame or two later instead of a synchronous stall"
   },
   {
-    "query": "two surfaces at the same pixel sometimes report the wrong object because both threads pass the depth test and the last one wins — the stored id doesn't match the stored depth",
+    "query": "two surfaces at the same pixel sometimes report the wrong object because both threads pass the depth test and the last one wins. The stored id doesn't match the stored depth",
     "should_trigger": true,
     "split": "train",
     "rationale": "object-picking: atomic-min on depth plus a spinlock so the id stays consistent with the winning depth"
@@ -36,7 +36,7 @@
     "rationale": "selection-highlighting: GatherRed a 2x2 block per instruction and compare neighbor ids to the center"
   },
   {
-    "query": "right now every component type implements its own translate handle and they all behave slightly differently — I want one move/rotate/scale tool that works on splines and regular transforms alike",
+    "query": "right now every component type implements its own translate handle and they all behave slightly differently: I want one move/rotate/scale tool that works on splines and regular transforms alike",
     "should_trigger": true,
     "split": "train",
     "rationale": "manipulation-gizmos: central gizmo, components expose a queried get/set-transform interface"
@@ -60,7 +60,7 @@
     "rationale": "gizmo-math: apply the delta from a stored start parameter and guard near-parallel/degenerate denominators with an epsilon"
   },
   {
-    "query": "our transform handles become tiny and unclickable when the camera pulls back — how do I keep them a constant size on screen",
+    "query": "our transform handles become tiny and unclickable when the camera pulls back. How do I keep them a constant size on screen",
     "should_trigger": true,
     "split": "validation",
     "rationale": "gizmo-math: scale handle geometry by camera distance for constant on-screen pixel size"
@@ -108,13 +108,13 @@
     "rationale": "validation negative: concrete Vulkan barrier how-to -> gpu-rendering-vulkan-guide, not the viewport seam"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "validation"
@@ -126,7 +126,7 @@
     "split": "validation"
   },
   {
-    "query": "I'm building an ECS and can't decide how to store components — should each entity own its components or should I group entities by which components they have?",
+    "query": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
     "rationale": "near miss owned by ecs-guide",
     "should_trigger": false,
     "split": "validation"

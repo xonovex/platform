@@ -1,12 +1,12 @@
 [
   {
-    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code — how should I structure the thing they're editing",
+    "query": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code. How should I structure the thing they're editing",
     "should_trigger": true,
     "split": "train",
     "rationale": "core: visual node-based authoring, graph as data with nodes/pins/wires -> node-model.md"
   },
   {
-    "query": "each box has little sockets on the left and right and I need to stop people from plugging a color output into a number input — what's the right way to validate a connection as they draw it",
+    "query": "each box has little sockets on the left and right and I need to stop people from plugging a color output into a number input. What's the right way to validate a connection as they draw it",
     "should_trigger": true,
     "split": "train",
     "rationale": "typed pins, connection validity checked at author time -> typing-and-connections.md"
@@ -18,7 +18,7 @@
     "rationale": "compile/lower to flattened executable form vs interpret editor graph -> evaluation-and-compilation.md"
   },
   {
-    "query": "some nodes do expensive image filtering and I don't want to recompute them when nothing upstream changed — how do I know a node's result is still valid",
+    "query": "some nodes do expensive image filtering and I don't want to recompute them when nothing upstream changed. How do I know a node's result is still valid",
     "should_trigger": true,
     "split": "train",
     "rationale": "validity-hash caching from node settings + input hashes -> evaluation-and-compilation.md"
@@ -30,7 +30,7 @@
     "rationale": "subgraph encapsulation behind a typed interface, create-from-selection -> subgraphs-and-functions.md"
   },
   {
-    "query": "how do I run a graph that contains other graphs nested inside it without my evaluator having to understand the nesting — can I just inline them before running",
+    "query": "how do I run a graph that contains other graphs nested inside it without my evaluator having to understand the nesting: can I just inline them before running",
     "should_trigger": true,
     "split": "train",
     "rationale": "flatten/inline subgraphs at compile, evaluator sees flat DAG -> subgraphs-and-functions.md"
@@ -48,7 +48,7 @@
     "rationale": "data-driven node-type + wire-type registry extensible by plugins -> authoring-and-introspection.md / node-model.md"
   },
   {
-    "query": "one node should adapt its input and output types depending on what's wired into it — a CPU image vs a GPU image — instead of me making two near-identical nodes",
+    "query": "one node should adapt its input and output types depending on what's wired into it: a CPU image vs a GPU image, instead of me making two near-identical nodes",
     "should_trigger": true,
     "split": "validation",
     "rationale": "polymorphic/variant node resolving pin types from connections -> typing-and-connections.md"
@@ -60,13 +60,13 @@
     "rationale": "terminal/output node hands result to owning system which schedules -> node-model.md (scheduling itself -> gpu-rendering-guide)"
   },
   {
-    "query": "should one graph output just a single texture, or should I bundle the mesh, material, and textures of a whole object into one big graph — what does that decide for my project",
+    "query": "should one graph output just a single texture, or should I bundle the mesh, material, and textures of a whole object into one big graph. What does that decide for my project",
     "should_trigger": true,
     "split": "validation",
     "rationale": "asset granularity fine vs uber-graph, sets project data layout -> authoring-and-introspection.md"
   },
   {
-    "query": "artists can't tell why the final output looks wrong because they can't see the data coming out of any of the intermediate boxes — how do I let them inspect a wire",
+    "query": "artists can't tell why the final output looks wrong because they can't see the data coming out of any of the intermediate boxes. How do I let them inspect a wire",
     "should_trigger": true,
     "split": "validation",
     "rationale": "per-pin introspection / preview of intermediate values -> authoring-and-introspection.md"
@@ -96,25 +96,25 @@
     "rationale": "near-miss: the underlying typed data model / object store -> data-model-guide, not the graph layer on top"
   },
   {
-    "query": "I'm building the core document store for our level editor — objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+    "query": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
     "rationale": "near miss owned by data-model-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes — I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+    "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
     "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data — how should we structure the two forms so editing and loading don't fight each other",
+    "query": "our editor lets artists drop in an FBX or PNG and we want them edited in-tool but shipped as packed GPU-ready data. How should we structure the two forms so editing and loading don't fight each other",
     "rationale": "near miss owned by asset-pipeline-guide",
     "should_trigger": false,
     "split": "validation"
@@ -126,7 +126,7 @@
     "split": "validation"
   },
   {
-    "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset — how should the pipeline handle platforms",
+    "query": "we need to emit different compressed texture formats and byte order per target platform but share one source asset. How should the pipeline handle platforms",
     "rationale": "validation near miss owned by asset-pipeline-guide",
     "should_trigger": false,
     "split": "validation"

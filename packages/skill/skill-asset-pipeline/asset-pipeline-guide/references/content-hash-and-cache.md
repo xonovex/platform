@@ -6,16 +6,16 @@ Compute a content hash over (source bytes + settings + the content hashes of eve
 
 ## Rationale
 
-Once compilation is deterministic, the output is a pure function of its inputs, so the input hash is a complete identity for the output (the same principle Git uses). Keying the cache on it cooks each distinct (input, settings, platform) combination at most once anywhere — a teammate or CI machine that already produced the artifact serves it directly. The hash must fold in dependencies' hashes transitively, not just the direct source, so an upstream change ripples down. The hash must cover everything that can affect the output and nothing that cannot: a path, host name, or timestamp breaks content-addressing and stops two machines from sharing.
+Compilation is deterministic, so the input hash is a complete identity for the output; keying the cache on it cooks each distinct (input, settings, platform) combination at most once. The hash must fold in dependencies' hashes transitively, not just the direct source. It must exclude anything that cannot affect the output: a path, host name, or timestamp breaks content-addressing and stops two machines from sharing.
 
 ## How to Apply
 
 1. For each output, compute a 64-bit (or wider) validity hash from the canonical source content, the canonicalized settings, the target platform, and the validity hashes of each input resource it consumed.
-2. Use that hash as the cache key; look it up before cooking — on a hit, skip the compile and serve the stored artifact; on a miss, cook, store, and serve.
+2. Use that hash as the cache key; look it up before cooking, on a hit, skip the compile and serve the stored artifact; on a miss, cook, store, and serve.
 3. Hash canonical content, never raw memory: avoid struct padding, normalize floating-point representations, sort unordered collections before hashing.
 4. Exclude location and environment from the hash entirely (absolute paths, machine names, wall-clock times) so the key is purely a function of content and settings.
 5. Make the cache shareable: a local disk cache backed by a shared remote store lets one machine's cook satisfy another's lookup; because keys are content-derived, no coordination is needed.
-6. Apply caching selectively — wrap the expensive cooks (compression, mip filtering, mesh optimization) and skip caching nodes whose compute is cheaper than computing and looking up the hash.
+6. Apply caching selectively: wrap the expensive cooks (compression, mip filtering, mesh optimization) and skip caching nodes whose compute is cheaper than computing and looking up the hash.
 
 ## Example
 
@@ -44,8 +44,8 @@ runtime_texture_t cache_get_or_cook(cache_t *c, const image_t *src, tex_settings
 
 ## Gotchas
 
-- A hash that omits a real input (the settings, a dependency, the target platform) serves stale output after that input changes — under-covering the hash is a correctness bug, not a perf bug.
-- A hash that includes irrelevant state (timestamps, absolute paths, host names) over-invalidates and breaks cross-machine sharing — every machine computes a different key for identical content.
+- A hash that omits a real input (the settings, a dependency, the target platform) serves stale output after that input changes: under-covering the hash is a correctness bug, not a perf bug.
+- A hash that includes irrelevant state (timestamps, absolute paths, host names) over-invalidates and breaks cross-machine sharing: every machine computes a different key for identical content.
 - Hashing raw structs drags in uninitialized padding and pointer values; hash canonical serialized content so the same logical input always hashes the same.
 - Caching a node whose work is cheaper than the hash-and-lookup makes things slower; reserve the cache for genuinely heavy steps.
 - A 64-bit hash can collide in principle; for a shared, long-lived cache prefer a wider hash or verify content on hit if a collision would ship wrong data.

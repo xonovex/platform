@@ -24,7 +24,7 @@
       "id": 3,
       "prompt": "I want my game to output real HDR to an HDR10 display. Today I render the scene and present to an 8-bit sRGB swapchain. What do I need to change in the swapchain configuration and the final output pass to get correct HDR on the panel?",
       "assertions": [
-        "Specifies a wide-gamut swapchain: PQ/ST2084 Rec.2020 at 10-bit-or-more per channel (e.g. an A2B10G10R10 packed format) for HDR10, or extended-linear scRGB at FP16 (RGBA16F) — not an 8-bit sRGB backbuffer for the HDR path",
+        "Specifies a wide-gamut swapchain: PQ/ST2084 Rec.2020 at 10-bit-or-more per channel (e.g. an A2B10G10R10 packed format) for HDR10, or extended-linear scRGB at FP16 (RGBA16F), not an 8-bit sRGB backbuffer for the HDR path",
         "Applies the display transfer function exactly once in an explicit final pass and does not rely on an automatic sRGB backbuffer to encode",
         "Scales luminance to the display's actual measured peak nits rather than PQ's full 10,000-nit range"
       ]

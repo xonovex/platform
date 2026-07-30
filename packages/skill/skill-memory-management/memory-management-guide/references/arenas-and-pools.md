@@ -6,7 +6,7 @@ Allocate from arena/bump and pool allocators over contiguous blocks and reclaim 
 
 ## Rationale
 
-An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction, and places objects contiguously. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior — see data-oriented-design-guide — but the allocation strategy is the concern here.)
+An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction, and places objects contiguously. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior, see data-oriented-design-guide, but the allocation strategy is the concern here.)
 
 ## Techniques
 
@@ -14,7 +14,7 @@ An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction
 - **Object pool** - Fixed-size slots for one type; a free list threads through dead slots. O(1) alloc/free, stable storage, no fragmentation.
 - **Lifetime by reset** - Group allocations by lifetime (per-frame, per-level, per-request); reset the arena at the boundary so everything dies at once.
 - **Scratch / temp arena** - A per-cycle arena for transient buffers, reset every cycle, so temporaries never hit the global allocator.
-- **Virtual-memory reserve/commit** - Reserve a huge virtual range once (cheap — no physical pages), commit pages lazily as the arena grows. The block never moves and never reallocs, so pointers/back-pointers into it stay valid as it grows — a growable array with stable addresses. Reset/decommit returns the pages.
+- **Virtual-memory reserve/commit** - Reserve a huge virtual range once (cheap, no physical pages), commit pages lazily as the arena grows. The block never moves and never reallocs, so pointers/back-pointers into it stay valid as it grows. A growable array with stable addresses. Reset/decommit returns the pages.
 
 ## Example
 
@@ -38,9 +38,8 @@ static void arena_reset(arena_t *a) { a->used = 0; }   // free everything, O(1)
 
 ## Gotchas
 
-- Arenas cannot free individual objects; an object outliving its arena's reset is a use-after-free — match lifetimes.
 - Bump allocation has no bounds safety unless you check capacity; always assert/return on overflow.
-- Pointers into a growing/reset arena become invalid — prefer offsets/handles across a boundary. (Exception: a reserve/commit arena never moves, so pointers survive growth; only reset invalidates them.)
+- Pointers into a growing/reset arena become invalid: prefer offsets/handles across a boundary. (Exception: a reserve/commit arena never moves, so pointers survive growth; only reset invalidates them.)
 - Reserve is cheap but not infinite (address space, overcommit/page-table limits); pick a sane ceiling and still assert on commit failure.
 
 ## Related

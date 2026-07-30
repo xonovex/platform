@@ -42,13 +42,13 @@ How to make native C/C++ software portable across operating systems and targets 
 
 ## Gotchas
 
-- A backend that leaks a raw OS handle (file descriptor, window handle, connection) re-couples callers to one platform — keep the type opaque at the interface boundary.
+- A backend that leaks a raw OS handle (file descriptor, window handle, connection) re-couples callers to one platform: keep the type opaque at the interface boundary.
 - Reverse-engineering the abstraction from one platform bakes that platform's assumptions in (one global clipboard, OS-reported relative mouse motion); design the interface before the first backend.
-- A stricter target compiler surfacing new warnings almost always means the warnings were always real — fix `void f()` → `void f(void)`, unused vars, and declaration mismatches rather than suppressing.
+- A stricter target compiler surfacing new warnings almost always means the warnings were always real: fix `void f()` → `void f(void)`, unused vars, and declaration mismatches rather than suppressing.
 - 32-bit pointers (Wasm) silently change struct padding, breaking any hash/`memcmp` keyed on the byte layout; widen keys and re-pad for that build.
 - A blocking `while (running)` loop hangs the browser tab; the browser owns the frame clock, so the frame must be a callback that returns each iteration.
 - `fopen` that "works natively" returns nothing in the browser unless the file was preloaded into the virtual filesystem or fetched asynchronously first.
-- A device node under `/dev/input` is not necessarily the device you want — a keyboard and a gamepad both appear there; verify capability bits before mapping.
+- A device node under `/dev/input` is not necessarily the device you want: a keyboard and a gamepad both appear there; verify capability bits before mapping.
 - Raw `eventN` numbers and per-device axis ranges are not stable or symmetric; bind off the `by-id` symlink and normalize using the queried min/max and `flat` deadzone.
 
 ## Progressive Disclosure

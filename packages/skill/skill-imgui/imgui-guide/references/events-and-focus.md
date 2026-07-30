@@ -2,11 +2,7 @@
 
 ## Guideline
 
-Track keyboard focus as a responder chain (root → focused control) built from an explicit scope stack, trickle events through it by processing them in the `end_*()` functions, and consume an event by clearing its flag. Feed one input event per frame.
-
-## Rationale
-
-With no widget tree to walk, the responder chain is reconstructed from ids and explicit scope tracking. Processing events in `end_*()` runs them in reverse of issue order, giving outer/earlier controls first refusal; clearing the flag consumes the event so nothing else reacts. One event per frame avoids juggling several events' state mutations in a single frame.
+Track keyboard focus as a responder chain (root → focused control) built from an explicit scope stack, trickle events through it by processing them in the `end_*()` functions, and consume an event by clearing its flag. Feed one input event per frame. Processing events in `end_*()` runs them in reverse of issue order, giving outer/earlier controls first refusal; clearing the flag consumes the event so nothing else reacts.
 
 ## How to Apply
 
@@ -31,7 +27,7 @@ void end_pane(ui_o *ui, uint64_t my_id) {
 
 ## Counter-Example
 
-A UI with no keyboard interaction (pure mouse tool palette) needs neither responder chains nor trickling — hover/active ids suffice.
+A UI with no keyboard interaction (pure mouse tool palette) needs neither responder chains nor trickling: hover/active ids suffice.
 
 ## Gotcha
 

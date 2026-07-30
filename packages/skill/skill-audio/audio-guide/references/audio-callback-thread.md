@@ -2,19 +2,17 @@
 
 ## Guideline
 
-Treat the OS audio callback (or the dedicated render thread that feeds it) as a hard real-time context: it must produce a fixed block of samples within a fixed deadline, and must never block, lock, allocate, free, page-fault, log, or make a syscall on its path — do bounded, predictable work only.
+Treat the OS audio callback (or the dedicated render thread that feeds it) as a hard real-time context: it must produce a fixed block of samples within a fixed deadline, and everything it touches must already be allocated and resident (pre-touched) so it never page-faults on its path.
 
 ## Rationale
 
-The device drains its buffer at a constant rate; if the next block isn't ready it replays stale samples or silence, and an audio underrun is immediately and harshly audible — far worse than a dropped render frame. The callback runs on a high-priority thread scheduled just ahead of the device, so any unbounded operation (a lock the game thread holds, a `malloc` that hits the kernel, a page fault, a file read) can stall it past the deadline. Treat it like an interrupt handler: known-bounded work, no waiting on anything another thread might own indefinitely.
+The device drains its buffer at a constant rate; if the next block isn't ready it replays stale samples or silence, and an audio underrun is immediately and harshly audible: far worse than a dropped render frame. The callback runs on a high-priority thread scheduled just ahead of the device, so any unbounded operation can stall it past the deadline.
 
 ## How to Apply
 
 1. Render in fixed-size chunks (a "render quantum") sized to comfortably fit inside the buffer the device drains; everything the callback touches must already be allocated and resident.
 2. Pre-touch and pin all buffers and voice state at startup so the first callback never page-faults; never grow a data structure from inside the callback.
-3. Forbid, on the audio path: `malloc`/`free`, mutexes the game thread can hold, file/network/console I/O, and anything that can sleep unboundedly. Receive all work via a lock-free queue (see command-handoff).
-4. Keep the render loop's worst case bounded: a fixed voice-pool size caps the inner loop, so the per-block cost has a hard ceiling regardless of how many sounds the game requests.
-5. If running a dedicated render thread rather than rendering inside the device callback, give it elevated priority and have it sleep on the device's "buffer low" event, waking only to top up the queue.
+3. If running a dedicated render thread rather than rendering inside the device callback, give it elevated priority and have it sleep on the device's "buffer low" event, waking only to top up the queue.
 
 ## Example
 
@@ -39,11 +37,8 @@ static void render_thread_main(audio_backend_t *backend, mixer_t *mixer) {
 
 ## Gotchas
 
-- A lock is poison even if it is "almost never" contended: the one time the game thread holds it during the callback's deadline, you get an audible dropout — priority inversion makes this worse, not rarer.
-- `malloc`/`free` are not real-time safe; a single allocation that trips the allocator's slow path or the kernel can blow the deadline. Allocate the voice pool and all scratch buffers once, up front.
 - The first touch of a fresh page faults; lazily-allocated buffers underrun on their first use even though "nothing changed." Write to every buffer once at init.
 - Sizing the queue-ahead target too tight invites starvation from ordinary OS scheduling jitter and high-latency devices (USB/Bluetooth audio); too loose adds latency. Tune it against the worst real device, not the dev machine.
-- Don't `printf` or assert from the callback to "debug" a glitch — the I/O itself causes the glitch. Record diagnostics into a preallocated ring and inspect them off-thread.
 
 ## Related
 

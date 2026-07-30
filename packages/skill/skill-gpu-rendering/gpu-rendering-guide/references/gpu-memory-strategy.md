@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Allocate a small number of large GPU memory blocks and sub-allocate resources out of them with correct placement alignment; choose the memory tier by access pattern (device-local for GPU-resident data, host-visible for CPU-written data); upload static data through a staging buffer into device-local memory; keep dynamic per-frame data in persistently-mapped ring buffers — never one allocation per resource.
+Allocate a small number of large GPU memory blocks and sub-allocate resources out of them with correct placement alignment; choose the memory tier by access pattern (device-local for GPU-resident data, host-visible for CPU-written data); upload static data through a staging buffer into device-local memory; keep dynamic per-frame data in persistently-mapped ring buffers, never one allocation per resource.
 
 ## Rationale
 
-On an explicit API the driver does not allocate for you; you pick the tier and place the resource. The device-allocation count is hard-capped (often a few thousand) and each allocation is slow, so one allocation per buffer/image exhausts the limit and stalls. A sub-allocator carves resources out of a handful of big blocks — the same arena/pool principle as CPU allocators, see memory-management-guide. Tiers differ physically: device-local is fast for the GPU but usually not CPU-mappable; host-visible is CPU-writable but slower for the GPU to read. Static assets therefore want a staging copy: write host-visible, then copy into a device-local resource the shaders sample. Dynamic per-frame data (uniforms, instance arrays) lives in a persistently-mapped host-visible ring buffer sized for frames-in-flight: map once, write a fresh sub-range each frame, never re-map. Long-lived sub-allocation fragments, so a defragmentation pass relocates live resources to keep blocks compact. (Per-API memory-type flags, alignment queries, and the staging copy command belong in the per-API skill.)
+On an explicit API the driver does not allocate for you; you pick the tier and place the resource. The device-allocation count is hard-capped (often a few thousand) and each allocation is slow, so one allocation per buffer/image exhausts the limit and stalls. A sub-allocator carves resources out of a handful of big blocks: the same arena/pool principle as CPU allocators, see memory-management-guide. Tiers differ physically: device-local is fast for the GPU but usually not CPU-mappable; host-visible is CPU-writable but slower for the GPU to read. Static assets therefore want a staging copy: write host-visible, then copy into a device-local resource the shaders sample. Dynamic per-frame data (uniforms, instance arrays) lives in a persistently-mapped host-visible ring buffer sized for frames-in-flight: map once, write a fresh sub-range each frame, never re-map. Long-lived sub-allocation fragments, so a defragmentation pass relocates live resources to keep blocks compact. (Per-API memory-type flags, alignment queries, and the staging copy command belong in the per-API skill.)
 
 ## Techniques
 
@@ -44,10 +44,10 @@ memcpy(slot, &per_frame_ubo, sizeof per_frame_ubo);
 
 ## Gotchas
 
-- The device allocation count is capped; per-resource allocation works on small scenes then fails at scale — sub-allocate from the start.
-- Device-local memory is usually not CPU-mappable; writing it directly is invalid — go through staging.
+- The device allocation count is capped; per-resource allocation works on small scenes then fails at scale: sub-allocate from the start.
+- Device-local memory is usually not CPU-mappable; writing it directly is invalid: go through staging.
 - Without host-coherent memory you must flush after writing and invalidate before reading; coherent memory skips this but can be slower for the GPU.
-- Buffer and image alignment requirements differ and some implementations require buffer/image granularity separation within a block — query and respect both.
+- Buffer and image alignment requirements differ and some implementations require buffer/image granularity separation within a block: query and respect both.
 - Writing a ring-buffer sub-range still in use by an in-flight frame races the GPU; size the ring to frames-in-flight and gate on the per-frame fence.
 - Defragmentation invalidates offsets/views that referenced the moved resource; update every binding and view, or you sample stale memory.
 - A buddy/power-of-two block allocator rounds each request up to the next power of two; a 9 MB texture can quietly consume a 16 MB slot. Measure occupancy before assuming the allocator is tight.

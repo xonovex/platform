@@ -15,7 +15,6 @@ description: "Use when designing or refactoring performance-critical data layout
 ## Layout
 
 - **SoA / AoS / AoSoA** - Split structs into per-field arrays for hot loops, see [references/soa-aos-aosoa.md](references/soa-aos-aosoa.md)
-- **Hot/cold splitting** - Keep frequently-touched fields out of cold bytes, see [references/hot-cold-splitting.md](references/hot-cold-splitting.md)
 - **SIMD-friendly layout** - Contiguous columns, padding, alignment for vectorization, see [references/simd-friendly-layout.md](references/simd-friendly-layout.md)
 - **Nested / variable-length arrays** - Hold child lists in bulk arrays + cache-line chunks, not per-object heap pointers, see [references/nested-arrays.md](references/nested-arrays.md)
 
@@ -28,23 +27,21 @@ description: "Use when designing or refactoring performance-critical data layout
 
 ## Memory
 
-- **Handles, not pointers** - Reference by index/generational handle for relocatable, stable arrays, see [references/handles-and-indices.md](references/handles-and-indices.md)
-- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general — see **memory-management-guide**
+- **Handles, not pointers** - Reference by index/handle into relocatable, stable arrays (swap-remove, free lists, indirection tables), see [references/handles-and-indices.md](references/handles-and-indices.md)
+- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general, see **memory-management-guide**
 
 ## Gotchas
 
-- SoA only wins when loops touch a subset of fields; full-record access can favor AoS — measure both.
-- A generational handle prevents use-after-free dangling on swap-remove, but only if you actually compare the generation.
+- SoA only wins when loops touch a subset of fields; full-record access can favor AoS: measure both.
 - The hardware prefetcher tracks linear strides; randomizing your index order silently disables it.
-- Padding for alignment trades memory for throughput — on cache-bound loads, the smaller packed layout can still win.
-- A counter you cache as a raw pointer dangles if its backing array reallocates — hand out indices into a stable block, or pointers into a non-relocating pool.
+- Padding for alignment trades memory for throughput, on cache-bound loads, the smaller packed layout can still win.
+- A counter you cache as a raw pointer dangles if its backing array reallocates: hand out indices into a stable block, or pointers into a non-relocating pool.
 
 ## Progressive Disclosure
 
 - Read [references/cache-behavior.md](references/cache-behavior.md) - Load when reasoning about cache lines, latency, or miss types
 - Read [references/data-as-transforms.md](references/data-as-transforms.md) - Load when modeling a system as bulk streams instead of objects
 - Read [references/soa-aos-aosoa.md](references/soa-aos-aosoa.md) - Load when choosing or converting between AoS, SoA, and AoSoA layouts
-- Read [references/hot-cold-splitting.md](references/hot-cold-splitting.md) - Load when a fat struct drags rarely-used fields through hot loops
 - Read [references/access-patterns.md](references/access-patterns.md) - Load when iterating collections or replacing pointer-chasing structures
 - Read [references/handles-and-indices.md](references/handles-and-indices.md) - Load when designing entity references, stable arrays, or free lists
 - Read [references/existence-based-processing.md](references/existence-based-processing.md) - Load when removing per-item branches by sorting or bucketing

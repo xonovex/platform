@@ -2,6 +2,8 @@
   "name": "xonovex-skill-imgui",
   "version": "5.1.0",
   "description": "Xonovex immediate-mode GUI skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./imgui-guide"]
 }

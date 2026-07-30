@@ -6,21 +6,21 @@ Define node kinds as data a registry consumes (pins, defaults, evaluate callback
 
 ### Rationale
 
-A node graph ships a _toolbox_ rather than a black box — composable parts the author combines into the case-specific solution — which only works if node kinds are data: a plugin registers a node (pins, defaults, evaluate callback) and a new wire type, and the editor and evaluator pick them up with no core change. Inline constant defaults keep simple graphs readable — most inputs are literals. Asset granularity is a deliberate lever: a graph outputting a single image or material stays fine-grained and shareable across objects, while a graph free to output more becomes a coarser "uber-graph" bundling mesh, material, and textures — appropriate for terrain sculpt/paint maps, generated vertex data such as UV-unwraps, or particle-state buffers in a VFX system, where the data is intrinsically per-object. Granularity sets the project's data layout, so it is a design decision. Introspection addresses the two recurring pains — discoverability (which nodes fit together) and seeing the data at an intermediate node — so per-pin preview is not a luxury. Hot-iteration re-evaluates on change.
+A node graph ships a _toolbox_ rather than a black box: composable parts the author combines into the case-specific solution. Which only works if node kinds are data: a plugin registers a node (pins, defaults, evaluate callback) and a new wire type, and the editor and evaluator pick them up with no core change. Inline constant defaults keep simple graphs readable. Most inputs are literals. Asset granularity is a deliberate lever: a graph outputting a single image or material stays fine-grained and shareable across objects, while a graph free to output more becomes a coarser "uber-graph" bundling mesh, material, and textures. Appropriate for terrain sculpt/paint maps, generated vertex data such as UV-unwraps, or particle-state buffers in a VFX system, where the data is intrinsically per-object. Granularity sets the project's data layout, so it is a design decision. Introspection addresses the two recurring pains: discoverability (which nodes fit together) and seeing the data at an intermediate node, so per-pin preview is not a luxury. Hot-iteration re-evaluates on change.
 
 ### How to Apply
 
-1. Register each node kind as data: its input/output pins, per-input default constants, settings schema, and an evaluate callback — keep the core registry-driven so plugins add nodes and wire types.
+1. Register each node kind as data: its input/output pins, per-input default constants, settings schema, and an evaluate callback. Keep the core registry-driven so plugins add nodes and wire types.
 2. For each input pin, store a default constant edited inline in the node; when no wire feeds the pin, evaluation uses the default.
 3. Distinguish "deliberately constant" from "unwired by mistake" in the UI (e.g. a visibly empty connector) so missing wires are not mistaken for intent.
-4. Let a graph output one resource (fine granularity, shareable) or many (coarse uber-graph); pick per asset, knowing it sets the project's data layout — keep immutable, broadly shared assets fine-grained.
+4. Let a graph output one resource (fine granularity, shareable) or many (coarse uber-graph); pick per asset, knowing it sets the project's data layout: keep immutable, broadly shared assets fine-grained.
 5. Build introspection: let the author select any pin and preview the value flowing through it; show which node kinds are compatible to aid discoverability.
 6. Support hot-iteration: on edit, recompile (re-flatten + re-sort) and re-evaluate only what the validity hashes show changed (see evaluation-and-compilation.md).
 
 ### Example
 
 ```c
-// Node kinds are DATA in a registry — plugins extend the toolbox, core untouched.
+// Node kinds are DATA in a registry: plugins extend the toolbox, core untouched.
 typedef struct node_type_t {
     uint64_t    type_hash;
     const char *category;                 // grouping for discoverability in the picker
@@ -44,9 +44,9 @@ void register_node_type(registry_t *r, const node_type_t *t); // any plugin may 
 
 - An unwired input quietly using its default hides a forgotten connection; make "no wire" visually distinct from "constant on purpose".
 - A coarse uber-graph that bundles a shared texture with per-object data makes that texture unshareable; keep immutable, broadly shared assets in their own fine-grained graphs.
-- Granularity is not free-form polish — it sets the project's data layout, so changing it late forces re-authoring; decide it up front (see data-model-guide).
+- Granularity is not free-form polish. It sets the project's data layout, so changing it late forces re-authoring; decide it up front (see data-model-guide).
 - Discoverability degrades as the toolbox grows; without categories and compatibility hints, authors cannot find or correctly combine nodes.
-- No intermediate-value preview means a wrong result is undebuggable — you cannot tell which node along the chain produced bad data; build per-pin introspection early.
+- No intermediate-value preview means a wrong result is undebuggable. You cannot tell which node along the chain produced bad data; build per-pin introspection early.
 - Hot-iteration that recompiles the whole graph on every keystroke stalls the editor; gate re-evaluation on validity-hash changes so only affected nodes rerun.
 
 ### Related

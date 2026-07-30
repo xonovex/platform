@@ -6,9 +6,9 @@ A lock is often the right answer; when you spin, spin politely (test-and-test-an
 
 ## Rationale
 
-Lock-free is not automatically better — an uncontended or well-designed lock is frequently faster and always simpler. The performance failures of locks come from _how_ threads wait: a naive spinlock that hammers an atomic exchange in a tight loop saturates the coherence bus and starves the holder. The fixes are well known; pick by contention level and wait duration.
+Lock-free is not automatically better. An uncontended or well-designed lock is frequently faster and always simpler. The performance failures of locks come from _how_ threads wait: a naive spinlock that hammers an atomic exchange in a tight loop saturates the coherence bus and starves the holder. The fixes are well known; pick by contention level and wait duration.
 
-## Spinlock — test-and-test-and-set with backoff
+## Spinlock: test-and-test-and-set with backoff
 
 ```c
 #include <stdatomic.h>
@@ -46,20 +46,20 @@ void spin_unlock(atomic_bool *l) {
 }
 ```
 
-## Lock varieties — pick by contention and pattern
+## Lock varieties: pick by contention and pattern
 
 - **TTAS spinlock + backoff:** short critical sections, low/medium contention. Simple, but all waiters still contend on one line.
-- **Ticket lock:** FIFO fairness — take a `fetch_add` ticket, wait until `now_serving` equals it. Fair, but every waiter spins on the same `now_serving` line (cache-line bouncing under high contention).
+- **Ticket lock:** FIFO fairness: take a `fetch_add` ticket, wait until `now_serving` equals it. Fair, but every waiter spins on the same `now_serving` line (cache-line bouncing under high contention).
 - **MCS lock:** each waiter spins on its _own_ queue node's flag; the unlocker hands off to the next node. No global bouncing, scales to many cores; needs a per-acquire node (often stack-local).
 - **CLH lock:** like MCS but each waiter spins on its _predecessor's_ node; slightly simpler, implicit queue. Both MCS and CLH are the scalable choice for contended locks.
-- **Seqlock:** read-mostly data. Writer bumps an even→odd→even counter around its update; readers snapshot the counter, read, and retry if it changed or was odd. Lock-free, wait-free reads with no writer-visible cost — but readers must tolerate reading torn data and retrying, so the protected data must be trivially copyable.
+- **Seqlock:** read-mostly data. Writer bumps an even→odd→even counter around its update; readers snapshot the counter, read, and retry if it changed or was odd. Lock-free, wait-free reads with no writer-visible cost, but readers must tolerate reading torn data and retrying, so the protected data must be trivially copyable.
 - **rwlock:** many readers / occasional writer when readers must _block_ writers (can't just retry). Heavier than a seqlock; prefer seqlock or RCU when readers dominate.
 - **Eventcount:** lets threads _block_ (futex/condvar) when there's no work instead of burning CPU spinning, while keeping a lock-free fast path. The right pattern for an idle worker pool: spin briefly, then sleep on the eventcount until producers signal.
 
 ## Gotchas
 
 - A spinlock is correct only if the holder cannot be preempted for long; on a loaded machine prefer a blocking mutex or an eventcount so a descheduled holder doesn't make others burn cycles.
-- `pause`/`yield` are not optional micro-optimizations on hyperthreaded cores — without them spinning starves the sibling thread (which may be the holder).
+- `pause`/`yield` are not optional micro-optimizations on hyperthreaded cores, without them spinning starves the sibling thread (which may be the holder).
 - Always `release` on unlock and `acquire` on lock; that pairing is what publishes the critical section's writes to the next holder.
 
 ## Related

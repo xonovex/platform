@@ -2,11 +2,11 @@
 
 ## Guideline
 
-Let rendering-relevant components implement renderer-facing interfaces, cull once per viewer into a visibility bitmask, and extend the render graph by injecting modules — rather than walking a scene graph or pushing draw calls per object.
+Let rendering-relevant components implement renderer-facing interfaces, cull once per viewer into a visibility bitmask, and extend the render graph by injecting modules, rather than walking a scene graph or pushing draw calls per object.
 
 ## Rationale
 
-Expressing "which viewers see this object" as bits lets a single parallel pass per component type visit each renderable once for all viewers (which is what makes per-camera state mutation safe). Plugin interfaces keep the core renderer ignorant of specific component types, so new renderable kinds need no core changes.
+Expressing "which viewers see this object" as bits lets a single parallel pass per component type visit each renderable once for all viewers, instead of re-traversing the scene once per camera.
 
 ## How to Apply
 
@@ -31,7 +31,7 @@ for_each_camera(c) for_each_object(o) { o->lod = pick_lod(o, c); draw(o, c); }
 
 ## Counter-Example
 
-A single-camera, low-object-count tool view doesn't need bitmask visibility or multi-viewer machinery — a straight cull-and-draw is clearer. The bitmask model earns its keep with multiple simultaneous viewers.
+A single-camera, low-object-count tool view doesn't need bitmask visibility or multi-viewer machinery. A straight cull-and-draw is clearer. The bitmask model earns its keep with multiple simultaneous viewers.
 
 ## Related
 

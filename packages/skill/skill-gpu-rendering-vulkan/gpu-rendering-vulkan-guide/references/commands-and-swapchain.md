@@ -6,7 +6,7 @@ Allocate command buffers from one `VkCommandPool` per recording thread per frame
 
 ## Rationale
 
-A `VkCommandPool` is externally synchronized and frees buffers cheaply only as a whole (`vkResetCommandPool` / `vkResetCommandBuffer`), so the efficient model is one pool per (thread × frame slot): record, submit, and later reset the whole pool in O(1) once the GPU is done — proven done by the slot's `VkFence`. Keeping 2–3 frame slots in flight lets the CPU record slot i while the GPU runs slot i-1. Recording parallelizes: worker threads each fill a secondary `VkCommandBuffer` from their own pool, and a primary buffer runs them with `vkCmdExecuteCommands`. The swapchain ties it together — `vkAcquireNextImageKHR` returns an image index and signals an image-available semaphore, you render into that image, then `vkQueuePresentKHR` waits the render-finished semaphore. The agnostic frames-in-flight model is in gpu-rendering-guide (command-recording-and-frames).
+A `VkCommandPool` is externally synchronized and frees buffers cheaply only as a whole (`vkResetCommandPool` / `vkResetCommandBuffer`), so the efficient model is one pool per (thread × frame slot): record, submit, and later reset the whole pool in O(1) once the GPU is done. Proven done by the slot's `VkFence`. Keeping 2–3 frame slots in flight lets the CPU record slot i while the GPU runs slot i-1. Recording parallelizes: worker threads each fill a secondary `VkCommandBuffer` from their own pool, and a primary buffer runs them with `vkCmdExecuteCommands`. The swapchain ties it together: `vkAcquireNextImageKHR` returns an image index and signals an image-available semaphore, you render into that image, then `vkQueuePresentKHR` waits the render-finished semaphore. The agnostic frames-in-flight model is in gpu-rendering-guide (command-recording-and-frames).
 
 ## Techniques
 
@@ -64,10 +64,10 @@ void draw_frame(uint64_t frame) {
 
 ## Gotchas
 
-- Resetting a pool or recording into a buffer whose previous submission's fence has not signaled corrupts in-flight GPU work — always gate on the slot fence.
-- A `VkCommandPool` is not thread-safe; two threads recording from one pool race — one pool per thread.
+- Resetting a pool or recording into a buffer whose previous submission's fence has not signaled corrupts in-flight GPU work, always gate on the slot fence.
+- A `VkCommandPool` is not thread-safe; two threads recording from one pool race. One pool per thread.
 - Waiting on the fence you just submitted (not the slot about to be reused) collapses frames-in-flight into a stall.
-- Ignoring `VK_SUBOPTIMAL_KHR`/`VK_ERROR_OUT_OF_DATE_KHR` from acquire or present leaves a stale swapchain after resize — recreate it (and never present into a stale image).
+- Ignoring `VK_SUBOPTIMAL_KHR`/`VK_ERROR_OUT_OF_DATE_KHR` from acquire or present leaves a stale swapchain after resize: recreate it (and never present into a stale image).
 - The image-available semaphore must be one not currently pending on another acquire; using a per-frame-slot semaphore avoids reusing one mid-flight.
 
 ## Related

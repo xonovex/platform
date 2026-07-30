@@ -1,12 +1,16 @@
 # mpmc-bounded-queue: Bounded MPMC Queue
 
+## Contents
+
+[Guideline](#guideline) · [Rationale](#rationale) · [How it works](#how-it-works) · [Example](#example) · [Gotchas](#gotchas) · [Related](#related)
+
 ## Guideline
 
 For the general multi-producer/multi-consumer case, use a bounded queue: a power-of-two array of cells, each carrying its own sequence number, with a CAS on the position counter to claim a slot. It is fast, ABA-free, and needs no node allocation or reclamation.
 
 ## Rationale
 
-A naive MPMC queue built from a linked list pays for allocation, CAS contention, _and_ the ABA / reclamation problem. This design sidesteps all three: storage is a fixed ring, so nothing is ever freed; each cell's sequence number encodes "whose turn it is", so producers and consumers never collide on the same cell; and the only contended atomic is a position counter advanced by CAS. The per-cell sequence makes ABA impossible without tagging — the number only ever moves forward.
+A naive MPMC queue built from a linked list pays for allocation, CAS contention, _and_ the ABA / reclamation problem. This design sidesteps all three: storage is a fixed ring, so nothing is ever freed; each cell's sequence number encodes "whose turn it is", so producers and consumers never collide on the same cell; and the only contended atomic is a position counter advanced by CAS. The per-cell sequence makes ABA impossible without tagging: the number only ever moves forward.
 
 ## How it works
 
@@ -95,7 +99,7 @@ bool mpmc_dequeue(mpmc_queue_t *q, void **out) {
 
 ## Gotchas
 
-- Size must be a power of two; `mask` does the wrap. The capacity is the array size — it is genuinely bounded (returns false when full).
+- Size must be a power of two; `mask` does the wrap. The capacity is the array size. It is genuinely bounded (returns false when full).
 - `enqueue_pos` and `dequeue_pos` must live on separate cache lines or producers and consumers false-share them.
 - Use `intptr_t` for the `diff` so wraparound of the unsigned positions compares correctly as a signed difference.
 

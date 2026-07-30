@@ -6,13 +6,13 @@
     "rationale": "direct: acquire/release publish-consume ordering"
   },
   {
-    "query": "my pop() in this CAS stack occasionally reads garbage from a node — is this the ABA thing?",
+    "query": "my pop() in this CAS stack occasionally reads garbage from a node: is this the ABA thing?",
     "should_trigger": true,
     "split": "train",
     "rationale": "Treiber stack + ABA / use-after-free without naming lock-free"
   },
   {
-    "query": "I have 8 worker threads each bumping its slot in a counters[] array and it's somehow slower than a single global atomic — why?",
+    "query": "I have 8 worker threads each bumping its slot in a counters[] array and it's somehow slower than a single global atomic: why?",
     "should_trigger": true,
     "split": "train",
     "rationale": "false sharing, described by symptom"
@@ -24,7 +24,7 @@
     "rationale": "MPMC bounded queue, doesn't say lock-free"
   },
   {
-    "query": "the audio thread can't take a lock — build me a single-producer single-consumer ring for samples",
+    "query": "the audio thread can't take a lock: build me a single-producer single-consumer ring for samples",
     "should_trigger": true,
     "split": "train",
     "rationale": "SPSC ring buffer"
@@ -36,7 +36,7 @@
     "rationale": "safe memory reclamation, hazard pointers/epoch"
   },
   {
-    "query": "this spinlock pegs all cores under contention — how do I make threads back off or use a scalable queue lock?",
+    "query": "this spinlock pegs all cores under contention. How do I make threads back off or use a scalable queue lock?",
     "should_trigger": true,
     "split": "train",
     "rationale": "backoff + MCS/CLH locks"
@@ -60,7 +60,7 @@
     "rationale": "near-miss: C99 style, use c99-opinionated-guide"
   },
   {
-    "query": "I think I need a compare-exchange loop to atomically clamp a shared max value — show the weak vs strong choice",
+    "query": "I think I need a compare-exchange loop to atomically clamp a shared max value: show the weak vs strong choice",
     "should_trigger": true,
     "split": "train",
     "rationale": "CAS loop, weak vs strong"
@@ -72,7 +72,7 @@
     "rationale": "memory model: volatile is not atomic"
   },
   {
-    "query": "many threads log into one collector thread — what queue avoids producer-side CAS contention?",
+    "query": "many threads log into one collector thread: what queue avoids producer-side CAS contention?",
     "should_trigger": true,
     "split": "validation",
     "rationale": "MPSC Vyukov queue, implicit"
@@ -102,19 +102,19 @@
     "rationale": "near-miss: single-threaded SIMD alignment, not concurrency"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "our exporter crashes opening the second project but the first one is fine — where do I even start",
+    "query": "our exporter crashes opening the second project but the first one is fine, where do I even start",
     "rationale": "near miss owned by debugging-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "my sound randomly cuts out with a little pop when the frame rate dips — the mixing happens in a callback that sometimes grabs a mutex",
+    "query": "my sound randomly cuts out with a little pop when the frame rate dips: the mixing happens in a callback that sometimes grabs a mutex",
     "rationale": "near miss owned by audio-guide",
     "should_trigger": false,
     "split": "validation"

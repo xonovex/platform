@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-lock-free",
   "version": "5.1.0",
+  "description": "Xonovex Lock-free / wait-free concurrency skills",
   "private": true,
   "type": "module",
   "keywords": [

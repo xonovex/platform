@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-data-model",
   "version": "5.1.0",
+  "description": "Xonovex Data-model skills",
   "private": true,
   "type": "module",
   "keywords": [

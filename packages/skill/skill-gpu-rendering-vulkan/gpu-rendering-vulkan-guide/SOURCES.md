@@ -19,8 +19,8 @@
 ## Khronos Vulkan-Guide and Vulkan-Samples
 
 - **URLs:**
-  - Khronos Vulkan-Guide — https://docs.vulkan.org/guide/latest/
-  - Khronos Vulkan-Samples — https://github.com/KhronosGroup/Vulkan-Samples
+  - Khronos Vulkan-Guide: https://docs.vulkan.org/guide/latest/
+  - Khronos Vulkan-Samples: https://github.com/KhronosGroup/Vulkan-Samples
 - **Last reviewed:** 2026-05-27
 - **Used for:**
   - `SKILL.md` → Setup, Pipelines & binding, Commands & present
@@ -43,7 +43,7 @@
 ## GPU memory allocator documentation
 
 - **URLs:**
-  - Vulkan memory allocator documentation — https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/index.html
+  - Vulkan memory allocator documentation: https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/index.html
   - https://gpuopen-librariesandsdks.github.io/VulkanMemoryAllocator/html/
 - **Last reviewed:** 2026-05-27
 - **Used for:**
@@ -60,11 +60,11 @@
   - `SKILL.md` → Pipelines & binding, Commands & present, Setup (device memory)
   - Shipped Vulkan practice for descriptor management, command-buffer lifecycle, pipeline caching, and device-memory allocation
 - **Aspects extracted:**
-  - "Moving the engine to Bindless" — one global `VkDescriptorSet` with a large array per resource class, array index embedded in the resource handle, fence-deferred slot release, device-limit clamping, fallback "null" resources → `references/descriptors.md`
-  - "Vulkan: Descriptor Sets Management" — shared sets as read-only blueprints, per-job `VkDescriptorPool` + lazy `VkCopyDescriptorSet`, whole-pool recycling to avoid fragmentation → `references/descriptors.md`
-  - "Vulkan: Command Buffer Management" — pool per worker thread, fence-gated deferred resource deletion, recycling whole reset pools into a free pool-of-pools, primary/secondary split → `references/commands-and-swapchain.md`
-  - "Vulkan: Pipelines and Render States" — deferred pipeline creation hashed on (formats, shader, state overrides), worker-thread-local staging merged post-frame, stacked render-state override blocks (last-wins, dynamic vs static) → `references/pipelines.md`
-  - "Device Memory Management" — buddy 256 MB blocks ≤ block size vs dedicated above, linear staging allocator recycled by fence, tagged allocations + early visual debugging → `references/device-memory.md`
+  - "Moving the engine to Bindless": one global `VkDescriptorSet` with a large array per resource class, array index embedded in the resource handle, fence-deferred slot release, device-limit clamping, fallback "null" resources → `references/descriptors.md`
+  - "Vulkan: Descriptor Sets Management": shared sets as read-only blueprints, per-job `VkDescriptorPool` + lazy `VkCopyDescriptorSet`, whole-pool recycling to avoid fragmentation → `references/descriptors.md`
+  - "Vulkan: Command Buffer Management": pool per worker thread, fence-gated deferred resource deletion, recycling whole reset pools into a free pool-of-pools, primary/secondary split → `references/commands-and-swapchain.md`
+  - "Vulkan: Pipelines and Render States": deferred pipeline creation hashed on (formats, shader, state overrides), worker-thread-local staging merged post-frame, stacked render-state override blocks (last-wins, dynamic vs static) → `references/pipelines.md`
+  - "Device Memory Management": buddy 256 MB blocks ≤ block size vs dedicated above, linear staging allocator recycled by fence, tagged allocations + early visual debugging → `references/device-memory.md`
 
 ## Refresh Workflow
 
