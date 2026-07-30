@@ -1,12 +1,9 @@
 {
   "name": "@xonovex/skill-lua",
   "version": "5.1.0",
+  "description": "Xonovex Lua skills",
   "private": true,
   "type": "module",
-  "dependencies": {
-    "@xonovex/skill-fp": "5.1.0",
-    "@xonovex/skill-oop": "5.1.0"
-  },
   "keywords": [
     "xonovex",
     "skill",

@@ -1,6 +1,6 @@
 # islands-architecture: Islands Architecture and Hydration
 
-Astro components render to static HTML with zero JS. Framework components ship no JavaScript until marked with a `client:*` directive — pick the cheapest one that works.
+Astro components render to static HTML with zero JS. Framework components ship no JavaScript until marked with a `client:*` directive: pick the cheapest one that works.
 
 ```astro
 ---
@@ -17,8 +17,6 @@ import SearchBar from "../components/SearchBar.tsx";
 </Layout>
 ```
 
-- `client:load` — hydrate immediately (critical interactivity)
-- `client:idle` — hydrate on browser idle (lower priority)
-- `client:visible` — hydrate on viewport entry (below-the-fold)
-- `client:media={query}` — hydrate when the media query matches
-- `client:only={framework}` — skip SSR, render client-side only
+- `client:load`: hydrate immediately (critical interactivity)
+- `client:idle`: hydrate on browser idle (lower priority)
+- `client:media={query}`: hydrate when the media query matches

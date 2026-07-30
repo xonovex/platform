@@ -20,7 +20,7 @@ were distilled from conference-talk material on modern, data-oriented C.
   - The legacy-libc trap (`strlen`/`strtok` terminator rescans, the GTA Online JSON-load O(n²) case) and the owning-vs-non-owning string split → already covered in `references/string-views.md`
 
 The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, stb_ds-style
-meta-header dynamic arrays) from the same talks are intentionally **excluded** — out of scope
+meta-header dynamic arrays) from the same talks are intentionally **excluded**, out of scope
 for this C99 guide.
 
 ## Guide-level synthesis

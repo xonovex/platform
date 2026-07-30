@@ -10,4 +10,4 @@ a, b = b, a                                             -- swap via tuple assign
 local x, y, z = table.unpack(position)                  -- 5.4: table.unpack, not global unpack
 ```
 
-The `and`/`or` ternary is broken when `true_value` can itself be `false`/`nil` — use an `if` then.
+The `and`/`or` ternary is broken when `true_value` can itself be `false`/`nil`: use an `if` then.

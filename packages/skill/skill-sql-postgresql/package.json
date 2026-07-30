@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-sql-postgresql",
   "version": "5.1.0",
+  "description": "Xonovex PostgreSQL skills",
   "private": true,
   "type": "module",
   "keywords": [

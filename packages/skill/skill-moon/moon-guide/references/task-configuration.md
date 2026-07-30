@@ -22,8 +22,8 @@ tasks:
 
 ## command vs script (Moon 2.0)
 
-- `command:` — simple executable + args only, no shell features.
-- `script:` — shell commands with pipes (`|`), redirects (`>`), chaining (`&&`), variable expansion. Use `script:` whenever shell features appear.
+- `command:`: simple executable + args only, no shell features.
+- `script:`: shell commands with pipes (`|`), redirects (`>`), chaining (`&&`), variable expansion. Use `script:` whenever shell features appear.
 
 ```yaml
 command: [go, build, ./...]
@@ -32,12 +32,12 @@ script: mkdir -p bin && go build -o bin/app ./cmd/...
 
 ## Core settings
 
-- `inputs:` — files/globs that affect caching and invalidation.
-- `outputs:` — directories/files produced, cached and restored.
-- `deps:` — `~:task` (same project), `^:task` (upstream), or `project:task`; use `{target, optional: true}` for deps that may not exist.
-- `options:` — `runInCI`, `persistent`, `shell`, `cache`, and merge strategies (`merge`, `mergeArgs`, `mergeDeps`, `mergeEnv`, `mergeInputs`, `mergeOutputs`, `mergeToolchains` — each `append`/`prepend`/`replace`/`preserve`).
-- `env:` — task environment variables.
-- `toolchains:` — execution-environment constraint (replaces v1 `platform`).
+- `inputs:`: files/globs that affect caching and invalidation.
+- `outputs:`: directories/files produced, cached and restored.
+- `deps:`: `~:task` (same project), `^:task` (upstream), or `project:task`; use `{target, optional: true}` for deps that may not exist.
+- `options:`: `runInCI`, `persistent`, `shell`, `cache`, and merge strategies (`merge`, `mergeArgs`, `mergeDeps`, `mergeEnv`, `mergeInputs`, `mergeOutputs`, `mergeToolchains`: each `append`/`prepend`/`replace`/`preserve`).
+- `env:`: task environment variables.
+- `toolchains:`: execution-environment constraint (replaces v1 `platform`).
 
 ## Shell & env (Moon 2.0)
 

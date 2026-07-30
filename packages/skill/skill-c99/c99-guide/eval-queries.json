@@ -66,7 +66,7 @@
     "split": "train"
   },
   {
-    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c — the rest of the project uses _sse4 and _avx2 suffixes",
+    "query": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "train"
@@ -90,7 +90,7 @@
     "split": "validation"
   },
   {
-    "query": "review the file naming under src/comms/ — looks inconsistent with the rest",
+    "query": "review the file naming under src/comms/: looks inconsistent with the rest",
     "rationale": "near miss owned by c99-opinionated-guide",
     "should_trigger": false,
     "split": "validation"

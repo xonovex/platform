@@ -13,15 +13,15 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 
 - **Target-based builds** - Use targets, no global include/link dirs, see [references/target-types.md](references/target-types.md), [references/compile-options.md](references/compile-options.md)
 - **Visibility specifiers** - Use PUBLIC/PRIVATE/INTERFACE correctly, see [references/visibility-specifiers.md](references/visibility-specifiers.md)
-- **Dependencies** - Declare explicitly with FetchContent/find_package, see [references/find-package.md](references/find-package.md), [references/fetchcontent.md](references/fetchcontent.md)
+- **Dependencies** - Declare explicitly with find_package, see [references/find-package.md](references/find-package.md)
 - **Testing** - Enable testing with CTest, see [references/testing.md](references/testing.md)
 - **Project structure** - Organize multi-directory projects, see [references/project-structure.md](references/project-structure.md)
 
 ## Gotchas
 
-- `target_link_libraries` scope matters: PRIVATE = consumers don't see it, INTERFACE = no compile, PUBLIC = both — wrong scope leaks transitive deps
+- `target_link_libraries` scope matters: PRIVATE = consumers don't see it, INTERFACE = no compile, PUBLIC = both. Wrong scope leaks transitive deps
 - `find_package` may use PATHS or HINTS but ignores both if a config file is on a system path; use `<Pkg>_ROOT` env var to force-locate
-- Generator expressions (`$<CONFIG:Debug>`) only evaluate at build time — debugging by `message()` won't show their final values
+- Generator expressions (`$<CONFIG:Debug>`) only evaluate at build time: debugging by `message()` won't show their final values
 - `CMAKE_INSTALL_PREFIX` is captured at configure time; changing it after first config requires a clean reconfigure
 
 ## Progressive disclosure
@@ -30,7 +30,6 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 - Read [references/visibility-specifiers.md](references/visibility-specifiers.md) - Load when deciding PUBLIC vs PRIVATE vs INTERFACE
 - Read [references/compile-options.md](references/compile-options.md) - Load when adding compiler flags to targets
 - Read [references/find-package.md](references/find-package.md) - Load when integrating external dependencies
-- Read [references/fetchcontent.md](references/fetchcontent.md) - Load when vendoring dependencies from git/archives
 - Read [references/testing.md](references/testing.md) - Load when setting up CTest or test targets
 - Read [references/project-structure.md](references/project-structure.md) - Load when organizing multi-directory CMake projects
 - Read [references/generator-expressions.md](references/generator-expressions.md) - Load when using conditional build configuration

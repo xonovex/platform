@@ -60,8 +60,8 @@
     "split": "train"
   },
   {
-    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
-    "rationale": "near miss: hosted CI pipeline composition, not cluster manifests",
+    "query": "compose GitHub Actions workflows from reusable workflows and pin every action to a commit SHA",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -84,8 +84,8 @@
     "split": "validation"
   },
   {
-    "query": "is this a flaky emulator (device offline) or a real test failure?",
-    "rationale": "near miss: mobile CI test triage, not Kubernetes",
+    "query": "is this GitLab CI job failing from a runner outage or a real test failure?",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
     "split": "validation"
   },

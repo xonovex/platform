@@ -60,8 +60,8 @@
     "split": "train"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Write a typed Result wrapper and an exhaustive switch over our domain error union in a Node ESM library module.",
+    "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -84,8 +84,8 @@
     "split": "validation"
   },
   {
-    "query": "Validate Express route params and JSON bodies at the boundary, return field-level 400 responses, and pass typed values to the service layer.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Write the SQL migration and supporting indexes for the users table these API routes read from.",
+    "rationale": "near miss owned by sql-postgresql-guide",
     "should_trigger": false,
     "split": "validation"
   },

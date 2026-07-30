@@ -5,6 +5,5 @@
   "author": {
     "name": "Xonovex"
   },
-  "skills": "./lua-guide",
-  "dependencies": ["xonovex-skill-fp", "xonovex-skill-oop"]
+  "skills": "./lua-guide"
 }

@@ -24,9 +24,9 @@ inheritedBy:
 
 ## inheritedBy matching
 
-- `toolchain:` — project's language toolchain (go, typescript, rust).
-- `layer:` — project's layer (library, application, configuration).
-- `tag:` — any tag in the project's `tags` array.
+- `toolchain:`: project's language toolchain (go, typescript, rust).
+- `layer:`: project's layer (library, application, configuration).
+- `tag:`: any tag in the project's `tags` array.
 - Multiple criteria = AND (all must match).
 
 ## extends & merging
@@ -35,7 +35,7 @@ Configs merge sequentially: global → extends → local.
 
 - `extends: ./tag-go.yml` inherits all tasks; redefine a task in the extending file to override.
 - **fileGroups** and **command arrays** merge (use `script:` to fully replace an inherited command).
-- `args`, `deps`, `env`, `inputs`, `outputs`, `toolchains` merge via strategy: `append` (default, local after inherited), `prepend` (local before), `replace` (local replaces), `preserve` (inherited wins). Set per-key (`mergeDeps`, `mergeArgs`, …) or blanket via `merge`.
+- `args`, `deps`, `env`, `inputs`, `outputs`, `toolchains` merge via strategy: `append` (default, local after inherited), `prepend` (local before), `replace` (local replaces), `preserve` (inherited wins). Set per-key (`mergeDeps`, `mergeArgs`, ...) or blanket via `merge`.
 
 ```yaml
 # override deps only, inheriting command/options

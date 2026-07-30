@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-cmake",
   "version": "5.1.0",
+  "description": "Xonovex CMake skills",
   "private": true,
   "type": "module",
   "keywords": [

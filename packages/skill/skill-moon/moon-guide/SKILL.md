@@ -30,9 +30,9 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 
 ## Gotchas
 
-- Task inheritance flows from `.moon/tasks/*.yml` (by tag/language) → project `moon.yml` — overriding requires the same task key in the project file
-- Implicit task dependencies via `deps:` are project-scoped — cross-project deps need `<project>:<task>` syntax
-- `moon ci` skips persistent server tasks (`preset: 'server'`) and any task with `options.runInCI: false` — never gate CI-only checks behind a non-CI task
+- Task inheritance flows from `.moon/tasks/*.yml` (by tag/language) → project `moon.yml`: overriding requires the same task key in the project file
+- Implicit task dependencies via `deps:` are project-scoped: cross-project deps need `<project>:<task>` syntax
+- `moon ci` skips persistent server tasks (`preset: 'server'`) and any task with `options.runInCI: false`, never gate CI-only checks behind a non-CI task
 - Project tags drive task inheritance; misspelling a tag silently disables the inherited tasks for that project
 
 ## Progressive disclosure
@@ -44,7 +44,3 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 - Read [references/project-constraints.md](references/project-constraints.md) - Load when enforcing project boundaries
 - Read [references/migration-v2.md](references/migration-v2.md) - Load when migrating from moon v1 to v2
 - Read [references/docker-multistage.md](references/docker-multistage.md) - Load when building Docker images with moon scaffold
-
-## External References
-
-- [Moon 2.0 Migration Guide](https://moonrepo.dev/docs/migrate/2.0)

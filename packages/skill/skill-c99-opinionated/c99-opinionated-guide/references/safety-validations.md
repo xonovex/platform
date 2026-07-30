@@ -21,5 +21,7 @@ vec3_t vec3_normalize(const vec3_t *v) {
 ```
 
 - Multiplication overflow: test `count > SIZE_MAX / size` before `count * size`.
-- Bounded containers: keep `data + count + capacity` together and gate every access through a checked accessor — a raw `T*` plus a separate, unenforced length is the bug surface this removes.
-- Handle/index resolution: resolve a stored index/handle against the live `count` (and generation, if slots recycle) before dereferencing — see [references/handles-and-indices.md](./handles-and-indices.md).
+- Bounded containers: keep `data + count + capacity` together and gate every access through a checked accessor. A raw `T*` plus a separate, unenforced length is the bug surface this removes.
+- Caller-provided storage: expose a `size_t *_req(...)` query beside the matching `*_init(T *state, void *memory, size_t memory_size)` layout calculation; include alignment padding, then validate pointer, size, and alignment before placement.
+- Scratch buffers: pass `void *scratch, size_t scratch_size` explicitly and document whether input, output, and scratch may overlap; do not apply `restrict` assumptions when overlap is allowed.
+- Handle/index resolution: check `index < capacity` before reading alive or generation arrays, then check liveness and generation; resolve to `T *` only within a scope where no grow, compact, recycle, or remove can run.

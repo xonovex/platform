@@ -1,6 +1,6 @@
 # constraints: Database Constraint Patterns
 
-Enforce integrity in-schema: PRIMARY KEY, FOREIGN KEY (with `ON DELETE`/`ON UPDATE` actions), UNIQUE, CHECK, NOT NULL. For "no overlapping ranges" use an EXCLUSION constraint (`EXCLUDE USING GIST`) — the non-obvious case.
+Enforce integrity in-schema: PRIMARY KEY, FOREIGN KEY (with `ON DELETE`/`ON UPDATE` actions), UNIQUE, CHECK, NOT NULL. For "no overlapping ranges" use an EXCLUSION constraint (`EXCLUDE USING GIST`).
 
 ```sql
 CREATE TABLE orders (

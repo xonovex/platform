@@ -17,11 +17,8 @@ description: "Use when writing or editing POSIX shell or Bash automation. Trigge
 
 ## Gotchas
 
-- Unquoted variables word-split and glob-expand — `cp $file dest/` silently breaks on filenames with spaces; quote everything
-- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail` — combine `set -euo pipefail` at the top
-- `[[ ]]` is bash/ksh-specific; POSIX `sh` needs `[ ]` with different quoting rules — `#!/usr/bin/env bash` makes the dep explicit
-- `command -v` is portable for checking command existence; `which` varies across platforms and exits non-zero on missing
-- `trap ... EXIT` runs on normal exit AND on errors with `set -e` — use it for cleanup; place it BEFORE the code that needs cleanup
+- Unquoted variables word-split and glob-expand: `cp $file dest/` silently breaks on filenames with spaces; quote everything
+- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail`: combine `set -euo pipefail` at the top
 
 ## Progressive disclosure
 

@@ -1,11 +1,11 @@
 ---
 name: lua-opinionated-guide
-description: "Use when tuning performance-critical Lua hot paths — the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. An overlay on lua-guide: covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'."
+description: "Use when tuning performance-critical Lua hot paths: the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. Triggers on `.lua` files in performance-sensitive or LuaJIT projects and on prompts about JIT-friendly tables, table pre-allocation, cache lookups, stable table shapes, or hot-path tuning, even when the user doesn't say 'LuaJIT'."
 ---
 
 # Lua Opinionated Guidelines (Performance Tuning)
 
-A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamentals — module pattern, local variables, metatables, coroutines, input validation, error handling, string building, idioms. This skill adds only hot-path tuning: the tunings especially benefit LuaJIT, and the same principles still help vanilla Lua 5.4.
+A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamentals: module pattern, local variables, metatables, coroutines, input validation, error handling, string building, idioms. This skill adds only hot-path tuning: the tunings especially benefit LuaJIT, and the same principles still help vanilla Lua 5.4.
 
 ## Requirements
 
@@ -14,15 +14,12 @@ A performance overlay on **lua-guide**. Apply **lua-guide** for all Lua fundamen
 ## Essentials
 
 - **Foundation** - All Lua fundamentals live in **lua-guide**; this skill adds hot-path performance tuning on top
-- **Stable table shapes** - Pre-allocate all fields, never add fields after creation, so the JIT can specialize, see [references/jit-friendly-tables.md](references/jit-friendly-tables.md)
-- **Cache lookups** - Hoist repeated table/global/stdlib lookups into locals on hot paths, see [references/cache-lookups.md](references/cache-lookups.md)
+- **Simple hot loops** - Iterate dense arrays with a plain numeric for-loop; don't over-engineer with unrolling or FFI, see [references/jit-friendly-tables.md](references/jit-friendly-tables.md)
+- **Cache lookups** - Hoist repeated global/module-table lookups into locals on hot paths, see [references/cache-lookups.md](references/cache-lookups.md)
 
 ## Gotchas
 
-- Adding a field after table creation changes the table's shape — it deoptimizes the JIT trace even though the code is correct
-- `pairs()` in a hot loop can't be JIT-compiled as tightly as a numeric `for i = 1, #t` loop over a dense array
-- Sparse arrays (`nil` holes) break both `#` and fast array traces — keep arrays dense
-- Caching `math.sin`/`math.cos` into locals matters in hot loops but is noise elsewhere — apply tuning where profiling shows it, not everywhere
+- Apply hot-path tuning only where profiling shows a need: don't over-engineer with FFI arrays or SIMD-style tricks beyond what was asked
 
 ## Progressive disclosure
 

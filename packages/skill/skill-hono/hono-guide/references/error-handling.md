@@ -1,6 +1,6 @@
-# error-handling: RFC 7807 Problem Details for Error Responses
+# error-handling: RFC 9457 Problem Details for Error Responses
 
-Return errors as RFC 7807 Problem Details: required `type`, `title`, `status`; optional `detail`, `instance`; for validation add an `issues[]` array of `{path, message, code}`. Set `Content-Type: application/json`. Wrap common cases in helpers.
+Return errors as RFC 9457 Problem Details with `Content-Type: application/problem+json`. This API's stable problem shape includes the canonical `type`, `title`, and `status` members plus optional `detail` and `instance`; validation problems add an `issues[]` extension of `{path, message, code}`. Use a stable problem-type URI controlled by the API for custom problem types. Wrap common cases in helpers.
 
 ```typescript
 import type {Context} from "hono";
@@ -17,8 +17,8 @@ export interface ProblemDetails {
 
 export function badRequest(c: Context, error: z.ZodError): Response {
   const problem: ProblemDetails = {
-    type: "about:blank#bad-request",
-    title: "Bad Request",
+    type: "https://api.example.com/problems/validation-error",
+    title: "Request validation failed",
     status: 400,
     detail: "Request validation failed",
     instance: c.req.path,
@@ -30,7 +30,7 @@ export function badRequest(c: Context, error: z.ZodError): Response {
   };
   return new Response(JSON.stringify(problem), {
     status: 400,
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type": "application/problem+json"},
   });
 }
 ```

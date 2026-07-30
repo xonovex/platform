@@ -2,6 +2,8 @@
   "name": "xonovex-skill-docker",
   "version": "5.1.0",
   "description": "Xonovex Docker skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./docker-guide"]
 }

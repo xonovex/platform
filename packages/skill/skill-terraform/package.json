@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-terraform",
   "version": "5.1.0",
+  "description": "Xonovex Terraform skills",
   "private": true,
   "type": "module",
   "keywords": [

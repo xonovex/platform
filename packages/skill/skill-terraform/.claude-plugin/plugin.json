@@ -2,6 +2,8 @@
   "name": "xonovex-skill-terraform",
   "version": "5.1.0",
   "description": "Xonovex Terraform skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./terraform-guide"]
 }

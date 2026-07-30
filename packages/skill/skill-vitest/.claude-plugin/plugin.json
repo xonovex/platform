@@ -2,6 +2,8 @@
   "name": "xonovex-skill-vitest",
   "version": "5.1.0",
   "description": "Xonovex Vitest skills",
-  "author": {"name": "Xonovex"},
+  "author": {
+    "name": "Xonovex"
+  },
   "skills": ["./vitest-guide"]
 }

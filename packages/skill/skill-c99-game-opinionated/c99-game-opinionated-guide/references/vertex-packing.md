@@ -1,6 +1,6 @@
 # vertex-packing: Vertex Packing for GPU
 
-Pack mesh data into GPU-ready formats named `vertex_{components}_{types}_t` (e.g. `vertex_3f_4u8_t`). Support interleaved (all attributes per vertex, single buffer) and streaming (position/normal/UV in separate buffers). Provide `*_pack_size` before allocation. The library never calls a graphics API — the caller uploads.
+Pack mesh data into GPU-ready formats named `vertex_{components}_{types}_t` (e.g. `vertex_3f_4u8_t`). Support interleaved (all attributes per vertex, single buffer) and streaming (position/normal/UV in separate buffers). Provide `*_pack_size` before allocation. The library never calls a graphics API: the caller uploads.
 
 ```c
 typedef struct {

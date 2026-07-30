@@ -1,6 +1,6 @@
 ---
 name: react-guide
-description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler — even when the user doesn't say 'React'."
+description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler, even when the user doesn't say 'React'."
 ---
 
 # React Coding Guidelines
@@ -73,18 +73,18 @@ function App({children}) {
 ## Essentials
 
 - **Component design** - Small, composable; lift/minimize state; derive when possible, see [references/component-design.md](references/component-design.md)
-- **Performance** - Let React Compiler handle memoization; manual `useMemo`/`useCallback` for effect deps only, see [references/performance-optimization.md](references/performance-optimization.md)
+- **Performance** - `memo()`, `lazy()` code-splitting, Server Components for FCP/SEO, see [references/performance-optimization.md](references/performance-optimization.md)
 - **Rendering** - Prefer Server Components; use Suspense for streaming, see [references/suspense-streaming.md](references/suspense-streaming.md)
 - **Accessibility** - Semantic HTML, ARIA, keyboard/focus management, see [references/accessibility.md](references/accessibility.md)
 - **Custom hooks** - Extract reusable logic, see [references/hooks.md](references/hooks.md)
 
 ## Gotchas
 
-- Stale closures in `useEffect` — captured state from the render that scheduled the effect, not the current state; use refs or include in deps
-- List keys must be stable AND unique — index keys cause re-mounts on reorder, generated keys cause re-mounts every render
-- `useMemo`/`useCallback` aren't free — the comparison + bookkeeping costs more than re-running cheap computations
+- Stale closures in `useEffect`: captured state from the render that scheduled the effect, not the current state; use refs or include in deps
+- List keys must be stable AND unique: index keys cause re-mounts on reorder, generated keys cause re-mounts every render
+- `useMemo`/`useCallback` aren't free. The comparison + bookkeeping costs more than re-running cheap computations
 - Controlled vs uncontrolled inputs: passing `value` without `onChange` warns; switching mid-lifetime is silently buggy
-- Server Components can't use state/effects/event handlers — the boundary is `'use client'`; mis-marking causes runtime errors only
+- Server Components can't use state/effects/event handlers. The boundary is `'use client'`; mis-marking causes runtime errors only
 
 ## Progressive Disclosure
 
@@ -98,7 +98,7 @@ function App({children}) {
 - Read [references/new-hooks.md](references/new-hooks.md) - Load when using useActionState, useOptimistic, use(), or useFormStatus
 - Read [references/server-components.md](references/server-components.md) - Load when building with RSC, Server Actions, or 'use server'/'use client' directives
 - Read [references/suspense-streaming.md](references/suspense-streaming.md) - Load when using Suspense boundaries, streaming, or error handling
-- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up React Compiler or understanding automatic memoization
+- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up or configuring the React Compiler
 - Read [references/activity-effect-event.md](references/activity-effect-event.md) - Load when using Activity component or useEffectEvent
 
 ### Migration from React 18

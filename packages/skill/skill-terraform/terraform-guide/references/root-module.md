@@ -1,6 +1,6 @@
 # root-module: Root Module Pattern
 
-Keep root modules thin: they pin `required_version`/`required_providers`, configure the provider, and wire child modules together — no resource creation of their own. Apply cross-cutting tags via provider `default_tags`. Feed module outputs into dependent modules as inputs.
+Keep root modules thin: they pin `required_version`/`required_providers`, configure the provider, and wire child modules together, no resource creation of their own. Apply cross-cutting tags via provider `default_tags`. Feed module outputs into dependent modules as inputs.
 
 ```hcl
 # environments/prod/main.tf

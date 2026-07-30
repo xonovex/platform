@@ -1,6 +1,6 @@
 # multi-return-functions: Lua Multi-Return with $multi
 
-Import `LuaMultiReturn` from `"typescript-to-lua"`, type the return as `LuaMultiReturn<[T1, T2, ...]>`, and return via `$multi(...)`. Destructure at the call site. This emits native Lua multiple returns — cheaper than array/object wrappers.
+Import `LuaMultiReturn` from `"typescript-to-lua"`, type the return as `LuaMultiReturn<[T1, T2, ...]>`, and return via `$multi(...)`. Destructure at the call site. This emits native Lua multiple returns: cheaper than array/object wrappers.
 
 ```typescript
 import {LuaMultiReturn} from "typescript-to-lua";

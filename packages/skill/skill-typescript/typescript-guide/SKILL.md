@@ -13,7 +13,7 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 
 - **Strict mode** - Enable strict flags, avoid `@ts-ignore` without comment+issue
 - **Type safety** - Explicit public types, `unknown` over `any`, derive from generated types
-- **Imports** - Named ESM imports, `import type` for types, direct from source, see [references/avoid-indirect-exports.md](references/avoid-indirect-exports.md)
+- **Imports** - Use `import type` for type-only imports
 - **Async/await** - Handle errors explicitly, only use `async` with `await`, see [references/async-without-await.md](references/async-without-await.md), [references/unnecessary-async-keywords.md](references/unnecessary-async-keywords.md)
 - **Immutability** - Use `const`/`readonly` where possible
 - **Validation** - Zod for I/O boundaries, infer types from schemas
@@ -26,11 +26,11 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 
 ## Gotchas
 
-- Structural typing means `{ a: string }` accepts `{ a: string, b: number }` silently — explicit `satisfies` is the way to catch unintended extras
-- `as` casts bypass the type system without check — prefer narrowing functions (type predicates) over casts
-- `type` vs `interface`: interfaces merge across declarations, types don't — `declare global { interface Window { … } }` works, `type Window = …` doesn't
-- `unknown` is the safer `any` — but it doesn't propagate; narrowing once doesn't carry across assignments
-- Module resolution depends on `tsconfig` `moduleResolution` (`bundler` vs `node16` vs `nodenext`) — wrong choice silently breaks deep imports
+- Structural typing means `{ a: string }` accepts `{ a: string, b: number }` silently: explicit `satisfies` is the way to catch unintended extras
+- `as` casts bypass the type system without check: prefer narrowing functions (type predicates) over casts
+- `type` vs `interface`: interfaces merge across declarations, types don't. `declare global { interface Window { ... } }` works, `type Window = ...` doesn't
+- `unknown` is the safer `any`, but it doesn't propagate; narrowing once doesn't carry across assignments
+- Module resolution depends on `tsconfig` `moduleResolution` (`bundler` vs `node16` vs `nodenext`): wrong choice silently breaks deep imports
 
 ## Progressive disclosure
 
@@ -40,5 +40,4 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 - Read [references/template-literals-require-string-conversion.md](references/template-literals-require-string-conversion.md) - Load when inserting numbers in template literals
 - Read [references/numeric-separator-enforcement.md](references/numeric-separator-enforcement.md) - Load when writing large numeric literals
 - Read [references/unbound-method-references.md](references/unbound-method-references.md) - Load when passing methods as callbacks or references
-- Read [references/avoid-indirect-exports.md](references/avoid-indirect-exports.md) - Load when creating index.ts barrels or re-exporting from other modules
 - Read [references/env-access-bracket-notation.md](references/env-access-bracket-notation.md) - Load when accessing process.env variables

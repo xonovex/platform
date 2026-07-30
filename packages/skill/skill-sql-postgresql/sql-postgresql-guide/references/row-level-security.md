@@ -1,6 +1,6 @@
 # row-level-security: Row-Level Security (RLS) Implementation
 
-Enable per table (`ALTER TABLE … ENABLE ROW LEVEL SECURITY`), then add a policy per operation. `USING` filters which rows are visible/modifiable; `WITH CHECK` validates rows being written (INSERT/UPDATE). Policies read request context via `current_setting('app.tenant_id')`, set per session/transaction before queries.
+Enable per table (`ALTER TABLE ... ENABLE ROW LEVEL SECURITY`), then add a policy per operation. `USING` filters which rows are visible/modifiable; `WITH CHECK` validates rows being written (INSERT/UPDATE). Policies read request context via `current_setting('app.tenant_id')`, set per session/transaction before queries.
 
 ```sql
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;

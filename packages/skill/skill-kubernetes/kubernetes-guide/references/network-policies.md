@@ -1,6 +1,6 @@
 # network-policies: Network Segmentation with NetworkPolicy
 
-Control pod ingress/egress with NetworkPolicy. A policy selecting a pod is implicit default-deny for the listed `policyTypes` — anything not explicitly allowed is dropped. Always allow DNS egress (UDP 53 to kube-system), or in-cluster name resolution breaks.
+Control pod ingress/egress with NetworkPolicy. A policy selecting a pod is implicit default-deny for the listed `policyTypes`: anything not explicitly allowed is dropped. Always allow DNS egress (UDP 53 to kube-system), or in-cluster name resolution breaks.
 
 ```yaml
 apiVersion: networking.k8s.io/v1

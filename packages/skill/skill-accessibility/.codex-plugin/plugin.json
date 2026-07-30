@@ -1,0 +1,21 @@
+{
+  "name": "xonovex-skill-accessibility",
+  "version": "5.1.0",
+  "description": "Xonovex accessibility assurance skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./accessibility-guide",
+  "interface": {
+    "displayName": "Accessibility Assurance",
+    "shortDescription": "Versioned accessibility design and assurance",
+    "longDescription": "Plan, assess, govern, and operate accessibility with pinned criteria, layered evidence, explicit exceptions, and exact-revision reassessment.",
+    "developerName": "Xonovex",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Assess this release against WCAG 2.2 AA",
+      "Design an accessibility assurance profile"
+    ]
+  }
+}

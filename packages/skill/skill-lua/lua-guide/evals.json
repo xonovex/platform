@@ -28,7 +28,7 @@
     },
     {
       "id": 4,
-      "prompt": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required — use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
+      "prompt": "Write a Lua 5.4 function `paginate(total, per_page)` that returns two values: the number of full pages needed to hold all items (rounded up is not required, use floor of total divided by per_page), and the exact average items-per-page as a decimal number.",
       "assertions": [
         "The whole-pages value is computed with the integer floor-division operator `//` (not `math.floor` on a `/` result)",
         "The decimal average is computed with the float division operator `/`"

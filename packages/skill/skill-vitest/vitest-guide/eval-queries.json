@@ -48,8 +48,8 @@
     "split": "validation"
   },
   {
-    "query": "Write an Express 5 + TypeScript login route handler. It should look up the user by email, verify the submitted password against the stored hash, and on success return a signed JWT the client will send on future API requests.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Explain when to use a stub versus a spy versus a fake, independent of any test framework.",
+    "rationale": "near miss owned by testing-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,13 +72,13 @@
     "split": "train"
   },
   {
-    "query": "Validate Express route params and JSON bodies at the boundary, return field-level 400 responses, and pass typed values to the service layer.",
-    "rationale": "near miss owned by expressjs-guide",
+    "query": "Drive this pricing rule test-first: write the failing test, go green with a fake, then refactor.",
+    "rationale": "near miss owned by tdd-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts",
+    "query": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
     "rationale": "near miss owned by typescript-guide",
     "should_trigger": false,
     "split": "validation"
@@ -93,6 +93,12 @@
     "query": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
     "rationale": "near miss owned by hono-guide",
     "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "fix the failing assertion in user.spec.ts: it expects 200 but we return 204",
+    "rationale": "fixing a failing Vitest assertion",
+    "should_trigger": true,
     "split": "validation"
   }
 ]

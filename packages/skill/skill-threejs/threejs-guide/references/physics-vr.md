@@ -1,6 +1,6 @@
 # physics-vr: Physics and WebXR
 
-Use Rapier (or Cannon-es) for physics — Three.js has none built in; sync physics bodies to meshes each frame. WebXR requires `renderer.setAnimationLoop()`, not requestAnimationFrame.
+Use Rapier (or Cannon-es) for physics: Three.js has none built in; sync physics bodies to meshes each frame. WebXR requires `renderer.setAnimationLoop()`, not requestAnimationFrame.
 
 ```javascript
 // Physics setup

@@ -1,6 +1,6 @@
 # cookie-handling: Secure Cookie Configuration and Signed Cookies
 
-Set `secure`/`httpOnly`/`sameSite` explicitly. Use `setSignedCookie`/`getSignedCookie` (both async) for integrity; `getSignedCookie` returns `false` on a tampered value. Non-obvious constraints: `__Host-` prefix requires `secure: true` and `path: "/"` and forbids `domain`; keep `maxAge` under 400 days (browser cap). Helpers are in `hono/cookie`.
+Set `secure`/`httpOnly`/`sameSite` explicitly. Use `setSignedCookie`/`getSignedCookie` (both async) for integrity; `getSignedCookie` returns `false` on a tampered value. Non-obvious constraints: `__Host-` prefix requires `secure: true` and `path: "/"` and forbids `domain`. Helpers are in `hono/cookie`.
 
 ```typescript
 import {getSignedCookie, setCookie, setSignedCookie} from "hono/cookie";

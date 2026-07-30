@@ -1,0 +1,104 @@
+[
+  {
+    "query": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "versioned accessibility assurance"
+  },
+  {
+    "query": "decide which WCAG criteria apply to our authenticated dashboard and document the gaps",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "applicability and gap analysis"
+  },
+  {
+    "query": "combine automated accessibility scans with keyboard and screen-reader testing",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "layered verification"
+  },
+  {
+    "query": "design an expiring accessibility exception with owner, remediation, and reassessment",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "accessibility governance"
+  },
+  {
+    "query": "make accessibility a release profile without claiming the scanner proves compliance",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "profile and evidence boundaries"
+  },
+  {
+    "query": "retest focus, zoom, errors, and dynamic status after this UI revision",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "exact-revision assessment"
+  },
+  {
+    "query": "retire an obsolete accessibility waiver after verifying the replacement",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "operational lifecycle"
+  },
+  {
+    "query": "memoize this React icon button so it stops re-rendering with the parent list",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: React implementation owner"
+  },
+  {
+    "query": "implement an aria-live React component",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: framework implementation"
+  },
+  {
+    "query": "write a generic unit test for a parser",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: testing owner"
+  },
+  {
+    "query": "pick a color palette for a poster",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: visual design without assurance intent"
+  },
+  {
+    "query": "configure a security policy engine",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss: security governance"
+  },
+  {
+    "query": "Assess release candidate sha256:abc against WCAG 2.2 AA. We have an automated scanner report; tell me what evidence is still missing and what result to publish.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "convert this React class component to hooks and memoize the expensive list render",
+    "rationale": "near miss owned by react-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "build a threat-informed security assurance plan with exact control and evidence ownership",
+    "rationale": "security planning rather than accessibility work",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+    "rationale": "AI regulatory classification rather than accessibility work",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "write a Vitest test that mocks the payment service and asserts the retry backoff timing",
+    "rationale": "near miss owned by vitest-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

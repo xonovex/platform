@@ -14,7 +14,8 @@
       "id": 2,
       "prompt": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
       "assertions": [
-        "Response body is RFC 7807 Problem Details containing type, title, and status fields (not a plain {error: ...} object)",
+        "Response body follows RFC 9457 Problem Details and contains type, title, and status fields rather than a plain {error: ...} object",
+        "Sets Content-Type to application/problem+json",
         "Includes an issues array mapping each validation problem to at least path and message"
       ]
     },

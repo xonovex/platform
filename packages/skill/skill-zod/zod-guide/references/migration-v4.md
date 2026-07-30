@@ -1,6 +1,6 @@
 # migration-v4: Zod v3 → v4 Migration
 
-Replace deprecated v3 string refinements with v4 standalone validators, and native TS enums with `z.enum()`. Deprecated forms trigger ESLint deprecation warnings.
+Replace deprecated v3 string refinements with v4 standalone validators, and native TS enums with `z.enum()`.
 
 | v3 (deprecated)         | v4                 |
 | ----------------------- | ------------------ |
@@ -14,7 +14,4 @@ Replace deprecated v3 string refinements with v4 standalone validators, and nati
 
 ```typescript
 const StatusSchema = z.enum(Status); // native TS enum; v3 required z.nativeEnum(Status)
-
-// Defaults must match the transformed output type
-const port = z.string().transform(Number).pipe(z.number()).default(3000); // not .default("3000")
 ```

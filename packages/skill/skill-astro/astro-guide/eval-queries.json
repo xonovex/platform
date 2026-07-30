@@ -48,20 +48,20 @@
     "split": "validation"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "query": "make this client component server-rendered if possible. It's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using the Motion animation library. Show the full component code.",
-    "rationale": "near miss owned by motion-guide",
+    "query": "In a React + TypeScript app, create a reusable component that fades and slides its children upward into view when it first mounts, using CSS transitions and a mount hook. Show the full component code.",
+    "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Author an /llms.txt index for our documentation site and add per-page markdown mirrors for each guide.",
+    "rationale": "near miss owned by llmstxt-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -72,20 +72,20 @@
     "split": "train"
   },
   {
-    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker: split it",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Implement keyboard, hover, and drag feedback with Motion while avoiding gesture conflicts and preserving accessible button semantics.",
-    "rationale": "near miss owned by motion-guide",
+    "query": "Implement keyboard, hover, and focus feedback on a custom button while preserving accessible semantics and a visible focus order.",
+    "rationale": "near miss owned by accessibility-guide",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Rewrite this Dutch news article's intro so it reads naturally while keeping every frontmatter field intact.",
+    "rationale": "near miss owned by content-guide",
     "should_trigger": false,
     "split": "validation"
   },

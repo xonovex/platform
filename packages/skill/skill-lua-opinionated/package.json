@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-lua-opinionated",
   "version": "5.1.0",
+  "description": "Xonovex Lua opinionated skills",
   "private": true,
   "type": "module",
   "dependencies": {

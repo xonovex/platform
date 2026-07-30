@@ -48,14 +48,14 @@
     "split": "validation"
   },
   {
-    "query": "make this client component server-rendered if possible — it's just fetching the user's recent orders",
+    "query": "make this client component server-rendered if possible. It's just fetching the user's recent orders",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "In a Remotion project running at 30fps, write a React component that fades a headline in from opacity 0 to 1 over the first half second and slides it up 40px at the same time. Give me the full component code.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Design the render-pass graph and resource barriers for a deferred renderer on an explicit GPU API.",
+    "rationale": "near miss owned by gpu-rendering-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -66,20 +66,20 @@
     "split": "train"
   },
   {
-    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none — how should we figure out what's under the cursor",
+    "query": "in our level editor clicking on a character that's GPU-skinned never selects it because we ray-cast against physics shapes and skinned meshes have none. How should we figure out what's under the cursor",
     "rationale": "near miss owned by editor-viewport-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker — split it",
+    "query": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker: split it",
     "rationale": "near miss owned by react-guide",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Sequence three Remotion scenes with overlaps and transitions while keeping every scene's local frame origin predictable.",
-    "rationale": "near miss owned by remotion-guide",
+    "query": "Lay out the mesh and transform component arrays as SoA so the update loop stays cache-friendly.",
+    "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"
   },

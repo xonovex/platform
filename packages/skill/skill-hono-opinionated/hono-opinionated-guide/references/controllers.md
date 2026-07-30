@@ -5,12 +5,12 @@ Remove `async` from controller functions with no `await` in the body; keep it on
 ```typescript
 import type {Context} from "hono";
 
-// ✅ sync body — no async
+// ✅ sync body, no async
 export function getUser(c: Context) {
   const {id} = c.req.valid("param");
   return c.json(userService.getById(id));
 }
-// ✅ keep async — body awaits
+// ✅ keep async: body awaits
 export async function createUser(c: Context) {
   const user = await userService.create(c.req.valid("json"));
   return c.json(user, 201);

@@ -12,18 +12,17 @@ description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on
 ## Essentials
 
 - **Organization** - Use namespaces, labels, annotations consistently, see [references/deployments.md](references/deployments.md)
-- **Container images** - No `latest` tags, set requests/limits and probes, see [references/deployments.md](references/deployments.md)
-- **Security** - Run as non-root, read-only FS, drop capabilities, see [references/deployments.md](references/deployments.md)
+- **Container images** - Set requests/limits and probes, see [references/deployments.md](references/deployments.md)
 - **Configuration** - Use ConfigMaps/Secrets, SOPS/External Secrets for secrets, see [references/configmaps-secrets.md](references/configmaps-secrets.md)
 - **Multi-environment** - Manage with Kustomize bases/overlays, validate with `--dry-run`, see [references/kustomize.md](references/kustomize.md), [references/validation.md](references/validation.md)
 
 ## Gotchas
 
-- `Secrets` are base64-encoded, not encrypted — encryption-at-rest requires enabling KMS provider on the cluster
-- `resources.requests` is what the scheduler considers; `.limits` is what the kubelet enforces — without requests, pods compete unbounded
-- Label selectors are immutable once a Service/Deployment is created — changing them requires recreate, not patch
+- `Secrets` are base64-encoded, not encrypted: encryption-at-rest requires enabling KMS provider on the cluster
+- `resources.requests` is what the scheduler considers; `.limits` is what the kubelet enforces, without requests, pods compete unbounded
+- Label selectors are immutable once a Service/Deployment is created: changing them requires recreate, not patch
 - Namespace scope: `kubectl` defaults to `default` namespace; cross-namespace traffic needs `<svc>.<ns>.svc.cluster.local` or `NetworkPolicy`
-- `Deployment` rolling updates require `readinessProbe` to be honest — a probe that returns 200 too early routes traffic to a not-ready pod
+- `Deployment` rolling updates require `readinessProbe` to be honest: a probe that returns 200 too early routes traffic to a not-ready pod
 
 ## Progressive disclosure
 

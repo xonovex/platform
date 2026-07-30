@@ -1,6 +1,6 @@
 # avoid-eslint-disable: Fix Root Causes, Never Suppress
 
-Never suppress with `eslint-disable`, `@ts-ignore`, or an `any` cast — refactor the code to satisfy the type instead. Suppression hides the underlying type mismatch.
+Never suppress with `eslint-disable`, `@ts-ignore`, or an `any` cast: refactor the code to satisfy the type instead.
 
 ```typescript
 // ❌ suppress the error

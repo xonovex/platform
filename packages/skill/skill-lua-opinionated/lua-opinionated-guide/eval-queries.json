@@ -60,7 +60,7 @@
     "split": "train"
   },
   {
-    "query": "our particle simulator stalls when we have 50k particles — the update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+    "query": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "train"
@@ -78,7 +78,7 @@
     "split": "train"
   },
   {
-    "query": "profile why the broad-phase is slow — I suspect we're missing cache constantly but want to confirm before changing the layout",
+    "query": "profile why the broad-phase is slow. I suspect we're missing cache constantly but want to confirm before changing the layout",
     "rationale": "near miss owned by data-oriented-design-guide",
     "should_trigger": false,
     "split": "validation"

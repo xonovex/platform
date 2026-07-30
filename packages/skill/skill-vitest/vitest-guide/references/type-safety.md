@@ -1,6 +1,6 @@
 # type-safety: Type Safety in Tests
 
-`res.json()` resolves to `any` — cast it to a declared interface before property access, or `@typescript-eslint/no-unsafe-assignment` fires and you lose autocomplete. Define reusable response interfaces at the file top.
+`res.json()` resolves to `any`: cast it to a declared interface before property access, or `@typescript-eslint/no-unsafe-assignment` fires and you lose autocomplete. Define reusable response interfaces at the file top.
 
 ```typescript
 interface User {

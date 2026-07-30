@@ -60,8 +60,8 @@
     "split": "train"
   },
   {
-    "query": "compose Bitrise Pipelines from reusable Workflows and pin every custom Step version",
-    "rationale": "near miss: hosted CI pipeline composition, not infrastructure code",
+    "query": "compose GitHub Actions workflows from reusable workflows and pin every action to a commit SHA",
+    "rationale": "near miss owned by github-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -84,8 +84,8 @@
     "split": "validation"
   },
   {
-    "query": "is this a flaky emulator (device offline) or a real test failure?",
-    "rationale": "near miss: mobile CI test triage, not Terraform",
+    "query": "is this GitLab CI job failing from a runner outage or a real test failure?",
+    "rationale": "near miss owned by gitlab-guide",
     "should_trigger": false,
     "split": "validation"
   },
@@ -96,8 +96,8 @@
     "split": "validation"
   },
   {
-    "query": "recover an AWS governance decision from CloudTrail and Security Hub references after restart",
-    "rationale": "validation near miss: cloud audit-log forensics, not Terraform configuration",
+    "query": "recover a plan decision and its evidence references from the plan document after restart",
+    "rationale": "validation near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

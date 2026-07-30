@@ -1,6 +1,6 @@
 # platform-runtime: Platform-Specific Runtime Detection
 
-Read env with `env<T>(c)` from `hono/adapter` (not `process.env`/`Deno.env`), branch on `getRuntimeKey()` for platform code (Workers returns `"workerd"`), and import `getConnInfo` from the platform-specific subpath. Platform quirks: Deno cache needs `wait: true`; Node needs explicit compression middleware.
+Read env with `env<T>(c)` from `hono/adapter` (not `process.env`/`Deno.env`), branch on `getRuntimeKey()` for platform code (Workers returns `"workerd"`), and import `getConnInfo` from the platform-specific subpath.
 
 ```typescript
 import {env, getRuntimeKey} from "hono/adapter";

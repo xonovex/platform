@@ -1,6 +1,6 @@
 # openapi-router-hierarchy: OpenAPIHono at Every Level
 
-Use `OpenAPIHono` (not plain `Hono`) for root, intermediate, and leaf routers. Metadata propagates only through an all-`OpenAPIHono` chain; a single plain `Hono` in the path drops its children's routes from the generated spec. Mount with `.route()` as usual; plain non-OpenAPI routes can still live on an `OpenAPIHono` instance.
+Use `OpenAPIHono` (not plain `Hono`) for root, intermediate, and leaf routers. A single plain `Hono` anywhere in the path drops its children's routes from the generated spec. Mount with `.route()` as usual.
 
 ```typescript
 import {OpenAPIHono} from "@hono/zod-openapi";

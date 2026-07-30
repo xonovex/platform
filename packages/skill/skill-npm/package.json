@@ -1,6 +1,7 @@
 {
   "name": "@xonovex/skill-npm",
   "version": "5.1.0",
+  "description": "Xonovex npm publishing skills",
   "private": true,
   "type": "module",
   "keywords": [
