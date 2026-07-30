@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-3
-status: pending
+status: complete
 dependencies:
   plans:
     [
@@ -18,11 +18,11 @@ skills_to_consult:
   - moon-guide
   - typescript-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 05: Shared & Agent Slice
@@ -72,10 +72,54 @@ from the donor, and confirm `npx moon run :ci-check` stays green.
 
 ## Success Criteria
 
-- [ ] All three mapped main-commit intents verified
-- [ ] Go and TS builds/tests green
-- [ ] No resurrected or accidentally-dropped files
-- [ ] Lockfiles/go.sum regenerated, not copied
+- [x] All three mapped main-commit intents verified — see below
+- [x] Go and TS builds/tests green — `:ci-check --force`, 790 tasks, exit 0,
+      nothing cached, with the go coverage gate back in the closure
+- [x] No resurrected files; three donor removals the checkout missed were
+      applied — see below
+- [x] Lockfile and every `go.sum` regenerated via `npm install` and `go mod tidy`
+
+## Intent Verification
+
+- `022af353` — generated coverage output still ignored: `coverage.out` resolves
+  to `.gitignore`'s `*.out` rule. Present.
+- `9dfb7522` — prettier pass: **regressed and repaired**. The donor left
+  `shared-agent-go/README.md` and `agent-operator-go/README.md` unformatted,
+  both of which main had formatted. Reformatted, along with
+  `agent-operator-go-docker/package.json`, which main had already missed.
+- `a2b8e0f4` — egress and governance claims match the code: **superseded, not
+  dropped**. The donor rewrites `packages/agent/AGENTS.md` entirely, so the
+  overclaims that commit corrected (a kill-switch, anomaly detection and an AI
+  bill-of-materials described as existing) are simply absent rather than
+  restated. The donor's replacement claims were checked against the migrated
+  code: `proxy` is documented as reserved and failing closed, and
+  `shared/network.go` defines `ErrProxyEnforcementUnavailable` to that effect.
+
+## Donor Removals the Checkout Missed
+
+`git checkout <branch> -- <path>` adds and modifies but never deletes, so a
+file the donor removed survives on `main` unless it is removed explicitly. All
+three predate the merge base, so each is a deliberate donor removal rather than
+newer work on `main`:
+
+| Path | Donor commit | Why it had to go |
+| --- | --- | --- |
+| `agent-cli-go/internal/network/proxy/` | `861264a0` | Its only surviving import still named the old `packages/cli/agent-cli-go` module path, which no longer resolves after the donor renamed the module to match its directory |
+| `shared-core-go/pkg/scriptlib/` | `7ab28721` | No tests and no consumers, so the per-package coverage check failed with "declares no coverage floor" |
+| `agent-operator-go/config/samples/agentconfig_sample.yaml` | `73c70ca8` | `AgentConfig` was replaced by the four-concern resource model, so the sample no longer decodes against the API scheme |
+
+## Findings
+
+- The donor commits `os` and `cpu` onto the five `agent-cli-go-<platform>`
+  packages **and** drops them from the root `workspaces` list. The two changes
+  are inseparable: with the platform fields committed but the packages still
+  globbed in as workspace members, `npm install` fails with `EBADPLATFORM` on
+  any host that is not that platform. Moon's project discovery is independent of
+  npm workspaces, so all five remain in the task graph.
+- `format-check` does not cover markdown or JSON in Go- and docker-tagged
+  projects — the go tag checks `gofmt` only. That is how two unformatted READMEs
+  passed `ci-check` while a direct prettier run flagged them. Worth closing
+  repo-wide, but it is a change to `.moon/tasks`, not to this slice.
 
 ## Files Modified/Created
 
