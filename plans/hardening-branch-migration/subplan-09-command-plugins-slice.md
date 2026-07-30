@@ -31,6 +31,35 @@ Lands after all skill chunks because commands are thin delegators to skills:
 every command's target skill must already exist on main in its migrated form.
 Carries main's command-removal history, which the donor branch predates.
 
+## Carried From Subplan 08
+
+The donor replaces the whole workflow command surface: `create`, `review`,
+`revise`, `decide`, `execute`, `publish`, `abandon` and the `workspace-*` set,
+in place of main's `plan-*` commands. Until that lands, main's commands name
+operations the migrated skills no longer register, so this slice inherits:
+
+1. `.moon/tasks/tag-command.yml` — `command-validate` carries `runInCI: false`
+   and is out of `ci-check`. Restore both once the command surface matches the
+   skills, and confirm the delegation contract resolves.
+2. `script-moon-skill-validate-spec/src/workflow-contracts.test.ts` — five tests
+   are skipped; they read
+   `packages/command/command-workflow/commands/<command>.md`. Un-skip them.
+3. `script-moon-skill-validate-drift:drift-check` reports two findings, both
+   command files; `budgets.json` was raised for
+   `command-utility/commands/skill-optimize.md` (172 to 187) and
+   `slashcommand-distill.md` (113 to 169). Reset both to the donor's values once
+   the donor's command files replace main's.
+4. `9ab3bd7d` — the plan lifecycle banners must still name the accept gate;
+   verify the intent survives in whatever the new surface calls it.
+
+**Decide the fate of `plan-delegate`.** `7464a219` added a delegation
+supervision operation and command after the merge base; the donor has no
+counterpart. Subplan 08 preserved the skill half as
+`skill-plan/plan-guide/references/delegate.md`, registered in the guide, with a
+`budgets.json` entry. Its command half is still main's `plan-delegate.md`.
+Either carry delegation into the new command surface, or retire the operation
+and remove `delegate.md`, its guide entry and its budget line together.
+
 ## Tasks
 
 1. **Create the slice branch**:
