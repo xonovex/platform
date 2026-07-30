@@ -72,7 +72,11 @@ removal of the donor branches and worktrees.
    `composable-workflow-platform-hardening` and
    `composable-workflow-implementations-merge` (local + origin) and remove the
    `../xonovex-platform-merge` worktree. `xonovex-platform-fable` and its
-   worktree stay — hand off to the follow-up governance-skills plan.
+   worktree stay — hand off to the follow-up governance-skills plan. Keep the
+   tag `salvage/runtime-probes-d1692d3e`: it is the only remaining anchor for
+   the commit once `composable-workflow-implementations-merge` is gone, so
+   confirm `git rev-list -1 salvage/runtime-probes-d1692d3e` still resolves
+   after the deletions and push the tag to origin.
 
 ## Validation Steps
 

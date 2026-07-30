@@ -68,10 +68,35 @@ resurrection risk.
    - `a90a569a` — skill-ablate folded into skill-optimize's verify phase (the
      skill side; the command side is subplan 09)
    - plus catalog-wide: `66b9ad55`, `6b332e83`, `22f48559`, `87d452e0`
-5. **Close deferred gates**: any validators subplans 04/06/07 deferred to "when
+5. **Restore the runtime probe evidence** on the harness adapters. The donor
+   branch records `Observed runtime | Not installed in the validation
+   environment` for codex, copilot, opencode and pi, and drops the probe
+   paragraph from `skill-kiro`'s onboarding reference. Taking the donor state
+   verbatim therefore discards credentialed probe results that exist only on
+   `composable-workflow-implementations-merge`, anchored by the tag
+   `salvage/runtime-probes-d1692d3e` (commit `d1692d3e`). After the checkout,
+   reapply to each `<harness>-guide/references/capabilities.md` capability
+   table:
+
+   | Skill | Observed runtime | Probed |
+   | --- | --- | --- |
+   | `skill-codex` | `codex-cli 0.144.4` | `2026-07-16` |
+   | `skill-copilot` | `0.0.377 (Copilot CLI)` | `2026-07-16` |
+   | `skill-opencode` | `1.14.30` | `2026-07-16` |
+   | `skill-pi` | `0.80.2` | `2026-07-16` |
+
+   Carry the accompanying caveat with the values: the probe observed the
+   installed CLI version on a host with a working credentialed install and
+   exercised the guard exit-code contract locally; native hook registration was
+   not exercised, so hook-level rows stay documentation-verified and must not be
+   reported as runtime conformance. Take `skill-kiro`'s probe runbook from the
+   same tag; kiro stays a candidate (not installed). Leave each guide's
+   `Documentation snapshot` at the donor's value — only the observed-runtime
+   rows are restored.
+6. **Close deferred gates**: any validators subplans 04/06/07 deferred to "when
    the full catalog is migrated" are enabled and must pass now, except
    marketplace-registration checks (subplan 10).
-6. **Run full validation**, commit, open the PR.
+7. **Run full validation**, commit, open the PR.
 
 ## Validation Steps
 
@@ -85,6 +110,8 @@ resurrection risk.
 - [ ] `git diff main composable-workflow-platform-hardening -- packages/skill`
       empty after merge (except caveman/fable, which stay deleted)
 - [ ] caveman/fable NOT resurrected
+- [ ] Runtime probe evidence restored for codex, copilot, opencode and pi; kiro
+      probe runbook present
 - [ ] All mapped intents verified
 - [ ] All deferred catalog gates closed (registration excepted)
 
