@@ -288,9 +288,7 @@ const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
   }, timeout * 1000);
   try {
     const resp = await fetch(url, {
-      method: "GET",
       headers: {"User-Agent": "skill-source-audit/1"},
-      redirect: "follow",
       signal: controller.signal,
     });
     const code = resp.status;
@@ -815,7 +813,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
   // --mark-reviewed is a single-skill write action; refuse it for --all.
   if (args.markReviewed !== undefined) {
     const single = targets[0];
-    if (targets.length !== 1 || single === undefined) {
+    if (single === undefined || targets.length !== 1) {
       process.stderr.write(
         "error: --mark-reviewed operates on a single skill\n",
       );

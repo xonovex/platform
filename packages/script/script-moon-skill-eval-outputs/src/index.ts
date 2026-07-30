@@ -681,7 +681,7 @@ const main = async (argv: readonly string[]): Promise<number> => {
       : [];
     const expectedOutput =
       typeof e.expected_output === "string" ? e.expected_output : "";
-    if (assertions.length === 0 && expectedOutput) {
+    if (expectedOutput && assertions.length === 0) {
       assertions = [expectedOutput];
     }
     if (assertions.length === 0) {

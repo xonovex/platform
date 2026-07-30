@@ -281,9 +281,9 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
     }
 
     const eq = arg.indexOf("=");
-    const flag = arg.startsWith("--") && eq !== -1 ? arg.slice(0, eq) : arg;
+    const flag = eq !== -1 && arg.startsWith("--") ? arg.slice(0, eq) : arg;
     const inline =
-      arg.startsWith("--") && eq !== -1 ? arg.slice(eq + 1) : undefined;
+      eq !== -1 && arg.startsWith("--") ? arg.slice(eq + 1) : undefined;
 
     if (OPTION_FLAGS.has(flag)) {
       const {value, next} = takeValue(flag, inline, i);
@@ -313,7 +313,7 @@ const parseCli = (argv: readonly string[]): ParsedCli => {
       continue;
     }
 
-    if (arg.startsWith("-") && arg !== "-") {
+    if (arg !== "-" && arg.startsWith("-")) {
       usageError(`unrecognized arguments: ${arg}`);
     }
     positionals.push(arg);
