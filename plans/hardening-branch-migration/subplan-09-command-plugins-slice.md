@@ -43,7 +43,8 @@ operations the migrated skills no longer register, so this slice inherits:
    skills, and confirm the delegation contract resolves.
 2. `script-moon-skill-validate-spec/src/workflow-contracts.test.ts` — five tests
    are skipped; they read
-   `packages/command/command-workflow/commands/<command>.md`. Un-skip them.
+   `packages/command/command-workflow/commands/<command>.md`. Resolved by
+   removing four of them and narrowing the fifth; see below.
 3. `script-moon-skill-validate-drift:drift-check` reports two findings, both
    command files; `budgets.json` was raised for
    `command-utility/commands/skill-optimize.md` (172 to 187) and
@@ -120,9 +121,12 @@ plan-prefixed surface stays. Consequences, all deliberate:
   list, and given budget entries.
 - `plan-delegate` is resolved by the same decision: the command stays and its
   operation, preserved as `delegate.md` in subplan 08, is now reachable.
-- Five `workflow-contracts.test.ts` tests stay skipped permanently rather than
-  temporarily. They assert the generic surface exists; they become live only if
-  it is adopted later.
+- Four `workflow-contracts.test.ts` tests were removed rather than left
+  skipped: they assert the generic command files exist, and a permanently
+  skipped test is dead weight. The helpers that only served them went with
+  them. A fifth read both sides; its skill-side assertions survive as
+  `keeps the effects table internally consistent`. The suite keeps nine
+  skill-side contract tests and skips nothing.
 
 ## The Donor's Command Validator Landed Here
 
