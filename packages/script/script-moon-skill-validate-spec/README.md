@@ -1,6 +1,6 @@
 # moon-skill-validate
 
-Validates a `SKILL.md` against the Agent Skills spec and authoring best practices (frontmatter, body limits, reference links, progressive-disclosure triggers, harness-neutrality). Read-only.
+Validates a `SKILL.md` against the Agent Skills spec and authoring best practices (frontmatter, body limits, reference links, progressive-disclosure triggers, harness-neutrality). Every prose file in the package (guide, references, `SOURCES.md`, eval fixtures, bundled scripts, asset templates, manifests) is also checked for an em dash, ellipsis character, or typographic quote, in both the literal and unicode-escaped spelling. Read-only.
 
 ## Usage
 

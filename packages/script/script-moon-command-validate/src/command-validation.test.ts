@@ -20,7 +20,7 @@ allowed-tools:
 argument-hint: "<subject>"
 ---
 
-# /${namespace}:run — Run
+# /${namespace}:run - Run
 
 ## Arguments
 
@@ -55,7 +55,7 @@ const fixture = (): {packageDir: string; root: string} => {
   write(
     root,
     "packages/skill/skill-test/test-guide/SKILL.md",
-    "# Test\n\n- **Run** — run one test — see [run](references/run.md)\n",
+    "# Test\n\n- **Run**: run one test, see [run](references/run.md)\n",
   );
   write(
     root,
@@ -80,6 +80,50 @@ describe("validateCommandPackage", () => {
       commands: 1,
       issues: [],
     });
+  });
+
+  it("reports an em dash or ellipsis in any package prose file", () => {
+    const {packageDir, root} = fixture();
+    write(
+      root,
+      "packages/command/command-test/commands/run.md",
+      commandSource().replace("Subject.", "Subject \u2014 the thing to run."),
+    );
+    write(
+      root,
+      "packages/command/command-test/README.md",
+      "# Test\n\nUse when\u2026\n",
+    );
+    write(
+      root,
+      "packages/command/command-test/.claude-plugin/plugin.json",
+      String.raw`{"name": "xonovex-test", "dependencies": ["xonovex-skill-test"], "description": "a \u2014 b"}`,
+    );
+
+    const findings = validateCommandPackage(packageDir, root)
+      .report.issues.filter(({code}) => code === "prose.punctuation")
+      .map(({message, path}) => [path, message.split(",", 1)[0]]);
+
+    expect(findings).toEqual([
+      [
+        join(
+          "packages",
+          "command",
+          "command-test",
+          ".claude-plugin",
+          "plugin.json",
+        ),
+        "escaped em dash on line 1",
+      ],
+      [
+        join("packages", "command", "command-test", "README.md"),
+        "ellipsis on line 3",
+      ],
+      [
+        join("packages", "command", "command-test", "commands", "run.md"),
+        "em dash on line 13",
+      ],
+    ]);
   });
 
   it("reports namespace, filename, manifest, and skill drift", () => {

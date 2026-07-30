@@ -12,7 +12,7 @@ argument-hint: >-
   [--context <context>...]
 ---
 
-# /xonovex-workflow:validate — Validate
+# /xonovex-workflow:validate - Validate
 
 ## Arguments
 

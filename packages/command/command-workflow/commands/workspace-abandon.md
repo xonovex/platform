@@ -11,7 +11,7 @@ argument-hint: >-
   [subject] [reason] [--request <file>] [--context <context>...]
 ---
 
-# /xonovex-workflow:workspace-abandon — Workspace abandon
+# /xonovex-workflow:workspace-abandon - Workspace abandon
 
 ## Arguments
 

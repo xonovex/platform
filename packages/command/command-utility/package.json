@@ -1,7 +1,7 @@
 {
   "name": "@xonovex/command-utility",
   "version": "7.0.0",
-  "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning",
+  "description": "Xonovex utility commands: skills, instructions, reflect, content, versioning",
   "private": true,
   "dependencies": {
     "@xonovex/skill-command": "7.0.0",

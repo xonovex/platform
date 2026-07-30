@@ -11,7 +11,7 @@ argument-hint: >-
   [subject] [--request <file>] [--context <context>...]
 ---
 
-# /xonovex-workflow:decide — Decide
+# /xonovex-workflow:decide - Decide
 
 ## Arguments
 

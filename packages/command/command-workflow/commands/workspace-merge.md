@@ -15,7 +15,7 @@ argument-hint: >-
   [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:workspace-merge — Workspace merge
+# /xonovex-workflow:workspace-merge - Workspace merge
 
 ## Arguments
 

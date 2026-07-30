@@ -1,5 +1,5 @@
 ---
-description: Author or refresh a skill's evals.json output-eval seed — knowledge probes (prompt + binary assertions) with a tier field
+description: Author or refresh a skill's evals.json output-eval seed, knowledge probes (prompt + binary assertions) with a tier field
 allowed-tools:
   - Read
   - Write
@@ -11,7 +11,7 @@ allowed-tools:
 argument-hint: "[skill-file] [--count <n>]"
 ---
 
-# /xonovex-utility:skill-evaluate — Seed a skill's output-eval file
+# /xonovex-utility:skill-evaluate - Seed a skill's output-eval file
 
 ## Arguments
 
@@ -22,6 +22,6 @@ argument-hint: "[skill-file] [--count <n>]"
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
 **evaluating-outputs** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas — do not restate them.
+for the procedure, output format, and gotchas. Do not restate them.
 Prefer an installed test-design skill when its routing description fits the requested
 evaluation work; continue with baseline evaluation design when none is installed.

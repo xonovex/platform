@@ -15,7 +15,7 @@ argument-hint: >-
   [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:publish — Publish
+# /xonovex-workflow:publish - Publish
 
 ## Arguments
 

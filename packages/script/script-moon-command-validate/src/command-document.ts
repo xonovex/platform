@@ -5,7 +5,7 @@ import {issue, type ValidationIssue} from "./validation.js";
 
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/u;
 const TITLE_RE =
-  /^# \/([a-z0-9]+(?:-[a-z0-9]+)*):([a-z0-9]+(?:-[a-z0-9]+)*)\s+—\s+(.+)$/mu;
+  /^# \/([a-z0-9]+(?:-[a-z0-9]+)*):([a-z0-9]+(?:-[a-z0-9]+)*)\s+-\s+(.+)$/mu;
 const DELEGATION_RE =
   /Load the `([^`]+)` skill \(plugin `([^`]+)`\)[\s\S]*?\*\*([^*]+)\*\*/u;
 const HEADING_RE = /^## (.+)$/gmu;
@@ -183,7 +183,7 @@ export const parseCommandDocument = (
       issue(
         "command.title",
         path,
-        "expected '# /<namespace>:<command> — <title>'",
+        "expected '# /<namespace>:<command> - <title>'",
       ),
     );
   }

@@ -15,7 +15,7 @@ allowed-tools:
 argument-hint: "[skill-file|--all] [--model <weakest>] [--tier <tier>] [--dry-run] [--report-only]"
 ---
 
-# /xonovex-utility:skill-optimize — Trim a skill to its knowledge delta and verify
+# /xonovex-utility:skill-optimize - Trim a skill to its knowledge delta and verify
 
 ## Arguments
 
@@ -30,4 +30,4 @@ argument-hint: "[skill-file|--all] [--model <weakest>] [--tier <tier>] [--dry-ru
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
 **optimize** operation with these arguments. The skill is the source of truth for the
-procedure, tiers, and gotchas — do not restate them.
+procedure, tiers, and gotchas. Do not restate them.

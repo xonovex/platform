@@ -12,7 +12,7 @@ argument-hint: >-
   [--context <context>...]
 ---
 
-# /xonovex-workflow:review — Review
+# /xonovex-workflow:review - Review
 
 ## Arguments
 

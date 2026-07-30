@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[agents-file | --all] [--dry-run] [--update-workflows]"
 ---
 
-# /xonovex-utility:instructions-sync — Sync AGENTS.md with Current State
+# /xonovex-utility:instructions-sync - Sync AGENTS.md with Current State
 
 ## Arguments
 
@@ -25,4 +25,4 @@ argument-hint: "[agents-file | --all] [--dry-run] [--update-workflows]"
 
 Load the `instruction-guide` skill (plugin `xonovex-skill-instruction`) and perform its
 **sync** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

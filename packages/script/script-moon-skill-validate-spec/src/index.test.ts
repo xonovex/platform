@@ -124,6 +124,51 @@ Use references/missing_file.md with @references/legacy.md.
     expect(output).toContain("Result: FAIL");
   });
 
+  it("fails on an em dash or ellipsis anywhere in the package", () => {
+    const root = mkdtempSync(join(tmpdir(), "skill-punctuation-"));
+    temporaryDirectories.push(root);
+    const packageDir = join(root, "skill-dashed");
+    const skill = join(packageDir, "dashed-guide");
+    mkdirSync(join(skill, "references"), {recursive: true});
+    writeFileSync(join(packageDir, "package.json"), '{"name": "skill-dashed"}');
+    writeFileSync(
+      join(skill, "SKILL.md"),
+      `---
+name: dashed-guide
+description: "Use when checking punctuation. Triggers on validator fixtures, even when the user doesn't say punctuation."
+---
+# Guide
+
+- **Label** \u2014 detail
+`,
+    );
+    writeFileSync(
+      join(skill, "references", "one.md"),
+      "# One\n\n- Use when\u2026\n",
+    );
+    writeFileSync(
+      join(skill, "eval-queries.json"),
+      String.raw`{"queries": [{"query": "a \u2014 b"}]}`,
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const result = validateSkill([skill]);
+
+    expect(result).toBe(1);
+    const output = log.mock.calls.flat().join("\n");
+    expect(output).toContain(
+      "punctuation: em dash in dashed-guide/SKILL.md line 7, " +
+        "use a comma, colon, or full stop:",
+    );
+    expect(output).toContain(
+      "punctuation: ellipsis in dashed-guide/references/one.md line 3, " +
+        "use three periods:",
+    );
+    expect(output).toContain(
+      "punctuation: escaped em dash in dashed-guide/eval-queries.json line 1",
+    );
+  });
+
   it("returns an input error for invalid YAML frontmatter", () => {
     const root = mkdtempSync(join(tmpdir(), "skill-validate-"));
     temporaryDirectories.push(root);

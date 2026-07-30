@@ -1,5 +1,6 @@
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
+import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
 import {checkCommandBudgets} from "./command-budgets.js";
 import {
   parseCommandDocument,
@@ -122,6 +123,20 @@ const headingAnchors = (path: string): ReadonlySet<string> => {
   return anchors;
 };
 
+// The scan covers the whole package: commands, docs, README, and the manifests
+// whose descriptions reach a marketplace listing.
+const validateProsePunctuation = (
+  packageDir: string,
+  repositoryRoot: string,
+): readonly ValidationIssue[] =>
+  scanProsePunctuation(packageDir).map(({excerpt, hint, label, line, path}) =>
+    issue(
+      "prose.punctuation",
+      relative(repositoryRoot, join(packageDir, path)),
+      `${label} on line ${String(line)}, ${hint}: ${excerpt}`,
+    ),
+  );
+
 const validateInternalLinks = (
   packageDir: string,
   repositoryRoot: string,
@@ -213,7 +228,10 @@ export const validateCommandPackage = (
   const commandFiles = readdirSync(commandDir)
     .filter((entry) => entry.endsWith(".md"))
     .toSorted();
-  issues.push(...validateInternalLinks(packageDir, repositoryRoot));
+  issues.push(
+    ...validateInternalLinks(packageDir, repositoryRoot),
+    ...validateProsePunctuation(packageDir, repositoryRoot),
+  );
 
   for (const commandFile of commandFiles) {
     const absolutePath = join(commandDir, commandFile);

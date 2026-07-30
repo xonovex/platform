@@ -57,6 +57,9 @@ tasks:
       XONOVEX_LINT_MODE: enforce
     inputs:
       - "**/*.md"
+      - "**/*.md.template"
+      - "**/*.json"
+      - "**/*.py"
       - /budgets.json
       - /vocabulary.json
     options:

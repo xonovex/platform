@@ -1,7 +1,7 @@
 {
   "name": "xonovex-utility",
   "version": "7.0.0",
-  "description": "Xonovex utility commands — skills, instructions, reflect, content, versioning",
+  "description": "Xonovex utility commands: skills, instructions, reflect, content, versioning",
   "author": {
     "name": "Xonovex"
   },

@@ -14,7 +14,7 @@ argument-hint: >-
   [--operation <name>] [--dry-run]
 ---
 
-# /xonovex-utility:slashcommand-distill — Distill a Command
+# /xonovex-utility:slashcommand-distill - Distill a Command
 
 ## Arguments
 

@@ -9,6 +9,7 @@ import {
   isFile,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
+import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {checkGuideDrift} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
 import {checkReferenceFileLinks} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
@@ -659,6 +660,21 @@ const checkHarnessNeutrality = (body: string, report: Report): void => {
   }
 };
 
+// The scan covers the whole package, not just SKILL.md: references, SOURCES.md,
+// eval fixtures, bundled scripts, asset templates, and the manifests all ship
+// prose a reader sees.
+const checkProsePunctuation = (packageRoot: string, report: Report): void => {
+  const findings = scanProsePunctuation(packageRoot);
+  for (const {excerpt, hint, label, line, path} of findings) {
+    report.addFail(
+      `punctuation: ${label} in ${path} line ${String(line)}, ${hint}: ${excerpt}`,
+    );
+  }
+  if (findings.length === 0) {
+    report.addPass("punctuation: no em dash or ellipsis character");
+  }
+};
+
 const renderReport = (
   report: Report,
   skillPath: string,
@@ -759,6 +775,12 @@ export const main = (argv: readonly string[]): number => {
   checkReferenceTocs(skillDir, report);
   checkReferenceFileLinks(skillDir, report);
   checkHarnessNeutrality(body, report);
+  checkProsePunctuation(
+    isFile(join(dirname(skillDir), "package.json"))
+      ? dirname(skillDir)
+      : skillDir,
+    report,
+  );
   const catalogReport = checkCatalogFiles(skillDir, fm);
   for (const pass of catalogReport.passes) report.addPass(pass);
   for (const error of catalogReport.errors) report.addFail(error);

@@ -12,7 +12,7 @@ allowed-tools:
 argument-hint: "[source] [--name <name>] [--dry-run]"
 ---
 
-# /xonovex-utility:skill-create — Create Guideline Skill from Document
+# /xonovex-utility:skill-create - Create Guideline Skill from Document
 
 ## Arguments
 
@@ -24,4 +24,4 @@ argument-hint: "[source] [--name <name>] [--dry-run]"
 
 Load the `skill-guide` skill (plugin `xonovex-skill-skill`) and perform its
 **create** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

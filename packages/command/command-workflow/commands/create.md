@@ -11,7 +11,7 @@ argument-hint: >-
   [subject] [--request <file>] [--context <context>...]
 ---
 
-# /xonovex-workflow:create — Create
+# /xonovex-workflow:create - Create
 
 ## Arguments
 

@@ -14,7 +14,7 @@ argument-hint: >-
   [--effect <inspect|preview|apply>] [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:workspace-create — Workspace create
+# /xonovex-workflow:workspace-create - Workspace create
 
 ## Arguments
 

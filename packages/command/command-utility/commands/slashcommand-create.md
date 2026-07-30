@@ -14,7 +14,7 @@ argument-hint: >-
   [--interactive] [--dry-run] [--force]
 ---
 
-# /xonovex-utility:slashcommand-create — Create Slash Command
+# /xonovex-utility:slashcommand-create - Create Slash Command
 
 ## Arguments
 

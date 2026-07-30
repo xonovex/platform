@@ -15,7 +15,7 @@ argument-hint: >-
   [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:execute — Execute
+# /xonovex-workflow:execute - Execute
 
 ## Arguments
 

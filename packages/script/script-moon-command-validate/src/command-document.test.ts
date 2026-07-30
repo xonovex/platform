@@ -9,7 +9,7 @@ allowed-tools:
 argument-hint: "<subject> [--perspective <selection>...]"
 ---
 
-# /xonovex-test:review — Review
+# /xonovex-test:review - Review
 
 ## Arguments
 

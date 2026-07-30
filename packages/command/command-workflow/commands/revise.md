@@ -12,7 +12,7 @@ argument-hint: >-
   [--context <context>...]
 ---
 
-# /xonovex-workflow:revise — Revise
+# /xonovex-workflow:revise - Revise
 
 ## Arguments
 

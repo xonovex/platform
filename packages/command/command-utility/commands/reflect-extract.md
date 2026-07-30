@@ -9,7 +9,7 @@ allowed-tools:
 argument-hint: "[category] [--out-dir <dir>]"
 ---
 
-# /xonovex-utility:reflect-extract — Extract Development Lessons
+# /xonovex-utility:reflect-extract - Extract Development Lessons
 
 ## Arguments
 
@@ -20,4 +20,4 @@ argument-hint: "[category] [--out-dir <dir>]"
 
 Load the `reflect-guide` skill (plugin `xonovex-skill-reflect`) and perform its
 **extract** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas — do not restate them.
+procedure, output format, and gotchas. Do not restate them.

@@ -52,6 +52,10 @@
       "types": "./src/platform-meta.ts",
       "default": "./dist/src/platform-meta.js"
     },
+    "./prose-punctuation": {
+      "types": "./src/prose-punctuation.ts",
+      "default": "./dist/src/prose-punctuation.js"
+    },
     "./records": {
       "types": "./src/records.ts",
       "default": "./dist/src/records.js"

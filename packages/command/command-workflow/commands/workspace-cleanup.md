@@ -14,7 +14,7 @@ argument-hint: >-
   [--effect <inspect|preview|apply>] [--idempotency-key <key>]
 ---
 
-# /xonovex-workflow:workspace-cleanup — Workspace cleanup
+# /xonovex-workflow:workspace-cleanup - Workspace cleanup
 
 ## Arguments
 
