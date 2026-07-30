@@ -7,8 +7,7 @@
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"],
       "@xonovex/script-moon-skill-eval-common/*": [
         "../script-moon-skill-eval-common/src/*"
-      ],
-      "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"]
+      ]
     }
   },
   "include": ["src"],

@@ -4,8 +4,7 @@
     "outDir": "./dist",
     "rootDir": ".",
     "paths": {
-      "@xonovex/core/*": ["../../shared/shared-core/src/*"],
-      "@xonovex/core": ["../../shared/shared-core/src/index.ts"]
+      "@xonovex/core/*": ["../../shared/shared-core/src/*"]
     }
   },
   "include": ["src"],

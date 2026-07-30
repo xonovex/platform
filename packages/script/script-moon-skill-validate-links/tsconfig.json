@@ -5,13 +5,9 @@
     "rootDir": ".",
     "paths": {
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"],
-      "@xonovex/script-moon-skill-catalog-common": [
-        "../script-moon-skill-catalog-common/src/index.ts"
-      ],
       "@xonovex/script-moon-skill-catalog-common/*": [
         "../script-moon-skill-catalog-common/src/*"
-      ],
-      "@xonovex/script-moon-common": ["../script-moon-common/src/index.ts"]
+      ]
     }
   },
   "include": ["src"],
