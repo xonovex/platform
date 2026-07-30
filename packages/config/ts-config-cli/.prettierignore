@@ -1,7 +1,5 @@
 # Build outputs
 dist/
-
-# Coverage
 coverage/
 
 # Dependencies

@@ -1,21 +1,13 @@
-import {existsSync} from "node:fs";
-import path from "node:path";
 import {fileURLToPath} from "node:url";
 import jseslint from "@eslint/js";
 import eslintViTest from "@vitest/eslint-plugin";
-//import eslintFunctional from "eslint-plugin-functional";
-//import eslintImportX from "eslint-plugin-import-x";
-//import eslintJsdoc from "eslint-plugin-jsdoc";
-//import eslintPerfectionist from "eslint-plugin-perfectionist";
-//import eslintPrettierRecommended from "eslint-plugin-prettier/recommended";
-//import eslintPromise from "eslint-plugin-promise";
 import {configs as eslintRegexpConfigs} from "eslint-plugin-regexp";
 import {configs as eslintSecurityConfigs} from "eslint-plugin-security";
-//import eslintSimpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintSonarjs from "eslint-plugin-sonarjs";
 import eslintUnicorn from "eslint-plugin-unicorn";
 import {defineConfig, globalIgnores, includeIgnoreFile} from "eslint/config";
 import tseslint from "typescript-eslint";
+import {resolveGitignorePath} from "./gitignore.js";
 
 export const GLOB_CONFIG_TS = [
   ".*.{ts,tsx,cts,mts}",
@@ -43,20 +35,6 @@ export const GLOB_CONFIG_JS = [
   "**/prettier.config.{js,jsx,cjs,mjs}",
 ];
 
-export const GLOB_FUNCTIONAL_JS = [
-  "*.func.{js,mjs,cjs}",
-  "**/*.func.{js,mjs,cjs}",
-];
-export const GLOB_FUNCTIONAL_TS = [
-  "*.func.{ts,tsx,cts,mts}",
-  "**/*.func.{ts,tsx,cts,mts}",
-];
-
-export const GLOB_DECLARATIONS = [
-  "*.d.{ts,tsx,cts,mts}",
-  "**/*.d.{ts,tsx,cts,mts}",
-];
-
 export const GLOB_TYPES = ["types/**/*.{ts,tsx,cts,mts}"];
 
 export const GLOB_TEST = [
@@ -69,10 +47,6 @@ export const GLOB_TEST = [
 
 export const GLOB_SCRIPT = ["scripts/**/*.{ts,cts,mts}"];
 
-export const GLOB_SRC_JS = ["**/src/**/*.{js,jsx,cjs,mjs}"];
-export const GLOB_SRC_TS = ["**/src/**/*.{ts,tsx,cts,mts}"];
-export const GLOB_SRC_JS_WITHONLY_JSX = ["**/src/**/*.{jsx}"];
-export const GLOB_SRC_TS_WITHONLY_JSX = ["**/src/**/*.{tsx}"];
 export const GLOB_SRC_JS_WITHOUT_JSX = ["**/src/**/*.{js,mjs,cjs}"];
 export const GLOB_SRC_TS_WITHOUT_JSX = ["**/src/**/*.{ts,mts,cts}"];
 
@@ -80,21 +54,7 @@ export const GLOB_JS = ["*.{js,jsx,cjs,mjs}", "**/*.{js,jsx,cjs,mjs}"];
 export const GLOB_TS = ["*.{ts,tsx,cts,mts}", "**/*.{ts,tsx,cts,mts}"];
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = ((): string | undefined => {
-  let dir = path.dirname(__filename);
-  while (dir) {
-    const hasGit = existsSync(path.join(dir, ".git"));
-    const hasPkg = existsSync(path.join(dir, "package.json"));
-    if (hasGit && hasPkg) return dir;
-    const parent = path.dirname(dir);
-    if (parent === dir) return dir;
-    dir = parent;
-  }
-})();
-
-const gitignorePath = __dirname
-  ? path.join(__dirname, ".gitignore")
-  : undefined;
+const gitignorePath = resolveGitignorePath(__filename);
 
 export const enableTypeCheckedRules = {
   ...tseslint.configs.strictTypeCheckedOnly
@@ -188,6 +148,12 @@ export default defineConfig(
     "**/.assetsignore",
   ]),
 
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: "error",
+    },
+  },
+
   // Git ignores
   gitignorePath ? includeIgnoreFile(gitignorePath) : {},
 
@@ -221,10 +187,8 @@ export default defineConfig(
   // TypeScript and JavaScript
   {
     extends: [
-      // eslintPerfectionist.configs["recommended-natural"],
       eslintRegexpConfigs["flat/recommended"],
       eslintUnicorn.configs.recommended,
-      //eslintPromise.configs["flat/recommended"],
       eslintSecurityConfigs.recommended,
       eslintSonarjs.configs.recommended,
     ],
@@ -236,21 +200,15 @@ export default defineConfig(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    plugins: {
-      // "simple-import-sort": eslintSimpleImportSort,
-    },
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
       "regexp/no-super-linear-backtracking": "off",
       "perfectionist/sort-exports": "off",
       "perfectionist/sort-imports": "off",
-      // "promise/always-return": "off",
       "security/detect-non-literal-regexp": "off",
       "security/detect-non-literal-fs-filename": "off",
       "security/detect-object-injection": "off",
       "security/detect-unsafe-regex": "off",
-      // "simple-import-sort/exports": "warn",
-      // "simple-import-sort/imports": "warn",
       "sonarjs/pseudo-random": "off",
       "sonarjs/no-alphabetical-sort": "off",
       "sonarjs/function-return-type": "off",
@@ -277,10 +235,7 @@ export default defineConfig(
       "unicorn/number-literal-case": "off",
       "unicorn/template-indent": "off",
 
-      // Rules added to the unicorn `recommended` set in the v66-v69
-      // majors and to the sonarjs `recommended` set in v4.1, kept off to
-      // preserve the existing baseline. Adopt incrementally rather than as
-      // part of a version bump.
+      // Rules disabled by current project conventions.
       "unicorn/class-reference-in-static-methods": "off",
       "unicorn/consistent-boolean-name": "off",
       "unicorn/consistent-class-member-order": "off",
@@ -349,54 +304,6 @@ export default defineConfig(
     },
   },
 
-  // Typescript type definitions
-  {
-    files: GLOB_DECLARATIONS,
-    rules: {
-      "unicorn/no-abusive-eslint-disable": "off",
-    },
-  },
-
-  // JSDoc TypeScript and JavaScript
-  // {
-  //   extends: [eslintJsdoc.configs["flat/recommended"]],
-  //   files: [...GLOB_JS, ...GLOB_TS],
-  //   plugins: {
-  //     jsdoc: eslintJsdoc,
-  //   },
-  //   rules: {
-  //     "jsdoc/require-jsdoc": "off",
-  //   },
-  // },
-
-  // Functional TypeScript and JavaScript
-  // {
-  //   extends: [eslintFunctional.configs.recommended],
-  //   files: [...GLOB_FUNCTIONAL_JS, ...GLOB_FUNCTIONAL_TS],
-  // },
-
-  // Packages JavaScript
-  // {
-  //   extends: [eslintImportX.flatConfigs.recommended],
-  //   files: [...GLOB_SRC_JS],
-  //   rules: {
-  //     "import-x/no-unresolved": "off",
-  //   },
-  // },
-
-  // Packages TypeScript
-  // {
-  //   extends: [
-  //     eslintImportX.flatConfigs.recommended,
-  //     eslintImportX.flatConfigs.typescript,
-  //   ],
-  //   files: [...GLOB_SRC_TS],
-  //   rules: {
-  //     "import-x/no-named-as-default-member": "off",
-  //     "import-x/no-unresolved": "off",
-  //   },
-  // },
-
   // Tests
   {
     extends: [eslintViTest.configs.recommended],
@@ -460,7 +367,4 @@ export default defineConfig(
       ...disableTypeCheckedRules,
     },
   },
-
-  // Prettier
-  // eslintPrettierRecommended,
 );

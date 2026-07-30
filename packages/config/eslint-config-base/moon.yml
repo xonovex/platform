@@ -7,3 +7,22 @@ tags:
   - typescript-config
 dependsOn:
   - ts-config-node
+tasks:
+  ts-test:
+    script: npx vitest run
+    deps:
+      - ^:build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: true
+      mergeDeps: replace
+workspace:
+  inheritedTasks:
+    # A config package has no tests (ts-test is stubbed out), so a
+    # coverage gate would measure nothing.
+    exclude:
+      - ts-coverage

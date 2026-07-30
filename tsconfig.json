@@ -39,16 +39,40 @@
       "path": "./packages/script/script-moon-npm-publish"
     },
     {
+      "path": "./packages/script/script-moon-release-validate"
+    },
+    {
       "path": "./packages/script/script-moon-skill-audit-sources"
     },
     {
+      "path": "./packages/script/script-moon-skill-catalog-common"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-eval-common"
+    },
+    {
       "path": "./packages/script/script-moon-skill-eval-outputs"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-eval-routing"
     },
     {
       "path": "./packages/script/script-moon-skill-eval-triggers"
     },
     {
       "path": "./packages/script/script-moon-skill-validate"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-validate-drift"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-validate-links"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-validate-routing"
+    },
+    {
+      "path": "./packages/script/script-moon-skill-validate-spec"
     },
     {
       "path": "./packages/script/script-moon-version-bump"

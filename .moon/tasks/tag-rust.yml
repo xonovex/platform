@@ -32,6 +32,25 @@ tasks:
       - "@globs(tests)"
     options:
       cache: true
+  rust-format:
+    command:
+      - cargo
+      - fmt
+    toolchain: [system, nix]
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    options:
+      cache: false
+      runInCI: false
+  rust-clean:
+    command:
+      - cargo
+      - clean
+    toolchain: [system, nix]
+    options:
+      cache: false
+      runInCI: false
   lint:
     command: noop
     deps: [rust-lint]
@@ -44,5 +63,18 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  format:
+    command: noop
+    deps: [rust-format]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  clean:
+    command: noop
+    deps: [rust-clean]
+    options:
+      cache: false
+      runInCI: false
 inheritedBy:
   tag: rust

@@ -1,7 +1,7 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
   command-format:
-    command: [npm, run, fmt]
+    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.md"
       - "*.config.*"
@@ -11,12 +11,32 @@ tasks:
       cache: false
       runInCI: false
   command-format-check:
-    command: [npm, run, "fmt:check"]
+    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.md"
       - "*.config.*"
       - package.json
     outputs: []
+  command-validate:
+    command:
+      - npx
+      - moon-command-validate
+      - .
+    deps:
+      - target: ~:build
+        optional: true
+    inputs:
+      - commands/*.md
+      - docs/**/*.md
+      - README.md
+      - package.json
+      - .claude-plugin/plugin.json
+      - /budgets.json
+      - /packages/skill/*/*/SKILL.md
+    env:
+      XONOVEX_LINT_MODE: enforce
+    options:
+      cache: false
   format:
     command: noop
     deps: [command-format]
@@ -30,27 +50,13 @@ tasks:
     options:
       cache: false
       mergeDeps: append
-  command-validate:
-    command:
-      - npx
-      - moon-command-validate
-    deps:
-      - target: ~:build
-        optional: true
-      - script-moon-command-validate:install
-    inputs:
-      - "commands/*.md"
-      - "docs/**/*.md"
-      - README.md
-      - package.json
-      - .claude-plugin/plugin.json
-      - "/packages/skill/*/*/SKILL.md"
-    options:
-      cache: false
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check, command-validate]
+    deps: [build, command-validate, format-check]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
 inheritedBy:
   tag: command

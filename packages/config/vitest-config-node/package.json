@@ -19,7 +19,8 @@
     "registry": "https://registry.npmjs.org/"
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -46,8 +47,9 @@
     "@xonovex/ts-config-build": "0.1.22"
   },
   "devDependencies": {
-    "@xonovex/ts-config-build": "0.1.22",
-    "@xonovex/eslint-config-base": "0.1.22"
+    "@xonovex/eslint-config-base": "0.1.22",
+    "@xonovex/prettier-config": "0.1.22",
+    "@xonovex/ts-config-build": "0.1.22"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

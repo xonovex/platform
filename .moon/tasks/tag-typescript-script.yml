@@ -32,5 +32,16 @@ tasks:
     deps: []
     options:
       mergeDeps: replace
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  # ci-check spells out every gate because a task redefined across `extends`
+  # replaces the inherited deps rather than appending to them.
+  ci-check:
+    deps: [build, lint, typecheck, test, format-check]
+    options:
+      cache: false
 inheritedBy:
   tag: typescript-script

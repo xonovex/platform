@@ -1,5 +1,12 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 tasks:
+  # Every npm project gates publish readiness; npm-check verifies the packed
+  # tarball resolves every exports, bin and relative import target.
+  ci-check:
+    deps:
+      - npm-check
+    options:
+      mergeDeps: append
   npm-publish:
     command:
       - npx
@@ -9,11 +16,11 @@ tasks:
         optional: true
       - ^:npm-publish
       - ~:npm-check
-      - script-moon-npm-publish:install
     inputs:
       - package.json
     options:
       cache: false
+      runInCI: false
   npm-publish-dry-run:
     command:
       - npx
@@ -23,11 +30,11 @@ tasks:
       - target: ~:build
         optional: true
       - ~:npm-check
-      - script-moon-npm-publish:install
     inputs:
       - package.json
     options:
       cache: false
+      runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
@@ -36,6 +43,7 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   npm-check:
     command:
       - npx
@@ -43,13 +51,13 @@ tasks:
     deps:
       - target: ~:build
         optional: true
-      - script-moon-npm-check:install
     options:
       cache: false
   npm-lint-fix:
     script: npm pkg fix
     options:
       cache: false
+      runInCI: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
@@ -58,13 +66,13 @@ tasks:
       - package.json
     options:
       cache: false
+      runInCI: false
   version-bump:
     command:
       - npx
       - moon-version-bump
-    deps:
-      - script-moon-version-bump:install
     options:
       cache: false
+      runInCI: false
 inheritedBy:
   tag: npm

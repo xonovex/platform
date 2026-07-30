@@ -11,6 +11,7 @@ tasks:
     command:
       - hadolint
       - Dockerfile
+    toolchain: [system, nix]
     inputs:
       - "@globs(dockerfiles)"
     outputs: []
@@ -27,3 +28,6 @@ tasks:
     deps: [lint]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace

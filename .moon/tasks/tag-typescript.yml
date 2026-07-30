@@ -68,8 +68,9 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   ts-format:
-    script: npx prettier --write .
+    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -79,8 +80,9 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   ts-format-check:
-    script: npx prettier --check .
+    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -103,7 +105,20 @@ tasks:
     options:
       cache: true
   ts-coverage:
-    script: npx vitest run --coverage
+    script: >-
+      npx vitest run --coverage --coverage.include='src/**'
+      --coverage.thresholds.lines "$TS_COVERAGE_MIN_LINES"
+      --coverage.thresholds.functions "$TS_COVERAGE_MIN_FUNCTIONS"
+      --coverage.thresholds.branches "$TS_COVERAGE_MIN_BRANCHES"
+      --coverage.thresholds.statements "$TS_COVERAGE_MIN_STATEMENTS"
+    # These are the floors for a project that sets none of its own. Each project
+    # overrides them to sit just under its own coverage, so a drop fails that
+    # project instead of coasting on the weakest project's floor.
+    env:
+      TS_COVERAGE_MIN_LINES: "50"
+      TS_COVERAGE_MIN_FUNCTIONS: "50"
+      TS_COVERAGE_MIN_BRANCHES: "50"
+      TS_COVERAGE_MIN_STATEMENTS: "50"
     deps:
       - ^:build
     inputs:
@@ -114,6 +129,11 @@ tasks:
       - coverage
     options:
       cache: true
+  ts-clean:
+    script: rm -rf dist coverage *.tsbuildinfo
+    options:
+      cache: false
+      runInCI: false
   build:
     command: noop
     deps: [ts-build]
@@ -125,6 +145,20 @@ tasks:
     deps: [ts-lint]
     options:
       cache: false
+      mergeDeps: append
+  lint-fix:
+    command: noop
+    deps: [ts-lint-fix]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  format:
+    command: noop
+    deps: [ts-format]
+    options:
+      cache: false
+      runInCI: false
       mergeDeps: append
   typecheck:
     command: noop
@@ -144,6 +178,12 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  clean:
+    command: noop
+    deps: [ts-clean]
+    options:
+      cache: false
+      runInCI: false
   ci-check:
     command: echo 'ci-check complete'
     deps:
@@ -154,5 +194,8 @@ tasks:
       - format-check
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
 inheritedBy:
   tag: typescript

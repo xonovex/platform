@@ -3,16 +3,21 @@ fileGroups:
   sources:
     - "**/*.sh"
   configs:
-    - .shellcheckrc
-    - .editorconfig
+    - "/.editorconfig"
 tasks:
   sh-lint:
-    script: shopt -s globstar nullglob && files=(**/*.sh) && [ ${#files[@]} -gt 0 ] && shellcheck -x "${files[@]}" || echo 'No .sh files found'
+    script: |
+      shopt -s globstar nullglob
+      files=(**/*.sh)
+      if [ "${#files[@]}" -eq 0 ]; then
+        echo 'No .sh files found'
+      else
+        shellcheck -x "${files[@]}"
+      fi
     toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
-      - .shellcheckrc
-      - .editorconfig
+      - "/.editorconfig"
     options:
       cache: true
   sh-format:
@@ -25,6 +30,7 @@ tasks:
       - "@globs(sources)"
     options:
       cache: false
+      runInCI: false
   sh-format-check:
     command:
       - shfmt
@@ -47,10 +53,20 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  format:
+    command: noop
+    deps: [sh-format]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
     deps: [lint, format-check]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
 inheritedBy:
   tag: shell

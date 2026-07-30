@@ -31,6 +31,7 @@ tasks:
     script: rm -rf dist
     options:
       cache: false
+      runInCI: false
   tsconfig-typecheck:
     command:
       - npm
@@ -73,6 +74,7 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   tsconfig-format:
     command:
       - npm
@@ -86,6 +88,7 @@ tasks:
     outputs: []
     options:
       cache: false
+      runInCI: false
   tsconfig-format-check:
     command:
       - npm
@@ -111,6 +114,20 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  lint-fix:
+    command: noop
+    deps: [tsconfig-lint-fix]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  format:
+    command: noop
+    deps: [tsconfig-format]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
   typecheck:
     command: noop
     deps: [tsconfig-typecheck]
@@ -123,10 +140,19 @@ tasks:
     options:
       cache: false
       mergeDeps: append
+  clean:
+    command: noop
+    deps: [tsconfig-clean]
+    options:
+      cache: false
+      runInCI: false
   ci-check:
     command: echo 'ci-check complete'
     deps: [build, lint, typecheck, format-check]
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
 inheritedBy:
   tag: tsconfig

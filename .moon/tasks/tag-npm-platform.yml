@@ -1,0 +1,20 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  ci-check:
+    toolchain: [system, nix]
+  npm-check:
+    toolchain: [system, nix]
+  npm-publish:
+    toolchain: [system, nix]
+  npm-publish-dry-run:
+    toolchain: [system, nix]
+  npm-lint-fix:
+    toolchain: [system, nix]
+  ci-publish:
+    toolchain: [system, nix]
+  ci-publish-dry-run:
+    toolchain: [system, nix]
+  version-bump:
+    toolchain: [system, nix]
+inheritedBy:
+  tag: npm-platform

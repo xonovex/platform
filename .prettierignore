@@ -108,3 +108,7 @@ docs/_build/
 
 # Miscellaneous Generated Files
 .assetsignore
+
+# Skill eval run artifacts
+*-guide-workspace/
+.skill-eval-results/

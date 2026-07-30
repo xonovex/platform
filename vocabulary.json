@@ -1,0 +1,18 @@
+{
+  "cold boundary": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "convention-derived effect": "packages/skill/skill-workflow/workflow-guide/references/governance.md",
+  "declared team convention": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "deferred context": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "descriptive result": "packages/skill/skill-workflow/workflow-guide/references/governance.md",
+  "effect": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "entry point": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "fetched content": "packages/skill/skill-workflow/workflow-guide/references/governance.md",
+  "freeform session": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "handoff": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "native system": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "operation": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "protected effect": "packages/skill/skill-workflow/workflow-guide/references/governance.md",
+  "stream-shaped work": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "subject": "packages/skill/skill-workflow/workflow-guide/references/contract.md",
+  "warm session": "packages/skill/skill-workflow/workflow-guide/references/contract.md"
+}

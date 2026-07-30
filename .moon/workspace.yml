@@ -1,19 +1,21 @@
 $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
-  - packages/asset/*
-  - packages/diagram/*
-  - packages/skill/*
-  - packages/command/*
-  - packages/config/*
-  - packages/agent/*
-  - packages/shared/*
-  - packages/docker/*
-  - packages/script/*
-  - packages/moon/*
-  # Tenant roots may hold AGENTS.md/CLAUDE.md instruction files; the globs above
-  # match them as project roots, so exclude markdown to keep project location to
-  # directories only.
-  - "!**/*.md"
+  globs:
+    - packages/asset/*
+    - packages/skill/*
+    - packages/command/*
+    - packages/config/*
+    - packages/agent/*
+    - packages/shared/*
+    - packages/script/*
+    - packages/moon/*
+    # Project globs exclude tenant files so discovered locations stay directories.
+    - "!**/*.md"
+  sources:
+    github-actions: .github
+    gitlab-ci: .gitlab
+    repository-shell: .hooks
+    workspace-config: .
 vcs:
   hooks:
     commit-msg:
@@ -27,6 +29,10 @@ vcs:
   sync: true
 constraints:
   enforceLayerRelationships: true
+docker:
+  scaffold:
+    configsPhaseGlobs:
+      - packages/config/ts-config-*/src/index.json
 hasher:
   optimization: performance
   walkStrategy: vcs

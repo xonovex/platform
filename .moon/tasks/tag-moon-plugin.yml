@@ -51,8 +51,12 @@ tasks:
       - test
       - lint
       - format-check
+      - github-check
     options:
       cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
   github-check:
     script: |
       set -euo pipefail
@@ -95,6 +99,7 @@ tasks:
       - github-check
     options:
       cache: false
+      runInCI: false
   github-publish-dry-run:
     script: |
       set -euo pipefail
@@ -116,17 +121,20 @@ tasks:
       - github-check
     options:
       cache: false
+      runInCI: false
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
       - github-publish
     options:
       cache: false
+      runInCI: false
   ci-publish-dry-run:
     command: echo 'ci-publish-dry-run complete'
     deps:
       - github-publish-dry-run
     options:
       cache: false
+      runInCI: false
 inheritedBy:
   tag: moon-plugin
