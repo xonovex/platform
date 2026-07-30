@@ -35,37 +35,6 @@ const workspaceCommands = [
   "workspace-cleanup",
 ] as const;
 
-const retryProtectedCommands = [
-  "execute",
-  "publish",
-  "workspace-create",
-  "workspace-merge",
-  "workspace-cleanup",
-] as const;
-
-// The safety core from the architecture contract. This literal stays a literal on
-// purpose: the commands are the only place the flags exist, so deriving the expected
-// set from them would compare the commands to themselves and assert nothing. Like a
-// recorded budget, it is an external anchor that makes growing the surface a
-// decision rather than an accident.
-const SAFETY_CORE_FLAGS = [
-  "--context",
-  "--destination",
-  "--effect",
-  "--expected-revision",
-  "--idempotency-key",
-  "--request",
-  "--revision",
-  "--source",
-] as const;
-
-const workflowCommandSources = (): readonly string[] =>
-  [...coreWorkflowCommands, ...workspaceCommands].map((command) =>
-    readRepositoryFile(
-      `packages/command/command-workflow/commands/${command}.md`,
-    ),
-  );
-
 // Every guide name the catalog ships, so the inventory ban derives from what
 // exists rather than from a list that ages the moment a skill is added.
 const installedGuideNames = (): readonly string[] =>
@@ -108,44 +77,7 @@ const effectDefaultsFromSkill = (
   return defaults;
 };
 
-// The default one command documents for its own --effect argument, or
-// undefined when it exposes no such argument.
-const effectDefaultFromCommand = (command: string): string | undefined => {
-  const source = readRepositoryFile(
-    `packages/command/command-workflow/commands/${command}.md`,
-  );
-  if (!source.includes("`--effect`")) return undefined;
-  return /`--effect`[^\n]*Defaults to `([a-z]+)`/u.exec(source)?.at(1);
-};
-
 describe("workflow composition contracts", () => {
-  // Asserts the generic workflow command surface. This repository keeps the
-  // plan-prefixed commands, so the files this reads do not exist.
-  it.skip("keeps the command flag surface at the safety core", () => {
-    // Every occurrence, not just the argument-hint ones: a backtick guard here
-    // would leave the Arguments section and the delegation prose unchecked, so a
-    // flag documented in only one of them would pass.
-    const used = new Set<string>();
-    for (const source of workflowCommandSources()) {
-      for (const match of source.matchAll(/--[a-z][a-z-]*/gu)) {
-        used.add(match[0]);
-      }
-    }
-
-    expect([...used].toSorted()).toEqual([...SAFETY_CORE_FLAGS]);
-  });
-
-  // Asserts the generic workflow command surface. This repository keeps the
-  // plan-prefixed commands, so the files this reads do not exist.
-  it.skip("keeps core command subjects revision-addressable", () => {
-    for (const command of coreWorkflowCommands) {
-      const source = readRepositoryFile(
-        `packages/command/command-workflow/commands/${command}.md`,
-      );
-      expect(source).toContain("`subject`");
-    }
-  });
-
   it("defines a minimal cold-boundary handoff anchored to code", () => {
     const handoffs = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/handoffs.md",
@@ -173,33 +105,6 @@ describe("workflow composition contracts", () => {
       );
     }
     expect(readme).not.toMatch(/Context has stable identity/u);
-  });
-
-  // Asserts the generic workflow command surface. This repository keeps the
-  // plan-prefixed commands, so the files this reads do not exist.
-  it.skip("exposes revision and retry protection for mutating provider operations", () => {
-    for (const command of retryProtectedCommands) {
-      const source = readRepositoryFile(
-        `packages/command/command-workflow/commands/${command}.md`,
-      );
-      expect(source).toContain("[--idempotency-key <key>]");
-      expect(source).toContain("`--idempotency-key`");
-    }
-
-    const merge = readRepositoryFile(
-      "packages/command/command-workflow/commands/workspace-merge.md",
-    );
-    expect(merge).toContain("[--expected-revision <revision>]");
-
-    const effects = readRepositoryFile(
-      "packages/skill/skill-workflow/workflow-guide/references/effects.md",
-    );
-    expect(effects).toMatch(
-      /requires the exact source or\s+destination revision when that provider exposes one/u,
-    );
-    expect(effects).toMatch(
-      /requires a stable idempotency key when the\s+provider supports one/u,
-    );
   });
 
   it("states governance once and points every other file at it", () => {
@@ -269,49 +174,24 @@ describe("workflow composition contracts", () => {
 
   // Asserts the generic workflow command surface. This repository keeps the
   // plan-prefixed commands, so the files this reads do not exist.
-  it.skip("agrees on the default effect mode across skill and commands", () => {
+  it("keeps the effects table internally consistent", () => {
     const effects = readRepositoryFile(
       "packages/skill/skill-workflow/workflow-guide/references/effects.md",
     );
     // inline was a result-placement label, not an external-state mode.
-    expect(effects).not.toContain("`inline`");
+    expect(effects).not.toContain("\`inline\`");
 
-    // Both sides are read from the files. The test asserts they agree rather
-    // than restating the default, so a table edit that misses a command fails
-    // here instead of passing on two literals that were updated together.
     const table = effectDefaultsFromSkill(effects);
     expect(table.size).toBe(
       coreWorkflowCommands.length + workspaceCommands.length,
     );
 
-    for (const [command, expected] of table) {
-      const documented = effectDefaultFromCommand(command);
-      expect(
-        {command, effect: documented},
-        `${command} must document the default effects.md assigns`,
-      ).toEqual({command, effect: expected});
-    }
     // Every mode the table names is a mode the mode table defines.
     for (const mode of new Set(table.values())) {
       if (mode === undefined) continue;
       expect(effects).toContain(`| \`${mode}\``);
     }
   });
-
-  // Asserts the generic workflow command surface. This repository keeps the
-  // plan-prefixed commands, so the files this reads do not exist.
-  it.skip("lets every operation read the subject it is given", () => {
-    // A provider-native subject or --context reference is read through a
-    // provider CLI, so withholding Bash would block the operation outright.
-    for (const command of [...coreWorkflowCommands, ...workspaceCommands]) {
-      expect(
-        readRepositoryFile(
-          `packages/command/command-workflow/commands/${command}.md`,
-        ),
-      ).toMatch(/^ {2}- Bash$/mu);
-    }
-  });
-
   it("keeps planning operations inline and continuation effect-aware", () => {
     for (const reference of planningReferences) {
       const source = readRepositoryFile(
