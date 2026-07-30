@@ -77,6 +77,28 @@ removal of the donor branches and worktrees.
    confirm `git rev-list -1 salvage/runtime-probes-d1692d3e` still resolves
    after the deletions and push the tag to origin.
 
+## Carried From Subplan 09
+
+- **`packages/command/command-workflow` will not match the donor, by decision.**
+  The plan-prefixed command surface is kept instead of the donor's generic
+  lifecycle. Treat that package as an accepted difference in the zero-diff
+  check, not residue.
+- **Bump the catalog once, here.** Every skill and command package, and their
+  `@xonovex/skill-*` pins, are held at 5.1.0 while the donor sits at 7.0.0.
+  Bump them together, in lockstep with both marketplace files.
+- **Reset two budgets.** `budgets.json` was raised for
+  `command-utility/commands/skill-optimize.md` (172 to 187) and
+  `slashcommand-distill.md` (113 to 169) while main's command files were still
+  in place. Those files are now the donor's, so recheck both against the
+  donor's values.
+- **Register the unregistered packages.** `skill-accessibility` and
+  `skill-credential-management` shipped without marketplace entries, and the
+  seven harness and workflow skills subplan 08 added need entries too. Both
+  marketplace files, alphabetical.
+- **Budget entries added outside the donor's set** cover the operations kept
+  for the plan surface: `plan-guide`'s `accept.md`, `decide.md`, `reject.md`,
+  `delegate.md` and its grown `SKILL.md`. Keep them when reconciling.
+
 ## Gates Inherited from Subplan 04
 
 `packages/script/script-moon-release-validate` carries `runInCI: false` on its
