@@ -1,0 +1,34 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-eval-common
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "90"
+      TS_COVERAGE_MIN_FUNCTIONS: "95"
+      TS_COVERAGE_MIN_BRANCHES: "80"
+      TS_COVERAGE_MIN_STATEMENTS: "90"
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-eval-common:build
+  ci-routing:
+    script: >-
+      npx moon-skill-eval-routing packages/skill
+      --split "${SKILL_ROUTING_SPLIT:-validation}"
+      --runs "${SKILL_ROUTING_RUNS:-3}"
+      --owners "${SKILL_ROUTING_OWNERS:-}"
+      --threshold 0.5
+      --batch-size 8
+      --max-budget-usd 0.05
+      --workspace ".skill-eval-results/routing/${SKILL_EVAL_HARNESS:-claude}"
+    inputs:
+      - /packages/skill/*/*/eval-queries.json
+      - /packages/skill/*/*/SKILL.md
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false

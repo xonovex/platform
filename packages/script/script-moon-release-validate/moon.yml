@@ -1,0 +1,60 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ts-test:
+    deps:
+      - ~:ts-build
+    options:
+      mergeDeps: append
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "90"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "77"
+      TS_COVERAGE_MIN_STATEMENTS: "90"
+    deps:
+      - ~:ts-build
+    options:
+      mergeDeps: append
+  release-validate:
+    command: node packages/script/script-moon-release-validate/dist/src/index.js
+    deps:
+      - ~:build
+    inputs:
+      - src/**/*
+      - /README.md
+      - /package-lock.json
+      - /.github/workflows/release.yml
+      - /.moon/tasks/*.yml
+      - /packages/*/*/moon.yml
+      - /.claude-plugin/marketplace.json
+      - /.agents/plugins/marketplace.json
+      - /packages/command/*/package.json
+      - /packages/command/*/.claude-plugin/plugin.json
+      - /packages/skill/*/package.json
+      - /packages/skill/*/.claude-plugin/plugin.json
+      - /packages/skill/*/.codex-plugin/plugin.json
+      - /AGENTS.md
+      - /CLAUDE.md
+      - /.moon/AGENTS.md
+      - /.moon/CLAUDE.md
+      - /packages/*/AGENTS.md
+      - /packages/*/CLAUDE.md
+      - /packages/*/*/AGENTS.md
+      - /packages/*/*/CLAUDE.md
+    options:
+      runFromWorkspaceRoot: true
+      # Reads this repository's marketplace and catalog files, which still list
+      # the command plugins, so it reports findings until they are reconciled.
+      runInCI: false
+  ci-check:
+    deps:
+      - coverage
+    options:
+      mergeDeps: append

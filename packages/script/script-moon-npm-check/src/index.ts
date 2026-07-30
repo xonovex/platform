@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-import {existsSync} from "node:fs";
+import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {
   logError,
   logInfo,
   logSuccess,
-  logWarning,
-  parseCliArgs,
-  readPkg,
-} from "@xonovex/script-moon-common";
-import {validatePackage} from "./validate.js";
+} from "@xonovex/script-moon-common/logging";
+import {readPkg} from "@xonovex/script-moon-common/package-json";
+import {packagedFilePaths, validatePackedPackage} from "./packed-package.js";
+import {validateDeclaredFiles, validatePackage} from "./validate.js";
 
 parseCliArgs({
   name: "moon-npm-check",
@@ -17,6 +17,7 @@ parseCliArgs({
 });
 
 const packageJsonPath = join(process.cwd(), "package.json");
+const packageRoot = process.cwd();
 
 let pkg;
 try {
@@ -26,22 +27,26 @@ try {
   process.exit(1);
 }
 
-if (pkg.private) {
+if (pkg.private === true) {
   logInfo(`Skipping private package ${pkg.name ?? "(unnamed)"}`);
   process.exit(0);
 }
 
-const errors = validatePackage(pkg);
-
-if (pkg.files && Array.isArray(pkg.files)) {
-  for (const file of pkg.files) {
-    if (!existsSync(join(process.cwd(), String(file)))) {
-      logWarning(
-        `  Warning: file "${String(file)}" does not exist yet (may be created during build)`,
-      );
-    }
-  }
+let packedFiles: readonly string[];
+try {
+  packedFiles = packagedFilePaths(packageRoot);
+} catch (error: unknown) {
+  logError(`Failed to inspect packed package: ${String(error)}`);
+  process.exit(1);
 }
+
+const errors = [
+  ...validatePackage(pkg),
+  ...validateDeclaredFiles(pkg, (file) => existsSync(join(packageRoot, file))),
+  ...validatePackedPackage(pkg, packedFiles, (file) =>
+    readFileSync(join(packageRoot, file), "utf8"),
+  ),
+];
 
 if (errors.length > 0) {
   logError(`\n${pkg.name ?? packageJsonPath} is not ready for publishing:\n`);

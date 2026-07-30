@@ -150,6 +150,7 @@ export default defineConfig(
 
   {
     linterOptions: {
+      noInlineConfig: true,
       reportUnusedDisableDirectives: "error",
     },
   },
@@ -202,6 +203,18 @@ export default defineConfig(
     },
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "no-warning-comments": [
+        "error",
+        {
+          terms: [
+            "eslint-disable",
+            "@ts-ignore",
+            "@ts-expect-error",
+            "@ts-nocheck",
+          ],
+          location: "anywhere",
+        },
+      ],
       "regexp/no-super-linear-backtracking": "off",
       "perfectionist/sort-exports": "off",
       "perfectionist/sort-imports": "off",
@@ -212,7 +225,7 @@ export default defineConfig(
       "sonarjs/pseudo-random": "off",
       "sonarjs/no-alphabetical-sort": "off",
       "sonarjs/function-return-type": "off",
-      "sonarjs/cognitive-complexity": "off",
+      "sonarjs/cognitive-complexity": ["error", 30],
       "sonarjs/regex-complexity": "off",
       "sonarjs/anchor-precedence": "off",
       "sonarjs/no-commented-code": "off",

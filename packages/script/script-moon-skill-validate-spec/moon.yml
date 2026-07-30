@@ -1,0 +1,27 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ts-test:
+    inputs:
+      - /packages/skill/skill-skill/skill-guide/assets/**/*
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "75"
+      TS_COVERAGE_MIN_FUNCTIONS: "89"
+      TS_COVERAGE_MIN_BRANCHES: "60"
+      TS_COVERAGE_MIN_STATEMENTS: "75"
+    inputs:
+      - /packages/skill/skill-skill/skill-guide/assets/**/*
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-catalog-common:build

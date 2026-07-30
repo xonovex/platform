@@ -1,4 +1,3 @@
-import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import {
   isIncludedType,
   parseConventionalCommit,
@@ -93,37 +92,29 @@ const generateChangelogEntry = (
   return lines.join("\n");
 };
 
-const updateChangelog = (
-  changelogPath: string,
+const renderUpdatedChangelog = (
+  existing: string | undefined,
   packageName: string,
   newEntry: string,
-): void => {
+): string => {
   const title = `# ${packageName}`;
-
-  if (!existsSync(changelogPath)) {
-    writeFileSync(changelogPath, `${title}\n\n${newEntry}`, "utf8");
-    return;
-  }
-
-  const existing = readFileSync(changelogPath, "utf8");
+  if (existing === undefined) return `${title}\n\n${newEntry}`;
   const titleIndex = existing.indexOf(title);
 
   if (titleIndex === -1) {
-    writeFileSync(changelogPath, `${title}\n\n${newEntry}`, "utf8");
-    return;
+    return `${title}\n\n${newEntry}\n${existing}`;
   }
 
   const insertPos = titleIndex + title.length + 1;
-  const updated =
-    existing.slice(0, insertPos) + "\n" + newEntry + existing.slice(insertPos);
-  writeFileSync(changelogPath, updated, "utf8");
+  return (
+    existing.slice(0, insertPos) + "\n" + newEntry + existing.slice(insertPos)
+  );
 };
 
 export {
   generateChangelogEntry,
-  updateChangelog,
+  renderUpdatedChangelog,
   determineBumpLevel,
-  sectionTitle,
   formatCommitEntry,
 };
-export type {DepUpdate, BumpLevel};
+export type {DepUpdate};

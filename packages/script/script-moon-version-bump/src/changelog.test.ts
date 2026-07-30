@@ -3,6 +3,7 @@ import {
   determineBumpLevel,
   formatCommitEntry,
   generateChangelogEntry,
+  renderUpdatedChangelog,
 } from "./changelog.js";
 import type {Commit} from "./git-log.js";
 
@@ -146,5 +147,37 @@ describe("generateChangelogEntry", () => {
     expect(entry).toContain("add unit tests");
     expect(entry).not.toContain("add widget");
     expect(entry).not.toContain("resolve crash");
+  });
+});
+
+describe("renderUpdatedChangelog", () => {
+  it("renders a new changelog without writing", () => {
+    expect(
+      renderUpdatedChangelog(undefined, "@xonovex/example", "## 1.0.0\n"),
+    ).toBe("# @xonovex/example\n\n## 1.0.0\n");
+  });
+
+  it("inserts an entry after the matching package title", () => {
+    expect(
+      renderUpdatedChangelog(
+        "# @xonovex/example\n\n## 1.0.0\n\n- Initial\n",
+        "@xonovex/example",
+        "## 1.1.0\n\n- Update\n",
+      ),
+    ).toContain("# @xonovex/example\n\n## 1.1.0\n\n- Update\n\n## 1.0.0");
+  });
+
+  it("preserves existing history when the package title is missing", () => {
+    const existing = "# Existing package\n\n## 1.0.0\n\n- Initial release\n";
+
+    const updated = renderUpdatedChangelog(
+      existing,
+      "@xonovex/current",
+      "## 1.1.0\n\n- Update\n",
+    );
+
+    expect(updated).toContain("# @xonovex/current");
+    expect(updated).toContain("## 1.1.0");
+    expect(updated).toContain(existing);
   });
 });

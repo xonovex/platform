@@ -35,7 +35,6 @@ tasks:
     deps:
       - build
       - format-check
-      - skill-validate
       - target: ~:test
         optional: true
     options:
@@ -46,13 +45,24 @@ tasks:
   skill-validate:
     command:
       - npx
-      - moon-skill-validate
+      - moon-skill-validate-spec
+      - --strict
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-validate:install
+      - script-moon-skill-validate-routing:routing-check
+    env:
+      XONOVEX_LINT_MODE: enforce
+    inputs:
+      - "**/*.md"
+      - "**/*.md.template"
+      - "**/*.json"
+      - "**/*.py"
+      - /budgets.json
+      - /vocabulary.json
     options:
       cache: false
+      runInCI: false
   skill-audit-sources:
     command:
       - npx

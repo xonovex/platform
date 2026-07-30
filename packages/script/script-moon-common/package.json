@@ -4,11 +4,75 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./dist/src/index.js"
+    "./batches": {
+      "types": "./src/batches.ts",
+      "default": "./dist/src/batches.js"
+    },
+    "./child-process": {
+      "types": "./src/child-process.ts",
+      "default": "./dist/src/child-process.js"
+    },
+    "./cli-args": {
+      "types": "./src/cli-args.ts",
+      "default": "./dist/src/cli-args.js"
+    },
+    "./direct-execution": {
+      "types": "./src/direct-execution.ts",
+      "default": "./dist/src/direct-execution.js"
+    },
+    "./drift-budgets": {
+      "types": "./src/drift-budgets.ts",
+      "default": "./dist/src/drift-budgets.js"
+    },
+    "./executable": {
+      "types": "./src/executable.ts",
+      "default": "./dist/src/executable.js"
+    },
+    "./frontmatter": {
+      "types": "./src/frontmatter.ts",
+      "default": "./dist/src/frontmatter.js"
+    },
+    "./fs": {
+      "types": "./src/fs.ts",
+      "default": "./dist/src/fs.js"
+    },
+    "./logging": {
+      "types": "./src/logging.ts",
+      "default": "./dist/src/logging.js"
+    },
+    "./moon-query": {
+      "types": "./src/moon-query.ts",
+      "default": "./dist/src/moon-query.js"
+    },
+    "./package-json": {
+      "types": "./src/package-json.ts",
+      "default": "./dist/src/package-json.js"
+    },
+    "./platform-meta": {
+      "types": "./src/platform-meta.ts",
+      "default": "./dist/src/platform-meta.js"
+    },
+    "./prose-punctuation": {
+      "types": "./src/prose-punctuation.ts",
+      "default": "./dist/src/prose-punctuation.js"
+    },
+    "./records": {
+      "types": "./src/records.ts",
+      "default": "./dist/src/records.js"
+    },
+    "./skill-eval-models": {
+      "types": "./src/skill-eval-models.ts",
+      "default": "./dist/src/skill-eval-models.js"
+    },
+    "./workspace": {
+      "types": "./src/workspace.ts",
+      "default": "./dist/src/workspace.js"
+    }
   },
-  "devDependencies": {
-    "@xonovex/vitest-config-node": "0.1.22"
+  "dependencies": {
+    "zod": "^4.4.3"
   },
+  "devDependencies": {},
   "keywords": [
     "xonovex",
     "script",

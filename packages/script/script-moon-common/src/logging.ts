@@ -1,3 +1,7 @@
+// These log helpers restate the ones in shared-core rather than importing them.
+// shared-core is tagged npm, so its npm-check, publish, and version tasks depend
+// on the script packages; a script package that depended on shared-core would
+// close that loop and moon would reject the project graph with would_cycle.
 const C = {
   RED: "\u001B[0;31m",
   GREEN: "\u001B[0;32m",

@@ -13,9 +13,7 @@
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"
   },
-  "devDependencies": {
-    "@xonovex/vitest-config-node": "0.1.22"
-  },
+  "devDependencies": {},
   "keywords": [
     "xonovex",
     "script",

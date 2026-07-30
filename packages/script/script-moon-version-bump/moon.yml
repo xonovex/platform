@@ -4,17 +4,19 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "85"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "85"
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ci-check:
+    deps: [coverage]
   ts-build:
     deps:
       - script-moon-common:build
-  install:
-    command:
-      - npm
-      - install
-      - -w
-      - "@xonovex/script-moon-version-bump"
-    deps:
-      - ~:build
-    options:
-      cache: false
-      runFromWorkspaceRoot: true

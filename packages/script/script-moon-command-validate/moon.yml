@@ -2,6 +2,14 @@ $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script]
 tasks:
+  bin-permissions:
+    command: [chmod, +x, dist/src/index.js]
+    deps: [ts-build]
+    inputs: [dist/src/index.js]
+    options:
+      cache: false
+  build:
+    deps: [bin-permissions]
   coverage:
     command: noop
     deps: [ts-coverage]

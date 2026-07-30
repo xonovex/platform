@@ -31,6 +31,35 @@ describe("package-json", () => {
     it("should throw for missing file", () => {
       expect(() => readPkg(join(tmp, "missing.json"))).toThrow();
     });
+
+    it("should reject invalid dependency values", () => {
+      const pkgPath = join(tmp, "package.json");
+      writeFileSync(pkgPath, JSON.stringify({dependencies: {invalid: 42}}));
+
+      expect(() => readPkg(pkgPath)).toThrow("invalid package.json");
+    });
+
+    it("should reject malformed JSON with source context", () => {
+      const pkgPath = join(tmp, "package.json");
+      writeFileSync(pkgPath, "{");
+
+      expect(() => readPkg(pkgPath)).toThrow(
+        `invalid package.json at ${pkgPath}: malformed JSON`,
+      );
+    });
+
+    it("should preserve fields outside the release schema", () => {
+      const pkgPath = join(tmp, "package.json");
+      writeFileSync(
+        pkgPath,
+        JSON.stringify({name: "example", scripts: {test: "vitest"}}),
+      );
+
+      expect(readPkg(pkgPath)).toEqual({
+        name: "example",
+        scripts: {test: "vitest"},
+      });
+    });
   });
 
   describe("writePkg", () => {

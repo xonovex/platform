@@ -45,7 +45,7 @@ Top-level summary, pointing at the detail rather than renumbering it:
 >
 > Direction is good. One thing before merge:
 >
-> 1. The reload overlay fires on background refresh and covers content. ([details](link-to-the-inline-comment))
+> 1. The reload overlay fires on background refresh and covers content. ([details](https://example.com/reviews/123#comment-1))
 >
 > Remaining notes are inline and non-blocking.
 

@@ -1,0 +1,21 @@
+{
+  "name": "@xonovex/script-moon-skill-validate-routing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-skill-validate-routing": "./dist/src/index.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
+    "@xonovex/script-moon-skill-eval-common": "0.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "skill"
+  ]
+}

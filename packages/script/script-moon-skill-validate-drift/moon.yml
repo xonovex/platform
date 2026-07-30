@@ -1,0 +1,38 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "90"
+      TS_COVERAGE_MIN_FUNCTIONS: "85"
+      TS_COVERAGE_MIN_BRANCHES: "85"
+      TS_COVERAGE_MIN_STATEMENTS: "90"
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-catalog-common:build
+  drift-check:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate-drift/dist/src/index.js
+    deps: [build]
+    env:
+      XONOVEX_LINT_MODE: enforce
+    inputs:
+      - /budgets.json
+      - /vocabulary.json
+      - /packages/command/*/commands/*.md
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/references/*.md
+    options:
+      runFromWorkspaceRoot: true
+      # Enforce mode reports 36 findings against the current skill catalog and
+      # command prose, so it gates content that is not yet migrated.
+      runInCI: false
+  ci-check:
+    options:
+      mergeDeps: append

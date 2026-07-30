@@ -1,0 +1,36 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "80"
+  ts-build:
+    deps:
+      - script-moon-common:build
+      - script-moon-skill-catalog-common:build
+  composition-check:
+    command:
+      - node
+      - packages/script/script-moon-skill-validate-links/dist/src/index.js
+      - .
+    deps: [build]
+    inputs:
+      - /packages/skill/*/package.json
+      - /packages/skill/*/.claude-plugin/plugin.json
+      - /packages/skill/*/.codex-plugin/plugin.json
+      - /packages/skill/*/*/SKILL.md
+      - /packages/skill/*/*/SOURCES.md
+      - /packages/skill/*/*/references/*.md
+    options:
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [composition-check]
+    options:
+      mergeDeps: append

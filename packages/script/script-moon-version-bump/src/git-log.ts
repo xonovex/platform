@@ -1,4 +1,6 @@
-import {execSync} from "node:child_process";
+import {execFileSync} from "node:child_process";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {parsePackageJson} from "@xonovex/script-moon-common/package-json";
 
 interface Commit {
   readonly hash: string;
@@ -31,31 +33,43 @@ const getLastVersionRef = (
   pkgDir: string,
   currentVersion: string,
 ): string | undefined => {
-  // Walk back through commits that touched package.json to find where version differs
-  const hashes = execSync(`git log --format=%H -- ${pkgDir}/package.json`, {
-    cwd: rootDir,
-    encoding: "utf8",
-  })
+  // The first historical package version that differs bounds the current release.
+  const hashes = execFileSync(
+    resolveExecutable("git"),
+    ["log", "--format=%H", "--", `${pkgDir}/package.json`],
+    {
+      cwd: rootDir,
+      encoding: "utf8",
+    },
+  )
     .trim()
     .split("\n")
     .filter(Boolean);
 
   for (const hash of hashes) {
-    try {
-      const oldPkgJson = execSync(`git show ${hash}:${pkgDir}/package.json`, {
+    const path = `${pkgDir}/package.json`;
+    const listed = execFileSync(
+      resolveExecutable("git"),
+      ["ls-tree", "-z", "--name-only", hash, "--", path],
+      {cwd: rootDir, encoding: "utf8"},
+    );
+    if (listed.length === 0) continue;
+
+    const oldPkgJson = execFileSync(
+      resolveExecutable("git"),
+      ["show", `${hash}:${path}`],
+      {
         cwd: rootDir,
         encoding: "utf8",
-      });
-      const oldVersion = (JSON.parse(oldPkgJson) as {version?: string}).version;
-      if (oldVersion !== currentVersion) {
-        return hash;
-      }
-    } catch {
-      // Commit may not have this file, skip
+      },
+    );
+    const oldVersion = parsePackageJson(oldPkgJson, `${hash}:${path}`).version;
+    if (oldVersion !== currentVersion) {
+      return hash;
     }
   }
 
-  // Fall back to the parent of the earliest commit that introduced this package
+  // A never-versioned package starts before the commit that introduced it.
   const earliest = hashes.at(-1);
   return earliest ? `${earliest}~1` : undefined;
 };
@@ -67,8 +81,9 @@ const getCommitsSince = (
   pkgDir: string,
   sinceRef: string,
 ): readonly Commit[] => {
-  const raw = execSync(
-    `git log --format="%x00%H|%aN%n%B" ${sinceRef}..HEAD -- ${pkgDir}`,
+  const raw = execFileSync(
+    resolveExecutable("git"),
+    ["log", "--format=%x00%H|%aN%n%B", `${sinceRef}..HEAD`, "--", pkgDir],
     {cwd: rootDir, encoding: "utf8"},
   );
   return raw
@@ -101,6 +116,5 @@ export {
   parseConventionalCommit,
   isIncludedType,
   REPO_URL,
-  INCLUDED_TYPES,
 };
-export type {Commit, ParsedCommit};
+export type {Commit};
