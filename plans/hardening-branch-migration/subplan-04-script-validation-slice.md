@@ -32,6 +32,31 @@ from subplan 02. Every validator must pass against main's CURRENT content
 before it lands; gates that require not-yet-migrated content are explicitly
 deferred to the slice that carries that content.
 
+## Gates Inherited from Subplan 02
+
+Subplan 02 landed the donor's infrastructure but held back six gates that check
+`packages/script` content. Re-enable each one in this slice, once the content
+it checks is present, and confirm the workspace `ci-check` stays green:
+
+1. `.moon/tasks/tag-skill.yml` — restore `skill-validate` to
+   `npx moon-skill-validate-spec --strict` with the
+   `script-moon-skill-validate-routing:routing-check` dependency, the
+   `XONOVEX_LINT_MODE: enforce` env and the donor's `inputs` list.
+2. `.moon/tasks/tag-skill.yml` — return `skill-audit-sources` to `ci-check`'s
+   deps and drop its `runInCI: false`, but only if the rewritten script no
+   longer reaches the network; `.moon/AGENTS.md` forbids network in `ci-check`.
+3. `.moon/tasks/tag-typescript-script.yml` — return `coverage` to `ci-check`'s
+   deps.
+4. `packages/config/vitest-config-base/src/index.ts` — remove
+   `passWithNoTests: true` once every script package has a test file.
+5. `packages/config/eslint-config-base/src/index.ts` — restore
+   `noInlineConfig: true`, the `no-warning-comments` rule over
+   `eslint-disable` / `@ts-ignore` / `@ts-expect-error` / `@ts-nocheck`, and
+   `sonarjs/cognitive-complexity: ["error", 30]`.
+6. Rebuild `vitest-config-base` and `vitest-config-node` after any config
+   change — the compiled `dist/` is what the script packages resolve, so a
+   source-only edit silently keeps the old behaviour.
+
 ## Tasks
 
 1. **Create the slice branch**:

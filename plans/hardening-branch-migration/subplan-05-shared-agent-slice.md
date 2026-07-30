@@ -34,6 +34,15 @@ shared-agent-go — 34 files) and the agent tooling (`packages/agent`:
 agent-cli-go, agent-operator-go — 196 files) in one PR, respecting the
 `config -> shared -> agent` dependency chain.
 
+## Gate Inherited from Subplan 02
+
+Subplan 02 removed `coverage` from `.moon/tasks/tag-go.yml`'s `ci-check` deps.
+The template's `GO_COVERAGE_MIN` floor is 55 and `agent-cli-go` covers 44.8% on
+main, while the donor's own `agent-cli-go/moon.yml` sets 81 because its tests
+arrive with this slice. Once `packages/agent` is migrated, return `coverage` to
+that `ci-check` deps list, carry each Go project's `GO_COVERAGE_MIN` override
+from the donor, and confirm `npx moon run :ci-check` stays green.
+
 ## Tasks
 
 1. **Create the slice branch**:
