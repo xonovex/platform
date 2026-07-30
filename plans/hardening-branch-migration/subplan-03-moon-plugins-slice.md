@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-2
-status: pending
+status: complete
 dependencies:
   plans: [plans/hardening-branch-migration/subplan-02-infra-config-slice.md]
   files: [packages/moon]
@@ -14,11 +14,11 @@ skills_to_consult:
   - moon-guide
   - versioning-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 03: Moon Plugins Slice
@@ -63,12 +63,48 @@ release through the normal flow.
 
 ## Success Criteria
 
-- [ ] Toolchain version bumped past 0.6.1 with an accurate CHANGELOG
-- [ ] All three crates build and test green via moon
-- [ ] Release tags published for toolchain (new version), extension 0.1.0,
-      runtime 0.1.0
-- [ ] Workspace still consumes the OLD toolchain tag — no config change in this
-      slice
+- [x] Toolchain version bumped past 0.6.1 with an accurate CHANGELOG — 0.7.0,
+      set by the one `feat` among three commits; no public item added or
+      removed and no breaking footer, so the bump is minor
+- [x] All three crates build and test green via moon — `:ci-check --force`,
+      723 tasks, exit 0
+- [ ] Release tags published — **blocked, and only two are due**; see below
+- [x] Workspace still consumes the OLD toolchain tag — `.moon/toolchains.yml`
+      unchanged, still `moon_nix_toolchain-v0.6.1`
+
+## Release Status
+
+`github-check` passes for both plugins: each has a valid WASM artifact and a
+matching `## <version>` changelog section, and reports itself ready to publish.
+The release itself has not run, for two reasons.
+
+**Only two tags are due, not three.** This subplan expected release tags for
+the toolchain, the extension and the runtime. The runtime takes no tag: the
+donor gives it the `rust` tag alone, without `moon-plugin`, so it gets none of
+the `github-check` / `moon-build` release tasks. It is a path dependency
+compiled into both plugin artifacts, not a plugin consumers resolve over
+`github://`. The criterion above is corrected to the toolchain and the
+extension.
+
+**The release flow cannot run yet.** `packages/moon/AGENTS.md` and the parent
+plan both require a reviewed PR whose title contains `version packages`, merged
+to `main`, to trigger `.github/workflows/release.yml`. `main` is still unpushed,
+so no PR exists to merge and no tag can be produced. Once `main` reaches
+`origin`, release `moon_nix_toolchain-v0.7.0` and `moon_nix_extension-v0.1.0`
+through that flow. Subplan 10 must not bump the `.moon/toolchains.yml`
+reference until those tag assets exist.
+
+## Plan Gap Found
+
+`.hooks/` belonged to no subplan, the same class of gap subplan 11 closed for
+`flake.nix` and `.github/moon.yml`. This slice needed it: the extension's
+fixture workspaces carry `package.json` files, and main's `validate-lockfile`
+hook matched them with a `git ls-files 'packages/*/*/package.json'` pathspec —
+whose `*` spans slashes — so it demanded lockfile entries for test fixtures that
+are not workspace members. The donor's hook delegates the check to
+`npm ci --dry-run`, which tracks real workspaces only. `.hooks/` is taken here
+rather than left for a later slice, since nothing in this slice could be
+committed without it.
 
 ## Files Modified/Created
 

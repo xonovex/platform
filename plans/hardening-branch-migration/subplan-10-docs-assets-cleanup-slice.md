@@ -78,6 +78,17 @@ removal of the donor branches and worktrees.
    confirm `git rev-list -1 salvage/runtime-probes-d1692d3e` still resolves
    after the deletions and push the tag to origin.
 
+## Toolchain Reference Bump — Preconditions
+
+Subplan 03 bumped `moon_nix_toolchain` to 0.7.0 and left
+`.moon/toolchains.yml` pointing at `moon_nix_toolchain-v0.6.1`, because a
+consumer pin may only move once the tag assets exist. Before touching that
+reference, confirm the release actually ran: `main` reached `origin`, a
+`version packages` PR merged, and `moon_nix_toolchain-v0.7.0` and
+`moon_nix_extension-v0.1.0` are published. `moon_nix_runtime` takes no tag — it
+is a path dependency compiled into both plugin artifacts, carrying the `rust`
+tag without `moon-plugin`.
+
 ## Validation Steps
 
 - Full workspace `npx moon run :typecheck :lint :build :test`
