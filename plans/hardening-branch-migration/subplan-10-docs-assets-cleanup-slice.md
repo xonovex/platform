@@ -78,6 +78,21 @@ removal of the donor branches and worktrees.
    confirm `git rev-list -1 salvage/runtime-probes-d1692d3e` still resolves
    after the deletions and push the tag to origin.
 
+## Gates Inherited from Subplan 04
+
+`packages/script/script-moon-release-validate` carries `runInCI: false` on its
+`release-validate` task, and its end-to-end test in `src/validate.test.ts` is
+skipped. Both fail today because the Codex marketplace still lists the command
+plugins this migration removes. Once the marketplace and catalog files are
+reconciled, return `release-validate` to that project's `ci-check`, drop the
+`runInCI: false`, and un-skip the test.
+
+`packages/script/script-moon-action-graph` is still on `main`. The donor deleted
+it together with the diagrams that consume it, so its removal belongs here:
+delete the package, `packages/diagram/diagram-moon-action`, and the root
+`tsconfig.json` reference, and drop the per-project coverage floors added to
+keep it green in the meantime.
+
 ## Toolchain Reference Bump — Preconditions
 
 Subplan 03 bumped `moon_nix_toolchain` to 0.7.0 and left

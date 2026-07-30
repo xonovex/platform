@@ -36,6 +36,40 @@ skills, and the skill-package `AGENTS.md`/`CLAUDE.md`. This chunk closes the
 of main's 25 commits touched these packages — plus the caveman/fable
 resurrection risk.
 
+## Gates Inherited from Subplans 02 and 04
+
+Everything below reads the skill catalog, so it stays deferred until this slice
+lands it. Re-enable each and confirm `npx moon run :ci-check --force` is green.
+
+1. `.moon/tasks/tag-skill.yml` — return `skill-validate` and
+   `skill-audit-sources` to `ci-check`'s deps and drop the `runInCI: false` on
+   both. `skill-validate` already runs `moon-skill-validate-spec --strict` with
+   the routing dependency; it currently reports findings against the catalog.
+2. `packages/script/script-moon-skill-validate-routing/moon.yml` — return
+   `routing-check` to `ci-check` and drop `runInCI: false`. It fails today
+   because `gitlab-guide` owns no validation-split routing scenario: another
+   skill must carry one of its validation positives as a negative. Main commit
+   `c3b920d2` retargeted those provider queries deliberately, so reconcile that
+   intent against the donor's query set rather than overwriting blindly.
+3. `packages/script/script-moon-skill-validate-drift/moon.yml` — return
+   `drift-check` to `ci-check` and drop `runInCI: false`. Enforce mode reports
+   36 findings across 598 catalog and command files today.
+4. Un-skip the catalog-reading tests and restore the floors lowered to match
+   them:
+   - `script-moon-skill-validate-spec/src/workflow-contracts.test.ts` — the
+     whole suite, which reads the workflow command and skill files
+   - `script-moon-skill-validate-spec/src/template-assets.test.ts` — both
+     template cases
+   - `script-moon-skill-validate-spec/src/index.test.ts` — three tests reading
+     live skills
+   - `script-moon-skill-eval-common/src/routing-catalog.test.ts` — the
+     catalog-wide validation-routing test
+   - `script-moon-skill-validate-spec/moon.yml` — functions floor 89 back to 90
+   - `script-moon-skill-validate-spec/vitest.config.ts` — per-file floors for
+     `src/validate-skill.ts` back to statements 70, branches 50, functions 90,
+     lines 75
+5. Restore the runtime probe evidence recorded earlier in this document.
+
 ## Tasks
 
 1. **Fix chunk membership**: everything in `packages/skill` not taken by
