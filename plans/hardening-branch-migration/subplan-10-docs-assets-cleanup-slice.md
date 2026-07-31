@@ -144,27 +144,32 @@ tag without `moon-plugin`.
 ## Zero-Diff Proof
 
 `git diff main composable-workflow-platform-hardening` leaves 311 files, every
-one an intentional non-migration:
+one an intentional non-migration. Re-measured after the 6.0.0 catalog bump:
 
 | Category                                                         | Files |
 | ---------------------------------------------------------------- | ----- |
-| Catalog version held at 5.1.0 while the donor sits at 7.0.0      | 228   |
-| Plan-prefixed command surface kept by decision                   | 31    |
+| Catalog at 6.0.0 while the donor sits at 7.0.0                   | 218   |
+| Plan-prefixed command surface kept by decision                   | 34    |
 | This migration's own plan documents                              | 12    |
 | Runtime probe evidence restored from the salvage tag             | 5     |
 | `plan-guide` operations kept for the plan-prefixed commands      | 5     |
 | Non-terminal donor plans dropped per the terminal-status rule    | 5     |
-| `moon-nix-toolchain` 0.7.0 release prepared on main              | 5     |
+| `moon-nix` releases prepared on main                             | 5     |
 | Bare package specifier removed from the tsconfig `paths`         | 5     |
+| Dependency versions advanced on main past the donor's            | 5     |
 | Repository policy files changed on main                          | 4     |
 | Prettier formatting applied on main                              | 4     |
 | Validator bug fix and dead-test removal                          | 3     |
 | `bin-permissions` task and its dependency                        | 2     |
 | `version-bump.md`, removed by `708dfa1a`, correctly still absent | 1     |
 | Regenerated lockfile                                             | 1     |
+| `budgets.json` floors matching the restored probe sections       | 1     |
+| Marketplace description matching the kept command surface        | 1     |
 
-Nothing is unexplained. The largest category is the version hold, which
-collapses to zero the moment the catalog is bumped.
+Nothing is unexplained. The version category does not collapse: main's release
+history is its own, so it moved 5.1.0 to 6.0.0 rather than adopting the donor's
+7.0.0, and those 218 files differ by that number alone. The remaining 93 carry
+real content differences, each one deliberate.
 
 ## Residue the Proof Caught
 
