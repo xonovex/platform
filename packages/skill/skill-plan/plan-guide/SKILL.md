@@ -5,7 +5,7 @@ description: "Use when researching, creating, critiquing, revising, expanding, c
 
 # Implementation Planning Guidelines
 
-Provide implementation-planning procedures selected by a caller or generic operation. This skill owns planning behavior and planning-oriented research, not general code-quality audits, invocation, lifecycle governance, or persistence.
+Provide implementation-planning procedures selected by a caller. This skill owns planning behavior and planning-oriented research, not general code-quality audits, invocation, lifecycle governance, or persistence.
 
 ## Core Principles
 
@@ -18,19 +18,6 @@ Provide implementation-planning procedures selected by a caller or generic opera
 
 Operation boundaries, effect modes, handoff shape, decision anchors, and authority
 belong to the caller; this skill adds no rule of its own on any of them.
-
-## Called From A Generic Operation
-
-A generic operation resolves to the planning procedure of the same name. Three do not
-match by name:
-
-| Generic operation | Planning procedure                |
-| ----------------- | --------------------------------- |
-| Review            | Critique                          |
-| Execute           | Continue                          |
-| Create            | Create, or Expand for child plans |
-
-Research and Update have no generic counterpart; a caller asks for them by name.
 
 ## Planning Operations
 
