@@ -1,11 +1,11 @@
 {
   "name": "@xonovex/skill-gpu-rendering-vulkan",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "description": "Xonovex GPU rendering (Vulkan) skills",
   "private": true,
   "type": "module",
   "dependencies": {
-    "@xonovex/skill-gpu-rendering": "5.1.0"
+    "@xonovex/skill-gpu-rendering": "6.0.0"
   },
   "keywords": [
     "xonovex",
