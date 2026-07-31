@@ -3,7 +3,7 @@ type: plan
 has_subplans: false
 parent_plan: plans/hardening-branch-migration.md
 parallel_group: group-7
-status: pending
+status: in_progress
 dependencies:
   plans: [plans/hardening-branch-migration/subplan-09-command-plugins-slice.md]
   files:
@@ -24,11 +24,11 @@ skills_to_consult:
   - skill-guide
   - moon-guide
 validation:
-  type_check: pending
-  lint: pending
-  build: pending
-  tests: pending
-  integration: pending
+  type_check: pass
+  lint: pass
+  build: pass
+  tests: pass
+  integration: pass
 ---
 
 # Subplan 10: Docs, Assets, Reconciliation & Cleanup
@@ -133,12 +133,83 @@ tag without `moon-plugin`.
 
 ## Success Criteria
 
-- [ ] Zero-diff proof documented; no unexplained residue
-- [ ] Marketplaces match the post-migration catalog exactly
-- [ ] Toolchain reference on the new released tag, verified working
-- [ ] Donor branches and merge worktree deleted (after confirmation);
-      fable branch handed off to a follow-up plan
-- [ ] Release flow used for any version bumps; no direct pushes
+- [x] Zero-diff proof documented; no unexplained residue, see below
+- [x] Marketplaces match the post-migration catalog exactly, and
+      `release-validate` passes at 1,713 checks over 74 lockstep packages
+- [ ] **Blocked:** toolchain reference on the new released tag, see below
+- [ ] **Blocked:** donor branches and worktree removal, see below
+- [x] No direct pushes; nothing was released
+
+## Zero-Diff Proof
+
+`git diff main composable-workflow-platform-hardening` leaves 311 files, every
+one an intentional non-migration:
+
+| Category                                                         | Files |
+| ---------------------------------------------------------------- | ----- |
+| Catalog version held at 5.1.0 while the donor sits at 7.0.0      | 228   |
+| Plan-prefixed command surface kept by decision                   | 31    |
+| This migration's own plan documents                              | 12    |
+| Runtime probe evidence restored from the salvage tag             | 5     |
+| `plan-guide` operations kept for the plan-prefixed commands      | 5     |
+| Non-terminal donor plans dropped per the terminal-status rule    | 5     |
+| `moon-nix-toolchain` 0.7.0 release prepared on main              | 5     |
+| Bare package specifier removed from the tsconfig `paths`         | 5     |
+| Repository policy files changed on main                          | 4     |
+| Prettier formatting applied on main                              | 4     |
+| Validator bug fix and dead-test removal                          | 3     |
+| `bin-permissions` task and its dependency                        | 2     |
+| `version-bump.md`, removed by `708dfa1a`, correctly still absent | 1     |
+| Regenerated lockfile                                             | 1     |
+
+Nothing is unexplained. The largest category is the version hold, which
+collapses to zero the moment the catalog is bumped.
+
+## Residue the Proof Caught
+
+The proof is what found these; none were visible from the slice diffs:
+
+- **Five donor deletions in `packages/agent`** that subplan 05's path checkout
+  left behind: `agent-cli-go/scripts/validate.sh`,
+  `agent-cli-go/test/feature-parity.md`, the operator's
+  `internal/validator/repository.go` and its test, and
+  `internal/webhook/agentpolicy_verdict_test.go`. All predate the merge base.
+- **Seven paths no subplan owned:** `.dockerignore`, `.gitlab/`, `.gitignore`,
+  `.github/dependabot.yml`, `CONTRIBUTING.md`, the root `AGENTS.md` and
+  `packages/command/AGENTS.md`. The root `AGENTS.md` mattered most: main's
+  still described the `diagram` package this slice deletes, while the donor's
+  carries the punctuation and exact-pin policies the migrated validators
+  enforce.
+- **A dangling diagram link** in the kept `command-workflow/README.md`,
+  pointing at the deleted agent workflow diagram. Only `--force` exposed it;
+  the cached run reported `composition-check` as passing.
+
+## packages/diagram Removed Entirely
+
+The donor deletes all three diagram projects, not just the moon-action pair:
+`2f9d258b` took `diagram-agent-workflow`, `a5d2b732` took
+`diagram-moon-action` with the action-graph generator, and `e5439b9d` folded
+the group into `packages/asset`, which now carries the sandbox-isolation
+diagrams. The agent workflow diagram was dropped rather than folded, so the
+README link to it went too.
+
+## Blocked: Toolchain Bump and Cleanup
+
+Neither can proceed from here, and both are gates rather than oversights.
+
+**Toolchain reference.** `.moon/toolchains.yml` still points at
+`moon_nix_toolchain-v0.6.1`. Moving it requires `moon_nix_toolchain-v0.7.0` to
+exist as a published tag, which requires `main` to reach `origin` and a
+`version packages` PR to merge. `main` is unpushed, so no release has run.
+
+**Branch and worktree removal.** Deleting
+`composable-workflow-platform-hardening` and
+`composable-workflow-implementations-merge`, and removing
+`../xonovex-platform-merge`, is destructive and gated on explicit
+confirmation. It should also wait until the migration is pushed: while `main`
+is local-only, those branches are the sole copies of the donor state. Keep the
+tag `salvage/runtime-probes-d1692d3e` and push it, since it becomes the only
+anchor for that commit.
 
 ## Files Modified/Created
 
