@@ -135,7 +135,7 @@ tag without `moon-plugin`.
 
 - [x] Zero-diff proof documented; no unexplained residue, see below
 - [x] Marketplaces match the post-migration catalog exactly, and
-      `release-validate` passes at 1,713 checks over 74 lockstep packages
+      `release-validate` passes at 1,690 checks over 73 lockstep packages
 - [ ] **Blocked:** toolchain reference on the new released tag, see below
 - [x] Catalog bumped to 6.0.0 in lockstep
 - [ ] **Blocked:** donor branches and worktree removal, see below
@@ -143,32 +143,34 @@ tag without `moon-plugin`.
 
 ## Zero-Diff Proof
 
-`git diff main composable-workflow-platform-hardening` leaves 311 files, every
-one an intentional non-migration. Re-measured after the 6.0.0 catalog bump:
+`git diff main composable-workflow-platform-hardening` leaves 345 files, every
+one an intentional non-migration. Re-measured after the 6.0.0 catalog bump and
+the `skill-workflow` deferral:
 
 | Category                                                         | Files |
 | ---------------------------------------------------------------- | ----- |
-| Catalog at 6.0.0 while the donor sits at 7.0.0                   | 218   |
+| Catalog at 6.0.0 while the donor sits at 7.0.0                   | 215   |
 | Plan-prefixed command surface kept by decision                   | 34    |
+| `skill-workflow` deferred off main with its contract test        | 28    |
 | This migration's own plan documents                              | 12    |
-| Runtime probe evidence restored from the salvage tag             | 5     |
 | `plan-guide` operations kept for the plan-prefixed commands      | 5     |
 | Non-terminal donor plans dropped per the terminal-status rule    | 5     |
+| Runtime probe evidence restored from the salvage tag             | 5     |
 | `moon-nix` releases prepared on main                             | 5     |
 | Bare package specifier removed from the tsconfig `paths`         | 5     |
 | Dependency versions advanced on main past the donor's            | 5     |
+| Registrations reflecting the `skill-workflow` removal            | 5     |
 | Repository policy files changed on main                          | 4     |
 | Prettier formatting applied on main                              | 4     |
-| Validator bug fix and dead-test removal                          | 3     |
+| Ownership rehomed out of the deferred `workflow-guide`           | 4     |
+| Validator bug fix                                                | 2     |
 | `bin-permissions` task and its dependency                        | 2     |
 | `version-bump.md`, removed by `708dfa1a`, correctly still absent | 1     |
 | Regenerated lockfile                                             | 1     |
-| `budgets.json` floors matching the restored probe sections       | 1     |
-| Marketplace description matching the kept command surface        | 1     |
 
 Nothing is unexplained. The version category does not collapse: main's release
 history is its own, so it moved 5.1.0 to 6.0.0 rather than adopting the donor's
-7.0.0, and those 218 files differ by that number alone. The remaining 93 carry
+7.0.0, and those 215 files differ by that number alone. The remaining 130 carry
 real content differences, each one deliberate.
 
 ## Residue the Proof Caught
@@ -211,21 +213,24 @@ locator against a GitHub release, and only `v0.6.1` has one, carrying
 to reach `origin` and a `version packages` PR to merge, so the reference stays
 until then. The crate itself is already at 0.7.0.
 
-**Catalog version.** Bumped to 6.0.0 in lockstep across all 74 skill and
-command packages, their manifests, both marketplace files, and the exact
-`@xonovex/skill-*` pins. The level is major because the migration removes nine
-skill plugins, which breaks anyone installing them from either marketplace.
-`release-validate` passes at 1,713 checks over 74 lockstep packages. Nothing is
-published; the release flow still decides when this ships.
+**Catalog version.** Bumped to 6.0.0 in lockstep across every skill and command
+package, their manifests, both marketplace files, and the exact
+`@xonovex/skill-*` pins. The level is major because the migration removes ten
+skill plugins, which breaks anyone installing them from either marketplace: the
+nine `a102cfb6` dropped to match the donor's catalog, plus `skill-workflow`,
+deferred afterwards. One major covers all ten because nothing shipped in
+between. `release-validate` passes at 1,690 checks over 73 lockstep packages.
+Nothing is published; the release flow still decides when this ships.
 
 **Branch and worktree removal.** Deleting
 `composable-workflow-platform-hardening` and
 `composable-workflow-implementations-merge`, and removing
 `../xonovex-platform-merge`, is destructive and gated on explicit
 confirmation. It should also wait until the migration is pushed: while `main`
-is local-only, those branches are the sole copies of the donor state. Keep the
-tag `salvage/runtime-probes-d1692d3e` and push it, since it becomes the only
-anchor for that commit.
+is local-only, those branches are the sole copies of the donor state. Two tags
+must survive and reach origin first, because each is the only anchor for state
+that lives nowhere else: `salvage/runtime-probes-d1692d3e` for the probe
+evidence, and `salvage/skill-workflow` for the deferred workflow package.
 
 ## Files Modified/Created
 
