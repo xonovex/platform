@@ -369,11 +369,6 @@
       "description": "Xonovex Vitest skills"
     },
     {
-      "name": "xonovex-skill-workflow",
-      "source": "./packages/skill/skill-workflow",
-      "description": "Xonovex minimal workflow operation skills"
-    },
-    {
       "name": "xonovex-skill-zod",
       "source": "./packages/skill/skill-zod",
       "description": "Xonovex Zod skills"

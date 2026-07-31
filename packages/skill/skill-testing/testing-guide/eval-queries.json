@@ -97,7 +97,7 @@
   },
   {
     "query": "Validate release candidate 91c2 against these three binding criteria and return pass, fail, or blocked with evidence for each:\n1. every changed package has a passing test run\n2. the CHANGELOG entry names the user-visible change\n3. no dependency moved to a prerelease version",
-    "rationale": "near miss owned by workflow-guide",
+    "rationale": "near miss owned by plan-guide",
     "should_trigger": false,
     "split": "validation"
   }

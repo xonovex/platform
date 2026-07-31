@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-workflow",
-  "version": "6.0.0",
-  "description": "Xonovex minimal workflow operation skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": "./workflow-guide"
-}

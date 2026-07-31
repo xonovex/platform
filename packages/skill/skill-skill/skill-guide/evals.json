@@ -37,9 +37,9 @@
     },
     {
       "id": 5,
-      "prompt": "Our workflow command always needs workflow-guide, but one operation can optionally use any installed changelog skill whose description fits. Explain how to represent both relationships without copying instructions or building another metadata catalog.",
+      "prompt": "Our planning command always needs plan-guide, but one operation can optionally use any installed changelog skill whose description fits. Explain how to represent both relationships without copying instructions or building another metadata catalog.",
       "assertions": [
-        "Places the exact workflow-guide installation dependency in every supported plugin manifest and matching package dependencies.",
+        "Places the exact plan-guide installation dependency in every supported plugin manifest and matching package dependencies.",
         "Keeps optional changelog selection in runtime prose and selects from installed skill names and routing descriptions.",
         "States that installation does not load a skill into context and avoids copying either skill's procedure.",
         "Does not add lifecycle roles, provisions, semantic-version ranges, overlays, or another composition catalog."

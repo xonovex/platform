@@ -147,7 +147,6 @@ claude plugin install xonovex-skill-code-review@xonovex-marketplace   # Conventi
 claude plugin install xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 claude plugin install xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
-claude plugin install xonovex-skill-workflow@xonovex-marketplace      # direct workflow operation routing without slash commands
 claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 
@@ -177,7 +176,6 @@ codex plugin add xonovex-skill-code-review@xonovex-marketplace   # Conventional 
 codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
 codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
 codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
-codex plugin add xonovex-skill-workflow@xonovex-marketplace      # explicit operations, context forwarding, and effect/workspace boundaries
 codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
 codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
 

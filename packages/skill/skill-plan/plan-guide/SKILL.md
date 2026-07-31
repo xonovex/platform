@@ -16,8 +16,8 @@ Provide implementation-planning procedures selected by a caller or generic opera
 - **Skills to consult**: plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation**: check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
-Operation boundaries, effect modes, handoff shape, decision anchors, and authority are
-owned by **workflow-guide**; this skill adds no rule of its own on any of them.
+Operation boundaries, effect modes, handoff shape, decision anchors, and authority
+belong to the caller; this skill adds no rule of its own on any of them.
 
 ## Called From A Generic Operation
 
