@@ -20,6 +20,7 @@
 - Write in plain sentences; prefer a comma, colon, or full stop to an em dash, use a colon after a label, write an ellipsis as three periods rather than the single ellipsis character, and use straight quotes and apostrophes rather than the typographic ones.
 - Match a written document's length to what the task needs: cover the substance and leave out filler sections, redundant summaries, and boilerplate.
 - Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
+- When work stops before completion, state the safe retry boundary: what is already durable, what is partial, and where a resumer restarts without redoing or corrupting it.
 - Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
 - Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when the error changes a conclusion or a decision, and state the correction plainly instead of recounting the mistake.
 - Keep what remains, meaning unfinished work inside the agreed scope, separate from suggestions, which are optional follow-ups.
