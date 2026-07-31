@@ -137,6 +137,7 @@ tag without `moon-plugin`.
 - [x] Marketplaces match the post-migration catalog exactly, and
       `release-validate` passes at 1,713 checks over 74 lockstep packages
 - [ ] **Blocked:** toolchain reference on the new released tag, see below
+- [x] Catalog bumped to 6.0.0 in lockstep
 - [ ] **Blocked:** donor branches and worktree removal, see below
 - [x] No direct pushes; nothing was released
 
@@ -198,9 +199,19 @@ README link to it went too.
 Neither can proceed from here, and both are gates rather than oversights.
 
 **Toolchain reference.** `.moon/toolchains.yml` still points at
-`moon_nix_toolchain-v0.6.1`. Moving it requires `moon_nix_toolchain-v0.7.0` to
-exist as a published tag, which requires `main` to reach `origin` and a
-`version packages` PR to merge. `main` is unpushed, so no release has run.
+`moon_nix_toolchain-v0.6.1`. Retargeting it at `v0.7.0` was tried and fails
+with `plugin::loader::github::asset_missing`: moon resolves the `github://`
+locator against a GitHub release, and only `v0.6.1` has one, carrying
+`moon_nix_toolchain.wasm` and its checksum. Publishing `v0.7.0` requires `main`
+to reach `origin` and a `version packages` PR to merge, so the reference stays
+until then. The crate itself is already at 0.7.0.
+
+**Catalog version.** Bumped to 6.0.0 in lockstep across all 74 skill and
+command packages, their manifests, both marketplace files, and the exact
+`@xonovex/skill-*` pins. The level is major because the migration removes nine
+skill plugins, which breaks anyone installing them from either marketplace.
+`release-validate` passes at 1,713 checks over 74 lockstep packages. Nothing is
+published; the release flow still decides when this ships.
 
 **Branch and worktree removal.** Deleting
 `composable-workflow-platform-hardening` and
