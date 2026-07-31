@@ -50,11 +50,9 @@ tasks:
       - /packages/*/*/CLAUDE.md
     options:
       runFromWorkspaceRoot: true
-      # Reads this repository's marketplace and catalog files, which still list
-      # the command plugins, so it reports findings until they are reconciled.
-      runInCI: false
   ci-check:
     deps:
       - coverage
+      - release-validate
     options:
       mergeDeps: append

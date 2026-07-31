@@ -32,6 +32,8 @@ image.env
 # Auto-Generated Files
 *.gen.*
 auto-imports.d.ts
+.skill-eval-results/
+*-guide-workspace/
 
 # Testing and Coverage
 test-results
@@ -403,9 +405,6 @@ web_modules/
 # Optional eslint cache
 .eslintcache
 
-# Optional stylelint cache
-.stylelintcache
-
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
@@ -478,8 +477,6 @@ dist
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
-
-# Optional stylelint cache
 
 # SvelteKit build / generate output
 .svelte-kit

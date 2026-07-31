@@ -5,59 +5,12 @@
   },
   "plugins": [
     {
-      "name": "xonovex-utility",
+      "name": "xonovex-skill-accessibility",
       "source": {
         "source": "local",
-        "path": "./packages/command/command-utility"
+        "path": "./packages/skill/skill-accessibility"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-workflow",
-      "source": {
-        "source": "local",
-        "path": "./packages/command/command-workflow"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-adr",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-adr"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-android-analytics",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-android-analytics"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-android-wcag",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-android-wcag"
-      },
+      "description": "Xonovex accessibility assurance skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -70,6 +23,7 @@
         "source": "local",
         "path": "./packages/skill/skill-asset-pipeline"
       },
+      "description": "Xonovex Asset pipeline skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -82,6 +36,7 @@
         "source": "local",
         "path": "./packages/skill/skill-astro"
       },
+      "description": "Xonovex Astro skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -94,6 +49,7 @@
         "source": "local",
         "path": "./packages/skill/skill-audio"
       },
+      "description": "Xonovex Low-level audio skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -106,6 +62,7 @@
         "source": "local",
         "path": "./packages/skill/skill-bdd"
       },
+      "description": "Xonovex Behaviour/acceptance-driven development skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -118,6 +75,7 @@
         "source": "local",
         "path": "./packages/skill/skill-c99"
       },
+      "description": "Xonovex C99 skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -130,6 +88,7 @@
         "source": "local",
         "path": "./packages/skill/skill-c99-game-opinionated"
       },
+      "description": "Xonovex C99 game opinionated skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -142,6 +101,20 @@
         "source": "local",
         "path": "./packages/skill/skill-c99-opinionated"
       },
+      "description": "Xonovex C99 opinionated skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-claude-code",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-claude-code"
+      },
+      "description": "Xonovex Claude Code hook skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -154,6 +127,7 @@
         "source": "local",
         "path": "./packages/skill/skill-cmake"
       },
+      "description": "Xonovex CMake skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -166,6 +140,7 @@
         "source": "local",
         "path": "./packages/skill/skill-code-quality"
       },
+      "description": "Xonovex Code quality skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -178,6 +153,20 @@
         "source": "local",
         "path": "./packages/skill/skill-code-review"
       },
+      "description": "Xonovex Code review skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-codex",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-codex"
+      },
+      "description": "Xonovex Codex hook skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -190,6 +179,7 @@
         "source": "local",
         "path": "./packages/skill/skill-command"
       },
+      "description": "Xonovex Command skill: author, merge, simplify reusable user-invocable prompt files (slash commands)",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -202,6 +192,7 @@
         "source": "local",
         "path": "./packages/skill/skill-connascence"
       },
+      "description": "Xonovex Connascence skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -214,6 +205,33 @@
         "source": "local",
         "path": "./packages/skill/skill-content"
       },
+      "description": "Xonovex Content skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-copilot",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-copilot"
+      },
+      "description": "Xonovex GitHub Copilot hook skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-credential-management",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-credential-management"
+      },
+      "description": "Xonovex credential lifecycle skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -226,6 +244,7 @@
         "source": "local",
         "path": "./packages/skill/skill-cross-platform"
       },
+      "description": "Xonovex Cross-platform / portability skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -238,6 +257,7 @@
         "source": "local",
         "path": "./packages/skill/skill-data-model"
       },
+      "description": "Xonovex Data-model skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -250,6 +270,7 @@
         "source": "local",
         "path": "./packages/skill/skill-data-oriented-design"
       },
+      "description": "Xonovex Data-oriented design skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -262,6 +283,7 @@
         "source": "local",
         "path": "./packages/skill/skill-ddd"
       },
+      "description": "Xonovex Domain-driven design skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -274,6 +296,7 @@
         "source": "local",
         "path": "./packages/skill/skill-debugging"
       },
+      "description": "Xonovex Debugging skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -286,6 +309,7 @@
         "source": "local",
         "path": "./packages/skill/skill-docker"
       },
+      "description": "Xonovex Docker skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -298,6 +322,7 @@
         "source": "local",
         "path": "./packages/skill/skill-ecs"
       },
+      "description": "Xonovex Entity-Component-System skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -310,30 +335,7 @@
         "source": "local",
         "path": "./packages/skill/skill-editor-viewport"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-expressjs",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-expressjs"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-fdd",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-fdd"
-      },
+      "description": "Xonovex Editor viewport skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -346,6 +348,7 @@
         "source": "local",
         "path": "./packages/skill/skill-fp"
       },
+      "description": "Xonovex Functional programming skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -358,6 +361,7 @@
         "source": "local",
         "path": "./packages/skill/skill-game-networking"
       },
+      "description": "Xonovex Game networking skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -370,6 +374,7 @@
         "source": "local",
         "path": "./packages/skill/skill-git"
       },
+      "description": "Xonovex Git skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -382,6 +387,7 @@
         "source": "local",
         "path": "./packages/skill/skill-github"
       },
+      "description": "Xonovex GitHub host delivery skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -394,6 +400,7 @@
         "source": "local",
         "path": "./packages/skill/skill-gitlab"
       },
+      "description": "Xonovex GitLab host delivery skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -406,6 +413,7 @@
         "source": "local",
         "path": "./packages/skill/skill-gpu-rendering"
       },
+      "description": "Xonovex GPU rendering skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -418,6 +426,7 @@
         "source": "local",
         "path": "./packages/skill/skill-gpu-rendering-vulkan"
       },
+      "description": "Xonovex GPU rendering (Vulkan) skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -430,6 +439,7 @@
         "source": "local",
         "path": "./packages/skill/skill-hexagonal-pattern"
       },
+      "description": "Xonovex Hexagonal architecture skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -442,6 +452,7 @@
         "source": "local",
         "path": "./packages/skill/skill-hono"
       },
+      "description": "Xonovex Hono skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -454,6 +465,7 @@
         "source": "local",
         "path": "./packages/skill/skill-hono-opinionated"
       },
+      "description": "Xonovex Hono opinionated skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -466,6 +478,7 @@
         "source": "local",
         "path": "./packages/skill/skill-imgui"
       },
+      "description": "Xonovex immediate-mode GUI skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -478,6 +491,20 @@
         "source": "local",
         "path": "./packages/skill/skill-instruction"
       },
+      "description": "Xonovex Instruction skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-kiro",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-kiro"
+      },
+      "description": "Xonovex Kiro hook skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -490,6 +517,7 @@
         "source": "local",
         "path": "./packages/skill/skill-kubernetes"
       },
+      "description": "Xonovex Kubernetes skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -502,6 +530,7 @@
         "source": "local",
         "path": "./packages/skill/skill-llmstxt"
       },
+      "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -514,6 +543,7 @@
         "source": "local",
         "path": "./packages/skill/skill-lock-free"
       },
+      "description": "Xonovex Lock-free / wait-free concurrency skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -526,6 +556,7 @@
         "source": "local",
         "path": "./packages/skill/skill-lua"
       },
+      "description": "Xonovex Lua skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -538,6 +569,7 @@
         "source": "local",
         "path": "./packages/skill/skill-lua-opinionated"
       },
+      "description": "Xonovex Lua opinionated skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -550,6 +582,7 @@
         "source": "local",
         "path": "./packages/skill/skill-memory-management"
       },
+      "description": "Xonovex Memory management skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -562,6 +595,7 @@
         "source": "local",
         "path": "./packages/skill/skill-microkernel-pattern"
       },
+      "description": "Xonovex Microkernel architecture skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -574,18 +608,7 @@
         "source": "local",
         "path": "./packages/skill/skill-moon"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-motion-react",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-motion-react"
-      },
+      "description": "Xonovex Moon skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -598,6 +621,7 @@
         "source": "local",
         "path": "./packages/skill/skill-node-graph"
       },
+      "description": "Xonovex Node graph skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -610,6 +634,7 @@
         "source": "local",
         "path": "./packages/skill/skill-npm"
       },
+      "description": "Xonovex npm publishing skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -622,6 +647,20 @@
         "source": "local",
         "path": "./packages/skill/skill-oop"
       },
+      "description": "Xonovex Object-oriented programming skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-opencode",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-opencode"
+      },
+      "description": "Xonovex OpenCode plugin skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -634,6 +673,20 @@
         "source": "local",
         "path": "./packages/skill/skill-orthogonal-pattern"
       },
+      "description": "Xonovex Orthogonal pattern skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-pi",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-pi"
+      },
+      "description": "Xonovex Pi extension skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -646,18 +699,7 @@
         "source": "local",
         "path": "./packages/skill/skill-plan"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-presentation",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-presentation"
-      },
+      "description": "Xonovex implementation-planning skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -670,6 +712,7 @@
         "source": "local",
         "path": "./packages/skill/skill-pull-request"
       },
+      "description": "Xonovex Pull request skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -682,6 +725,7 @@
         "source": "local",
         "path": "./packages/skill/skill-python"
       },
+      "description": "Xonovex Python skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -694,6 +738,7 @@
         "source": "local",
         "path": "./packages/skill/skill-react"
       },
+      "description": "Xonovex React skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -706,18 +751,7 @@
         "source": "local",
         "path": "./packages/skill/skill-reflect"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-remotion",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-remotion"
-      },
+      "description": "Xonovex Reflect skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -730,6 +764,7 @@
         "source": "local",
         "path": "./packages/skill/skill-shell-scripting"
       },
+      "description": "Xonovex Shell scripting skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -742,6 +777,7 @@
         "source": "local",
         "path": "./packages/skill/skill-skill"
       },
+      "description": "Xonovex Skill skill: author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -754,18 +790,7 @@
         "source": "local",
         "path": "./packages/skill/skill-sql-postgresql"
       },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
-      "name": "xonovex-skill-strudel",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-strudel"
-      },
+      "description": "Xonovex PostgreSQL skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -778,6 +803,7 @@
         "source": "local",
         "path": "./packages/skill/skill-tdd"
       },
+      "description": "Xonovex Test-driven development skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -790,6 +816,7 @@
         "source": "local",
         "path": "./packages/skill/skill-terraform"
       },
+      "description": "Xonovex Terraform skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -802,6 +829,7 @@
         "source": "local",
         "path": "./packages/skill/skill-testing"
       },
+      "description": "Xonovex Testing skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -814,6 +842,7 @@
         "source": "local",
         "path": "./packages/skill/skill-threejs"
       },
+      "description": "Xonovex Three.js skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -826,6 +855,7 @@
         "source": "local",
         "path": "./packages/skill/skill-typescript"
       },
+      "description": "Xonovex TypeScript skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -838,6 +868,7 @@
         "source": "local",
         "path": "./packages/skill/skill-typescript-to-lua"
       },
+      "description": "Xonovex TypeScript to Lua skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -850,6 +881,7 @@
         "source": "local",
         "path": "./packages/skill/skill-user-stories"
       },
+      "description": "Xonovex User story skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -862,6 +894,7 @@
         "source": "local",
         "path": "./packages/skill/skill-versioning"
       },
+      "description": "Xonovex versioning skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -874,6 +907,7 @@
         "source": "local",
         "path": "./packages/skill/skill-vitest"
       },
+      "description": "Xonovex Vitest skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -881,11 +915,25 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-workflow",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-workflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity",
+      "description": "Xonovex minimal workflow operation skills"
+    },
+    {
       "name": "xonovex-skill-zod",
       "source": {
         "source": "local",
         "path": "./packages/skill/skill-zod"
       },
+      "description": "Xonovex Zod skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

@@ -1,2 +1,29 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
+tasks:
+  asset-check:
+    # Every committed PNG is checked, so a new image cannot enter unvalidated.
+    script: |
+      shopt -s nullglob
+      images=(*.png)
+      if [ "${#images[@]}" -eq 0 ]; then
+        echo 'No PNG assets found' >&2
+        exit 1
+      fi
+      for image in "${images[@]}"; do
+        mime=$(file --brief --mime-type "$image")
+        if [ "$mime" != "image/png" ]; then
+          echo "$image is $mime, not image/png" >&2
+          exit 1
+        fi
+      done
+    toolchain: [system, nix]
+    inputs:
+      - "*.png"
+    options:
+      cache: true
+  ci-check:
+    command: noop
+    deps: [asset-check]
+    options:
+      cache: false

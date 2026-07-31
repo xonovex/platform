@@ -24,9 +24,6 @@
       "path": "./packages/config/vitest-config-node"
     },
     {
-      "path": "./packages/script/script-moon-action-graph"
-    },
-    {
       "path": "./packages/script/script-moon-command-validate"
     },
     {
@@ -58,9 +55,6 @@
     },
     {
       "path": "./packages/script/script-moon-skill-eval-triggers"
-    },
-    {
-      "path": "./packages/script/script-moon-skill-validate"
     },
     {
       "path": "./packages/script/script-moon-skill-validate-drift"

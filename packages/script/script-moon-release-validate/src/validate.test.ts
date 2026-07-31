@@ -21,10 +21,7 @@ describe("createChecker", () => {
 });
 
 describe("release validator", () => {
-  // Runs the validator against this repository's own marketplace and catalog
-  // files, so it passes only once those are reconciled. The Codex marketplace
-  // still lists the command plugins. Skipped until that reconciliation lands.
-  it.skip("validates the repository release inputs end to end", () => {
+  it("validates the repository release inputs end to end", () => {
     const sourceDirectory = dirname(fileURLToPath(import.meta.url));
     const entrypoint = resolve(sourceDirectory, "../dist/src/index.js");
 

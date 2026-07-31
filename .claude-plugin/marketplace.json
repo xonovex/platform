@@ -1,6 +1,8 @@
 {
   "name": "xonovex-marketplace",
-  "owner": {"name": "Xonovex"},
+  "owner": {
+    "name": "Xonovex"
+  },
   "metadata": {
     "description": "Official Xonovex development tools",
     "version": "5.1.0"
@@ -9,27 +11,17 @@
     {
       "name": "xonovex-utility",
       "source": "./packages/command/command-utility",
-      "description": "Xonovex utility commands — skills, instructions, reflect, content"
+      "description": "Xonovex utility commands: skills, instructions, reflect, content, versioning"
     },
     {
       "name": "xonovex-workflow",
       "source": "./packages/command/command-workflow",
-      "description": "Xonovex workflow commands — planning, code analysis, git"
+      "description": "Xonovex workflow commands: planning, code analysis, git"
     },
     {
-      "name": "xonovex-skill-adr",
-      "source": "./packages/skill/skill-adr",
-      "description": "Xonovex ADR skills"
-    },
-    {
-      "name": "xonovex-skill-android-analytics",
-      "source": "./packages/skill/skill-android-analytics",
-      "description": "Xonovex Android analytics skills"
-    },
-    {
-      "name": "xonovex-skill-android-wcag",
-      "source": "./packages/skill/skill-android-wcag",
-      "description": "Xonovex Android WCAG accessibility skills"
+      "name": "xonovex-skill-accessibility",
+      "source": "./packages/skill/skill-accessibility",
+      "description": "Xonovex accessibility assurance skills"
     },
     {
       "name": "xonovex-skill-asset-pipeline",
@@ -67,6 +59,11 @@
       "description": "Xonovex C99 opinionated skills"
     },
     {
+      "name": "xonovex-skill-claude-code",
+      "source": "./packages/skill/skill-claude-code",
+      "description": "Xonovex Claude Code hook skills"
+    },
+    {
       "name": "xonovex-skill-cmake",
       "source": "./packages/skill/skill-cmake",
       "description": "Xonovex CMake skills"
@@ -82,9 +79,14 @@
       "description": "Xonovex Code review skills"
     },
     {
+      "name": "xonovex-skill-codex",
+      "source": "./packages/skill/skill-codex",
+      "description": "Xonovex Codex hook skills"
+    },
+    {
       "name": "xonovex-skill-command",
       "source": "./packages/skill/skill-command",
-      "description": "Xonovex Command skill — author, merge, simplify reusable user-invocable prompt files"
+      "description": "Xonovex Command skill: author, merge, simplify reusable user-invocable prompt files (slash commands)"
     },
     {
       "name": "xonovex-skill-connascence",
@@ -95,6 +97,16 @@
       "name": "xonovex-skill-content",
       "source": "./packages/skill/skill-content",
       "description": "Xonovex Content skills"
+    },
+    {
+      "name": "xonovex-skill-copilot",
+      "source": "./packages/skill/skill-copilot",
+      "description": "Xonovex GitHub Copilot hook skills"
+    },
+    {
+      "name": "xonovex-skill-credential-management",
+      "source": "./packages/skill/skill-credential-management",
+      "description": "Xonovex credential lifecycle skills"
     },
     {
       "name": "xonovex-skill-cross-platform",
@@ -135,16 +147,6 @@
       "name": "xonovex-skill-editor-viewport",
       "source": "./packages/skill/skill-editor-viewport",
       "description": "Xonovex Editor viewport skills"
-    },
-    {
-      "name": "xonovex-skill-expressjs",
-      "source": "./packages/skill/skill-expressjs",
-      "description": "Xonovex Express.js skills"
-    },
-    {
-      "name": "xonovex-skill-fdd",
-      "source": "./packages/skill/skill-fdd",
-      "description": "Xonovex Feature-driven development skills"
     },
     {
       "name": "xonovex-skill-fp",
@@ -207,6 +209,11 @@
       "description": "Xonovex Instruction skills"
     },
     {
+      "name": "xonovex-skill-kiro",
+      "source": "./packages/skill/skill-kiro",
+      "description": "Xonovex Kiro hook skills"
+    },
+    {
       "name": "xonovex-skill-kubernetes",
       "source": "./packages/skill/skill-kubernetes",
       "description": "Xonovex Kubernetes skills"
@@ -214,7 +221,7 @@
     {
       "name": "xonovex-skill-llmstxt",
       "source": "./packages/skill/skill-llmstxt",
-      "description": "Xonovex llms.txt skill — author and maintain /llms.txt files and per-page markdown mirrors per the llmstxt.org spec"
+      "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification"
     },
     {
       "name": "xonovex-skill-lock-free",
@@ -247,11 +254,6 @@
       "description": "Xonovex Moon skills"
     },
     {
-      "name": "xonovex-skill-motion-react",
-      "source": "./packages/skill/skill-motion-react",
-      "description": "Xonovex Motion for React skills"
-    },
-    {
       "name": "xonovex-skill-node-graph",
       "source": "./packages/skill/skill-node-graph",
       "description": "Xonovex Node graph skills"
@@ -267,19 +269,24 @@
       "description": "Xonovex Object-oriented programming skills"
     },
     {
+      "name": "xonovex-skill-opencode",
+      "source": "./packages/skill/skill-opencode",
+      "description": "Xonovex OpenCode plugin skills"
+    },
+    {
       "name": "xonovex-skill-orthogonal-pattern",
       "source": "./packages/skill/skill-orthogonal-pattern",
       "description": "Xonovex Orthogonal pattern skills"
     },
     {
-      "name": "xonovex-skill-plan",
-      "source": "./packages/skill/skill-plan",
-      "description": "Xonovex Plan skills"
+      "name": "xonovex-skill-pi",
+      "source": "./packages/skill/skill-pi",
+      "description": "Xonovex Pi extension skills"
     },
     {
-      "name": "xonovex-skill-presentation",
-      "source": "./packages/skill/skill-presentation",
-      "description": "Xonovex Presentation skills"
+      "name": "xonovex-skill-plan",
+      "source": "./packages/skill/skill-plan",
+      "description": "Xonovex implementation-planning skills"
     },
     {
       "name": "xonovex-skill-pull-request",
@@ -302,11 +309,6 @@
       "description": "Xonovex Reflect skills"
     },
     {
-      "name": "xonovex-skill-remotion",
-      "source": "./packages/skill/skill-remotion",
-      "description": "Xonovex Remotion skills"
-    },
-    {
       "name": "xonovex-skill-shell-scripting",
       "source": "./packages/skill/skill-shell-scripting",
       "description": "Xonovex Shell scripting skills"
@@ -314,17 +316,12 @@
     {
       "name": "xonovex-skill-skill",
       "source": "./packages/skill/skill-skill",
-      "description": "Xonovex Skill skills"
+      "description": "Xonovex Skill skill: author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure"
     },
     {
       "name": "xonovex-skill-sql-postgresql",
       "source": "./packages/skill/skill-sql-postgresql",
       "description": "Xonovex PostgreSQL skills"
-    },
-    {
-      "name": "xonovex-skill-strudel",
-      "source": "./packages/skill/skill-strudel",
-      "description": "Xonovex Strudel skills"
     },
     {
       "name": "xonovex-skill-tdd",
@@ -370,6 +367,11 @@
       "name": "xonovex-skill-vitest",
       "source": "./packages/skill/skill-vitest",
       "description": "Xonovex Vitest skills"
+    },
+    {
+      "name": "xonovex-skill-workflow",
+      "source": "./packages/skill/skill-workflow",
+      "description": "Xonovex minimal workflow operation skills"
     },
     {
       "name": "xonovex-skill-zod",

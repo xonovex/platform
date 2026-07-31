@@ -1,42 +1,26 @@
 # Xonovex Platform
 
-Monorepo for Xonovex tools and configuration packages, all code under `packages/`.
-
-## Structure
-
-### Packages
-
-- **`config`**: shared configs (ESLint, TypeScript, Vitest, Prettier, Vite)
-- **`agent`**: CLI tools (agent-cli-go) and K8s operator (agent-operator-go)
-- **`shared`**: shared libraries (shared-core, shared-core-go, shared-agent-go)
-- **`skill`**: coding guidelines and skills
-- **`command`**: command plugins (command-utility, command-workflow)
-- **`diagram`**: diagrams (agent workflow, moon action, sandbox isolation)
-- **`docker`**: Docker images (docker-agent)
-- **`moon`**: moon toolchain plugins (moon-nix-toolchain)
-- **`script`**: moon action scripts (version bump, npm publish, skill audit)
-- **`asset`**: static assets
-
-### Workflow
-
-- **Setup**: `npm install`
-- **Tasks**: `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`
-- **Moon**: `.moon/tasks/*.yml` templates auto-inherit by type/language/tags
-- **Query**: `moon query projects --tags "<pattern>"`
-- **Git**: Do not create feature branches unless explicitly asked. Never push unless explicitly asked.
-- **Release**: via PR only, never direct push; a `version packages` PR merged to `main` triggers `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Don't bypass branch protection.
-
-### Code Style
-
-- **Paradigm**: functional where practical (pure functions, immutability, no side effects); module-level functions over classes; compose simple functions; pass state explicitly, no global/shared mutable state
-- **Imports**: direct from source; no re-exports or backwards-compat wrappers
-- **Design**: modular functions, explicit context, small focused files
-- **Quality**: strict types, clear naming, explicit error handling
-- **Validation**: typecheck, lint, build, test must pass; fix warnings at root cause
-- **Deprecation**: remove unused/deprecated code immediately; no @deprecated markers or backwards-compat shims
-- **Comments**: state present behavior only; name the declaration/function/module, never a plan, agent, doc, or other file by path; no porting-provenance or `INTERIM`/`TODO` markers
-- **Commits**: conventional commits
-
-## Integration Points
-
-- config -> shared -> agent
+- Monorepo for Xonovex tools and configuration packages; code lives under `packages/`.
+- Setup: `npm install`.
+- Run tasks with `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`; query projects with `moon query projects --tags "<pattern>"`.
+- Task templates are tag-based: a project inherits `.moon/tasks/tag-<name>.yml` by listing `<name>` in its `moon.yml` `tags`. A template refines another with `extends`, as `tag-typescript-script.yml` and `tag-typescript-config.yml` extend `tag-typescript.yml`.
+- A task redefined across `extends` replaces the parent's `deps` rather than appending to them, so restate every inherited dep or declare `mergeDeps: replace`; `script-moon-release-validate` fails the build otherwise.
+- Do not create feature branches or push unless explicitly asked.
+- Delegate to a subagent only for large, genuinely independent work such as a wide multi-file investigation; do not delegate what a handful of tool calls finishes, do not spawn one to check your own work, and keep the count low.
+- Release only through a reviewed `version packages` PR; merging to `main` runs `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Never bypass branch protection.
+- Prefer pure functions, immutability, composition, module-level functions, and explicit state; avoid global mutable state.
+- Import directly from source; do not add re-exports, deprecated APIs, compatibility wrappers, or shims.
+- Keep modules small and focused, with strict types, clear names, explicit context, and explicit error handling.
+- Typecheck, lint, build, and test must pass; fix warnings at their source.
+- Remove unused or deprecated code immediately; do not add `@deprecated` markers.
+- Comments describe present behavior and name the declaration, function, or module; never reference a plan, agent, doc path, porting history, `INTERIM`, or `TODO`.
+- Use conventional commits.
+- Dependency direction: `config -> shared -> agent`.
+- Internal `@xonovex/*` dependencies are exact, and a config package pins the plugins it configures exactly so consumers get identical behaviour. Every other external dependency takes a caret range; an exact pin elsewhere records its reason: `typescript` and `vite` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task.
+- Write in plain sentences; prefer a comma, colon, or full stop to an em dash, use a colon after a label, write an ellipsis as three periods rather than the single ellipsis character, and use straight quotes and apostrophes rather than the typographic ones.
+- Match a written document's length to what the task needs: cover the substance and leave out filler sections, redundant summaries, and boilerplate.
+- Report when the requested work is done or blocked: quality gates, what was done, what remains, suggestions.
+- Report each gate by its command and outcome; a gate that was skipped, cached, or does not cover the change is not a pass.
+- Mark each claim as verified, naming the evidence, or as unverified; correct an earlier claim when the error changes a conclusion or a decision, and state the correction plainly instead of recounting the mistake.
+- Keep what remains, meaning unfinished work inside the agreed scope, separate from suggestions, which are optional follow-ups.
+- Label what remains `R1`, `R2`, ... and suggestions `S1`, `S2`, ... so either can be referenced by its identifier.

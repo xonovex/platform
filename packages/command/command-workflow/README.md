@@ -59,8 +59,6 @@ Parallel: Multiple agents work on parallel subplan groups in separate worktrees
 Learning: reflect-to-instructions / reflect-to-skill fold learnings into guidelines for future sessions
 ```
 
-[View workflow diagram](../../diagram/diagram-agent-workflow/workflow-diagram.png)
-
 ## Commands
 
 | Command                 | Description                                                                                |
