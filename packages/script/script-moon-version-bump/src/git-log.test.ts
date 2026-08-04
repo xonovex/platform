@@ -14,15 +14,28 @@ import {
 const directories: string[] = [];
 const gitExecutable = resolveExecutable("git");
 
+// Git exports GIT_DIR, GIT_INDEX_FILE, and GIT_AUTHOR_* to the hooks it runs,
+// and those take precedence over a repository's own config. Running these
+// fixtures under a hook would otherwise commit with the caller's identity and
+// resolve paths against the outer repository, so drop every GIT_* variable.
+const gitEnvironment = Object.fromEntries(
+  Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
+);
+
 const createRepository = (): string => {
   const directory = mkdtempSync(join(tmpdir(), "version-git-log-"));
   directories.push(directory);
-  execFileSync(gitExecutable, ["init", "--quiet"], {cwd: directory});
+  execFileSync(gitExecutable, ["init", "--quiet"], {
+    cwd: directory,
+    env: gitEnvironment,
+  });
   execFileSync(gitExecutable, ["config", "user.name", "Test Author"], {
     cwd: directory,
+    env: gitEnvironment,
   });
   execFileSync(gitExecutable, ["config", "user.email", "test@example.com"], {
     cwd: directory,
+    env: gitEnvironment,
   });
   mkdirSync(join(directory, "packages", "example"), {recursive: true});
   return directory;
@@ -36,15 +49,19 @@ const writePackage = (directory: string, version: string): void => {
 };
 
 const commit = (directory: string, subject: string, body?: string): string => {
-  execFileSync(gitExecutable, ["add", "."], {cwd: directory});
+  execFileSync(gitExecutable, ["add", "."], {
+    cwd: directory,
+    env: gitEnvironment,
+  });
   execFileSync(
     gitExecutable,
     ["commit", "--quiet", "-m", subject, ...(body ? ["-m", body] : [])],
-    {cwd: directory},
+    {cwd: directory, env: gitEnvironment},
   );
   return execFileSync(gitExecutable, ["rev-parse", "HEAD"], {
     cwd: directory,
     encoding: "utf8",
+    env: gitEnvironment,
   }).trim();
 };
 
