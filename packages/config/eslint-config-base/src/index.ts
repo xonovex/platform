@@ -307,6 +307,7 @@ export default defineConfig(
       "unicorn/prefer-unicode-code-point-escapes": "off",
       "unicorn/prefer-url-href": "off",
       "unicorn/require-array-sort-compare": "off",
+      "unicorn/single-line-block-comment-style": "off",
       "sonarjs/assertions-in-tests": "off",
       "sonarjs/no-floating-point-equality": "off",
       "sonarjs/no-redundant-optional": "off",
