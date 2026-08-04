@@ -35,7 +35,44 @@ docker:
       - packages/config/ts-config-*/src/index.json
 hasher:
   optimization: performance
-  walkStrategy: vcs
+  # glob rather than vcs: the vcs walk is scoped to each project directory, so a
+  # workspace-root input such as package-lock.json is hashed from the git index
+  # and an uncommitted change to it does not invalidate a project's cache.
+  walkStrategy: glob
+  # The glob walk does not read .gitignore, so every exclusion that git applies
+  # via --exclude-standard has to be restated here. Derived from the ignored
+  # paths git reports, and verified by comparing the hashed input set of every
+  # task against the vcs walk. Extend this whenever .gitignore grows a directory
+  # that a task input glob such as **/*.md or **/*.json can match. dist is
+  # deliberately absent: the bin-permissions tasks declare dist/src/index.js as
+  # an input, and a pattern here excludes declared inputs as well as walked ones.
+  ignorePatterns:
+    - "**/node_modules/**"
+    - "**/coverage/**"
+    - "**/target/**"
+    - "**/bin/**"
+    - "**/build/**"
+    - "**/__pycache__/**"
+    - "**/release-assets/**"
+    - "**/test-results/**"
+    - "**/playwright-report/**"
+    - "**/blob-report/**"
+    - "**/__screenshots__/**"
+    - "**/stryker-tmp/**"
+    - "**/reports/**"
+    - "**/.nyc_output/**"
+    - "**/.cache/**"
+    - "**/*-guide-workspace/**"
+    - ".moon/cache/**"
+    - ".moon/docker/**"
+    - ".moon/toolchain/**"
+    - ".artifacts/**"
+    - ".gitlab-ci-local/**"
+    - ".skill-eval-results/**"
+    - "**/*.tsbuildinfo"
+    - "**/coverage.out"
+    - "**/*.local.md"
+    - "**/*.gen.*"
 pipeline:
   autoCleanCache: true
   cacheLifetime: 7 days
