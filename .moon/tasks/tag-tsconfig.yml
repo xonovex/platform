@@ -2,6 +2,9 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 implicitInputs:
   - package.json
   - tsconfig*.json
+  # The resolved version of prettier and of every eslint plugin lives in the
+  # root lockfile, so a tool upgrade must invalidate these cached results.
+  - /package-lock.json
 fileGroups:
   sources:
     - src/**/*

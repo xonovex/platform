@@ -1,4 +1,8 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
+implicitInputs:
+  # These tasks run prettier and the moon-skill-* binaries from the workspace
+  # install, so a tool upgrade must invalidate their cached results.
+  - /package-lock.json
 tasks:
   skill-format:
     script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"

@@ -2,6 +2,10 @@ $schema: https://moonrepo.dev/schemas/tasks.json
 implicitInputs:
   - package.json
   - tsconfig*.json
+  # The resolved versions of eslint, its plugins, tsc, and vitest live in the
+  # root lockfile, not in any project's package.json. Without it a linter major
+  # that changes which code passes serves a stale cached pass.
+  - /package-lock.json
 fileGroups:
   sources:
     - src/**/*
