@@ -23,9 +23,9 @@ The implementation agent starts with no context, so the brief carries all of it:
 - [ ] **Required reading**: the subplan, its parent plan, the completed predecessor subplans, the `AGENTS.md` of every package the item touches, and the existing source files the work builds on, by path
 - [ ] **Carried facts**: the downstream-impact notes from every predecessor's report (renamed types, new APIs, changed capacities, moved conventions), restated so the agent inherits them instead of rediscovering them
 - [ ] **Skills**: every entry in the subplan's `skills_to_consult`, loaded before implementation starts
-- [ ] **Hard constraints**: the governing decisions bearing on this subplan, restated concretely (value currency and units, determinism pins, which package may see which type, real-time-safety rules) rather than cited by number
+- [ ] **Hard constraints**: the governing decisions bearing on this subplan, restated concretely (the units a value carries, the versions pinned, which module may see which type, what a hot path may not do) rather than cited by number
 - [ ] **Deliverables and tests**: the subplan's tasks and success criteria, verbatim
-- [ ] **Validation commands**: every task that must be green, sanitizer presets, format checks, and dependent packages' suites included
+- [ ] **Validation commands**: every task that must be green, the strictest configured presets, format checks, and dependent packages' suites included
 - [ ] **Working agreement**: work on the current branch; do not commit, do not push
 - [ ] **Document update**: on completion set `status` and `validation` frontmatter, tick only the criteria actually met, add a Results section in the factual style of its sibling subplans, and leave `status: in_progress` with reasons if one is unmet
 - [ ] **Required return**: status; files touched; every criterion met or not-met with the test that evidences it; validation commands with their results; deviations with rationale; downstream impact on consuming plans
@@ -34,7 +34,7 @@ The implementation agent starts with no context, so the brief carries all of it:
 
 The agent's report is input to review, never a substitute for it: re-running is the one step that cannot be delegated.
 
-- Re-run the key suites yourself, sanitizer presets included: a green claim is a claim.
+- Re-run the key suites yourself, the strictest presets included: a green claim is a claim.
 - Where a criterion is visual, open the captures the agent named: an assertion can pass while its screenshot shows an empty panel.
 - Read the diff against the success criteria and the repo's code and writing conventions.
 - Check the document is honest: unmet criteria left unticked, deviations enumerated with rationale and their impact on consuming plans, `validation` frontmatter matching what you just ran.
@@ -44,7 +44,7 @@ The agent's report is input to review, never a substitute for it: re-running is 
 ## Defaults
 
 - Sequential ordering. Parallel-by-group only on request, and only for members whose file sets are genuinely disjoint: check the sets, not the group label, or the conflict lands mid-review.
-- Plain subagents; scripted workflow orchestration only on request.
+- Plain implementation agents; scripted orchestration only on request.
 - Run until the ordering is exhausted or something blocks, unless given a stop condition (a count of items, or a named plan to finish on).
 - The implementation model is a parameter with a strong default, never hardcoded; the supervisor stays on the stronger model.
 
@@ -55,9 +55,9 @@ Roadmap: plans/example-family/roadmap.md, item 3 of 7 (sequential)
 Item: plans/other-family/subsystem/02-scheduler.md (borrowed, owned by plans/other-family/)
 Brief: 5 required reads · 3 skills · 6 criteria · 4 validation commands
 Agent: complete, 11 files · 5/6 criteria met · 2 deviations
-Review: re-ran test + asan + format-check → green · diff matches criteria · doc honest
+Review: re-ran test + lint + format-check → green · diff matches criteria · doc honest
 Record: roadmap line ticked (done for this family) · commit feat(example): add scheduler
-Open: criterion 4 measured -46 dB against the -60 dB asked for, carried to plans/example-family/verification.md
+Open: criterion 4 measured 140 ms against the 100 ms asked for, carried to plans/example-family/verification.md
 ```
 
 ## Gotchas
