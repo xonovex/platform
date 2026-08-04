@@ -1,7 +1,10 @@
+import {execFileSync} from "node:child_process";
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, resolve} from "node:path";
+import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {type z} from "zod";
 import {coverageFloorFailures} from "./coverage-floors.js";
+import {workspaceHasherFailures} from "./hasher-ignore.js";
 import {
   instructionDocFailures,
   type InstructionDirectory,
@@ -92,6 +95,52 @@ const readText = (
     check(false, `${label} could not be read: ${message}`);
     return undefined;
   }
+};
+
+// gitIgnoredPaths lists what git excludes from the working tree, collapsing a
+// fully ignored directory to a single entry. Returns undefined when git cannot
+// answer, so a checkout without a git directory reports one clear failure
+// rather than a missing-coverage failure per pattern.
+const gitIgnoredPaths = (
+  repositoryRoot: string,
+): readonly string[] | undefined => {
+  try {
+    return execFileSync(
+      resolveExecutable("git"),
+      [
+        "ls-files",
+        "--others",
+        "--ignored",
+        "--exclude-standard",
+        "--directory",
+      ],
+      {cwd: repositoryRoot, encoding: "utf8", maxBuffer: 64 * 1024 * 1024},
+    )
+      .split("\n")
+      .filter((line) => line !== "");
+  } catch {
+    return undefined;
+  }
+};
+
+// validateHasherIgnore keeps hasher.ignorePatterns aligned with .gitignore.
+// The glob walk does not apply .gitignore, so an ignored directory that no
+// pattern covers starts being hashed, and a pattern that matches a declared
+// input stops that task from re-running when the input changes.
+const validateHasherIgnore = (
+  repositoryRoot: string,
+  projectFiles: readonly {path: string; text: string}[],
+  check: Check,
+): void => {
+  const workspacePath = resolve(repositoryRoot, ".moon/workspace.yml");
+  const failures = workspaceHasherFailures({
+    workspaceText: existsSync(workspacePath)
+      ? readFileSync(workspacePath, "utf8")
+      : undefined,
+    ignoredPaths: gitIgnoredPaths(repositoryRoot),
+    projectFiles,
+  });
+  for (const failure of failures) check(false, failure);
 };
 
 const marketplaceSource = (
@@ -525,6 +574,8 @@ export const validateRelease = (
   for (const failure of coverageFloorFailures(projectFiles)) {
     check(false, failure);
   }
+
+  validateHasherIgnore(repositoryRoot, projectFiles, check);
 
   // Every package group documents itself, and every AGENTS.md anywhere in the
   // repository carries the CLAUDE.md pointer that makes it load in Claude Code.

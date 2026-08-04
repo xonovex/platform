@@ -68,9 +68,10 @@
     "coverage": "moon run :coverage",
     "dev": "moon run :dev",
     "clean": "moon run :clean",
-    "check:all": "moon run :lint :typecheck",
+    "check:all": "moon run :lint :typecheck :coverage",
     "check:fast": "moon run :lint-fix :typecheck --concurrency=4",
-    "check:affected": "moon run :lint-fix :typecheck :test :build :format --affected --concurrency=4",
+    "check:affected": "moon run :lint-fix :typecheck :test :coverage :build :format --affected --concurrency=4",
+    "check:hook": "moon run :ci-check --affected --status=staged --concurrency=4",
     "ci": "moon ci",
     "sync:hooks": "moon sync hooks",
     "prepare": "npm run sync:hooks"
