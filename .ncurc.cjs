@@ -17,7 +17,7 @@ module.exports = {
     // instead of reusing the pinned typescript, so it demands a second
     // typescript and every moon task that installs dependencies fails with
     // ERESOLVE.
-    if (name === "npm") return "patch";
+    if (name === "npm") return "minor";
 
     return "latest";
   },

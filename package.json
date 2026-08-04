@@ -51,8 +51,8 @@
     "typescript": "6.0.3"
   },
   "scripts": {
-    "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional",
-    "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional",
+    "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional,packageManager",
+    "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional,packageManager",
     "nix:shell": "nix --extra-experimental-features 'nix-command flakes' develop",
     "nix:lock": "nix --extra-experimental-features 'nix-command flakes' flake lock",
     "ci:github": "act push -W .github/workflows/ci.yml --input dry_run=true",
@@ -75,7 +75,7 @@
     "sync:hooks": "moon sync hooks",
     "prepare": "npm run sync:hooks"
   },
-  "packageManager": "npm@11.10.1",
+  "packageManager": "npm@11.19.0",
   "allowScripts": {
     "esbuild@0.28.1": true,
     "fsevents@2.3.3": true
