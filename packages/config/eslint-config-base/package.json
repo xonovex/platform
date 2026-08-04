@@ -43,12 +43,12 @@
   },
   "dependencies": {
     "@eslint/js": "10.0.1",
-    "@vitest/eslint-plugin": "1.6.24",
+    "@vitest/eslint-plugin": "1.6.26",
     "eslint-plugin-regexp": "3.1.1",
     "eslint-plugin-security": "4.0.1",
     "eslint-plugin-sonarjs": "4.2.0",
-    "eslint-plugin-unicorn": "72.0.0",
-    "typescript-eslint": "8.65.0",
+    "eslint-plugin-unicorn": "73.0.0",
+    "typescript-eslint": "8.66.0",
     "@xonovex/ts-config-node": "0.1.22"
   },
   "devDependencies": {
