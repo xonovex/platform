@@ -14,12 +14,14 @@ Before item one, mirror the ordering into the environment's task tracker, one en
 4. **Review**: always, and always yourself (below).
 5. **Record**: tick the roadmap's line for the item and close its tracker entry; for a borrowed item whose owning family still has work left in it, record "done for this family" rather than "complete". Then commit with a conventional-commit message scoped to the subplan. Never push unless the user asked.
 6. **Advance**: move to the next item. On a blocker, or a criterion that is genuinely unmet, stop and report; never paper over one to keep the loop running.
+7. **Close out**: when the ordering is exhausted, re-run the full suites of every touched package once on the final tree, then record family completion the way the roadmap's completed siblings record it (parent plan frontmatter, roadmap entry, criteria ticked), naming anything deliberately deferred rather than leaving it implied.
 
 ## The brief
 
 The implementation agent starts with no context, so the brief carries all of it:
 
-- [ ] **Required reading**: the subplan, its parent plan, the completed predecessor subplans, and the concrete existing source files the work builds on, by path
+- [ ] **Required reading**: the subplan, its parent plan, the completed predecessor subplans, the `AGENTS.md` of every package the item touches, and the concrete existing source files the work builds on, by path
+- [ ] **Carried facts**: the accumulated downstream-impact notes from every predecessor's report (renamed types, new APIs, changed capacities, moved conventions), restated in the brief so the agent inherits them instead of rediscovering them
 - [ ] **Skills**: every entry in the subplan's `skills_to_consult`, loaded before implementation starts
 - [ ] **Hard constraints**: the governing decisions and non-deferrable constraints that bear on this subplan, restated concretely (value currency and units, determinism pins, which package may see which type, real-time-safety rules) rather than cited by number
 - [ ] **Deliverables and tests**: the subplan's tasks and success criteria, verbatim
@@ -33,6 +35,7 @@ The implementation agent starts with no context, so the brief carries all of it:
 The agent's report is input to review, never a substitute for it.
 
 - Re-run the key suites yourself, sanitizer presets included: a green claim is a claim.
+- Where a criterion is visual, open the captures the agent named: an assertion can pass while its screenshot shows an empty panel, and only a look catches that.
 - Read the diff against the success criteria and against the repo's code and writing conventions.
 - Check the document is honest: unmet criteria left unticked, deviations written down, `validation` frontmatter matching what you just ran.
 - Distrust editor and stale-index diagnostics, and settle every dispute with a real build.
@@ -67,3 +70,5 @@ Open: criterion 4 measured -46 dB against the -60 dB asked for, carried to plans
 - Members of one `parallel_group` that touch the same file leave the supervisor untangling a conflict mid-review, so check the file sets, not the group label
 - Spawning a fresh agent for a review-fix pass repeats discovery and often reintroduces the finding
 - Deviations from the plan as written are expected and worth keeping: enumerated with rationale, with their impact on consuming plans recorded
+- An agent may fix a defect the plan assumed away (a missing pin, a dropped parameter); accept it when the fix is at root cause and tested, and carry the fact forward, because hiding it re-surfaces as the next item's mystery
+- User feedback that arrives mid-roadmap is a new item, not a detour: brief it like any other, with the report of the agent whose work it touches
