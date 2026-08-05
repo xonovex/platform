@@ -60,7 +60,9 @@ A member is named by its package name (`@xonovex/prettier-config`) or by its
 project directory (`prettier-config`). The run works from any directory inside
 the workspace; the moon task above runs it from the workspace root. The
 per-project `<project>:version-bump` task bumps one package; a release line goes
-through the workspace task instead of a loop over that task.
+through the workspace task instead of a loop over that task. Run it with
+`--dry-run` first: the preview names every member, every reference that moves,
+and every dependent the run patch-bumps.
 
 Semantics:
 
