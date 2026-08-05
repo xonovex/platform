@@ -17,6 +17,12 @@ export default defineConfig({
           functions: 100,
           lines: 100,
         },
+        "src/index.ts": {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
         "src/lockstep.ts": {
           statements: 100,
           branches: 88,
