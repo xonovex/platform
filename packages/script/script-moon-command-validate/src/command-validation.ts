@@ -6,6 +6,7 @@ import {
   parseCommandDocument,
   type CommandDocument,
 } from "./command-document.js";
+import {checkDependencyUsage} from "./dependency-usage.js";
 import {checkReadmeCatalog} from "./readme-catalog.js";
 import {
   issue,
@@ -229,14 +230,14 @@ export const validateCommandPackage = (
   const commandFiles = readdirSync(commandDir)
     .filter((entry) => entry.endsWith(".md"))
     .toSorted();
+  const commandNames = commandFiles.map((entry) =>
+    entry.slice(0, -".md".length),
+  );
+  const delegatedPlugins = new Set<string>();
   issues.push(
     ...validateInternalLinks(packageDir, repositoryRoot),
     ...validateProsePunctuation(packageDir, repositoryRoot),
-    ...checkReadmeCatalog(
-      packageDir,
-      commandFiles.map((entry) => entry.slice(0, -".md".length)),
-      repositoryRoot,
-    ),
+    ...checkReadmeCatalog(packageDir, commandNames, repositoryRoot),
   );
 
   for (const commandFile of commandFiles) {
@@ -275,6 +276,7 @@ export const validateCommandPackage = (
 
     const delegation = document.delegation;
     if (delegation === undefined) continue;
+    delegatedPlugins.add(delegation.plugin);
     if (!(pluginManifest?.dependencies ?? []).includes(delegation.plugin)) {
       issues.push(
         issue(
@@ -335,7 +337,17 @@ export const validateCommandPackage = (
     }
   }
 
-  issues.push(...checkCommandBudgets(packageDir, repositoryRoot));
+  issues.push(
+    ...checkDependencyUsage({
+      packageDirectory: packageDir,
+      repositoryRoot,
+      commandNames,
+      pluginDependencies: pluginManifest?.dependencies ?? [],
+      packageDependencies: Object.keys(packageManifest?.dependencies ?? {}),
+      delegatedPlugins,
+    }),
+    ...checkCommandBudgets(packageDir, repositoryRoot),
+  );
 
   return {
     documents,
