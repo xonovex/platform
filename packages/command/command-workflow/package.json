@@ -1,14 +1,14 @@
 {
   "name": "@xonovex/command-workflow",
-  "version": "6.0.0",
+  "version": "5.1.0",
   "description": "Xonovex workflow commands: planning, code analysis, git",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-bdd": "6.0.0",
-    "@xonovex/skill-code-quality": "6.0.0",
-    "@xonovex/skill-git": "6.0.0",
-    "@xonovex/skill-plan": "6.0.0",
-    "@xonovex/skill-tdd": "6.0.0"
+    "@xonovex/skill-bdd": "5.1.0",
+    "@xonovex/skill-code-quality": "5.1.0",
+    "@xonovex/skill-git": "5.1.0",
+    "@xonovex/skill-plan": "5.1.0",
+    "@xonovex/skill-tdd": "5.1.0"
   },
   "keywords": [
     "xonovex",
