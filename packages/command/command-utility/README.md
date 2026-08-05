@@ -20,7 +20,6 @@ codex plugin add xonovex-skill-instruction@xonovex-marketplace
 codex plugin add xonovex-skill-reflect@xonovex-marketplace
 codex plugin add xonovex-skill-skill@xonovex-marketplace
 codex plugin add xonovex-skill-command@xonovex-marketplace
-codex plugin add xonovex-skill-versioning@xonovex-marketplace
 ```
 
 Install only the skills needed for the intended operation and invoke the matching
