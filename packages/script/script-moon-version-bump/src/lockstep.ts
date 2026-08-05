@@ -166,6 +166,44 @@ const selectBaseVersion = (members: readonly ResolvedMember[]): string => {
   );
 };
 
+// A dependent earns a version of its own only when it is publishable and the
+// worktree has not already bumped it away from its committed version.
+const dependentVersionOf = (entry: WorkspacePackage): string | undefined => {
+  const currentVersion = entry.pkg.version;
+  if (currentVersion === undefined) return undefined;
+  if (entry.pkg.private === true) return undefined;
+  if (entry.headVersion !== currentVersion) return undefined;
+  return bumpVersion(currentVersion, "patch");
+};
+
+// A patch-bumped dependent is itself held by exact references elsewhere, so the
+// version map is driven to a fixed point before any package is planned. Each
+// pass that changes anything adds a name, which bounds the pass count.
+const resolveVersions = (
+  packages: readonly WorkspacePackage[],
+  memberPaths: ReadonlySet<string>,
+  memberVersions: ReadonlyMap<string, string>,
+): ReadonlyMap<string, string> => {
+  const resolved = new Map(memberVersions);
+  let settled = false;
+  let remainingPasses = packages.length;
+  while (!settled && remainingPasses > 0) {
+    remainingPasses -= 1;
+    settled = true;
+    for (const entry of packages) {
+      const name = entry.pkg.name;
+      if (name === undefined) continue;
+      if (memberPaths.has(entry.path) || resolved.has(name)) continue;
+      if (rewriteReferences(entry.pkg, resolved).changed === 0) continue;
+      const newVersion = dependentVersionOf(entry);
+      if (newVersion === undefined) continue;
+      resolved.set(name, newVersion);
+      settled = false;
+    }
+  }
+  return resolved;
+};
+
 const planDependent = (
   entry: WorkspacePackage,
   versions: ReadonlyMap<string, string>,
@@ -174,11 +212,7 @@ const planDependent = (
   if (rewritten.changed === 0) return undefined;
   const currentVersion = entry.pkg.version;
   const newVersion =
-    currentVersion !== undefined &&
-    entry.pkg.private !== true &&
-    entry.headVersion === currentVersion
-      ? bumpVersion(currentVersion, "patch")
-      : undefined;
+    entry.pkg.name === undefined ? undefined : versions.get(entry.pkg.name);
   return {
     name: entry.pkg.name ?? entry.path,
     path: entry.path,
@@ -199,10 +233,12 @@ const planLockstep = (request: LockstepRequest): LockstepPlan => {
   const baseVersion = selectBaseVersion(members);
   const targetVersion =
     request.exact ?? bumpVersion(baseVersion, request.bumpType, request.preid);
-  const versions = new Map(
-    members.map((member) => [member.name, targetVersion]),
-  );
   const memberPaths = new Set(members.map((member) => member.entry.path));
+  const versions = resolveVersions(
+    request.packages,
+    memberPaths,
+    new Map(members.map((member) => [member.name, targetVersion])),
+  );
 
   const memberPlans = members.map((member) => ({
     name: member.name,

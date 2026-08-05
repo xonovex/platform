@@ -5,8 +5,8 @@ import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {afterEach, describe, expect, it} from "vitest";
 import {
+  findChangelogRange,
   getCommitsSince,
-  getLastVersionRef,
   isIncludedType,
   parseConventionalCommit,
 } from "./git-log.js";
@@ -126,22 +126,37 @@ describe("git history", () => {
     writePackage(directory, "2.0.0");
     commit(directory, "chore: release 2.0.0");
 
-    expect(getLastVersionRef(directory, "packages/example", "2.0.0")).toBe(
-      previousVersionCommit,
-    );
+    expect(findChangelogRange(directory, "packages/example", "2.0.0")).toEqual({
+      since: previousVersionCommit,
+    });
   });
 
   it("falls back to before the package introduction when its version never changed", () => {
     const directory = createRepository();
+    writeFileSync(join(directory, "unrelated.txt"), "ok\n");
+    commit(directory, "chore: seed the repository");
     writePackage(directory, "1.0.0");
     const introduction = commit(directory, "feat: initial package");
 
-    expect(getLastVersionRef(directory, "packages/example", "1.0.0")).toBe(
-      `${introduction}~1`,
-    );
+    expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
+      since: `${introduction}~1`,
+    });
     expect(
-      getLastVersionRef(directory, "packages/missing", "1.0.0"),
+      findChangelogRange(directory, "packages/missing", "1.0.0"),
     ).toBeUndefined();
+  });
+
+  it("covers the whole history when the root commit introduced the package", () => {
+    const directory = createRepository();
+    writePackage(directory, "1.0.0");
+    const introduction = commit(directory, "feat: initial package");
+
+    expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
+      since: undefined,
+    });
+    expect(
+      getCommitsSince(directory, "packages/example", undefined),
+    ).toMatchObject([{hash: introduction, author: "Test Author"}]);
   });
 
   it("extracts conventional subject and body messages from package commits", () => {

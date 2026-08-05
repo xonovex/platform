@@ -196,6 +196,106 @@ describe("planLockstep", () => {
     expect(plan.dependents[0]?.newVersion).toBe("0.1.32");
   });
 
+  it("propagates a patch-bumped dependent along the whole chain", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("mid", {
+        name: "@xonovex/mid",
+        version: "1.4.0",
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+      }),
+      workspacePackage("outer", {
+        name: "@xonovex/outer",
+        version: "3.0.0",
+        dependencies: {"@xonovex/mid": "1.4.0"},
+      }),
+      workspacePackage("leaf", {
+        name: "@xonovex/leaf",
+        version: "5.2.9",
+        dependencies: {"@xonovex/outer": "3.0.0"},
+      }),
+    ];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "minor",
+      preid: undefined,
+      exact: undefined,
+    });
+
+    const byName = new Map(
+      plan.dependents.map((dependent) => [dependent.name, dependent]),
+    );
+    expect(byName.get("@xonovex/mid")?.newVersion).toBe("1.4.1");
+    expect(byName.get("@xonovex/outer")?.newVersion).toBe("3.0.1");
+    expect(byName.get("@xonovex/outer")?.pkg.dependencies).toEqual({
+      "@xonovex/mid": "1.4.1",
+    });
+    expect(byName.get("@xonovex/leaf")?.newVersion).toBe("5.2.10");
+    expect(byName.get("@xonovex/leaf")?.pkg.dependencies).toEqual({
+      "@xonovex/outer": "3.0.1",
+    });
+  });
+
+  it("stops propagation at a dependent that keeps its version", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("internal", {
+        name: "@xonovex/internal",
+        version: "0.0.0",
+        private: true,
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+      }),
+      workspacePackage("beyond", {
+        name: "@xonovex/beyond",
+        version: "3.0.0",
+        dependencies: {"@xonovex/internal": "0.0.0"},
+      }),
+    ];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "minor",
+      preid: undefined,
+      exact: undefined,
+    });
+
+    expect(plan.dependents.map((dependent) => dependent.name)).toEqual([
+      "@xonovex/internal",
+    ]);
+    expect(plan.dependents[0]?.newVersion).toBeUndefined();
+  });
+
+  it("moves a member reference to a patch-bumped dependent", () => {
+    const packages = [
+      workspacePackage("eslint-config-base", {
+        name: "@xonovex/eslint-config-base",
+        version: "0.1.22",
+        devDependencies: {"@xonovex/tooling": "1.4.0"},
+      }),
+      workspacePackage("tooling", {
+        name: "@xonovex/tooling",
+        version: "1.4.0",
+        dependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+      }),
+    ];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base"],
+      bumpType: "minor",
+      preid: undefined,
+      exact: undefined,
+    });
+
+    expect(plan.dependents[0]?.newVersion).toBe("1.4.1");
+    expect(plan.members[0]?.pkg.devDependencies).toEqual({
+      "@xonovex/tooling": "1.4.1",
+    });
+  });
+
   it("leaves an already bumped dependent version alone", () => {
     const packages = [
       ...cyclicLine(),
@@ -222,6 +322,44 @@ describe("planLockstep", () => {
     expect(
       plan.dependents[0]?.pkg.devDependencies?.["@xonovex/eslint-config-base"],
     ).toBe("0.2.0");
+  });
+
+  it("rewrites references held by a package with no name or no version", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("nameless", {
+        dependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+      }),
+      workspacePackage("versionless", {
+        name: "@xonovex/versionless",
+        dependencies: {"@xonovex/prettier-config": "0.1.22"},
+      }),
+    ];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "minor",
+      preid: undefined,
+      exact: undefined,
+    });
+
+    const nameless = plan.dependents.find((dependent) =>
+      dependent.path.includes("nameless"),
+    );
+    expect(nameless?.name).toBe("/repo/packages/nameless/package.json");
+    expect(nameless?.newVersion).toBeUndefined();
+    expect(nameless?.pkg.dependencies).toEqual({
+      "@xonovex/eslint-config-base": "0.2.0",
+    });
+
+    const versionless = plan.dependents.find(
+      (dependent) => dependent.name === "@xonovex/versionless",
+    );
+    expect(versionless?.newVersion).toBeUndefined();
+    expect(versionless?.pkg.dependencies).toEqual({
+      "@xonovex/prettier-config": "0.2.0",
+    });
   });
 
   it("ignores a package whose references already hold the target", () => {

@@ -42,12 +42,6 @@ const commit = (root: string, subject: string): void => {
   });
 };
 
-const consumer = (version: string, coreVersion: string): Manifest => ({
-  name: "@xonovex/consumer",
-  version,
-  dependencies: {"@xonovex/core": coreVersion},
-});
-
 const createRepository = (): {
   readonly root: string;
   readonly corePath: string;
@@ -73,11 +67,11 @@ const createRepository = (): {
     name: "@xonovex/core",
     version: "1.0.0",
   });
-  const consumerPath = writeManifest(
-    root,
-    "consumer",
-    consumer("2.0.0", "1.0.0"),
-  );
+  const consumerPath = writeManifest(root, "consumer", {
+    name: "@xonovex/consumer",
+    version: "2.0.0",
+    dependencies: {"@xonovex/core": "1.0.0"},
+  });
   const privatePath = writeManifest(root, "internal", {
     name: "@xonovex/internal",
     version: "0.0.0",
@@ -85,7 +79,10 @@ const createRepository = (): {
     devDependencies: {"@xonovex/core": "1.0.0"},
   });
   commit(root, "feat: introduce the packages");
-  writeManifest(root, "consumer", consumer("2.1.0", "1.0.0"));
+  writeFileSync(
+    join(root, "packages", "consumer", "source.ts"),
+    "export {};\n",
+  );
   commit(root, "feat(consumer): add a capability");
   return {root, corePath, consumerPath, privatePath};
 };
@@ -129,7 +126,7 @@ describe("planDependentUpdates", () => {
       (change) => change.path === consumerPath,
     );
     expect(consumerChange?.content).toContain('"@xonovex/core": "1.1.0"');
-    expect(consumerChange?.content).toContain('"version": "2.1.1"');
+    expect(consumerChange?.content).toContain('"version": "2.0.1"');
     const privateChange = result.changes.find(
       (change) => change.path === privatePath,
     );
@@ -137,7 +134,7 @@ describe("planDependentUpdates", () => {
     const changelog = result.changes.find((change) =>
       change.path.endsWith("CHANGELOG.md"),
     );
-    expect(changelog?.content).toContain("## 2.1.1");
+    expect(changelog?.content).toContain("## 2.0.1");
     expect(changelog?.content).toContain(
       "- Updated dependency `@xonovex/core` to `1.1.0`",
     );

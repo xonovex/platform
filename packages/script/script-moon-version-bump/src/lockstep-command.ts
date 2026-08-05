@@ -126,7 +126,7 @@ const runLockstep = (options: LockstepOptions): number => {
         ? "version unchanged"
         : `${String(dependent.previousVersion)} -> ${dependent.newVersion}`;
     logInfo(
-      `${label}${dependent.name}: ${String(dependent.referenceCount)} reference(s) -> ${plan.targetVersion} (${versionNote})`,
+      `${label}${dependent.name}: ${String(dependent.referenceCount)} reference(s) updated (${versionNote})`,
     );
     changes.push(...planDependentChanges(options, dependent));
   }

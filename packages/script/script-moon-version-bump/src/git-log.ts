@@ -13,6 +13,12 @@ interface ParsedCommit {
   readonly description: string;
 }
 
+interface ChangelogRange {
+  // undefined covers the whole history, which is what a package introduced by
+  // the root commit needs.
+  readonly since: string | undefined;
+}
+
 const REPO_URL = "https://github.com/xonovex/platform";
 
 const INCLUDED_TYPES = new Set(["feat", "fix", "refactor", "perf", "docs"]);
@@ -28,11 +34,22 @@ const isIncludedType = (
   includedTypes?: ReadonlySet<string>,
 ): boolean => (includedTypes ?? INCLUDED_TYPES).has(type);
 
-const getLastVersionRef = (
+const hasParent = (rootDir: string, hash: string): boolean => {
+  const parents = execFileSync(
+    resolveExecutable("git"),
+    ["rev-list", "--parents", "-n", "1", hash],
+    {cwd: rootDir, encoding: "utf8"},
+  )
+    .trim()
+    .split(" ");
+  return parents.length > 1;
+};
+
+const findChangelogRange = (
   rootDir: string,
   pkgDir: string,
   currentVersion: string,
-): string | undefined => {
+): ChangelogRange | undefined => {
   // The first historical package version that differs bounds the current release.
   const hashes = execFileSync(
     resolveExecutable("git"),
@@ -65,13 +82,15 @@ const getLastVersionRef = (
     );
     const oldVersion = parsePackageJson(oldPkgJson, `${hash}:${path}`).version;
     if (oldVersion !== currentVersion) {
-      return hash;
+      return {since: hash};
     }
   }
 
-  // A never-versioned package starts before the commit that introduced it.
+  // A never-versioned package starts before the commit that introduced it, and
+  // a root commit has no parent to name, so its range is the whole history.
   const earliest = hashes.at(-1);
-  return earliest ? `${earliest}~1` : undefined;
+  if (earliest === undefined) return undefined;
+  return {since: hasParent(rootDir, earliest) ? `${earliest}~1` : undefined};
 };
 
 const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
@@ -79,11 +98,17 @@ const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
 const getCommitsSince = (
   rootDir: string,
   pkgDir: string,
-  sinceRef: string,
+  sinceRef: string | undefined,
 ): readonly Commit[] => {
   const raw = execFileSync(
     resolveExecutable("git"),
-    ["log", "--format=%x00%H|%aN%n%B", `${sinceRef}..HEAD`, "--", pkgDir],
+    [
+      "log",
+      "--format=%x00%H|%aN%n%B",
+      ...(sinceRef === undefined ? ["HEAD"] : [`${sinceRef}..HEAD`]),
+      "--",
+      pkgDir,
+    ],
     {cwd: rootDir, encoding: "utf8"},
   );
   return raw
@@ -111,10 +136,10 @@ const getCommitsSince = (
 };
 
 export {
-  getLastVersionRef,
+  findChangelogRange,
   getCommitsSince,
   parseConventionalCommit,
   isIncludedType,
   REPO_URL,
 };
-export type {Commit};
+export type {ChangelogRange, Commit};

@@ -9,7 +9,7 @@ import {
   type DepUpdate,
 } from "./changelog.js";
 import type {FileChange} from "./file-transaction.js";
-import {getCommitsSince, getLastVersionRef} from "./git-log.js";
+import {findChangelogRange, getCommitsSince} from "./git-log.js";
 
 interface ChangelogRequest {
   readonly rootDir: string;
@@ -30,11 +30,12 @@ const serializePackage = (pkg: PackageJson): string =>
 const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   const pkgDir = relative(request.rootDir, dirname(request.packagePath));
   const filename = request.changelogFilename ?? "CHANGELOG.md";
-  const sinceRef =
-    request.gitBase ??
-    getLastVersionRef(request.rootDir, pkgDir, request.oldVersion);
+  const range =
+    request.gitBase === undefined
+      ? findChangelogRange(request.rootDir, pkgDir, request.oldVersion)
+      : {since: request.gitBase};
 
-  if (!sinceRef) {
+  if (range === undefined) {
     logInfo(
       `${request.packageName}: no previous version found, skipping changelog.`,
     );
@@ -42,7 +43,7 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   }
 
   const bumpLevel = determineBumpLevel(request.oldVersion, request.newVersion);
-  const commits = getCommitsSince(request.rootDir, pkgDir, sinceRef);
+  const commits = getCommitsSince(request.rootDir, pkgDir, range.since);
   const entry = generateChangelogEntry(
     request.newVersion,
     commits,

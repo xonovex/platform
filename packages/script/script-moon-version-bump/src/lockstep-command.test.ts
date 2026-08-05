@@ -30,49 +30,49 @@ const gitEnvironment = Object.fromEntries(
 type Manifest = Readonly<Record<string, unknown>>;
 type Manifests = Readonly<Record<string, Manifest>>;
 
-// Every package needs two committed versions: a changelog range is bounded by
-// the commit holding the preceding version, and the root commit has no parent.
-interface Stage {
-  readonly line: string;
-  readonly consumer: string;
-}
-
-const configLine = (stage: Stage): Manifests => ({
+const configLine = (version: string): Manifests => ({
   "eslint-config-base": {
     name: "@xonovex/eslint-config-base",
-    version: stage.line,
-    devDependencies: {"@xonovex/prettier-config": stage.line},
+    version,
+    devDependencies: {"@xonovex/prettier-config": version},
   },
   "prettier-config": {
     name: "@xonovex/prettier-config",
-    version: stage.line,
-    dependencies: {"@xonovex/eslint-config-base": stage.line},
+    version,
+    dependencies: {"@xonovex/eslint-config-base": version},
   },
   consumer: {
     name: "@xonovex/consumer",
-    version: stage.consumer,
+    version: "1.4.0",
     devDependencies: {
-      "@xonovex/eslint-config-base": stage.line,
-      "@xonovex/prettier-config": stage.line,
+      "@xonovex/eslint-config-base": version,
+      "@xonovex/prettier-config": version,
     },
+  },
+  // Holds an exact reference to the consumer rather than to a member, so its
+  // reference only moves once the consumer itself is patch-bumped.
+  "downstream-consumer": {
+    name: "@xonovex/downstream-consumer",
+    version: "3.0.0",
+    dependencies: {"@xonovex/consumer": "1.4.0"},
   },
 });
 
-const agentLine = (stage: Stage): Manifests => ({
+const agentLine = (version: string): Manifests => ({
   "agent-cli-go": {
     name: "@xonovex/agent-cli-go",
-    version: stage.line,
-    optionalDependencies: {"@xonovex/agent-cli-go-linux-x64": stage.line},
+    version,
+    optionalDependencies: {"@xonovex/agent-cli-go-linux-x64": version},
   },
   "agent-cli-go-linux-x64": {
     name: "@xonovex/agent-cli-go-linux-x64",
-    version: stage.line,
+    version,
   },
   "agent-cli-go-github": {
     name: "@xonovex/agent-cli-go-github",
     version: "0.0.0",
     private: true,
-    optionalDependencies: {"@xonovex/agent-cli-go-linux-x64": stage.line},
+    optionalDependencies: {"@xonovex/agent-cli-go-linux-x64": version},
   },
 });
 
@@ -95,7 +95,7 @@ const commit = (root: string, subject: string): void => {
   });
 };
 
-const createRepository = (line: (stage: Stage) => Manifests): string => {
+const createRepository = (line: (version: string) => Manifests): string => {
   const root = mkdtempSync(join(tmpdir(), "version-lockstep-"));
   directories.push(root);
   mkdirSync(join(root, ".moon"));
@@ -111,9 +111,9 @@ const createRepository = (line: (stage: Stage) => Manifests): string => {
     cwd: root,
     env: gitEnvironment,
   });
-  writeManifests(root, line({line: "0.1.21", consumer: "1.3.0"}));
+  writeManifests(root, line("0.1.21"));
   commit(root, "feat: introduce the line");
-  writeManifests(root, line({line: "0.1.22", consumer: "1.4.0"}));
+  writeManifests(root, line("0.1.22"));
   commit(root, "chore: release 0.1.22");
   for (const directory of readdirSync(join(root, "packages"))) {
     writeFileSync(
@@ -239,6 +239,22 @@ describe("runLockstep", () => {
     expect(changelogAt(root, "consumer")).toContain("## 1.4.1");
   });
 
+  it("propagates a patch-bumped dependent to its own dependents", () => {
+    const root = createRepository(configLine);
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"]),
+    );
+
+    expect(manifestAt(root, "downstream-consumer")).toMatchObject({
+      version: "3.0.1",
+      dependencies: {"@xonovex/consumer": "1.4.1"},
+    });
+    expect(changelogAt(root, "downstream-consumer")).toContain(
+      "- Updated dependency `@xonovex/consumer` to `1.4.1`",
+    );
+  });
+
   it("keeps out-of-set references untouched with --no-dependents", () => {
     const root = createRepository(configLine);
 
@@ -301,6 +317,29 @@ describe("runLockstep", () => {
     expect(
       readdirSync(join(root, "packages", "eslint-config-base")),
     ).not.toContain("CHANGELOG.md");
+  });
+
+  it("honours an explicit changelog base ref and filename", () => {
+    const root = createRepository(configLine);
+    const base = execFileSync(gitExecutable, ["rev-parse", "HEAD~1"], {
+      cwd: root,
+      encoding: "utf8",
+      env: gitEnvironment,
+    }).trim();
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        gitBase: base,
+        changelogPath: "CHANGES.md",
+      }),
+    );
+
+    const changelog = readFileSync(
+      join(root, "packages", "eslint-config-base", "CHANGES.md"),
+      "utf8",
+    );
+    expect(changelog).toContain("## 0.2.0");
+    expect(changelog).toContain("add a shared capability");
   });
 
   it("skips changelog generation on request", () => {
