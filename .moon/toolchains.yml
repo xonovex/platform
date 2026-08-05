@@ -13,7 +13,9 @@ javascript:
   packageManager: npm
   syncPackageManagerField: true
   syncProjectWorkspaceDependencies: true
-  dependencyVersionFormat: version-caret
+  # Internal @xonovex/* dependencies are exact, so the dependency sync writes an
+  # exact version rather than a caret range when it adds a dependsOn edge.
+  dependencyVersionFormat: version
 nix:
   plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
   shellByTag:
