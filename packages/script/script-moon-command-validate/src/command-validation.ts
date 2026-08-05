@@ -6,6 +6,7 @@ import {
   parseCommandDocument,
   type CommandDocument,
 } from "./command-document.js";
+import {checkReadmeCatalog} from "./readme-catalog.js";
 import {
   issue,
   type ValidationIssue,
@@ -231,6 +232,11 @@ export const validateCommandPackage = (
   issues.push(
     ...validateInternalLinks(packageDir, repositoryRoot),
     ...validateProsePunctuation(packageDir, repositoryRoot),
+    ...checkReadmeCatalog(
+      packageDir,
+      commandFiles.map((entry) => entry.slice(0, -".md".length)),
+      repositoryRoot,
+    ),
   );
 
   for (const commandFile of commandFiles) {

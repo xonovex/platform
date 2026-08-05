@@ -1,6 +1,6 @@
 # Utility Commands
 
-Manage project instructions, reflect on sessions, create skills, and bump package versions.
+Manage project instructions, reflect on sessions, author content, and create skills and commands.
 
 ## Installation
 
@@ -81,9 +81,3 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 | `slashcommand-simplify`   | Reduce verbosity in slash command files                    |
 | `slashcommand-assimilate` | Augment a slash command with elements from another         |
 | `slashcommand-distill`    | Distill a fat command with explicit owner/supporting needs |
-
-### Versioning
-
-| Command        | Description                                                                     |
-| -------------- | ------------------------------------------------------------------------------- |
-| `version-bump` | Bump a package version, propagate to dependents, and generate a changelog entry |
