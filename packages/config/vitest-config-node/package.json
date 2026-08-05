@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/vitest-config-node",
-  "version": "0.1.22",
-  "description": "Vitest configuration for Node.js applications",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/vitest-config-node"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/vitest-config-node#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist",
@@ -41,16 +30,27 @@
       }
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
-    "@xonovex/vitest-config-base": "0.1.22",
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/vitest-config-base": "0.2.0",
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/prettier-config": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0"
   },
+  "description": "Vitest configuration for Node.js applications",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/vitest-config-node#readme",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",

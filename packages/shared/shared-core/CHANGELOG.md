@@ -1,5 +1,21 @@
 # @xonovex/core
 
+## 0.2.0
+
+### Minor Changes
+
+- [`ac40476`](https://github.com/xonovex/platform/commit/ac40476f6bbc1bfe5a4c9b489db345b0505585e8) [@Deorder](https://github.com/Deorder)! - land the shared libraries and agent tooling
+- [`b299a93`](https://github.com/xonovex/platform/commit/b299a93598db50db766af35ade163901669aea5d) [@Deorder](https://github.com/Deorder)! - prefix tag tasks per language and aggregate via ci-check
+- [`46a31c3`](https://github.com/xonovex/platform/commit/46a31c3a1e29fd4d074ca87d09a51ce2ca6df089) [@Deorder](https://github.com/Deorder)! - remove deprecated baseUrl from TypeScript configs
+- [`d2fc919`](https://github.com/xonovex/platform/commit/d2fc919cd7931946517bf569399868f4b52ef5b3) [@Deorder](https://github.com/Deorder)! - consolidate and standardize AGENTS.md files
+- [`b17c2cc`](https://github.com/xonovex/platform/commit/b17c2cc583d67c24962cdfc05a8719c4325bb7ef) [@Deorder](https://github.com/Deorder)! - back to skills (#18)
+- [`70256c0`](https://github.com/xonovex/platform/commit/70256c017b30cb830f779352a39826f50681bcba) [@Deorder](https://github.com/Deorder)! - restructure skill packages into guide and prompt packages
+- [`73da81c`](https://github.com/xonovex/platform/commit/73da81c57752f0d0a655f603e54811881b0621ae) [@Deorder](https://github.com/Deorder)! - add TypeScript guidelines and related scripts for various plugins
+- Updated dependency `@xonovex/eslint-config-cli` to `0.2.0`
+- Updated dependency `@xonovex/prettier-config` to `0.2.0`
+- Updated dependency `@xonovex/ts-config-cli` to `0.2.0`
+- Updated dependency `@xonovex/vitest-config-node` to `0.2.0`
+
 ## 0.1.21
 
 ### Patch Changes

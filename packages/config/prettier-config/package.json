@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/prettier-config",
-  "version": "0.1.22",
-  "description": "Shared Prettier configuration for Xonovex projects",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/prettier-config"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/prettier-config#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "src"
@@ -25,17 +14,28 @@
     "./package.json": "./package.json",
     ".": "./src/index.js"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.8.1",
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0"
   },
+  "description": "Shared Prettier configuration for Xonovex projects",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/prettier-config#readme",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

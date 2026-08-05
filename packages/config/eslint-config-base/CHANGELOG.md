@@ -1,5 +1,23 @@
 # @xonovex/eslint-config-base
 
+## 0.2.0
+
+### Minor Changes
+
+- [`9d4916a`](https://github.com/xonovex/platform/commit/9d4916a004de48a1ebf63264157ff114d7c04ee9) [@Deorder](https://github.com/Deorder)! - disable unicorn/single-line-block-comment-style
+- [`bc77c3e`](https://github.com/xonovex/platform/commit/bc77c3e5e23df1189b5f906805b8158cee894419) [@Deorder](https://github.com/Deorder)! - land the moon action scripts and split skill validators
+- [`03e9d12`](https://github.com/xonovex/platform/commit/03e9d12945b503b6b02f304f23ebb8d4a2591f6a) [@Deorder](https://github.com/Deorder)! - land the branch infrastructure and shared configs
+- [`2ea459e`](https://github.com/xonovex/platform/commit/2ea459ef4ae13b982e267062ce0c25c19342684b) [@Deorder](https://github.com/Deorder)! - consume the shared vitest config instead of redefining it
+- [`46a31c3`](https://github.com/xonovex/platform/commit/46a31c3a1e29fd4d074ca87d09a51ce2ca6df089) [@Deorder](https://github.com/Deorder)! - remove deprecated baseUrl from TypeScript configs
+- [`d2fc919`](https://github.com/xonovex/platform/commit/d2fc919cd7931946517bf569399868f4b52ef5b3) [@Deorder](https://github.com/Deorder)! - consolidate and standardize AGENTS.md files
+- [`b17c2cc`](https://github.com/xonovex/platform/commit/b17c2cc583d67c24962cdfc05a8719c4325bb7ef) [@Deorder](https://github.com/Deorder)! - back to skills (#18)
+- [`7a52f06`](https://github.com/xonovex/platform/commit/7a52f060e8aa0cb6b661515c550f14185d9e4137) [@Deorder](https://github.com/Deorder)! - update AGENTS.md files for clarity and consistency in formatting
+- [`70256c0`](https://github.com/xonovex/platform/commit/70256c017b30cb830f779352a39826f50681bcba) [@Deorder](https://github.com/Deorder)! - restructure skill packages into guide and prompt packages
+- [`73da81c`](https://github.com/xonovex/platform/commit/73da81c57752f0d0a655f603e54811881b0621ae) [@Deorder](https://github.com/Deorder)! - add TypeScript guidelines and related scripts for various plugins
+- [`8d13e3e`](https://github.com/xonovex/platform/commit/8d13e3ec1eea9968dbc8cc94a184c15264187848) [@Deorder](https://github.com/Deorder)! - add export condition ordering documentation for eslint-config packages
+- Updated dependency `@xonovex/ts-config-node` to `0.2.0`
+- Updated dependency `@xonovex/prettier-config` to `0.2.0`
+
 ## 0.1.20
 
 ### Patch Changes

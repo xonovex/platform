@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/vite-config-base",
-  "version": "0.1.22",
-  "description": "Base Vite configuration for Xonovex projects",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/vite-config-base"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/vite-config-base#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist",
@@ -37,17 +26,28 @@
       "default": "./src/*.ts"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@tailwindcss/vite": "4.3.3",
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/prettier-config": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22",
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0",
     "typescript": "6.0.3"
   },
+  "description": "Base Vite configuration for Xonovex projects",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/vite-config-base#readme",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",

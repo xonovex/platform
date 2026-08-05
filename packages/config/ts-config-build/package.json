@@ -1,36 +1,36 @@
 {
   "name": "@xonovex/ts-config-build",
-  "version": "0.1.22",
-  "description": "TypeScript configuration for building packages",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/ts-config-build"
   },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/ts-config-build#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
   "files": [
     "src"
   ],
-  "main": "./src/index.json",
   "exports": {
     "./package.json": "./package.json",
     ".": "./src/index.json",
     "./tsconfig.json": "./src/index.json"
   },
+  "main": "./src/index.json",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {},
   "devDependencies": {
-    "@xonovex/ts-config-base": "0.1.22"
+    "@xonovex/ts-config-base": "0.2.0"
   },
+  "description": "TypeScript configuration for building packages",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/ts-config-build#readme",
   "scripts": {
     "lint": "echo 'No linting needed for JSON-only config package'",
     "lint:fix": "echo 'No linting needed for JSON-only config package'",

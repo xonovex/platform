@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/eslint-config-cli",
-  "version": "0.1.22",
-  "description": "ESLint configuration for CLI tools and scripts",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/eslint-config-cli"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/eslint-config-cli#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist",
@@ -41,17 +30,28 @@
       "node": "./dist/src/*.js"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
-    "@xonovex/eslint-config-base": "0.1.22",
+    "@xonovex/eslint-config-base": "0.2.0",
     "globals": "17.9.0",
-    "@xonovex/ts-config-build": "0.1.22"
+    "@xonovex/ts-config-build": "0.2.0"
   },
   "devDependencies": {
-    "@xonovex/eslint-config-base": "0.1.22",
-    "@xonovex/prettier-config": "0.1.22",
-    "@xonovex/ts-config-build": "0.1.22",
+    "@xonovex/eslint-config-base": "0.2.0",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-build": "0.2.0",
     "@types/node": "^26.1.2"
   },
+  "description": "ESLint configuration for CLI tools and scripts",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/eslint-config-cli#readme",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",

@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/core",
-  "version": "0.1.22",
-  "description": "Core library for Xonovex TypeScript scripts (Node.js)",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/shared/shared-core"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/shared/shared-core#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist"
@@ -25,6 +14,31 @@
     ".": "./dist/src/index.js",
     "./*": "./dist/src/*.js"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@xonovex/eslint-config-cli": "0.2.0",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-cli": "0.2.0",
+    "@xonovex/vitest-config-node": "0.2.0",
+    "@types/node": "^26.1.2",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.8.0",
+    "jiti": "^2.7.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.5",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "description": "Core library for Xonovex TypeScript scripts (Node.js)",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/shared/shared-core#readme",
   "scripts": {
     "build": "tsc --build",
     "dev": "tsx watch src/index.ts",
@@ -37,20 +51,6 @@
     "fmt:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
-  },
-  "devDependencies": {
-    "@xonovex/eslint-config-cli": "0.1.22",
-    "@xonovex/prettier-config": "0.1.22",
-    "@xonovex/ts-config-cli": "0.1.22",
-    "@xonovex/vitest-config-node": "0.1.22",
-    "@types/node": "^26.1.2",
-    "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^10.8.0",
-    "jiti": "^2.7.0",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.5",
-    "typescript": "6.0.3",
-    "vitest": "^4.1.10"
   },
   "keywords": [
     "xonovex",

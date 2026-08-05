@@ -1,22 +1,11 @@
 {
   "name": "@xonovex/eslint-config-base",
-  "version": "0.1.22",
-  "description": "Base ESLint configuration for Xonovex projects",
-  "type": "module",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/config/eslint-config-base"
-  },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/eslint-config-base#readme",
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "files": [
     "dist",
@@ -41,6 +30,10 @@
       "node": "./dist/src/*.js"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "dependencies": {
     "@eslint/js": "10.0.1",
     "@vitest/eslint-plugin": "1.6.26",
@@ -49,15 +42,22 @@
     "eslint-plugin-sonarjs": "4.2.0",
     "eslint-plugin-unicorn": "73.0.0",
     "typescript-eslint": "8.66.0",
-    "@xonovex/ts-config-node": "0.1.22"
+    "@xonovex/ts-config-node": "0.2.0"
   },
   "devDependencies": {
-    "@xonovex/prettier-config": "0.1.22",
-    "@xonovex/ts-config-node": "0.1.22",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-node": "0.2.0",
     "@types/eslint": "9.6.1",
     "@types/eslint-plugin-security": "3.0.1",
     "@types/node": "^26.1.2"
   },
+  "description": "Base ESLint configuration for Xonovex projects",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/config/eslint-config-base#readme",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",

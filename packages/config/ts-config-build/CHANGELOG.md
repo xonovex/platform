@@ -1,5 +1,18 @@
 # @xonovex/ts-config-build
 
+## 0.2.0
+
+### Minor Changes
+
+- [`03e9d12`](https://github.com/xonovex/platform/commit/03e9d12945b503b6b02f304f23ebb8d4a2591f6a) [@Deorder](https://github.com/Deorder)! - land the branch infrastructure and shared configs
+- [`2ea459e`](https://github.com/xonovex/platform/commit/2ea459ef4ae13b982e267062ce0c25c19342684b) [@Deorder](https://github.com/Deorder)! - consume the shared vitest config instead of redefining it
+- [`b299a93`](https://github.com/xonovex/platform/commit/b299a93598db50db766af35ade163901669aea5d) [@Deorder](https://github.com/Deorder)! - prefix tag tasks per language and aggregate via ci-check
+- [`d2fc919`](https://github.com/xonovex/platform/commit/d2fc919cd7931946517bf569399868f4b52ef5b3) [@Deorder](https://github.com/Deorder)! - consolidate and standardize AGENTS.md files
+- [`b17c2cc`](https://github.com/xonovex/platform/commit/b17c2cc583d67c24962cdfc05a8719c4325bb7ef) [@Deorder](https://github.com/Deorder)! - back to skills (#18)
+- [`70256c0`](https://github.com/xonovex/platform/commit/70256c017b30cb830f779352a39826f50681bcba) [@Deorder](https://github.com/Deorder)! - restructure skill packages into guide and prompt packages
+- [`73da81c`](https://github.com/xonovex/platform/commit/73da81c57752f0d0a655f603e54811881b0621ae) [@Deorder](https://github.com/Deorder)! - add TypeScript guidelines and related scripts for various plugins
+- Updated dependency `@xonovex/ts-config-base` to `0.2.0`
+
 ## 0.1.20
 
 ### Patch Changes
