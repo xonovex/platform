@@ -71,6 +71,10 @@ tasks:
     command:
       - npx
       - moon-version-bump
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-version-bump:build
     options:
       cache: false
       runInCI: false
