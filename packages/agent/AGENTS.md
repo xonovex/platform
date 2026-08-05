@@ -1,6 +1,7 @@
 # Agent
 
 - Move the agent release line in lockstep: `agent-cli-go`'s version and five `optionalDependencies`, all five `agent-cli-go-<platform>` packages, and `agent-cli-go-github` platform refs. Add the matching `## <version>` `CHANGELOG.md` section from conventional commits or `github-publish` fails or ships stale notes.
+- One invocation moves the whole line, never a loop over `<project>:version-bump`: `npx moon run workspace-config:version-bump-lockstep -- --lockstep agent-cli-go,agent-cli-go-darwin-arm64,agent-cli-go-darwin-x64,agent-cli-go-linux-arm64,agent-cli-go-linux-x64,agent-cli-go-win32-x64 --type minor`. It writes every version and every exact `@xonovex/*` reference as one transaction and generates each `CHANGELOG.md` section. Preview with `--dry-run` first.
 - Model the sandbox as independent `Isolation {none,bwrap,docker}`, `Provision {none,nix,command}`, and `Network {host,none,proxy}` axes plus `hostPassthrough`; never fuse them into one method.
 - `bwrap` and default-runc Docker reduce attack surface but are not kernel trust boundaries. `nix` mounts only `flake.lock`/rev-pinned closure requisites from `nix path-info -r`, read-only; never mount all of `/nix/store` or the Nix daemon socket. `command` runs initialization commands before the agent.
 - Apply network policy explicitly: `host` is unrestricted and does not satisfy `RequireEgressRestricted`; `none` uses `--unshare-net`/`--network none`; `proxy` is reserved and must fail closed until a transport prevents direct sockets from bypassing an HTTP(S) allowlist.

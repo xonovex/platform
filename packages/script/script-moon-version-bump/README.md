@@ -58,7 +58,9 @@ npx moon run workspace-config:version-bump-lockstep -- \
 
 A member is named by its package name (`@xonovex/prettier-config`) or by its
 project directory (`prettier-config`). The run works from any directory inside
-the workspace; the moon task above runs it from the workspace root.
+the workspace; the moon task above runs it from the workspace root. The
+per-project `<project>:version-bump` task bumps one package; a release line goes
+through the workspace task instead of a loop over that task.
 
 Semantics:
 
@@ -72,7 +74,10 @@ Semantics:
   reference rewritten too, and follows the single-package dependent rule: it is
   patch-bumped once for the whole set when it is public and not already bumped
   in the worktree, and left at its version when it is private or already bumped.
-  Packages that depend on such a dependent are not revisited.
+  Propagation runs to a fixed point: a patch-bumped dependent is itself held by
+  exact references elsewhere, so those move as well and their holders follow the
+  same rule, until nothing changes. A dependent that keeps its version, because
+  it is private or already bumped, ends the chain.
 - Each member whose version actually moves gains a `## <version>` changelog
   section built from the conventional commits since its previous release,
   followed by the `Updated dependency ... to X` bullets for every internal
