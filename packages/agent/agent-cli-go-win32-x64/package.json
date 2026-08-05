@@ -1,31 +1,31 @@
 {
   "name": "@xonovex/agent-cli-go-win32-x64",
-  "version": "0.1.31",
-  "description": "Windows x64 binary for @xonovex/agent-cli-go",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/agent/agent-cli-go-win32-x64"
   },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-win32-x64#readme",
+  "files": [
+    "bin"
+  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "files": [
-    "bin"
-  ],
   "os": [
     "win32"
   ],
   "cpu": [
     "x64"
   ],
+  "description": "Windows x64 binary for @xonovex/agent-cli-go",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-win32-x64#readme",
   "keywords": [
     "xonovex",
     "agent",

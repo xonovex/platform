@@ -1,5 +1,12 @@
 # @xonovex/agent-cli-go-win32-x64
 
+## 0.2.0
+
+### Minor Changes
+
+- [`ac40476`](https://github.com/xonovex/platform/commit/ac40476f6bbc1bfe5a4c9b489db345b0505585e8) [@Deorder](https://github.com/Deorder)! - land the shared libraries and agent tooling
+- [`4d1a9cc`](https://github.com/xonovex/platform/commit/4d1a9ccfec4e95cc26974bf7888b3da70c7d54ea) [@Deorder](https://github.com/Deorder)! - track CLI source in platform binary build cache inputs (#31)
+
 ## 0.1.23
 
 ### Patch Changes

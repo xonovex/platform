@@ -1,5 +1,18 @@
 # @xonovex/agent-cli-go
 
+## 0.2.0
+
+### Minor Changes
+
+- [`a102cfb`](https://github.com/xonovex/platform/commit/a102cfb6484fe253cf9f84e40efcc057acf89b88) [@Deorder](https://github.com/Deorder)! - close the migration with docs, assets and the registrations
+- [`ac40476`](https://github.com/xonovex/platform/commit/ac40476f6bbc1bfe5a4c9b489db345b0505585e8) [@Deorder](https://github.com/Deorder)! - land the shared libraries and agent tooling
+- [`81123cc`](https://github.com/xonovex/platform/commit/81123cc9c5100d01102d8abf7bedbd49262a9397) [@Deorder](https://github.com/Deorder)! - make Go nix flakes multi-platform
+- Updated dependency `@xonovex/agent-cli-go-linux-x64` to `0.2.0`
+- Updated dependency `@xonovex/agent-cli-go-linux-arm64` to `0.2.0`
+- Updated dependency `@xonovex/agent-cli-go-darwin-x64` to `0.2.0`
+- Updated dependency `@xonovex/agent-cli-go-darwin-arm64` to `0.2.0`
+- Updated dependency `@xonovex/agent-cli-go-win32-x64` to `0.2.0`
+
 ## 0.1.31
 
 ### Patch Changes

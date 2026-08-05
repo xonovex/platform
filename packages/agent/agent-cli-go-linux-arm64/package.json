@@ -1,31 +1,31 @@
 {
   "name": "@xonovex/agent-cli-go-linux-arm64",
-  "version": "0.1.31",
-  "description": "Linux arm64 binary for @xonovex/agent-cli-go",
+  "version": "0.2.0",
   "license": "MIT",
-  "author": "Xonovex",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/xonovex/platform.git",
     "directory": "packages/agent/agent-cli-go-linux-arm64"
   },
-  "bugs": {
-    "url": "https://github.com/xonovex/platform/issues"
-  },
-  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-linux-arm64#readme",
+  "files": [
+    "bin"
+  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
-  "files": [
-    "bin"
-  ],
   "os": [
     "linux"
   ],
   "cpu": [
     "arm64"
   ],
+  "description": "Linux arm64 binary for @xonovex/agent-cli-go",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/agent/agent-cli-go-linux-arm64#readme",
   "keywords": [
     "xonovex",
     "agent",
