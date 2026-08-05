@@ -1,147 +1,18 @@
-import {existsSync, readFileSync} from "node:fs";
-import {dirname, join, relative} from "node:path";
+import {existsSync} from "node:fs";
+import {join} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
 import {findAllPackageJsonPaths} from "@xonovex/script-moon-common/moon-query";
-import {
-  readPkg,
-  type PackageJson,
-} from "@xonovex/script-moon-common/package-json";
+import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {bumpVersion, type BumpType} from "./bump.js";
-import {
-  determineBumpLevel,
-  generateChangelogEntry,
-  renderUpdatedChangelog,
-  type DepUpdate,
-} from "./changelog.js";
 import {detectDepUpdates} from "./dep-updates.js";
-import {updateDependent} from "./dependents.js";
+import {planDependentUpdates} from "./dependents-command.js";
 import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getCommitsSince, getLastVersionRef} from "./git-log.js";
 import {getGitVersion} from "./git.js";
-
-const serializePackage = (pkg: PackageJson): string =>
-  JSON.stringify(pkg, null, 2) + "\n";
-
-const planChangelog = (
-  rootDir: string,
-  pkgPath: string,
-  packageName: string,
-  oldVersion: string,
-  newVersion: string,
-  dryRun: boolean,
-  depUpdates?: readonly DepUpdate[],
-  changelogFilename?: string,
-  gitBase?: string,
-  includedTypes?: ReadonlySet<string>,
-): FileChange | undefined => {
-  const pkgDir = relative(rootDir, dirname(pkgPath));
-  const filename = changelogFilename ?? "CHANGELOG.md";
-  const sinceRef = gitBase ?? getLastVersionRef(rootDir, pkgDir, oldVersion);
-
-  if (!sinceRef) {
-    logInfo(`${packageName}: no previous version found, skipping changelog.`);
-    return undefined;
-  }
-
-  const bumpLevel = determineBumpLevel(oldVersion, newVersion);
-  const commits = getCommitsSince(rootDir, pkgDir, sinceRef);
-  const deps = depUpdates ?? detectDepUpdates(rootDir, pkgPath);
-  const entry = generateChangelogEntry(
-    newVersion,
-    commits,
-    bumpLevel,
-    deps,
-    includedTypes,
-  );
-
-  if (dryRun) {
-    logInfo(`[dry-run] Changelog entry for ${packageName}@${newVersion}:`);
-    console.log(entry);
-    return undefined;
-  }
-  const changelogPath = join(dirname(pkgPath), filename);
-  const existing = existsSync(changelogPath)
-    ? readFileSync(changelogPath, "utf8")
-    : undefined;
-  return {
-    path: changelogPath,
-    content: renderUpdatedChangelog(existing, packageName, entry),
-  };
-};
-
-interface DependentUpdateOptions {
-  readonly rootDir: string;
-  readonly packagePath: string;
-  readonly packageName: string;
-  readonly newVersion: string;
-  readonly dryRun: boolean;
-  readonly noChangelog: boolean;
-  readonly changelogPath: string | undefined;
-  readonly gitBase: string | undefined;
-  readonly includedTypes: ReadonlySet<string> | undefined;
-}
-
-interface DependentChangeSet {
-  readonly updated: number;
-  readonly changes: readonly FileChange[];
-}
-
-const planDependentUpdates = (
-  options: DependentUpdateOptions,
-): DependentChangeSet => {
-  let updated = 0;
-  const changes: FileChange[] = [];
-  for (const dependentPath of findAllPackageJsonPaths(options.rootDir)) {
-    if (dependentPath === options.packagePath) continue;
-    const dependent = readPkg(dependentPath);
-    const result = updateDependent(
-      dependent,
-      dependentPath,
-      options.packageName,
-      options.newVersion,
-      () => getGitVersion(options.rootDir, dependentPath),
-    );
-    if (!result.depsChanged) continue;
-
-    if (result.versionBumped) {
-      const label = options.dryRun ? "[dry-run] " : "[planned] ";
-      logInfo(
-        `${label}${dependent.name ?? dependentPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
-      );
-    }
-    if (!options.dryRun) {
-      changes.push({
-        path: dependentPath,
-        content: serializePackage(result.pkg),
-      });
-    }
-    updated += 1;
-
-    if (
-      !options.noChangelog &&
-      result.versionBumped &&
-      result.oldVersion &&
-      result.newVersion
-    ) {
-      const changelog = planChangelog(
-        options.rootDir,
-        dependentPath,
-        dependent.name ?? dependentPath,
-        result.oldVersion,
-        result.newVersion,
-        options.dryRun,
-        [{name: options.packageName, version: options.newVersion}],
-        options.changelogPath,
-        options.gitBase,
-        options.includedTypes,
-      );
-      if (changelog !== undefined) changes.push(changelog);
-    }
-  }
-  return {updated, changes};
-};
+import {readWorkspacePackages, runLockstep} from "./lockstep-command.js";
+import {parseLockstepNames} from "./lockstep.js";
+import {planChangelog, serializePackage} from "./package-changes.js";
 
 const validateVersionRequest = (
   exact: string | undefined,
@@ -210,6 +81,11 @@ export const main = (
           description:
             "Comma-separated list of conventional commit types to include (default: feat,fix,refactor,perf,docs)",
         },
+        lockstep: {
+          type: "string",
+          description:
+            "Comma-separated packages to move to one shared version in a single write",
+        },
       },
     },
     argv,
@@ -228,6 +104,26 @@ export const main = (
   const includedTypes = includeTypesRaw
     ? new Set(includeTypesRaw.split(",").map((s) => s.trim()))
     : undefined;
+  const lockstep = values.lockstep as string | undefined;
+
+  if (lockstep !== undefined) {
+    validateVersionRequest(exact, bumpType);
+    const lockstepRoot = findWorkspaceRoot(workingDirectory);
+    return runLockstep({
+      rootDir: lockstepRoot,
+      packages: readWorkspacePackages(lockstepRoot),
+      names: parseLockstepNames(lockstep),
+      bumpType,
+      preid,
+      exact,
+      dryRun,
+      noChangelog,
+      noDependents,
+      changelogPath,
+      gitBase,
+      includedTypes,
+    });
+  }
 
   const pkgPath = join(workingDirectory, "package.json");
 
@@ -268,6 +164,7 @@ export const main = (
     ? {updated: 0, changes: []}
     : planDependentUpdates({
         rootDir,
+        packagePaths: findAllPackageJsonPaths(rootDir),
         packagePath: pkgPath,
         packageName: pkg.name,
         newVersion,
@@ -280,18 +177,18 @@ export const main = (
   changes.push(...dependentChanges.changes);
 
   if (!noChangelog && newVersion !== oldVersion) {
-    const changelog = planChangelog(
+    const changelog = planChangelog({
       rootDir,
-      pkgPath,
-      pkg.name,
+      packagePath: pkgPath,
+      packageName: pkg.name,
       oldVersion,
       newVersion,
       dryRun,
-      undefined,
-      changelogPath,
+      depUpdates: detectDepUpdates(rootDir, pkgPath, readPkg(pkgPath)),
+      changelogFilename: changelogPath,
       gitBase,
       includedTypes,
-    );
+    });
     if (changelog !== undefined) changes.push(changelog);
   }
 

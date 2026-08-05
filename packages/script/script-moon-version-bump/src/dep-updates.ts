@@ -1,5 +1,4 @@
 import {execFileSync} from "node:child_process";
-import {readFileSync} from "node:fs";
 import {relative} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
@@ -23,11 +22,13 @@ const getWorkspaceDeps = (pkg: PackageJson): ReadonlyMap<string, string> => {
   return deps;
 };
 
+// currentPkg is passed rather than read from pkgPath so a planned package that
+// is not on disk yet is diffed against the same HEAD baseline.
 const detectDepUpdates = (
   rootDir: string,
   pkgPath: string,
+  currentPkg: PackageJson,
 ): readonly DepUpdate[] => {
-  const currentPkg = parsePackageJson(readFileSync(pkgPath, "utf8"), pkgPath);
   const currentDeps = getWorkspaceDeps(currentPkg);
 
   const relativePath = relative(rootDir, pkgPath);

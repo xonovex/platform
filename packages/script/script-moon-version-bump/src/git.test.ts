@@ -3,6 +3,7 @@ import {mkdirSync, mkdtempSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {detectDepUpdates} from "./dep-updates.js";
 import {getGitVersion} from "./git.js";
@@ -55,7 +56,7 @@ describe("Git package history", () => {
     );
 
     expect(getGitVersion(root, pkgPath)).toBe("1.0.0");
-    expect(detectDepUpdates(root, pkgPath)).toEqual([
+    expect(detectDepUpdates(root, pkgPath, readPkg(pkgPath))).toEqual([
       {name: "@xonovex/shared", version: "workspace:2.0.0"},
     ]);
   });
@@ -71,7 +72,9 @@ describe("Git package history", () => {
     );
 
     expect(getGitVersion(root, newPackagePath)).toBeUndefined();
-    expect(detectDepUpdates(root, newPackagePath)).toEqual([]);
+    expect(
+      detectDepUpdates(root, newPackagePath, readPkg(newPackagePath)),
+    ).toEqual([]);
 
     const nonRepository = mkdtempSync(join(tmpdir(), "version-bump-no-git-"));
     expect(() => getGitVersion(nonRepository, newPackagePath)).toThrow();

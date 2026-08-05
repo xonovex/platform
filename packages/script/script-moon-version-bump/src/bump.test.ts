@@ -1,5 +1,9 @@
 import {describe, expect, it} from "vitest";
-import {bumpVersion, updateDependencyVersions} from "./bump.js";
+import {
+  bumpVersion,
+  compareVersions,
+  updateDependencyVersions,
+} from "./bump.js";
 
 describe("bumpVersion", () => {
   it("should bump patch", () => {
@@ -38,6 +42,30 @@ describe("bumpVersion", () => {
 
   it("should create major prerelease", () => {
     expect(bumpVersion("1.2.3", "major", "alpha")).toBe("2.0.0-alpha.0");
+  });
+});
+
+describe("compareVersions", () => {
+  it("orders by major, then minor, then patch", () => {
+    expect(compareVersions("1.0.0", "0.9.9")).toBeGreaterThan(0);
+    expect(compareVersions("0.1.22", "0.2.0")).toBeLessThan(0);
+    expect(compareVersions("0.1.22", "0.1.23")).toBeLessThan(0);
+    expect(compareVersions("0.1.22", "0.1.22")).toBe(0);
+  });
+
+  it("sorts a prerelease below its release", () => {
+    expect(compareVersions("1.0.0-beta.1", "1.0.0")).toBeLessThan(0);
+    expect(compareVersions("1.0.0", "1.0.0-beta.1")).toBeGreaterThan(0);
+  });
+
+  it("compares prerelease identifiers numerically then alphabetically", () => {
+    expect(compareVersions("1.0.0-beta.2", "1.0.0-beta.10")).toBeLessThan(0);
+    expect(compareVersions("1.0.0-alpha.1", "1.0.0-beta.1")).toBeLessThan(0);
+    expect(compareVersions("1.0.0-beta.1", "1.0.0-beta")).toBeGreaterThan(0);
+    expect(compareVersions("1.0.0-beta", "1.0.0-beta.1")).toBeLessThan(0);
+    expect(compareVersions("1.0.0-1", "1.0.0-beta")).toBeLessThan(0);
+    expect(compareVersions("1.0.0-beta", "1.0.0-1")).toBeGreaterThan(0);
+    expect(compareVersions("1.0.0-beta.1", "1.0.0-beta.1")).toBe(0);
   });
 });
 

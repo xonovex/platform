@@ -28,6 +28,19 @@ tasks:
     deps: [workspace-format-check]
     options:
       cache: false
+  # A release line moves as one transaction, so it is a workspace task rather
+  # than a per-project one: a single invocation writes every member version and
+  # every internal reference, leaving no state where the two disagree.
+  version-bump-lockstep:
+    command:
+      - npx
+      - moon-version-bump
+    deps:
+      - script-moon-version-bump:build
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false
   ci-check:
     command: noop
     deps: [format-check]
