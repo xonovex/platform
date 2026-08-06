@@ -1,5 +1,5 @@
 use moon_nix_runtime::installable::{
-    canonical_installable, moon_shell_environment, parse_workspace_installable,
+    canonical_installable, moon_shell_environment, parse_workspace_installable, InstallableScheme,
     MOON_COMPONENTS_ENV, MOON_FLAKE_ENV, MOON_SHELL_EXPRESSION,
 };
 use std::path::{Path, PathBuf};
@@ -8,8 +8,18 @@ use std::path::{Path, PathBuf};
 fn workspace_installable_requires_a_relative_path_and_named_shell() {
     let parsed = parse_workspace_installable("path:./packages/demo#go").unwrap();
 
+    assert_eq!(parsed.scheme, InstallableScheme::Copy);
     assert_eq!(parsed.relative_flake, PathBuf::from("./packages/demo"));
     assert_eq!(parsed.dev_shell, "go");
+}
+
+#[test]
+fn workspace_installable_accepts_a_tree_reference() {
+    let parsed = parse_workspace_installable("dir:./packages/demo#default").unwrap();
+
+    assert_eq!(parsed.scheme, InstallableScheme::Tree);
+    assert_eq!(parsed.relative_flake, PathBuf::from("./packages/demo"));
+    assert_eq!(parsed.dev_shell, "default");
 }
 
 #[test]
@@ -20,6 +30,9 @@ fn workspace_installable_rejects_remote_absolute_and_missing_shell_forms() {
         "path:./project",
         "path:./project#",
         "path:./project#go#extra",
+        "dir:/outside#go",
+        "dir:./project",
+        "dir:./project#",
     ] {
         assert!(
             parse_workspace_installable(value).is_err(),
@@ -34,6 +47,7 @@ fn canonical_installable_keeps_workspace_paths_with_spaces() {
         Path::new("/workspace with spaces"),
         Path::new("/workspace with spaces/packages/demo"),
         "node",
+        InstallableScheme::Copy,
     )
     .unwrap();
 
@@ -44,9 +58,27 @@ fn canonical_installable_keeps_workspace_paths_with_spaces() {
 }
 
 #[test]
+fn canonical_tree_installable_is_a_bare_directory_reference() {
+    let installable = canonical_installable(
+        Path::new("/workspace"),
+        Path::new("/workspace/packages/demo"),
+        "default",
+        InstallableScheme::Tree,
+    )
+    .unwrap();
+
+    assert_eq!(installable, "/workspace/packages/demo#default");
+}
+
+#[test]
 fn canonical_installable_rejects_a_symlink_escape_fact() {
-    let error = canonical_installable(Path::new("/workspace"), Path::new("/outside/project"), "go")
-        .unwrap_err();
+    let error = canonical_installable(
+        Path::new("/workspace"),
+        Path::new("/outside/project"),
+        "go",
+        InstallableScheme::Copy,
+    )
+    .unwrap_err();
 
     assert_eq!(
         error.to_string(),
