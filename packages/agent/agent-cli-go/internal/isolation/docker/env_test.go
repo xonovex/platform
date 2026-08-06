@@ -27,8 +27,7 @@ func envValue(env []string, key string) (string, bool) {
 // host environment rather than the container's allowlist.
 func TestProcessEnv_CarriesTheHostEnvironment(t *testing.T) {
 	t.Setenv("XONOVEX_PROCESS_ENV_PROBE", "host-value")
-	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
-	cfg.HomeDir = t.TempDir()
+	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
 
 	env, err := NewIsolator().processEnv(cfg, provision.Contribution{})
 
@@ -43,7 +42,7 @@ func TestProcessEnv_CarriesTheHostEnvironment(t *testing.T) {
 // The container HOME is fixed, so the environment fails on an unresolvable
 // provider credential rather than on directories.
 func TestProcessEnv_ReportsAnUnresolvableProviderToken(t *testing.T) {
-	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
 	cfg.Provider = &types.ModelProvider{
 		CredentialSourceEnv: "MISSING_DOCKER_PROCESS_ENV_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
@@ -55,7 +54,7 @@ func TestProcessEnv_ReportsAnUnresolvableProviderToken(t *testing.T) {
 }
 
 func TestProcessEnv_ReportsMalformedCustomEnvironment(t *testing.T) {
-	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
 	cfg.CustomEnv = []string{"not-a-key-value-pair"}
 
 	if _, err := NewIsolator().processEnv(cfg, provision.Contribution{}); err == nil {
@@ -64,8 +63,7 @@ func TestProcessEnv_ReportsMalformedCustomEnvironment(t *testing.T) {
 }
 
 func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
-	cfg := dockerCfg(netshared.ModeNone, t.TempDir())
-	cfg.HomeDir = t.TempDir()
+	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
 
 	command, env, err := NewIsolator().TerminalCommand(cfg, provision.Contribution{})
 
@@ -85,7 +83,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 }
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
-	cfg := dockerCfg(netshared.ModeNone, filepath.Join(t.TempDir(), "absent"))
+	cfg := dockerCfg(t, netshared.ModeNone, filepath.Join(t.TempDir(), "absent"))
 
 	if _, _, err := NewIsolator().TerminalCommand(
 		cfg, provision.Contribution{},
