@@ -1,16 +1,23 @@
 $schema: https://moonrepo.dev/schemas/tasks.json
 extends: ./tag-typescript.yml
 tasks:
+  # A script package imports its siblings through their exports map, whose
+  # default target is dist, so anything that executes this package's code needs
+  # the upstream builds. Restating ^:build is not decoration: a task redefined
+  # across `extends` replaces the parent's deps rather than appending to them.
   ts-build:
-    deps: []
+    deps:
+      - ^:build
     options:
       mergeDeps: replace
   ts-test:
-    deps: []
+    deps:
+      - ^:build
     options:
       mergeDeps: replace
   ts-test-watch:
-    deps: []
+    deps:
+      - ^:build
     options:
       mergeDeps: replace
   # bin.js is the committed launcher npm links; the unmatched-pattern flag keeps
@@ -43,7 +50,8 @@ tasks:
     options:
       mergeDeps: replace
   ts-coverage:
-    deps: []
+    deps:
+      - ^:build
     options:
       mergeDeps: replace
   coverage:
