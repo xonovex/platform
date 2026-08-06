@@ -8,11 +8,22 @@ linters:
     - unused
     - ineffassign
     - misspell
+    - forbidigo
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: ^os\.UserHomeDir$
+          msg: a test must not read the host home directory; set RunConfig.HomeDir to t.TempDir() instead
   exclusions:
     rules:
       - path: _test\.go
         linters:
           - errcheck
+      # forbidigo guards the tests only: the production fallback to the host
+      # home is the behaviour it keeps out of a measurement.
+      - path-except: _test\.go
+        linters:
+          - forbidigo
 
 formatters:
   enable:
