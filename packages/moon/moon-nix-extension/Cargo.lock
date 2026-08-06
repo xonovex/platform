@@ -2725,7 +2725,7 @@ dependencies = [
 
 [[package]]
 name = "moon_nix_extension"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "extism-pdk",
  "moon_nix_runtime",
@@ -2741,7 +2741,7 @@ dependencies = [
 
 [[package]]
 name = "moon_nix_runtime"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "moon_pdk"

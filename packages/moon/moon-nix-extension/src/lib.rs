@@ -374,8 +374,12 @@ fn resolve_workspace_installable(
     let parsed = parse_workspace_installable(installable)?;
     let flake_candidate = canonical_workspace.join(parsed.relative_flake);
     let canonical_flake = canonicalize_host_path(&flake_candidate, "environment flake")?;
-    let canonical_reference =
-        canonical_installable(canonical_workspace, &canonical_flake, &parsed.dev_shell)?;
+    let canonical_reference = canonical_installable(
+        canonical_workspace,
+        &canonical_flake,
+        &parsed.dev_shell,
+        parsed.scheme,
+    )?;
 
     for required_file in ["flake.nix", "flake.lock"] {
         let required_path = canonical_flake.join(required_file);

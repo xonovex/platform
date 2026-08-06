@@ -2,30 +2,40 @@
 
 A Moon extension that maps a task's detected native toolchains to curated Nix
 environment components and runs the task in the resulting workspace devShell.
-It is the recommended Nix integration for new Xonovex consumers.
 
-Version 0.1.0 is qualified against Moon 2.4.5 and Moon PDK 2.0.4. The Moon WASM
+Version 0.2.0 is qualified against Moon 2.4.5 and Moon PDK 2.0.4. The Moon WASM
 extension interface remains experimental, so compatibility with newer Moon
 versions is recorded separately before the declared support version changes.
 
 ## Choose one Nix plugin
 
-Every workspace must use exactly one Xonovex Nix plugin.
+Every workspace must use exactly one Xonovex Nix plugin. Neither replaces the
+other: both answer the same question — run selected tasks inside a flake
+devShell — with different trade-offs, and both are maintained.
 
-| Capability      | `moon_nix_extension`                                                             | `moon_nix_toolchain`                                                                 |
-| --------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Recommended use | New consumers                                                                    | Compatibility or special-purpose consumers                                           |
-| Task selection  | Detected native toolchains plus typed project/task overrides                     | Explicit `nix` toolchain selection plus task, toolchain, tag, and language selectors |
-| Environment     | Dynamically composes central, mapping-gated components through `lib.mkMoonShell` | Selects a workspace or automatically discovered project devShell                     |
-| Realization     | Lazy, when an active task runs                                                   | Eager, through `setup_environment`                                                   |
-| Cache contract  | Consumer declares central and project Nix inputs                                 | Plugin adds resolved flake, shell, and lock data through `hash_task_contents`        |
+| Aspect         | `moon_nix_extension`                                                                                                                                            | `moon_nix_toolchain`                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Task selection | Detected native toolchains mapped to components, plus typed per-project and per-task overrides, all in one validated file                                        | Explicit `nix` toolchain selection, routed by task, toolchain, tag, and language selectors                               |
+| Environment    | Centrally composed components through `lib.mkMoonShell`, or an explicit installable (`path:` self-contained copy, `dir:` resolved through the workspace git tree) | Workspace devShell, or a project's own `flake.nix` discovered automatically; the devShell picked by selector             |
+| Cache contract | Consumer declares central and project Nix inputs by hand — a Moon extension cannot contribute task hash contents, so a missed input is a silently stale cache    | Plugin folds the resolved flake root, devShell, and `flake.lock` into every task hash automatically and precisely        |
+| Realization    | Lazy, when an active task runs                                                                                                                                   | Eager pre-build through `setup_environment`, so the first wrapped task is warm                                           |
+| New projects   | Must be added to the config; an unlisted project silently runs on host tools                                                                                     | Wrap by tag or language; adding the tag is the whole opt-in                                                              |
+| Fail-closed    | One global `failClosed` flag                                                                                                                                     | Opt-in per tag and language allowlists                                                                                   |
 
-The toolchain plugin remains supported for consumers that need explicit `nix`
-selection, automatic cache hashing, eager shell setup, automatic project-flake
-discovery, or tag/language selectors. Migrating replaces the old plugin
-configuration atomically in one reviewed PR; do not configure both plugins,
-even temporarily. Retiring the toolchain plugin requires a separate plan after
-hook parity and consumer migration are complete.
+Pick the extension when the workspace wants every wrapped project named
+explicitly in one typed file, environments composed from a central component
+registry, and no `nix` entry in any task's toolchain list — it models Nix as an
+environment concern rather than as a toolchain of the task, and it costs
+nothing until an active task runs.
+
+Pick the toolchain plugin when the workspace wants automatic, exact cache
+invalidation (the resolved shell is hashed for you, and an edit no shell uses
+invalidates nothing), projects that ship and compose their own flakes with zero
+per-project config, or tag and language routing. Arbitrary peer command
+replacement is also unsupported by the extension.
+
+Do not configure both plugins, even temporarily; switching between them
+replaces the whole configuration atomically in one reviewed PR.
 
 ## Configure the extension
 
@@ -38,7 +48,7 @@ automatically.
 ```yaml
 # .moon/extensions.yml
 nix-environment:
-  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.1.0"
+  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.2.0"
   baseComponents: [general]
   environmentByToolchain:
     javascript: node
@@ -173,10 +183,23 @@ from a locked, workspace-contained project flake:
 ```
 
 Commit both `projects/special-compiler/flake.nix` and its generated
-`projects/special-compiler/flake.lock`. Installables must use
-`path:./workspace-relative#devShell`; remote locators, inline Nix expressions,
-missing attributes, missing locks, and paths that resolve outside the workspace
-are rejected.
+`projects/special-compiler/flake.lock`. Installables use
+`path:./workspace-relative#devShell` or `dir:./workspace-relative#devShell`;
+remote locators, inline Nix expressions, missing attributes, missing locks, and
+paths that resolve outside the workspace are rejected.
+
+The two schemes differ in how nix is handed the directory. A `path:`
+installable is copied into the store alone, so the flake must be
+self-contained: every input has to be fetchable from its lock, and a relative
+input escaping the directory cannot resolve. A `dir:` installable is a bare
+directory reference that nix resolves in place — in a git workspace, through
+the enclosing git tree — so the project flake may compose from shared workspace
+files through relative inputs (for example `path:../../nix`). With `dir:` only
+tracked files exist to the evaluation in a git workspace: a file that is not in
+the index does not exist to the build, and the whole tracked tree is hashed per
+evaluation, which a large workspace pays on every wrapped task run. Choose
+`path:` for a self-contained flake and `dir:` for one that composes from shared
+workspace files.
 
 Resolution is deterministic:
 
@@ -235,9 +258,11 @@ discover central or project flake files for the hasher.
 - The extension realizes Nix lazily when an active task runs; it has no eager
   `setup_environment` hook.
 
-## Migrate from the toolchain plugin
+## Switch from the toolchain plugin
 
-Make the migration atomic in one reviewed PR:
+Switching in either direction is a deliberate trade (see the comparison above),
+not an upgrade. When a workspace does switch to the extension, make it atomic
+in one reviewed PR:
 
 1. Remove the `nix` locator and explicit `nix` task/project selections.
 2. Add the pinned extension locator, native toolchain mappings, scoped

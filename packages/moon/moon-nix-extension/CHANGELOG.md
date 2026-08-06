@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-extension
 
+## 0.2.0
+
+### Minor Changes
+
+- Accept `dir:./workspace-relative#devShell` installables beside `path:`. A `dir:` installable is handed to `nix develop` as a bare directory reference, so nix resolves it through the enclosing git tree: the project flake may compose from shared workspace files through relative inputs (for example `path:../../../nix`), where a `path:` installable is copied into the store alone and must be self-contained. Both forms stay workspace-contained and require a committed `flake.lock`.
+
 ## 0.1.0
 
 ### Minor Changes
