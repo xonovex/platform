@@ -44,7 +44,7 @@ hasher:
   # paths git reports, and verified by comparing the hashed input set of every
   # task against the vcs walk. Extend this whenever .gitignore grows a directory
   # that a task input glob such as **/*.md or **/*.json can match. dist is
-  # deliberately absent: the bin-permissions tasks declare dist/src/index.js as
+  # deliberately absent: the skill-validate tasks declare dist/src/index.js as
   # an input, and a pattern here excludes declared inputs as well as walked ones.
   ignorePatterns:
     - "**/node_modules/**"
