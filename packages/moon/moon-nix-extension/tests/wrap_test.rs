@@ -59,7 +59,7 @@ async fn register_extension_preserves_public_metadata() {
     let plugin = sandbox.create_extension("nix-environment").await;
 
     assert_eq!(plugin.metadata.name, "Nix environment");
-    assert_eq!(plugin.metadata.plugin_version, "0.1.0");
+    assert_eq!(plugin.metadata.plugin_version, "0.2.0");
     assert_eq!(
         plugin.metadata.description.as_deref(),
         Some("Composes native Moon task toolchains through the workspace Nix flake.")
@@ -260,6 +260,43 @@ async fn workspace_installable_is_canonicalized_and_bypasses_the_expression() {
     assert!(!args.iter().any(|argument| argument == "--expr"));
     assert!(!output.env.contains_key(MOON_FLAKE_ENV));
     assert!(!output.env.contains_key(MOON_COMPONENTS_ENV));
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn workspace_tree_installable_is_a_bare_directory_reference() {
+    reset_wrap_env();
+    let mut sandbox = create_empty_moon_sandbox();
+    sandbox
+        .host_funcs
+        .mock_load_project(|id| serde_json::json!({ "id": id }));
+    let flake_root = sandbox.root.join("composing-flake");
+    std::fs::create_dir_all(&flake_root).unwrap();
+    std::fs::write(flake_root.join("flake.nix"), "{}").unwrap();
+    std::fs::write(flake_root.join("flake.lock"), "{}").unwrap();
+    let plugin = sandbox.create_extension("nix-environment").await;
+
+    let mut input = command_input("go", &["test", "./..."], &["custom"]);
+    input.extension_config = serde_json::json!({
+        "environmentByToolchain": {},
+        "environmentByProject": {
+            "project": { "installable": "dir:./composing-flake#default" }
+        }
+    });
+    let output = plugin.extend_task_command(input).await;
+    let args = replaced_args(&output);
+
+    assert_eq!(
+        args[6],
+        format!(
+            "{}#default",
+            flake_root.canonicalize().unwrap().display()
+        ),
+        "a tree installable must carry no `path:` prefix so nix resolves it through the enclosing git tree"
+    );
+    assert_eq!(args[7], "--command");
+    assert!(!args.iter().any(|argument| argument == "--expr"));
+    assert!(!output.env.contains_key(MOON_FLAKE_ENV));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

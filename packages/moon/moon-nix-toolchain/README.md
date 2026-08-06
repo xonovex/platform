@@ -4,30 +4,33 @@ A moon toolchain plugin that runs selected tasks inside the workspace's Nix flak
 
 ## Choose one Nix plugin
 
-Every workspace must use exactly one Xonovex Nix plugin.
+Every workspace must use exactly one Xonovex Nix plugin. Neither replaces the
+other: both answer the same question — run selected tasks inside a flake
+devShell — with different trade-offs, and both are maintained.
 
-| Capability      | `moon_nix_extension`                                                             | `moon_nix_toolchain`                                                                 |
-| --------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Recommended use | New consumers                                                                    | Compatibility or special-purpose consumers                                           |
-| Task selection  | Detected native toolchains plus typed project/task overrides                     | Explicit `nix` toolchain selection plus task, toolchain, tag, and language selectors |
-| Environment     | Dynamically composes central, mapping-gated components through `lib.mkMoonShell` | Selects a workspace or automatically discovered project devShell                     |
-| Realization     | Lazy, when an active task runs                                                   | Eager, through `setup_environment`                                                   |
-| Cache contract  | Consumer declares central and project Nix inputs                                 | Plugin adds resolved flake, shell, and lock data through `hash_task_contents`        |
+| Aspect         | `moon_nix_extension`                                                                                                                                            | `moon_nix_toolchain`                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Task selection | Detected native toolchains mapped to components, plus typed per-project and per-task overrides, all in one validated file                                        | Explicit `nix` toolchain selection, routed by task, toolchain, tag, and language selectors                               |
+| Environment    | Centrally composed components through `lib.mkMoonShell`, or an explicit installable (`path:` self-contained copy, `dir:` resolved through the workspace git tree) | Workspace devShell, or a project's own `flake.nix` discovered automatically; the devShell picked by selector             |
+| Cache contract | Consumer declares central and project Nix inputs by hand — a Moon extension cannot contribute task hash contents, so a missed input is a silently stale cache    | Plugin folds the resolved flake root, devShell, and `flake.lock` into every task hash automatically and precisely        |
+| Realization    | Lazy, when an active task runs                                                                                                                                   | Eager pre-build through `setup_environment`, so the first wrapped task is warm                                           |
+| New projects   | Must be added to the config; an unlisted project silently runs on host tools                                                                                     | Wrap by tag or language; adding the tag is the whole opt-in                                                              |
+| Fail-closed    | One global `failClosed` flag                                                                                                                                     | Opt-in per tag and language allowlists                                                                                   |
 
-The extension is recommended for new consumers and is pinned as:
+Pick the extension when the workspace wants every wrapped project named
+explicitly in one typed file, environments composed from a central component
+registry, and no `nix` entry in any task's toolchain list — it models Nix as an
+environment concern rather than as a toolchain of the task, and it costs
+nothing until an active task runs.
 
-```yaml
-nix-environment:
-  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.1.0"
-```
+Pick the toolchain plugin when the workspace wants automatic, exact cache
+invalidation (the resolved shell is hashed for you, and an edit no shell uses
+invalidates nothing), projects that ship and compose their own flakes with zero
+per-project config, or tag and language routing. Arbitrary peer command
+replacement is also unsupported by the extension.
 
-This toolchain plugin remains supported for consumers that need explicit `nix`
-selection, automatic cache hashing, eager shell setup, automatic project-flake
-discovery, or tag/language selectors. Migrating replaces the old plugin
-configuration atomically in one reviewed PR; do not configure both plugins,
-even temporarily. Arbitrary peer command replacement is unsupported by the
-extension. Retiring this plugin requires a separate plan after hook parity and
-consumer migration are complete.
+Do not configure both plugins, even temporarily; switching between them
+replaces the whole configuration atomically in one reviewed PR.
 
 ## What it does
 
@@ -45,7 +48,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -69,7 +72,7 @@ An unset, empty, or `default` value selects the flake's default devShell. `shell
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
   # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
   # without enumerating task ids or relying on a real toolchain id.
   shellByTag:
@@ -106,7 +109,7 @@ By default a task on a host without `nix` runs unchanged on host tools — conve
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
   # Tasks in any project carrying one of these tags MUST run inside nix.
   failClosedByTag: [cmake]
   # Or key the same contract on the project language:
