@@ -4,12 +4,16 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  # The parity test runs the shipped auditor through uv, which the Nix shell
+  # supplies; resolving it from the caller's PATH is what let CI run without it.
   ts-coverage:
+    toolchain: [system, nix]
     env:
       TS_COVERAGE_MIN_LINES: "80"
       TS_COVERAGE_MIN_FUNCTIONS: "75"
       TS_COVERAGE_MIN_BRANCHES: "60"
       TS_COVERAGE_MIN_STATEMENTS: "75"
   ts-test:
+    toolchain: [system, nix]
     inputs:
       - /packages/skill/skill-skill/skill-guide/scripts/audit-sources.py

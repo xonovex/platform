@@ -109,10 +109,17 @@ describe("main", () => {
       import.meta.dirname,
       "../../../skill/skill-skill/skill-guide/scripts/audit-sources.py",
     );
+    // ci-check forbids network access. The script declares no dependencies and
+    // imports only the standard library, so uv has nothing to fetch: --offline
+    // and a refused interpreter download turn any future dependency into a
+    // visible failure rather than a silent download.
     const portableResult = spawnSync(
       resolveExecutable("uv"),
-      ["run", portable, skill, "--json"],
-      {encoding: "utf8"},
+      ["run", "--offline", "--script", portable, skill, "--json"],
+      {
+        encoding: "utf8",
+        env: {...process.env, UV_PYTHON_DOWNLOADS: "never"},
+      },
     );
     const portableReport = JSON.parse(
       portableResult.stdout,
