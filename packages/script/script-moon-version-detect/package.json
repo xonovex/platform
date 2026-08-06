@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-version-detect": "./dist/src/index.js"
+    "moon-version-detect": "./bin.js"
   },
   "scripts": {
     "fmt:check": "prettier --check .",

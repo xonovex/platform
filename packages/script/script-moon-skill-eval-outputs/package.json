@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-eval-outputs": "./dist/src/index.js"
+    "moon-skill-eval-outputs": "./bin.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",

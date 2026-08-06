@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-version-bump": "./dist/src/index.js"
+    "moon-version-bump": "./bin.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"

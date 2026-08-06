@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-npm-check": "./dist/src/index.js"
+    "moon-npm-check": "./bin.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"

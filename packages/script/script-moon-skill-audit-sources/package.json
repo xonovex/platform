@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-skill-audit-sources": "./dist/src/index.js"
+    "moon-skill-audit-sources": "./bin.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0"

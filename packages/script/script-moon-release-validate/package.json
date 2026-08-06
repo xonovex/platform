@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "bin": {
-    "moon-release-validate": "./dist/src/index.js"
+    "moon-release-validate": "./bin.js"
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",
