@@ -16,6 +16,7 @@ tasks:
         optional: true
       - ^:npm-publish
       - ~:npm-check
+      - script-moon-npm-publish:build
     inputs:
       - package.json
     options:
@@ -30,6 +31,7 @@ tasks:
       - target: ~:build
         optional: true
       - ~:npm-check
+      - script-moon-npm-publish:build
     inputs:
       - package.json
     options:
@@ -51,6 +53,7 @@ tasks:
     deps:
       - target: ~:build
         optional: true
+      - script-moon-npm-check:build
     options:
       cache: false
   npm-lint-fix:
