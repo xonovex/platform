@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -30,13 +31,29 @@ func TestBwrap_NetworkNoneBlocksEgress(t *testing.T) {
 	}
 }
 
-func claudeCfg(net netshared.Mode, passthrough bool, workDir string) isoshared.RunConfig {
+// claudeCfg builds a run config rooted in an empty temporary home directory, so
+// the arguments depend on the config paths a test creates rather than on the
+// host user's configuration.
+func claudeCfg(t *testing.T, net netshared.Mode, passthrough bool, workDir string) isoshared.RunConfig {
+	t.Helper()
 	return isoshared.RunConfig{
 		Agent:           &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
 		WorkDir:         workDir,
+		HomeDir:         t.TempDir(),
 		Network:         net,
 		HostPassthrough: passthrough,
 	}
+}
+
+// canonicalPath resolves the symlinks a bind source is reported through, which
+// is how the isolator names a path it mounts.
+func canonicalPath(t *testing.T, path string) string {
+	t.Helper()
+	resolved, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		t.Fatalf("EvalSymlinks(%q) error = %v", path, err)
+	}
+	return resolved
 }
 
 func bwrapCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
@@ -71,7 +88,8 @@ func argHasPair(args []string, a, b string) bool {
 func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	t.Setenv("BWRAP_UNRELATED_HOST_VALUE", "must-not-enter-sandbox")
 	work := t.TempDir()
-	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
+	cfg := claudeCfg(t, netshared.ModeNone, false, work)
+	args := bwrapCommand(t, cfg, provision.Contribution{})
 
 	if !argHasPair(args, "--dev", "/dev") {
 		t.Error("missing minimal --dev /dev")
@@ -82,10 +100,7 @@ func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	if !argHasPair(args, "--unsetenv", "BWRAP_UNRELATED_HOST_VALUE") {
 		t.Error("unrelated host environment variable must be explicitly unset")
 	}
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		t.Fatalf("UserHomeDir() error = %v", err)
-	}
+	homeDir := canonicalPath(t, cfg.HomeDir)
 	if !argHasPair(args, "--tmpfs", homeDir) {
 		t.Error("HOME must be a sandbox-local tmpfs")
 	}
@@ -99,17 +114,56 @@ func TestBwrap_DenyDefaultHardening(t *testing.T) {
 	}
 }
 
+// The sandbox-local HOME is a tmpfs, so the curated config paths are the only
+// home content bound back into it, each read-only at its original path.
+func TestBwrap_BindsExistingUserConfigPathsReadOnly(t *testing.T) {
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
+	configDir := filepath.Join(cfg.HomeDir, ".claude")
+	if err := os.Mkdir(configDir, 0o755); err != nil {
+		t.Fatalf("create %q: %v", configDir, err)
+	}
+	configFile := filepath.Join(cfg.HomeDir, ".claude.json")
+	if err := os.WriteFile(configFile, []byte("{}\n"), 0o600); err != nil {
+		t.Fatalf("write %q: %v", configFile, err)
+	}
+
+	args := bwrapCommand(t, cfg, provision.Contribution{})
+
+	homeDir := canonicalPath(t, cfg.HomeDir)
+	for _, configPath := range []string{".claude", ".claude.json"} {
+		source := canonicalPath(t, filepath.Join(cfg.HomeDir, configPath))
+		if !argHasTriple(args, "--ro-bind", source, filepath.Join(homeDir, configPath)) {
+			t.Errorf("missing read-only user config bind for %q", configPath)
+		}
+	}
+}
+
+// An absent config path contributes no bind, so a home without agent
+// configuration leaves the sandbox HOME an empty tmpfs.
+func TestBwrap_SkipsAbsentUserConfigPaths(t *testing.T) {
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
+
+	args := bwrapCommand(t, cfg, provision.Contribution{})
+
+	homeDir := canonicalPath(t, cfg.HomeDir)
+	for _, configPath := range []string{".claude", ".claude.json"} {
+		if argHas(args, filepath.Join(homeDir, configPath)) {
+			t.Errorf("absent user config path %q must not be bound", configPath)
+		}
+	}
+}
+
 func TestBwrap_NetworkExplicit(t *testing.T) {
 	work := t.TempDir()
-	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), provision.Contribution{})
+	args := bwrapCommand(t, claudeCfg(t, netshared.ModeNone, false, work), provision.Contribution{})
 	if !argHas(args, "--unshare-net") || argHas(args, "--share-net") {
 		t.Error("network none must --unshare-net and not --share-net")
 	}
-	args = bwrapCommand(t, claudeCfg(netshared.ModeHost, false, work), provision.Contribution{})
+	args = bwrapCommand(t, claudeCfg(t, netshared.ModeHost, false, work), provision.Contribution{})
 	if !argHas(args, "--share-net") || argHas(args, "--unshare-net") {
 		t.Error("network host must --share-net and not --unshare-net")
 	}
-	if _, err := NewIsolator().Command(claudeCfg(netshared.ModeProxy, false, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+	if _, err := NewIsolator().Command(claudeCfg(t, netshared.ModeProxy, false, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
 		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
@@ -123,8 +177,8 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 		Env:          map[string]string{"FOO": "bar"},
 		InitCommands: []string{"echo hi"},
 	}
-	args := bwrapCommand(t, claudeCfg(netshared.ModeNone, false, work), c)
-	env, err := NewIsolator().sandboxEnv(claudeCfg(netshared.ModeNone, false, work), c, work)
+	args := bwrapCommand(t, claudeCfg(t, netshared.ModeNone, false, work), c)
+	env, err := NewIsolator().sandboxEnv(claudeCfg(t, netshared.ModeNone, false, work), c, work)
 	if err != nil {
 		t.Fatalf("sandboxEnv() error = %v", err)
 	}
@@ -150,7 +204,7 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 
 func TestBwrap_HostPassthrough(t *testing.T) {
 	work := t.TempDir()
-	args := bwrapCommand(t, claudeCfg(netshared.ModeHost, true, work), provision.Contribution{})
+	args := bwrapCommand(t, claudeCfg(t, netshared.ModeHost, true, work), provision.Contribution{})
 	if !argHasTriple(args, "--ro-bind", "/usr", "/usr") {
 		t.Error("HostPassthrough must ro-bind host /usr")
 	}
@@ -158,7 +212,7 @@ func TestBwrap_HostPassthrough(t *testing.T) {
 
 func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	work := t.TempDir()
-	cfg := claudeCfg(netshared.ModeNone, false, work)
+	cfg := claudeCfg(t, netshared.ModeNone, false, work)
 	cfg.RoBindPaths = []string{work + "/missing"}
 	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing bind error")
@@ -177,7 +231,7 @@ func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 func TestBwrap_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	const secret = "bwrap-secret-must-not-appear"
 	t.Setenv("BWRAP_TEST_TOKEN", secret)
-	cfg := claudeCfg(netshared.ModeNone, false, t.TempDir())
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
 	cfg.Provider = &types.ModelProvider{
 		CredentialSourceEnv: "BWRAP_TEST_TOKEN",
 		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",

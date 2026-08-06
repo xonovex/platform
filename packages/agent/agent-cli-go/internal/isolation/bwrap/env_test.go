@@ -24,10 +24,8 @@ func envValue(env []string, key string) (string, bool) {
 // host environment merged with the sandbox allowlist.
 func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T) {
 	t.Setenv("XONOVEX_PROCESS_ENV_PROBE", "host-value")
-	workDir := t.TempDir()
-	homeDir := t.TempDir()
-	cfg := claudeCfg(netshared.ModeNone, false, workDir)
-	cfg.HomeDir = homeDir
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
+	homeDir := canonicalPath(t, cfg.HomeDir)
 
 	env, err := NewIsolator().processEnv(cfg, provision.Contribution{})
 
@@ -46,7 +44,7 @@ func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T
 }
 
 func TestProcessEnv_ReportsAnUnresolvableWorkDir(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeNone, false, t.TempDir())
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
 	cfg.HomeDir = filepath.Join(t.TempDir(), "absent")
 
 	if _, err := NewIsolator().processEnv(cfg, provision.Contribution{}); err == nil {
@@ -57,10 +55,8 @@ func TestProcessEnv_ReportsAnUnresolvableWorkDir(t *testing.T) {
 // TerminalCommand hands a terminal wrapper both the command and the environment
 // it must be launched with, so the two must stay consistent.
 func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
-	workDir := t.TempDir()
-	homeDir := t.TempDir()
-	cfg := claudeCfg(netshared.ModeNone, false, workDir)
-	cfg.HomeDir = homeDir
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
+	homeDir := canonicalPath(t, cfg.HomeDir)
 
 	command, env, err := NewIsolator().TerminalCommand(cfg, provision.Contribution{})
 
@@ -80,7 +76,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 }
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeNone, false, filepath.Join(t.TempDir(), "absent"))
+	cfg := claudeCfg(t, netshared.ModeNone, false, filepath.Join(t.TempDir(), "absent"))
 
 	if _, _, err := NewIsolator().TerminalCommand(
 		cfg, provision.Contribution{},
