@@ -7,9 +7,8 @@
 - Keep instruction content in Markdown. Limit JSON to required manifests, package metadata, and evals. Never add TypeScript or MJS implementation files to a skill.
 - Treat skills as software: review bundled scripts and fetched URLs, never hardcode secrets, and restrict script-bundling skills with least-privilege experimental `allowed-tools` frontmatter such as `Bash(git:*) Read`.
 - Point each Codex manifest's string `skills` value directly at `"./<topic>-guide"`; `"./"` does not reliably expose nested guide skills.
-- Keep versions lockstep across every skill plugin, command plugin, and `marketplace.json`.
+- Keep versions lockstep across every skill plugin, command plugin, and `marketplace.json`, and keep exact install-time dependencies in both plugin manifests.
 - Register every new skill alphabetically in both marketplace files; skills are not auto-discovered.
 - Select optional skills at runtime by installed names and routing descriptions.
-- Keep exact install-time dependencies in both plugin manifests and content provenance in each guide's `SOURCES.md`.
 - Format changed packages and `marketplace.json` with `npx prettier --write`, validate JSON, and resolve every `SKILL.md` -> `references/` link.
 - Run `npm install` after adding or removing a skill package so `package-lock.json` matches the workspaces. CI uses `npm ci`, and `.hooks/validate-lockfile.sh` blocks but does not repair stale locks.
