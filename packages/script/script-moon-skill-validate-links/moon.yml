@@ -11,10 +11,6 @@ tasks:
       TS_COVERAGE_MIN_FUNCTIONS: "90"
       TS_COVERAGE_MIN_BRANCHES: "75"
       TS_COVERAGE_MIN_STATEMENTS: "80"
-  ts-build:
-    deps:
-      - script-moon-common:build
-      - script-moon-skill-catalog-common:build
   composition-check:
     command:
       - node

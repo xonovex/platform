@@ -10,9 +10,6 @@ tasks:
       TS_COVERAGE_MIN_FUNCTIONS: "75"
       TS_COVERAGE_MIN_BRANCHES: "60"
       TS_COVERAGE_MIN_STATEMENTS: "75"
-  ts-build:
-    deps:
-      - script-moon-common:build
   ts-test:
     inputs:
       - /packages/skill/skill-skill/skill-guide/scripts/audit-sources.py

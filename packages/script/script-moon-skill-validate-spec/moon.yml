@@ -21,7 +21,3 @@ tasks:
       TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:
       - /packages/skill/skill-skill/skill-guide/assets/**/*
-  ts-build:
-    deps:
-      - script-moon-common:build
-      - script-moon-skill-catalog-common:build

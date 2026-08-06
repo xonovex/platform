@@ -17,6 +17,3 @@ tasks:
       cache: false
   ci-check:
     deps: [coverage]
-  ts-build:
-    deps:
-      - script-moon-common:build

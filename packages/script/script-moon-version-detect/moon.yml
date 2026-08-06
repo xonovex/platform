@@ -10,6 +10,3 @@ tasks:
       TS_COVERAGE_MIN_FUNCTIONS: "60"
       TS_COVERAGE_MIN_BRANCHES: "55"
       TS_COVERAGE_MIN_STATEMENTS: "60"
-  ts-build:
-    deps:
-      - script-moon-common:build

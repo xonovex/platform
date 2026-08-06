@@ -11,10 +11,6 @@ tasks:
       TS_COVERAGE_MIN_FUNCTIONS: "85"
       TS_COVERAGE_MIN_BRANCHES: "85"
       TS_COVERAGE_MIN_STATEMENTS: "90"
-  ts-build:
-    deps:
-      - script-moon-common:build
-      - script-moon-skill-catalog-common:build
   drift-check:
     command:
       - node
