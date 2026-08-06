@@ -61,6 +61,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BASE: ${{ inputs.base || 'HEAD~1' }}
         run: |
+          # npm resolves its project config from each package directory, not the
+          # workspace root, so the root .npmrc token reference never applies to a
+          # publish; the user config is the one place npm always reads.
+          echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' >> ~/.npmrc
           nix develop --no-update-lock-file --command npm ci
           nix develop --no-update-lock-file --command npx moon run :ci-publish --affected --color --concurrency 1 --base "$BASE"
 
