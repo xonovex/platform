@@ -35,7 +35,7 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: false
+      runInCI: true
   docker-publish:
     script: bash packages/agent/agent-operator-go-docker/scripts/docker-publish.sh "$workspaceRoot"
     deps:
@@ -54,18 +54,18 @@ tasks:
     options:
       cache: false
       runFromWorkspaceRoot: true
-      runInCI: false
+      runInCI: true
   ci-publish:
     command: echo 'ci-publish complete'
     deps:
       - docker-publish
     options:
       cache: false
-      runInCI: false
+      runInCI: true
   ci-publish-dry-run:
     command: echo 'ci-publish complete'
     deps:
       - docker-build
     options:
       cache: false
-      runInCI: false
+      runInCI: true
