@@ -1,0 +1,45 @@
+# Changelog
+
+Release notes for the plugin catalog line: the `packages/skill/*` and
+`packages/command/*` plugins versioned in lockstep with
+`.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The
+agent line keeps its own notes in `packages/agent/agent-cli-go/CHANGELOG.md`.
+
+## 5.1.0 - 2026-08-06
+
+73 skill and command plugins. Previous catalog version: 5.0.0.
+
+### Removed
+
+These are breaking changes, released under a minor by decision. Installed
+copies keep working; none of these resolve from either marketplace any more.
+
+#### Commands
+
+- /xonovex-workflow:acceptance-formalize, acceptance-validate, story-refine,
+  pr-create, pr-review-analyze, pr-review-refine, pr-review-post and
+  pr-review-resolve. Entry triage now goes straight to plan-research, and
+  merge and delivery run into the Definition-of-Done gate. The procedures
+  are unaffected and still live in the pull-request-guide, code-review-guide,
+  bdd-guide, user-stories-guide, testing-guide, github-guide and
+  gitlab-guide skills.
+- /xonovex-utility:version-bump. versioning-guide still carries the procedure.
+- /xonovex-utility:skill-ablate, folded into /xonovex-utility:skill-optimize
+  as its verify phase. skill-optimize gains --all for catalog scale, --model
+  and --report-only.
+
+#### Skill plugins
+
+- xonovex-skill-caveman, a terse writing-style overlay, and
+  xonovex-skill-fable, a voice-imitation prompt overlay. No package depended
+  on either.
+- xonovex-skill-adr, -android-analytics, -android-wcag, -expressjs, -fdd,
+  -motion-react, -presentation, -remotion and -strudel, retired when the
+  catalog closed on its consolidated state.
+
+### Added
+
+- /xonovex-workflow:plan-delegate, supervising a roadmap by delegation.
+- Harness skills xonovex-skill-claude-code, -codex, -copilot, -kiro,
+  -opencode and -pi.
+- xonovex-skill-accessibility and xonovex-skill-credential-management.
