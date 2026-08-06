@@ -17,7 +17,7 @@ javascript:
   # exact version rather than a caret range when it adds a dependsOn edge.
   dependencyVersionFormat: version
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.6.1"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
   shellByTag:
     ci: ci
     docker: docker
