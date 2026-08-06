@@ -47,6 +47,11 @@ export const GLOB_TEST = [
 
 export const GLOB_SCRIPT = ["scripts/**/*.{ts,cts,mts}"];
 
+// A package whose bin target is generated ships a committed launcher instead,
+// so npm has a file to link at install time. It sits outside the TypeScript
+// project on purpose and is parsed without type information.
+export const GLOB_BIN = ["bin.js"];
+
 export const GLOB_SRC_JS_WITHOUT_JSX = ["**/src/**/*.{js,mjs,cjs}"];
 export const GLOB_SRC_TS_WITHOUT_JSX = ["**/src/**/*.{ts,mts,cts}"];
 
@@ -348,6 +353,21 @@ export default defineConfig(
       "no-console": "off",
       "unicorn/no-process-exit": "off",
       "unicorn/prefer-top-level-await": "off",
+      ...disableTypeCheckedRules,
+    },
+  },
+
+  // Bin launchers
+  {
+    files: GLOB_BIN,
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        project: false,
+        projectService: false,
+      },
+    },
+    rules: {
       ...disableTypeCheckedRules,
     },
   },
