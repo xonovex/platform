@@ -3,6 +3,11 @@ import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, resolve} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {type z} from "zod";
+import {
+  binEntries,
+  binTargetFailures,
+  type PackageBins,
+} from "./bin-targets.js";
 import {coverageFloorFailures} from "./coverage-floors.js";
 import {workspaceHasherFailures} from "./hasher-ignore.js";
 import {
@@ -120,6 +125,69 @@ const gitIgnoredPaths = (
       .filter((line) => line !== "");
   } catch {
     return undefined;
+  }
+};
+
+// gitTrackedPaths lists the committed files, which is the tree npm links a
+// workspace bin from. Returns undefined when git cannot answer, so a checkout
+// without a git directory reports one clear failure rather than one per bin.
+const gitTrackedPaths = (
+  repositoryRoot: string,
+): ReadonlySet<string> | undefined => {
+  try {
+    return new Set(
+      execFileSync(resolveExecutable("git"), ["ls-files"], {
+        cwd: repositoryRoot,
+        encoding: "utf8",
+        maxBuffer: 64 * 1024 * 1024,
+      })
+        .split("\n")
+        .filter((line) => line !== ""),
+    );
+  } catch {
+    return undefined;
+  }
+};
+
+// validateBinTargets keeps every workspace bin linkable on a cold install.
+const validateBinTargets = (repositoryRoot: string, check: Check): void => {
+  const trackedPaths = gitTrackedPaths(repositoryRoot);
+  if (trackedPaths === undefined) {
+    check(false, "git could not list the committed files");
+    return;
+  }
+  const packages: PackageBins[] = [];
+  for (const area of childDirectories(
+    resolve(repositoryRoot, "packages"),
+    "packages",
+    check,
+  )) {
+    for (const packageDirectory of childDirectories(
+      area,
+      `${basename(area)} packages`,
+      check,
+    )) {
+      const manifestPath = resolve(packageDirectory, "package.json");
+      if (!existsSync(manifestPath)) continue;
+      const relative = packageDirectory.slice(repositoryRoot.length + 1);
+      const manifest = readJson<PackageManifest>(
+        manifestPath,
+        `${relative}/package.json`,
+        PackageManifestSchema,
+        check,
+      );
+      if (manifest?.bin === undefined) continue;
+      packages.push({
+        manifestPath: `${relative}/package.json`,
+        packageDirectory: relative,
+        isPrivate: manifest.private === true,
+        files: manifest.files,
+        bins: binEntries(manifest.bin, manifest.name),
+      });
+    }
+  }
+  for (const failure of binTargetFailures({packages, trackedPaths})) {
+    check(false, failure);
   }
 };
 
@@ -576,6 +644,7 @@ export const validateRelease = (
   }
 
   validateHasherIgnore(repositoryRoot, projectFiles, check);
+  validateBinTargets(repositoryRoot, check);
 
   // Every package group documents itself, and every AGENTS.md anywhere in the
   // repository carries the CLAUDE.md pointer that makes it load in Claude Code.
