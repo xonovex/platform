@@ -1,42 +1,18 @@
-import {execFileSync} from "node:child_process";
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
+import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {
   findChangelogRange,
   getCommitsSince,
   isIncludedType,
   parseConventionalCommit,
 } from "../../../src/git-log.js";
+import {commitAll, gitRepositories} from "../../util/git-repository.js";
 
-const directories: string[] = [];
-const gitExecutable = resolveExecutable("git");
-
-// Git exports GIT_DIR, GIT_INDEX_FILE, and GIT_AUTHOR_* to the hooks it runs,
-// and those take precedence over a repository's own config. Running these
-// fixtures under a hook would otherwise commit with the caller's identity and
-// resolve paths against the outer repository, so drop every GIT_* variable.
-const gitEnvironment = Object.fromEntries(
-  Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
-);
+const repository = gitRepositories();
 
 const createRepository = (): string => {
-  const directory = mkdtempSync(join(tmpdir(), "version-git-log-"));
-  directories.push(directory);
-  execFileSync(gitExecutable, ["init", "--quiet"], {
-    cwd: directory,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.name", "Test Author"], {
-    cwd: directory,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.email", "test@example.com"], {
-    cwd: directory,
-    env: gitEnvironment,
-  });
+  const directory = repository("version-git-log-");
   mkdirSync(join(directory, "packages", "example"), {recursive: true});
   return directory;
 };
@@ -47,30 +23,6 @@ const writePackage = (directory: string, version: string): void => {
     `${JSON.stringify({name: "example", version}, null, 2)}\n`,
   );
 };
-
-const commit = (directory: string, subject: string, body?: string): string => {
-  execFileSync(gitExecutable, ["add", "."], {
-    cwd: directory,
-    env: gitEnvironment,
-  });
-  execFileSync(
-    gitExecutable,
-    ["commit", "--quiet", "-m", subject, ...(body ? ["-m", body] : [])],
-    {cwd: directory, env: gitEnvironment},
-  );
-  return execFileSync(gitExecutable, ["rev-parse", "HEAD"], {
-    cwd: directory,
-    encoding: "utf8",
-    env: gitEnvironment,
-  }).trim();
-};
-
-afterEach(() => {
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
-});
 
 describe("parseConventionalCommit", () => {
   it("should parse type and description", () => {
@@ -122,9 +74,9 @@ describe("git history", () => {
   it("finds the commit containing the preceding package version", () => {
     const directory = createRepository();
     writePackage(directory, "1.0.0");
-    const previousVersionCommit = commit(directory, "feat: initial package");
+    const previousVersionCommit = commitAll(directory, "feat: initial package");
     writePackage(directory, "2.0.0");
-    commit(directory, "chore: release 2.0.0");
+    commitAll(directory, "chore: release 2.0.0");
 
     expect(findChangelogRange(directory, "packages/example", "2.0.0")).toEqual({
       since: previousVersionCommit,
@@ -134,9 +86,9 @@ describe("git history", () => {
   it("falls back to before the package introduction when its version never changed", () => {
     const directory = createRepository();
     writeFileSync(join(directory, "unrelated.txt"), "ok\n");
-    commit(directory, "chore: seed the repository");
+    commitAll(directory, "chore: seed the repository");
     writePackage(directory, "1.0.0");
-    const introduction = commit(directory, "feat: initial package");
+    const introduction = commitAll(directory, "feat: initial package");
 
     expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
       since: `${introduction}~1`,
@@ -149,7 +101,7 @@ describe("git history", () => {
   it("covers the whole history when the root commit introduced the package", () => {
     const directory = createRepository();
     writePackage(directory, "1.0.0");
-    const introduction = commit(directory, "feat: initial package");
+    const introduction = commitAll(directory, "feat: initial package");
 
     expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
       since: undefined,
@@ -162,9 +114,9 @@ describe("git history", () => {
   it("extracts conventional subject and body messages from package commits", () => {
     const directory = createRepository();
     writePackage(directory, "1.0.0");
-    const initial = commit(directory, "chore: initial package");
+    const initial = commitAll(directory, "chore: initial package");
     writeFileSync(join(directory, "packages", "example", "feature.ts"), "ok\n");
-    const feature = commit(
+    const feature = commitAll(
       directory,
       "feat(example): add feature",
       "docs: explain feature\n\nfree-form detail",
@@ -182,9 +134,9 @@ describe("git history", () => {
   it("uses the first body line when a commit is not conventional", () => {
     const directory = createRepository();
     writePackage(directory, "1.0.0");
-    const initial = commit(directory, "Initial package");
+    const initial = commitAll(directory, "Initial package");
     writeFileSync(join(directory, "packages", "example", "feature.ts"), "ok\n");
-    commit(directory, "Plain message");
+    commitAll(directory, "Plain message");
 
     expect(
       getCommitsSince(directory, "packages/example", initial)[0],

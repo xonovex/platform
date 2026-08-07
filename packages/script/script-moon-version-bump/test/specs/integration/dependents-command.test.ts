@@ -1,25 +1,14 @@
-import {execFileSync} from "node:child_process";
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
+import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {
   planDependentUpdates,
   type DependentUpdateOptions,
 } from "../../../src/dependents-command.js";
 import {runGit} from "../../../src/git.js";
+import {commitAll, gitRepositories} from "../../util/git-repository.js";
 
-const directories: string[] = [];
-const gitExecutable = resolveExecutable("git");
-
-// Git exports GIT_DIR, GIT_INDEX_FILE, and GIT_AUTHOR_* to the hooks it runs,
-// and those take precedence over a repository's own config. Running these
-// fixtures under a hook would otherwise commit with the caller's identity and
-// resolve paths against the outer repository, so drop every GIT_* variable.
-const gitEnvironment = Object.fromEntries(
-  Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
-);
+const repository = gitRepositories();
 
 type Manifest = Readonly<Record<string, unknown>>;
 
@@ -35,35 +24,14 @@ const writeManifest = (
   return path;
 };
 
-const commit = (root: string, subject: string): void => {
-  execFileSync(gitExecutable, ["add", "."], {cwd: root, env: gitEnvironment});
-  execFileSync(gitExecutable, ["commit", "--quiet", "-m", subject], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-};
-
 const createRepository = (): {
   readonly root: string;
   readonly corePath: string;
   readonly consumerPath: string;
   readonly privatePath: string;
 } => {
-  const root = mkdtempSync(join(tmpdir(), "version-dependents-"));
-  directories.push(root);
+  const root = repository("version-dependents-");
   mkdirSync(join(root, ".moon"));
-  execFileSync(gitExecutable, ["init", "--quiet"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.name", "Test Author"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.email", "test@example.com"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
   const corePath = writeManifest(root, "core", {
     name: "@xonovex/core",
     version: "1.0.0",
@@ -79,12 +47,12 @@ const createRepository = (): {
     private: true,
     devDependencies: {"@xonovex/core": "1.0.0"},
   });
-  commit(root, "feat: introduce the packages");
+  commitAll(root, "feat: introduce the packages");
   writeFileSync(
     join(root, "packages", "consumer", "source.ts"),
     "export {};\n",
   );
-  commit(root, "feat(consumer): add a capability");
+  commitAll(root, "feat(consumer): add a capability");
   return {root, corePath, consumerPath, privatePath};
 };
 
@@ -106,13 +74,6 @@ const dependentOptions = (
   gitBase: undefined,
   includedTypes: undefined,
   ...overrides,
-});
-
-afterEach(() => {
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
 });
 
 describe("planDependentUpdates", () => {

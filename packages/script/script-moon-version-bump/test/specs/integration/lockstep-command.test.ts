@@ -1,34 +1,16 @@
-import {execFileSync} from "node:child_process";
-import {
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import {tmpdir} from "node:os";
+import {mkdirSync, readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {getGitVersion, runGit} from "../../../src/git.js";
 import {
   runLockstep,
   type LockstepOptions,
 } from "../../../src/lockstep-command.js";
 import type {WorkspacePackage} from "../../../src/lockstep.js";
+import {commitAll, git, gitRepositories} from "../../util/git-repository.js";
 
-const directories: string[] = [];
-const gitExecutable = resolveExecutable("git");
-
-// Git exports GIT_DIR, GIT_INDEX_FILE, and GIT_AUTHOR_* to the hooks it runs,
-// and those take precedence over a repository's own config. Running these
-// fixtures under a hook would otherwise commit with the caller's identity and
-// resolve paths against the outer repository, so drop every GIT_* variable.
-const gitEnvironment = Object.fromEntries(
-  Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")),
-);
+const repository = gitRepositories();
 
 type Manifest = Readonly<Record<string, unknown>>;
 type Manifests = Readonly<Record<string, Manifest>>;
@@ -90,41 +72,20 @@ const writeManifests = (root: string, manifests: Manifests): void => {
   }
 };
 
-const commit = (root: string, subject: string): void => {
-  execFileSync(gitExecutable, ["add", "."], {cwd: root, env: gitEnvironment});
-  execFileSync(gitExecutable, ["commit", "--quiet", "-m", subject], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-};
-
 const createRepository = (line: (version: string) => Manifests): string => {
-  const root = mkdtempSync(join(tmpdir(), "version-lockstep-"));
-  directories.push(root);
+  const root = repository("version-lockstep-");
   mkdirSync(join(root, ".moon"));
-  execFileSync(gitExecutable, ["init", "--quiet"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.name", "Test Author"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
-  execFileSync(gitExecutable, ["config", "user.email", "test@example.com"], {
-    cwd: root,
-    env: gitEnvironment,
-  });
   writeManifests(root, line("0.1.21"));
-  commit(root, "feat: introduce the line");
+  commitAll(root, "feat: introduce the line");
   writeManifests(root, line("0.1.22"));
-  commit(root, "chore: release 0.1.22");
+  commitAll(root, "chore: release 0.1.22");
   for (const directory of readdirSync(join(root, "packages"))) {
     writeFileSync(
       join(root, "packages", directory, "source.ts"),
       "export {};\n",
     );
   }
-  commit(root, "feat(line): add a shared capability");
+  commitAll(root, "feat(line): add a shared capability");
   return root;
 };
 
@@ -160,13 +121,6 @@ const manifestAt = (root: string, directory: string): Manifest =>
 
 const changelogAt = (root: string, directory: string): string =>
   readFileSync(join(root, "packages", directory, "CHANGELOG.md"), "utf8");
-
-afterEach(() => {
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
-});
 
 describe("runLockstep", () => {
   it("moves a dependency cycle to one version in a single write", () => {
@@ -325,11 +279,7 @@ describe("runLockstep", () => {
 
   it("honours an explicit changelog base ref and filename", () => {
     const root = createRepository(configLine);
-    const base = execFileSync(gitExecutable, ["rev-parse", "HEAD~1"], {
-      cwd: root,
-      encoding: "utf8",
-      env: gitEnvironment,
-    }).trim();
+    const base = git(root, ["rev-parse", "HEAD~1"]);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"], {

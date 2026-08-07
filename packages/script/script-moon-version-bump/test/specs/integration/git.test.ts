@@ -1,22 +1,23 @@
-import {execFileSync} from "node:child_process";
-import {mkdirSync, mkdtempSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
+import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {detectDepUpdates} from "../../../src/dep-updates.js";
 import {getGitVersion} from "../../../src/git.js";
+import {
+  commitAll,
+  gitRepositories,
+  temporaryDirectories,
+} from "../../util/git-repository.js";
 
-const runGit = (cwd: string, args: readonly string[]): void => {
-  execFileSync(resolveExecutable("git"), [...args], {cwd, stdio: "ignore"});
-};
+const repository = gitRepositories();
+const temporaryDirectory = temporaryDirectories();
 
 const createRepository = (): {
   readonly root: string;
   readonly pkgPath: string;
 } => {
-  const root = mkdtempSync(join(tmpdir(), "version-bump-git-"));
+  const root = repository("version-bump-git-");
   const packageDir = join(root, "packages", "example");
   const pkgPath = join(packageDir, "package.json");
   mkdirSync(packageDir, {recursive: true});
@@ -28,18 +29,7 @@ const createRepository = (): {
       dependencies: {"@xonovex/shared": "workspace:1.0.0"},
     }),
   );
-  runGit(root, ["init", "--quiet"]);
-  runGit(root, ["add", "packages/example/package.json"]);
-  runGit(root, [
-    "-c",
-    "user.name=Xonovex Test",
-    "-c",
-    "user.email=test@xonovex.invalid",
-    "commit",
-    "--quiet",
-    "-m",
-    "test: initial package",
-  ]);
+  commitAll(root, "test: initial package");
   return {root, pkgPath};
 };
 
@@ -76,7 +66,7 @@ describe("Git package history", () => {
       detectDepUpdates(root, newPackagePath, readPkg(newPackagePath)),
     ).toEqual([]);
 
-    const nonRepository = mkdtempSync(join(tmpdir(), "version-bump-no-git-"));
+    const nonRepository = temporaryDirectory("version-bump-no-git-");
     expect(() => getGitVersion(nonRepository, newPackagePath)).toThrow();
   });
 });

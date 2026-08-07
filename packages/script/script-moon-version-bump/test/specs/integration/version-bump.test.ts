@@ -1,20 +1,16 @@
-import {execFileSync} from "node:child_process";
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import {tmpdir} from "node:os";
+import {mkdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {main} from "../../../src/version-bump.js";
+import {
+  commitAll,
+  gitRepositories,
+  temporaryDirectories,
+} from "../../util/git-repository.js";
 
-const directories: string[] = [];
-const gitExecutable = resolveExecutable("git");
+const repository = gitRepositories();
+const temporaryDirectory = temporaryDirectories();
 const defaultPackage = {
   name: "@xonovex/example",
   version: "1.0.0",
@@ -22,42 +18,20 @@ const defaultPackage = {
 
 const createRepository = (
   pkg: Readonly<Record<string, unknown>> = defaultPackage,
-): {readonly packageDirectory: string; readonly packagePath: string} => {
-  const root = mkdtempSync(join(tmpdir(), "version-command-"));
-  directories.push(root);
+): {
+  readonly root: string;
+  readonly packageDirectory: string;
+  readonly packagePath: string;
+} => {
+  const root = repository("version-command-");
   mkdirSync(join(root, ".moon"));
   const packageDirectory = join(root, "packages", "example");
   const packagePath = join(packageDirectory, "package.json");
   mkdirSync(packageDirectory, {recursive: true});
   writeFileSync(packagePath, `${JSON.stringify(pkg, null, 2)}\n`);
-  execFileSync(gitExecutable, ["init", "--quiet"], {cwd: root});
-  execFileSync(gitExecutable, ["config", "user.name", "Test Author"], {
-    cwd: root,
-  });
-  execFileSync(gitExecutable, ["config", "user.email", "test@example.com"], {
-    cwd: root,
-  });
-  execFileSync(gitExecutable, ["add", "."], {cwd: root});
-  execFileSync(gitExecutable, ["commit", "--quiet", "-m", "feat: initial"], {
-    cwd: root,
-  });
-  return {packageDirectory, packagePath};
+  commitAll(root, "feat: initial");
+  return {root, packageDirectory, packagePath};
 };
-
-const commitAll = (packageDirectory: string, message: string): void => {
-  const root = join(packageDirectory, "..", "..");
-  execFileSync(gitExecutable, ["add", "."], {cwd: root});
-  execFileSync(gitExecutable, ["commit", "--quiet", "-m", message], {
-    cwd: root,
-  });
-};
-
-afterEach(() => {
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
-});
 
 describe("version bump command", () => {
   it("bumps a package through the atomic write path", () => {
@@ -91,12 +65,12 @@ describe("version bump command", () => {
   });
 
   it("updates the package and changelog in one command", () => {
-    const {packageDirectory, packagePath} = createRepository();
+    const {root, packageDirectory, packagePath} = createRepository();
     writeFileSync(
       packagePath,
       `${JSON.stringify({name: "@xonovex/example", version: "1.1.0"}, null, 2)}\n`,
     );
-    commitAll(packageDirectory, "chore: release 1.1.0");
+    commitAll(root, "chore: release 1.1.0");
 
     const exitCode = main(["--no-dependents"], packageDirectory);
 
@@ -132,10 +106,7 @@ describe("version bump command", () => {
       main(["--no-dependents", "--no-changelog", "invalid"], packageDirectory),
     ).toThrow("invalid bump type");
 
-    const missingPackage = mkdtempSync(
-      join(tmpdir(), "version-command-empty-"),
-    );
-    directories.push(missingPackage);
+    const missingPackage = temporaryDirectory("version-command-empty-");
     expect(() => main([], missingPackage)).toThrow("no package.json found");
 
     const invalidPackage = createRepository({version: "1.0.0"});
