@@ -14,11 +14,23 @@ fn reset_wrap_env() {
 /// Simulate a host without `nix`: point PATH at a dir whose only `which` reports
 /// every command missing (exit 1), mirroring a real `which nix` miss without
 /// trapping on a missing `which` itself. Returns a closure that restores the prior
-/// PATH; call it before asserting so PATH never leaks across `#[serial]` tests.
+/// PATH and removes the stub dir; call it before asserting so neither PATH nor the
+/// directory leaks across `#[serial]` tests.
+///
+/// The directory name carries the pid and a per-call counter because `#[serial]`
+/// orders tests within one binary only: two concurrent `cargo test` runs share
+/// $TMPDIR, and a fixed name would race on the write and the chmod.
 fn stub_missing_nix() -> impl FnOnce() {
     use std::os::unix::fs::PermissionsExt;
+    use std::sync::atomic::{AtomicU32, Ordering};
 
-    let bin_dir = std::env::temp_dir().join("moon-nix-toolchain-no-nix");
+    static CALL: AtomicU32 = AtomicU32::new(0);
+
+    let bin_dir = std::env::temp_dir().join(format!(
+        "moon-nix-toolchain-no-nix-{}-{}",
+        std::process::id(),
+        CALL.fetch_add(1, Ordering::Relaxed)
+    ));
     std::fs::create_dir_all(&bin_dir).unwrap();
     let which = bin_dir.join("which");
     std::fs::write(&which, "#!/bin/sh\nexit 1\n").unwrap();
@@ -27,9 +39,12 @@ fn stub_missing_nix() -> impl FnOnce() {
     let original_path = std::env::var_os("PATH");
     std::env::set_var("PATH", &bin_dir);
 
-    move || match original_path {
-        Some(path) => std::env::set_var("PATH", path),
-        None => std::env::remove_var("PATH"),
+    move || {
+        match original_path {
+            Some(path) => std::env::set_var("PATH", path),
+            None => std::env::remove_var("PATH"),
+        }
+        std::fs::remove_dir_all(&bin_dir).unwrap();
     }
 }
 

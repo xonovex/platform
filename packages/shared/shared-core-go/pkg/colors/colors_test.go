@@ -1,29 +1,17 @@
 package colors
 
 import (
-	"os"
 	"testing"
 )
 
+// withEnv runs fn with TERM and NO_COLOR set to the given values. IsColorSupported
+// compares both against the empty string, so an empty value here stands for an unset
+// variable. t.Setenv restores the prior values as cleanup and panics if the test is
+// parallel, which is the constraint mutating process environment imposes.
 func withEnv(t *testing.T, term, noColor string, fn func()) {
 	t.Helper()
-	origTerm := os.Getenv("TERM")
-	origNoColor := os.Getenv("NO_COLOR")
-	defer func() {
-		_ = os.Setenv("TERM", origTerm)
-		if origNoColor == "" {
-			_ = os.Unsetenv("NO_COLOR")
-		} else {
-			_ = os.Setenv("NO_COLOR", origNoColor)
-		}
-	}()
-
-	_ = os.Setenv("TERM", term)
-	if noColor == "" {
-		_ = os.Unsetenv("NO_COLOR")
-	} else {
-		_ = os.Setenv("NO_COLOR", noColor)
-	}
+	t.Setenv("TERM", term)
+	t.Setenv("NO_COLOR", noColor)
 
 	fn()
 }

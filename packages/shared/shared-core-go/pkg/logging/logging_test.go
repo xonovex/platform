@@ -82,16 +82,9 @@ func TestLogError(t *testing.T) {
 }
 
 func TestLogDebug(t *testing.T) {
-	origDebug := os.Getenv("DEBUG")
-	defer func() {
-		if origDebug == "" {
-			_ = os.Unsetenv("DEBUG")
-		} else {
-			_ = os.Setenv("DEBUG", origDebug)
-		}
-	}()
-
-	_ = os.Unsetenv("DEBUG")
+	// LogDebug compares DEBUG against the empty string, so an empty value stands for
+	// an unset variable. t.Setenv restores the prior value as cleanup.
+	t.Setenv("DEBUG", "")
 	output := captureStderr(func() {
 		LogDebug("should not appear")
 	})
@@ -99,7 +92,7 @@ func TestLogDebug(t *testing.T) {
 		t.Errorf("LogDebug() without DEBUG env should not output, got %q", output)
 	}
 
-	_ = os.Setenv("DEBUG", "1")
+	t.Setenv("DEBUG", "1")
 	output = captureStderr(func() {
 		LogDebug("debug message")
 	})
