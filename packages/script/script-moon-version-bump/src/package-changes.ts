@@ -10,6 +10,7 @@ import {
 } from "./changelog.js";
 import type {FileChange} from "./file-transaction.js";
 import {findChangelogRange, getCommitsSince} from "./git-log.js";
+import type {GitRunner} from "./git.js";
 
 interface ChangelogRequest {
   readonly rootDir: string;
@@ -22,6 +23,7 @@ interface ChangelogRequest {
   readonly changelogFilename: string | undefined;
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
+  readonly git: GitRunner;
 }
 
 const serializePackage = (pkg: PackageJson): string =>
@@ -32,7 +34,12 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   const filename = request.changelogFilename ?? "CHANGELOG.md";
   const range =
     request.gitBase === undefined
-      ? findChangelogRange(request.rootDir, pkgDir, request.oldVersion)
+      ? findChangelogRange(
+          request.rootDir,
+          pkgDir,
+          request.oldVersion,
+          request.git,
+        )
       : {since: request.gitBase};
 
   if (range === undefined) {
@@ -43,7 +50,12 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   }
 
   const bumpLevel = determineBumpLevel(request.oldVersion, request.newVersion);
-  const commits = getCommitsSince(request.rootDir, pkgDir, range.since);
+  const commits = getCommitsSince(
+    request.rootDir,
+    pkgDir,
+    range.since,
+    request.git,
+  );
   const entry = generateChangelogEntry(
     request.newVersion,
     commits,

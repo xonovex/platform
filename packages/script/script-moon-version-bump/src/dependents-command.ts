@@ -2,7 +2,7 @@ import {logInfo} from "@xonovex/script-moon-common/logging";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {updateDependent} from "./dependents.js";
 import type {FileChange} from "./file-transaction.js";
-import {getGitVersion} from "./git.js";
+import {getGitVersion, type GitRunner} from "./git.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
 
 interface DependentUpdateOptions {
@@ -16,6 +16,7 @@ interface DependentUpdateOptions {
   readonly changelogPath: string | undefined;
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
+  readonly git: GitRunner;
 }
 
 interface DependentChangeSet {
@@ -36,7 +37,7 @@ const planDependentUpdates = (
       dependentPath,
       options.packageName,
       options.newVersion,
-      () => getGitVersion(options.rootDir, dependentPath),
+      () => getGitVersion(options.rootDir, dependentPath, options.git),
     );
     if (!result.depsChanged) continue;
 
@@ -71,6 +72,7 @@ const planDependentUpdates = (
         changelogFilename: options.changelogPath,
         gitBase: options.gitBase,
         includedTypes: options.includedTypes,
+        git: options.git,
       });
       if (changelog !== undefined) changes.push(changelog);
     }

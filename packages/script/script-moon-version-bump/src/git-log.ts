@@ -1,6 +1,5 @@
-import {execFileSync} from "node:child_process";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {parsePackageJson} from "@xonovex/script-moon-common/package-json";
+import {runGit, type GitRunner} from "./git.js";
 
 interface Commit {
   readonly hash: string;
@@ -34,12 +33,8 @@ const isIncludedType = (
   includedTypes?: ReadonlySet<string>,
 ): boolean => (includedTypes ?? INCLUDED_TYPES).has(type);
 
-const hasParent = (rootDir: string, hash: string): boolean => {
-  const parents = execFileSync(
-    resolveExecutable("git"),
-    ["rev-list", "--parents", "-n", "1", hash],
-    {cwd: rootDir, encoding: "utf8"},
-  )
+const hasParent = (rootDir: string, hash: string, git: GitRunner): boolean => {
+  const parents = git(["rev-list", "--parents", "-n", "1", hash], rootDir)
     .trim()
     .split(" ");
   return parents.length > 1;
@@ -49,15 +44,12 @@ const findChangelogRange = (
   rootDir: string,
   pkgDir: string,
   currentVersion: string,
+  git: GitRunner = runGit,
 ): ChangelogRange | undefined => {
   // The first historical package version that differs bounds the current release.
-  const hashes = execFileSync(
-    resolveExecutable("git"),
+  const hashes = git(
     ["log", "--format=%H", "--", `${pkgDir}/package.json`],
-    {
-      cwd: rootDir,
-      encoding: "utf8",
-    },
+    rootDir,
   )
     .trim()
     .split("\n")
@@ -65,21 +57,13 @@ const findChangelogRange = (
 
   for (const hash of hashes) {
     const path = `${pkgDir}/package.json`;
-    const listed = execFileSync(
-      resolveExecutable("git"),
+    const listed = git(
       ["ls-tree", "-z", "--name-only", hash, "--", path],
-      {cwd: rootDir, encoding: "utf8"},
+      rootDir,
     );
     if (listed.length === 0) continue;
 
-    const oldPkgJson = execFileSync(
-      resolveExecutable("git"),
-      ["show", `${hash}:${path}`],
-      {
-        cwd: rootDir,
-        encoding: "utf8",
-      },
-    );
+    const oldPkgJson = git(["show", `${hash}:${path}`], rootDir);
     const oldVersion = parsePackageJson(oldPkgJson, `${hash}:${path}`).version;
     if (oldVersion !== currentVersion) {
       return {since: hash};
@@ -90,7 +74,9 @@ const findChangelogRange = (
   // a root commit has no parent to name, so its range is the whole history.
   const earliest = hashes.at(-1);
   if (earliest === undefined) return undefined;
-  return {since: hasParent(rootDir, earliest) ? `${earliest}~1` : undefined};
+  return {
+    since: hasParent(rootDir, earliest, git) ? `${earliest}~1` : undefined,
+  };
 };
 
 const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
@@ -99,9 +85,9 @@ const getCommitsSince = (
   rootDir: string,
   pkgDir: string,
   sinceRef: string | undefined,
+  git: GitRunner = runGit,
 ): readonly Commit[] => {
-  const raw = execFileSync(
-    resolveExecutable("git"),
+  const raw = git(
     [
       "log",
       "--format=%x00%H|%aN%n%B",
@@ -109,7 +95,7 @@ const getCommitsSince = (
       "--",
       pkgDir,
     ],
-    {cwd: rootDir, encoding: "utf8"},
+    rootDir,
   );
   return raw
     .split("\0")

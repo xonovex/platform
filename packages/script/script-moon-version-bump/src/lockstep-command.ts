@@ -4,7 +4,7 @@ import {readPkg} from "@xonovex/script-moon-common/package-json";
 import type {BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
 import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getGitVersion} from "./git.js";
+import {getGitVersion, runGit, type GitRunner} from "./git.js";
 import {
   planLockstep,
   type DependentPlan,
@@ -26,13 +26,20 @@ interface LockstepOptions {
   readonly changelogPath: string | undefined;
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
+  readonly git: GitRunner;
 }
 
-const readWorkspacePackages = (rootDir: string): readonly WorkspacePackage[] =>
-  findAllPackageJsonPaths(rootDir).map((path) => ({
+const readWorkspacePackages = (
+  rootDir: string,
+  git: GitRunner = runGit,
+  listPackagePaths: (
+    dir: string,
+  ) => readonly string[] = findAllPackageJsonPaths,
+): readonly WorkspacePackage[] =>
+  listPackagePaths(rootDir).map((path) => ({
     path,
     pkg: readPkg(path),
-    headVersion: getGitVersion(rootDir, path),
+    headVersion: getGitVersion(rootDir, path, git),
   }));
 
 const planMemberChanges = (
@@ -58,6 +65,7 @@ const planMemberChanges = (
     changelogFilename: options.changelogPath,
     gitBase: options.gitBase,
     includedTypes: options.includedTypes,
+    git: options.git,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;
@@ -96,6 +104,7 @@ const planDependentChanges = (
     changelogFilename: options.changelogPath,
     gitBase: options.gitBase,
     includedTypes: options.includedTypes,
+    git: options.git,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;

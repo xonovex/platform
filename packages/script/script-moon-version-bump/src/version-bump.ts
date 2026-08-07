@@ -9,7 +9,7 @@ import {bumpVersion, type BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
 import {planDependentUpdates} from "./dependents-command.js";
 import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getGitVersion} from "./git.js";
+import {getGitVersion, runGit, type GitRunner} from "./git.js";
 import {readWorkspacePackages, runLockstep} from "./lockstep-command.js";
 import {parseLockstepNames} from "./lockstep.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
@@ -33,10 +33,25 @@ const validateVersionRequest = (
   }
 };
 
+// The two ports that reach outside this process: git reads, and the moon query
+// that lists workspace packages. Supplying both lets a caller drive main over a
+// plain directory tree with no repository and no moon invocation.
+export interface VersionBumpDependencies {
+  readonly git: GitRunner;
+  readonly listPackagePaths: (rootDir: string) => readonly string[];
+}
+
+export const defaultDependencies: VersionBumpDependencies = {
+  git: runGit,
+  listPackagePaths: findAllPackageJsonPaths,
+};
+
 export const main = (
   argv: readonly string[],
   workingDirectory = process.cwd(),
+  dependencies: VersionBumpDependencies = defaultDependencies,
 ): number => {
+  const {git, listPackagePaths} = dependencies;
   const {values, positionals} = parseCliArgs(
     {
       name: "moon-version-bump",
@@ -111,7 +126,7 @@ export const main = (
     const lockstepRoot = findWorkspaceRoot(workingDirectory);
     return runLockstep({
       rootDir: lockstepRoot,
-      packages: readWorkspacePackages(lockstepRoot),
+      packages: readWorkspacePackages(lockstepRoot, git, listPackagePaths),
       names: parseLockstepNames(lockstep),
       bumpType,
       preid,
@@ -122,6 +137,7 @@ export const main = (
       changelogPath,
       gitBase,
       includedTypes,
+      git,
     });
   }
 
@@ -140,7 +156,7 @@ export const main = (
 
   const oldVersion = pkg.version;
   const rootDir = findWorkspaceRoot(workingDirectory);
-  const gitVersion = getGitVersion(rootDir, pkgPath);
+  const gitVersion = getGitVersion(rootDir, pkgPath, git);
   let newVersion: string;
   const changes: FileChange[] = [];
 
@@ -164,7 +180,7 @@ export const main = (
     ? {updated: 0, changes: []}
     : planDependentUpdates({
         rootDir,
-        packagePaths: findAllPackageJsonPaths(rootDir),
+        packagePaths: listPackagePaths(rootDir),
         packagePath: pkgPath,
         packageName: pkg.name,
         newVersion,
@@ -173,6 +189,7 @@ export const main = (
         changelogPath,
         gitBase,
         includedTypes,
+        git,
       });
   changes.push(...dependentChanges.changes);
 
@@ -188,6 +205,7 @@ export const main = (
       changelogFilename: changelogPath,
       gitBase,
       includedTypes,
+      git,
     });
     if (changelog !== undefined) changes.push(changelog);
   }

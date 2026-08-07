@@ -1,12 +1,12 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
-tags: [typescript-script]
+tags: [typescript-script, typescript-integration]
 dependsOn:
   - script-moon-common
 tasks:
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "60"
-      TS_COVERAGE_MIN_FUNCTIONS: "60"
+      TS_COVERAGE_MIN_FUNCTIONS: "50"
       TS_COVERAGE_MIN_BRANCHES: "55"
-      TS_COVERAGE_MIN_STATEMENTS: "60"
+      TS_COVERAGE_MIN_STATEMENTS: "59"

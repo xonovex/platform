@@ -1,0 +1,37 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+# The integration tier for TypeScript projects: cases that spawn git, node, uv, or
+# another external binary. They live in test/specs/integration/, which ts-test never
+# selects, so nothing ci-check runs leaves the test process. A project opts in by
+# listing `typescript-integration` in its tags.
+tasks:
+  ts-test-integration:
+    script: npx vitest run test/specs/integration
+    deps:
+      - ~:ts-build
+      - ^:build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: true
+      # These spawn external binaries, so they are deliberately outside every CI
+      # gate; run them locally with `npx moon run <project>:test-integration`.
+      runInCI: false
+  test-integration:
+    command: noop
+    deps: [ts-test-integration]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  ci-integration:
+    command: noop
+    deps: [test-integration]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+inheritedBy:
+  tag: typescript-integration
