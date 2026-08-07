@@ -10,8 +10,6 @@ fileGroups:
   sources:
     - src/**/*
   tests:
-    - src/**/*.test.*
-    - src/**/*.spec.*
     - test/**/*
   configs:
     - "*.config.*"
@@ -21,7 +19,7 @@ tasks:
   ts-build:
     deps:
       - ^:build
-    script: npx tsc
+    script: npx tsc -p tsconfig.build.json
     inputs:
       - "@globs(sources)"
       - tsconfig*.json
@@ -30,7 +28,7 @@ tasks:
     options:
       cache: true
   ts-test:
-    script: npx vitest run
+    script: npx vitest run test/specs/unit
     deps:
       - ^:build
     inputs:
@@ -41,7 +39,7 @@ tasks:
     options:
       cache: true
   ts-test-watch:
-    script: npx vitest
+    script: npx vitest test/specs/unit
     deps:
       - ^:build
     options:
@@ -49,7 +47,7 @@ tasks:
       persistent: true
     preset: server
   ts-lint:
-    script: npx eslint src
+    script: npx eslint src test --no-error-on-unmatched-pattern
     deps:
       - ts-build
       - ^:build
@@ -61,7 +59,7 @@ tasks:
     options:
       cache: true
   ts-lint-fix:
-    script: npx eslint src --fix
+    script: npx eslint src test --fix --no-error-on-unmatched-pattern
     deps:
       - ts-build
       - ^:build
@@ -110,7 +108,7 @@ tasks:
       cache: true
   ts-coverage:
     script: >-
-      npx vitest run --coverage --coverage.include='src/**'
+      npx vitest run test/specs/unit --coverage --coverage.include='src/**'
       --coverage.thresholds.lines "$TS_COVERAGE_MIN_LINES"
       --coverage.thresholds.functions "$TS_COVERAGE_MIN_FUNCTIONS"
       --coverage.thresholds.branches "$TS_COVERAGE_MIN_BRANCHES"

@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src", "eslint.config.ts"],
+  "references": [
+    {
+      "path": "../eslint-config-base"
+    }
+  ]
+}

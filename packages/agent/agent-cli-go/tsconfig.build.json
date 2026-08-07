@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../config/eslint-config-cli"
+    },
+    {
+      "path": "../../config/vitest-config-node"
+    }
+  ]
+}

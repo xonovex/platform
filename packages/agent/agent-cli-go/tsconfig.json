@@ -1,7 +1,6 @@
 {
   "extends": "@xonovex/ts-config-cli",
   "compilerOptions": {
-    "rootDir": "src",
     "outDir": "dist",
     "paths": {
       "@xonovex/eslint-config-cli": [
@@ -14,7 +13,7 @@
       "@xonovex/vitest-config-node/*": ["../../config/vitest-config-node/src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts"],
   "references": [
     {
       "path": "../../config/eslint-config-cli"

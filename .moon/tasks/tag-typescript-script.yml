@@ -23,7 +23,7 @@ tasks:
   # bin.js is the committed launcher npm links; the unmatched-pattern flag keeps
   # the shared-code packages, which ship no binary, lintable.
   ts-lint:
-    script: npx eslint src bin.js --no-error-on-unmatched-pattern
+    script: npx eslint src test bin.js --no-error-on-unmatched-pattern
     deps:
       - ts-build
     inputs:
@@ -34,7 +34,7 @@ tasks:
     options:
       mergeDeps: replace
   ts-lint-fix:
-    script: npx eslint src bin.js --fix --no-error-on-unmatched-pattern
+    script: npx eslint src test bin.js --fix --no-error-on-unmatched-pattern
     deps:
       - ts-build
     inputs:

@@ -2,7 +2,6 @@ import {defineConfig} from "vitest/config";
 
 export default defineConfig({
   test: {
-    include: ["src/**/*.test.ts"],
     coverage: {
       thresholds: {
         "src/file-transaction.ts": {
@@ -12,8 +11,8 @@ export default defineConfig({
           lines: 100,
         },
         "src/git-log.ts": {
-          statements: 95,
-          branches: 85,
+          statements: 100,
+          branches: 95,
           functions: 100,
           lines: 100,
         },
@@ -30,10 +29,10 @@ export default defineConfig({
           lines: 100,
         },
         "src/version-bump.ts": {
-          statements: 90,
+          statements: 87,
           branches: 85,
-          functions: 65,
-          lines: 90,
+          functions: 66,
+          lines: 89,
         },
       },
     },

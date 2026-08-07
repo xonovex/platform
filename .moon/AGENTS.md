@@ -1,7 +1,8 @@
 # Moon Configuration
 
 - Tasks inherit from `tasks/tag-*.yml` based on `tags` in `moon.yml`
-- Tags: `cli`, `command`, `go`, `npm`, `shell`, `skill`, `tsconfig`, `typescript-config`, `typescript-script`, `typescript`
+- Tags: `cli`, `command`, `go`, `npm`, `shell`, `skill`, `tsconfig`, `typescript-config`, `typescript-integration`, `typescript-script`, `typescript`
+- TypeScript specs live in `test/specs/<tier>/`, never beside the source: `unit` is what `ci-check` runs, `integration` is the `typescript-integration` tier for cases that spawn a process. `tsconfig.json` covers `src` and `test` for typecheck; `tsconfig.build.json` narrows to `src` so `dist` holds no specs, and it must restate `include` and `references` because `extends` inherits neither.
 - `ci-check` gates only side-effect-free work: no network, no process or server spawning, and no writes outside a task's declared `outputs`. Anything else belongs to `ci-integration`, `ci-e2e*`, or `ci-publish`.
 - `runInCI` is `true` inside the `ci-check` closure and the publish closure (`ci-publish`, `ci-publish-dry-run` and their deps), which the Release workflow invokes by explicit target; every other task sets `runInCI: false`. Moon suppresses CI-disabled tasks even for explicit `moon run` targets when `CI` is set, so a task a workflow must execute has to be CI-enabled. Accidental publishing is prevented by invocation, not by `runInCI`: every workflow, hook, and npm script names explicit targets. Moon rejects a CI-enabled task that depends on a CI-disabled one (`run_in_ci_mismatch`), so a task pulled into an enabled closure must be enabled in the same change.
 - `runInCI` defaults to `true`, and also suppresses `moon run` when `CI` is set, so a task left at the default runs in CI whether or not it is wanted there.

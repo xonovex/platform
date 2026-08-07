@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../script-moon-common"
+    },
+    {
+      "path": "../script-moon-skill-catalog-common"
+    }
+  ]
+}

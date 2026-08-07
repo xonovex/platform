@@ -7,7 +7,7 @@
       "@xonovex/script-moon-common/*": ["../script-moon-common/src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "test"],
   "exclude": ["node_modules", "dist"],
   "references": [
     {
