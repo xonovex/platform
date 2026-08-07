@@ -13,6 +13,10 @@ tasks:
   ts-test:
     inputs:
       - /packages/skill/skill-skill/skill-guide/assets/**/*
+      # index.test.ts validates these two skills as they stand in the catalog, so
+      # an edit to either must invalidate this project's cached result.
+      - /packages/skill/skill-code-quality/**/*
+      - /packages/skill/skill-claude-code/**/*
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "75"
@@ -21,3 +25,7 @@ tasks:
       TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:
       - /packages/skill/skill-skill/skill-guide/assets/**/*
+      # index.test.ts validates these two skills as they stand in the catalog, so
+      # an edit to either must invalidate this project's cached result.
+      - /packages/skill/skill-code-quality/**/*
+      - /packages/skill/skill-claude-code/**/*

@@ -4,9 +4,22 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
 tasks:
+  # Two routing-catalog cases assert against the live skill catalog rather than a
+  # fixture, reading each skill's SKILL.md, eval-queries.json and reference names.
+  # Without these inputs a skill edit leaves this project's hash unchanged and moon
+  # serves the previous pass from cache.
+  ts-test:
+    inputs:
+      - /packages/skill/**/SKILL.md
+      - /packages/skill/**/eval-queries.json
+      - /packages/skill/**/references/*.md
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "85"
       TS_COVERAGE_MIN_FUNCTIONS: "85"
       TS_COVERAGE_MIN_BRANCHES: "70"
       TS_COVERAGE_MIN_STATEMENTS: "80"
+    inputs:
+      - /packages/skill/**/SKILL.md
+      - /packages/skill/**/eval-queries.json
+      - /packages/skill/**/references/*.md
