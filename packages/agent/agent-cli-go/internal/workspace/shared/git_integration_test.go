@@ -1,3 +1,8 @@
+//go:build integration
+
+// The cases here drive the real git or jj binary in a temporary repository, so
+// they carry the integration build tag and stay out of ci-check. Run them with
+// `npx moon run agent-cli-go:go-integration`.
 package shared
 
 import (
@@ -40,7 +45,7 @@ func initializeRepository(t *testing.T) string {
 func TestExecGit_ReturnsTrimmedStdout(t *testing.T) {
 	repoDir := initializeRepository(t)
 
-	output, err := ExecGit([]string{"rev-parse", "--abbrev-ref", "HEAD"}, repoDir)
+	output, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, repoDir)
 
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
@@ -56,11 +61,11 @@ func TestExecGit_RunsInTheGivenDirectory(t *testing.T) {
 	second := initializeRepository(t)
 	runGit(t, second, "checkout", "-b", "other")
 
-	firstBranch, err := ExecGit([]string{"rev-parse", "--abbrev-ref", "HEAD"}, first)
+	firstBranch, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, first)
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
 	}
-	secondBranch, err := ExecGit([]string{"rev-parse", "--abbrev-ref", "HEAD"}, second)
+	secondBranch, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, second)
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
 	}
@@ -74,7 +79,7 @@ func TestExecGit_RunsInTheGivenDirectory(t *testing.T) {
 func TestExecGit_ReportsAFailedCommand(t *testing.T) {
 	repoDir := initializeRepository(t)
 
-	output, err := ExecGit([]string{"rev-parse", "--verify", "absent-branch"}, repoDir)
+	output, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--verify", "absent-branch"}, repoDir)
 
 	if err == nil {
 		t.Fatal("ExecGit() must return an error for a failing git command")
@@ -86,7 +91,7 @@ func TestExecGit_ReportsAFailedCommand(t *testing.T) {
 
 func TestExecGit_ReportsANonRepositoryDirectory(t *testing.T) {
 	if _, err := ExecGit(
-		[]string{"rev-parse", "--abbrev-ref", "HEAD"}, t.TempDir(),
+		NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, t.TempDir(),
 	); err == nil {
 		t.Fatal("ExecGit() must return an error outside a git repository")
 	}
@@ -96,24 +101,24 @@ func TestGetCurrentBranchSync_ReturnsTheCheckedOutBranch(t *testing.T) {
 	repoDir := initializeRepository(t)
 	runGit(t, repoDir, "checkout", "-b", "feature/x")
 
-	if got := GetCurrentBranchSync(repoDir); got != "feature/x" {
-		t.Errorf("GetCurrentBranchSync() = %q, want %q", got, "feature/x")
+	if got := GetCurrentBranchSync(NewExecRunner(), repoDir); got != "feature/x" {
+		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want %q", got, "feature/x")
 	}
 }
 
 // A detached HEAD names no branch, so there is no source revision to report.
-func TestGetCurrentBranchSync_ReturnsEmptyWhenDetached(t *testing.T) {
+func TestGetCurrentBranchSync_ReturnsEmptyWhenDetachedInARealRepository(t *testing.T) {
 	repoDir := initializeRepository(t)
 	head := runGit(t, repoDir, "rev-parse", "HEAD")
 	runGit(t, repoDir, "checkout", "--detach", head)
 
-	if got := GetCurrentBranchSync(repoDir); got != "" {
-		t.Errorf("GetCurrentBranchSync() = %q, want empty for a detached HEAD", got)
+	if got := GetCurrentBranchSync(NewExecRunner(), repoDir); got != "" {
+		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want empty for a detached HEAD", got)
 	}
 }
 
 func TestGetCurrentBranchSync_ReturnsEmptyOutsideARepository(t *testing.T) {
-	if got := GetCurrentBranchSync(t.TempDir()); got != "" {
-		t.Errorf("GetCurrentBranchSync() = %q, want empty outside a repository", got)
+	if got := GetCurrentBranchSync(NewExecRunner(), t.TempDir()); got != "" {
+		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want empty outside a repository", got)
 	}
 }

@@ -427,9 +427,10 @@ func prepareWorkspace(options runOptions, workDir string, verbose bool) (prepare
 		return preparedWorkspace{sourceRepoDir: workDir, executionDir: workDir, displayDir: displayDir}, nil
 	}
 
-	var vcs wsshared.VCS = git.New()
+	runner := wsshared.NewExecRunner()
+	var vcs wsshared.VCS = git.New(runner)
 	if vcsType == wsp.VCSJujutsu {
-		vcs = jj.New()
+		vcs = jj.New(runner)
 	}
 
 	created, err := vcs.Setup(wsshared.Config{

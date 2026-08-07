@@ -4,7 +4,6 @@ package jj
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	wsshared "github.com/xonovex/platform/packages/agent/agent-cli-go/internal/workspace/shared"
@@ -12,16 +11,13 @@ import (
 )
 
 // Workspace is the jj VCS variant: it creates or reuses a jj workspace.
-type Workspace struct{}
+type Workspace struct{ runner wsshared.Runner }
 
-// New creates the jj workspace variant.
-func New() *Workspace { return &Workspace{} }
+// New creates the jj workspace variant over the given process runner.
+func New(runner wsshared.Runner) *Workspace { return &Workspace{runner: runner} }
 
 // Available reports whether the jj binary is on PATH.
-func (Workspace) Available() bool {
-	_, err := exec.LookPath("jj")
-	return err == nil
-}
+func (w Workspace) Available() bool { return w.runner.Available("jj") }
 
 // Setup creates or reuses a jj workspace at config.Dir, branching from the source
 // revision (defaulting to the repo's current git branch).
@@ -45,7 +41,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 
 	sourceBranch := config.SourceBranch
 	if sourceBranch == "" {
-		sourceBranch = wsshared.GetCurrentBranchSync(repoDir)
+		sourceBranch = wsshared.GetCurrentBranchSync(w.runner, repoDir)
 		if sourceBranch == "" {
 			return "", fmt.Errorf("failed to determine source revision")
 		}
@@ -55,11 +51,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 		logging.LogInfo(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
 	}
 
-	cmd := exec.Command("jj", "workspace", "add", resolvedDir, "--revision", sourceBranch)
-	cmd.Dir = repoDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
+	if err := w.runner.Stream("jj", []string{"workspace", "add", resolvedDir, "--revision", sourceBranch}, repoDir); err != nil {
 		return "", fmt.Errorf("jj workspace add failed: %w", err)
 	}
 

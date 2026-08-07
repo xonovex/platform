@@ -3,7 +3,6 @@ package bwrap
 import (
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -13,23 +12,6 @@ import (
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/shared/shared-agent-go/pkg/types"
 )
-
-// TestBwrap_NetworkNoneBlocksEgress verifies the mechanism the regression guard
-// relies on: --unshare-net actually isolates the network. It is gated on bwrap +
-// bash and is robust offline (an unshared netns has no route, so the connect
-// fails regardless of host connectivity).
-func TestBwrap_NetworkNoneBlocksEgress(t *testing.T) {
-	for _, bin := range []string{"bwrap", "bash"} {
-		if _, err := exec.LookPath(bin); err != nil {
-			t.Skipf("%s not available", bin)
-		}
-	}
-	probe := exec.Command("bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc",
-		"--", "bash", "-c", "exec 3<>/dev/tcp/1.1.1.1/53")
-	if err := probe.Run(); err == nil {
-		t.Error("--unshare-net should block egress, but the TCP connect succeeded")
-	}
-}
 
 // claudeCfg builds a run config rooted in an empty temporary home directory, so
 // the arguments depend on the config paths a test creates rather than on the

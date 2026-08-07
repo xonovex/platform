@@ -5,6 +5,7 @@
 package shared
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -23,9 +24,27 @@ type VCS interface {
 	Available() bool
 }
 
-// ExecGit runs a git command in cwd and returns trimmed stdout.
-func ExecGit(args []string, cwd string) (string, error) {
-	cmd := exec.Command("git", args...)
+// Runner is the process port for this axis. Every command the workspace variants
+// launch goes through it, so a test supplies recorded output instead of a real
+// repository and a real git or jj binary.
+type Runner interface {
+	// Capture runs name with args in cwd and returns trimmed stdout.
+	Capture(name string, args []string, cwd string) (string, error)
+	// Stream runs name with args in cwd, wiring the child to this process's
+	// stdout and stderr, which the worktree and workspace creation commands need.
+	Stream(name string, args []string, cwd string) error
+	// Available reports whether name resolves on PATH.
+	Available(name string) bool
+}
+
+type execRunner struct{}
+
+// NewExecRunner returns the Runner that actually launches processes. It is the
+// only implementation that does; the composition root supplies it.
+func NewExecRunner() Runner { return execRunner{} }
+
+func (execRunner) Capture(name string, args []string, cwd string) (string, error) {
+	cmd := exec.Command(name, args...)
 	cmd.Dir = cwd
 	output, err := cmd.Output()
 	if err != nil {
@@ -34,10 +53,28 @@ func ExecGit(args []string, cwd string) (string, error) {
 	return strings.TrimSpace(string(output)), nil
 }
 
+func (execRunner) Stream(name string, args []string, cwd string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Dir = cwd
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func (execRunner) Available(name string) bool {
+	_, err := exec.LookPath(name)
+	return err == nil
+}
+
+// ExecGit runs a git command in cwd and returns trimmed stdout.
+func ExecGit(runner Runner, args []string, cwd string) (string, error) {
+	return runner.Capture("git", args, cwd)
+}
+
 // GetCurrentBranchSync returns the current git branch name, or "" if detached or
 // on error. Both the git and jj variants use it to resolve a source revision.
-func GetCurrentBranchSync(cwd string) string {
-	result, err := ExecGit([]string{"rev-parse", "--abbrev-ref", "HEAD"}, cwd)
+func GetCurrentBranchSync(runner Runner, cwd string) string {
+	result, err := ExecGit(runner, []string{"rev-parse", "--abbrev-ref", "HEAD"}, cwd)
 	if err != nil || result == "HEAD" {
 		return ""
 	}
