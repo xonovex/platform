@@ -1,6 +1,6 @@
-import {writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-process";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
 import {type Query} from "@xonovex/script-moon-skill-eval-common/validation";
 
 interface ResultRecord {
@@ -34,6 +34,7 @@ export interface TriggerEvaluationOptions {
   readonly skillName: string;
   readonly workspace: string | undefined;
   readonly check: TriggerCheck;
+  readonly fs: FileSystem;
 }
 
 // A harness error is transient (a dropped stream, a timeout, a killed process), so
@@ -76,10 +77,9 @@ const evaluateQuery = async (
     const outcome = await runOnce(entry.query, options);
     if ("error" in outcome) {
       if (options.workspace !== undefined) {
-        writeFileSync(
+        options.fs.writeFile(
           join(options.workspace, "invalid-run.json"),
           `${JSON.stringify({query: entry.query, error: outcome.error}, null, 2)}\n`,
-          "utf8",
         );
       }
       process.stderr.write(

@@ -3,6 +3,9 @@ language: typescript
 tags: [typescript-script, typescript-integration]
 dependsOn:
   - script-moon-common
+fileGroups:
+  dependencySources:
+    - /packages/script/script-moon-common/src/**/*
 tasks:
   # The parity test runs the shipped auditor through uv, which the Nix shell
   # supplies; resolving it from the caller's PATH is what let CI run without it.

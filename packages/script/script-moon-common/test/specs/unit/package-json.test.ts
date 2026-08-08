@@ -1,94 +1,78 @@
-import {mkdtempSync, readFileSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
+import {memoryFileSystem} from "../../../src/file-system-memory.js";
 import {
   readPkg,
   writePkg,
   type PackageJson,
 } from "../../../src/package-json.js";
 
+const PKG_PATH = "/workspace/package/package.json";
+
+const fsWith = (contents: string) =>
+  memoryFileSystem({files: {[PKG_PATH]: contents}});
+
 describe("package-json", () => {
-  let tmp: string;
-
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), "moon-scripts-common-"));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, {recursive: true, force: true});
-  });
-
   describe("readPkg", () => {
     it("should read and parse a package.json file", () => {
-      const pkgPath = join(tmp, "package.json");
-      writeFileSync(
-        pkgPath,
-        JSON.stringify({name: "@xonovex/test", version: "1.0.0"}),
+      const result = readPkg(
+        PKG_PATH,
+        fsWith(JSON.stringify({name: "@xonovex/test", version: "1.0.0"})),
       );
 
-      const result = readPkg(pkgPath);
       expect(result.name).toBe("@xonovex/test");
       expect(result.version).toBe("1.0.0");
     });
 
     it("should throw for missing file", () => {
-      expect(() => readPkg(join(tmp, "missing.json"))).toThrow();
+      expect(() => readPkg(PKG_PATH, memoryFileSystem())).toThrow();
     });
 
     it("should reject invalid dependency values", () => {
-      const pkgPath = join(tmp, "package.json");
-      writeFileSync(pkgPath, JSON.stringify({dependencies: {invalid: 42}}));
-
-      expect(() => readPkg(pkgPath)).toThrow("invalid package.json");
+      expect(() =>
+        readPkg(
+          PKG_PATH,
+          fsWith(JSON.stringify({dependencies: {invalid: 42}})),
+        ),
+      ).toThrow("invalid package.json");
     });
 
     it("should reject malformed JSON with source context", () => {
-      const pkgPath = join(tmp, "package.json");
-      writeFileSync(pkgPath, "{");
-
-      expect(() => readPkg(pkgPath)).toThrow(
-        `invalid package.json at ${pkgPath}: malformed JSON`,
+      expect(() => readPkg(PKG_PATH, fsWith("{"))).toThrow(
+        `invalid package.json at ${PKG_PATH}: malformed JSON`,
       );
     });
 
     it("should preserve fields outside the release schema", () => {
-      const pkgPath = join(tmp, "package.json");
-      writeFileSync(
-        pkgPath,
-        JSON.stringify({name: "example", scripts: {test: "vitest"}}),
-      );
-
-      expect(readPkg(pkgPath)).toEqual({
-        name: "example",
-        scripts: {test: "vitest"},
-      });
+      expect(
+        readPkg(
+          PKG_PATH,
+          fsWith(JSON.stringify({name: "example", scripts: {test: "vitest"}})),
+        ),
+      ).toEqual({name: "example", scripts: {test: "vitest"}});
     });
   });
 
   describe("writePkg", () => {
     it("should write package.json with 2-space indent and trailing newline", () => {
-      const pkgPath = join(tmp, "package.json");
+      const fs = memoryFileSystem();
       const pkg: PackageJson = {name: "@xonovex/test", version: "2.0.0"};
 
-      writePkg(pkgPath, pkg);
+      writePkg(PKG_PATH, pkg, fs);
 
-      const raw = readFileSync(pkgPath, "utf8");
-      expect(raw).toBe(JSON.stringify(pkg, null, 2) + "\n");
+      expect(fs.readText(PKG_PATH)).toBe(JSON.stringify(pkg, null, 2) + "\n");
     });
 
     it("should produce a round-trippable result", () => {
-      const pkgPath = join(tmp, "package.json");
+      const fs = memoryFileSystem();
       const pkg: PackageJson = {
         name: "@xonovex/round-trip",
         version: "0.1.0",
         dependencies: {"some-dep": "^1.0.0"},
       };
 
-      writePkg(pkgPath, pkg);
-      const result = readPkg(pkgPath);
+      writePkg(PKG_PATH, pkg, fs);
 
-      expect(result).toEqual(pkg);
+      expect(readPkg(PKG_PATH, fs)).toEqual(pkg);
     });
   });
 });

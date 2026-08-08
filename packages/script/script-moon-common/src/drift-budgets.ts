@@ -1,6 +1,5 @@
-import {readFileSync} from "node:fs";
 import {z} from "zod";
-import {isFile} from "./fs.js";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
 // Drift findings are advisory until the mode is switched to enforce.
 export type DriftLintMode = "warn" | "enforce";
@@ -52,11 +51,12 @@ export const countProseWords = (text: string): number => {
 
 export const readBudgetManifest = (
   path: string,
+  fs: FileSystem = nodeFileSystem,
 ): {readonly manifest: BudgetManifest; readonly error?: string} => {
-  if (!isFile(path)) return {manifest: {}};
+  if (!fs.isFile(path)) return {manifest: {}};
   let parsed: unknown;
   try {
-    parsed = JSON.parse(readFileSync(path, "utf8"));
+    parsed = JSON.parse(fs.readText(path));
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     return {

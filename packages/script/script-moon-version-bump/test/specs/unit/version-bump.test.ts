@@ -1,48 +1,33 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
+import type {FileChange} from "../../../src/file-transaction.js";
 import type {GitRunner} from "../../../src/git.js";
 import {main, type VersionBumpDependencies} from "../../../src/version-bump.js";
 
-const directories: string[] = [];
-
 afterEach(() => {
   vi.restoreAllMocks();
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
 });
 
-const writeJson = (path: string, value: unknown): void => {
-  writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
-};
+const ROOT = "/repo";
 
-// A workspace is just a directory holding .moon plus package manifests: main
-// finds the root by walking up for .moon, and both ports are supplied, so no
-// repository and no moon process are involved.
-const workspace = (
-  packages: Readonly<Record<string, unknown>>,
-): {root: string; packagePath: (name: string) => string} => {
-  const root = mkdtempSync(join(tmpdir(), "version-bump-unit-"));
-  directories.push(root);
-  mkdirSync(join(root, ".moon"));
-  for (const [name, manifest] of Object.entries(packages)) {
-    mkdirSync(join(root, "packages", name), {recursive: true});
-    writeJson(join(root, "packages", name, "package.json"), manifest);
-  }
-  return {
-    root,
-    packagePath: (name) => join(root, "packages", name, "package.json"),
-  };
-};
+const packagePath = (name: string): string =>
+  join(ROOT, "packages", name, "package.json");
+
+// A workspace is just a tree holding .moon plus package manifests: main finds the
+// root by walking up for .moon, and every port is supplied, so no repository, no
+// moon process, and no disk are involved.
+const workspace = (packages: Readonly<Record<string, unknown>>): FileSystem =>
+  memoryFileSystem({
+    directories: [join(ROOT, ".moon")],
+    files: Object.fromEntries(
+      Object.entries(packages).map(([name, manifest]) => [
+        packagePath(name),
+        `${JSON.stringify(manifest, null, 2)}\n`,
+      ]),
+    ),
+  });
 
 // Answers the two reads getGitVersion makes. An empty ls-tree means the path is
 // absent at HEAD, which is how a never-committed package looks.
@@ -62,14 +47,24 @@ const gitAtHead = (versions: Readonly<Record<string, string>>): GitRunner => {
   };
 };
 
+// applyChanges installs into the same tree the reads come from, so a case can
+// assert on what a run wrote without a disk.
 const dependencies = (
   git: GitRunner,
   paths: readonly string[],
-): VersionBumpDependencies => ({git, listPackagePaths: () => paths});
+  fs: FileSystem,
+): VersionBumpDependencies => ({
+  git,
+  fs,
+  listPackagePaths: () => paths,
+  applyChanges: (changes: readonly FileChange[]) => {
+    for (const change of changes) fs.writeFile(change.path, change.content);
+  },
+});
 
 describe("main", () => {
   it("bumps a package that is unchanged at HEAD and writes the manifest", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},
     });
     const corePath = packagePath("core");
@@ -77,20 +72,22 @@ describe("main", () => {
 
     const code = main(
       ["--type", "minor", "--no-changelog"],
-      join(root, "packages", "core"),
-      dependencies(gitAtHead({"packages/core/package.json": "1.2.3"}), [
-        corePath,
-      ]),
+      join(ROOT, "packages", "core"),
+      dependencies(
+        gitAtHead({"packages/core/package.json": "1.2.3"}),
+        [corePath],
+        fs,
+      ),
     );
 
     expect(code).toBe(0);
-    expect(JSON.parse(readFileSync(corePath, "utf8"))).toMatchObject({
+    expect(JSON.parse(fs.readText(corePath))).toMatchObject({
       version: "1.3.0",
     });
   });
 
   it("leaves an already-bumped package alone", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "2.0.0"},
     });
     const corePath = packagePath("core");
@@ -98,42 +95,45 @@ describe("main", () => {
 
     const code = main(
       ["--no-changelog"],
-      join(root, "packages", "core"),
+      join(ROOT, "packages", "core"),
       dependencies(
         // HEAD still holds 1.0.0, so the working tree is ahead already.
         gitAtHead({"packages/core/package.json": "1.0.0"}),
         [corePath],
+        fs,
       ),
     );
 
     expect(code).toBe(0);
-    expect(JSON.parse(readFileSync(corePath, "utf8"))).toMatchObject({
+    expect(JSON.parse(fs.readText(corePath))).toMatchObject({
       version: "2.0.0",
     });
   });
 
   it("writes nothing under --dry-run", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},
     });
     const corePath = packagePath("core");
-    const before = readFileSync(corePath, "utf8");
+    const before = fs.readText(corePath);
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     const code = main(
       ["--dry-run", "--no-changelog"],
-      join(root, "packages", "core"),
-      dependencies(gitAtHead({"packages/core/package.json": "1.2.3"}), [
-        corePath,
-      ]),
+      join(ROOT, "packages", "core"),
+      dependencies(
+        gitAtHead({"packages/core/package.json": "1.2.3"}),
+        [corePath],
+        fs,
+      ),
     );
 
     expect(code).toBe(0);
-    expect(readFileSync(corePath, "utf8")).toBe(before);
+    expect(fs.readText(corePath)).toBe(before);
   });
 
   it("applies an exact version instead of a bump type", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},
     });
     const corePath = packagePath("core");
@@ -141,19 +141,21 @@ describe("main", () => {
 
     main(
       ["--exact", "4.5.6", "--no-changelog"],
-      join(root, "packages", "core"),
-      dependencies(gitAtHead({"packages/core/package.json": "1.2.3"}), [
-        corePath,
-      ]),
+      join(ROOT, "packages", "core"),
+      dependencies(
+        gitAtHead({"packages/core/package.json": "1.2.3"}),
+        [corePath],
+        fs,
+      ),
     );
 
-    expect(JSON.parse(readFileSync(corePath, "utf8"))).toMatchObject({
+    expect(JSON.parse(fs.readText(corePath))).toMatchObject({
       version: "4.5.6",
     });
   });
 
   it("updates a dependent that pins the bumped package exactly", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},
       consumer: {
         name: "@xonovex/consumer",
@@ -167,23 +169,24 @@ describe("main", () => {
 
     main(
       ["--type", "minor", "--no-changelog"],
-      join(root, "packages", "core"),
+      join(ROOT, "packages", "core"),
       dependencies(
         gitAtHead({
           "packages/core/package.json": "1.2.3",
           "packages/consumer/package.json": "0.1.0",
         }),
         [corePath, consumerPath],
+        fs,
       ),
     );
 
-    expect(JSON.parse(readFileSync(consumerPath, "utf8"))).toMatchObject({
+    expect(JSON.parse(fs.readText(consumerPath))).toMatchObject({
       dependencies: {"@xonovex/core": "1.3.0"},
     });
   });
 
   it("skips dependent updates when asked", () => {
-    const {root, packagePath} = workspace({
+    const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},
       consumer: {
         name: "@xonovex/consumer",
@@ -197,62 +200,63 @@ describe("main", () => {
 
     main(
       ["--type", "minor", "--no-changelog", "--no-dependents"],
-      join(root, "packages", "core"),
-      dependencies(gitAtHead({"packages/core/package.json": "1.2.3"}), [
-        corePath,
-        consumerPath,
-      ]),
+      join(ROOT, "packages", "core"),
+      dependencies(
+        gitAtHead({"packages/core/package.json": "1.2.3"}),
+        [corePath, consumerPath],
+        fs,
+      ),
     );
 
-    expect(JSON.parse(readFileSync(consumerPath, "utf8"))).toMatchObject({
+    expect(JSON.parse(fs.readText(consumerPath))).toMatchObject({
       dependencies: {"@xonovex/core": "1.2.3"},
     });
   });
 
   it("rejects a malformed exact version", () => {
-    const {root} = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
+    const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
         ["--exact", "not-a-version"],
-        join(root, "packages", "core"),
-        dependencies(gitAtHead({}), []),
+        join(ROOT, "packages", "core"),
+        dependencies(gitAtHead({}), [], fs),
       ),
     ).toThrow("invalid exact version");
   });
 
   it("rejects an unknown bump type", () => {
-    const {root} = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
+    const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
         ["--type", "sideways"],
-        join(root, "packages", "core"),
-        dependencies(gitAtHead({}), []),
+        join(ROOT, "packages", "core"),
+        dependencies(gitAtHead({}), [], fs),
       ),
     ).toThrow("invalid bump type");
   });
 
   it("rejects a directory with no package.json", () => {
-    const {root} = workspace({});
+    const fs = workspace({});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    expect(() => main([], root, dependencies(gitAtHead({}), []))).toThrow(
+    expect(() => main([], ROOT, dependencies(gitAtHead({}), [], fs))).toThrow(
       "no package.json found",
     );
   });
 
   it("rejects a manifest missing a name or version", () => {
-    const {root, packagePath} = workspace({core: {description: "no identity"}});
+    const fs = workspace({core: {description: "no identity"}});
     vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
         [],
-        join(root, "packages", "core"),
-        dependencies(gitAtHead({}), [packagePath("core")]),
+        join(ROOT, "packages", "core"),
+        dependencies(gitAtHead({}), [packagePath("core")], fs),
       ),
     ).toThrow("missing a name or version");
   });

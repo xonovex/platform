@@ -4,6 +4,10 @@ tags: [typescript-script]
 dependsOn:
   - script-moon-common
   - script-moon-skill-catalog-common
+fileGroups:
+  dependencySources:
+    - /packages/script/script-moon-common/src/**/*
+    - /packages/script/script-moon-skill-catalog-common/src/**/*
 tasks:
   ts-coverage:
     env:

@@ -1,27 +1,25 @@
-import {readdirSync, readFileSync, statSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
-export const isFile = (path: string): boolean => {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-};
+export const isFile = (
+  path: string,
+  fs: FileSystem = nodeFileSystem,
+): boolean => fs.isFile(path);
 
-export const isDirectory = (path: string): boolean => {
-  try {
-    return statSync(path).isDirectory();
-  } catch {
-    return false;
-  }
-};
+export const isDirectory = (
+  path: string,
+  fs: FileSystem = nodeFileSystem,
+): boolean => fs.isDirectory(path);
 
-export const resolveGuideDirectory = (base: string): string => {
-  if (isFile(join(base, "SKILL.md"))) return base;
-  const nested = readdirSync(base)
+export const resolveGuideDirectory = (
+  base: string,
+  fs: FileSystem = nodeFileSystem,
+): string => {
+  if (fs.isFile(join(base, "SKILL.md"))) return base;
+  const nested = fs
+    .readDirectory(base)
     .map((entry) => join(base, entry))
-    .filter((path) => isFile(join(path, "SKILL.md")));
+    .filter((path) => fs.isFile(join(path, "SKILL.md")));
   if (nested.length > 1) {
     throw new Error(
       `multiple SKILL.md found under ${base}; pass one explicitly`,
@@ -44,11 +42,14 @@ const CLAUDE_SKILL_PLUGIN_FIELDS = new Set([
   "version",
 ]);
 
-const readClaudePluginManifest = (directory: string): ClaudePluginManifest => {
+const readClaudePluginManifest = (
+  directory: string,
+  fs: FileSystem,
+): ClaudePluginManifest => {
   const manifestPath = join(directory, ".claude-plugin", "plugin.json");
   let parsed: unknown;
   try {
-    parsed = JSON.parse(readFileSync(manifestPath, "utf8"));
+    parsed = JSON.parse(fs.readText(manifestPath));
   } catch {
     throw new Error(`invalid Claude plugin manifest: ${manifestPath}`);
   }
@@ -92,7 +93,7 @@ const readClaudePluginManifest = (directory: string): ClaudePluginManifest => {
   ];
   const executableComponent = executableComponents.find((entry) => {
     const path = join(directory, entry);
-    return isFile(path) || isDirectory(path);
+    return fs.isFile(path) || fs.isDirectory(path);
   });
   if (executableComponent !== undefined) {
     throw new Error(
@@ -104,21 +105,22 @@ const readClaudePluginManifest = (directory: string): ClaudePluginManifest => {
 
 export const resolveClaudePluginDirectories = (
   targetDirectory: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly string[] => {
   const target = resolve(targetDirectory);
   const siblingRoot = dirname(target);
   const directoryByName = new Map<string, string>();
-  for (const entry of readdirSync(siblingRoot)) {
+  for (const entry of fs.readDirectory(siblingRoot)) {
     const directory = join(siblingRoot, entry);
-    if (!isFile(join(directory, ".claude-plugin", "plugin.json"))) continue;
-    const manifest = readClaudePluginManifest(directory);
+    if (!fs.isFile(join(directory, ".claude-plugin", "plugin.json"))) continue;
+    const manifest = readClaudePluginManifest(directory, fs);
     directoryByName.set(manifest.name, directory);
   }
 
   const ordered: string[] = [];
   const visited = new Set<string>();
   const visit = (directory: string): void => {
-    const manifest = readClaudePluginManifest(directory);
+    const manifest = readClaudePluginManifest(directory, fs);
     if (visited.has(manifest.name)) return;
     visited.add(manifest.name);
     for (const dependency of manifest.dependencies) {

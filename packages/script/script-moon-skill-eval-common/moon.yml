@@ -1,25 +1,29 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
-tags: [typescript-script]
+tags: [typescript-script, typescript-acceptance, typescript-integration]
 dependsOn:
   - script-moon-common
+fileGroups:
+  dependencySources:
+    - /packages/script/script-moon-common/src/**/*
 tasks:
-  # Two routing-catalog cases assert against the live skill catalog rather than a
+  # The acceptance tier asserts against the live skill catalog rather than a
   # fixture, reading each skill's SKILL.md, eval-queries.json and reference names.
   # Without these inputs a skill edit leaves this project's hash unchanged and moon
-  # serves the previous pass from cache.
-  ts-test:
+  # serves the previous pass from cache. The unit tier and its coverage floor read
+  # only fixtures they build, so neither takes these inputs.
+  ts-test-acceptance:
     inputs:
       - /packages/skill/**/SKILL.md
       - /packages/skill/**/eval-queries.json
       - /packages/skill/**/references/*.md
+  # These floors cover the unit tier alone, and src/trigger-process.ts is spawn
+  # plumbing only test/specs/integration reaches, so the project totals sit lower
+  # than the logic modules do. vitest.config.ts holds the per-file floors that keep
+  # src/trigger-scan.ts and src/validation.ts near full coverage.
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "85"
-      TS_COVERAGE_MIN_FUNCTIONS: "85"
-      TS_COVERAGE_MIN_BRANCHES: "70"
-      TS_COVERAGE_MIN_STATEMENTS: "80"
-    inputs:
-      - /packages/skill/**/SKILL.md
-      - /packages/skill/**/eval-queries.json
-      - /packages/skill/**/references/*.md
+      TS_COVERAGE_MIN_LINES: "70"
+      TS_COVERAGE_MIN_FUNCTIONS: "70"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "70"

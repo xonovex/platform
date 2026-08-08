@@ -1,6 +1,8 @@
-import {readFileSync} from "node:fs";
 import {join, relative} from "node:path";
-import {isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {issue, type ValidationIssue} from "./validation.js";
 
 // The command tables sit under the README's `## Commands` heading, so a table
@@ -34,11 +36,12 @@ export const checkReadmeCatalog = (
   packageDirectory: string,
   commandNames: readonly string[],
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly ValidationIssue[] => {
   const readmePath = join(packageDirectory, "README.md");
-  if (!isFile(readmePath)) return [];
+  if (!fs.isFile(readmePath)) return [];
   const displayPath = relative(repositoryRoot, readmePath);
-  const listed = parseReadmeCommands(readFileSync(readmePath, "utf8"));
+  const listed = parseReadmeCommands(fs.readText(readmePath));
   if (listed === undefined) return [];
   const shipped = new Set(commandNames);
   return [

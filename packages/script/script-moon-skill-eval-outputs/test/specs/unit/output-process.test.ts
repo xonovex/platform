@@ -1,15 +1,13 @@
-import {
-  chmodSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {main} from "../../../src/evaluate.js";
+import type {
+  HarnessRequest,
+  HarnessRunner,
+  ProcessOutput,
+} from "../../../src/output-harness.js";
+import {CODEX_SKILL_SIGNAL} from "../../../src/output-parse.js";
 import {runJob, type RunContext} from "../../../src/output-process.js";
 import type {NormalizedEval} from "../../../src/validation.js";
 
@@ -21,66 +19,118 @@ const evaluation = (prompt: string): NormalizedEval => ({
   files: [],
 });
 
+const output = (overrides: Partial<ProcessOutput> = {}): ProcessOutput => ({
+  stdout: "",
+  timedOut: false,
+  outputLimitExceeded: false,
+  error: null,
+  ...overrides,
+});
+
+const claudeGeneration = (result: string): string =>
+  [
+    JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}),
+    JSON.stringify({
+      message: {
+        content: [
+          {type: "tool_use", name: "Skill", input: {skill: "test-skill"}},
+        ],
+      },
+    }),
+    JSON.stringify({
+      type: "result",
+      result,
+      usage: {input_tokens: 3, output_tokens: 2},
+      duration_ms: 12,
+    }),
+  ].join("\n");
+
+const claudeJudgement = (passed: boolean): string =>
+  JSON.stringify({
+    structured_output: {
+      assertion_results: [
+        {passed, evidence: passed ? "answer present" : "answer missing"},
+      ],
+    },
+  });
+
+// A runner that answers from recorded output and records what it was asked to run,
+// which is what lets these cases score a job without a harness process.
+const recordingRunner = (
+  reply: (request: HarnessRequest) => ProcessOutput,
+): {runner: HarnessRunner; requests: HarnessRequest[]} => {
+  const requests: HarnessRequest[] = [];
+  return {
+    requests,
+    runner: (request) => {
+      requests.push(request);
+      return Promise.resolve(reply(request));
+    },
+  };
+};
+
+const isJudgeRequest = (request: HarnessRequest): boolean =>
+  request.finalArgument.includes("ASSISTANT RESPONSE:");
+
+const ITERATION_DIRECTORY = "/workspace/iteration-1";
+
 describe("runJob", () => {
-  const originalPath = process.env.PATH;
-  let temporaryDirectory: string;
+  let tree: FileSystem;
 
   beforeEach(() => {
-    temporaryDirectory = mkdtempSync(join(tmpdir(), "skill-eval-output-"));
-    const executable = join(temporaryDirectory, "claude");
-    writeFileSync(
-      executable,
-      String.raw`#!/usr/bin/env node
-const args = process.argv.slice(2);
-const finalArgument = args.at(-1) ?? "";
-if (!args.includes("--json-schema") && finalArgument.includes("fail-generation")) {
-  process.stderr.write("generation failed");
-  process.exit(3);
-}
-if (args.includes("--json-schema")) {
-  const passed = finalArgument.includes("ASSISTANT RESPONSE:\nthe answer");
-  console.log(JSON.stringify({structured_output: {assertion_results: [{passed, evidence: passed ? "response contains the answer" : "answer missing"}]}}));
-} else {
-  const result = finalArgument.startsWith("/test-skill ") ? "the answer" : "wrong";
-  console.log(JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}));
-  console.log(JSON.stringify({message: {content: [{type: "tool_use", name: "Skill", input: {skill: "test-skill"}}]}}));
-  console.log(JSON.stringify({type: "result", result, usage: {input_tokens: 3, output_tokens: 2}, duration_ms: 12}));
-}
-`,
-    );
-    chmodSync(executable, 0o755);
-    process.env.PATH = `${temporaryDirectory}:${originalPath ?? ""}`;
+    tree = memoryFileSystem();
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
   });
 
   afterEach(() => {
-    process.env.PATH = originalPath;
     vi.restoreAllMocks();
-    rmSync(temporaryDirectory, {recursive: true, force: true});
   });
 
-  const context = (): RunContext => ({
-    withArgs: [],
-    withoutArgs: [],
+  const context = (overrides: Partial<RunContext> = {}): RunContext => ({
+    withArgs: ["--with"],
+    withoutArgs: ["--without"],
     cwd: undefined,
-    guideDirectory: temporaryDirectory,
+    guideDirectory: join(ITERATION_DIRECTORY, "guide"),
     harness: "claude",
     timeout: 2,
     target: "test-skill",
     shortName: "test-skill",
     judgeModel: "judge-model",
     judgeBudget: 0.01,
-    iterationDirectory: temporaryDirectory,
+    iterationDirectory: ITERATION_DIRECTORY,
+    fs: tree,
     runs: 1,
     buildPrompt: (value) => value.prompt,
+    runHarness: () => Promise.resolve(output()),
+    now: () => 0,
+    ...overrides,
   });
 
+  const readArm = (arm: string, file: string, run?: string): string =>
+    tree.readText(
+      join(
+        ITERATION_DIRECTORY,
+        "eval-1",
+        arm,
+        ...(run === undefined ? [] : [run]),
+        file,
+      ),
+    );
+
   it("generates, grades, and persists a healthy run", async () => {
+    const {runner} = recordingRunner((request) =>
+      output({
+        stdout: isJudgeRequest(request)
+          ? claudeJudgement(true)
+          : claudeGeneration("the answer"),
+      }),
+    );
+
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      context(),
+      context({runHarness: runner}),
     );
 
     expect(record).toEqual({
@@ -92,74 +142,72 @@ if (args.includes("--json-schema")) {
       skill_triggered: true,
       error: null,
     });
-    expect(
-      readFileSync(
-        join(
-          temporaryDirectory,
-          "eval-1",
-          "with_skill",
-          "outputs",
-          "response.md",
-        ),
-        "utf8",
-      ),
-    ).toBe("the answer");
+    expect(readArm("with_skill", join("outputs", "response.md"))).toBe(
+      "the answer",
+    );
+    expect(JSON.parse(readArm("with_skill", "timing.json"))).toMatchObject({
+      total_tokens: 5,
+      skill_triggered: true,
+    });
   });
 
-  it("records a generation process failure without grading", async () => {
-    const record = await runJob(
-      evaluation("fail-generation"),
+  it("sends the arm's own harness arguments", async () => {
+    const {runner, requests} = recordingRunner((request) =>
+      output({
+        stdout: isJudgeRequest(request)
+          ? claudeJudgement(true)
+          : claudeGeneration("the answer"),
+      }),
+    );
+
+    await runJob(
+      evaluation("answer the question"),
       "without_skill",
       0,
-      context(),
+      context({runHarness: runner}),
     );
 
-    expect(record).toMatchObject({
-      pass_rate: 0,
-      skill_triggered: false,
-      error: "claude exited 3: generation failed",
-    });
-    expect(
-      readFileSync(
-        join(temporaryDirectory, "eval-1", "without_skill", "grading.json"),
-        "utf8",
-      ),
-    ).toContain("not graded because generation evidence is invalid");
+    expect(requests[0]?.args).toEqual(["--without"]);
+    expect(requests[0]?.skillGuide).toBeUndefined();
   });
 
-  it("runs generation and judging through the Codex harness", async () => {
-    const codex = join(temporaryDirectory, "codex");
-    const guideDirectory = join(temporaryDirectory, "guide");
-    mkdirSync(guideDirectory);
-    writeFileSync(
-      join(guideDirectory, "SKILL.md"),
-      "---\nname: test-skill\ndescription: Use for test prompts.\n---\n",
+  it("stages the guide for a Codex run that is expected to use the skill", async () => {
+    const guideDirectory = join(ITERATION_DIRECTORY, "guide");
+    const {runner, requests} = recordingRunner((request) =>
+      output({
+        stdout: isJudgeRequest(request)
+          ? JSON.stringify({
+              type: "item.completed",
+              item: {
+                type: "agent_message",
+                text: '{"assertion_results":[{"passed":true,"evidence":"present"}]}',
+              },
+            })
+          : [
+              JSON.stringify({
+                type: "item.completed",
+                item: {
+                  type: "agent_message",
+                  text: `${CODEX_SKILL_SIGNAL}\nthe answer`,
+                },
+              }),
+              JSON.stringify({
+                type: "turn.completed",
+                usage: {input_tokens: 4, output_tokens: 2},
+              }),
+            ].join("\n"),
+      }),
     );
-    writeFileSync(
-      codex,
-      String.raw`#!/usr/bin/env node
-const prompt = process.argv.at(-1) ?? "";
-const text = prompt.includes("ASSISTANT RESPONSE:")
-  ? '{"assertion_results":[{"passed":true,"evidence":"answer present"}]}'
-  : "XONOVEX_SKILL_USED\nthe answer";
-console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message", text}}));
-console.log(JSON.stringify({type: "turn.completed", usage: {input_tokens: 4, output_tokens: 2}}));
-`,
-    );
-    chmodSync(codex, 0o755);
-    const codexContext = {
-      ...context(),
-      guideDirectory,
-      harness: "codex" as const,
-    };
 
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      codexContext,
+      context({harness: "codex", guideDirectory, runHarness: runner}),
     );
 
+    expect(requests[0]?.skillGuide).toBe(guideDirectory);
+    expect(requests[0]?.maxOutputCharacters).toBe(10_000);
     expect(record).toMatchObject({
       pass_rate: 1,
       tokens: 6,
@@ -168,83 +216,134 @@ console.log(JSON.stringify({type: "turn.completed", usage: {input_tokens: 4, out
     });
   });
 
-  it("runs the complete evaluator and writes benchmark evidence", async () => {
-    const evaluationsFile = join(temporaryDirectory, "evals.json");
-    const workspace = join(temporaryDirectory, "workspace");
-    writeFileSync(
-      evaluationsFile,
-      JSON.stringify({
-        skill_name: "test-skill",
-        tier: "moderate",
-        evals: [evaluation("question")],
+  it("records a generation process failure without grading it", async () => {
+    const {runner, requests} = recordingRunner(() =>
+      output({error: "claude exited 3: generation failed"}),
+    );
+
+    const record = await runJob(
+      evaluation("answer the question"),
+      "without_skill",
+      0,
+      context({runHarness: runner}),
+    );
+
+    expect(record).toMatchObject({
+      pass_rate: 0,
+      skill_triggered: false,
+      error: "claude exited 3: generation failed",
+    });
+    expect(requests).toHaveLength(1);
+    expect(readArm("without_skill", "grading.json")).toContain(
+      "not graded because generation evidence is invalid",
+    );
+  });
+
+  it("reports a generation that hit the output ceiling or the clock", async () => {
+    for (const [reply, error, durationMs] of [
+      [output({outputLimitExceeded: true}), "output-limit", 0],
+      [output({timedOut: true}), "timeout", 2000],
+    ] as const) {
+      const record = await runJob(
+        evaluation("answer the question"),
+        "without_skill",
+        0,
+        context({runHarness: () => Promise.resolve(reply)}),
+      );
+
+      expect(record).toMatchObject({error, duration_ms: durationMs});
+    }
+  });
+
+  it("treats a with_skill run that never used the skill as invalid evidence", async () => {
+    const {runner, requests} = recordingRunner(() =>
+      output({
+        stdout: JSON.stringify({
+          type: "result",
+          result: "the answer",
+          usage: {},
+          duration_ms: 1,
+        }),
       }),
     );
 
-    const exitCode = await main([
-      "--workspace",
-      workspace,
-      evaluationsFile,
-      "test-skill",
-      "iteration-1",
-    ]);
+    const record = await runJob(
+      evaluation("answer the question"),
+      "with_skill",
+      0,
+      context({runHarness: runner}),
+    );
 
-    expect(exitCode).toBe(0);
-    expect(
-      JSON.parse(
-        readFileSync(join(workspace, "iteration-1", "benchmark.json"), "utf8"),
-      ),
-    ).toMatchObject({
-      skill: "test-skill",
-      tier: "moderate",
-      iteration: "iteration-1",
-      run_summary: {
-        with_skill: {pass_rate: {mean: 1}},
-        without_skill: {pass_rate: {mean: 0}},
-        delta: {pass_rate: 1},
-      },
-      quality_gate: {passed: true},
+    expect(record).toMatchObject({skill_triggered: false, pass_rate: 0});
+    expect(requests).toHaveLength(1);
+  });
+
+  it("fails every assertion when the judge output cannot be read", async () => {
+    const record = await runJob(
+      evaluation("answer the question"),
+      "with_skill",
+      0,
+      context({
+        runHarness: (request) =>
+          Promise.resolve(
+            output({
+              stdout: isJudgeRequest(request)
+                ? "not json"
+                : claudeGeneration("the answer"),
+            }),
+          ),
+      }),
+    );
+
+    expect(record).toMatchObject({
+      pass_rate: 0,
+      error: "unparseable judge output",
     });
   });
 
-  it("fails a valid positive delta below the tier's absolute quality floor", async () => {
-    const evaluationsFile = join(temporaryDirectory, "low-quality-evals.json");
-    const workspace = join(temporaryDirectory, "low-quality-workspace");
-    writeFileSync(
-      evaluationsFile,
-      JSON.stringify({
-        skill_name: "test-skill",
-        tier: "moderate",
-        evals: [
-          {
-            ...evaluation("question"),
-            assertions: ["one", "two", "three", "four"],
-          },
-        ],
+  it("fails every assertion when the judge process fails or times out", async () => {
+    for (const [reply, error] of [
+      [output({error: "boom"}), "judge process error: boom"],
+      [output({timedOut: true}), "judge timeout"],
+    ] as const) {
+      const record = await runJob(
+        evaluation("answer the question"),
+        "with_skill",
+        0,
+        context({
+          runHarness: (request) =>
+            Promise.resolve(
+              isJudgeRequest(request)
+                ? reply
+                : output({stdout: claudeGeneration("the answer")}),
+            ),
+        }),
+      );
+
+      expect(record).toMatchObject({pass_rate: 0, error});
+    }
+  });
+
+  it("keeps each run of a multi-run sweep in its own directory", async () => {
+    await runJob(
+      evaluation("answer the question"),
+      "with_skill",
+      1,
+      context({
+        runs: 2,
+        runHarness: (request) =>
+          Promise.resolve(
+            output({
+              stdout: isJudgeRequest(request)
+                ? claudeJudgement(true)
+                : claudeGeneration("the answer"),
+            }),
+          ),
       }),
     );
 
-    const exitCode = await main([
-      "--workspace",
-      workspace,
-      evaluationsFile,
-      "test-skill",
-      "iteration-1",
-    ]);
-
-    expect(exitCode).toBe(1);
-    expect(
-      JSON.parse(
-        readFileSync(join(workspace, "iteration-1", "benchmark.json"), "utf8"),
-      ),
-    ).toMatchObject({
-      run_summary: {
-        with_skill: {pass_rate: {mean: 0.25}},
-        without_skill: {pass_rate: {mean: 0}},
-      },
-      quality_gate: {
-        passed: false,
-        checks: {withSkillPassRate: false, deltaPassRate: true},
-      },
-    });
+    expect(readArm("with_skill", join("outputs", "response.md"), "run-2")).toBe(
+      "the answer",
+    );
   });
 });

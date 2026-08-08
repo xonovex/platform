@@ -1,6 +1,8 @@
-import {readFileSync} from "node:fs";
 import {join, relative} from "node:path";
-import {isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {issue, type ValidationIssue} from "./validation.js";
 
 const SKILL_PLUGIN_PREFIX = "xonovex-skill-";
@@ -31,15 +33,16 @@ const mentionsSubject = (source: string, subject: string): boolean => {
 const documentationSources = (
   packageDirectory: string,
   commandNames: readonly string[],
+  fs: FileSystem,
 ): readonly string[] => {
   const readme = join(packageDirectory, "README.md");
   const commandDirectory = join(packageDirectory, "commands");
   return [
-    ...(isFile(readme) ? [readFileSync(readme, "utf8")] : []),
+    ...(fs.isFile(readme) ? [fs.readText(readme)] : []),
     ...commandNames
       .map((name) => join(commandDirectory, `${name}.md`))
-      .filter((path) => isFile(path))
-      .map((path) => readFileSync(path, "utf8")),
+      .filter((path) => fs.isFile(path))
+      .map((path) => fs.readText(path)),
   ];
 };
 
@@ -58,10 +61,12 @@ export interface DependencyUsageInput {
 // so naming it in the README or a command document counts as that reason.
 export const checkDependencyUsage = (
   input: DependencyUsageInput,
+  fs: FileSystem = nodeFileSystem,
 ): readonly ValidationIssue[] => {
   const sources = documentationSources(
     input.packageDirectory,
     input.commandNames,
+    fs,
   );
   const isUnused = (plugin: string): boolean => {
     if (input.delegatedPlugins.has(plugin)) return false;

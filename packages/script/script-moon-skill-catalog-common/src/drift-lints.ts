@@ -4,6 +4,10 @@ import {
   evaluateBudgets,
   readBudgetManifest,
 } from "@xonovex/script-moon-common/drift-budgets";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {collectGuideFiles} from "./drift-files.js";
 import {
   evaluateVocabulary,
@@ -21,14 +25,17 @@ export interface DriftLintReport {
 export const checkGuideDrift = (
   guideDirectory: string,
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): DriftLintReport => {
   const budgets = readBudgetManifest(
     join(repositoryRoot, BUDGET_MANIFEST_FILE),
+    fs,
   );
   const vocabulary = readVocabularyManifest(
     join(repositoryRoot, VOCABULARY_MANIFEST_FILE),
+    fs,
   );
-  const files = collectGuideFiles(guideDirectory, repositoryRoot);
+  const files = collectGuideFiles(guideDirectory, repositoryRoot, fs);
   return {
     findings: [
       ...evaluateBudgets(files, budgets.manifest).map(({message}) => message),

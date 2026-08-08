@@ -1,13 +1,15 @@
-import {mkdirSync, rmSync, writeFileSync} from "node:fs";
+import {rmSync} from "node:fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {
   buildEvaluationPrompt,
   resolveEvaluationConfig,
 } from "./evaluation-config.js";
-import {
-  GENERATION_OUTPUT_LIMIT,
-  runJob,
-  type RunContext,
-} from "./output-process.js";
+import {spawnHarness, type HarnessRunner} from "./output-harness.js";
+import {GENERATION_OUTPUT_LIMIT} from "./output-parse.js";
+import {runJob, type RunContext} from "./output-process.js";
 import {aggregateArm, fmean, round, type JobRecord} from "./output-results.js";
 import {
   evaluateOutputGate,
@@ -78,7 +80,7 @@ const runEvaluationBatches = async (
 
     const failures = findEvaluationInfrastructureFailures(batchRecords);
     if (failures.length > 0) {
-      writeFileSync(
+      context.fs.writeFile(
         invalidRunPath,
         JSON.stringify(
           {
@@ -91,7 +93,6 @@ const runEvaluationBatches = async (
           null,
           2,
         ),
-        {encoding: "utf8"},
       );
       process.stderr.write(
         `invalid benchmark evidence: ${String(failures.length)} infrastructure failure(s)\n` +
@@ -152,8 +153,39 @@ const writeEvaluationLines = (
   }
 };
 
-export const main = async (argv: readonly string[]): Promise<number> => {
-  const configResult = resolveEvaluationConfig(argv);
+/**
+ * The effects the evaluator reaches the outside world through. A run supplies the
+ * real ones; a test supplies recorded harness output and a fixed clock, so the
+ * whole sweep can be scored without a process.
+ */
+export interface EvaluatorDependencies {
+  readonly runHarness: HarnessRunner;
+  readonly now: () => number;
+  readonly fs: FileSystem;
+  // Removes a previous run's verdicts so a rerun cannot be read as this run's.
+  readonly discard: (path: string) => void;
+  // Where relative paths and the guide are resolved from. A run uses the process
+  // directory; a test names a directory in its own tree.
+  readonly workingDirectory?: string;
+}
+
+export const defaultDependencies: EvaluatorDependencies = {
+  runHarness: spawnHarness,
+  now: () => Date.now(),
+  fs: nodeFileSystem,
+  discard: (path) => {
+    rmSync(path, {force: true});
+  },
+};
+
+export const main = async (
+  argv: readonly string[],
+  dependencies: EvaluatorDependencies = defaultDependencies,
+): Promise<number> => {
+  const configResult = resolveEvaluationConfig(argv, {
+    fs: dependencies.fs,
+    workingDirectory: dependencies.workingDirectory,
+  });
   for (const warning of configResult.warnings) {
     process.stderr.write(`${warning}\n`);
   }
@@ -163,9 +195,9 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   }
   const config = configResult.data;
 
-  mkdirSync(config.iterationDirectory, {recursive: true});
-  rmSync(config.benchmarkPath, {force: true});
-  rmSync(config.invalidRunPath, {force: true});
+  dependencies.fs.makeDirectory(config.iterationDirectory);
+  dependencies.discard(config.benchmarkPath);
+  dependencies.discard(config.invalidRunPath);
 
   const ctx: RunContext = {
     withArgs: config.withArgs,
@@ -182,6 +214,9 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     runs: config.runs,
     buildPrompt: (evaluation) =>
       buildEvaluationPrompt(config.evaluationsDirectory, evaluation),
+    runHarness: dependencies.runHarness,
+    now: dependencies.now,
+    fs: dependencies.fs,
   };
 
   const harnessCaps =
@@ -249,9 +284,10 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       withBlock.skill_trigger_rate?.mean ?? 0,
     ),
   };
-  writeFileSync(config.benchmarkPath, JSON.stringify(benchmark, null, 2), {
-    encoding: "utf8",
-  });
+  dependencies.fs.writeFile(
+    config.benchmarkPath,
+    JSON.stringify(benchmark, null, 2),
+  );
 
   const delta = benchmark.run_summary.delta;
   process.stderr.write(

@@ -1,51 +1,44 @@
-import {mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
+import {memoryFileSystem} from "../../../src/file-system-memory.js";
 import {readPlatformMeta} from "../../../src/platform-meta.js";
 
+const metaIn = (contents?: string) =>
+  readPlatformMeta(
+    "/pkg",
+    memoryFileSystem(
+      contents === undefined
+        ? {directories: ["/pkg"]}
+        : {files: {"/pkg/platform.json": contents}},
+    ),
+  );
+
 describe("readPlatformMeta", () => {
-  let tmp: string;
-
-  beforeEach(() => {
-    tmp = mkdtempSync(join(tmpdir(), "platform-meta-"));
-  });
-
-  afterEach(() => {
-    rmSync(tmp, {recursive: true, force: true});
-  });
-
   it("should return undefined when no platform.json exists", () => {
-    expect(readPlatformMeta(tmp)).toBeUndefined();
+    expect(metaIn()).toBeUndefined();
   });
 
   it("should parse platform.json with os and cpu", () => {
-    writeFileSync(
-      join(tmp, "platform.json"),
-      JSON.stringify({os: ["darwin"], cpu: ["arm64"]}),
-    );
-
-    const result = readPlatformMeta(tmp);
-    expect(result).toEqual({os: ["darwin"], cpu: ["arm64"]});
-  });
-
-  it("should parse platform.json with os, cpu, and libc", () => {
-    writeFileSync(
-      join(tmp, "platform.json"),
-      JSON.stringify({os: ["linux"], cpu: ["x64"], libc: ["glibc", "musl"]}),
-    );
-
-    const result = readPlatformMeta(tmp);
-    expect(result).toEqual({
-      os: ["linux"],
-      cpu: ["x64"],
-      libc: ["glibc", "musl"],
+    expect(metaIn(JSON.stringify({os: ["darwin"], cpu: ["arm64"]}))).toEqual({
+      os: ["darwin"],
+      cpu: ["arm64"],
     });
   });
 
-  it("should reject platform metadata without a CPU list", () => {
-    writeFileSync(join(tmp, "platform.json"), JSON.stringify({os: ["linux"]}));
+  it("should parse platform.json with os, cpu, and libc", () => {
+    expect(
+      metaIn(
+        JSON.stringify({os: ["linux"], cpu: ["x64"], libc: ["glibc", "musl"]}),
+      ),
+    ).toEqual({os: ["linux"], cpu: ["x64"], libc: ["glibc", "musl"]});
+  });
 
-    expect(() => readPlatformMeta(tmp)).toThrow("invalid platform metadata");
+  it("should reject platform metadata without a CPU list", () => {
+    expect(() => metaIn(JSON.stringify({os: ["linux"]}))).toThrow(
+      "invalid platform metadata",
+    );
+  });
+
+  it("should reject malformed JSON", () => {
+    expect(() => metaIn("{")).toThrow("malformed JSON");
   });
 });

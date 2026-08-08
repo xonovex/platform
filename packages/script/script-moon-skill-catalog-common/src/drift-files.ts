@@ -1,10 +1,14 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {join, relative, sep} from "node:path";
 import type {BudgetedFile} from "@xonovex/script-moon-common/drift-budgets";
-import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 
-const readDirectory = (path: string): readonly string[] =>
-  isDirectory(path) ? readdirSync(path).toSorted() : [];
+// An absent directory reads as empty, so a catalog missing a whole tier is a
+// quiet no-op rather than a throw.
+const listing = (path: string, fs: FileSystem): readonly string[] =>
+  fs.isDirectory(path) ? fs.readDirectory(path).toSorted() : [];
 
 // manifestPath keys every manifest entry by a repository-relative POSIX path so
 // the manifests stay readable and platform independent.
@@ -15,13 +19,14 @@ const readBudgeted = (
   repositoryRoot: string,
   path: string,
   kind: BudgetedFile["kind"],
+  fs: FileSystem,
 ): readonly BudgetedFile[] =>
-  isFile(path)
+  fs.isFile(path)
     ? [
         {
           kind,
           path: manifestPath(repositoryRoot, path),
-          text: readFileSync(path, "utf8"),
+          text: fs.readText(path),
         },
       ]
     : [];
@@ -30,15 +35,22 @@ const readBudgeted = (
 export const collectGuideFiles = (
   guideDirectory: string,
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => [
-  ...readBudgeted(repositoryRoot, join(guideDirectory, "SKILL.md"), "skill"),
-  ...readDirectory(join(guideDirectory, "references"))
+  ...readBudgeted(
+    repositoryRoot,
+    join(guideDirectory, "SKILL.md"),
+    "skill",
+    fs,
+  ),
+  ...listing(join(guideDirectory, "references"), fs)
     .filter((entry) => entry.endsWith(".md"))
     .flatMap((entry) =>
       readBudgeted(
         repositoryRoot,
         join(guideDirectory, "references", entry),
         "reference",
+        fs,
       ),
     ),
 ];
@@ -46,13 +58,18 @@ export const collectGuideFiles = (
 // collectSkillCatalogFiles walks every guide under packages/skill.
 export const collectSkillCatalogFiles = (
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => {
   const skillRoot = join(repositoryRoot, "packages", "skill");
-  return readDirectory(skillRoot).flatMap((packageName) =>
-    readDirectory(join(skillRoot, packageName))
+  return listing(skillRoot, fs).flatMap((packageName) =>
+    listing(join(skillRoot, packageName), fs)
       .filter((entry) => entry.endsWith("-guide"))
       .flatMap((guide) =>
-        collectGuideFiles(join(skillRoot, packageName, guide), repositoryRoot),
+        collectGuideFiles(
+          join(skillRoot, packageName, guide),
+          repositoryRoot,
+          fs,
+        ),
       ),
   );
 };
@@ -60,10 +77,15 @@ export const collectSkillCatalogFiles = (
 // collectCommandCatalogFiles walks every command document under packages/command.
 export const collectCommandCatalogFiles = (
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => {
   const commandRoot = join(repositoryRoot, "packages", "command");
-  return readDirectory(commandRoot).flatMap((packageName) =>
-    collectCommandPackageFiles(join(commandRoot, packageName), repositoryRoot),
+  return listing(commandRoot, fs).flatMap((packageName) =>
+    collectCommandPackageFiles(
+      join(commandRoot, packageName),
+      repositoryRoot,
+      fs,
+    ),
   );
 };
 
@@ -71,13 +93,15 @@ export const collectCommandCatalogFiles = (
 export const collectCommandPackageFiles = (
   packageDirectory: string,
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] =>
-  readDirectory(join(packageDirectory, "commands"))
+  listing(join(packageDirectory, "commands"), fs)
     .filter((entry) => entry.endsWith(".md"))
     .flatMap((entry) =>
       readBudgeted(
         repositoryRoot,
         join(packageDirectory, "commands", entry),
         "command",
+        fs,
       ),
     );

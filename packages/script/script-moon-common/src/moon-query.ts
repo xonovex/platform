@@ -1,8 +1,8 @@
 import {execFileSync} from "node:child_process";
-import {existsSync} from "node:fs";
 import {join} from "node:path";
 import {z} from "zod";
 import {resolveExecutable} from "./executable.js";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
 const MoonProjectSchema = z.looseObject({
   id: z.string().min(1),
@@ -46,7 +46,10 @@ export const queryMoonProjects = (rootDir: string): readonly MoonProject[] => {
   return parseMoonProjects(output);
 };
 
-export const findAllPackageJsonPaths = (rootDir: string): readonly string[] =>
+export const findAllPackageJsonPaths = (
+  rootDir: string,
+  fs: FileSystem = nodeFileSystem,
+): readonly string[] =>
   queryMoonProjects(rootDir)
     .map((p) => join(rootDir, p.source, "package.json"))
-    .filter((p) => existsSync(p));
+    .filter((p) => fs.isFile(p));

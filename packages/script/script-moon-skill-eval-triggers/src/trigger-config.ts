@@ -1,12 +1,13 @@
 import {spawnSync} from "node:child_process";
-import {readFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {
-  isDirectory,
-  isFile,
   resolveClaudePluginDirectories,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
@@ -33,11 +34,12 @@ type TriggerConfigResult =
       readonly kind: "runtime" | "usage";
     };
 
-interface TriggerConfigOptions {
+export interface TriggerConfigOptions {
   readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly executableRuns?: (executable: string) => boolean;
   readonly resolveExecutablePath?: (command: string) => string | undefined;
   readonly workingDirectory?: string;
+  readonly fs?: FileSystem;
 }
 
 export interface TriggerConfig {
@@ -99,13 +101,17 @@ const partitionOwnedQueries = (
   shortName: string,
   catalogRootArgument: string | undefined,
   workingDirectory: string,
+  fs: FileSystem,
 ): PartitionResult => {
   if (catalogRootArgument === undefined) {
     return {success: true, kept: queries, deferred: []};
   }
   let owners: ReadonlyMap<string, string>;
   try {
-    owners = catalogQueryOwners(resolve(workingDirectory, catalogRootArgument));
+    owners = catalogQueryOwners(
+      resolve(workingDirectory, catalogRootArgument),
+      fs,
+    );
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : String(error);
     return {success: false, error: `catalog root unreadable: ${detail}`};
@@ -135,14 +141,15 @@ export const resolveTriggerConfig = (
 
   const environment = options.environment ?? process.env;
   const workingDirectory = options.workingDirectory ?? resolve(".");
-  const guideDirectory = resolveGuideDirectory(workingDirectory);
+  const fs = options.fs ?? nodeFileSystem;
+  const guideDirectory = resolveGuideDirectory(workingDirectory, fs);
   const queriesArgument =
     cli.positionals[0] ?? join(guideDirectory, "eval-queries.json");
   const queriesFile = resolve(workingDirectory, queriesArgument);
   const skillMd = join(guideDirectory, "SKILL.md");
   const skillName =
     cli.positionals[1] ??
-    (isFile(skillMd) ? parseFrontmatterName(skillMd) : undefined);
+    (fs.isFile(skillMd) ? parseFrontmatterName(skillMd, fs) : undefined);
   if (skillName === undefined) {
     return failure(
       "usage",
@@ -172,7 +179,7 @@ export const resolveTriggerConfig = (
     );
   }
 
-  if (!isFile(queriesFile)) {
+  if (!fs.isFile(queriesFile)) {
     return failure("runtime", `queries file not found: ${queriesFile}`);
   }
   const resolveExecutablePath =
@@ -214,8 +221,8 @@ export const resolveTriggerConfig = (
   const pluginDirectory = resolve(workingDirectory, pluginDirectoryArgument);
   if (
     harness === "claude" &&
-    (!isDirectory(pluginDirectory) ||
-      !isFile(join(pluginDirectory, ".claude-plugin", "plugin.json")))
+    (!fs.isDirectory(pluginDirectory) ||
+      !fs.isFile(join(pluginDirectory, ".claude-plugin", "plugin.json")))
   ) {
     return failure(
       "runtime",
@@ -225,7 +232,7 @@ export const resolveTriggerConfig = (
 
   let parsed: unknown;
   try {
-    parsed = JSON.parse(readFileSync(queriesFile, "utf8"));
+    parsed = JSON.parse(fs.readText(queriesFile));
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : String(error);
     return failure("runtime", `invalid JSON in ${queriesFile}: ${detail}`);
@@ -248,6 +255,7 @@ export const resolveTriggerConfig = (
     shortNameForCatalog,
     cli.catalogRoot ?? environment.CATALOG_ROOT,
     workingDirectory,
+    fs,
   );
   if (!deferredResult.success) {
     return failure("runtime", deferredResult.error);
@@ -288,8 +296,10 @@ export const resolveTriggerConfig = (
           ? buildTriggerClaudeArgs({
               model,
               budget,
-              pluginDirectories:
-                resolveClaudePluginDirectories(pluginDirectory),
+              pluginDirectories: resolveClaudePluginDirectories(
+                pluginDirectory,
+                fs,
+              ),
             })
           : buildIsolatedCodexArgs({model}),
       harnessExecutable,

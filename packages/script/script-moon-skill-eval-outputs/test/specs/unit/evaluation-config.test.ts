@@ -1,7 +1,7 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {beforeEach, describe, expect, it} from "vitest";
 import {
   buildEvaluationPrompt,
   resolveEvaluationConfig,
@@ -42,23 +42,33 @@ const normalizedEvaluation = (files: readonly string[]): NormalizedEval => ({
   files,
 });
 
-describe("evaluation configuration", () => {
-  let directory: string;
+const DIRECTORY = "/guide";
 
-  beforeEach(() => {
-    directory = mkdtempSync(join(tmpdir(), "skill-eval-config-"));
-    writeFileSync(
-      join(directory, "SKILL.md"),
-      "---\nname: 'plugin:test-skill'\n---\n",
-    );
-    writeFileSync(
-      join(directory, "evals.json"),
-      JSON.stringify(evalFile([validEvaluation()])),
-    );
+// The guide a run resolves from: a SKILL.md naming the skill, plus the file the
+// evaluations are read out of. A case that needs one of them absent builds the
+// tree without it rather than deleting it.
+const guideTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
+  memoryFileSystem({
+    files: {
+      ...(skill
+        ? {
+            [join(DIRECTORY, "SKILL.md")]:
+              "---\nname: 'plugin:test-skill'\n---\n",
+          }
+        : {}),
+      [join(DIRECTORY, "evals.json")]: JSON.stringify(
+        evalFile([validEvaluation()]),
+      ),
+    },
   });
 
-  afterEach(() => {
-    rmSync(directory, {recursive: true, force: true});
+describe("evaluation configuration", () => {
+  let directory: string;
+  let fs: FileSystem;
+
+  beforeEach(() => {
+    directory = DIRECTORY;
+    fs = guideTree();
   });
 
   const resolveConfig = (
@@ -69,13 +79,12 @@ describe("evaluation configuration", () => {
       environment,
       executableAvailable: () => true,
       workingDirectory: directory,
+      fs,
     });
 
   it("resolves defaults, environment options, batches, and the next iteration", () => {
-    mkdirSync(join(directory, "workspace", "iteration-2"), {recursive: true});
-    mkdirSync(join(directory, "workspace", "iteration-invalid"), {
-      recursive: true,
-    });
+    fs.makeDirectory(join(directory, "workspace", "iteration-2"));
+    fs.makeDirectory(join(directory, "workspace", "iteration-invalid"));
 
     const config = successfulConfig(
       resolveConfig([], {
@@ -117,7 +126,7 @@ describe("evaluation configuration", () => {
   });
 
   it("honors CLI options and explicit positional values", () => {
-    writeFileSync(
+    fs.writeFile(
       join(directory, "evals.json"),
       JSON.stringify(evalFile([validEvaluation()], "explicit-skill")),
     );
@@ -193,7 +202,7 @@ describe("evaluation configuration", () => {
   });
 
   it("keeps valid evaluations and reports skipped invalid entries", () => {
-    writeFileSync(
+    fs.writeFile(
       join(directory, "evals.json"),
       JSON.stringify(evalFile([{prompt: ""}, validEvaluation("valid")])),
     );
@@ -216,34 +225,35 @@ describe("evaluation configuration", () => {
         environment: {},
         executableAvailable: () => false,
         workingDirectory: directory,
+        fs,
       }),
     ).toMatchObject({
       success: false,
       error: "'claude' CLI not found in PATH",
     });
 
-    rmSync(join(directory, "SKILL.md"));
+    fs = guideTree({skill: false});
     expect(failureMessage(resolveConfig())).toContain("no skill_name given");
   });
 
   it("rejects malformed, empty, ungradable, and duplicate evaluations", () => {
     const evalsPath = join(directory, "evals.json");
-    writeFileSync(evalsPath, "not-json");
+    fs.writeFile(evalsPath, "not-json");
     expect(failureMessage(resolveConfig())).toContain("invalid JSON");
 
-    writeFileSync(evalsPath, JSON.stringify({unknown: []}));
+    fs.writeFile(evalsPath, JSON.stringify({unknown: []}));
     expect(failureMessage(resolveConfig())).toContain("invalid eval structure");
 
-    writeFileSync(evalsPath, JSON.stringify(evalFile([])));
+    fs.writeFile(evalsPath, JSON.stringify(evalFile([])));
     expect(failureMessage(resolveConfig())).toContain("has no evals");
 
-    writeFileSync(evalsPath, JSON.stringify(evalFile([{prompt: ""}])));
+    fs.writeFile(evalsPath, JSON.stringify(evalFile([{prompt: ""}])));
     expect(resolveConfig()).toMatchObject({
       success: false,
       error: "no gradable evals",
     });
 
-    writeFileSync(
+    fs.writeFile(
       evalsPath,
       JSON.stringify(evalFile([validEvaluation(1), validEvaluation(1)])),
     );
@@ -259,7 +269,7 @@ describe("evaluation configuration", () => {
       "invalid evaluator options",
     );
 
-    writeFileSync(
+    fs.writeFile(
       join(directory, "evals.json"),
       JSON.stringify(
         evalFile(Array.from({length: 7}, (_, index) => validEvaluation(index))),

@@ -1,13 +1,13 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {describe, expect, it} from "vitest";
 import {
   checkReadmeCatalog,
   parseReadmeCommands,
 } from "../../../src/readme-catalog.js";
 
-const directories: string[] = [];
+const PACKAGE_DIR = "/repo/packages/command/pkg";
 
 const readme = `# Utility Commands
 
@@ -40,20 +40,11 @@ Manage project instructions and create skills.
 | \`after-end\` | Outside the Commands section |
 `;
 
-const createPackage = (source: string): string => {
-  const directory = mkdtempSync(join(tmpdir(), "command-readme-"));
-  directories.push(directory);
-  mkdirSync(join(directory, "commands"), {recursive: true});
-  writeFileSync(join(directory, "README.md"), source);
-  return directory;
-};
-
-afterEach(() => {
-  for (const directory of directories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  directories.length = 0;
-});
+const createPackage = (source: string): FileSystem =>
+  memoryFileSystem({
+    directories: [join(PACKAGE_DIR, "commands")],
+    files: {[join(PACKAGE_DIR, "README.md")]: source},
+  });
 
 describe("parseReadmeCommands", () => {
   it("reads every table row under the Commands heading", () => {
@@ -81,21 +72,27 @@ describe("parseReadmeCommands", () => {
 
 describe("checkReadmeCatalog", () => {
   it("accepts a README that matches the shipped commands", () => {
-    const directory = createPackage(readme);
+    const fs = createPackage(readme);
 
     expect(
       checkReadmeCatalog(
-        directory,
+        PACKAGE_DIR,
         ["instructions-init", "skill-create"],
-        directory,
+        PACKAGE_DIR,
+        fs,
       ),
     ).toEqual([]);
   });
 
   it("reports a README entry whose command file was removed", () => {
-    const directory = createPackage(readme);
+    const fs = createPackage(readme);
 
-    const issues = checkReadmeCatalog(directory, ["skill-create"], directory);
+    const issues = checkReadmeCatalog(
+      PACKAGE_DIR,
+      ["skill-create"],
+      PACKAGE_DIR,
+      fs,
+    );
 
     expect(issues).toHaveLength(1);
     expect(issues[0]).toMatchObject({
@@ -107,12 +104,13 @@ describe("checkReadmeCatalog", () => {
   });
 
   it("reports a shipped command the README never lists", () => {
-    const directory = createPackage(readme);
+    const fs = createPackage(readme);
 
     const issues = checkReadmeCatalog(
-      directory,
+      PACKAGE_DIR,
       ["instructions-init", "skill-create", "skill-extract"],
-      directory,
+      PACKAGE_DIR,
+      fs,
     );
 
     expect(issues).toHaveLength(1);
@@ -121,19 +119,18 @@ describe("checkReadmeCatalog", () => {
   });
 
   it("skips a README that declares no command catalog", () => {
-    const directory = createPackage("# Commands\n\nProse only.\n");
+    const fs = createPackage("# Commands\n\nProse only.\n");
 
-    expect(checkReadmeCatalog(directory, ["skill-create"], directory)).toEqual(
-      [],
-    );
+    expect(
+      checkReadmeCatalog(PACKAGE_DIR, ["skill-create"], PACKAGE_DIR, fs),
+    ).toEqual([]);
   });
 
   it("skips a package that ships no README", () => {
-    const directory = mkdtempSync(join(tmpdir(), "command-readme-none-"));
-    directories.push(directory);
+    const fs = memoryFileSystem({directories: [PACKAGE_DIR]});
 
-    expect(checkReadmeCatalog(directory, ["skill-create"], directory)).toEqual(
-      [],
-    );
+    expect(
+      checkReadmeCatalog(PACKAGE_DIR, ["skill-create"], PACKAGE_DIR, fs),
+    ).toEqual([]);
   });
 });

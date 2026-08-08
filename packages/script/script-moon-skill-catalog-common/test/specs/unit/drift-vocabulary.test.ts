@@ -1,6 +1,4 @@
-import {mkdtempSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
   coinedTerms,
@@ -89,21 +87,25 @@ describe("drift vocabulary", () => {
   });
 
   it("reads a manifest and reports malformed content", () => {
-    const dir = mkdtempSync(join(tmpdir(), "drift-vocabulary-"));
-    const valid = join(dir, "valid.json");
-    const malformed = join(dir, "malformed.json");
-    const wrongShape = join(dir, "shape.json");
-    writeFileSync(valid, JSON.stringify({Handoff: "contract.md"}), "utf8");
-    writeFileSync(malformed, "{", "utf8");
-    writeFileSync(wrongShape, JSON.stringify({Handoff: 3}), "utf8");
+    const fs = memoryFileSystem({
+      files: {
+        "/repo/valid.json": JSON.stringify({Handoff: "contract.md"}),
+        "/repo/malformed.json": "{",
+        "/repo/shape.json": JSON.stringify({Handoff: 3}),
+      },
+    });
 
-    expect(readVocabularyManifest(valid).manifest).toEqual({
+    expect(readVocabularyManifest("/repo/valid.json", fs).manifest).toEqual({
       Handoff: "contract.md",
     });
-    expect(readVocabularyManifest(join(dir, "missing.json")).manifest).toEqual(
+    expect(readVocabularyManifest("/repo/missing.json", fs).manifest).toEqual(
       {},
     );
-    expect(readVocabularyManifest(malformed).error).toContain("not valid JSON");
-    expect(readVocabularyManifest(wrongShape).error).toContain("owning file");
+    expect(readVocabularyManifest("/repo/malformed.json", fs).error).toContain(
+      "not valid JSON",
+    );
+    expect(readVocabularyManifest("/repo/shape.json", fs).error).toContain(
+      "owning file",
+    );
   });
 });

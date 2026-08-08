@@ -1,5 +1,5 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {extname, join, relative} from "node:path";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
 interface ProsePunctuationRule {
   readonly hint: string;
@@ -106,17 +106,21 @@ export const prosePunctuationFindings = (
   return findings;
 };
 
-const proseFiles = (root: string, directory: string): readonly string[] => {
+const proseFiles = (
+  root: string,
+  directory: string,
+  fs: FileSystem,
+): readonly string[] => {
   const files: string[] = [];
-  for (const entry of readdirSync(directory, {withFileTypes: true})) {
-    const absolute = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      if (SKIPPED_DIRECTORIES.has(entry.name)) continue;
-      files.push(...proseFiles(root, absolute));
+  for (const name of fs.readDirectory(directory)) {
+    const absolute = join(directory, name);
+    if (fs.isDirectory(absolute)) {
+      if (SKIPPED_DIRECTORIES.has(name)) continue;
+      files.push(...proseFiles(root, absolute, fs));
       continue;
     }
-    if (!entry.isFile()) continue;
-    if (!PROSE_FILE_EXTENSIONS.includes(extname(entry.name).toLowerCase())) {
+    if (!fs.isFile(absolute)) continue;
+    if (!PROSE_FILE_EXTENSIONS.includes(extname(name).toLowerCase())) {
       continue;
     }
     files.push(relative(root, absolute));
@@ -127,9 +131,10 @@ const proseFiles = (root: string, directory: string): readonly string[] => {
 /** Every finding under `root`, with paths relative to `root`. */
 export const scanProsePunctuation = (
   root: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly ProsePunctuationFinding[] =>
-  proseFiles(root, root)
+  proseFiles(root, root, fs)
     .toSorted()
     .flatMap((path) =>
-      prosePunctuationFindings(path, readFileSync(join(root, path), "utf8")),
+      prosePunctuationFindings(path, fs.readText(join(root, path))),
     );

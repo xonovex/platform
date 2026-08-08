@@ -3,6 +3,9 @@ language: typescript
 tags: [typescript-script]
 dependsOn:
   - script-moon-common
+fileGroups:
+  dependencySources:
+    - /packages/script/script-moon-common/src/**/*
 tasks:
   ts-coverage:
     env:

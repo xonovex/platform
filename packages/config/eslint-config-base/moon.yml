@@ -7,6 +7,9 @@ tags:
   - typescript-config
 dependsOn:
   - ts-config-node
+fileGroups:
+  dependencySources:
+    - /packages/config/ts-config-node/src/**/*
 tasks:
   ts-test:
     script: npx vitest run

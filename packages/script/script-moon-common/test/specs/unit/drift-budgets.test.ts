@@ -1,6 +1,3 @@
-import {mkdtempSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join} from "node:path";
 import {describe, expect, it} from "vitest";
 import {
   countProseWords,
@@ -9,6 +6,7 @@ import {
   resolveDriftLintMode,
   seedBudgets,
 } from "../../../src/drift-budgets.js";
+import {memoryFileSystem} from "../../../src/file-system-memory.js";
 
 const file = (path: string, text: string, kind = "reference" as const) => ({
   kind,
@@ -97,18 +95,22 @@ describe("drift budgets", () => {
   });
 
   it("reads a manifest and reports malformed content", () => {
-    const dir = mkdtempSync(join(tmpdir(), "drift-budgets-"));
-    const valid = join(dir, "valid.json");
-    const malformed = join(dir, "malformed.json");
-    const negative = join(dir, "negative.json");
-    writeFileSync(valid, JSON.stringify({"a.md": 12}), "utf8");
-    writeFileSync(malformed, "{", "utf8");
-    writeFileSync(negative, JSON.stringify({"a.md": -1}), "utf8");
+    const fs = memoryFileSystem({
+      files: {
+        "/repo/valid.json": JSON.stringify({"a.md": 12}),
+        "/repo/malformed.json": "{",
+        "/repo/negative.json": JSON.stringify({"a.md": -1}),
+      },
+    });
 
-    expect(readBudgetManifest(valid).manifest).toEqual({"a.md": 12});
-    expect(readBudgetManifest(join(dir, "missing.json")).manifest).toEqual({});
-    expect(readBudgetManifest(malformed).error).toContain("not valid JSON");
-    expect(readBudgetManifest(negative).error).toContain(
+    expect(readBudgetManifest("/repo/valid.json", fs).manifest).toEqual({
+      "a.md": 12,
+    });
+    expect(readBudgetManifest("/repo/missing.json", fs).manifest).toEqual({});
+    expect(readBudgetManifest("/repo/malformed.json", fs).error).toContain(
+      "not valid JSON",
+    );
+    expect(readBudgetManifest("/repo/negative.json", fs).error).toContain(
       "positive word budget",
     );
   });

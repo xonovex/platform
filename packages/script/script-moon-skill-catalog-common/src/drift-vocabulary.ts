@@ -1,5 +1,7 @@
-import {readFileSync} from "node:fs";
-import {isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {z} from "zod";
 
 // The repository-relative name of the vocabulary manifest, owned here alongside
@@ -69,11 +71,12 @@ export const coinedTerms = (text: string): ReadonlySet<string> => {
 
 export const readVocabularyManifest = (
   path: string,
+  fs: FileSystem = nodeFileSystem,
 ): {readonly manifest: VocabularyManifest; readonly error?: string} => {
-  if (!isFile(path)) return {manifest: {}};
+  if (!fs.isFile(path)) return {manifest: {}};
   let parsed: unknown;
   try {
-    parsed = JSON.parse(readFileSync(path, "utf8"));
+    parsed = JSON.parse(fs.readText(path));
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     return {

@@ -1,5 +1,8 @@
-import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {join, relative, resolve, sep} from "node:path";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
 import {checkCommandBudgets} from "./command-budgets.js";
 import {
@@ -28,9 +31,13 @@ export interface CommandPackageValidation {
   readonly report: ValidationReport;
 }
 
-const readJson = (path: string, issues: ValidationIssue[]): unknown => {
+const readJson = (
+  path: string,
+  issues: ValidationIssue[],
+  fs: FileSystem,
+): unknown => {
   try {
-    return JSON.parse(readFileSync(path, "utf8")) as unknown;
+    return JSON.parse(fs.readText(path)) as unknown;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     issues.push(
@@ -97,20 +104,21 @@ const validateArgumentParity = (
   }
 };
 
-const markdownFilesBelow = (directory: string): readonly string[] => {
-  if (!existsSync(directory)) return [];
-  return readdirSync(directory, {withFileTypes: true}).flatMap((entry) => {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) return markdownFilesBelow(path);
-    return entry.isFile() && entry.name.endsWith(".md") ? [path] : [];
+const markdownFilesBelow = (
+  directory: string,
+  fs: FileSystem,
+): readonly string[] => {
+  if (!fs.isDirectory(directory)) return [];
+  return fs.readDirectory(directory).flatMap((name) => {
+    const path = join(directory, name);
+    if (fs.isDirectory(path)) return markdownFilesBelow(path, fs);
+    return fs.isFile(path) && name.endsWith(".md") ? [path] : [];
   });
 };
 
-const headingAnchors = (path: string): ReadonlySet<string> => {
+const headingAnchors = (path: string, fs: FileSystem): ReadonlySet<string> => {
   const anchors = new Set<string>();
-  for (const match of readFileSync(path, "utf8").matchAll(
-    /^#{1,6}\s+(.+)$/gmu,
-  )) {
+  for (const match of fs.readText(path).matchAll(/^#{1,6}\s+(.+)$/gmu)) {
     const heading = match[1];
     if (heading === undefined) continue;
     anchors.add(
@@ -130,28 +138,31 @@ const headingAnchors = (path: string): ReadonlySet<string> => {
 const validateProsePunctuation = (
   packageDir: string,
   repositoryRoot: string,
+  fs: FileSystem,
 ): readonly ValidationIssue[] =>
-  scanProsePunctuation(packageDir).map(({excerpt, hint, label, line, path}) =>
-    issue(
-      "prose.punctuation",
-      relative(repositoryRoot, join(packageDir, path)),
-      `${label} on line ${String(line)}, ${hint}: ${excerpt}`,
-    ),
+  scanProsePunctuation(packageDir, fs).map(
+    ({excerpt, hint, label, line, path}) =>
+      issue(
+        "prose.punctuation",
+        relative(repositoryRoot, join(packageDir, path)),
+        `${label} on line ${String(line)}, ${hint}: ${excerpt}`,
+      ),
   );
 
 const validateInternalLinks = (
   packageDir: string,
   repositoryRoot: string,
+  fs: FileSystem,
 ): readonly ValidationIssue[] => {
   const issues: ValidationIssue[] = [];
   const readme = join(packageDir, "README.md");
   const files = [
-    ...(existsSync(readme) ? [readme] : []),
-    ...markdownFilesBelow(join(packageDir, "commands")),
-    ...markdownFilesBelow(join(packageDir, "docs")),
+    ...(fs.isFile(readme) ? [readme] : []),
+    ...markdownFilesBelow(join(packageDir, "commands"), fs),
+    ...markdownFilesBelow(join(packageDir, "docs"), fs),
   ];
   for (const file of files) {
-    const source = readFileSync(file, "utf8");
+    const source = fs.readText(file);
     for (const match of source.matchAll(/\[.*?\]\(([^)\s]+)(?:\s[^)]*)?\)/gu)) {
       const rawTarget = match[1];
       if (
@@ -166,7 +177,7 @@ const validateInternalLinks = (
       if (target !== packageDir && !target.startsWith(packageDir + sep)) {
         continue;
       }
-      if (!existsSync(target)) {
+      if (!fs.isFile(target) && !fs.isDirectory(target)) {
         issues.push(
           issue(
             "link.missing-target",
@@ -179,9 +190,9 @@ const validateInternalLinks = (
       if (
         rawFragment !== undefined &&
         rawFragment.length > 0 &&
-        statSync(target).isFile() &&
+        fs.isFile(target) &&
         target.endsWith(".md") &&
-        !headingAnchors(target).has(
+        !headingAnchors(target, fs).has(
           decodeURIComponent(rawFragment).toLowerCase(),
         )
       ) {
@@ -201,11 +212,12 @@ const validateInternalLinks = (
 export const validateCommandPackage = (
   packageDir: string,
   repositoryRoot = resolve(packageDir, "../../.."),
+  fs: FileSystem = nodeFileSystem,
 ): CommandPackageValidation => {
   const issues: ValidationIssue[] = [];
   const documents: CommandDocument[] = [];
   const commandDir = join(packageDir, "commands");
-  if (!existsSync(commandDir)) {
+  if (!fs.isDirectory(commandDir)) {
     return {
       documents,
       report: {
@@ -223,11 +235,12 @@ export const validateCommandPackage = (
 
   const packageManifestPath = join(packageDir, "package.json");
   const pluginManifestPath = join(packageDir, ".claude-plugin", "plugin.json");
-  const packageManifest = readJson(packageManifestPath, issues) as
+  const packageManifest = readJson(packageManifestPath, issues, fs) as
     PackageManifest | undefined;
-  const pluginManifest = readJson(pluginManifestPath, issues) as
+  const pluginManifest = readJson(pluginManifestPath, issues, fs) as
     PluginManifest | undefined;
-  const commandFiles = readdirSync(commandDir)
+  const commandFiles = fs
+    .readDirectory(commandDir)
     .filter((entry) => entry.endsWith(".md"))
     .toSorted();
   const commandNames = commandFiles.map((entry) =>
@@ -235,18 +248,15 @@ export const validateCommandPackage = (
   );
   const delegatedPlugins = new Set<string>();
   issues.push(
-    ...validateInternalLinks(packageDir, repositoryRoot),
-    ...validateProsePunctuation(packageDir, repositoryRoot),
-    ...checkReadmeCatalog(packageDir, commandNames, repositoryRoot),
+    ...validateInternalLinks(packageDir, repositoryRoot, fs),
+    ...validateProsePunctuation(packageDir, repositoryRoot, fs),
+    ...checkReadmeCatalog(packageDir, commandNames, repositoryRoot, fs),
   );
 
   for (const commandFile of commandFiles) {
     const absolutePath = join(commandDir, commandFile);
     const displayPath = relative(repositoryRoot, absolutePath);
-    const parsed = parseCommandDocument(
-      displayPath,
-      readFileSync(absolutePath, "utf8"),
-    );
+    const parsed = parseCommandDocument(displayPath, fs.readText(absolutePath));
     issues.push(...parsed.issues);
     const document = parsed.document;
     if (document === undefined) continue;
@@ -311,7 +321,7 @@ export const validateCommandPackage = (
     const dependencyLabel = npmDependency ?? delegation.plugin;
     if (
       skillPackage !== undefined &&
-      !existsSync(join(skillPackage, delegation.skill, "SKILL.md"))
+      !fs.isFile(join(skillPackage, delegation.skill, "SKILL.md"))
     ) {
       issues.push(
         issue(
@@ -325,7 +335,7 @@ export const validateCommandPackage = (
     if (skillPackage !== undefined) {
       const skillPath = join(skillPackage, delegation.skill, "SKILL.md");
       const reference = operationReference(delegation.operation);
-      if (!readFileSync(skillPath, "utf8").includes(`](${reference})`)) {
+      if (!fs.readText(skillPath).includes(`](${reference})`)) {
         issues.push(
           issue(
             "delegation.operation-missing",

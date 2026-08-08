@@ -1,7 +1,10 @@
 import {execFileSync} from "node:child_process";
-import {existsSync, readFileSync} from "node:fs";
 import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
 
 interface PackageJson {
@@ -68,18 +71,16 @@ export const detectVersionChanges = (
   commit: string,
   projects: readonly MoonProject[],
   git: GitReader,
+  fs: FileSystem = nodeFileSystem,
 ): readonly string[] => {
   const changed: string[] = [];
 
   for (const project of projects) {
     const relativePath = `${project.source}/package.json`;
     const currentPath = join(rootDir, relativePath);
-    if (!existsSync(currentPath)) continue;
+    if (!fs.isFile(currentPath)) continue;
 
-    const current = parsePackage(
-      readFileSync(currentPath, "utf8"),
-      currentPath,
-    );
+    const current = parsePackage(fs.readText(currentPath), currentPath);
     const currentVersion = publishableVersion(current, currentPath);
     if (currentVersion === undefined) continue;
 

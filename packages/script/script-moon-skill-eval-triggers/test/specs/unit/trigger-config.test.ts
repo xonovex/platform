@@ -1,7 +1,7 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {beforeEach, describe, expect, it} from "vitest";
 import {
   resolveTriggerConfig,
   type TriggerConfig,
@@ -39,34 +39,39 @@ const failureMessage = (
   return result.error;
 };
 
-describe("trigger configuration", () => {
-  let directory: string;
+const DIRECTORY = "/skill";
 
-  beforeEach(() => {
-    directory = mkdtempSync(join(tmpdir(), "skill-trigger-config-"));
-    writeFileSync(
-      join(directory, "SKILL.md"),
-      "---\nname: 'plugin:test-skill'\n---\n",
-    );
-    writeFileSync(
-      join(directory, "eval-queries.json"),
-      JSON.stringify([query("train"), query("validation", "validation")]),
-    );
-    const manifestDirectory = join(directory, "plugin", ".claude-plugin");
-    mkdirSync(manifestDirectory, {recursive: true});
-    writeFileSync(
-      join(manifestDirectory, "plugin.json"),
-      JSON.stringify({
-        name: "test-plugin",
-        version: "0.0.0",
-        dependencies: [],
-        skills: ["./skills/test-skill"],
-      }),
-    );
+// The guide a run resolves from: its SKILL.md, its queries, and the plugin
+// manifest a Claude run loads the skill through.
+const guideTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
+  memoryFileSystem({
+    files: {
+      ...(skill
+        ? {
+            [join(DIRECTORY, "SKILL.md")]:
+              "---\nname: 'plugin:test-skill'\n---\n",
+          }
+        : {}),
+      [join(DIRECTORY, "eval-queries.json")]: JSON.stringify([
+        query("train"),
+        query("validation", "validation"),
+      ]),
+      [join(DIRECTORY, "plugin", ".claude-plugin", "plugin.json")]:
+        JSON.stringify({
+          name: "test-plugin",
+          version: "0.0.0",
+          dependencies: [],
+          skills: ["./skills/test-skill"],
+        }),
+    },
   });
 
-  afterEach(() => {
-    rmSync(directory, {recursive: true, force: true});
+describe("trigger configuration", () => {
+  const directory = DIRECTORY;
+  let fs: FileSystem;
+
+  beforeEach(() => {
+    fs = guideTree();
   });
 
   const resolveConfig = (
@@ -76,6 +81,7 @@ describe("trigger configuration", () => {
     > = defaultEnvironment,
   ) =>
     resolveTriggerConfig(argv, {
+      fs,
       environment,
       executableRuns: () => true,
       resolveExecutablePath: () => "/bin/claude",
@@ -190,7 +196,7 @@ describe("trigger configuration", () => {
       "invalid evaluator options",
     );
 
-    rmSync(join(directory, "SKILL.md"));
+    fs = guideTree({skill: false});
     expect(failureMessage(resolveConfig(), "usage")).toContain(
       "arguments are required: skill_name",
     );
@@ -203,6 +209,7 @@ describe("trigger configuration", () => {
     expect(
       failureMessage(
         resolveTriggerConfig([], {
+          fs,
           environment: {PLUGIN_DIR: "plugin"},
           executableRuns: () => true,
           resolveExecutablePath: () => void 0,
@@ -214,6 +221,7 @@ describe("trigger configuration", () => {
     expect(
       failureMessage(
         resolveTriggerConfig([], {
+          fs,
           environment: {PLUGIN_DIR: "plugin"},
           executableRuns: () => false,
           resolveExecutablePath: () => "/bin/claude",
@@ -229,17 +237,17 @@ describe("trigger configuration", () => {
 
   it("rejects malformed queries and empty split selections", () => {
     const queriesFile = join(directory, "eval-queries.json");
-    writeFileSync(queriesFile, "not-json");
+    fs.writeFile(queriesFile, "not-json");
     expect(failureMessage(resolveConfig(), "runtime")).toContain(
       "invalid JSON",
     );
 
-    writeFileSync(queriesFile, JSON.stringify([]));
+    fs.writeFile(queriesFile, JSON.stringify([]));
     expect(failureMessage(resolveConfig(), "runtime")).toContain(
       "invalid queries",
     );
 
-    writeFileSync(queriesFile, JSON.stringify([query("train")]));
+    fs.writeFile(queriesFile, JSON.stringify([query("train")]));
     expect(
       failureMessage(
         resolveConfig(["eval-queries.json", "skill", "validation"]),
@@ -258,12 +266,12 @@ describe("trigger configuration", () => {
     const catalogRoot = join(directory, "catalog");
     for (const entry of entries) {
       const guideDirectory = join(catalogRoot, entry.directory, entry.name);
-      mkdirSync(guideDirectory, {recursive: true});
-      writeFileSync(
+      fs.makeDirectory(guideDirectory);
+      fs.writeFile(
         join(guideDirectory, "SKILL.md"),
         `---\nname: ${entry.name}\n---\n`,
       );
-      writeFileSync(
+      fs.writeFile(
         join(guideDirectory, "eval-queries.json"),
         JSON.stringify(entry.queries),
       );
@@ -272,7 +280,7 @@ describe("trigger configuration", () => {
   };
 
   it("leaves a query another catalog skill owns to the routing evaluator", () => {
-    writeFileSync(
+    fs.writeFile(
       join(directory, "eval-queries.json"),
       JSON.stringify([query("own concept"), negative("owned elsewhere")]),
     );
@@ -300,7 +308,7 @@ describe("trigger configuration", () => {
   });
 
   it("keeps a negative no catalog skill claims", () => {
-    writeFileSync(
+    fs.writeFile(
       join(directory, "eval-queries.json"),
       JSON.stringify([query("own concept"), negative("unclaimed")]),
     );
@@ -335,7 +343,7 @@ describe("trigger configuration", () => {
   });
 
   it("rejects oversized batches and accepts a bounded equivalent", () => {
-    writeFileSync(
+    fs.writeFile(
       join(directory, "eval-queries.json"),
       JSON.stringify(
         Array.from({length: 9}, (_, index) => query(String(index))),

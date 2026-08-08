@@ -1,6 +1,6 @@
-import {mkdirSync, mkdtempSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
   checkCommandBudgets,
@@ -10,31 +10,33 @@ import {
 const words = (count: number) =>
   Array.from({length: count}, () => "word").join(" ");
 
+const REPOSITORY_ROOT = "/repo";
+const PACKAGE_DIR = join(REPOSITORY_ROOT, "packages", "command", "pkg");
+
 const packageWith = (
   commands: Readonly<Record<string, string>>,
   budgets?: Readonly<Record<string, number>>,
-): {readonly packageDir: string; readonly repositoryRoot: string} => {
-  const repositoryRoot = mkdtempSync(join(tmpdir(), "command-budgets-"));
-  const packageDir = join(repositoryRoot, "packages", "command", "pkg");
-  mkdirSync(join(packageDir, "commands"), {recursive: true});
-  for (const [name, text] of Object.entries(commands)) {
-    writeFileSync(join(packageDir, "commands", name), text, "utf8");
-  }
-  if (budgets !== undefined) {
-    writeFileSync(
-      join(repositoryRoot, "budgets.json"),
-      JSON.stringify(budgets),
-      "utf8",
-    );
-  }
-  return {packageDir, repositoryRoot};
-};
+): FileSystem =>
+  memoryFileSystem({
+    directories: [join(PACKAGE_DIR, "commands")],
+    files: {
+      ...Object.fromEntries(
+        Object.entries(commands).map(([name, text]) => [
+          join(PACKAGE_DIR, "commands", name),
+          text,
+        ]),
+      ),
+      ...(budgets === undefined
+        ? {}
+        : {[join(REPOSITORY_ROOT, "budgets.json")]: JSON.stringify(budgets)}),
+    },
+  });
 
 describe("command budgets", () => {
   it("keys command files by repository-relative path", () => {
-    const {packageDir, repositoryRoot} = packageWith({"a.md": "one two"});
+    const fs = packageWith({"a.md": "one two"});
 
-    expect(commandFiles(packageDir, repositoryRoot)).toEqual([
+    expect(commandFiles(PACKAGE_DIR, REPOSITORY_ROOT, fs)).toEqual([
       {
         kind: "command",
         path: "packages/command/pkg/commands/a.md",
@@ -44,28 +46,40 @@ describe("command budgets", () => {
   });
 
   it("returns nothing for a package without a commands directory", () => {
-    const repositoryRoot = mkdtempSync(join(tmpdir(), "command-budgets-"));
+    const fs = memoryFileSystem({directories: [REPOSITORY_ROOT]});
 
-    expect(commandFiles(repositoryRoot, repositoryRoot)).toEqual([]);
+    expect(commandFiles(REPOSITORY_ROOT, REPOSITORY_ROOT, fs)).toEqual([]);
   });
 
   it("stays silent when every command is within budget", () => {
-    const {packageDir, repositoryRoot} = packageWith(
+    const fs = packageWith(
       {"a.md": "one two three"},
       {"packages/command/pkg/commands/a.md": 3},
     );
 
-    expect(checkCommandBudgets(packageDir, repositoryRoot)).toEqual([]);
+    expect(
+      checkCommandBudgets(PACKAGE_DIR, REPOSITORY_ROOT, "warn", fs),
+    ).toEqual([]);
   });
 
   it("warns in warn mode and fails in enforce mode", () => {
-    const {packageDir, repositoryRoot} = packageWith(
+    const fs = packageWith(
       {"a.md": words(300)},
       {"packages/command/pkg/commands/a.md": 10},
     );
 
-    const warned = checkCommandBudgets(packageDir, repositoryRoot, "warn");
-    const enforced = checkCommandBudgets(packageDir, repositoryRoot, "enforce");
+    const warned = checkCommandBudgets(
+      PACKAGE_DIR,
+      REPOSITORY_ROOT,
+      "warn",
+      fs,
+    );
+    const enforced = checkCommandBudgets(
+      PACKAGE_DIR,
+      REPOSITORY_ROOT,
+      "enforce",
+      fs,
+    );
 
     expect(warned).toHaveLength(1);
     expect(warned[0]?.severity).toBe("warning");
@@ -74,19 +88,29 @@ describe("command budgets", () => {
   });
 
   it("applies the command cap when the manifest omits the file", () => {
-    const {packageDir, repositoryRoot} = packageWith({"a.md": words(300)});
+    const fs = packageWith({"a.md": words(300)});
 
-    const issues = checkCommandBudgets(packageDir, repositoryRoot, "warn");
+    const issues = checkCommandBudgets(
+      PACKAGE_DIR,
+      REPOSITORY_ROOT,
+      "warn",
+      fs,
+    );
 
     expect(issues).toHaveLength(1);
     expect(issues[0]?.message).toContain("250-word cap");
   });
 
   it("reports a malformed manifest as an error regardless of mode", () => {
-    const {packageDir, repositoryRoot} = packageWith({"a.md": "one"});
-    writeFileSync(join(repositoryRoot, "budgets.json"), "{", "utf8");
+    const fs = packageWith({"a.md": "one"});
+    fs.writeFile(join(REPOSITORY_ROOT, "budgets.json"), "{");
 
-    const issues = checkCommandBudgets(packageDir, repositoryRoot, "warn");
+    const issues = checkCommandBudgets(
+      PACKAGE_DIR,
+      REPOSITORY_ROOT,
+      "warn",
+      fs,
+    );
 
     expect(issues).toHaveLength(1);
     expect(issues[0]?.severity).toBe("error");

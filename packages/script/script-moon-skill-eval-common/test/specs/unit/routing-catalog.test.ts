@@ -1,7 +1,7 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join, resolve} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
+import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {describe, expect, it} from "vitest";
 import {
   buildRoutingScenarios,
   conflictingQueryOwners,
@@ -9,60 +9,54 @@ import {
   unresolvedOperationRationales,
 } from "../../../src/routing-catalog.js";
 
-const temporaryDirectories: string[] = [];
+const ROOT = "/catalog";
 
-const addSkill = (
-  root: string,
-  name: string,
-  queries: readonly unknown[],
-  references: readonly string[] = [],
-): void => {
-  const plugin = join(root, `skill-${name}`);
-  const guide = join(plugin, `${name}-guide`);
-  mkdirSync(join(plugin, ".claude-plugin"), {recursive: true});
-  mkdirSync(guide, {recursive: true});
-  writeFileSync(
-    join(plugin, ".claude-plugin", "plugin.json"),
-    JSON.stringify({
+interface Skill {
+  readonly name: string;
+  readonly queries: readonly unknown[];
+  readonly references?: readonly string[];
+}
+
+// A catalog is a set of skill plugins, each holding one guide with its queries
+// and, optionally, the reference files an operation rationale can name.
+const catalog = (...skills: readonly Skill[]): FileSystem => {
+  const files: Record<string, string> = {};
+  for (const {name, queries, references = []} of skills) {
+    const plugin = join(ROOT, `skill-${name}`);
+    const guide = join(plugin, `${name}-guide`);
+    files[join(plugin, ".claude-plugin", "plugin.json")] = JSON.stringify({
       name: `xonovex-skill-${name}`,
       skills: [`./${name}-guide`],
-    }),
-  );
-  writeFileSync(
-    join(guide, "SKILL.md"),
-    `---\nname: ${name}-guide\ndescription: Use for ${name}.\n---\n`,
-  );
-  writeFileSync(join(guide, "eval-queries.json"), JSON.stringify(queries));
-  if (references.length === 0) return;
-  mkdirSync(join(guide, "references"), {recursive: true});
-  for (const reference of references) {
-    writeFileSync(
-      join(guide, "references", `${reference}.md`),
-      `# ${reference}\n`,
-    );
+    });
+    files[join(guide, "SKILL.md")] =
+      `---\nname: ${name}-guide\ndescription: Use for ${name}.\n---\n`;
+    files[join(guide, "eval-queries.json")] = JSON.stringify(queries);
+    for (const reference of references) {
+      files[join(guide, "references", `${reference}.md`)] = `# ${reference}\n`;
+    }
   }
+  return memoryFileSystem({files});
 };
-
-afterEach(() => {
-  for (const directory of temporaryDirectories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  temporaryDirectories.length = 0;
-});
 
 describe("routing catalog", () => {
   it("builds competitive scenarios from one positive and shared negatives", () => {
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(root, "alpha", [
-      {query: "shared request", should_trigger: true, split: "validation"},
-      {query: "alpha only", should_trigger: true, split: "train"},
-    ]);
-    addSkill(root, "beta", [
-      {query: "shared request", should_trigger: false, split: "validation"},
-    ]);
+    const fs = catalog(
+      {
+        name: "alpha",
+        queries: [
+          {query: "shared request", should_trigger: true, split: "validation"},
+          {query: "alpha only", should_trigger: true, split: "train"},
+        ],
+      },
+      {
+        name: "beta",
+        queries: [
+          {query: "shared request", should_trigger: false, split: "validation"},
+        ],
+      },
+    );
 
-    expect(buildRoutingScenarios(root)).toEqual([
+    expect(buildRoutingScenarios(ROOT, fs)).toEqual([
       {
         query: "shared request",
         split: "validation",
@@ -73,55 +67,68 @@ describe("routing catalog", () => {
         ],
       },
     ]);
-    expect(missingValidationRoutingOwners(root)).toEqual(["beta-guide"]);
-  });
-
-  it("gives every catalog skill a validation routing scenario", () => {
-    const catalogRoot = resolve(import.meta.dirname, "../../../../../skill");
-
-    const missingOwners = missingValidationRoutingOwners(catalogRoot);
-
-    expect(missingOwners).toEqual([]);
+    expect(missingValidationRoutingOwners(ROOT, fs)).toEqual(["beta-guide"]);
   });
 
   it("reports a query two skills claim, ignoring case and closing punctuation", () => {
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(root, "alpha", [
-      {query: "Record the decision.", should_trigger: true, split: "train"},
-    ]);
-    addSkill(root, "beta", [
-      {query: "record the   decision", should_trigger: true, split: "train"},
-    ]);
-    addSkill(root, "gamma", [
-      {query: "Record the decision.", should_trigger: false, split: "train"},
-    ]);
+    const fs = catalog(
+      {
+        name: "alpha",
+        queries: [
+          {query: "Record the decision.", should_trigger: true, split: "train"},
+        ],
+      },
+      {
+        name: "beta",
+        queries: [
+          {
+            query: "record the   decision",
+            should_trigger: true,
+            split: "train",
+          },
+        ],
+      },
+      {
+        name: "gamma",
+        queries: [
+          {
+            query: "Record the decision.",
+            should_trigger: false,
+            split: "train",
+          },
+        ],
+      },
+    );
 
-    expect(conflictingQueryOwners(root)).toEqual([
+    expect(conflictingQueryOwners(ROOT, fs)).toEqual([
       {owners: ["alpha-guide", "beta-guide"], query: "Record the decision."},
     ]);
   });
 
   it("leaves a query with one claimant and many negatives alone", () => {
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(root, "alpha", [
-      {query: "shared request", should_trigger: true, split: "train"},
-    ]);
-    addSkill(root, "beta", [
-      {query: "shared request", should_trigger: false, split: "train"},
-    ]);
+    const fs = catalog(
+      {
+        name: "alpha",
+        queries: [
+          {query: "shared request", should_trigger: true, split: "train"},
+        ],
+      },
+      {
+        name: "beta",
+        queries: [
+          {query: "shared request", should_trigger: false, split: "train"},
+        ],
+      },
+    );
 
-    expect(conflictingQueryOwners(root)).toEqual([]);
+    expect(conflictingQueryOwners(ROOT, fs)).toEqual([]);
   });
 
   it("reports a rationale citing an operation no skill owns a reference for", () => {
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(
-      root,
-      "alpha",
-      [
+    const fs = catalog({
+      name: "alpha",
+      references: ["alpha-revise"],
+      queries: [
         {
           query: "settle this",
           rationale: "settling it is the alpha-decide operation",
@@ -135,10 +142,9 @@ describe("routing catalog", () => {
           split: "train",
         },
       ],
-      ["alpha-revise"],
-    );
+    });
 
-    expect(unresolvedOperationRationales(root)).toEqual([
+    expect(unresolvedOperationRationales(ROOT, fs)).toEqual([
       {
         operation: "alpha-decide",
         rationale: "settling it is the alpha-decide operation",
@@ -148,35 +154,29 @@ describe("routing catalog", () => {
   });
 
   it("does not read an English compound as an operation identifier", () => {
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(root, "alpha", [
-      {
-        query: "tag the release",
-        rationale:
-          "A direct version-control operation needs no workflow boundary.",
-        should_trigger: false,
-        split: "train",
-      },
-    ]);
+    const fs = catalog({
+      name: "alpha",
+      queries: [
+        {
+          query: "tag the release",
+          rationale:
+            "A direct version-control operation needs no workflow boundary.",
+          should_trigger: false,
+          split: "train",
+        },
+      ],
+    });
 
-    expect(unresolvedOperationRationales(root)).toEqual([]);
-  });
-
-  it("keeps the catalog free of claimed-twice queries and phantom operations", () => {
-    const catalogRoot = resolve(import.meta.dirname, "../../../../../skill");
-
-    expect(conflictingQueryOwners(catalogRoot)).toEqual([]);
-    expect(unresolvedOperationRationales(catalogRoot)).toEqual([]);
+    expect(unresolvedOperationRationales(ROOT, fs)).toEqual([]);
   });
 
   it("rejects missing roots and malformed query files", () => {
-    expect(() => buildRoutingScenarios("/missing-routing-catalog")).toThrow(
-      "catalog root not found",
-    );
-    const root = mkdtempSync(join(tmpdir(), "routing-catalog-"));
-    temporaryDirectories.push(root);
-    addSkill(root, "alpha", []);
-    expect(() => buildRoutingScenarios(root)).toThrow("invalid queries");
+    expect(() =>
+      buildRoutingScenarios("/missing-routing-catalog", memoryFileSystem()),
+    ).toThrow("catalog root not found");
+
+    expect(() =>
+      buildRoutingScenarios(ROOT, catalog({name: "alpha", queries: []})),
+    ).toThrow("invalid queries");
   });
 });

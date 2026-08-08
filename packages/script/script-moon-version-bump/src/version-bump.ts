@@ -1,6 +1,9 @@
-import {existsSync} from "node:fs";
 import {join} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
 import {findAllPackageJsonPaths} from "@xonovex/script-moon-common/moon-query";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
@@ -39,11 +42,19 @@ const validateVersionRequest = (
 export interface VersionBumpDependencies {
   readonly git: GitRunner;
   readonly listPackagePaths: (rootDir: string) => readonly string[];
+  readonly fs: FileSystem;
+  // How the planned changes are installed. The transaction owns the ordering and
+  // the rollback; supplying it here lets a run be planned without a disk.
+  readonly applyChanges: (changes: readonly FileChange[]) => void;
 }
 
 export const defaultDependencies: VersionBumpDependencies = {
   git: runGit,
   listPackagePaths: findAllPackageJsonPaths,
+  fs: nodeFileSystem,
+  applyChanges: (changes) => {
+    applyFileChanges(changes);
+  },
 };
 
 export const main = (
@@ -51,7 +62,7 @@ export const main = (
   workingDirectory = process.cwd(),
   dependencies: VersionBumpDependencies = defaultDependencies,
 ): number => {
-  const {git, listPackagePaths} = dependencies;
+  const {applyChanges, fs, git, listPackagePaths} = dependencies;
   const {values, positionals} = parseCliArgs(
     {
       name: "moon-version-bump",
@@ -123,7 +134,7 @@ export const main = (
 
   if (lockstep !== undefined) {
     validateVersionRequest(exact, bumpType);
-    const lockstepRoot = findWorkspaceRoot(workingDirectory);
+    const lockstepRoot = findWorkspaceRoot(workingDirectory, undefined, fs);
     return runLockstep({
       rootDir: lockstepRoot,
       packages: readWorkspacePackages(lockstepRoot, git, listPackagePaths),
@@ -143,11 +154,11 @@ export const main = (
 
   const pkgPath = join(workingDirectory, "package.json");
 
-  if (!existsSync(pkgPath)) {
+  if (!fs.isFile(pkgPath)) {
     throw new Error("no package.json found in current directory");
   }
 
-  const pkg = readPkg(pkgPath);
+  const pkg = readPkg(pkgPath, fs);
   if (!pkg.name || !pkg.version) {
     throw new Error("package.json is missing a name or version");
   }
@@ -155,7 +166,7 @@ export const main = (
   validateVersionRequest(exact, bumpType);
 
   const oldVersion = pkg.version;
-  const rootDir = findWorkspaceRoot(workingDirectory);
+  const rootDir = findWorkspaceRoot(workingDirectory, undefined, fs);
   const gitVersion = getGitVersion(rootDir, pkgPath, git);
   let newVersion: string;
   const changes: FileChange[] = [];
@@ -179,6 +190,7 @@ export const main = (
   const dependentChanges = noDependents
     ? {updated: 0, changes: []}
     : planDependentUpdates({
+        fs,
         rootDir,
         packagePaths: listPackagePaths(rootDir),
         packagePath: pkgPath,
@@ -201,7 +213,7 @@ export const main = (
       oldVersion,
       newVersion,
       dryRun,
-      depUpdates: detectDepUpdates(rootDir, pkgPath, readPkg(pkgPath)),
+      depUpdates: detectDepUpdates(rootDir, pkgPath, readPkg(pkgPath, fs)),
       changelogFilename: changelogPath,
       gitBase,
       includedTypes,
@@ -210,7 +222,7 @@ export const main = (
     if (changelog !== undefined) changes.push(changelog);
   }
 
-  if (!dryRun) applyFileChanges(changes);
+  if (!dryRun) applyChanges(changes);
 
   const prefix = dryRun ? "[dry-run] Would bump" : "Bumped";
   logSuccess(

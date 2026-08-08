@@ -1,5 +1,5 @@
-import {readFileSync, writeFileSync} from "node:fs";
 import {z} from "zod";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
 const DependencyMapSchema = z.record(z.string(), z.string());
 const BinSchema = z.union([z.string(), z.record(z.string(), z.string())]);
@@ -57,9 +57,15 @@ export const parsePackageJson = (text: string, source: string): PackageJson => {
   return result.data;
 };
 
-export const readPkg = (path: string): PackageJson =>
-  parsePackageJson(readFileSync(path, "utf8"), path);
+export const readPkg = (
+  path: string,
+  fs: FileSystem = nodeFileSystem,
+): PackageJson => parsePackageJson(fs.readText(path), path);
 
-export const writePkg = (path: string, pkg: PackageJson): void => {
-  writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
+export const writePkg = (
+  path: string,
+  pkg: PackageJson,
+  fs: FileSystem = nodeFileSystem,
+): void => {
+  fs.writeFile(path, JSON.stringify(pkg, null, 2) + "\n");
 };

@@ -8,6 +8,10 @@
       "types": "./src/trigger-process.ts",
       "default": "./dist/src/trigger-process.js"
     },
+    "./trigger-scan": {
+      "types": "./src/trigger-scan.ts",
+      "default": "./dist/src/trigger-scan.js"
+    },
     "./validation": {
       "types": "./src/validation.ts",
       "default": "./dist/src/validation.js"

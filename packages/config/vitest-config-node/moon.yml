@@ -15,3 +15,9 @@ workspace:
     # coverage gate would measure nothing.
     exclude:
       - ts-coverage
+fileGroups:
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/config/vitest-config-base/src/**/*

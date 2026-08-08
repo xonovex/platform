@@ -1,5 +1,9 @@
 import {resolve} from "node:path";
 import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
+import {
   conflictingQueryOwners,
   missingValidationRoutingOwners,
   unresolvedOperationRationales,
@@ -25,7 +29,10 @@ const HELP = [
   "  -h, --help    show this help message and exit",
 ].join("\n");
 
-export const main = (argv: readonly string[]): number => {
+export const main = (
+  argv: readonly string[],
+  fs: FileSystem = nodeFileSystem,
+): number => {
   if (argv.includes("-h") || argv.includes("--help")) {
     console.log(HELP);
     return 0;
@@ -39,13 +46,13 @@ export const main = (argv: readonly string[]): number => {
   const catalogRoot = resolve(argv[0] ?? "packages/skill");
   const failures: string[] = [];
   try {
-    for (const owner of missingValidationRoutingOwners(catalogRoot)) {
+    for (const owner of missingValidationRoutingOwners(catalogRoot, fs)) {
       failures.push(
         `routing: ${owner} owns no validation-split routing scenario; ` +
           "another skill must carry one of its validation positives as a negative",
       );
     }
-    for (const {owners, query} of conflictingQueryOwners(catalogRoot)) {
+    for (const {owners, query} of conflictingQueryOwners(catalogRoot, fs)) {
       failures.push(
         `routing: ${owners.join(" and ")} both mark "${query}" should_trigger; ` +
           "exactly one skill owns a query and the others carry it as a negative",
@@ -53,6 +60,7 @@ export const main = (argv: readonly string[]): number => {
     }
     for (const {operation, skill} of unresolvedOperationRationales(
       catalogRoot,
+      fs,
     )) {
       failures.push(
         `routing: ${skill} cites the '${operation}' operation, which no skill ` +

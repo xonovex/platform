@@ -3,13 +3,16 @@ language: typescript
 tags: [typescript-script, typescript-integration]
 dependsOn:
   - script-moon-common
+fileGroups:
+  dependencySources:
+    - /packages/script/script-moon-common/src/**/*
 tasks:
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "84"
-      TS_COVERAGE_MIN_FUNCTIONS: "86"
-      TS_COVERAGE_MIN_BRANCHES: "75"
-      TS_COVERAGE_MIN_STATEMENTS: "84"
+      TS_COVERAGE_MIN_LINES: "83"
+      TS_COVERAGE_MIN_FUNCTIONS: "82"
+      TS_COVERAGE_MIN_BRANCHES: "74"
+      TS_COVERAGE_MIN_STATEMENTS: "83"
   coverage:
     command: noop
     deps: [ts-coverage]

@@ -1,3 +1,4 @@
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
   runTriggerEvaluation,
@@ -14,6 +15,9 @@ const optionsWith = (
   threshold: 0.5,
   skillName: "test-skill",
   workspace: undefined,
+  // No workspace, so nothing is written; the port is supplied because the
+  // options require it.
+  fs: memoryFileSystem(),
   check,
 });
 

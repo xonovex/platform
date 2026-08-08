@@ -1,55 +1,59 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
-import {resolveGitignorePath} from "../../../src/gitignore.js";
+import {describe, expect, it} from "vitest";
+import {resolveGitignorePath, type PathExists} from "../../../src/gitignore.js";
+
+const ROOT = "/repo";
+const SOURCE_PATH = join(ROOT, "src", "index.js");
+
+// A tree is just the set of paths the walk asks about.
+const present = (...paths: readonly string[]): PathExists => {
+  const set = new Set(paths);
+  return (path) => set.has(path);
+};
+
+// A repository root is the .git and package.json pair, plus the .gitignore the
+// walk is looking for.
+const repository = (includeGitignore: boolean): PathExists =>
+  present(
+    join(ROOT, ".git"),
+    join(ROOT, "package.json"),
+    ...(includeGitignore ? [join(ROOT, ".gitignore")] : []),
+  );
 
 describe("resolveGitignorePath", () => {
-  const temporaryDirectories: string[] = [];
-
-  afterEach(() => {
-    for (const directory of temporaryDirectories) {
-      rmSync(directory, {recursive: true, force: true});
-    }
-    temporaryDirectories.length = 0;
-  });
-
-  function repository(includeGitignore: boolean): {
-    root: string;
-    sourcePath: string;
-  } {
-    const root = mkdtempSync(join(tmpdir(), "eslint-config-base-"));
-    temporaryDirectories.push(root);
-    mkdirSync(join(root, ".git"));
-    mkdirSync(join(root, "src"));
-    writeFileSync(join(root, "package.json"), "{}");
-    if (includeGitignore) writeFileSync(join(root, ".gitignore"), "dist\n");
-    return {root, sourcePath: join(root, "src", "index.js")};
-  }
-
   it("finds the repository gitignore from a nested source path", () => {
-    const {root, sourcePath} = repository(true);
-
-    const result = resolveGitignorePath(sourcePath);
-
-    expect(result).toBe(join(root, ".gitignore"));
+    expect(resolveGitignorePath(SOURCE_PATH, repository(true))).toBe(
+      join(ROOT, ".gitignore"),
+    );
   });
 
   it("returns undefined when a repository has no gitignore", () => {
-    const {sourcePath} = repository(false);
-
-    const result = resolveGitignorePath(sourcePath);
-
-    expect(result).toBeUndefined();
+    expect(
+      resolveGitignorePath(SOURCE_PATH, repository(false)),
+    ).toBeUndefined();
   });
 
   it("returns undefined outside a Git repository", () => {
-    const root = mkdtempSync(join(tmpdir(), "eslint-config-base-"));
-    temporaryDirectories.push(root);
-    const sourcePath = join(root, "src", "index.js");
+    expect(resolveGitignorePath(SOURCE_PATH, present())).toBeUndefined();
+  });
 
-    const result = resolveGitignorePath(sourcePath);
+  it("walks up from a deeply nested path to the repository root", () => {
+    const nested = join(ROOT, "packages", "a", "b", "src", "index.js");
 
-    expect(result).toBeUndefined();
+    expect(resolveGitignorePath(nested, repository(true))).toBe(
+      join(ROOT, ".gitignore"),
+    );
+  });
+
+  it("passes over a nested package that carries no repository marker", () => {
+    const nested = join(ROOT, "packages", "a", "src", "index.js");
+    const exists = present(
+      join(ROOT, "packages", "a", "package.json"),
+      join(ROOT, ".git"),
+      join(ROOT, "package.json"),
+      join(ROOT, ".gitignore"),
+    );
+
+    expect(resolveGitignorePath(nested, exists)).toBe(join(ROOT, ".gitignore"));
   });
 });

@@ -1,5 +1,5 @@
-import {accessSync, constants, statSync} from "node:fs";
 import {delimiter, isAbsolute, resolve, sep} from "node:path";
+import {nodeFileSystem, type FileSystem} from "./file-system.js";
 
 const executableExtensions = (): readonly string[] =>
   process.platform === "win32"
@@ -9,6 +9,7 @@ const executableExtensions = (): readonly string[] =>
 export const resolveExecutable = (
   name: string,
   searchPath = process.env.PATH,
+  fs: FileSystem = nodeFileSystem,
 ): string => {
   if (
     name.length === 0 ||
@@ -30,12 +31,7 @@ export const resolveExecutable = (
     .filter((entry) => isAbsolute(entry))) {
     for (const extension of executableExtensions()) {
       const candidate = resolve(directory, `${name}${extension}`);
-      try {
-        accessSync(candidate, constants.X_OK);
-        if (statSync(candidate).isFile()) return candidate;
-      } catch {
-        // Continue searching the remaining PATH entries.
-      }
+      if (fs.isExecutableFile(candidate)) return candidate;
     }
   }
 

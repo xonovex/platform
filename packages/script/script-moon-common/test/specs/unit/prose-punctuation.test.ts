@@ -1,7 +1,6 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
+import {memoryFileSystem} from "../../../src/file-system-memory.js";
 import {
   prosePunctuationFindings,
   scanProsePunctuation,
@@ -93,51 +92,50 @@ describe("prosePunctuationFindings", () => {
 });
 
 describe("scanProsePunctuation", () => {
-  let root: string;
+  const ROOT = "/repo";
 
-  beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "moon-common-punctuation-"));
-  });
-
-  afterEach(() => {
-    rmSync(root, {recursive: true, force: true});
-  });
+  const scan = (files: Readonly<Record<string, string>>) =>
+    scanProsePunctuation(
+      ROOT,
+      memoryFileSystem({
+        files: Object.fromEntries(
+          Object.entries(files).map(([path, text]) => [join(ROOT, path), text]),
+        ),
+      }),
+    );
 
   it("walks prose files and returns root-relative paths", () => {
-    mkdirSync(join(root, "guide", "references"), {recursive: true});
-    writeFileSync(join(root, "package.json"), '{"description": "plain"}\n');
-    writeFileSync(join(root, "guide", "SKILL.md"), `a ${EM_DASH} b\n`);
-    writeFileSync(
-      join(root, "guide", "references", "one.md"),
-      `x${ELLIPSIS}\n`,
-    );
-    expect(
-      scanProsePunctuation(root).map(({label, path}) => [path, label]),
-    ).toEqual([
+    const findings = scan({
+      "package.json": '{"description": "plain"}\n',
+      [join("guide", "SKILL.md")]: `a ${EM_DASH} b\n`,
+      [join("guide", "references", "one.md")]: `x${ELLIPSIS}\n`,
+    });
+
+    expect(findings.map(({label, path}) => [path, label])).toEqual([
       [join("guide", "SKILL.md"), "em dash"],
       [join("guide", "references", "one.md"), "ellipsis"],
     ]);
   });
 
   it("scans bundled scripts and asset templates", () => {
-    mkdirSync(join(root, "scripts"), {recursive: true});
-    writeFileSync(
-      join(root, "scripts", "validate.py"),
-      `# note ${EM_DASH} detail\n`,
-    );
-    writeFileSync(join(root, "SKILL.md.template"), `{a} ${EM_DASH} {b}\n`);
-    expect(scanProsePunctuation(root).map(({path}) => path)).toEqual([
+    const findings = scan({
+      [join("scripts", "validate.py")]: `# note ${EM_DASH} detail\n`,
+      "SKILL.md.template": `{a} ${EM_DASH} {b}\n`,
+    });
+
+    expect(findings.map(({path}) => path)).toEqual([
       "SKILL.md.template",
       join("scripts", "validate.py"),
     ]);
   });
 
   it("skips generated directories and non-prose files", () => {
-    mkdirSync(join(root, "dist"), {recursive: true});
-    mkdirSync(join(root, "node_modules"), {recursive: true});
-    writeFileSync(join(root, "dist", "index.md"), `a ${EM_DASH} b\n`);
-    writeFileSync(join(root, "node_modules", "dep.md"), `a ${EM_DASH} b\n`);
-    writeFileSync(join(root, "logo.svg"), `<!-- ${EM_DASH} -->\n`);
-    expect(scanProsePunctuation(root)).toEqual([]);
+    expect(
+      scan({
+        [join("dist", "index.md")]: `a ${EM_DASH} b\n`,
+        [join("node_modules", "dep.md")]: `a ${EM_DASH} b\n`,
+        "logo.svg": `<!-- ${EM_DASH} -->\n`,
+      }),
+    ).toEqual([]);
   });
 });

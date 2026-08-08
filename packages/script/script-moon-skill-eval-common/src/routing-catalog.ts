@@ -1,5 +1,8 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {join, resolve} from "node:path";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {
   isDirectory,
@@ -26,10 +29,10 @@ interface QueryOccurrence {
   readonly query: Query;
 }
 
-const readQueries = (path: string): readonly Query[] => {
+const readQueries = (path: string, fs: FileSystem): readonly Query[] => {
   let input: unknown;
   try {
-    input = JSON.parse(readFileSync(path, "utf8"));
+    input = JSON.parse(fs.readText(path));
   } catch (error: unknown) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`invalid JSON in ${path}: ${detail}`);
@@ -41,17 +44,21 @@ const readQueries = (path: string): readonly Query[] => {
   return result.data;
 };
 
-const catalogCandidates = (catalogRoot: string): readonly RoutingCandidate[] =>
-  readdirSync(catalogRoot)
+const catalogCandidates = (
+  catalogRoot: string,
+  fs: FileSystem,
+): readonly RoutingCandidate[] =>
+  fs
+    .readDirectory(catalogRoot)
     .filter((entry) => entry.startsWith("skill-"))
     .map((entry) => join(catalogRoot, entry))
-    .filter(isDirectory)
+    .filter((path) => isDirectory(path, fs))
     .flatMap((pluginDirectory) => {
-      const guideDirectory = resolveGuideDirectory(pluginDirectory);
+      const guideDirectory = resolveGuideDirectory(pluginDirectory, fs);
       const skillFile = join(guideDirectory, "SKILL.md");
       const queriesFile = join(guideDirectory, "eval-queries.json");
-      if (!isFile(skillFile) || !isFile(queriesFile)) return [];
-      const shortName = parseFrontmatterName(skillFile);
+      if (!isFile(skillFile, fs) || !isFile(queriesFile, fs)) return [];
+      const shortName = parseFrontmatterName(skillFile, fs);
       if (shortName === undefined) {
         throw new Error(`skill name missing from ${skillFile}`);
       }
@@ -60,14 +67,17 @@ const catalogCandidates = (catalogRoot: string): readonly RoutingCandidate[] =>
 
 export const buildRoutingScenarios = (
   catalogRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly RoutingScenario[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+  if (!isDirectory(root, fs))
+    throw new Error(`catalog root not found: ${root}`);
 
   const occurrencesByQuery = new Map<string, QueryOccurrence[]>();
-  for (const candidate of catalogCandidates(root)) {
+  for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
       join(candidate.guideDirectory, "eval-queries.json"),
+      fs,
     );
     for (const query of queries) {
       const occurrences = occurrencesByQuery.get(query.query) ?? [];
@@ -109,14 +119,17 @@ export const buildRoutingScenarios = (
 // one that belongs to no skill at all.
 export const catalogQueryOwners = (
   catalogRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): ReadonlyMap<string, string> => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+  if (!isDirectory(root, fs))
+    throw new Error(`catalog root not found: ${root}`);
 
   const positivesByQuery = new Map<string, string[]>();
-  for (const candidate of catalogCandidates(root)) {
+  for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
       join(candidate.guideDirectory, "eval-queries.json"),
+      fs,
     );
     for (const query of queries) {
       if (!query.should_trigger) continue;
@@ -155,14 +168,17 @@ const normalizeQuery = (query: string): string =>
 // the query its routing coverage on top of the ambiguity itself.
 export const conflictingQueryOwners = (
   catalogRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly QueryOwnerConflict[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+  if (!isDirectory(root, fs))
+    throw new Error(`catalog root not found: ${root}`);
 
   const claimants = new Map<string, {owners: Set<string>; query: string}>();
-  for (const candidate of catalogCandidates(root)) {
+  for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
       join(candidate.guideDirectory, "eval-queries.json"),
+      fs,
     );
     for (const query of queries) {
       if (!query.should_trigger) continue;
@@ -198,17 +214,20 @@ const guideTopic = (shortName: string): string =>
 // English compounds ('a version-control operation') are not identifiers.
 export const unresolvedOperationRationales = (
   catalogRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly UnresolvedOperation[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
+  if (!isDirectory(root, fs))
+    throw new Error(`catalog root not found: ${root}`);
 
-  const candidates = catalogCandidates(root);
+  const candidates = catalogCandidates(root, fs);
   const topics = candidates.map(({shortName}) => guideTopic(shortName));
   const references = new Set(
     candidates.flatMap(({guideDirectory}) => {
       const directory = join(guideDirectory, "references");
-      if (!isDirectory(directory)) return [];
-      return readdirSync(directory)
+      if (!isDirectory(directory, fs)) return [];
+      return fs
+        .readDirectory(directory)
         .filter((entry) => entry.endsWith(".md"))
         .map((entry) => entry.slice(0, -".md".length));
     }),
@@ -218,6 +237,7 @@ export const unresolvedOperationRationales = (
   for (const candidate of candidates) {
     const queries = readQueries(
       join(candidate.guideDirectory, "eval-queries.json"),
+      fs,
     );
     for (const {rationale} of queries) {
       for (const [, operation] of rationale.matchAll(OPERATION_MENTION)) {
@@ -240,14 +260,15 @@ export const unresolvedOperationRationales = (
 
 export const missingValidationRoutingOwners = (
   catalogRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly string[] => {
-  const scenarios = buildRoutingScenarios(catalogRoot);
+  const scenarios = buildRoutingScenarios(catalogRoot, fs);
   const validationOwners = new Set(
     scenarios
       .filter(({split}) => split === "validation")
       .map(({expectedSkill}) => expectedSkill),
   );
-  return catalogCandidates(resolve(catalogRoot))
+  return catalogCandidates(resolve(catalogRoot), fs)
     .map(({shortName}) => shortName)
     .filter((shortName) => !validationOwners.has(shortName))
     .toSorted();

@@ -1,17 +1,13 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main} from "../../../src/routing.js";
 
-const temporaryDirectories: string[] = [];
+const ROOT = "/catalog";
 
 afterEach(() => {
   vi.restoreAllMocks();
-  for (const directory of temporaryDirectories) {
-    rmSync(directory, {recursive: true, force: true});
-  }
-  temporaryDirectories.length = 0;
 });
 
 interface CatalogSkill {
@@ -19,22 +15,14 @@ interface CatalogSkill {
   readonly queries: readonly unknown[];
 }
 
-const writeCatalog = (skills: readonly CatalogSkill[]): string => {
-  const root = mkdtempSync(join(tmpdir(), "routing-"));
-  temporaryDirectories.push(root);
+const writeCatalog = (skills: readonly CatalogSkill[]): FileSystem => {
+  const files: Record<string, string> = {};
   for (const skill of skills) {
-    const guide = join(root, `skill-${skill.name}`, `${skill.name}-guide`);
-    mkdirSync(guide, {recursive: true});
-    writeFileSync(
-      join(guide, "SKILL.md"),
-      `---\nname: ${skill.name}-guide\n---\n`,
-    );
-    writeFileSync(
-      join(guide, "eval-queries.json"),
-      JSON.stringify(skill.queries),
-    );
+    const guide = join(ROOT, `skill-${skill.name}`, `${skill.name}-guide`);
+    files[join(guide, "SKILL.md")] = `---\nname: ${skill.name}-guide\n---\n`;
+    files[join(guide, "eval-queries.json")] = JSON.stringify(skill.queries);
   }
-  return root;
+  return memoryFileSystem({files});
 };
 
 const query = (text: string, shouldTrigger: boolean) => ({
@@ -65,7 +53,7 @@ describe("routing owners check", () => {
 
   it("passes when every skill owns a validation routing scenario", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    const root = writeCatalog([
+    const fs = writeCatalog([
       {
         name: "owner",
         queries: [query("owner's query", true), query("rival's query", false)],
@@ -76,18 +64,18 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([root])).toBe(0);
+    expect(main([ROOT], fs)).toBe(0);
     expect(log.mock.calls.at(-1)?.at(0)).toContain("every skill owns");
   });
 
   it("reports a skill whose only pairing was stripped", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    const root = writeCatalog([
+    const fs = writeCatalog([
       {name: "owner", queries: [query("unpaired routing query", true)]},
       {name: "rival", queries: [query("a query nobody else carries", true)]},
     ]);
 
-    expect(main([root])).toBe(1);
+    expect(main([ROOT], fs)).toBe(1);
     expect(
       log.mock.calls.map((call) => String(call.at(0))).join("\n"),
     ).toContain("owns no validation-split routing scenario");
@@ -95,7 +83,7 @@ describe("routing owners check", () => {
 
   it("reports a query two skills both claim", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    const root = writeCatalog([
+    const fs = writeCatalog([
       {
         name: "owner",
         queries: [
@@ -112,7 +100,7 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([root])).toBe(1);
+    expect(main([ROOT], fs)).toBe(1);
     expect(
       log.mock.calls.map((call) => String(call.at(0))).join("\n"),
     ).toContain(
@@ -122,7 +110,7 @@ describe("routing owners check", () => {
 
   it("reports a rationale citing an operation no reference file backs", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    const root = writeCatalog([
+    const fs = writeCatalog([
       {
         name: "owner",
         queries: [
@@ -144,7 +132,7 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([root])).toBe(1);
+    expect(main([ROOT], fs)).toBe(1);
     expect(
       log.mock.calls.map((call) => String(call.at(0))).join("\n"),
     ).toContain("owner-guide cites the 'owner-decide' operation");
@@ -155,7 +143,7 @@ describe("routing owners check", () => {
       .spyOn(process.stderr, "write")
       .mockImplementation(() => true);
 
-    expect(main([join(tmpdir(), "routing-absent")])).toBe(2);
+    expect(main(["/absent-catalog"], memoryFileSystem())).toBe(2);
     expect(write.mock.calls.at(0)?.at(0)).toContain("catalog root not found");
   });
 });

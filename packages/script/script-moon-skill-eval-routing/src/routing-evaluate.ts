@@ -1,8 +1,12 @@
-import {mkdirSync, rmSync, writeFileSync} from "node:fs";
+import {rmSync} from "node:fs";
 import {join, resolve} from "node:path";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {
@@ -12,8 +16,8 @@ import {
 import {
   checkCodexTriggered,
   checkTriggered,
-  type TriggerOutcome,
 } from "@xonovex/script-moon-skill-eval-common/trigger-process";
+import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
 import {
   buildIsolatedCodexArgs,
   buildTriggerClaudeArgs,
@@ -69,6 +73,30 @@ interface RoutingRecord {
   readonly pass: boolean;
 }
 
+/**
+ * The effects the routing evaluator reaches a harness through. A run supplies the
+ * spawning implementations; a test supplies decisions directly, so a whole catalog
+ * sweep is scored without a process.
+ */
+export interface RoutingDependencies {
+  readonly checkTriggered: typeof checkTriggered;
+  readonly checkCodexTriggered: typeof checkCodexTriggered;
+  readonly resolveExecutable: (command: string) => string;
+  readonly fs: FileSystem;
+  // Removes a previous run's evidence so a rerun cannot be read as this run's.
+  readonly discard: (path: string) => void;
+}
+
+export const defaultDependencies: RoutingDependencies = {
+  checkTriggered,
+  checkCodexTriggered,
+  resolveExecutable,
+  fs: nodeFileSystem,
+  discard: (path) => {
+    rmSync(path, {force: true});
+  },
+};
+
 interface RoutingContext {
   readonly budget: number;
   readonly executable: string;
@@ -76,6 +104,7 @@ interface RoutingContext {
   readonly model: string;
   readonly runs: number;
   readonly threshold: number;
+  readonly dependencies: RoutingDependencies;
 }
 
 interface RoutingFailure {
@@ -100,7 +129,10 @@ const evaluateScenario = async (
           budget: context.budget,
           pluginDirectories: unique(
             scenario.candidates.flatMap(({pluginDirectory}) =>
-              resolveClaudePluginDirectories(pluginDirectory),
+              resolveClaudePluginDirectories(
+                pluginDirectory,
+                context.dependencies.fs,
+              ),
             ),
           ),
         })
@@ -109,14 +141,14 @@ const evaluateScenario = async (
   for (let runIndex = 0; runIndex < context.runs; runIndex += 1) {
     const outcome: TriggerOutcome =
       context.harness === "claude"
-        ? await checkTriggered(
+        ? await context.dependencies.checkTriggered(
             scenario.query,
             args,
             target,
             target,
             context.executable,
           )
-        : await checkCodexTriggered({
+        : await context.dependencies.checkCodexTriggered({
             args,
             executable: context.executable,
             guideDirectory: targetGuide.guideDirectory,
@@ -141,7 +173,10 @@ const evaluateScenario = async (
   };
 };
 
-export const main = async (argv: readonly string[]): Promise<number> => {
+export const main = async (
+  argv: readonly string[],
+  dependencies: RoutingDependencies = defaultDependencies,
+): Promise<number> => {
   const {values, positionals} = parseCliArgs(cliDefinition, argv);
   if (positionals.length > 1) {
     throw new Error(
@@ -179,7 +214,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     limitRaw === undefined
       ? undefined
       : parseNonNegativeInteger("limit", limitRaw);
-  const catalogScenarios = buildRoutingScenarios(catalogRoot);
+  const catalogScenarios = buildRoutingScenarios(catalogRoot, dependencies.fs);
   const owners = new Set(
     ((values.owners as string | undefined) ?? "")
       .split(",")
@@ -209,7 +244,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   }
 
   const harness = harnessInput;
-  const executable = resolveExecutable(harness);
+  const executable = dependencies.resolveExecutable(harness);
   const defaultModel = skillEvalModelDefaults(harness).generation;
   const modelInput =
     (values.model as string | undefined) ??
@@ -222,13 +257,13 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     (values.workspace as string | undefined) ??
       `.skill-eval-results/routing/${harness}`,
   );
-  mkdirSync(workspace, {recursive: true});
+  dependencies.fs.makeDirectory(workspace);
   const resultsPath = join(workspace, "results.jsonl");
   const summaryPath = join(workspace, "summary.json");
   const invalidRunPath = join(workspace, "invalid-run.json");
-  rmSync(resultsPath, {force: true});
-  rmSync(summaryPath, {force: true});
-  rmSync(invalidRunPath, {force: true});
+  dependencies.discard(resultsPath);
+  dependencies.discard(summaryPath);
+  dependencies.discard(invalidRunPath);
 
   const context: RoutingContext = {
     budget,
@@ -237,6 +272,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     model,
     runs,
     threshold,
+    dependencies,
   };
   const records: RoutingRecord[] = [];
   for (const [batchIndex, batch] of batches.entries()) {
@@ -246,10 +282,9 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     for (const scenario of batch) {
       const record = await evaluateScenario(scenario, context);
       if ("error" in record) {
-        writeFileSync(
+        dependencies.fs.writeFile(
           invalidRunPath,
           `${JSON.stringify({query: scenario.query, error: record.error}, null, 2)}\n`,
-          "utf8",
         );
         process.stderr.write(
           `Error: routing infrastructure failure: ${record.error}\n`,
@@ -261,13 +296,12 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     }
   }
 
-  writeFileSync(
+  dependencies.fs.writeFile(
     resultsPath,
     `${records.map((record) => JSON.stringify(record)).join("\n")}\n`,
-    "utf8",
   );
   const passed = records.filter(({pass}) => pass).length;
-  writeFileSync(
+  dependencies.fs.writeFile(
     summaryPath,
     `${JSON.stringify(
       {
@@ -286,7 +320,6 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       null,
       2,
     )}\n`,
-    "utf8",
   );
   return passed === records.length ? 0 : 1;
 };

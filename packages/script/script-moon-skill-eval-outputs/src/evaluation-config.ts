@@ -1,11 +1,12 @@
-import {existsSync, readdirSync, readFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
-  isDirectory,
-  isFile,
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
+import {
   resolveClaudePluginDirectories,
   resolveGuideDirectory,
 } from "@xonovex/script-moon-common/fs";
@@ -51,10 +52,11 @@ type EvaluationLoadResult =
       readonly warnings: readonly string[];
     };
 
-interface EvaluationConfigOptions {
+export interface EvaluationConfigOptions {
   readonly environment?: Readonly<Record<string, string | undefined>>;
   readonly executableAvailable?: (command: string) => boolean;
   readonly workingDirectory?: string;
+  readonly fs?: FileSystem;
 }
 
 export interface EvaluationConfig {
@@ -169,9 +171,12 @@ const defaultExecutableAvailable = (command: string): boolean => {
   }
 };
 
-const skillNameFromSkillMd = (path: string): string | undefined => {
-  if (!isFile(path)) return undefined;
-  const content = readFileSync(path, "utf8");
+const skillNameFromSkillMd = (
+  path: string,
+  fs: FileSystem,
+): string | undefined => {
+  if (!fs.isFile(path)) return undefined;
+  const content = fs.readText(path);
   const frontmatterMatch = /^---\s*\n([\s\S]*?)\n---/.exec(content);
   const block = frontmatterMatch?.[1] ?? content;
   const nameMatch = /^name:\s*(.+?)\s*$/m.exec(block);
@@ -183,10 +188,11 @@ const skillNameFromSkillMd = (path: string): string | undefined => {
 const loadEvaluations = (
   evaluationsFile: string,
   evaluationsArgument: string,
+  fs: FileSystem,
 ): EvaluationLoadResult => {
   let data: unknown;
   try {
-    data = JSON.parse(readFileSync(evaluationsFile, "utf8"));
+    data = JSON.parse(fs.readText(evaluationsFile));
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return {
@@ -239,11 +245,11 @@ const loadEvaluations = (
     : {success: false, error: uniqueResult.error, warnings};
 };
 
-const nextIteration = (base: string): string => {
-  if (!existsSync(base)) return "iteration-1";
-  const existing = readdirSync(base).flatMap((entry) => {
+const nextIteration = (base: string, fs: FileSystem): string => {
+  if (!fs.isDirectory(base)) return "iteration-1";
+  const existing = fs.readDirectory(base).flatMap((entry) => {
     const match = /^iteration-(\d+)$/.exec(entry);
-    return match !== null && isDirectory(join(base, entry))
+    return match !== null && fs.isDirectory(join(base, entry))
       ? [Number(match[1])]
       : [];
   });
@@ -277,13 +283,14 @@ export const resolveEvaluationConfig = (
   const executableAvailable =
     options.executableAvailable ?? defaultExecutableAvailable;
   const workingDirectory = options.workingDirectory ?? resolve(".");
+  const fs = options.fs ?? nodeFileSystem;
   const {values, positionals} = parseCliArgs(cliDefinition, argv);
-  const guideDirectory = resolveGuideDirectory(workingDirectory);
+  const guideDirectory = resolveGuideDirectory(workingDirectory, fs);
   const evaluationsArgument =
     positionals[0] ?? join(guideDirectory, "evals.json");
   const evaluationsFile = resolve(workingDirectory, evaluationsArgument);
 
-  if (!isFile(evaluationsFile)) {
+  if (!fs.isFile(evaluationsFile)) {
     return failure(`evals file not found: ${evaluationsArgument}`);
   }
   const harnessInput =
@@ -305,14 +312,14 @@ export const resolveEvaluationConfig = (
   const skillName =
     skillArgument && skillArgument.length > 0
       ? skillArgument
-      : skillNameFromSkillMd(skillMd);
+      : skillNameFromSkillMd(skillMd, fs);
   if (!skillName) {
     return failure(
       `no skill_name given and no 'name' frontmatter in ${skillMd}`,
     );
   }
 
-  const loaded = loadEvaluations(evaluationsFile, evaluationsArgument);
+  const loaded = loadEvaluations(evaluationsFile, evaluationsArgument, fs);
   if (!loaded.success) return loaded;
   const requestedShortName = skillName.split(":").pop() ?? skillName;
   if (requestedShortName !== loaded.data.skillName) {
@@ -329,7 +336,7 @@ export const resolveEvaluationConfig = (
   const pluginDirectory = pluginDirectoryArgument
     ? resolve(workingDirectory, pluginDirectoryArgument)
     : undefined;
-  if (pluginDirectory !== undefined && !isDirectory(pluginDirectory)) {
+  if (pluginDirectory !== undefined && !fs.isDirectory(pluginDirectory)) {
     return failure(
       `local plugin directory not found: ${pluginDirectoryArgument}`,
       loaded.warnings,
@@ -394,7 +401,8 @@ export const resolveEvaluationConfig = (
   const workspace = workspaceArgument
     ? resolve(workingDirectory, workspaceArgument)
     : resolve(workingDirectory, `${shortName}-workspace`);
-  const iteration = optionsResult.data.iteration ?? nextIteration(workspace);
+  const iteration =
+    optionsResult.data.iteration ?? nextIteration(workspace, fs);
   const iterationDirectory = join(workspace, iteration);
   const defaultModels = skillEvalModelDefaults(harness);
   const environmentModel =

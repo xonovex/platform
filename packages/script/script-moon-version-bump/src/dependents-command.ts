@@ -1,3 +1,7 @@
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {logInfo} from "@xonovex/script-moon-common/logging";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {updateDependent} from "./dependents.js";
@@ -17,6 +21,8 @@ interface DependentUpdateOptions {
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
   readonly git: GitRunner;
+  // How dependent manifests are read. Absent, they are read from a real disk.
+  readonly fs?: FileSystem;
 }
 
 interface DependentChangeSet {
@@ -31,7 +37,7 @@ const planDependentUpdates = (
   const changes: FileChange[] = [];
   for (const dependentPath of options.packagePaths) {
     if (dependentPath === options.packagePath) continue;
-    const dependent = readPkg(dependentPath);
+    const dependent = readPkg(dependentPath, options.fs ?? nodeFileSystem);
     const result = updateDependent(
       dependent,
       dependentPath,

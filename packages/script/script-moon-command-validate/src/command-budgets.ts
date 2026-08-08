@@ -1,4 +1,3 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {join, relative, sep} from "node:path";
 import {
   BUDGET_MANIFEST_FILE,
@@ -8,7 +7,10 @@ import {
   resolveDriftLintMode,
   type BudgetedFile,
 } from "@xonovex/script-moon-common/drift-budgets";
-import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {issue, type ValidationIssue} from "./validation.js";
 
 // commandFiles reads every command document as a budgeted file keyed by its
@@ -16,18 +18,20 @@ import {issue, type ValidationIssue} from "./validation.js";
 export const commandFiles = (
   packageDirectory: string,
   repositoryRoot: string,
+  fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => {
   const commandDirectory = join(packageDirectory, "commands");
-  if (!isDirectory(commandDirectory)) return [];
-  return readdirSync(commandDirectory)
+  if (!fs.isDirectory(commandDirectory)) return [];
+  return fs
+    .readDirectory(commandDirectory)
     .toSorted()
     .filter((entry) => entry.endsWith(".md"))
     .map((entry) => join(commandDirectory, entry))
-    .filter((path) => isFile(path))
+    .filter((path) => fs.isFile(path))
     .map((path) => ({
       kind: "command" as const,
       path: relative(repositoryRoot, path).split(sep).join("/"),
-      text: readFileSync(path, "utf8"),
+      text: fs.readText(path),
     }));
 };
 
@@ -37,9 +41,11 @@ export const checkCommandBudgets = (
   packageDirectory: string,
   repositoryRoot: string,
   mode = resolveDriftLintMode(process.env[DRIFT_LINT_MODE_ENV]),
+  fs: FileSystem = nodeFileSystem,
 ): readonly ValidationIssue[] => {
   const {error, manifest} = readBudgetManifest(
     join(repositoryRoot, BUDGET_MANIFEST_FILE),
+    fs,
   );
   const severity = mode === "enforce" ? "error" : "warning";
   const manifestIssues =
@@ -49,7 +55,7 @@ export const checkCommandBudgets = (
   return [
     ...manifestIssues,
     ...evaluateBudgets(
-      commandFiles(packageDirectory, repositoryRoot),
+      commandFiles(packageDirectory, repositoryRoot, fs),
       manifest,
     ).map(({message, path}) => issue("budget", path, message, severity)),
   ];

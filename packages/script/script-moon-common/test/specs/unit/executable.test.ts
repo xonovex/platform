@@ -1,52 +1,89 @@
-import {chmodSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
 import {delimiter, join} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {resolveExecutable} from "../../../src/executable.js";
+import {memoryFileSystem} from "../../../src/file-system-memory.js";
+
+const FIRST = "/path/first";
+const SECOND = "/path/second";
+const SEARCH_PATH = [FIRST, SECOND].join(delimiter);
 
 describe("resolveExecutable", () => {
-  const directories: string[] = [];
-
-  afterEach(() => {
-    for (const directory of directories) {
-      rmSync(directory, {recursive: true, force: true});
-    }
-    directories.length = 0;
-  });
-
   it("returns the absolute executable from the first matching PATH entry", () => {
-    const first = mkdtempSync(join(tmpdir(), "executable-first-"));
-    const second = mkdtempSync(join(tmpdir(), "executable-second-"));
-    directories.push(first, second);
-    const executable = join(second, "example-command");
-    writeFileSync(executable, "#!/bin/sh\n");
-    chmodSync(executable, 0o755);
+    const executable = join(SECOND, "example-command");
+    const fs = memoryFileSystem({
+      files: {[executable]: "#!/bin/sh\n"},
+      executables: [executable],
+    });
 
-    const result = resolveExecutable(
-      "example-command",
-      [first, second].join(delimiter),
-    );
-
-    expect(result).toBe(executable);
-  });
-
-  it("rejects command paths", () => {
-    expect(() => resolveExecutable("./example-command", "/bin")).toThrow(
-      "must be a bare command",
+    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(
+      executable,
     );
   });
 
-  it("rejects a command missing from PATH", () => {
-    const directory = mkdtempSync(join(tmpdir(), "executable-missing-"));
-    directories.push(directory);
+  it("prefers the earlier PATH entry when both hold the command", () => {
+    const first = join(FIRST, "example-command");
+    const second = join(SECOND, "example-command");
+    const fs = memoryFileSystem({
+      files: {[first]: "#!/bin/sh\n", [second]: "#!/bin/sh\n"},
+      executables: [first, second],
+    });
 
-    expect(() => resolveExecutable("missing-command", directory)).toThrow(
+    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(first);
+  });
+
+  it("skips a match that is present but not executable", () => {
+    const first = join(FIRST, "example-command");
+    const second = join(SECOND, "example-command");
+    const fs = memoryFileSystem({
+      files: {[first]: "#!/bin/sh\n", [second]: "#!/bin/sh\n"},
+      executables: [second],
+    });
+
+    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(second);
+  });
+
+  it("skips an executable directory that shares the command name", () => {
+    const fs = memoryFileSystem({
+      directories: [join(FIRST, "example-command")],
+      executables: [join(FIRST, "example-command")],
+    });
+
+    expect(() => resolveExecutable("example-command", FIRST, fs)).toThrow(
       "was not found on PATH",
     );
   });
 
+  it("rejects command paths", () => {
+    expect(() =>
+      resolveExecutable("./example-command", "/bin", memoryFileSystem()),
+    ).toThrow("must be a bare command");
+  });
+
+  it("rejects an empty command name", () => {
+    expect(() => resolveExecutable("", "/bin", memoryFileSystem())).toThrow(
+      "must be a bare command",
+    );
+  });
+
+  it("rejects an empty PATH", () => {
+    expect(() =>
+      resolveExecutable("example-command", "", memoryFileSystem()),
+    ).toThrow("PATH is empty");
+  });
+
+  it("rejects a command missing from PATH", () => {
+    expect(() =>
+      resolveExecutable("missing-command", FIRST, memoryFileSystem()),
+    ).toThrow("was not found on PATH");
+  });
+
   it("does not search relative PATH entries", () => {
-    expect(() => resolveExecutable("example-command", ".")).toThrow(
+    const fs = memoryFileSystem({
+      files: {"/example-command": "#!/bin/sh\n"},
+      executables: ["/example-command"],
+    });
+
+    expect(() => resolveExecutable("example-command", ".", fs)).toThrow(
       "was not found on PATH",
     );
   });

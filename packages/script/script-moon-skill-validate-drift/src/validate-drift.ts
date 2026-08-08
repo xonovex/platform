@@ -1,4 +1,3 @@
-import {writeFileSync} from "node:fs";
 import {dirname, join, resolve} from "node:path";
 import {fileURLToPath} from "node:url";
 import {
@@ -9,6 +8,10 @@ import {
   resolveDriftLintMode,
   seedBudgets,
 } from "@xonovex/script-moon-common/drift-budgets";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {
   collectCommandCatalogFiles,
@@ -35,7 +38,10 @@ const HELP = [
   `Set ${DRIFT_LINT_MODE_ENV}=enforce to exit non-zero on findings.`,
 ].join("\n");
 
-export const main = (argv: readonly string[]): number => {
+export const main = (
+  argv: readonly string[],
+  fs: FileSystem = nodeFileSystem,
+): number => {
   if (argv.includes("-h") || argv.includes("--help")) {
     console.log(HELP);
     return 0;
@@ -52,11 +58,18 @@ export const main = (argv: readonly string[]): number => {
   const rootIndex = argv.indexOf("--repo-root");
   const repositoryRoot =
     rootIndex === -1
-      ? findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)))
+      ? findWorkspaceRoot(
+          dirname(fileURLToPath(import.meta.url)),
+          undefined,
+          fs,
+        )
       : resolve(argv[rootIndex + 1] ?? ".");
 
-  const skillFiles = collectSkillCatalogFiles(repositoryRoot);
-  const files = [...skillFiles, ...collectCommandCatalogFiles(repositoryRoot)];
+  const skillFiles = collectSkillCatalogFiles(repositoryRoot, fs);
+  const files = [
+    ...skillFiles,
+    ...collectCommandCatalogFiles(repositoryRoot, fs),
+  ];
   if (files.length === 0) {
     process.stderr.write(`Error: no catalog files under ${repositoryRoot}\n`);
     return 2;
@@ -65,16 +78,17 @@ export const main = (argv: readonly string[]): number => {
   const budgetPath = join(repositoryRoot, BUDGET_MANIFEST_FILE);
   if (argv.includes("--seed")) {
     const manifest = seedBudgets(files);
-    writeFileSync(budgetPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+    fs.writeFile(budgetPath, `${JSON.stringify(manifest, null, 2)}\n`);
     console.log(
       `Seeded ${String(Object.keys(manifest).length)} budgets into ${BUDGET_MANIFEST_FILE}`,
     );
     return 0;
   }
 
-  const budgets = readBudgetManifest(budgetPath);
+  const budgets = readBudgetManifest(budgetPath, fs);
   const vocabulary = readVocabularyManifest(
     join(repositoryRoot, VOCABULARY_MANIFEST_FILE),
+    fs,
   );
   const manifestErrors = [budgets.error, vocabulary.error].filter(
     (error): error is string => error !== undefined,

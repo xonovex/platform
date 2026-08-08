@@ -1,15 +1,14 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {dirname, join} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
+import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {describe, expect, it} from "vitest";
 import {validateCommandPackage} from "../../../src/command-validation.js";
 
-const temporaryDirectories: string[] = [];
+const ROOT = "/repo";
+const PACKAGE_DIR = join(ROOT, "packages", "command", "command-test");
 
-const write = (root: string, path: string, content: string): void => {
-  const target = join(root, path);
-  mkdirSync(dirname(target), {recursive: true});
-  writeFileSync(target, content);
+const write = (fs: FileSystem, path: string, content: string): void => {
+  fs.writeFile(join(ROOT, path), content);
 };
 
 const commandSource = (namespace = "xonovex-test"): string => `---
@@ -32,75 +31,80 @@ Load the \`test-guide\` skill (plugin \`xonovex-skill-test\`) and perform its
 **Run** operation with these arguments.
 `;
 
-const fixture = (): {packageDir: string; root: string} => {
-  const root = mkdtempSync(join(tmpdir(), "command-validation-"));
-  temporaryDirectories.push(root);
-  const packageDir = join(root, "packages", "command", "command-test");
+// The parts a case can leave out, so a missing piece is expressed by not building
+// it rather than by deleting it from a tree that was already built.
+interface FixtureParts {
+  readonly commands?: boolean;
+  readonly skill?: boolean;
+}
+
+const fixture = ({
+  commands = true,
+  skill = true,
+}: FixtureParts = {}): FileSystem => {
+  const fs = memoryFileSystem();
   write(
-    root,
+    fs,
     "packages/command/command-test/package.json",
     JSON.stringify({
       dependencies: {"@xonovex/skill-test": "1.0.0"},
     }),
   );
   write(
-    root,
+    fs,
     "packages/command/command-test/.claude-plugin/plugin.json",
     JSON.stringify({
       name: "xonovex-test",
       dependencies: ["xonovex-skill-test"],
     }),
   );
-  write(root, "packages/command/command-test/commands/run.md", commandSource());
-  write(
-    root,
-    "packages/skill/skill-test/test-guide/SKILL.md",
-    "# Test\n\n- **Run**: run one test, see [run](references/run.md)\n",
-  );
-  write(
-    root,
-    "packages/skill/skill-test/test-guide/references/run.md",
-    "# Run\n",
-  );
-  return {packageDir, root};
-};
-
-afterEach(() => {
-  for (const directory of temporaryDirectories) {
-    rmSync(directory, {recursive: true, force: true});
+  if (commands) {
+    write(fs, "packages/command/command-test/commands/run.md", commandSource());
   }
-  temporaryDirectories.length = 0;
-});
+  if (skill) {
+    write(
+      fs,
+      "packages/skill/skill-test/test-guide/SKILL.md",
+      "# Test\n\n- **Run**: run one test, see [run](references/run.md)\n",
+    );
+    write(
+      fs,
+      "packages/skill/skill-test/test-guide/references/run.md",
+      "# Run\n",
+    );
+  }
+  return fs;
+};
 
 describe("validateCommandPackage", () => {
   it("accepts a thin command with declared hard delegation", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
 
-    expect(validateCommandPackage(packageDir, root).report).toEqual({
+    expect(validateCommandPackage(PACKAGE_DIR, ROOT, fs).report).toEqual({
       commands: 1,
       issues: [],
     });
   });
 
   it("reports an em dash or ellipsis in any package prose file", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/run.md",
       commandSource().replace("Subject.", "Subject \u2014 the thing to run."),
     );
     write(
-      root,
+      fs,
       "packages/command/command-test/README.md",
       "# Test\n\nUse when\u2026\n",
     );
     write(
-      root,
+      fs,
       "packages/command/command-test/.claude-plugin/plugin.json",
       String.raw`{"name": "xonovex-test", "dependencies": ["xonovex-skill-test"], "description": "a \u2014 b"}`,
     );
 
-    const findings = validateCommandPackage(packageDir, root)
+    const findings = validateCommandPackage(PACKAGE_DIR, ROOT, fs)
       .report.issues.filter(({code}) => code === "prose.punctuation")
       .map(({message, path}) => [path, message.split(",", 1)[0]]);
 
@@ -127,29 +131,28 @@ describe("validateCommandPackage", () => {
   });
 
   it("reports namespace, filename, manifest, and skill drift", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture({skill: false});
     write(
-      root,
+      fs,
       "packages/command/command-test/package.json",
       JSON.stringify({dependencies: {}}),
     );
     write(
-      root,
+      fs,
       "packages/command/command-test/.claude-plugin/plugin.json",
       JSON.stringify({name: "other", dependencies: []}),
     );
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/wrong.md",
       commandSource(),
     );
-    rmSync(join(root, "packages", "skill", "skill-test", "test-guide"), {
-      recursive: true,
-    });
 
-    const codes = validateCommandPackage(packageDir, root).report.issues.map(
-      ({code}) => code,
-    );
+    const codes = validateCommandPackage(
+      PACKAGE_DIR,
+      ROOT,
+      fs,
+    ).report.issues.map(({code}) => code);
 
     expect(codes).toEqual(
       expect.arrayContaining([
@@ -163,29 +166,28 @@ describe("validateCommandPackage", () => {
   });
 
   it("rejects a delegated operation that the owner does not register", () => {
-    const {packageDir, root} = fixture();
-    write(root, "packages/skill/skill-test/test-guide/SKILL.md", "# Test\n");
+    const fs = fixture();
+    write(fs, "packages/skill/skill-test/test-guide/SKILL.md", "# Test\n");
 
     expect(
-      validateCommandPackage(packageDir, root).report.issues,
+      validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues,
     ).toContainEqual(
       expect.objectContaining({code: "delegation.operation-missing"}),
     );
   });
 
   it("reports a missing commands directory", () => {
-    const {packageDir, root} = fixture();
-    rmSync(join(packageDir, "commands"), {recursive: true});
+    const fs = fixture({commands: false});
 
-    expect(validateCommandPackage(packageDir, root).report.issues).toEqual([
-      expect.objectContaining({code: "package.commands-missing"}),
-    ]);
+    expect(validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues).toEqual(
+      [expect.objectContaining({code: "package.commands-missing"})],
+    );
   });
 
   it("rejects drift between argument-hint and the Arguments section", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/run.md",
       commandSource()
         .replace(
@@ -198,9 +200,11 @@ describe("validateCommandPackage", () => {
         ),
     );
 
-    const codes = validateCommandPackage(packageDir, root).report.issues.map(
-      ({code}) => code,
-    );
+    const codes = validateCommandPackage(
+      PACKAGE_DIR,
+      ROOT,
+      fs,
+    ).report.issues.map(({code}) => code);
 
     expect(codes).toEqual(
       expect.arrayContaining([
@@ -211,9 +215,9 @@ describe("validateCommandPackage", () => {
   });
 
   it("allows a positional and a flag alias but rejects a repeated argument", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/run.md",
       commandSource().replace(
         'argument-hint: "<subject>"',
@@ -221,13 +225,13 @@ describe("validateCommandPackage", () => {
       ),
     );
     expect(
-      validateCommandPackage(packageDir, root).report.issues.map(
+      validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues.map(
         ({code}) => code,
       ),
     ).not.toContain("command.argument-duplicate");
 
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/run.md",
       commandSource()
         .replace(
@@ -240,16 +244,16 @@ describe("validateCommandPackage", () => {
         ),
     );
     expect(
-      validateCommandPackage(packageDir, root).report.issues.map(
+      validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues.map(
         ({code}) => code,
       ),
     ).toContain("command.argument-duplicate");
   });
 
   it("rejects obsolete machine-readable soft requirements", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
     write(
-      root,
+      fs,
       "packages/command/command-test/commands/run.md",
       commandSource().replace(
         "## Delegation",
@@ -263,7 +267,7 @@ describe("validateCommandPackage", () => {
       ),
     );
     expect(
-      validateCommandPackage(packageDir, root).report.issues,
+      validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues,
     ).toContainEqual(
       expect.objectContaining({
         code: "command.requirements-unsupported",
@@ -273,9 +277,9 @@ describe("validateCommandPackage", () => {
   });
 
   it("validates local Markdown targets and fragments", () => {
-    const {packageDir, root} = fixture();
+    const fs = fixture();
     write(
-      root,
+      fs,
       "packages/command/command-test/README.md",
       [
         "# Commands",
@@ -287,13 +291,13 @@ describe("validateCommandPackage", () => {
       ].join("\n"),
     );
     write(
-      root,
+      fs,
       "packages/command/command-test/docs/guide.md",
       "# Guide\n\n## Details\n",
     );
 
     expect(
-      validateCommandPackage(packageDir, root).report.issues.map(
+      validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues.map(
         ({code}) => code,
       ),
     ).toEqual(["link.missing-target", "link.missing-fragment"]);

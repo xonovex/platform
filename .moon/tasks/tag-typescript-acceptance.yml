@@ -1,0 +1,30 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+# The acceptance tier for TypeScript projects: cases that assert against the live
+# repository content, such as the skill catalog, rather than against a fixture they
+# built. They spawn nothing and mutate nothing, so unlike the integration tier they
+# stay inside ci-check, appended to `test`. They live in test/specs/acceptance/,
+# which ts-test and ts-coverage never select, so a unit run and its coverage floor
+# stay independent of what the catalog currently holds. A project opts in by listing
+# `typescript-acceptance` in its tags, and declares the content it reads as inputs.
+tasks:
+  ts-test-acceptance:
+    script: npx vitest run test/specs/acceptance
+    deps:
+      - ^:build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - "@globs(configs)"
+    outputs: []
+    options:
+      cache: true
+  # Appending rather than redefining is what keeps the inherited ts-test in place;
+  # a redefinition would replace the parent's deps and drop the unit tier.
+  test:
+    command: noop
+    deps: [ts-test-acceptance]
+    options:
+      cache: false
+      mergeDeps: append
+inheritedBy:
+  tag: typescript-acceptance

@@ -32,6 +32,14 @@
       "types": "./src/frontmatter.ts",
       "default": "./dist/src/frontmatter.js"
     },
+    "./file-system": {
+      "types": "./src/file-system.ts",
+      "default": "./dist/src/file-system.js"
+    },
+    "./file-system-memory": {
+      "types": "./src/file-system-memory.ts",
+      "default": "./dist/src/file-system-memory.js"
+    },
     "./fs": {
       "types": "./src/fs.ts",
       "default": "./dist/src/fs.js"

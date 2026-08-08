@@ -1,20 +1,58 @@
-import {mkdirSync, rmSync, writeFileSync} from "node:fs";
+import {rmSync} from "node:fs";
 import {join} from "node:path";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {
   checkCodexTriggered,
   checkTriggered,
-  TRIGGER_OUTPUT_LIMIT,
 } from "@xonovex/script-moon-skill-eval-common/trigger-process";
+import {TRIGGER_OUTPUT_LIMIT} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
 import {
   MAX_TRIGGER_MODEL_RUNS,
   triggerModelRunCount,
 } from "@xonovex/script-moon-skill-eval-common/validation";
 import {usageError} from "./cli.js";
-import {resolveTriggerConfig} from "./trigger-config.js";
+import {
+  resolveTriggerConfig,
+  type TriggerConfigOptions,
+} from "./trigger-config.js";
 import {runTriggerEvaluation} from "./trigger-evaluation.js";
 
-export const main = async (argv: readonly string[]): Promise<number> => {
-  const configResult = resolveTriggerConfig(argv);
+/**
+ * The effects the trigger evaluator reaches a harness through. A run supplies the
+ * spawning implementations; a test supplies decisions directly, so a whole sweep is
+ * scored without a process.
+ */
+export interface TriggerDependencies {
+  readonly checkTriggered: typeof checkTriggered;
+  readonly checkCodexTriggered: typeof checkCodexTriggered;
+  // How the configuration step probes that the harness binary exists and runs.
+  readonly configOptions: TriggerConfigOptions;
+  readonly fs: FileSystem;
+  // Removes a previous run's evidence so a rerun cannot be read as this run's.
+  readonly discard: (path: string) => void;
+}
+
+export const defaultDependencies: TriggerDependencies = {
+  checkTriggered,
+  checkCodexTriggered,
+  configOptions: {},
+  fs: nodeFileSystem,
+  discard: (path) => {
+    rmSync(path, {force: true});
+  },
+};
+
+export const main = async (
+  argv: readonly string[],
+  dependencies: TriggerDependencies = defaultDependencies,
+): Promise<number> => {
+  const configResult = resolveTriggerConfig(argv, {
+    ...dependencies.configOptions,
+    fs: dependencies.configOptions.fs ?? dependencies.fs,
+  });
   if (!configResult.success) {
     if (configResult.kind === "usage") {
       return usageError(configResult.error);
@@ -25,10 +63,10 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   const config = configResult.data;
 
   if (config.workspace !== undefined) {
-    mkdirSync(config.workspace, {recursive: true});
-    rmSync(join(config.workspace, "results.jsonl"), {force: true});
-    rmSync(join(config.workspace, "summary.json"), {force: true});
-    rmSync(join(config.workspace, "invalid-run.json"), {force: true});
+    dependencies.fs.makeDirectory(config.workspace);
+    dependencies.discard(join(config.workspace, "results.jsonl"));
+    dependencies.discard(join(config.workspace, "summary.json"));
+    dependencies.discard(join(config.workspace, "invalid-run.json"));
   }
 
   const evaluation = await runTriggerEvaluation({
@@ -37,10 +75,11 @@ export const main = async (argv: readonly string[]): Promise<number> => {
     threshold: config.threshold,
     skillName: config.skillName,
     workspace: config.workspace,
+    fs: dependencies.fs,
     check:
       config.harness === "claude"
         ? (query) =>
-            checkTriggered(
+            dependencies.checkTriggered(
               query,
               config.harnessArgs,
               config.skillName,
@@ -48,7 +87,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
               config.harnessExecutable,
             )
         : (query) =>
-            checkCodexTriggered({
+            dependencies.checkCodexTriggered({
               args: config.harnessArgs,
               executable: config.harnessExecutable,
               guideDirectory: config.guideDirectory,
@@ -62,12 +101,11 @@ export const main = async (argv: readonly string[]): Promise<number> => {
   const {results, passed, failed, total} = evaluation;
 
   if (config.workspace !== undefined) {
-    writeFileSync(
+    dependencies.fs.writeFile(
       join(config.workspace, "results.jsonl"),
       results.map((result) => JSON.stringify(result)).join("\n") + "\n",
-      "utf8",
     );
-    writeFileSync(
+    dependencies.fs.writeFile(
       join(config.workspace, "summary.json"),
       `${JSON.stringify(
         {
@@ -84,7 +122,6 @@ export const main = async (argv: readonly string[]): Promise<number> => {
         null,
         2,
       )}\n`,
-      "utf8",
     );
   }
 
