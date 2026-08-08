@@ -12,6 +12,7 @@ tasks:
       mergeDeps: replace
   ts-test:
     deps:
+      - ~:ts-typecheck
       - ^:build
     options:
       mergeDeps: replace

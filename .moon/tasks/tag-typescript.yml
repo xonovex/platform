@@ -43,9 +43,13 @@ tasks:
       - dist
     options:
       cache: true
+  # vitest transpiles without typechecking, so a spec that calls a function with
+  # the wrong arguments runs and fails at runtime, or passes for the wrong
+  # reason. Typechecking first turns that into a compile error.
   ts-test:
     script: npx vitest run test/specs/unit
     deps:
+      - ~:ts-typecheck
       - ^:build
     inputs:
       - "@globs(sources)"
