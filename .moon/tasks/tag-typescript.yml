@@ -6,8 +6,24 @@ implicitInputs:
   # root lockfile, not in any project's package.json. Without it a linter major
   # that changes which code passes serves a stale cached pass.
   - /package-lock.json
+  # Every internal dependency publishes its types from src through its exports
+  # map, so a project's build, typecheck, lint, and tests all read the source of
+  # the packages it depends on. Moon does not fold a dependency task's hash into
+  # its dependent, so without this a breaking change upstream leaves this
+  # project's hash unchanged and moon serves a cached pass over code that no
+  # longer compiles. Each project names its own dependencies rather than the
+  # whole workspace, so an edit only invalidates what actually reads it;
+  # script-moon-release-validate fails the build when the set drifts from
+  # dependsOn.
+  - "@globs(dependencySources)"
 fileGroups:
   sources:
+    - src/**/*
+  # The src of every internal package this project depends on, transitively. A
+  # file group cannot be empty, so a project with no internal dependencies keeps
+  # this default: its own sources, which every task already reads, so it adds
+  # nothing to the hash.
+  dependencySources:
     - src/**/*
   tests:
     - test/**/*

@@ -1,6 +1,6 @@
 import {execFileSync} from "node:child_process";
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
-import {basename, resolve} from "node:path";
+import {basename, dirname, resolve} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {type z} from "zod";
 import {
@@ -9,6 +9,7 @@ import {
   type PackageBins,
 } from "./bin-targets.js";
 import {coverageFloorFailures} from "./coverage-floors.js";
+import {dependencySourceFailures} from "./dependency-sources.js";
 import {workspaceHasherFailures} from "./hasher-ignore.js";
 import {
   instructionDocFailures,
@@ -640,6 +641,18 @@ export const validateRelease = (
     }));
   check(projectFiles.length > 0, "packages must define project task files");
   for (const failure of coverageFloorFailures(projectFiles)) {
+    check(false, failure);
+  }
+
+  // A project's id is its directory name and its source is the directory itself,
+  // which is how a dependency named in dependsOn resolves to the src glob its
+  // dependents must declare.
+  const dependencyProjects = projectFiles.map((file) => ({
+    id: basename(dirname(file.path)),
+    source: dirname(file.path),
+    text: file.text,
+  }));
+  for (const failure of dependencySourceFailures(dependencyProjects)) {
     check(false, failure);
   }
 
