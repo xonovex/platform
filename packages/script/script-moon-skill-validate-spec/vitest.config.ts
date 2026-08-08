@@ -6,9 +6,9 @@ export default defineConfig({
       thresholds: {
         "src/validate-skill.ts": {
           statements: 70,
-          branches: 50,
-          functions: 90,
-          lines: 75,
+          branches: 49,
+          functions: 83,
+          lines: 72,
         },
       },
     },

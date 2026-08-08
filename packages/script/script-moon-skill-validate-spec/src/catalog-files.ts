@@ -1,6 +1,8 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {join} from "node:path";
-import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {isRecord} from "@xonovex/script-moon-common/records";
 
 const OUTPUT_TIERS = new Set(["aggressive", "moderate", "conservative"]);
@@ -41,9 +43,9 @@ export interface CatalogFileReport {
   readonly errors: readonly string[];
 }
 
-const readJson = (path: string, errors: string[]): unknown => {
+const readJson = (path: string, errors: string[], fs: FileSystem): unknown => {
   try {
-    return JSON.parse(readFileSync(path, "utf8")) as unknown;
+    return JSON.parse(fs.readText(path)) as unknown;
   } catch (error) {
     errors.push(
       `catalog: ${path.split("/").at(-1) ?? path} is not valid JSON: ${error instanceof Error ? error.message : String(error)}`,
@@ -150,13 +152,14 @@ const checkOutputEvals = (
   skillName: unknown,
   passes: string[],
   errors: string[],
+  fs: FileSystem,
 ): void => {
   const path = join(skillDir, "evals.json");
-  if (!isFile(path)) {
+  if (!fs.isFile(path)) {
     errors.push("catalog: missing evals.json");
     return;
   }
-  const raw = readJson(path, errors);
+  const raw = readJson(path, errors, fs);
   if (!isRecord(raw)) {
     if (raw !== undefined) errors.push("catalog: evals.json must be an object");
     return;
@@ -209,13 +212,14 @@ const checkTriggerEvals = (
   skillDir: string,
   passes: string[],
   errors: string[],
+  fs: FileSystem,
 ): void => {
   const path = join(skillDir, "eval-queries.json");
-  if (!isFile(path)) {
+  if (!fs.isFile(path)) {
     errors.push("catalog: missing eval-queries.json");
     return;
   }
-  const raw = readJson(path, errors);
+  const raw = readJson(path, errors, fs);
   if (!Array.isArray(raw)) {
     if (raw !== undefined)
       errors.push("catalog: eval-queries.json must be an array");
@@ -261,13 +265,14 @@ const checkSources = (
   description: unknown,
   passes: string[],
   errors: string[],
+  fs: FileSystem,
 ): void => {
   const path = join(skillDir, "SOURCES.md");
-  if (!isFile(path)) {
+  if (!fs.isFile(path)) {
     errors.push("catalog: missing SOURCES.md");
     return;
   }
-  const text = readFileSync(path, "utf8");
+  const text = fs.readText(path);
   const hasUrlProvenance = URL_FIELD_RE.test(text) && HTTP_URL_RE.test(text);
   const hasDeclaredProvenance = PROVENANCE_RE.test(text);
   if (!hasUrlProvenance && !hasDeclaredProvenance) {
@@ -310,21 +315,24 @@ const checkCredentialExamples = (
   skillDir: string,
   passes: string[],
   errors: string[],
+  fs: FileSystem,
 ): void => {
   const skill = join(skillDir, "SKILL.md");
-  const files: [string, string][] = isFile(skill) ? [["SKILL.md", skill]] : [];
+  const files: [string, string][] = fs.isFile(skill)
+    ? [["SKILL.md", skill]]
+    : [];
   const references = join(skillDir, "references");
-  if (isDirectory(references)) {
-    for (const entry of readdirSync(references).toSorted()) {
+  if (fs.isDirectory(references)) {
+    for (const entry of fs.readDirectory(references).toSorted()) {
       const path = join(references, entry);
-      if (entry.endsWith(".md") && isFile(path)) {
+      if (entry.endsWith(".md") && fs.isFile(path)) {
         files.push([`references/${entry}`, path]);
       }
     }
   }
   let unsafe = 0;
   for (const [label, path] of files) {
-    const text = readFileSync(path, "utf8");
+    const text = fs.readText(path);
     for (const [pattern, reason] of UNSAFE_CREDENTIAL_PATTERNS) {
       if (!pattern.test(text)) continue;
       unsafe += 1;
@@ -336,14 +344,14 @@ const checkCredentialExamples = (
   }
 };
 
-const hasExecutableScripts = (dir: string): boolean => {
-  if (!isDirectory(dir)) return false;
-  for (const entry of readdirSync(dir, {withFileTypes: true})) {
-    if (entry.name === "__pycache__" || entry.name.startsWith(".")) continue;
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (hasExecutableScripts(path)) return true;
-    } else if (entry.isFile()) {
+const hasExecutableScripts = (dir: string, fs: FileSystem): boolean => {
+  if (!fs.isDirectory(dir)) return false;
+  for (const name of fs.readDirectory(dir)) {
+    if (name === "__pycache__" || name.startsWith(".")) continue;
+    const path = join(dir, name);
+    if (fs.isDirectory(path)) {
+      if (hasExecutableScripts(path, fs)) return true;
+    } else if (fs.isFile(path)) {
       return true;
     }
   }
@@ -352,23 +360,27 @@ const hasExecutableScripts = (dir: string): boolean => {
 
 const forbiddenImplementationFiles = (
   dir: string,
+  fs: FileSystem,
   prefix = "",
 ): readonly string[] => {
-  if (!isDirectory(dir)) return [];
-  return readdirSync(dir, {withFileTypes: true}).flatMap((entry) => {
-    if (entry.name === "__pycache__" || entry.name.startsWith(".")) return [];
-    const path = join(dir, entry.name);
-    const label = prefix === "" ? entry.name : `${prefix}/${entry.name}`;
-    if (entry.isDirectory()) return forbiddenImplementationFiles(path, label);
-    return entry.isFile() && /\.(?:mjs|ts)$/u.test(entry.name) ? [label] : [];
+  if (!fs.isDirectory(dir)) return [];
+  return fs.readDirectory(dir).flatMap((name) => {
+    if (name === "__pycache__" || name.startsWith(".")) return [];
+    const path = join(dir, name);
+    const label = prefix === "" ? name : `${prefix}/${name}`;
+    if (fs.isDirectory(path)) {
+      return forbiddenImplementationFiles(path, fs, label);
+    }
+    return fs.isFile(path) && /\.(?:mjs|ts)$/u.test(name) ? [label] : [];
   });
 };
 
 const checkImplementationFormats = (
   skillDir: string,
   errors: string[],
+  fs: FileSystem,
 ): void => {
-  const forbidden = forbiddenImplementationFiles(skillDir);
+  const forbidden = forbiddenImplementationFiles(skillDir, fs);
   if (forbidden.length === 0) return;
   errors.push(
     `catalog: skills must not contain TypeScript or MJS implementation files: ${forbidden.join(", ")}`,
@@ -380,8 +392,9 @@ const checkScriptMetadata = (
   frontmatter: Readonly<Record<string, unknown>>,
   passes: string[],
   errors: string[],
+  fs: FileSystem,
 ): void => {
-  if (!hasExecutableScripts(join(skillDir, "scripts"))) return;
+  if (!hasExecutableScripts(join(skillDir, "scripts"), fs)) return;
   if (
     typeof frontmatter.compatibility !== "string" ||
     frontmatter.compatibility.trim().length === 0
@@ -413,14 +426,15 @@ const checkScriptMetadata = (
 export const checkCatalogFiles = (
   skillDir: string,
   frontmatter: Readonly<Record<string, unknown>>,
+  fs: FileSystem = nodeFileSystem,
 ): CatalogFileReport => {
   const passes: string[] = [];
   const errors: string[] = [];
-  checkOutputEvals(skillDir, frontmatter.name, passes, errors);
-  checkTriggerEvals(skillDir, passes, errors);
-  checkSources(skillDir, frontmatter.description, passes, errors);
-  checkCredentialExamples(skillDir, passes, errors);
-  checkImplementationFormats(skillDir, errors);
-  checkScriptMetadata(skillDir, frontmatter, passes, errors);
+  checkOutputEvals(skillDir, frontmatter.name, passes, errors, fs);
+  checkTriggerEvals(skillDir, passes, errors, fs);
+  checkSources(skillDir, frontmatter.description, passes, errors, fs);
+  checkCredentialExamples(skillDir, passes, errors, fs);
+  checkImplementationFormats(skillDir, errors, fs);
+  checkScriptMetadata(skillDir, frontmatter, passes, errors, fs);
   return {passes, errors};
 };

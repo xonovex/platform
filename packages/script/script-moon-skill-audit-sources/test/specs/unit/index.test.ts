@@ -1,12 +1,11 @@
 import {createHash} from "node:crypto";
-import {mkdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main} from "../../../src/audit.js";
-import {skillDirectories} from "../../util/skill-directory.js";
+import {memorySkillDirectories} from "../../util/skill-directory.js";
 
 describe("main", () => {
-  const skillDirectory = skillDirectories();
+  const skillDirectory = memorySkillDirectories();
 
   afterEach(() => {
     vi.restoreAllMocks();
@@ -18,7 +17,7 @@ describe("main", () => {
   });
 
   it("reports a healthy skill as JSON", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "healthy-skill",
       `# Sources
 
@@ -30,10 +29,10 @@ describe("main", () => {
 - **Last reviewed:** 2099-01-01
 `,
     );
-    writeFileSync(join(skill, "references", "details.md"), "# Details\n");
+    fs.writeFile(join(skill, "references", "details.md"), "# Details\n");
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([skill, "--json"]);
+    const result = await main([skill, "--json"], fs);
 
     expect(result).toBe(0);
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
@@ -54,7 +53,7 @@ describe("main", () => {
   });
 
   it("uses the shorter review cadence for versioned sources", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "versioned-skill",
       `# Sources
 
@@ -68,12 +67,10 @@ describe("main", () => {
     );
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([
-      skill,
-      "--max-age=180",
-      "--version-max-age=1",
-      "--json",
-    ]);
+    const result = await main(
+      [skill, "--max-age=180", "--version-max-age=1", "--json"],
+      fs,
+    );
 
     expect(result).toBe(1);
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
@@ -82,7 +79,7 @@ describe("main", () => {
   });
 
   it("reports stale, unmapped, and uncovered sources", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "stale-skill",
       `# Sources
 
@@ -91,10 +88,10 @@ describe("main", () => {
 - **Last reviewed:** 2020-01-01
 `,
     );
-    writeFileSync(join(skill, "references", "uncovered.md"), "# Uncovered\n");
+    fs.writeFile(join(skill, "references", "uncovered.md"), "# Uncovered\n");
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([skill, "--max-age=1"]);
+    const result = await main([skill, "--max-age=1"], fs);
 
     expect(result).toBe(1);
     const output = log.mock.calls.flat().join("\n");
@@ -104,7 +101,7 @@ describe("main", () => {
   });
 
   it("requires a drift anchor for versioned web documentation", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "unanchored-skill",
       `# Sources
 
@@ -117,7 +114,7 @@ describe("main", () => {
     );
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([skill, "--json"]);
+    const result = await main([skill, "--json"], fs);
 
     expect(result).toBe(1);
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
@@ -129,7 +126,7 @@ describe("main", () => {
   it.each([401, 403, 429])(
     "does not fail a live check solely because a source returns HTTP %i",
     async (status) => {
-      const skill = skillDirectory(
+      const {fs, skill} = skillDirectory(
         "restricted-skill",
         `# Sources
 
@@ -145,7 +142,7 @@ describe("main", () => {
       );
       const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-      const result = await main([skill, "--fetch", "--json"]);
+      const result = await main([skill, "--fetch", "--json"], fs);
 
       expect(result).toBe(0);
       expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
@@ -158,7 +155,7 @@ describe("main", () => {
   );
 
   it("retries a transient live-check error once", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "retry-skill",
       `# Sources
 
@@ -175,7 +172,7 @@ describe("main", () => {
     vi.stubGlobal("fetch", fetch);
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([skill, "--fetch", "--json"]);
+    const result = await main([skill, "--fetch", "--json"], fs);
 
     expect(result).toBe(0);
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -194,7 +191,7 @@ describe("main", () => {
       .update(bodyDigest)
       .update("\n")
       .digest("hex");
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "snapshot-skill",
       `# Sources
 
@@ -212,7 +209,7 @@ describe("main", () => {
     );
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
 
-    const result = await main([skill, "--fetch", "--json"]);
+    const result = await main([skill, "--fetch", "--json"], fs);
 
     expect(result).toBe(0);
     expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
@@ -228,7 +225,7 @@ describe("main", () => {
   });
 
   it("marks a matching source as reviewed", async () => {
-    const skill = skillDirectory(
+    const {fs, skill} = skillDirectory(
       "reviewed-skill",
       `# Sources
 
@@ -245,10 +242,10 @@ describe("main", () => {
     );
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
-    const result = await main([skill, "--mark-reviewed=Primary"]);
+    const result = await main([skill, "--mark-reviewed=Primary"], fs);
 
     expect(result).toBe(0);
-    const updated = readFileSync(join(skill, "SOURCES.md"), "utf8");
+    const updated = fs.readText(join(skill, "SOURCES.md"));
     expect(updated).not.toContain(
       "## Primary source\n- **URL:** https://example.com/guide\n- **References:** all\n- **Last reviewed:** 2020-01-01",
     );
@@ -258,7 +255,7 @@ describe("main", () => {
   });
 
   it("audits every skill below a root", async () => {
-    const first = skillDirectory(
+    const {fs, skill: first} = skillDirectory(
       "first-skill",
       `# Sources
 
@@ -270,9 +267,8 @@ describe("main", () => {
     );
     const root = join(first, "..");
     const second = join(root, "second-skill");
-    mkdirSync(second);
-    writeFileSync(join(second, "SKILL.md"), "# second-skill\n");
-    writeFileSync(
+    fs.writeFile(join(second, "SKILL.md"), "# second-skill\n");
+    fs.writeFile(
       join(second, "SOURCES.md"),
       `# Sources
 
@@ -285,7 +281,7 @@ describe("main", () => {
     const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
-    const result = await main(["--all", root, "--json"]);
+    const result = await main(["--all", root, "--json"], fs);
 
     expect(result).toBe(0);
     const report = JSON.parse(String(log.mock.calls[0]?.[0])) as unknown[];

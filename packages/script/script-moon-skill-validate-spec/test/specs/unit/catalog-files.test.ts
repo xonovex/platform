@@ -1,34 +1,39 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, describe, expect, it} from "vitest";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {describe, expect, it} from "vitest";
 import {checkCatalogFiles} from "../../../src/catalog-files.js";
 
-const tempDirectories: string[] = [];
+const SKILL_DIR = "/skill";
 
-const makeSkill = (): string => {
-  const skillDir = mkdtempSync(join(tmpdir(), "skill-catalog-files-"));
-  tempDirectories.push(skillDir);
-  writeFileSync(
-    join(skillDir, "evals.json"),
-    JSON.stringify({
-      skill_name: "example-guide",
-      tier: "moderate",
-      evals: [1, 2, 3].map((id) => ({
-        id,
-        prompt: `prompt ${String(id)}`,
-        assertions: ["observable assertion"],
-      })),
-    }),
-  );
-  writeFileSync(
-    join(skillDir, "eval-queries.json"),
+// The evidence a complete skill ships. A case that needs one piece absent builds
+// the tree without it rather than deleting it.
+interface SkillParts {
+  readonly evals?: boolean;
+  readonly sources?: boolean;
+}
+
+const makeSkill = ({
+  evals = true,
+  sources = true,
+}: SkillParts = {}): FileSystem => {
+  const fs = memoryFileSystem({directories: [SKILL_DIR]});
+  if (evals) {
+    fs.writeFile(
+      join(SKILL_DIR, "evals.json"),
+      JSON.stringify({
+        skill_name: "example-guide",
+        tier: "moderate",
+        evals: [1, 2, 3].map((id) => ({
+          id,
+          prompt: `prompt ${String(id)}`,
+          assertions: ["observable assertion"],
+        })),
+      }),
+    );
+  }
+  fs.writeFile(
+    join(SKILL_DIR, "eval-queries.json"),
     JSON.stringify(
       [true, false].flatMap((shouldTrigger) =>
         Array.from({length: 8}, (_, index) => ({
@@ -39,43 +44,36 @@ const makeSkill = (): string => {
       ),
     ),
   );
-  writeFileSync(
-    join(skillDir, "SOURCES.md"),
-    "# Sources\n\n## Primary\n\n- **URLs:**\n  - https://example.com/docs\n- **Last reviewed:** 2026-07-19\n",
-  );
-  return skillDir;
-};
-
-afterEach(() => {
-  for (const directory of tempDirectories) {
-    rmSync(directory, {recursive: true, force: true});
+  if (sources) {
+    fs.writeFile(
+      join(SKILL_DIR, "SOURCES.md"),
+      "# Sources\n\n## Primary\n\n- **URLs:**\n  - https://example.com/docs\n- **Last reviewed:** 2026-07-19\n",
+    );
   }
-  tempDirectories.length = 0;
-});
+  return fs;
+};
 
 describe("checkCatalogFiles", () => {
   it("accepts complete output, trigger, and source evidence", () => {
-    const skillDir = makeSkill();
+    const fs = makeSkill();
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toEqual([]);
     expect(report.passes).toHaveLength(4);
   });
 
   it("rejects missing files and underspecified routing fixtures", () => {
-    const skillDir = makeSkill();
-    rmSync(join(skillDir, "evals.json"));
-    rmSync(join(skillDir, "SOURCES.md"));
-    writeFileSync(
-      join(skillDir, "eval-queries.json"),
+    const fs = makeSkill({evals: false, sources: false});
+    fs.writeFile(
+      join(SKILL_DIR, "eval-queries.json"),
       JSON.stringify([
         {query: "only one", should_trigger: true},
         {query: "only one", should_trigger: false},
       ]),
     );
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain("catalog: missing evals.json");
     expect(report.errors).toContain("catalog: missing SOURCES.md");
@@ -88,11 +86,11 @@ describe("checkCatalogFiles", () => {
   });
 
   it("requires capability metadata when a skill bundles scripts", () => {
-    const skillDir = makeSkill();
-    mkdirSync(join(skillDir, "scripts"));
-    writeFileSync(join(skillDir, "scripts", "probe.sh"), "#!/bin/sh\n");
+    const fs = makeSkill();
+    fs.makeDirectory(join(SKILL_DIR, "scripts"));
+    fs.writeFile(join(SKILL_DIR, "scripts", "probe.sh"), "#!/bin/sh\n");
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain(
       "catalog: scripted skills need compatibility runtime/network metadata",
@@ -103,22 +101,22 @@ describe("checkCatalogFiles", () => {
   });
 
   it("rejects TypeScript and MJS implementation files", () => {
-    const skillDir = makeSkill();
-    mkdirSync(join(skillDir, "scripts"));
-    writeFileSync(join(skillDir, "scripts", "validate.ts"), "");
-    writeFileSync(join(skillDir, "scripts", "evaluate.mjs"), "");
+    const fs = makeSkill();
+    fs.makeDirectory(join(SKILL_DIR, "scripts"));
+    fs.writeFile(join(SKILL_DIR, "scripts", "validate.ts"), "");
+    fs.writeFile(join(SKILL_DIR, "scripts", "evaluate.mjs"), "");
 
     expect(
-      checkCatalogFiles(skillDir, {name: "example-guide"}).errors,
+      checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs).errors,
     ).toContain(
       "catalog: skills must not contain TypeScript or MJS implementation files: scripts/evaluate.mjs, scripts/validate.ts",
     );
   });
 
   it("rejects generated routing boilerplate", () => {
-    const skillDir = makeSkill();
-    const path = join(skillDir, "eval-queries.json");
-    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+    const fs = makeSkill();
+    const path = join(SKILL_DIR, "eval-queries.json");
+    const queries = JSON.parse(fs.readText(path)) as {
       query: string;
     }[];
     const query =
@@ -126,9 +124,9 @@ describe("checkCatalogFiles", () => {
     const first = queries[0];
     if (first === undefined) throw new Error("fixture has no trigger queries");
     first.query = query;
-    writeFileSync(path, JSON.stringify(queries));
+    fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain(
       `catalog: generic trigger eval query must be replaced: '${query}'`,
@@ -140,17 +138,17 @@ describe("checkCatalogFiles", () => {
     "quick pre-merge sanity check: after the widgets change under `work/widgets/`, a clean checkout behaves differently from my local run.",
     "The clean Linux CI job fails only for the minimal widgets fixture under `work/widgets/`, while the full local fixture passes.",
   ])("rejects catalog-completion scenario templates", (query) => {
-    const skillDir = makeSkill();
-    const path = join(skillDir, "eval-queries.json");
-    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+    const fs = makeSkill();
+    const path = join(SKILL_DIR, "eval-queries.json");
+    const queries = JSON.parse(fs.readText(path)) as {
       query: string;
     }[];
     const first = queries[0];
     if (first === undefined) throw new Error("fixture has no trigger queries");
     first.query = query;
-    writeFileSync(path, JSON.stringify(queries));
+    fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain(
       `catalog: generic trigger eval query must be replaced: '${query}'`,
@@ -158,18 +156,18 @@ describe("checkCatalogFiles", () => {
   });
 
   it("rejects generated near misses concentrated in one sibling", () => {
-    const skillDir = makeSkill();
-    const path = join(skillDir, "eval-queries.json");
-    const queries = JSON.parse(readFileSync(path, "utf8")) as {
+    const fs = makeSkill();
+    const path = join(SKILL_DIR, "eval-queries.json");
+    const queries = JSON.parse(fs.readText(path)) as {
       rationale?: string;
       should_trigger: boolean;
     }[];
     for (const query of queries.filter(({should_trigger}) => !should_trigger)) {
       query.rationale = "near miss owned by one-guide";
     }
-    writeFileSync(path, JSON.stringify(queries));
+    fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain(
       "catalog: generated negative routes need at least 3 sibling owners (found 1)",
@@ -177,12 +175,16 @@ describe("checkCatalogFiles", () => {
   });
 
   it("requires a source version for a version-pinned skill", () => {
-    const skillDir = makeSkill();
+    const fs = makeSkill();
 
-    const report = checkCatalogFiles(skillDir, {
-      name: "example-guide",
-      description: "Use when editing Example 2.4+ projects.",
-    });
+    const report = checkCatalogFiles(
+      SKILL_DIR,
+      {
+        name: "example-guide",
+        description: "Use when editing Example 2.4+ projects.",
+      },
+      fs,
+    );
 
     expect(report.errors).toContain(
       "catalog: version-pinned skill needs a Version field in SOURCES.md",
@@ -190,9 +192,9 @@ describe("checkCatalogFiles", () => {
   });
 
   it("requires content or repository drift evidence for versioned web sources", () => {
-    const skillDir = makeSkill();
-    writeFileSync(
-      join(skillDir, "SOURCES.md"),
+    const fs = makeSkill();
+    fs.writeFile(
+      join(SKILL_DIR, "SOURCES.md"),
       `# Sources
 
 ## Versioned docs
@@ -203,7 +205,7 @@ describe("checkCatalogFiles", () => {
 `,
     );
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toContain(
       "catalog: versioned web source 'Versioned docs' needs Content SHA256 or Checkout + Commit + Watch drift fields",
@@ -211,13 +213,13 @@ describe("checkCatalogFiles", () => {
   });
 
   it("rejects credential examples that encourage plaintext token handling", () => {
-    const skillDir = makeSkill();
-    writeFileSync(
-      join(skillDir, "SKILL.md"),
+    const fs = makeSkill();
+    fs.writeFile(
+      join(SKILL_DIR, "SKILL.md"),
       '# Example\n\n```bash\necho "$API_TOKEN" | tool login\ntool login < token.txt\nexport API_TOKEN=secret\n```\n',
     );
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toEqual(
       expect.arrayContaining([
@@ -229,13 +231,13 @@ describe("checkCatalogFiles", () => {
   });
 
   it("allows secret exports sourced from an injected value or secret store", () => {
-    const skillDir = makeSkill();
-    writeFileSync(
-      join(skillDir, "SKILL.md"),
+    const fs = makeSkill();
+    fs.writeFile(
+      join(SKILL_DIR, "SKILL.md"),
       '# Example\n\n```bash\nexport API_TOKEN="${INJECTED_TOKEN}"\nexport SERVICE_PAT="$(secret-store read service)"\n```\n',
     );
 
-    const report = checkCatalogFiles(skillDir, {name: "example-guide"});
+    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
 
     expect(report.errors).toEqual([]);
     expect(report.passes).toContain(

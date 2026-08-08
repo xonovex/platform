@@ -1,14 +1,13 @@
-import {readdirSync, readFileSync} from "node:fs";
 import {basename, dirname, join, resolve} from "node:path";
 import {
   DRIFT_LINT_MODE_ENV,
   resolveDriftLintMode,
 } from "@xonovex/script-moon-common/drift-budgets";
 import {
-  isDirectory,
-  isFile,
-  resolveGuideDirectory,
-} from "@xonovex/script-moon-common/fs";
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
+import {resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
 import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {checkGuideDrift} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
@@ -95,26 +94,32 @@ const yamlTypeName = (value: unknown): string => {
   return typeof value;
 };
 
-const workspaceRootOrUndefined = (start: string): string | undefined => {
+const workspaceRootOrUndefined = (
+  start: string,
+  fs: FileSystem,
+): string | undefined => {
   try {
-    return findWorkspaceRoot(start);
+    return findWorkspaceRoot(start, undefined, fs);
   } catch {
     return undefined;
   }
 };
 
-const resolveTarget = (arg: string): {skill: string; skillDir: string} => {
+const resolveTarget = (
+  arg: string,
+  fs: FileSystem,
+): {skill: string; skillDir: string} => {
   const target = resolve(arg);
   let skill: string;
-  if (isDirectory(target)) {
-    skill = join(resolveGuideDirectory(target), "SKILL.md");
-  } else if (isFile(target)) {
+  if (fs.isDirectory(target)) {
+    skill = join(resolveGuideDirectory(target, fs), "SKILL.md");
+  } else if (fs.isFile(target)) {
     skill = target;
   } else {
     process.stderr.write(`Error: target not found: ${target}\n`);
     process.exit(2);
   }
-  if (!isFile(skill)) {
+  if (!fs.isFile(skill)) {
     process.stderr.write(`Error: SKILL.md not found at ${skill}\n`);
     process.exit(2);
   }
@@ -466,27 +471,26 @@ const checkSourcePlacement = (
   body: string,
   skillDir: string,
   report: Report,
+  fs: FileSystem,
 ): void => {
   const misplaced = EXTERNAL_REFERENCES_HEADING_RE.test(body)
     ? ["SKILL.md"]
     : [];
   const referencesDir = join(skillDir, "references");
-  if (isDirectory(referencesDir)) {
+  if (fs.isDirectory(referencesDir)) {
     const pending = [{directory: referencesDir, relative: "references"}];
     while (pending.length > 0) {
       const current = pending.pop();
       if (current === undefined) break;
-      for (const entry of readdirSync(current.directory, {
-        withFileTypes: true,
-      })) {
-        const path = join(current.directory, entry.name);
-        const relative = `${current.relative}/${entry.name}`;
-        if (entry.isDirectory()) {
+      for (const name of fs.readDirectory(current.directory)) {
+        const path = join(current.directory, name);
+        const relative = `${current.relative}/${name}`;
+        if (fs.isDirectory(path)) {
           pending.push({directory: path, relative});
           continue;
         }
-        if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-        const content = readFileSync(path, "utf8");
+        if (!fs.isFile(path) || !name.endsWith(".md")) continue;
+        const content = fs.readText(path);
         if (EXTERNAL_REFERENCES_HEADING_RE.test(content)) {
           misplaced.push(relative);
         }
@@ -509,6 +513,7 @@ const checkReferences = (
   body: string,
   skillDir: string,
   report: Report,
+  fs: FileSystem,
 ): void => {
   // Find unique reference paths
   const found = new Set<string>();
@@ -531,7 +536,7 @@ const checkReferences = (
     }
 
     const target = join(skillDir, "references", ref);
-    if (!isFile(target)) {
+    if (!fs.isFile(target)) {
       report.addFail(`references: broken link → references/${ref}`);
       broken += 1;
     }
@@ -602,22 +607,27 @@ const checkReferences = (
   }
 };
 
-const checkReferenceTocs = (skillDir: string, report: Report): void => {
+const checkReferenceTocs = (
+  skillDir: string,
+  report: Report,
+  fs: FileSystem,
+): void => {
   const refsDir = join(skillDir, "references");
-  if (!isDirectory(refsDir)) {
+  if (!fs.isDirectory(refsDir)) {
     return;
   }
   const tocRe = /^## *(?:Contents|Table of Contents)\b/im;
   const missing: string[] = [];
   let checked = 0;
 
-  const mdFiles = readdirSync(refsDir)
+  const mdFiles = fs
+    .readDirectory(refsDir)
     .filter((entry) => entry.endsWith(".md"))
-    .filter((entry) => isFile(join(refsDir, entry)))
+    .filter((entry) => fs.isFile(join(refsDir, entry)))
     .toSorted();
 
   for (const entry of mdFiles) {
-    const lines = splitLines(readFileSync(join(refsDir, entry), "utf8"));
+    const lines = splitLines(fs.readText(join(refsDir, entry)));
     if (lines.length <= 200) {
       continue;
     }
@@ -663,8 +673,12 @@ const checkHarnessNeutrality = (body: string, report: Report): void => {
 // The scan covers the whole package, not just SKILL.md: references, SOURCES.md,
 // eval fixtures, bundled scripts, asset templates, and the manifests all ship
 // prose a reader sees.
-const checkProsePunctuation = (packageRoot: string, report: Report): void => {
-  const findings = scanProsePunctuation(packageRoot);
+const checkProsePunctuation = (
+  packageRoot: string,
+  report: Report,
+  fs: FileSystem,
+): void => {
+  const findings = scanProsePunctuation(packageRoot, fs);
   for (const {excerpt, hint, label, line, path} of findings) {
     report.addFail(
       `punctuation: ${label} in ${path} line ${String(line)}, ${hint}: ${excerpt}`,
@@ -731,7 +745,10 @@ const HELP_TEXT = [
   "  --strict     treat authoring warnings as validation failures",
 ].join("\n");
 
-export const main = (argv: readonly string[]): number => {
+export const main = (
+  argv: readonly string[],
+  fs: FileSystem = nodeFileSystem,
+): number => {
   if (argv.includes("-h") || argv.includes("--help")) {
     console.log(HELP_TEXT);
     return 0;
@@ -750,9 +767,9 @@ export const main = (argv: readonly string[]): number => {
   const positional = argv.find((a) => !a.startsWith("-"));
   const target = positional ?? process.cwd();
 
-  const {skill: skillPath, skillDir} = resolveTarget(target);
+  const {skill: skillPath, skillDir} = resolveTarget(target, fs);
   const parentName = basename(skillDir);
-  const content = readFileSync(skillPath, "utf8");
+  const content = fs.readText(skillPath);
 
   let fm: Frontmatter;
   let body: string;
@@ -770,27 +787,28 @@ export const main = (argv: readonly string[]): number => {
   checkFrontmatter(fm, parentName, report);
   checkLoaderQuoting(fmRaw, report);
   checkBody(body, report);
-  checkSourcePlacement(body, skillDir, report);
-  checkReferences(body, skillDir, report);
-  checkReferenceTocs(skillDir, report);
-  checkReferenceFileLinks(skillDir, report);
+  checkSourcePlacement(body, skillDir, report, fs);
+  checkReferences(body, skillDir, report, fs);
+  checkReferenceTocs(skillDir, report, fs);
+  checkReferenceFileLinks(skillDir, report, fs);
   checkHarnessNeutrality(body, report);
   checkProsePunctuation(
-    isFile(join(dirname(skillDir), "package.json"))
+    fs.isFile(join(dirname(skillDir), "package.json"))
       ? dirname(skillDir)
       : skillDir,
     report,
+    fs,
   );
-  const catalogReport = checkCatalogFiles(skillDir, fm);
+  const catalogReport = checkCatalogFiles(skillDir, fm, fs);
   for (const pass of catalogReport.passes) report.addPass(pass);
   for (const error of catalogReport.errors) report.addFail(error);
 
   // Budgets and vocabulary are repository-scoped; a skill validated outside a
   // workspace simply has no manifests to measure against.
-  const repositoryRoot = workspaceRootOrUndefined(skillDir);
+  const repositoryRoot = workspaceRootOrUndefined(skillDir, fs);
   if (repositoryRoot !== undefined) {
     const driftMode = resolveDriftLintMode(process.env[DRIFT_LINT_MODE_ENV]);
-    const drift = checkGuideDrift(skillDir, repositoryRoot);
+    const drift = checkGuideDrift(skillDir, repositoryRoot, fs);
     for (const error of drift.manifestErrors) report.addFail(error);
     for (const finding of drift.findings) {
       if (driftMode === "enforce") report.addFail(finding);

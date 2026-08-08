@@ -1,13 +1,12 @@
 import {execFileSync} from "node:child_process";
 import {createHash} from "node:crypto";
-import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {basename, join, resolve, sep} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
-  isDirectory,
-  isFile,
-  resolveGuideDirectory,
-} from "@xonovex/script-moon-common/fs";
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
+import {resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
 import {parseArgs, type ParsedArgs} from "./args.js";
 import {
   hasReferenceMapping,
@@ -128,16 +127,19 @@ const daysBetween = (today: Date, reviewed: Date): number => {
   return Math.round((a - b) / msPerDay);
 };
 
-const resolveSourcesFile = (target: string): string | undefined => {
-  if (isFile(target) && basename(target) === "SOURCES.md") {
+const resolveSourcesFile = (
+  target: string,
+  fs: FileSystem,
+): string | undefined => {
+  if (fs.isFile(target) && basename(target) === "SOURCES.md") {
     return target;
   }
-  if (isDirectory(target)) {
-    if (isFile(join(target, "SOURCES.md"))) {
+  if (fs.isDirectory(target)) {
+    if (fs.isFile(join(target, "SOURCES.md"))) {
       return join(target, "SOURCES.md");
     }
     const guideDir = resolveGuideDirectory(target);
-    if (isFile(join(guideDir, "SOURCES.md"))) {
+    if (fs.isFile(join(guideDir, "SOURCES.md"))) {
       return join(guideDir, "SOURCES.md");
     }
   }
@@ -212,12 +214,12 @@ const aggregateContentSha256 = (
   return digest.digest("hex");
 };
 
-const listExistingRefs = (skillDir: string): Set<string> => {
+const listExistingRefs = (skillDir: string, fs: FileSystem): Set<string> => {
   const refsDir = join(skillDir, "references");
-  if (!isDirectory(refsDir)) return new Set<string>();
+  if (!fs.isDirectory(refsDir)) return new Set<string>();
   const refs = new Set<string>();
-  for (const entry of readdirSync(refsDir)) {
-    if (entry.endsWith(".md") && isFile(join(refsDir, entry))) {
+  for (const entry of fs.readDirectory(refsDir)) {
+    if (entry.endsWith(".md") && fs.isFile(join(refsDir, entry))) {
       refs.add(entry);
     }
   }
@@ -225,10 +227,10 @@ const listExistingRefs = (skillDir: string): Set<string> => {
 };
 
 // findWorkspaceRoot resolves checkout paths from the nearest Moon workspace.
-const findWorkspaceRoot = (start: string): string => {
+const findWorkspaceRoot = (start: string, fs: FileSystem): string => {
   let dir = resolve(start);
   for (;;) {
-    if (isDirectory(join(dir, ".moon"))) return dir;
+    if (fs.isDirectory(join(dir, ".moon"))) return dir;
     const parent = resolve(dir, "..");
     if (parent === dir) return resolve(start);
     dir = parent;
@@ -281,6 +283,7 @@ const computeDrift = (
   workspaceRoot: string,
   source: Source,
   pull: boolean,
+  fs: FileSystem,
 ): DriftReport => {
   const checkout = resolve(workspaceRoot, source.checkout ?? "");
   const report: DriftReport = {
@@ -294,7 +297,7 @@ const computeDrift = (
     commits: [],
     review_refs: [],
   };
-  if (!isDirectory(checkout) || !isDirectory(join(checkout, ".git"))) {
+  if (!fs.isDirectory(checkout) || !fs.isDirectory(join(checkout, ".git"))) {
     return {...report, note: "checkout not found or not a git repo"};
   }
   report.resolved = true;
@@ -375,6 +378,7 @@ interface AuditContext {
 const auditSource = async (
   s: Source,
   context: AuditContext,
+  fs: FileSystem,
 ): Promise<{readonly report: SourceReport; readonly problems: number}> => {
   const {
     existingRefs,
@@ -444,7 +448,7 @@ const auditSource = async (
     }
   }
   if (s.checkout !== undefined) {
-    const drift = computeDrift(workspaceRoot, s, pull);
+    const drift = computeDrift(workspaceRoot, s, pull, fs);
     report.drift = drift;
     if (drift.pull_failed || drift.behind || drift.commit_count > 0) {
       problems += 1;
@@ -460,13 +464,14 @@ const auditSkill = async (
   doFetch: boolean,
   pull: boolean,
   today: Date,
+  fs: FileSystem,
 ): Promise<SkillReport> => {
   const skillDir = resolve(sourcesFile, "..");
-  const workspaceRoot = findWorkspaceRoot(skillDir);
-  const text = readFileSync(sourcesFile, "utf8");
+  const workspaceRoot = findWorkspaceRoot(skillDir, fs);
+  const text = fs.readText(sourcesFile);
   const sources = parseSources(text);
 
-  const existingRefs = listExistingRefs(skillDir);
+  const existingRefs = listExistingRefs(skillDir, fs);
   const context: AuditContext = {
     doFetch,
     existingRefs,
@@ -481,7 +486,7 @@ const auditSkill = async (
   const srcReports: SourceReport[] = [];
   let problems = 0;
   for (const s of sources) {
-    const audited = await auditSource(s, context);
+    const audited = await auditSource(s, context, fs);
     problems += audited.problems;
     for (const r of s.refs) covered.add(r);
     if (s.coversAllReferences) {
@@ -507,8 +512,9 @@ const markReviewed = (
   sourcesFile: string,
   titleFilter: string | undefined,
   today: Date,
+  fs: FileSystem,
 ): string[] => {
-  const text = readFileSync(sourcesFile, "utf8");
+  const text = fs.readText(sourcesFile);
   const lines = text.split(/(?<=\n)/);
   const needle = titleFilter ? titleFilter.toLowerCase() : undefined;
   const edited: string[] = [];
@@ -533,7 +539,7 @@ const markReviewed = (
     }
   }
   if (edited.length > 0) {
-    writeFileSync(sourcesFile, lines.join(""), "utf8");
+    fs.writeFile(sourcesFile, lines.join(""));
   }
   return edited;
 };
@@ -653,14 +659,14 @@ const printTextReport = (
   );
 };
 
-const collectTargets = (args: ParsedArgs): string[] => {
+const collectTargets = (args: ParsedArgs, fs: FileSystem): string[] => {
   if (args.all !== undefined) {
     const root = args.all;
-    if (!isDirectory(root)) {
+    if (!fs.isDirectory(root)) {
       process.stderr.write(`error: --all root not a directory: ${root}\n`);
       process.exit(2);
     }
-    const found = walkSourcesFiles(root).toSorted(comparePaths);
+    const found = walkSourcesFiles(root, fs).toSorted(comparePaths);
     if (found.length === 0) {
       process.stderr.write(`error: no SOURCES.md found under ${root}\n`);
       process.exit(2);
@@ -669,7 +675,7 @@ const collectTargets = (args: ParsedArgs): string[] => {
   }
   // collectTargets uses the current directory when no target is supplied.
   const target = args.target ?? process.cwd();
-  const sf = resolveSourcesFile(target);
+  const sf = resolveSourcesFile(target, fs);
   if (sf === undefined) {
     process.stderr.write(`error: no SOURCES.md at ${target}\n`);
     process.exit(2);
@@ -691,21 +697,21 @@ const comparePaths = (a: string, b: string): number => {
   return partsA.length - partsB.length;
 };
 
-const walkSourcesFiles = (root: string): string[] => {
+const walkSourcesFiles = (root: string, fs: FileSystem): string[] => {
   const found: string[] = [];
   const walk = (dir: string): void => {
     let entries: string[];
     try {
-      entries = readdirSync(dir);
+      entries = [...fs.readDirectory(dir)];
     } catch {
       return;
     }
     for (const entry of entries) {
       const full = join(dir, entry);
-      if (isDirectory(full)) {
+      if (fs.isDirectory(full)) {
         if (entry === "node_modules") continue;
         walk(full);
-      } else if (entry === "SOURCES.md" && isFile(join(dir, "SKILL.md"))) {
+      } else if (entry === "SOURCES.md" && fs.isFile(join(dir, "SKILL.md"))) {
         found.push(full);
       }
     }
@@ -714,14 +720,17 @@ const walkSourcesFiles = (root: string): string[] => {
   return found;
 };
 
-export const main = async (argv: readonly string[]): Promise<number> => {
+export const main = async (
+  argv: readonly string[],
+  fs: FileSystem = nodeFileSystem,
+): Promise<number> => {
   const args = parseArgs(argv);
   if (args.help) {
     console.log(HELP);
     return 0;
   }
   const today = new Date();
-  const targets = collectTargets(args);
+  const targets = collectTargets(args, fs);
 
   // --mark-reviewed is a single-skill write action; refuse it for --all.
   if (args.markReviewed !== undefined) {
@@ -732,7 +741,12 @@ export const main = async (argv: readonly string[]): Promise<number> => {
       );
       return 2;
     }
-    const edited = markReviewed(single, args.markReviewed || undefined, today);
+    const edited = markReviewed(
+      single,
+      args.markReviewed || undefined,
+      today,
+      fs,
+    );
     if (edited.length > 0) {
       process.stderr.write(
         `stamped 'Last reviewed' = ${toIsoDate(today)} for: ` +
@@ -755,6 +769,7 @@ export const main = async (argv: readonly string[]): Promise<number> => {
         args.fetch,
         args.pull,
         today,
+        fs,
       ),
     );
   }

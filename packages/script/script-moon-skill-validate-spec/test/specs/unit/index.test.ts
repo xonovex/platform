@@ -1,18 +1,13 @@
-import {cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {join, resolve} from "node:path";
+import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main as validateSkill} from "../../../src/validate-skill.js";
 
-describe("skill validator entrypoints", () => {
-  const temporaryDirectories: string[] = [];
+const ROOT = "/repo";
 
+describe("skill validator entrypoints", () => {
   afterEach(() => {
     vi.restoreAllMocks();
-    for (const directory of temporaryDirectories) {
-      rmSync(directory, {recursive: true, force: true});
-    }
-    temporaryDirectories.length = 0;
   });
 
   it("renders validator help without reading a skill", () => {
@@ -24,74 +19,15 @@ describe("skill validator entrypoints", () => {
     expect(validateSkill(["--unknown"])).toBe(2);
   });
 
-  it("validates a complete repository skill", () => {
-    const skill = resolve(
-      import.meta.dirname,
-      "../../../../../skill/skill-code-quality",
-    );
-    vi.spyOn(console, "log").mockImplementation(() => {});
-
-    const result = validateSkill(["--strict", skill]);
-
-    expect(result).toBe(0);
-  });
-
-  it("keeps drift findings advisory in warn mode and blocking in enforce mode", () => {
-    // A copied skill in a throwaway workspace keeps the assertion independent of
-    // whatever the real catalog currently measures.
-    const root = mkdtempSync(join(tmpdir(), "skill-drift-"));
-    temporaryDirectories.push(root);
-    mkdirSync(join(root, ".moon"));
-    const guide = join(root, "packages", "skill", "skill-code-quality");
-    mkdirSync(join(root, "packages", "skill"), {recursive: true});
-    cpSync(
-      resolve(import.meta.dirname, "../../../../../skill/skill-code-quality"),
-      guide,
-      {recursive: true},
-    );
-    writeFileSync(
-      join(root, "budgets.json"),
-      JSON.stringify({
-        "packages/skill/skill-code-quality/code-quality-guide/SKILL.md": 1,
-      }),
-      "utf8",
-    );
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    expect(validateSkill(["--strict", guide])).toBe(0);
-    expect(log.mock.calls.flat().join("\n")).toContain("[DRIFT] budget:");
-
-    process.env.XONOVEX_LINT_MODE = "enforce";
-    try {
-      expect(validateSkill(["--strict", guide])).toBe(1);
-    } finally {
-      delete process.env.XONOVEX_LINT_MODE;
-    }
-  });
-
-  it("allows the catalog's explicit Claude Code adapter name", () => {
-    const skill = resolve(
-      import.meta.dirname,
-      "../../../../../skill/skill-claude-code",
-    );
-    vi.spyOn(console, "log").mockImplementation(() => {});
-
-    const result = validateSkill(["--strict", skill]);
-
-    expect(result).toBe(0);
-  });
-
   it("reports malformed frontmatter and missing catalog files", () => {
-    const root = mkdtempSync(join(tmpdir(), "skill-validate-"));
-    temporaryDirectories.push(root);
-    const skill = join(root, "invalid-skill");
-    mkdirSync(skill);
-    mkdirSync(join(skill, "references", "nested"), {recursive: true});
-    writeFileSync(
+    const fs = memoryFileSystem({directories: [ROOT]});
+    const skill = join(ROOT, "invalid-skill");
+    fs.makeDirectory(join(skill, "references", "nested"));
+    fs.writeFile(
       join(skill, "references", "nested", "sources.md"),
       "# Details\n\n## External References\n\n- https://example.com/nested-source\n",
     );
-    writeFileSync(
+    fs.writeFile(
       join(skill, "SKILL.md"),
       `---
 name: Invalid Skill
@@ -109,7 +45,7 @@ Use references/missing_file.md with @references/legacy.md.
     );
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const result = validateSkill([skill]);
+    const result = validateSkill([skill], fs);
 
     expect(result).toBe(1);
     const output = log.mock.calls.flat().join("\n");
@@ -125,13 +61,12 @@ Use references/missing_file.md with @references/legacy.md.
   });
 
   it("fails on an em dash or ellipsis anywhere in the package", () => {
-    const root = mkdtempSync(join(tmpdir(), "skill-punctuation-"));
-    temporaryDirectories.push(root);
-    const packageDir = join(root, "skill-dashed");
+    const fs = memoryFileSystem({directories: [ROOT]});
+    const packageDir = join(ROOT, "skill-dashed");
     const skill = join(packageDir, "dashed-guide");
-    mkdirSync(join(skill, "references"), {recursive: true});
-    writeFileSync(join(packageDir, "package.json"), '{"name": "skill-dashed"}');
-    writeFileSync(
+    fs.makeDirectory(join(skill, "references"));
+    fs.writeFile(join(packageDir, "package.json"), '{"name": "skill-dashed"}');
+    fs.writeFile(
       join(skill, "SKILL.md"),
       `---
 name: dashed-guide
@@ -142,17 +77,17 @@ description: "Use when checking punctuation. Triggers on validator fixtures, eve
 - **Label** \u2014 detail
 `,
     );
-    writeFileSync(
+    fs.writeFile(
       join(skill, "references", "one.md"),
       "# One\n\n- Use when\u2026\n",
     );
-    writeFileSync(
+    fs.writeFile(
       join(skill, "eval-queries.json"),
       String.raw`{"queries": [{"query": "a \u2014 b"}]}`,
     );
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const result = validateSkill([skill]);
+    const result = validateSkill([skill], fs);
 
     expect(result).toBe(1);
     const output = log.mock.calls.flat().join("\n");
@@ -170,14 +105,12 @@ description: "Use when checking punctuation. Triggers on validator fixtures, eve
   });
 
   it("returns an input error for invalid YAML frontmatter", () => {
-    const root = mkdtempSync(join(tmpdir(), "skill-validate-"));
-    temporaryDirectories.push(root);
-    const skill = join(root, "invalid-yaml");
-    mkdirSync(skill);
-    writeFileSync(join(skill, "SKILL.md"), "---\nname: [\n---\n# Guide\n");
+    const fs = memoryFileSystem({directories: [ROOT]});
+    const skill = join(ROOT, "invalid-yaml");
+    fs.writeFile(join(skill, "SKILL.md"), "---\nname: [\n---\n# Guide\n");
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
-    const result = validateSkill([skill]);
+    const result = validateSkill([skill], fs);
 
     expect(result).toBe(2);
   });

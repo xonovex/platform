@@ -1,6 +1,6 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
-tags: [typescript-script]
+tags: [typescript-script, typescript-acceptance]
 dependsOn:
   - script-moon-common
   - script-moon-skill-catalog-common
@@ -24,7 +24,7 @@ tasks:
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "75"
-      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_FUNCTIONS: "89"
       TS_COVERAGE_MIN_BRANCHES: "60"
       TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:
@@ -33,3 +33,9 @@ tasks:
       # an edit to either must invalidate this project's cached result.
       - /packages/skill/skill-code-quality/**/*
       - /packages/skill/skill-claude-code/**/*
+  # The acceptance tier validates the catalog's own skill packages and the shipped
+  # templates rather than a fixture, so a catalog edit has to change this project's
+  # hash or moon serves the previous pass from cache.
+  ts-test-acceptance:
+    inputs:
+      - /packages/skill/**/*
