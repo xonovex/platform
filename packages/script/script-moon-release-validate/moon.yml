@@ -33,6 +33,10 @@ tasks:
       - ~:build
     inputs:
       - src/**/*
+      # The filesystem-import check reads every package's TypeScript sources, so
+      # without them a new direct node:fs import leaves this task's hash
+      # unchanged and moon serves the previous pass from cache.
+      - /packages/*/*/src/**/*.ts
       - /README.md
       - /package-lock.json
       - /.github/workflows/release.yml

@@ -10,6 +10,10 @@ import {
 } from "./bin-targets.js";
 import {coverageFloorFailures} from "./coverage-floors.js";
 import {dependencySourceFailures} from "./dependency-sources.js";
+import {
+  filesystemImportFailures,
+  staleAllowlistFailures,
+} from "./filesystem-imports.js";
 import {workspaceHasherFailures} from "./hasher-ignore.js";
 import {
   instructionDocFailures,
@@ -70,6 +74,22 @@ const readJson = <Output>(
     return undefined;
   }
   return result.data;
+};
+
+// Every .ts under a project's src, so a direct filesystem import cannot hide in a
+// nested module. A project that ships no src contributes nothing.
+const typescriptSources = (directory: string): readonly string[] => {
+  let entries: readonly string[];
+  try {
+    entries = readdirSync(directory);
+  } catch {
+    return [];
+  }
+  return entries.flatMap((name) => {
+    const path = resolve(directory, name);
+    if (statSync(path).isDirectory()) return typescriptSources(path);
+    return name.endsWith(".ts") ? [path] : [];
+  });
 };
 
 const childDirectories = (
@@ -653,6 +673,22 @@ export const validateRelease = (
     text: file.text,
   }));
   for (const failure of dependencySourceFailures(dependencyProjects)) {
+    check(false, failure);
+  }
+
+  // Every module under src reaches the filesystem through the FileSystem port,
+  // so the unit tier can drive it from an in-memory tree. A direct node:fs
+  // import puts a real disk back into whatever tier reaches that module.
+  const sourceFiles = projectDirectories.flatMap((project) =>
+    typescriptSources(resolve(project, "src")).map((path) => ({
+      path: path.slice(repositoryRoot.length + 1),
+      text: readFileSync(path, "utf8"),
+    })),
+  );
+  for (const failure of filesystemImportFailures(sourceFiles)) {
+    check(false, failure);
+  }
+  for (const failure of staleAllowlistFailures(sourceFiles)) {
     check(false, failure);
   }
 
