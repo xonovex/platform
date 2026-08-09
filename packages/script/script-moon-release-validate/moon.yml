@@ -4,7 +4,15 @@ tags: [typescript-script, typescript-integration]
 dependsOn:
   - script-moon-common
 fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
   dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
     - /packages/script/script-moon-common/src/**/*
 tasks:
   coverage:
@@ -44,6 +52,15 @@ tasks:
       - /.github/workflows/release.yml
       - /.moon/tasks/*.yml
       - /packages/*/*/moon.yml
+      # The dependencySources check derives the config packages a project reads
+      # from the files that name them, so an edit to one of these changes what
+      # the check expects and must change this task's hash with it.
+      - /packages/*/*/package.json
+      - /packages/*/*/eslint.config.*
+      - /packages/*/*/prettier.config.*
+      - /packages/*/*/vitest.config.*
+      - /packages/*/*/vite.config.*
+      - /packages/*/*/tsconfig*.json
       - /.claude-plugin/marketplace.json
       - /.agents/plugins/marketplace.json
       - /packages/command/*/package.json

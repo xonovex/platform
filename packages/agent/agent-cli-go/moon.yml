@@ -16,6 +16,8 @@ dependsOn:
   - id: vitest-config-node
     scope: development
 fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
   dependencySources:
     - /packages/config/eslint-config-base/src/**/*
     - /packages/config/eslint-config-cli/src/**/*

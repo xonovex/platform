@@ -1,6 +1,16 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: typescript
 tags: [typescript-script, typescript-integration]
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
 tasks:
   # These floors cover the unit tier alone. src/file-system.ts and
   # src/child-process.ts are the adapters onto a real disk and a real process,

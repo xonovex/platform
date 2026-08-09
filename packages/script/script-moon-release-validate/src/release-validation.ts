@@ -39,6 +39,20 @@ import {
   releaseWorkflowFailures,
 } from "./validate.js";
 
+// The files a project names a config package in, which is how eslint, prettier,
+// vitest, and tsc are configured without a dependsOn edge that would cycle.
+const CONFIG_FILE_NAMES = [
+  "eslint.config.ts",
+  "eslint.config.js",
+  "prettier.config.ts",
+  "prettier.config.js",
+  "vitest.config.ts",
+  "vite.config.ts",
+  "tsconfig.json",
+  "tsconfig.build.json",
+  "tsconfig.test.json",
+] as const;
+
 export interface ReleaseValidationResult {
   readonly checks: number;
   readonly failures: readonly string[];
@@ -669,11 +683,28 @@ export const validateRelease = (
   // A project's id is its directory name and its source is the directory itself,
   // which is how a dependency named in dependsOn resolves to the src glob its
   // dependents must declare.
-  const dependencyProjects = projectFiles.map((file) => ({
-    id: basename(dirname(file.path)),
-    source: dirname(file.path),
-    text: file.text,
-  }));
+  const dependencyProjects = projectFiles.map((file) => {
+    const directory = resolve(repositoryRoot, dirname(file.path));
+    const readIfPresent = (name: string): string | undefined => {
+      const path = resolve(directory, name);
+      return existsSync(path) ? readFileSync(path, "utf8") : undefined;
+    };
+    const manifest = readIfPresent("package.json");
+    return {
+      id: basename(dirname(file.path)),
+      source: dirname(file.path),
+      text: file.text,
+      packageName:
+        manifest === undefined
+          ? undefined
+          : (JSON.parse(manifest) as {name?: string}).name,
+      // Where a config package is named: a config package cannot be a dependsOn
+      // edge without cycling, so its source reaches the hash through here.
+      configTexts: CONFIG_FILE_NAMES.map((name) => readIfPresent(name)).filter(
+        (text): text is string => text !== undefined,
+      ),
+    };
+  });
   for (const failure of dependencySourceFailures(dependencyProjects)) {
     check(false, failure);
   }

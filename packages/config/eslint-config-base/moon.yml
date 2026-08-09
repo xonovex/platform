@@ -8,7 +8,11 @@ tags:
 dependsOn:
   - ts-config-node
 fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
   dependencySources:
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
     - /packages/config/ts-config-node/src/**/*
 tasks:
   ts-test:

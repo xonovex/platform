@@ -16,7 +16,19 @@ export interface ProjectFile {
   readonly source: string;
   readonly id: string;
   readonly text: string;
+  /** The name in the project's package.json, which is how a config file names it. */
+  readonly packageName?: string;
+  /**
+   * The contents of the project's eslint, prettier, vitest, vite, and tsconfig
+   * files, which is where a config package is named. A config package cannot be
+   * a dependsOn edge, because it is tagged npm and its publish tasks depend on
+   * the script packages, so the reverse edge makes moon reject the graph with
+   * would_cycle. It is still read, so its source still has to be an input.
+   */
+  readonly configTexts?: readonly string[];
 }
+
+const PACKAGE_REFERENCE = /@[a-z0-9-]+\/[a-z0-9-]+/gu;
 
 // A project carrying any of these inherits the typescript task templates, whose
 // tasks read the source of the packages it depends on.
@@ -50,8 +62,9 @@ const dependencyIds = (
  * read the source of the packages it depends on. Moon does not fold a dependency
  * task's hash into its dependent, so a project that leaves one out serves a
  * cached pass over code its dependency has already broken. This reports a
- * dependencySources file group that has drifted from the transitive dependsOn
- * closure in either direction.
+ * dependencySources file group that has drifted, in either direction, from the
+ * transitive dependsOn closure together with the config packages the project
+ * names in its own eslint, prettier, vitest, and tsconfig files.
  */
 export const dependencySourceFailures = (
   files: readonly ProjectFile[],
@@ -59,6 +72,14 @@ export const dependencySourceFailures = (
   const failures: string[] = [];
   const parsed = new Map<string, z.infer<typeof ProjectFileSchema>>();
   const sourceById = new Map<string, string>();
+  const fileById = new Map<string, ProjectFile>();
+  const idByPackageName = new Map<string, string>();
+
+  for (const file of files) {
+    if (file.packageName !== undefined) {
+      idByPackageName.set(file.packageName, file.id);
+    }
+  }
 
   for (const file of files) {
     let input: unknown;
@@ -76,6 +97,7 @@ export const dependencySourceFailures = (
     }
     parsed.set(file.id, result.data);
     sourceById.set(file.id, file.source);
+    fileById.set(file.id, file);
   }
 
   const closure = (id: string, seen: Set<string>): Set<string> => {
@@ -87,12 +109,30 @@ export const dependencySourceFailures = (
     return seen;
   };
 
+  // The config packages a project names in its own config files, plus whatever
+  // those name in turn, since a config package re-exports the one it extends.
+  const configClosure = (id: string): Set<string> => {
+    const referenced = new Set<string>();
+    for (const text of fileById.get(id)?.configTexts ?? []) {
+      for (const [reference] of text.matchAll(PACKAGE_REFERENCE)) {
+        const target = idByPackageName.get(reference);
+        if (target !== undefined && target !== id) referenced.add(target);
+      }
+    }
+    for (const target of [...referenced]) closure(target, referenced);
+    referenced.delete(id);
+    return referenced;
+  };
+
   for (const [id, project] of parsed) {
     const tags = project.tags ?? [];
     if (tags.every((tag) => !TYPESCRIPT_TAGS.has(tag))) continue;
 
+    const reachable = closure(id, new Set<string>());
+    for (const target of configClosure(id)) reachable.add(target);
+
     const expected = new Set(
-      [...closure(id, new Set<string>())]
+      [...reachable]
         .filter((dependency) =>
           (parsed.get(dependency)?.tags ?? []).some((tag) =>
             READABLE_TAGS.has(tag),
@@ -122,7 +162,7 @@ export const dependencySourceFailures = (
     );
     if (extra.length > 0) {
       failures.push(
-        `${id} file group '${DEPENDENCY_SOURCES}' declares ${extra.toSorted().join(", ")}, which dependsOn does not reach: drop it or add the dependency`,
+        `${id} file group '${DEPENDENCY_SOURCES}' declares ${extra.toSorted().join(", ")}, which neither dependsOn nor a config file reaches: drop it or add the dependency`,
       );
     }
   }
