@@ -1,3 +1,5 @@
+import {z} from "zod";
+
 export interface SourceFile {
   /** Repository-relative path, which is how a failure names the file. */
   readonly path: string;
@@ -8,66 +10,42 @@ const FS_IMPORT_RE =
   /^\s*(?:import|export)[^;]*?from\s+["']node:fs(?:\/promises)?["']/mu;
 
 /**
- * The modules allowed to reach node:fs directly, each with the reason it cannot
- * go through the FileSystem port. Every other module under src takes the port as
- * a parameter, which is what keeps the unit tier off a real disk. Adding an entry
- * is a reviewed decision rather than a silent import, which is the whole point of
- * naming them here rather than exempting a directory.
+ * The modules allowed to reach node:fs directly, read from the repository's
+ * filesystem-allowlist.json so the release gate and the editor rule cannot
+ * disagree about which they are. Each entry carries the reason the module cannot
+ * go through the FileSystem port, so adding one is a reviewed decision rather
+ * than a silent import.
  */
-const ALLOWED: ReadonlyMap<string, string> = new Map([
-  [
-    "packages/script/script-moon-common/src/file-system.ts",
-    "is the node adapter the port is defined against",
-  ],
-  [
-    "packages/config/eslint-config-base/src/gitignore.ts",
-    "is a config package, which cannot depend on script-moon-common without inverting config -> shared -> agent",
-  ],
-  [
-    "packages/agent/agent-cli-go/src/bin.ts",
-    "is the launcher that locates the built Go binary before any port exists",
-  ],
-  [
-    "packages/script/script-moon-npm-check/src/index.ts",
-    "is a composition root that supplies the real filesystem to its checks",
-  ],
-  [
-    "packages/script/script-moon-npm-publish/src/cli.ts",
-    "defines the defaultDependencies its port is driven from",
-  ],
-  [
-    "packages/script/script-moon-release-validate/src/release-validation.ts",
-    "is a composition root that walks the repository it validates",
-  ],
-  [
-    "packages/script/script-moon-skill-eval-common/src/trigger-process.ts",
-    "stages an isolated workspace for a harness process it spawns",
-  ],
-  [
-    "packages/script/script-moon-skill-eval-outputs/src/output-harness.ts",
-    "stages an isolated workspace for a harness process it spawns",
-  ],
-  [
-    "packages/script/script-moon-skill-eval-outputs/src/evaluate.ts",
-    "defines the discard in defaultDependencies, which removes a previous run's evidence",
-  ],
-  [
-    "packages/script/script-moon-skill-eval-routing/src/routing-evaluate.ts",
-    "defines the discard in defaultDependencies, which removes a previous run's evidence",
-  ],
-  [
-    "packages/script/script-moon-skill-eval-triggers/src/evaluate.ts",
-    "defines the discard in defaultDependencies, which removes a previous run's evidence",
-  ],
-  [
-    "packages/script/script-moon-version-bump/src/file-transaction.ts",
-    "defines the defaultIo whose exclusive write and rename the transaction rests on",
-  ],
-  [
-    "packages/script/script-moon-version-bump/src/package-changes.ts",
-    "reads a changelog relative to the package being bumped",
-  ],
-]);
+export const FilesystemAllowlistSchema = z.record(
+  z.string(),
+  z.string().min(1),
+);
+
+export type FilesystemAllowlist = z.infer<typeof FilesystemAllowlistSchema>;
+
+export const FILESYSTEM_ALLOWLIST_FILE = "filesystem-allowlist.json";
+
+export const parseFilesystemAllowlist = (
+  text: string,
+): {readonly allowed: FilesystemAllowlist; readonly error?: string} => {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    return {
+      allowed: {},
+      error: `${FILESYSTEM_ALLOWLIST_FILE} is not valid JSON: ${detail}`,
+    };
+  }
+  const result = FilesystemAllowlistSchema.safeParse(parsed);
+  return result.success
+    ? {allowed: result.data}
+    : {
+        allowed: {},
+        error: `${FILESYSTEM_ALLOWLIST_FILE} must map a repository-relative path to the reason it cannot use the port`,
+      };
+};
 
 /**
  * Reports a module under src that imports node:fs without being named above. The
@@ -76,12 +54,16 @@ const ALLOWED: ReadonlyMap<string, string> = new Map([
  */
 export const filesystemImportFailures = (
   files: readonly SourceFile[],
+  allowed: FilesystemAllowlist,
 ): readonly string[] =>
   files
-    .filter((file) => !ALLOWED.has(file.path) && FS_IMPORT_RE.test(file.text))
+    .filter(
+      (file) =>
+        allowed[file.path] === undefined && FS_IMPORT_RE.test(file.text),
+    )
     .map(
       (file) =>
-        `${file.path} imports node:fs directly: take the FileSystem port from @xonovex/script-moon-common/file-system as a defaulted last parameter, or add the file to the allowlist in filesystem-imports.ts with the reason it cannot`,
+        `${file.path} imports node:fs directly: take the FileSystem port from @xonovex/script-moon-common/file-system as a defaulted last parameter, or add the file to filesystem-allowlist.json with the reason it cannot`,
     )
     .toSorted();
 
@@ -93,16 +75,17 @@ export const filesystemImportFailures = (
  */
 export const staleAllowlistFailures = (
   files: readonly SourceFile[],
+  allowed: FilesystemAllowlist,
 ): readonly string[] => {
   const scanned = new Map(files.map((file) => [file.path, file.text]));
-  return [...ALLOWED.keys()]
+  return Object.keys(allowed)
     .filter((path) => {
       const text = scanned.get(path);
       return text !== undefined && !FS_IMPORT_RE.test(text);
     })
     .map(
       (path) =>
-        `${path} is allowed to import node:fs but no longer does: drop it from the allowlist in filesystem-imports.ts`,
+        `${path} is allowed to import node:fs but no longer does: drop it from filesystem-allowlist.json`,
     )
     .toSorted();
 };

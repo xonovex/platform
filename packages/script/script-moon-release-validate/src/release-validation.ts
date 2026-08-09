@@ -11,7 +11,9 @@ import {
 import {coverageFloorFailures} from "./coverage-floors.js";
 import {dependencySourceFailures} from "./dependency-sources.js";
 import {
+  FILESYSTEM_ALLOWLIST_FILE,
   filesystemImportFailures,
+  parseFilesystemAllowlist,
   staleAllowlistFailures,
 } from "./filesystem-imports.js";
 import {workspaceHasherFailures} from "./hasher-ignore.js";
@@ -685,10 +687,21 @@ export const validateRelease = (
       text: readFileSync(path, "utf8"),
     })),
   );
-  for (const failure of filesystemImportFailures(sourceFiles)) {
+  const allowlistPath = resolve(repositoryRoot, FILESYSTEM_ALLOWLIST_FILE);
+  const allowlist = existsSync(allowlistPath)
+    ? parseFilesystemAllowlist(readFileSync(allowlistPath, "utf8"))
+    : {allowed: {}};
+  check(allowlist.error === undefined, allowlist.error ?? "");
+  for (const failure of filesystemImportFailures(
+    sourceFiles,
+    allowlist.allowed,
+  )) {
     check(false, failure);
   }
-  for (const failure of staleAllowlistFailures(sourceFiles)) {
+  for (const failure of staleAllowlistFailures(
+    sourceFiles,
+    allowlist.allowed,
+  )) {
     check(false, failure);
   }
 

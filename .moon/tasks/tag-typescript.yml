@@ -16,6 +16,11 @@ implicitInputs:
   # script-moon-release-validate fails the build when the set drifts from
   # dependsOn.
   - "@globs(dependencySources)"
+  # Every package's eslint.config.ts composes the workspace layer, which reads the
+  # filesystem allowlist. Without them an allowlist edit leaves a project's hash
+  # unchanged and moon serves a lint pass from before the rule changed.
+  - /eslint.workspace.ts
+  - /filesystem-allowlist.json
 fileGroups:
   sources:
     - src/**/*

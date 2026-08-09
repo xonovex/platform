@@ -1,0 +1,15 @@
+{
+  "packages/agent/agent-cli-go/src/bin.ts": "is the launcher that locates the built Go binary before any port exists",
+  "packages/config/eslint-config-base/src/gitignore.ts": "is a config package, which cannot depend on script-moon-common without inverting config -> shared -> agent",
+  "packages/script/script-moon-common/src/file-system.ts": "is the node adapter the port is defined against",
+  "packages/script/script-moon-npm-check/src/index.ts": "is a composition root that supplies the real filesystem to its checks",
+  "packages/script/script-moon-npm-publish/src/cli.ts": "defines the defaultDependencies its port is driven from",
+  "packages/script/script-moon-release-validate/src/release-validation.ts": "is a composition root that walks the repository it validates",
+  "packages/script/script-moon-skill-eval-common/src/trigger-process.ts": "stages an isolated workspace for a harness process it spawns",
+  "packages/script/script-moon-skill-eval-outputs/src/evaluate.ts": "defines the discard in defaultDependencies, which removes a previous run's evidence",
+  "packages/script/script-moon-skill-eval-outputs/src/output-harness.ts": "stages an isolated workspace for a harness process it spawns",
+  "packages/script/script-moon-skill-eval-routing/src/routing-evaluate.ts": "defines the discard in defaultDependencies, which removes a previous run's evidence",
+  "packages/script/script-moon-skill-eval-triggers/src/evaluate.ts": "defines the discard in defaultDependencies, which removes a previous run's evidence",
+  "packages/script/script-moon-version-bump/src/file-transaction.ts": "defines the defaultIo whose exclusive write and rename the transaction rests on",
+  "packages/script/script-moon-version-bump/src/package-changes.ts": "reads a changelog relative to the package being bumped"
+}
