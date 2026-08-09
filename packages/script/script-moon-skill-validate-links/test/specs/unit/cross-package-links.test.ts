@@ -1,8 +1,8 @@
-import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {dirname, join} from "node:path";
+import {join} from "node:path";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {type LinkReport} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
-import {afterEach, describe, expect, it} from "vitest";
+import {describe, expect, it} from "vitest";
 import {
   checkCrossPackageLinks,
   checkMarkdownFilesForCrossPackageLinks,
@@ -10,7 +10,7 @@ import {
   checkSkillDependencies,
 } from "../../../src/cross-package-links.js";
 
-const created: string[] = [];
+const REPO = "/repo";
 
 const makeSink = (): LinkReport & {fails: string[]; passes: string[]} => {
   const fails: string[] = [];
@@ -27,11 +27,8 @@ const makeSink = (): LinkReport & {fails: string[]; passes: string[]} => {
   };
 };
 
-// Build a throwaway repo whose files are written at the given repo-relative
-// paths, creating parent directories as needed. Returns the repo root.
-const makeRepo = (files: Record<string, string>): string => {
-  const root = mkdtempSync(join(tmpdir(), "xpkg-links-"));
-  created.push(root);
+// Build a repo in memory whose files sit at the given repo-relative paths.
+const makeRepo = (files: Record<string, string>): FileSystem => {
   const generatedPackageFiles = Object.fromEntries(
     Object.entries(files).flatMap(([path, content]) => {
       const match =
@@ -63,15 +60,13 @@ const makeRepo = (files: Record<string, string>): string => {
       ];
     }),
   );
-  for (const [rel, content] of Object.entries({
-    ...generatedPackageFiles,
-    ...files,
-  })) {
-    const abs = join(root, rel);
-    mkdirSync(dirname(abs), {recursive: true});
-    writeFileSync(abs, content);
-  }
-  return root;
+  return memoryFileSystem({
+    files: Object.fromEntries(
+      Object.entries({...generatedPackageFiles, ...files}).map(
+        ([rel, content]) => [join(REPO, rel), content],
+      ),
+    ),
+  });
 };
 
 const manifest = (
@@ -98,42 +93,37 @@ const commandFiles = (
     ]),
   );
 
-afterEach(() => {
-  while (created.length > 0) {
-    const dir = created.pop();
-    if (dir !== undefined) rmSync(dir, {recursive: true, force: true});
-  }
-});
-
 describe("checkMarkdownFilesForCrossPackageLinks", () => {
   it("resolves a boundary-crossing link to an existing target", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-x/x-guide/references/actors.md": "# Actors\n",
       "packages/command/command-test/commands/foo.md":
         "See [actors](../../../skill/skill-x/x-guide/references/actors.md).",
     });
-    const source = join(repo, "packages/command/command-test/commands/foo.md");
+    const source = join(REPO, "packages/command/command-test/commands/foo.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
     expect(counts).toEqual({resolved: 1, broken: 0});
     expect(report.fails).toEqual([]);
   });
 
   it("fails a boundary-crossing link whose target is missing, naming the source and link", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/command/command-test/commands/foo.md":
         "See [actors](../../../skill/skill-x/x-guide/references/actors.md).",
     });
-    const source = join(repo, "packages/command/command-test/commands/foo.md");
+    const source = join(REPO, "packages/command/command-test/commands/foo.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
     expect(counts.broken).toBe(1);
     expect(report.fails).toHaveLength(1);
@@ -146,7 +136,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
   });
 
   it("ignores link-shaped text inside a fenced block or an inline span", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/command/command-test/commands/foo.md": [
         "```c",
         "  m->listeners[i](../../../skill/skill-x/x-guide/references/gone.md);",
@@ -155,13 +145,14 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
         "A markdown hyperlink `[name](../../../skill/skill-x/x-guide/nope.md)`.",
       ].join("\n"),
     });
-    const source = join(repo, "packages/command/command-test/commands/foo.md");
+    const source = join(REPO, "packages/command/command-test/commands/foo.md");
     const report = makeSink();
 
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
 
     expect(counts).toEqual({resolved: 0, broken: 0});
@@ -169,22 +160,23 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
   });
 
   it("ignores an intra-package link, even a broken one", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/command/command-test/docs/a.md": "See [b](./missing.md).",
     });
-    const source = join(repo, "packages/command/command-test/docs/a.md");
+    const source = join(REPO, "packages/command/command-test/docs/a.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
     expect(counts).toEqual({resolved: 0, broken: 0});
     expect(report.fails).toEqual([]);
   });
 
   it("skips external, placeholder, ellipsis, and anchor forms", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/command/command-test/docs/skips.md": [
         "[a](https://example.com)",
         "[b](mailto:x@y.z)",
@@ -194,29 +186,31 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
         "[f](#anchor)",
       ].join("\n"),
     });
-    const source = join(repo, "packages/command/command-test/docs/skips.md");
+    const source = join(REPO, "packages/command/command-test/docs/skips.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
     expect(counts).toEqual({resolved: 0, broken: 0});
     expect(report.fails).toEqual([]);
   });
 
   it("resolves a boundary-crossing link that carries an in-page fragment", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-y/y-guide/references/g.md": "# G\n",
       "packages/command/command-test/docs/a.md":
         "See [g](../../../skill/skill-y/y-guide/references/g.md#section).",
     });
-    const source = join(repo, "packages/command/command-test/docs/a.md");
+    const source = join(REPO, "packages/command/command-test/docs/a.md");
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
       [source],
-      repo,
+      REPO,
       report,
+      fs,
     );
     expect(counts).toEqual({resolved: 1, broken: 0});
     expect(report.fails).toEqual([]);
@@ -225,7 +219,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
 describe("checkCrossPackageLinks", () => {
   it("scans command packages and retained planning references", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       ...commandFiles(),
       "packages/command/command-test/README.md":
         "See the [command model](../../asset/asset-diagrams/command-model.png).\n",
@@ -245,13 +239,13 @@ describe("checkCrossPackageLinks", () => {
         manifest("xonovex-skill-plan"),
     });
     const report = makeSink();
-    checkCrossPackageLinks(repo, report);
+    checkCrossPackageLinks(REPO, report, fs);
     expect(report.fails).toEqual([]);
     expect(report.passes).toContain("cross-package links: 2/2 link(s) resolve");
   });
 
   it("fails when a discovered SKILL.md points at a moved contract", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-x/x-guide/SKILL.md":
         "# X\nSee [g](../../skill-y/y-guide/references/g.md).\n",
       "packages/skill/skill-x/.claude-plugin/plugin.json": manifest(
@@ -263,7 +257,7 @@ describe("checkCrossPackageLinks", () => {
         manifest("xonovex-skill-x"),
     });
     const report = makeSink();
-    checkCrossPackageLinks(repo, report);
+    checkCrossPackageLinks(REPO, report, fs);
     expect(report.passes).not.toContain(
       "cross-package links: 1/1 link(s) resolve",
     );
@@ -276,18 +270,19 @@ describe("checkCrossPackageLinks", () => {
 
 describe("checkNamedSkillHandoffs", () => {
   it("resolves catalog guide names and rejects missing handoffs", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-x/x-guide/SKILL.md":
         "Use **known-guide** and **missing-guide**.\n",
     });
-    const source = join(repo, "packages/skill/skill-x/x-guide/SKILL.md");
+    const source = join(REPO, "packages/skill/skill-x/x-guide/SKILL.md");
     const report = makeSink();
 
     const counts = checkNamedSkillHandoffs(
       [source],
       new Set(["known-guide"]),
-      repo,
+      REPO,
       report,
+      fs,
     );
 
     expect(counts).toEqual({resolved: 1, broken: 1});
@@ -299,7 +294,7 @@ describe("checkNamedSkillHandoffs", () => {
 
 describe("checkSkillDependencies", () => {
   it("accepts matching acyclic manifest pairs", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-base",
@@ -322,7 +317,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toEqual([]);
     expect(report.passes).toContain(
@@ -331,7 +326,7 @@ describe("checkSkillDependencies", () => {
   });
 
   it("rejects mismatched, dangling, and cyclic dependencies", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-a/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-a",
         ["xonovex-skill-b", "xonovex-skill-missing", "xonovex-skill-other"],
@@ -353,7 +348,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill dependencies: manifest dependencies differ for xonovex-skill-a",
@@ -367,13 +362,13 @@ describe("checkSkillDependencies", () => {
   });
 
   it("rejects a discovered skill that has neither manifest", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-unpackaged/unpackaged-guide/SKILL.md":
         "# Unpackaged\n",
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill dependencies: packages/skill/skill-unpackaged needs both Claude and Codex manifests",
@@ -381,7 +376,7 @@ describe("checkSkillDependencies", () => {
   });
 
   it("requires package-derived plugin names", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-wrong",
@@ -404,7 +399,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill dependencies: manifests in packages/skill/skill-base must be named xonovex-skill-base",
@@ -412,7 +407,7 @@ describe("checkSkillDependencies", () => {
   });
 
   it("requires plugin hard dependencies in the npm and Moon graph", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-base",
@@ -439,7 +434,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill dependencies: xonovex-skill-child declares xonovex-skill-base in its plugin manifests but omits @xonovex/skill-base from package.json",
@@ -447,7 +442,7 @@ describe("checkSkillDependencies", () => {
   });
 
   it("requires exact bidirectional npm and plugin dependency parity", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-base",
@@ -475,7 +470,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill dependencies: xonovex-skill-child declares @xonovex/skill-base in package.json but omits xonovex-skill-base from its plugin manifests",
@@ -511,7 +506,7 @@ describe("checkSkillDependencies", () => {
     });
     const pinnedReport = makeSink();
 
-    checkSkillDependencies(pinnedRepo, pinnedReport);
+    checkSkillDependencies(REPO, pinnedReport, pinnedRepo);
 
     expect(pinnedReport.fails).toContain(
       "skill dependencies: xonovex-skill-child pins @xonovex/skill-base@^7.0.0; expected exact installed version 7.0.0",
@@ -519,7 +514,7 @@ describe("checkSkillDependencies", () => {
   });
 
   it("rejects stale and mismatched manifest skill paths", () => {
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-renamed/renamed-guide/SKILL.md": "# Renamed\n",
       "packages/skill/skill-renamed/.claude-plugin/plugin.json": manifest(
         "xonovex-skill-renamed",
@@ -536,7 +531,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContain(
       "skill packaging: manifest skill paths differ for xonovex-skill-renamed",
@@ -552,7 +547,7 @@ describe("checkSkillDependencies", () => {
       (_, index) =>
         `shared concept phrase number ${String(index)} stays identical`,
     ).join(" ");
-    const repo = makeRepo({
+    const fs = makeRepo({
       "packages/skill/skill-base/base-guide/SKILL.md": "# Base\n",
       "packages/skill/skill-base/base-guide/references/concept.md": duplicated,
       "packages/skill/skill-base/.claude-plugin/plugin.json": manifest(
@@ -578,7 +573,7 @@ describe("checkSkillDependencies", () => {
     });
     const report = makeSink();
 
-    checkSkillDependencies(repo, report);
+    checkSkillDependencies(REPO, report, fs);
 
     expect(report.fails).toContainEqual(
       expect.stringContaining(

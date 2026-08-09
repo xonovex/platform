@@ -1,5 +1,8 @@
-import {readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, dirname, join, relative, resolve, sep} from "node:path";
+import {
+  nodeFileSystem,
+  type FileSystem,
+} from "@xonovex/script-moon-common/file-system";
 import {isRecord} from "@xonovex/script-moon-common/records";
 import {
   MD_LINK_RE,
@@ -9,30 +12,9 @@ import {
 
 // This module validates relative links that cross package boundaries.
 
-const exists = (path: string): boolean => {
-  try {
-    statSync(path);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const isDir = (path: string): boolean => {
-  try {
-    return statSync(path).isDirectory();
-  } catch {
-    return false;
-  }
-};
-
-const isFile = (path: string): boolean => {
-  try {
-    return statSync(path).isFile();
-  } catch {
-    return false;
-  }
-};
+// A path of either kind, which is what a link target may legitimately be.
+const exists = (path: string, fs: FileSystem): boolean =>
+  fs.isFile(path) || fs.isDirectory(path);
 
 const isStringArray = (value: unknown): value is readonly string[] =>
   Array.isArray(value) && value.every((entry) => typeof entry === "string");
@@ -79,10 +61,11 @@ const readSkillPluginManifest = (
   kind: "Claude" | "Codex",
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): SkillPluginManifest | undefined => {
   let value: unknown;
   try {
-    value = JSON.parse(readFileSync(path, "utf8")) as unknown;
+    value = JSON.parse(fs.readText(path)) as unknown;
   } catch (error) {
     report.addFail(
       `skill dependencies: invalid JSON in ${relative(repoRoot, path)}: ${error instanceof Error ? error.message : String(error)}`,
@@ -148,26 +131,30 @@ const canonicalCycle = (cycle: readonly string[]): string => {
     : [...canonical, first].join(" → ");
 };
 
-const skillPackageSurface = (pkgDir: string): SkillPackageSurface => {
-  const guideNames = readdirSync(pkgDir)
-    .filter((entry) => isFile(join(pkgDir, entry, "SKILL.md")))
+const skillPackageSurface = (
+  pkgDir: string,
+  fs: FileSystem,
+): SkillPackageSurface => {
+  const guideNames = fs
+    .readDirectory(pkgDir)
+    .filter((entry) => fs.isFile(join(pkgDir, entry, "SKILL.md")))
     .toSorted();
   const references = guideNames.flatMap((guide) =>
-    markdownEntries(join(pkgDir, guide, "references")).map((path) => ({
+    markdownEntries(join(pkgDir, guide, "references"), fs).map((path) => ({
       path: relative(pkgDir, path),
-      text: readFileSync(path, "utf8"),
+      text: fs.readText(path),
     })),
   );
   const files = guideNames.flatMap((guide) => {
     const guideDir = join(pkgDir, guide);
     return [
       join(guideDir, "SKILL.md"),
-      ...markdownEntries(join(guideDir, "references")),
+      ...markdownEntries(join(guideDir, "references"), fs),
     ];
   });
   return {
     guideNames,
-    markdown: files.map((file) => readFileSync(file, "utf8")).join("\n"),
+    markdown: files.map((file) => fs.readText(file)).join("\n"),
     references,
   };
 };
@@ -230,14 +217,17 @@ const checkSkillPackage = (
   pkg: string,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): SkillPackageCheck | undefined => {
   const claudePath = join(pkgDir, ".claude-plugin", "plugin.json");
   const codexPath = join(pkgDir, ".codex-plugin", "plugin.json");
-  const hasGuide = readdirSync(pkgDir).some((entry) =>
-    isFile(join(pkgDir, entry, "SKILL.md")),
-  );
-  if (!hasGuide && !isFile(claudePath) && !isFile(codexPath)) return undefined;
-  if (!isFile(claudePath) || !isFile(codexPath)) {
+  const hasGuide = fs
+    .readDirectory(pkgDir)
+    .some((entry) => fs.isFile(join(pkgDir, entry, "SKILL.md")));
+  if (!hasGuide && !fs.isFile(claudePath) && !fs.isFile(codexPath)) {
+    return undefined;
+  }
+  if (!fs.isFile(claudePath) || !fs.isFile(codexPath)) {
     report.addFail(
       `skill dependencies: ${relative(repoRoot, pkgDir)} needs both Claude and Codex manifests`,
     );
@@ -248,8 +238,15 @@ const checkSkillPackage = (
     "Claude",
     repoRoot,
     report,
+    fs,
   );
-  const codex = readSkillPluginManifest(codexPath, "Codex", repoRoot, report);
+  const codex = readSkillPluginManifest(
+    codexPath,
+    "Codex",
+    repoRoot,
+    report,
+    fs,
+  );
   if (claude === undefined || codex === undefined) {
     return {valid: false, pair: false, manifest: undefined, surface: undefined};
   }
@@ -280,7 +277,7 @@ const checkSkillPackage = (
       `skill packaging: manifest skill paths differ for ${claude.name}`,
     );
   }
-  const surface = skillPackageSurface(pkgDir);
+  const surface = skillPackageSurface(pkgDir, fs);
   const expectedSkills = surface.guideNames.map((guide) => `./${guide}`);
   for (const [kind, manifest] of [
     ["Claude", claude],
@@ -307,11 +304,10 @@ const readPackageDependencies = (
   packagePath: string,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): Readonly<Record<string, string>> | undefined => {
   try {
-    const packageJson = JSON.parse(
-      readFileSync(packagePath, "utf8"),
-    ) as unknown;
+    const packageJson = JSON.parse(fs.readText(packagePath)) as unknown;
     if (isRecord(packageJson) && isStringRecord(packageJson.dependencies)) {
       return packageJson.dependencies;
     }
@@ -338,6 +334,7 @@ const checkDependencyVersion = (
   declaredVersion: string,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): boolean => {
   const dependencyPackagePath = join(
     repoRoot,
@@ -348,7 +345,7 @@ const checkDependencyVersion = (
   );
   try {
     const dependencyPackage = JSON.parse(
-      readFileSync(dependencyPackagePath, "utf8"),
+      fs.readText(dependencyPackagePath),
     ) as unknown;
     const expectedVersion =
       isRecord(dependencyPackage) &&
@@ -386,6 +383,7 @@ const checkManifestDependency = (
   surfaces: ReadonlyMap<string, SkillPackageSurface>,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): boolean => {
   if (!manifests.has(dependency)) {
     report.addFail(
@@ -409,6 +407,7 @@ const checkManifestDependency = (
       declaredVersion,
       repoRoot,
       report,
+      fs,
     );
   }
   const sourceSurface = surfaces.get(manifest.name);
@@ -431,6 +430,7 @@ const checkDeclaredDependencies = (
   surfaces: ReadonlyMap<string, SkillPackageSurface>,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem,
 ): boolean => {
   let valid = true;
   for (const manifest of manifests.values()) {
@@ -445,6 +445,7 @@ const checkDeclaredDependencies = (
       packagePath,
       repoRoot,
       report,
+      fs,
     );
     if (packageDependencies === undefined) valid = false;
     for (const npmDependency of Object.keys(packageDependencies ?? {}).filter(
@@ -468,6 +469,7 @@ const checkDeclaredDependencies = (
           surfaces,
           repoRoot,
           report,
+          fs,
         ) && valid;
     }
   }
@@ -500,17 +502,18 @@ const dependencyCycles = (
 export const checkSkillDependencies = (
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem = nodeFileSystem,
 ): void => {
   const skillRoot = join(repoRoot, "packages", "skill");
-  if (!isDir(skillRoot)) return;
+  if (!fs.isDirectory(skillRoot)) return;
   const manifests = new Map<string, SkillPluginManifest>();
   const surfaces = new Map<string, SkillPackageSurface>();
   let pairs = 0;
   let valid = true;
-  for (const pkg of readdirSync(skillRoot).toSorted()) {
+  for (const pkg of fs.readDirectory(skillRoot).toSorted()) {
     const pkgDir = join(skillRoot, pkg);
-    if (!pkg.startsWith("skill-") || !isDir(pkgDir)) continue;
-    const checked = checkSkillPackage(pkgDir, pkg, repoRoot, report);
+    if (!pkg.startsWith("skill-") || !fs.isDirectory(pkgDir)) continue;
+    const checked = checkSkillPackage(pkgDir, pkg, repoRoot, report, fs);
     if (checked === undefined) continue;
     valid &&= checked.valid;
     if (checked.pair) pairs += 1;
@@ -529,7 +532,8 @@ export const checkSkillDependencies = (
   }
 
   valid =
-    checkDeclaredDependencies(manifests, surfaces, repoRoot, report) && valid;
+    checkDeclaredDependencies(manifests, surfaces, repoRoot, report, fs) &&
+    valid;
   for (const cycle of dependencyCycles(manifests)) {
     valid = false;
     report.addFail(`skill dependencies: dependency cycle ${cycle}`);
@@ -547,11 +551,12 @@ export const checkNamedSkillHandoffs = (
   knownGuideNames: ReadonlySet<string>,
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem = nodeFileSystem,
 ): {resolved: number; broken: number} => {
   let resolved = 0;
   let broken = 0;
   for (const file of files) {
-    const text = readFileSync(file, "utf8");
+    const text = fs.readText(file);
     for (const match of text.matchAll(NAMED_GUIDE_RE)) {
       const guide = match[1];
       if (guide === undefined) continue;
@@ -568,28 +573,29 @@ export const checkNamedSkillHandoffs = (
   return {resolved, broken};
 };
 
-const markdownEntries = (dir: string): string[] =>
-  isDir(dir)
-    ? readdirSync(dir)
+const markdownEntries = (dir: string, fs: FileSystem): string[] =>
+  fs.isDirectory(dir)
+    ? fs
+        .readDirectory(dir)
         .filter((entry) => entry.endsWith(".md"))
-        .filter((entry) => isFile(join(dir, entry)))
+        .filter((entry) => fs.isFile(join(dir, entry)))
         .toSorted()
         .map((entry) => join(dir, entry))
     : [];
 
 // collectSkillMarkdown returns guide and reference Markdown across skill packages.
-const collectSkillMarkdown = (repoRoot: string): string[] => {
+const collectSkillMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
   const skillRoot = join(repoRoot, "packages", "skill");
-  if (!isDir(skillRoot)) return [];
+  if (!fs.isDirectory(skillRoot)) return [];
   const files: string[] = [];
-  for (const pkg of readdirSync(skillRoot).toSorted()) {
+  for (const pkg of fs.readDirectory(skillRoot).toSorted()) {
     const pkgDir = join(skillRoot, pkg);
-    if (!isDir(pkgDir)) continue;
-    for (const guide of readdirSync(pkgDir).toSorted()) {
+    if (!fs.isDirectory(pkgDir)) continue;
+    for (const guide of fs.readDirectory(pkgDir).toSorted()) {
       const guideDir = join(pkgDir, guide);
       const skillMd = join(guideDir, "SKILL.md");
-      if (!isFile(skillMd)) continue;
-      files.push(skillMd, ...markdownEntries(join(guideDir, "references")));
+      if (!fs.isFile(skillMd)) continue;
+      files.push(skillMd, ...markdownEntries(join(guideDir, "references"), fs));
     }
   }
   return files;
@@ -597,19 +603,20 @@ const collectSkillMarkdown = (repoRoot: string): string[] => {
 
 // collectCommandMarkdown returns the published Markdown surface of every command
 // package so cross-package references do not depend on one special command family.
-const collectCommandMarkdown = (repoRoot: string): string[] => {
+const collectCommandMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
   const root = join(repoRoot, "packages", "command");
-  if (!isDir(root)) return [];
-  return readdirSync(root)
+  if (!fs.isDirectory(root)) return [];
+  return fs
+    .readDirectory(root)
     .toSorted()
     .flatMap((pkg) => {
       const base = join(root, pkg);
-      if (!isDir(base)) return [];
+      if (!fs.isDirectory(base)) return [];
       return [
         join(base, "README.md"),
-        ...markdownEntries(join(base, "docs")),
-        ...markdownEntries(join(base, "commands")),
-      ].filter(isFile);
+        ...markdownEntries(join(base, "docs"), fs),
+        ...markdownEntries(join(base, "commands"), fs),
+      ].filter((path) => fs.isFile(path));
     });
 };
 
@@ -653,12 +660,13 @@ export const checkMarkdownFilesForCrossPackageLinks = (
   files: readonly string[],
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem = nodeFileSystem,
 ): LinkCounts => {
   let resolved = 0;
   let broken = 0;
   for (const file of files) {
     const dir = dirname(file);
-    const text = withoutCodeSpans(readFileSync(file, "utf8"));
+    const text = withoutCodeSpans(fs.readText(file));
     for (const m of text.matchAll(MD_LINK_RE)) {
       const raw = m[1];
       if (raw === undefined) continue;
@@ -666,7 +674,7 @@ export const checkMarkdownFilesForCrossPackageLinks = (
       if (target === null) continue;
       const resolvedTarget = resolve(dir, target);
       if (!crossesPackageBoundary(file, resolvedTarget, repoRoot)) continue;
-      if (exists(resolvedTarget)) {
+      if (exists(resolvedTarget, fs)) {
         resolved += 1;
       } else {
         report.addFail(
@@ -683,15 +691,17 @@ export const checkMarkdownFilesForCrossPackageLinks = (
 export const checkCrossPackageLinks = (
   repoRoot: string,
   report: LinkReport,
+  fs: FileSystem = nodeFileSystem,
 ): void => {
   const files = [
-    ...collectSkillMarkdown(repoRoot),
-    ...collectCommandMarkdown(repoRoot),
+    ...collectSkillMarkdown(repoRoot, fs),
+    ...collectCommandMarkdown(repoRoot, fs),
   ];
   const {resolved, broken} = checkMarkdownFilesForCrossPackageLinks(
     files,
     repoRoot,
     report,
+    fs,
   );
   if (broken === 0 && resolved > 0) {
     report.addPass(
@@ -708,6 +718,7 @@ export const checkCrossPackageLinks = (
     knownGuideNames,
     repoRoot,
     report,
+    fs,
   );
   if (handoffs.broken === 0 && handoffs.resolved > 0) {
     report.addPass(
