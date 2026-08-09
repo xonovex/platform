@@ -236,6 +236,23 @@ describe("evaluation configuration", () => {
     expect(failureMessage(resolveConfig())).toContain("no skill_name given");
   });
 
+  it("rejects a harness the runner cannot drive", () => {
+    expect(failureMessage(resolveConfig(["--harness", "gemini"]))).toBe(
+      "invalid harness 'gemini'; expected claude or codex",
+    );
+    expect(
+      failureMessage(resolveConfig([], {SKILL_EVAL_HARNESS: "gemini"})),
+    ).toContain("invalid harness 'gemini'");
+  });
+
+  it("rejects a skill argument the evals file does not declare", () => {
+    // The evals declare test-skill, so asking for another skill would score one
+    // skill's answers against another's evaluations.
+    expect(failureMessage(resolveConfig(["evals.json", "other-skill"]))).toBe(
+      "skill name mismatch: requested 'other-skill' but evals declare 'test-skill'",
+    );
+  });
+
   it("rejects malformed, empty, ungradable, and duplicate evaluations", () => {
     const evalsPath = join(directory, "evals.json");
     fs.writeFile(evalsPath, "not-json");

@@ -72,6 +72,10 @@ const dependencies = (
   fs,
   workingDirectory: ROOT,
   now: () => 0,
+  // The harness is answered from this tree, so its availability must not be
+  // read from the host's PATH.
+  executableAvailable: () => true,
+  environment: {},
   discard: () => {
     // Nothing to discard: each case builds its own tree.
   },
@@ -180,6 +184,8 @@ describe("the output evaluator", () => {
         fs,
         workingDirectory: ROOT,
         now: () => 0,
+        executableAvailable: () => true,
+        environment: {},
         discard: () => {
           // Nothing to discard: each case builds its own tree.
         },

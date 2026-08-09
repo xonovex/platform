@@ -167,6 +167,12 @@ export interface EvaluatorDependencies {
   // Where relative paths and the guide are resolved from. A run uses the process
   // directory; a test names a directory in its own tree.
   readonly workingDirectory?: string;
+  // Whether the harness CLI can be run. A run probes PATH; a test answers from
+  // its own tree, so the verdict does not depend on what the host has installed.
+  readonly executableAvailable?: (command: string) => boolean;
+  // The variables the harness and budget defaults are read from. A run uses the
+  // process environment; a test names its own.
+  readonly environment?: Readonly<Record<string, string | undefined>>;
 }
 
 export const defaultDependencies: EvaluatorDependencies = {
@@ -185,6 +191,8 @@ export const main = async (
   const configResult = resolveEvaluationConfig(argv, {
     fs: dependencies.fs,
     workingDirectory: dependencies.workingDirectory,
+    executableAvailable: dependencies.executableAvailable,
+    environment: dependencies.environment,
   });
   for (const warning of configResult.warnings) {
     process.stderr.write(`${warning}\n`);
