@@ -9,6 +9,15 @@ Record that a plan is not approved, with a reason, so it is not expanded or exec
 3. **Record it**, set `status: rejected`, refresh the `updated` date, and append the reason under a `## Rejection` section (date + reason) so the history stays visible
 4. **Present** the reason and the suggested next step, `revise` to address it, `research` if context was missing, or leave it rejected, then STOP
 
+## Example
+
+```text
+Rejected: plans/order-import-backpressure.md. Reason, recorded under
+## Rejection (2026-01-12): criterion 3 names no measurable target and
+group 2 depends on an unowned staging feed. Next: revise to address
+it, or research if the feed's ownership is the missing context.
+```
+
 ## Gotchas
 
 - A `rejected` plan fails `expand` (which requires `status: approved`), it cannot be executed until addressed and re-accepted with `accept`

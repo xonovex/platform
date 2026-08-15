@@ -13,6 +13,14 @@ A plan with `status: pending-approval` (or `rejected`, when re-accepting after f
 3. **Set `status: approved`** and refresh the `updated` date; change nothing else
 4. **Present** a one-line confirmation and the next step (`expand`), then STOP
 
+## Example
+
+```text
+Approved: plans/order-import-backpressure.md (status: approved,
+updated 2026-01-12). Sanity: skills_to_consult populated, criteria
+present, dependencies reconciled, no open annotations. Next: expand.
+```
+
 ## Gotchas
 
 - Approving only flips the status, it does not generate subplans or implement; `expand` is the next step and requires `status: approved`
