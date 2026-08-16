@@ -25,4 +25,8 @@ export default {
   // Import order configuration
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrderTypeScriptVersion: "5.0.0",
+
+  // Agent instructions are one line per paragraph or list item; proseWrap
+  // defaults to "preserve", which would neither enforce nor undo that.
+  overrides: [{files: "**/AGENTS.md", options: {proseWrap: "never"}}],
 };
