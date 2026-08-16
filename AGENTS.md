@@ -61,6 +61,4 @@
 
 ## Tone
 
-<tone_preference>
-Keep outputs reasonably concise.
-</tone_preference>
+<tone_preference> Keep outputs reasonably concise. </tone_preference>
