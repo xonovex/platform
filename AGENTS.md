@@ -40,9 +40,10 @@
 
 - **Prose**: plain sentences; comma, colon, or full stop over an em dash; colon after a label; three periods for an ellipsis; straight quotes
 - **Line breaks**: do not hard-wrap Markdown. Write one paragraph or list item on one line and leave the wrapping to whatever renders it
-- **Simplified Technical English**: ASD-STE100 in docs, comments, plans, and reports: approved words in their approved sense, one idea per sentence, active voice, simple present or past, one term per thing, 20 words in a procedure and 25 in a description
+- **Simplified Technical English**: ASD-STE100 in replies to the user and in reports: approved words in their approved sense, one idea per sentence, active voice, simple present or past, one term per thing
 - **Response length**: brief and focused; short caveats; a high-level summary unless asked for depth
 - **Readability**: lead with the outcome, detail after. Complete sentences and spelled-out terms; no arrow chain, stacked compound, or invented label
+- **Names in replies**: in replies to the user and in reports, name a plan, package, or document in full. Never a letter, an initial, or a document-number shorthand. A file path stays a file path
 - **Deliverable length**: match the document to the task; no filler, redundant summary, or boilerplate
 - **Progress updates**: one sentence before the first tool call, then only for an important find or a change of direction
 - **Corrections**: correct only what changes a conclusion or a decision; state it plainly and continue
