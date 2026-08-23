@@ -76,6 +76,8 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-delegate`         | Work a roadmap as supervisor: brief an agent per item, verify it, record and commit        |
 | `plan-validate`         | Verify that a plan or current work has been fully achieved                                 |
 | `plan-update`           | Update plan status and test results                                                        |
+| `plan-followup`         | Close out a completed, paused, or handed-over plan with an inline follow-up record         |
+| `plan-distill`          | Distill a completed plan's branch, record, and logs into a replayable skill suite          |
 | `git-commit`            | Commit and push changes                                                                    |
 | `plan-worktree-merge`   | Merge feature worktree back to source                                                      |
 | `plan-worktree-abandon` | Document and abandon a feature with reason and learnings                                   |

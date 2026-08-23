@@ -91,6 +91,24 @@
         "The critique first evaluates the pinned plan and criteria without author context, preserving its initial findings.",
         "It then resolves the supplied context in a second pass and reports whether each finding was confirmed, changed, or added without treating context as evidence."
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "Close out the plan below. The last commit has landed. Return the follow-up record inline; do not read or edit any files.\n\nPlan: replace the hand-rolled queue in packages/worker with a broker.\n  Success criteria: (1) all jobs flow through the broker, (2) no message loss during deploy, (3) the legacy queue module is deleted, (4) p95 job latency unchanged.\n  State: criteria 1 and 4 verified by the load test on commit 4f2a. Criterion 2 needs a production deploy window that operations has not scheduled. Criterion 3 is blocked because the billing service still imports the legacy module directly; its team has not been asked. During the work we found the retry logic double-charges on timeout and did not fix it. Two counts of migrated job types circulate: the plan says 14, the dashboard says 16.",
+      "assertions": [
+        "Every success criterion lands in exactly one bucket: met with named evidence, gated with a named gate, or open with a named owner",
+        "The record distinguishes the human gate from the cross-team dependency, records the unfixed double-charge defect with an owner, and reports the disagreeing counts rather than picking one",
+        "The operation returns the record inline and does not claim to have written files or changed plan state"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Plan the reconstruction phase for distilling the completed work described below into a replayable skill suite. Return the source inventory and the fan-out you would launch, with the report structure you would require from each agent. Work only from the text; do not read files or launch anything.\n\nAvailable: a 25-commit branch feature/payments-v2 with a known merge base; a plans/payments-v2/ directory containing a retrospective and a blockers file; 30MB of agent session logs from the run; a developer guide the work rewrote.",
+      "assertions": [
+        "The plan reads the plan record first and personally, before any delegation, and partitions the commits into tiers with one reconstruction agent per tier plus a log miner",
+        "Each agent's required report covers what was built with paths and snippets, why, order dependencies, temporary versus final, failure modes with mechanisms, and exact validation commands",
+        "Log handling samples rather than reads wholesale, and the log miner hunts for what the written record omits such as reverts and abandoned attempts"
+      ]
     }
   ]
 }

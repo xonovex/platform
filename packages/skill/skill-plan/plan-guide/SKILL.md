@@ -1,6 +1,6 @@
 ---
 name: plan-guide
-description: "Use when researching, creating, critiquing, revising, expanding, continuing, updating, or validating an implementation plan. Triggers on plan or subplan work, plan-driven implementation, codebase research explicitly intended to support a future plan, success-criteria validation, cross-session decision context, and resuming work from a plan reference, even when the user doesn't say 'plan'."
+description: "Use when researching, creating, critiquing, revising, expanding, continuing, updating, validating, closing out, or distilling an implementation plan. Triggers on plan or subplan work, plan-driven implementation, codebase research explicitly intended to support a future plan, success-criteria validation, cross-session decision context, resuming work from a plan reference, wrapping up or handing over a finished or stalled plan, and turning a completed plan's implementation into reusable skills, even when the user doesn't say 'plan'."
 ---
 
 # Implementation Planning Guidelines
@@ -29,6 +29,8 @@ belong to the caller; this skill adds no rule of its own on any of them.
 - **Continue**: implement one plan or child plan and stop, see [references/continue.md](references/continue.md)
 - **Update**: refresh descriptive progress and validation evidence, see [references/update.md](references/update.md)
 - **Validate**: evaluate explicit success criteria without changing the plan, see [references/validate.md](references/validate.md)
+- **Followup**: close out a completed, paused, or handed-over plan with an inline follow-up record, see [references/followup.md](references/followup.md)
+- **Distill**: turn a completed plan's implementation into a replayable skill suite, see [references/distill.md](references/distill.md)
 
 ## Gotchas
 
@@ -65,3 +67,8 @@ belong to the caller; this skill adds no rule of its own on any of them.
 - Read [references/delegate.md](references/delegate.md) - Load when supervising a roadmap's execution by handing each item to an implementation agent and verifying the result
 - Read [references/update.md](references/update.md) - Load when refreshing a plan with current progress and validation evidence
 - Read [references/validate.md](references/validate.md) - Load when checking a plan's success criteria and Definition of Done without mutation
+- Read [references/followup.md](references/followup.md) - Load when closing out a completed, paused, or handed-over plan with an inline record of status, gates, decisions, residue, and follow-up seeds
+- Read [references/followup-templates.md](references/followup-templates.md) - Load when assembling any follow-up record section (one skeleton per section)
+- Read [references/distill.md](references/distill.md) - Load when distilling a completed plan's branch, record, and execution logs into a self-contained replayable skill suite
+- Read [references/distill-sources.md](references/distill-sources.md) - Load when mining a distillation source: git history, Claude Code session logs, other harness logs, or CI and review records
+- Read [references/distill-templates.md](references/distill-templates.md) - Load when writing a distilled suite's files (layout, granular skill skeleton, provenance skeleton)

@@ -122,5 +122,25 @@
     "rationale": "subplan sizing is a planning decision",
     "should_trigger": true,
     "split": "validation"
+  },
+  {
+    "query": "The delegated run landed its last commit. Close the plan out: evidenced status per criterion, what is still blocked and by what, and the open decisions with owners.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This plan is pausing until the rollout holds; I am handing it over. Assemble the follow-up record a cold reader needs, including follow-up plan seeds with sequencing.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Turn the completed migration branch, its plan record, and the session logs into a suite of reusable skills we can replay onto main.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Distill last year's finished upgrade plan into a replay playbook of granular skills so next year is a controlled process instead of archaeology.",
+    "should_trigger": true,
+    "split": "validation"
   }
 ]
