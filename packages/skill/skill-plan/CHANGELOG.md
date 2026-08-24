@@ -1,6 +1,6 @@
 # @xonovex/skill-plan
 
-## 7.1.0 - 2026-08-23
+## 5.2.0 - 2026-08-23
 
 ### Added
 
@@ -12,7 +12,7 @@
   a self-contained replayable skill suite, with provenance quarantine and mechanical
   suite verification.
 
-## 7.0.0 - 2026-07-20
+## 5.1.0 - 2026-08-06
 
 ### Breaking changes
 

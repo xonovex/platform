@@ -5,6 +5,27 @@ Release notes for the plugin catalog line: the `packages/skill/*` and
 `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The
 agent line keeps its own notes in `packages/agent/agent-cli-go/CHANGELOG.md`.
 
+## 5.2.0 - 2026-08-23
+
+73 skill and command plugins. Previous catalog version: 5.1.0.
+
+### Added
+
+#### Skills
+
+- skill-plan gains the followup operation, which closes out a completed, paused,
+  or handed-over plan with an inline record of evidenced status, gates and
+  blockers, an open-decision register, residue, follow-up plan seeds, a review
+  brief, and a retrospective.
+- skill-plan gains the distill operation, which turns a completed plan's branch,
+  record, and execution logs into a self-contained replayable skill suite, with
+  provenance quarantine and mechanical suite verification.
+
+#### Commands
+
+- /xonovex-workflow:plan-followup and /xonovex-workflow:plan-distill, the entry
+  points for the two new plan-guide operations.
+
 ## 5.1.0 - 2026-08-06
 
 73 skill and command plugins. Previous catalog version: 5.0.0.
