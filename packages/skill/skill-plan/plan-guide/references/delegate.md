@@ -10,7 +10,7 @@ First mirror the ordering into the environment's task tracker, one entry per ite
 
 1. **Select** the first item not done (`plans:`, else phase checkboxes). A gated item waits until every prerequisite reads `status: complete` in that plan's own frontmatter, not in memory or the roadmap's prose. An item another family owns is **borrowed**: schedule it, leave its `parent_plan`, do not re-own it.
 2. **Brief** from your own reading of the subplan, its parent, and the governing decisions (below).
-3. **Execute**: one agent per subplan on the requested model, then wait; under parallel-by-group, spawn the whole `parallel_group` at once and wait for all.
+3. **Execute**: one agent per subplan on the requested model, then wait; under parallel-by-group, spawn the whole `parallel_group` at once and wait for all. Schedule the keepalive (Gotchas) before the first brief.
 4. **Review**: always, and always yourself (below).
 5. **Record**: tick the roadmap line, close the tracker entry, commit with a conventional-commit message scoped to the subplan. A borrowed item reads "done for this family", not "complete". Never push unless asked.
 6. **Advance**. On a blocker or an unmet criterion, stop and report; never paper over one to keep the loop running.
@@ -66,3 +66,4 @@ Open: criterion 4 measured 140 ms against the 100 ms asked for, carried to plans
 - A borrowed subplan marked `complete` can still carry deferred integration checks that following an ordering never reaches, so a `pending` verification plan owns them
 - An agent may fix a defect the plan assumed away: accept it when the fix is at root cause and tested, and carry it forward, or it re-surfaces as the next item's mystery
 - Mid-roadmap user feedback is a new item, not a detour: brief it like any other, with the report of the agent whose work it touches
+- A large subplan outruns the prompt cache's hour with the supervisor idle throughout, so the next turn reprocesses the whole supervising context: schedule one recurring half-hour keepalive, session-only and off the round minute, and cancel it at close-out. Its prompt is what keeps a tick cheap: one word and no tool call while an agent runs, standing aside for a finished agent's review
