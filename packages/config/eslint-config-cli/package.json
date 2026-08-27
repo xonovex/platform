@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@xonovex/eslint-config-base": "0.2.0",
-    "globals": "17.9.0",
+    "globals": "17.11.0",
     "@xonovex/ts-config-build": "0.2.0"
   },
   "devDependencies": {
