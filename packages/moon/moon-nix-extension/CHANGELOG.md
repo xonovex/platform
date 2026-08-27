@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-extension
 
+## 0.3.0
+
+### Minor Changes
+
+- Support Moon 2.5 host paths. The extension resolves the physical workspace through Moon's typed host-path mapping, so composed and explicit Nix environments receive the checkout path instead of Moon's guest `/workspace` path.
+
 ## 0.2.0
 
 ### Minor Changes

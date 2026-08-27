@@ -555,7 +555,7 @@ async fn register_toolchain_preserves_public_metadata() {
     let output = plugin.register_toolchain(input).await;
 
     assert_eq!(output.name, "Nix");
-    assert_eq!(output.plugin_version, "0.7.0");
+    assert_eq!(output.plugin_version, "0.8.0");
     assert_eq!(
         output.description.as_deref(),
         Some("Runs every task inside the project's or workspace's nix flake dev shell.")

@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.8.0
+
+### Minor Changes
+
+- Support Moon 2.5 host paths. The plugin resolves the physical workspace through Moon's typed host-path mapping, so Nix receives the checkout path instead of Moon's guest `/workspace` path.
+
 ## 0.7.0
 
 ### Minor Changes
