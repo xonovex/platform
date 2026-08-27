@@ -9,6 +9,7 @@ use moon_pdk::*;
 use moon_pdk_api::*;
 use schematic::{Config, SchemaBuilder};
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// Typed `nix` toolchain configuration, validated against the schema returned by
 /// `define_toolchain_config`. The devShell selectors are resolved most-specific
@@ -135,7 +136,7 @@ fn resolve_wrap_target(
             .unwrap_or_default()
             .is_empty(),
         already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
-        nix_available: command_exists(&get_host_environment()?, "nix"),
+        nix_available: command_exists(get_host_environment()?, "nix"),
     };
 
     match decide_wrap(facts) {
@@ -164,21 +165,16 @@ fn resolve_flake_target(
     context: &MoonContext,
     project_source: &str,
 ) -> AnyResult<Option<FlakeTarget>> {
+    let workspace_root = canonical_workspace_root(context)?;
     let project_flake_root = if !project_source.is_empty() {
-        if let Some(project_root) = context.workspace_root.join(project_source).real_path() {
-            // Detect the project flake over the host: the plugin's sandbox has no
-            // direct read access to the workspace, so `VirtualPath::is_file` cannot
-            // see it. `test -f` runs on the host against the real project path.
-            let flake = project_root.join("flake.nix");
-            let flake_path = flake.to_string_lossy();
+        let project_root = workspace_root.join(project_source);
+        let flake = project_root.join("flake.nix");
+        let flake_path = flake.to_string_lossy();
 
-            if exec_captured("test", ["-f", flake_path.as_ref()])
-                .is_ok_and(|result| result.exit_code == 0)
-            {
-                Some(project_root.to_string_lossy().into_owned())
-            } else {
-                None
-            }
+        if exec_captured("test", ["-f", flake_path.as_ref()])
+            .is_ok_and(|result| result.exit_code == 0)
+        {
+            Some(project_root.to_string_lossy().into_owned())
         } else {
             None
         }
@@ -186,15 +182,18 @@ fn resolve_flake_target(
         None
     };
 
-    let workspace_root = context
-        .workspace_root
-        .real_path()
-        .map(|path| path.to_string_lossy().into_owned());
-
     Ok(resolve_runtime_flake_target(
-        workspace_root,
+        Some(workspace_root.to_string_lossy().into_owned()),
         project_flake_root,
     ))
+}
+
+fn canonical_workspace_root(context: &MoonContext) -> AnyResult<PathBuf> {
+    context
+        .workspace_root
+        .to_real_path()?
+        .map(RealPath::into_inner)
+        .ok_or_else(|| anyhow!("Moon workspace root has no real filesystem path"))
 }
 
 /// Trim a configured devShell name, treating empty or `default` as no selection
@@ -493,7 +492,7 @@ pub fn setup_environment(
 ) -> FnResult<Json<SetupEnvironmentOutput>> {
     let mut output = SetupEnvironmentOutput::default();
 
-    if !command_exists(&get_host_environment()?, "nix") {
+    if !command_exists(get_host_environment()?, "nix") {
         return Ok(Json(output));
     }
 

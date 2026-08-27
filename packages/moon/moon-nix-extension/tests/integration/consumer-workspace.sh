@@ -107,7 +107,6 @@ export MOON_FIXTURE_COUNTER_DIR="$counters"
 export MOON_SKIP_INSTALL_DEPS=true
 export MOON_TELEMETRY=false
 export PROTO_BYPASS_VERSION_CHECK=true
-export PROTO_OFFLINE=true
 export PROTO_TELEMETRY=false
 export PROTO_VERSION_CHECKS=false
 export NO_COLOR=1
@@ -198,7 +197,7 @@ expect_current_failure() {
 
 log 'checking pinned Moon and standalone fixture configuration'
 run_moon "$evidence/moon-version.log" --version
-assert_contains "$evidence/moon-version.log" 'moon 2.4.5'
+assert_contains "$evidence/moon-version.log" 'moon 2.5.3'
 [[ "$(find "$workspace/.moon/plugins" -maxdepth 1 -type f -printf '%f\n')" == 'moon_nix_extension.wasm' ]] \
   || fail 'the fixture must stage only moon_nix_extension.wasm'
 if rg --quiet '^[[:space:]]*nix:|moon_nix_toolchain|toolchains:[[:space:]]*\[[^]]*nix' \

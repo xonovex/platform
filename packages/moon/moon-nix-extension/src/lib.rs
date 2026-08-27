@@ -325,7 +325,7 @@ fn resolve_develop_target(
             .unwrap_or_default()
             .is_empty(),
         already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
-        nix_available: command_exists(&get_host_environment()?, "nix"),
+        nix_available: command_exists(get_host_environment()?, "nix"),
     };
 
     match decide_wrap(facts) {
@@ -359,12 +359,11 @@ fn resolve_develop_target(
 }
 
 fn canonical_workspace_root(context: &MoonContext) -> AnyResult<PathBuf> {
-    let workspace_root = context
+    context
         .workspace_root
-        .real_path()
-        .ok_or_else(|| anyhow!("Moon workspace root has no real filesystem path"))?;
-
-    canonicalize_host_path(&workspace_root, "workspace")
+        .to_real_path()?
+        .map(RealPath::into_inner)
+        .ok_or_else(|| anyhow!("Moon workspace root has no real filesystem path"))
 }
 
 fn resolve_workspace_installable(

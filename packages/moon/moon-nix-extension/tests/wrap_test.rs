@@ -76,7 +76,7 @@ async fn register_extension_preserves_public_metadata() {
     let plugin = sandbox.create_extension("nix-environment").await;
 
     assert_eq!(plugin.metadata.name, "Nix environment");
-    assert_eq!(plugin.metadata.plugin_version, "0.2.0");
+    assert_eq!(plugin.metadata.plugin_version, "0.3.0");
     assert_eq!(
         plugin.metadata.description.as_deref(),
         Some("Composes native Moon task toolchains through the workspace Nix flake.")
