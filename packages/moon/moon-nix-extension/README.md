@@ -48,7 +48,7 @@ automatically.
 ```yaml
 # .moon/extensions.yml
 nix-environment:
-  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.2.0"
+  plugin: "github://xonovex/platform/moon_nix_extension@moon_nix_extension-v0.3.0"
   baseComponents: [general]
   environmentByToolchain:
     javascript: node

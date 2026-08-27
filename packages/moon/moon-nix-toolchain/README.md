@@ -48,7 +48,7 @@ Register the plugin in `.moon/toolchains.yml`, pinned to a release tag:
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.8.0"
 ```
 
 Opt a project in via its `moon.yml` (moon has no global toolchain default, so this is per project):
@@ -72,7 +72,7 @@ An unset, empty, or `default` value selects the flake's default devShell. `shell
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.8.0"
   # Tag-based: every project tagged `go` runs its tasks in `nix develop <root>#go`,
   # without enumerating task ids or relying on a real toolchain id.
   shellByTag:
@@ -109,7 +109,7 @@ By default a task on a host without `nix` runs unchanged on host tools — conve
 
 ```yaml
 nix:
-  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.7.0"
+  plugin: "github://xonovex/platform/moon_nix_toolchain@moon_nix_toolchain-v0.8.0"
   # Tasks in any project carrying one of these tags MUST run inside nix.
   failClosedByTag: [cmake]
   # Or key the same contract on the project language:
