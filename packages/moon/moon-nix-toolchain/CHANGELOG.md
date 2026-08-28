@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.8.1
+
+### Patch Changes
+
+- Hash the workspace's shared `nix/**/*.nix` for projects that resolve their own flake. A project flake composes the workspace devShells through a relative `path:` input, and since Nix 2.26 those resolve against the parent source tree instead of being fetched as an independent locked tree, so they carry no `narHash`. Editing a shared module such as `nix/cc.nix` therefore left the project's `flake.nix` and its `flake.lock` byte-identical while genuinely changing the resolved devShell — and `hash_task_contents` scanned only `<projectRoot>/nix`, which does not exist. Every project shipping its own `flake.nix` served cache hits built with the previous toolchain; projects on the workspace flake invalidated correctly, so the failure was inconsistent as well as silent. Shared-module paths are recorded relative to the workspace root, so keys still match between CI and a developer's machine. NOTE: this changes the cache key for every project-flake task, so expect one full re-run after upgrading.
+
 ## 0.8.0
 
 ### Minor Changes

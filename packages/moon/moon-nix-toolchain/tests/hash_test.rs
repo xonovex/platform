@@ -125,6 +125,82 @@ async fn project_flake_lock_chosen_over_workspace_lock() {
     );
 }
 
+/// The case that had no coverage, and was wrong because of it.
+///
+/// A project flake composes the workspace's shared devShells through a relative
+/// `path:` input. Those carry no `narHash` (Nix 2.26+ resolves them against the
+/// parent source tree), so editing `nix/cc.nix` leaves the project's own
+/// `flake.nix` AND its `flake.lock` byte-identical while the devShell it
+/// resolves to genuinely changes. Hashing only `<projectRoot>/**` therefore
+/// served cache hits built with the previous toolchain.
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn workspace_module_edit_busts_a_project_flake_hash() {
+    let sandbox = create_empty_moon_sandbox();
+
+    std::fs::write(sandbox.root.join("flake.nix"), "{ outputs = _: {}; }").unwrap();
+    std::fs::write(
+        sandbox.root.join("flake.lock"),
+        r#"{"version":7,"nodes":{}}"#,
+    )
+    .unwrap();
+    std::fs::create_dir_all(sandbox.root.join("nix")).unwrap();
+    std::fs::write(sandbox.root.join("nix/cc.nix"), "{ pkgs }: pkgs.gcc").unwrap();
+
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    std::fs::write(
+        sandbox.root.join("packages/proj/flake.nix"),
+        r#"{ inputs.nixShells.url = "path:../../nix"; outputs = _: {}; }"#,
+    )
+    .unwrap();
+    // Note the absence of a narHash on the path input — that is what the real
+    // lock files look like, and the whole reason this test is necessary.
+    std::fs::write(
+        sandbox.root.join("packages/proj/flake.lock"),
+        r#"{"version":7,"nodes":{"nixShells":{"locked":{"path":"../../nix","type":"path"}}}}"#,
+    )
+    .unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let before = plugin.hash_task_contents(ws_input("packages/proj")).await;
+
+    std::fs::write(sandbox.root.join("nix/cc.nix"), "{ pkgs }: pkgs.clang").unwrap();
+    let after = plugin.hash_task_contents(ws_input("packages/proj")).await;
+
+    assert_ne!(
+        before.contents, after.contents,
+        "editing a shared workspace module must bust the hash of a project that \
+         composes it through a relative path: input"
+    );
+}
+
+/// The shared modules must be labelled relative to the workspace root. An
+/// absolute path would differ between CI and a developer's machine, so the key
+/// would never match across them.
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn workspace_modules_are_labelled_relatively() {
+    let sandbox = create_empty_moon_sandbox();
+    std::fs::create_dir_all(sandbox.root.join("nix")).unwrap();
+    std::fs::write(sandbox.root.join("nix/cc.nix"), "{ pkgs }: pkgs.gcc").unwrap();
+    std::fs::create_dir_all(sandbox.root.join("packages/proj")).unwrap();
+    std::fs::write(sandbox.root.join("packages/proj/flake.nix"), "{}").unwrap();
+
+    let plugin = sandbox.create_toolchain("nix").await;
+    let output = plugin.hash_task_contents(ws_input("packages/proj")).await;
+    let blob = serde_json::to_string(&output.contents).unwrap();
+
+    assert!(
+        blob.contains("nix/cc.nix"),
+        "the shared module must be hashed, got: {blob}"
+    );
+    assert!(
+        !blob.contains(&format!("{}/nix/cc.nix", sandbox.root.to_string_lossy())),
+        "the label must be relative, not absolute, got: {blob}"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
 async fn setup_environment_pre_builds_devshell_when_nix_present() {

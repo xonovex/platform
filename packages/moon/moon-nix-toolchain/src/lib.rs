@@ -327,25 +327,27 @@ fn host_file_contents(path: &str) -> Option<String> {
         .map(|result| result.stdout)
 }
 
-/// Read the flake entry point and its conventional `nix/**/*.nix` modules so
-/// edits to toolchain definitions invalidate Moon's task cache.
-fn flake_source_contents(root: &str) -> Vec<serde_json::Value> {
-    let mut paths = vec![format!("{root}/flake.nix")];
-    let nix_root = format!("{root}/nix");
-    if let Ok(result) = exec_captured(
-        "find",
-        [nix_root.as_str(), "-type", "f", "-name", "*.nix", "-print"],
-    ) {
-        if result.exit_code == 0 {
-            paths.extend(
-                result
-                    .stdout
-                    .lines()
-                    .filter(|path| !path.is_empty())
-                    .map(str::to_owned),
-            );
-        }
-    }
+/// Every `*.nix` under `dir`, or nothing when `dir` does not exist.
+fn find_nix_files(dir: &str) -> Vec<String> {
+    exec_captured("find", [dir, "-type", "f", "-name", "*.nix", "-print"])
+        .ok()
+        .filter(|result| result.exit_code == 0)
+        .map(|result| {
+            result
+                .stdout
+                .lines()
+                .filter(|path| !path.is_empty())
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// Read each path, labelling it relative to `label_root`.
+///
+/// The label must be relative: an absolute path would differ between CI and a
+/// developer's machine and the cache key would never match across them.
+fn read_nix_sources(mut paths: Vec<String>, label_root: &str) -> Vec<serde_json::Value> {
     paths.sort();
     paths.dedup();
 
@@ -354,7 +356,7 @@ fn flake_source_contents(root: &str) -> Vec<serde_json::Value> {
         .filter_map(|path| {
             let contents = host_file_contents(&path)?;
             let relative_path = path
-                .strip_prefix(root)
+                .strip_prefix(label_root)
                 .unwrap_or(&path)
                 .trim_start_matches('/');
             Some(serde_json::json!({
@@ -363,6 +365,35 @@ fn flake_source_contents(root: &str) -> Vec<serde_json::Value> {
             }))
         })
         .collect()
+}
+
+/// Read the flake entry point and its conventional `nix/**/*.nix` modules so
+/// edits to toolchain definitions invalidate Moon's task cache.
+fn flake_source_contents(root: &str) -> Vec<serde_json::Value> {
+    let mut paths = vec![format!("{root}/flake.nix")];
+    paths.extend(find_nix_files(&format!("{root}/nix")));
+    read_nix_sources(paths, root)
+}
+
+/// The workspace's shared `nix/**/*.nix` modules, hashed on behalf of a project
+/// that resolves its own flake.
+///
+/// A project flake typically composes the workspace's devShells through a
+/// relative `path:` input, and relative path inputs carry no `narHash`
+/// (Nix 2.26+, which resolves them against the parent source tree instead of
+/// fetching them as an independent locked tree). So when a shared module such as
+/// `nix/cc.nix` is edited, the project's own `flake.nix` is unchanged AND its
+/// `flake.lock` is unchanged — while the devShell it resolves to genuinely
+/// changes. Without this the task hash stays byte-identical and Moon serves a
+/// cache hit built with the previous toolchain.
+///
+/// Labelled relative to the workspace root, so the key is identical wherever it
+/// is computed.
+fn workspace_module_contents(workspace_root: &str) -> Vec<serde_json::Value> {
+    read_nix_sources(
+        find_nix_files(&format!("{workspace_root}/nix")),
+        workspace_root,
+    )
 }
 
 fn command_output(decision: WrapDecision) -> ExtendTaskCommandOutput {
@@ -475,11 +506,24 @@ pub fn hash_task_contents(
         // Fold the resolved flake root, the selected shell, and the lock's pinned
         // inputs into the cache key: editing flake.lock or switching the shell
         // changes `contents`; an unrelated edit leaves it byte-identical.
+        let mut sources = flake_source_contents(&target.root);
+
+        // A project flake's own sources and lock do not cover the workspace's
+        // shared modules it composes through a relative `path:` input — those
+        // inputs carry no narHash, so nothing under the project root moves when
+        // one is edited. See `workspace_module_contents`.
+        if target.is_project_flake {
+            let workspace_root = canonical_workspace_root(&input.context)?
+                .to_string_lossy()
+                .into_owned();
+            sources.extend(workspace_module_contents(&workspace_root));
+        }
+
         contents.push(serde_json::json!({
             "flakeRoot": target.root,
             "shell": shell,
             "flakeLock": flake_lock_contents(&target.root),
-            "flakeSources": flake_source_contents(&target.root),
+            "flakeSources": sources,
         }));
     }
 
