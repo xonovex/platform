@@ -38,7 +38,7 @@ Registers a `Nix` toolchain. Tasks that select it are rewritten to run inside `n
 
 It leaves the task **unchanged** when any guard trips:
 
-- `IN_NIX_SHELL` is set — already in a dev shell (e.g. CI's outer `nix develop`); avoids double-entry.
+- `IN_NIX_SHELL` is set and the command exists in that shell — avoids double-entry for a sufficient outer `nix develop`. A command missing from an unrelated Nix shell is wrapped with the selected flake.
 - `MOON_NIX_WRAPPED=1` — already wrapped (the sentinel it sets on every wrapped task).
 - `nix` is not on `PATH` — never hard-fails on a host without nix, **unless** the project opted into [fail-closed enforcement](#fail-closed-enforcement).
 
@@ -116,7 +116,7 @@ nix:
   # failClosedByLanguage: [c, cpp]
 ```
 
-When `nix` is absent for a task in an opted-in project, the plugin errors with `nix is required for <project>:<task> …` and the task fails, instead of falling back to host tools. Tasks in projects outside both allowlists keep the silent no-op. The `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` guards still take precedence — a task already inside a dev shell (or already wrapped) never fails closed. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
+When `nix` is absent for a task in an opted-in project, the plugin errors with `nix is required for <project>:<task> …` and the task fails, instead of falling back to host tools. Tasks in projects outside both allowlists keep the silent no-op. `MOON_NIX_WRAPPED` always prevents another wrap. `IN_NIX_SHELL` prevents wrapping when the command is available in that shell. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
 
 ## Cache coherence
 

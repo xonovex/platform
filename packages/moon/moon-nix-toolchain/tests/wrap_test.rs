@@ -48,6 +48,46 @@ fn stub_missing_nix() -> impl FnOnce() {
     }
 }
 
+/// Simulate a host where `which` finds only one named command.
+fn stub_only_command(available_command: &str) -> impl FnOnce() {
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::atomic::{AtomicU32, Ordering};
+
+    static CALL: AtomicU32 = AtomicU32::new(0);
+
+    let bin_dir = std::env::temp_dir().join(format!(
+        "moon-nix-toolchain-only-nix-{}-{}",
+        std::process::id(),
+        CALL.fetch_add(1, Ordering::Relaxed)
+    ));
+    std::fs::create_dir_all(&bin_dir).unwrap();
+    let which = bin_dir.join("which");
+    std::fs::write(
+        &which,
+        format!(
+            "#!/bin/sh\n[ \"${{1:-}}\" = '{}' ] && exit 0\nexit 1\n",
+            available_command
+        ),
+    )
+    .unwrap();
+    std::fs::set_permissions(&which, std::fs::Permissions::from_mode(0o755)).unwrap();
+
+    let original_path = std::env::var_os("PATH");
+    let mut paths = vec![bin_dir.clone()];
+    if let Some(path) = &original_path {
+        paths.extend(std::env::split_paths(path));
+    }
+    std::env::set_var("PATH", std::env::join_paths(paths).unwrap());
+
+    move || {
+        match original_path {
+            Some(path) => std::env::set_var("PATH", path),
+            None => std::env::remove_var("PATH"),
+        }
+        std::fs::remove_dir_all(&bin_dir).unwrap();
+    }
+}
+
 fn command_input(command: &str, args: &[&str]) -> ExtendTaskCommandInput {
     ExtendTaskCommandInput {
         command: command.into(),
@@ -117,6 +157,30 @@ async fn no_op_when_already_in_nix_shell() {
     );
     assert!(output.args.is_none());
     assert!(output.env.is_empty());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn wraps_when_current_nix_shell_lacks_the_command() {
+    reset_wrap_env();
+    std::env::set_var("IN_NIX_SHELL", "impure");
+    let restore = stub_only_command("nix");
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let output = plugin
+        .extend_task_command(command_input(
+            "command-that-is-not-in-the-current-shell",
+            &["--version"],
+        ))
+        .await;
+
+    restore();
+    std::env::remove_var("IN_NIX_SHELL");
+
+    assert_eq!(output.command.as_deref(), Some("nix"));
+    assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -555,7 +619,7 @@ async fn register_toolchain_preserves_public_metadata() {
     let output = plugin.register_toolchain(input).await;
 
     assert_eq!(output.name, "Nix");
-    assert_eq!(output.plugin_version, "0.8.1");
+    assert_eq!(output.plugin_version, "0.8.2");
     assert_eq!(
         output.description.as_deref(),
         Some("Runs every task inside the project's or workspace's nix flake dev shell.")
@@ -675,10 +739,10 @@ async fn no_op_when_not_opted_in_and_nix_absent() {
 #[serial]
 async fn in_nix_shell_outranks_fail_closed() {
     reset_wrap_env();
-    // Already inside a dev shell: the `IN_NIX_SHELL` guard wins above the nix probe,
-    // so an opted-in, nix-absent task is a no-op rather than a fail-closed error.
+    // The current shell supplies cmake, so `IN_NIX_SHELL` wins above the nix probe
+    // and the opted-in task remains a no-op when nix itself is absent.
     std::env::set_var("IN_NIX_SHELL", "impure");
-    let restore = stub_missing_nix();
+    let restore = stub_only_command("cmake");
 
     let mut sandbox = create_empty_moon_sandbox();
     sandbox
@@ -695,7 +759,7 @@ async fn in_nix_shell_outranks_fail_closed() {
 
     assert_eq!(
         output.command, None,
-        "IN_NIX_SHELL must win over fail-closed: no wrap and no error"
+        "a sufficient Nix shell must win over fail-closed: no wrap and no error"
     );
     assert!(output.args.is_none());
 }

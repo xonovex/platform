@@ -120,8 +120,8 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
 }
 
 /// Return the flake to wrap the task with, or `None` when the task must run
-/// unchanged: already inside a dev shell (CI's outer `nix develop`), already
-/// wrapped, `nix` is unavailable for a non-opted project, or no real path resolves.
+/// unchanged: already inside a dev shell that provides the command, already wrapped,
+/// `nix` is unavailable for a non-opted project, or no real path resolves.
 /// Returns `Err` when `nix` is unavailable but the project opted into fail-closed
 /// nix (see `fail_closed_opted_in`). When the task's project has its own `flake.nix`,
 /// that project flake wins over the workspace flake.
@@ -130,13 +130,19 @@ fn resolve_wrap_target(
     project: &ProjectFragment,
     target_id: &str,
     config: &NixToolchainConfig,
+    required_command: Option<&str>,
 ) -> AnyResult<Option<FlakeTarget>> {
+    let host_environment = get_host_environment()?;
+    let in_nix_shell = !get_host_env_var("IN_NIX_SHELL")?
+        .unwrap_or_default()
+        .is_empty();
+    let command_available = required_command
+        .map(|command| command_exists(host_environment, command))
+        .unwrap_or(true);
     let facts = WrapFacts {
-        in_nix_shell: !get_host_env_var("IN_NIX_SHELL")?
-            .unwrap_or_default()
-            .is_empty(),
+        in_nix_shell: in_nix_shell && command_available,
         already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
-        nix_available: command_exists(get_host_environment()?, "nix"),
+        nix_available: command_exists(host_environment, "nix"),
     };
 
     match decide_wrap(facts) {
@@ -430,6 +436,7 @@ pub fn extend_task_command(
         &input.project,
         input.task.target.id.as_str(),
         &config,
+        Some(input.command.as_str()),
     )?;
 
     let decision = match target {
@@ -462,6 +469,7 @@ pub fn extend_task_script(
         &input.project,
         input.task.target.id.as_str(),
         &config,
+        None,
     )?;
 
     let decision = match target {

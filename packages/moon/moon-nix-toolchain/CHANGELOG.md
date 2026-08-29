@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.8.2
+
+### Patch Changes
+
+- Enter the selected flake when a command task is missing from the current Nix shell. `IN_NIX_SHELL` now avoids a nested shell only when that shell provides the command, so an unrelated shell can no longer make tools such as `golangci-lint` fail with exit code 127.
+
 ## 0.8.1
 
 ### Patch Changes
