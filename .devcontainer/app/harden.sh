@@ -4,9 +4,7 @@
 #
 # Sources all hardening modules from /usr/local/lib/harden.d/.
 # Each module mitigates a specific container escape vector.
-#
-# To add a new hardening module: create a .sh file in harden.d/.
-# It will be automatically sourced on every shell init.
+# Every .sh file in harden.d is sourced on each shell initialization.
 #
 # Sourced at line 1 of .bashrc BEFORE the interactive guard, because
 # coding agents invoke bash as non-interactive login shells where
@@ -16,6 +14,9 @@
 # =============================================================================
 
 for _harden_module in /usr/local/lib/harden.d/*.sh; do
-  [ -f "$_harden_module" ] && . "$_harden_module"
+  if [ -f "$_harden_module" ]; then
+    # shellcheck source=/dev/null
+    . "$_harden_module"
+  fi
 done
 unset _harden_module

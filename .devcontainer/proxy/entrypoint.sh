@@ -4,10 +4,9 @@ set -e
 # =============================================================================
 # Proxy Entrypoint — Config Generation and Service Startup
 #
-# Generates squid and dnsmasq configs from a shared domain allowlist,
-# then starts both services. This ensures a single source of truth:
-# edit allowed-domains.conf, and both HTTP proxy filtering and DNS
-# filtering update automatically.
+# Generates squid and dnsmasq configs from the shared domain allowlist,
+# then starts both services. Allowlist changes apply to HTTP proxy filtering
+# and DNS filtering together.
 # =============================================================================
 
 ALLOWED_DOMAINS="/etc/proxy/allowed-domains.conf"
@@ -88,8 +87,9 @@ memory_pools off
 # === Security Hardening ===
 # Hide squid version from error pages and responses.
 httpd_suppress_version_string on
-# Strip proxy headers that leak internal network topology.
-via off
+# Use a stable generic hostname in the HTTP-required Via header.
+visible_hostname proxy
+via on
 forwarded_for delete
 # Strip additional proxy-revealing headers from responses.
 reply_header_access X-Cache deny all
@@ -116,7 +116,7 @@ SQUID_STATIC
     line=$(echo "$line" | sed 's/#.*//' | tr -d '[:space:]')
     [ -z "$line" ] && continue
     printf " %s" "$line"
-  done < "$ALLOWED_DOMAINS"
+  done <"$ALLOWED_DOMAINS"
   printf "\n"
 
   cat <<'SQUID_RULES'
@@ -214,7 +214,7 @@ EOF
     [ -z "$line" ] && continue
     domain=$(echo "$line" | sed 's/^\.//')
     echo "server=/${domain}/${UPSTREAM_DNS}"
-  done < "$ALLOWED_DOMAINS"
+  done <"$ALLOWED_DOMAINS"
 }
 
 # ---------------------------------------------------------------------------
@@ -229,11 +229,11 @@ mkdir -p /etc/dnsmasq.d
 # by squid for MIME type handling — without it, squid aborts on startup.
 cp /etc/proxy/mime.conf /etc/squid/mime.conf
 
-generate_squid_conf > "$SQUID_CONF"
-DOMAIN_COUNT=$(grep -v '^\s*#' "$ALLOWED_DOMAINS" | grep -v '^\s*$' | wc -l)
+generate_squid_conf >"$SQUID_CONF"
+DOMAIN_COUNT=$(awk '!/^[[:space:]]*(#|$)/ { count++ } END { print count + 0 }' "$ALLOWED_DOMAINS")
 echo "Squid: generated ACL with ${DOMAIN_COUNT} domains"
 
-generate_dnsmasq_conf > "$DNSMASQ_CONF"
+generate_dnsmasq_conf >"$DNSMASQ_CONF"
 echo "Dnsmasq: generated ${DOMAIN_COUNT} forwarding rules (all others -> NXDOMAIN)"
 
 # ---------------------------------------------------------------------------
@@ -261,7 +261,7 @@ if [ -f "$ALLOWED_PORTS" ]; then
       socat TCP-LISTEN:"${LISTEN_PORT}",fork,reuseaddr TCP:"${TARGET_HOST}":"${TARGET_PORT}" &
       RELAY_COUNT=$((RELAY_COUNT + 1))
     fi
-  done < "$ALLOWED_PORTS"
+  done <"$ALLOWED_PORTS"
 fi
 echo "TCP relays: started ${RELAY_COUNT} (profiles: ${COMPOSE_PROFILES:-none})"
 
@@ -269,7 +269,14 @@ echo "TCP relays: started ${RELAY_COUNT} (profiles: ${COMPOSE_PROFILES:-none})"
 # Start dnsmasq (binds port 53 via setcap cap_net_bind_service)
 # ---------------------------------------------------------------------------
 echo "Starting dnsmasq..."
-dnsmasq --no-daemon --conf-dir=/etc/dnsmasq.d &
+dnsmasq --no-daemon --conf-file=/dev/null --conf-dir=/etc/dnsmasq.d &
+DNSMASQ_PID=$!
+sleep 1
+if ! kill -0 "$DNSMASQ_PID" 2>/dev/null; then
+  echo "dnsmasq failed to start" >&2
+  wait "$DNSMASQ_PID"
+  exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # Start squid

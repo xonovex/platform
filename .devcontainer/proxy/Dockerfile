@@ -4,15 +4,15 @@
 # This is the security boundary between the app and the internet.
 # All HTTP/HTTPS traffic and DNS queries from the app pass through here.
 #
-# Runs as the squid user (non-root) with cap_drop ALL. dnsmasq binds
-# port 53 via a setcap file capability (cap_net_bind_service), not via
-# Docker's cap_add — keeping the bounding set completely empty.
+# Runs as the squid user with all capabilities dropped except
+# NET_BIND_SERVICE. A file capability limits use of that capability to
+# dnsmasq, which needs it to bind port 53.
 #
 # no-new-privileges is NOT used on this container because squid 7.x
 # requires setgid/initgroups for user switching, and setcap file
 # capabilities also require the ability to gain privileges at execve.
-# This is acceptable because: cap_drop ALL empties the bounding set,
-# read_only prevents binary modification, and Alpine ships no setuid
+# The capability bounding set contains only NET_BIND_SERVICE. The read-only
+# root filesystem prevents binary replacement, and Alpine has no setuid
 # binaries.
 # =============================================================================
 
@@ -24,27 +24,28 @@ FROM alpine@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f
 # dnsmasq-dnssec (not plain dnsmasq) includes DNSSEC validation support.
 # Alpine's base dnsmasq package is compiled without it.
 # libcap-utils provides setcap for granting file capabilities.
-RUN apk update && \
-    apk add --no-cache ca-certificates squid tzdata dnsmasq-dnssec libcap-utils socat && \
-    rm -rf /var/cache/apk/*
-
 # SECURITY: Grant dnsmasq the ability to bind port 53 as non-root.
 # This is a file capability (stored in the binary's extended attributes),
 # not a process capability — it only takes effect when this specific
 # binary is executed. Combined with read_only: true, the binary cannot
 # be replaced with a malicious one that inherits this capability.
-RUN setcap cap_net_bind_service=+ep /usr/sbin/dnsmasq
-
 # Pre-create directories. At runtime these are overlaid with tmpfs
 # owned by uid=31 (squid) — see docker-compose.yml. The paths must
 # exist in the image for squid -z (cache initialization) to succeed.
-RUN mkdir -p /var/log/squid /var/cache/squid /run/squid /etc/dnsmasq.d /etc/proxy
-
 # SECURITY: Preserve squid's default mime.conf in a location that
 # survives the tmpfs overlay. The read_only + tmpfs over /etc/squid
 # wipes all files including mime.conf, which squid requires to start.
 # The entrypoint restores it at startup.
-RUN cp /etc/squid/mime.conf /etc/proxy/mime.conf
+RUN apk add --no-cache \
+      ca-certificates=20260611-r0 \
+      dnsmasq-dnssec=2.91-r1 \
+      libcap-utils=2.78-r0 \
+      socat=1.8.1.3-r0 \
+      squid=7.6-r0 \
+      tzdata=2026c-r0 \
+    && setcap cap_net_bind_service=+ep /usr/sbin/dnsmasq \
+    && mkdir -p /var/log/squid /var/cache/squid /run/squid /etc/dnsmasq.d /etc/proxy \
+    && cp /etc/squid/mime.conf /etc/proxy/mime.conf
 
 # Allowlists baked into image. Docker-compose bind mounts override these
 # at runtime for quick iteration without rebuilding.

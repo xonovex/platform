@@ -16,9 +16,8 @@ export interface LinkReport {
 
 // The file a markdown link points at, with any in-page fragment stripped, or
 // null when the link names no real sibling file: an external scheme
-// (http/https/mailto), a placeholder or elided illustrative form (<topic>.md,
-// {topic}.md, the …/pull/PR and …/commit/hash ellipsis links documented in the
-// versioning changelog guide), or a pure #anchor.
+// (http/https/mailto), a placeholder or elided illustrative form, or a pure
+// #anchor.
 export const relativeLinkTarget = (raw: string): string | null => {
   if (EXTERNAL_LINK_RE.test(raw)) return null;
   if (raw.includes("<") || raw.includes("{") || raw.includes("…")) return null;

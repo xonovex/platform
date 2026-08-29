@@ -4,5 +4,8 @@
   "dependencies": {
     "@anthropic-ai/claude-code": "2.1.211",
     "@moonrepo/cli": "2.4.5"
+  },
+  "allowScripts": {
+    "@anthropic-ai/claude-code@2.1.211": true
   }
 }

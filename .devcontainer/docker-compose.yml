@@ -72,7 +72,8 @@ services:
       - ../.claude:/workspaces/xonovex-platform/.claude:ro
 
     depends_on:
-      - proxy
+      proxy:
+        condition: service_healthy
 
     # SECURITY: Override Docker's default DNS (127.0.0.11) with the proxy's
     # dnsmasq. This is critical because on the internal network, Docker's
@@ -103,20 +104,21 @@ services:
       context: ./proxy
       dockerfile: Dockerfile
 
-    # SECURITY: Drop ALL Linux capabilities. dnsmasq needs to bind port 53
-    # but gets this via setcap file capability (set in Dockerfile), not via
-    # Docker's cap_add. This keeps the bounding set completely empty.
+    # SECURITY: Drop all Linux capabilities except NET_BIND_SERVICE.
+    # The dnsmasq file capability uses this one entry from the bounding set
+    # to bind port 53 as the non-root squid user.
     cap_drop:
       - ALL
+    cap_add:
+      - NET_BIND_SERVICE
 
     # NOTE: no-new-privileges is NOT set on the proxy container.
     # Squid 7.x refuses to run as root and requires user switching via
     # setgid/initgroups, which no-new-privileges blocks. The proxy runs
     # as the squid user instead. Without no-new-privileges, setcap file
-    # capabilities work — dnsmasq uses cap_net_bind_service to bind
-    # port 53 as non-root. This is acceptable because: cap_drop ALL
-    # removes all capabilities from the bounding set, read_only prevents
-    # binary modification, and Alpine ships no setuid binaries.
+    # capabilities work. The only capability in the bounding set is
+    # NET_BIND_SERVICE, read_only prevents binary modification, and Alpine
+    # ships no setuid binaries.
 
     # Pass active profiles to the entrypoint so it knows which port
     # relays to start from allowed-ports.conf.
@@ -128,6 +130,17 @@ services:
     # no persistent backdoors. Writable areas are explicitly enumerated
     # as tmpfs below and disappear on container restart.
     read_only: true
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pgrep -x dnsmasq >/dev/null && pgrep -x squid >/dev/null",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 12
+      start_period: 5s
 
     # Writable tmpfs areas for squid/dnsmasq runtime state.
     # uid=31,gid=31 = squid user, so the non-root process can write.

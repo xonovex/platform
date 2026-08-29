@@ -11,6 +11,8 @@
 # Update digest periodically after verifying the new image.
 FROM mcr.microsoft.com/devcontainers/base:ubuntu@sha256:4bcb1b466771b1ba1ea110e2a27daea2f6093f9527fb75ee59703ec89b5561cb
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Use the base image's existing vscode user (UID 1000). Creating a new
@@ -21,12 +23,6 @@ ARG USERNAME=vscode
 
 ARG NIX_VERSION=2.34.7
 ARG NIX_ARCHIVE_SHA256=eafe5042404e818505e28c5ca3d0885f3ec45c31f955489a25bb38258f87560e
-
-# Minimal apt packages — only what Nix and the base image need.
-# All development tools come from Nix (see flake.nix).
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl xz-utils \
-    && rm -rf /var/lib/apt/lists/*
 
 # SECURITY: Remove sudo entirely. The base image ships with passwordless
 # sudo for the vscode user. An agent or compromised tool with sudo access
@@ -78,7 +74,7 @@ RUN while IFS= read -r line || [ -n "$line" ]; do \
       line=$(echo "$line" | sed 's/#.*//' | tr -d '[:space:]'); \
       [ -z "$line" ] && continue; \
       echo "Installing group: $line"; \
-      $NIX_BIN/nix profile install "/tmp/devcontainer-flake#${line}"; \
+      $NIX_BIN/nix profile add "/tmp/devcontainer-flake#${line}"; \
     done < /tmp/allowed-packages.conf \
     && $NIX_BIN/nix-collect-garbage -d \
     && rm -rf /tmp/devcontainer-flake /tmp/allowed-packages.conf
@@ -100,7 +96,7 @@ RUN mkdir -p \
 
 # Shell hardening modules — each .sh file in harden.d/ mitigates a
 # specific container escape vector. harden.sh sources them all.
-# To add a new module: create a .sh file in harden.d/.
+# Every .sh file in harden.d/ is loaded during shell initialization.
 COPY harden.sh /usr/local/bin/harden.sh
 COPY harden.d/ /usr/local/lib/harden.d/
 RUN chmod +x /usr/local/bin/harden.sh
@@ -121,7 +117,7 @@ RUN BASHRC="/home/$USERNAME/.bashrc" \
 # host — this is a container escape vector (can exfiltrate credentials
 # or execute commands on the host via the git protocol). Setting an empty
 # helper at the user level overrides any system-level helper. The runtime
-# harden-ipc.sh repeats this as a fallback since VS Code re-injects it.
+# git-credentials.sh repeats this as a fallback since VS Code re-injects it.
 USER $USERNAME
 RUN git config --global --unset-all credential.helper 2>/dev/null || true \
     && git config --global credential.helper ""

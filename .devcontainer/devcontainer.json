@@ -73,7 +73,7 @@
 
   // SECURITY: Clear VS Code IPC variables that enable container-to-host
   // communication. VS Code reinjects some of these despite this config,
-  // so harden-ipc.sh (sourced in .bashrc) acts as a fallback.
+  // so harden.sh (sourced in .bashrc) acts as a fallback.
   // Setting to empty string ("") tells VS Code to unset them.
   "remoteEnv": {
     // SSH agent forwarding — allows host SSH key access from container
@@ -82,7 +82,6 @@
     "GPG_AGENT_INFO": "",
     "GNUPGHOME": "",
     // VS Code IPC sockets — primary container escape vector
-    // (The Red Guild: "Leveraging VS Code Internals to Escape Containers")
     "VSCODE_IPC_HOOK_CLI": "",
     "VSCODE_GIT_IPC_HANDLE": "",
     // Git credential helpers — VS Code injects a helper that proxies

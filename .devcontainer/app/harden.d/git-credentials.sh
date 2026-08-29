@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 # Git credential helpers — VS Code injects these to route git credential
 # requests through its own helper, which proxies to the host's credential
 # store. An agent could use this to exfiltrate tokens.

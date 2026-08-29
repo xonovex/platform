@@ -49,7 +49,6 @@
 - **Gates**: name the command and its outcome; skipped, cached, or not covering the change is not a pass
 - **Claims**: mark each verified, naming the evidence, or unverified
 - **Interruption**: state the safe retry boundary: what is durable, what is partial, where a resumer restarts
-- **Remainders**: label unfinished in-scope work `R1`, `R2`, ... and optional follow-ups `S1`, `S2`, ...
 
 ## Integration Points
 

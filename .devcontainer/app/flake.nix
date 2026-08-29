@@ -19,7 +19,6 @@
   outputs = { nixpkgs, ... }:
     let
       # Devcontainer always runs on Linux x86_64.
-      # Add aarch64-linux here if ARM containers are needed.
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
@@ -55,8 +54,7 @@
           # Process management
           procps
 
-          # Node.js (matches the version used in the project root flake)
-          nodejs_22
+          nodejs_26
 
           # Shell
           bash
@@ -101,7 +99,7 @@
         # Go — Go development toolchain
         # =================================================================
         go = mkGroup "go" (with pkgs; [
-          go_1_24
+          go_1_26
           golangci-lint
           gopls
         ]);
