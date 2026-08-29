@@ -1,8 +1,10 @@
 # Workflow Commands
 
-Plan-driven development workflow with worktrees and parallel execution.
+Install this workflow to research, plan, implement, validate, and merge work through explicit plan and worktree commands.
 
 ## Installation
+
+Install the workflow plugin for the active harness. Codex also needs the delegated skill plugins because it does not install plugin dependencies automatically.
 
 ### Claude Code
 
@@ -20,11 +22,7 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 
 ### Dependencies
 
-Each command delegates its procedure to a guideline skill, declared in `plugin.json`
-`dependencies`. On Claude Code, installing this plugin auto-installs those skills; if a
-depended-on skill is missing the command is disabled with `dependency-unsatisfied`. On
-Codex, `dependencies` is not auto-installed. Install the delegated skill plugins
-alongside this one.
+Each command delegates its procedure to a guideline skill declared in `plugin.json` dependencies. Claude Code installs these skills with the plugin and disables a command with `dependency-unsatisfied` when a required skill is missing. Codex does not install `dependencies` automatically, so install the delegated skill plugins with this plugin.
 
 ```
 +---------------------+     +---------------------+     +---------------------+
@@ -61,6 +59,8 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 
 ## Commands
 
+Use the command that matches the current stage of the plan-driven workflow.
+
 | Command                 | Description                                                                                |
 | ----------------------- | ------------------------------------------------------------------------------------------ |
 | `plan-research`         | Research codebase + web, or run a read-only code-quality audit (harden / simplify / align) |
@@ -84,6 +84,8 @@ Learning: reflect-to-instructions / reflect-to-skill fold learnings into guideli
 | `plan-worktree-cleanup` | Remove stale and merged worktrees, and prune leftover admin metadata                       |
 
 ## Design Decisions
+
+The workflow uses these constraints to keep plans portable and operations explicit.
 
 - **Domain-agnostic commands**: the agent figures out what to do based on context
 - **No hooks except git hooks**: agents decide when something cannot be fixed

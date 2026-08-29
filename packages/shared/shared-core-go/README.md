@@ -1,8 +1,10 @@
 # Shared Core Go
 
-Shared Go utility library used by other Go packages in the monorepo.
+Use this shared Go library for common terminal, environment, logging, and shell utilities.
 
 ## Packages
+
+Import the package that owns the required utility.
 
 | Package       | Description                     |
 | ------------- | ------------------------------- |

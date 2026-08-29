@@ -1,15 +1,17 @@
 # moon-skill-eval-outputs
 
-OUTPUT eval runs each eval twice — vanilla vs skill-augmented — in isolated model contexts, grades both with a binary reference-guided LLM-as-judge, and writes a `benchmark.json` with pass-rate / token / duration deltas and a tier-aware quality gate.
+Use this evaluator to compare baseline and skill-augmented output in isolated model contexts. It grades both outputs with a binary, reference-guided model judge and writes pass-rate, token, and duration differences to `benchmark.json`. The selected tier determines the quality gate.
 
 ## Usage
+
+Select a harness and run the evaluator against an output evaluation file.
 
 ```bash
 npx moon-skill-eval-outputs [evals.json] [skill-name] [iteration] [--harness claude|codex] [--runs N] [--concurrency N] [--model M] [--judge-model M] [--plugin-dir PATH]
 # evals defaults to ./evals.json; skill-name defaults to the name in ./SKILL.md
 ```
 
-Requires the selected CLI on PATH and its API credential. Claude is the default harness. Claude defaults to `claude-haiku-4-5-20251001` for generation and `claude-sonnet-5` for judging; Codex defaults to `gpt-5.3-codex` for both. CLI options and harness-specific environment variables are explicit overrides, and evidence records both resolved identifiers.
+The selected command-line interface and its API credential must be available. Claude is the default harness. Claude uses `claude-haiku-4-5-20251001` for generation and `claude-sonnet-5` for judging by default. Codex uses `gpt-5.3-codex` for both by default. Command-line options and harness-specific environment variables override these values. The evidence records both resolved identifiers.
 
 The Claude adapter uses `--plugin-dir packages/skill/<package>` to load an unpublished repository plugin and its declared local plugin dependencies only in the with-skill arm. Plugin preflight requires skill-only manifests and rejects commands, agents, hooks, MCP, LSP, and settings components. That arm invokes the exact namespaced slash command; the baseline prompt stays unchanged and blocks the Skill tool. Generation runs expose only `Skill` plus `Read` in the activated arm and only `Read` in baseline. Judges have no tools. The Codex adapter uses separate ephemeral homes, stages only the target skill for the activated arm, explicitly invokes it with `$skill-name`, ignores inherited configuration and rules, and runs read-only.
 

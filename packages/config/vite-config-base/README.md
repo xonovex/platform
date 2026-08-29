@@ -1,8 +1,10 @@
 # @xonovex/vite-config-base
 
-Base Vite configuration for Xonovex projects.
+Use this package to apply the shared Xonovex Vite configuration to a project.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/vite-config-base
@@ -10,7 +12,7 @@ npm install -D @xonovex/vite-config-base
 
 ## Usage
 
-In your `vite.config.ts`:
+Spread `baseViteConfig` into the configuration exported from `vite.config.ts`.
 
 ```typescript
 import {baseViteConfig} from "@xonovex/vite-config-base";
@@ -23,6 +25,8 @@ export default defineConfig({
 ```
 
 ## Included Plugins
+
+The configuration enables these plugins:
 
 - `@tailwindcss/vite` - Tailwind CSS integration
 - `vite-tsconfig-paths` - TypeScript path mapping

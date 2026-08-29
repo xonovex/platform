@@ -1,8 +1,10 @@
 # @xonovex/eslint-config-base
 
-Base ESLint configuration for Xonovex projects.
+Use this package to apply the shared Xonovex ESLint rules to a project.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/eslint-config-base
@@ -10,7 +12,7 @@ npm install -D @xonovex/eslint-config-base
 
 ## Usage
 
-Create an `eslint.config.js` file:
+Export `baseConfig` from an `eslint.config.js` file.
 
 ```javascript
 import {baseConfig} from "@xonovex/eslint-config-base";
@@ -18,7 +20,7 @@ import {baseConfig} from "@xonovex/eslint-config-base";
 export default baseConfig;
 ```
 
-Or extend with custom rules:
+Spread `baseConfig` before project-specific rules when the project needs overrides.
 
 ```javascript
 import {baseConfig} from "@xonovex/eslint-config-base";
@@ -35,6 +37,8 @@ export default [
 
 ## Included Plugins
 
+The configuration enables these plugins:
+
 - `@typescript-eslint` - TypeScript support
 - `eslint-plugin-import` - Import/export linting
 - `eslint-plugin-prettier` - Prettier integration
@@ -49,7 +53,7 @@ export default [
 
 ## Export Condition Ordering
 
-The `"import"` condition must appear before `"node"` in the `package.json` exports. ESLint uses jiti to load config files, and jiti resolves export conditions in object key order. Placing `"import"` first ensures jiti resolves to source (`src/index.ts`), allowing consumers to use this package without building it first. CJS consumers still fall through to `"node"` (`dist/src/index.js`).
+Keep the `"import"` condition before `"node"` in the `package.json` exports so consumers can use this package without building it first. ESLint uses jiti to load configuration files, and jiti resolves export conditions in object key order. The `"import"` condition resolves to `src/index.ts`. CommonJS consumers fall through to `"node"`, which resolves to `dist/src/index.js`.
 
 ## License
 

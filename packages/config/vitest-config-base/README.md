@@ -1,8 +1,10 @@
 # @xonovex/vitest-config-base
 
-Base Vitest configuration for Xonovex projects.
+Use this package to apply the shared Xonovex Vitest configuration to a project.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/vitest-config-base
@@ -10,7 +12,7 @@ npm install -D @xonovex/vitest-config-base
 
 ## Usage
 
-In your `vitest.config.ts`:
+Spread `baseVitestConfig` into the configuration exported from `vitest.config.ts`.
 
 ```typescript
 import {baseVitestConfig} from "@xonovex/vitest-config-base";
@@ -23,6 +25,8 @@ export default defineConfig({
 ```
 
 ## Features
+
+The configuration provides these test defaults:
 
 - TypeScript path mapping support via `vite-tsconfig-paths`
 - Sensible defaults for test coverage

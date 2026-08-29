@@ -1,14 +1,12 @@
 # Xonovex Platform Monorepo
 
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Node](https://img.shields.io/badge/node-22.18%2B-green)
-![Go](https://img.shields.io/badge/go-1.26%2B-00ADD8)
+![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.26%2B-00ADD8)
 
-> Monorepo for Xonovex AI agent tools, workflows, and skills
+> Run AI coding agents with explicit sandbox, provider, workspace, toolchain, and orchestration controls.
 
-AI coding agents handle prompts, tools, and code changes. What they don't manage is the environment around them: sandbox isolation, model provider routing, terminal sessions, reproducible toolchains, and orchestration at scale.
+Use the Agent CLI for local runs, the Agent Operator for policy-governed Kubernetes Jobs, and the plugin catalog for reusable commands and skills.
 
-Xonovex fills this gap. It currently supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode) as agents, with sandboxing via bubblewrap and Docker, VM-level isolation via gVisor and Kata Containers, confidential computing via [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers like Gemini, GLM, and GPT, workspace management with Git and [Jujutsu](https://github.com/jj-vcs/jj), reproducible toolchains via Nix, and Kubernetes orchestration for running agents at scale.
+Xonovex supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode). It provides bubblewrap and Docker sandboxes, gVisor and Kata Containers isolation, [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers such as Gemini, GLM, and GPT, Git and [Jujutsu](https://github.com/jj-vcs/jj) workspaces, Nix toolchains, and Kubernetes orchestration.
 
 The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md). Skills provide instructions, references, scripts, and setup capabilities; installing one is not proof that a policy executes or blocks an action.
 
@@ -19,26 +17,26 @@ The included skills are token-efficient, harness-neutral, and based on current r
 
 ## Quick Start
 
+Choose the local Agent CLI, Kubernetes operator, or plugin installation path for the required use case.
+
 ### Agent CLI
+
+Install the CLI and start a Claude Code run in a bubblewrap sandbox with the Gemini provider.
 
 ```bash
 npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --isolation bwrap --provider gemini
 ```
 
-The sandbox is selected by three orthogonal axes — `--isolation {none,bwrap,docker}` ×
-`--provision {none,nix,command}` × `--network {host,none,proxy}` — see
-`packages/agent/AGENTS.md`.
+Select the sandbox with three independent axes: `--isolation {none,bwrap,docker}`, `--provision {none,nix,command}`, and `--network {host,none,proxy}`. See `packages/agent/AGENTS.md` for the complete model.
 
 ![Three Claude Code agents in a tiled tmux session, each in its own git worktree: one under bwrap, one under bwrap with a Nix-provisioned toolchain, and one under Docker, routed to two different model providers](packages/asset/asset-images/multiple-agents.png)
 
-Each pane is a separate worktree with its own axis combination and provider, so
-concurrent agents neither share a checkout nor a sandbox.
+Each pane is a separate worktree with its own axis combination and provider, so concurrent agents do not share a checkout or sandbox.
 
 ### Agent Kubernetes Operator
 
-The operator requires a digest-pinned agent image and an installed sandboxed
-RuntimeClass such as gVisor or Kata. Set these to values available in your cluster:
+Install the operator only after the cluster has a digest-pinned agent image and a sandboxed RuntimeClass such as gVisor or Kata. Set these variables to values available in the cluster.
 
 ```bash
 export XONOVEX_AGENT_IMAGE='ghcr.io/your-org/xonovex-agent@sha256:<64-hex-digest>'
@@ -121,15 +119,15 @@ spec:
 EOF
 ```
 
-`network: host` permits unrestricted egress so the quick start can reach the
-public model API. Production namespaces should replace it with an enforceable
-cluster-level egress proxy or FQDN-aware policy.
+The `network: host` value permits unrestricted egress so this example can reach the public model API. Production namespaces should use an enforceable cluster-level egress proxy or a fully qualified domain name aware policy.
 
 ### Agent Plugins
 
-Each skill is a separate plugin. A compatible harness can route to an installed skill when its description matches the task; user-invocable commands explicitly load hard skill dependencies. Harness support, loading behavior, permissions, and native enforcement remain product-specific. The skills follow the [Agent Skills spec](https://agentskills.io/specification).
+Install only the plugins required for the intended operations. A compatible harness can route to an installed skill when its description matches the task. User-invocable commands load their required skill dependencies explicitly. Harness support, loading behavior, permissions, and native enforcement remain product-specific. The skills follow the [Agent Skills specification](https://agentskills.io/specification).
 
 #### Claude Code
+
+Add the marketplace, then install the required command and skill plugins.
 
 ```bash
 # Add the Xonovex plugin marketplace
@@ -156,10 +154,12 @@ claude plugin install xonovex-skill-react@xonovex-marketplace
 claude plugin install xonovex-skill-hono@xonovex-marketplace
 claude plugin install xonovex-skill-zod@xonovex-marketplace
 claude plugin install xonovex-skill-vitest@xonovex-marketplace
-# … see .claude-plugin/marketplace.json for the full list
+# ... see .claude-plugin/marketplace.json for the full list
 ```
 
 #### Codex
+
+Add the marketplace, then install the required skill plugins.
 
 ```bash
 # Add the Xonovex plugin marketplace
@@ -185,12 +185,12 @@ codex plugin add xonovex-skill-react@xonovex-marketplace
 codex plugin add xonovex-skill-hono@xonovex-marketplace
 codex plugin add xonovex-skill-zod@xonovex-marketplace
 codex plugin add xonovex-skill-vitest@xonovex-marketplace
-# … see .agents/plugins/marketplace.json for the full list
+# ... see .agents/plugins/marketplace.json for the full list
 ```
 
 ### Upgrades and retired skill plugins
 
-Upgrade the marketplace and selected plugins together; start a new session after changing an installation. Four pre-5.x plugin names are retired and must not remain installed alongside their replacements:
+Upgrade the marketplace and selected plugins together, then start a new session. Remove the four retired pre-5.x plugin names before installing their replacements.
 
 | Retired plugin              | Replacement             |
 | --------------------------- | ----------------------- |
@@ -210,12 +210,14 @@ claude plugin uninstall xonovex-skill-prompt@xonovex-marketplace
 
 ## Development
 
+Install workspace dependencies before running Moon tasks and repository gates.
+
 ```bash
 git clone https://github.com/xonovex/platform.git
 cd platform && npm install
 ```
 
-Tasks are managed with [Moon](https://moonrepo.dev/):
+[Moon](https://moonrepo.dev/) manages project tasks.
 
 ```bash
 npx moon run <project>:<task>    # run a specific task
@@ -226,8 +228,8 @@ npx moon query projects          # list all projects
 
 ## License
 
-MIT
+The repository uses the MIT License.
 
 ---
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development setup and contribution guidelines.

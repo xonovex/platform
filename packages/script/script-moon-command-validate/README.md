@@ -1,11 +1,7 @@
 # moon-command-validate
 
-Deterministically validates Xonovex command packages. The generic pass parses every
-command's YAML frontmatter, verifies its public title and thin delegation shape, and
-checks that hard skill delegations are declared by both package and Claude plugin
-manifests. The delegated operation must be registered as an exact reference in the
-owner skill. Interchangeable supporting skills are selected at runtime from installed
-skill descriptions rather than declared in command metadata. Every prose file in the
-package is also checked for an em dash, ellipsis character, or typographic quote, in
-both the literal and unicode-escaped spelling; the command title separator is a plain
-hyphen.
+Use this validator to reject command packages that violate the Xonovex delegation, manifest, or prose contracts.
+
+The generic pass parses each command's YAML frontmatter, verifies its public title and thin delegation shape, and checks that package and Claude plugin manifests declare each required skill. The owner skill must register the delegated operation as an exact reference. The runtime selects interchangeable supporting skills from installed skill descriptions instead of command metadata.
+
+The validator also rejects an em dash, an ellipsis character, or a typographic quote in every prose file in the package, in literal or Unicode-escaped form. Command titles use a plain hyphen as the separator.

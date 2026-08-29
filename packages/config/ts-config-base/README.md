@@ -1,8 +1,10 @@
 # @xonovex/ts-config-base
 
-Base TypeScript configuration for Xonovex projects.
+Use this package as the strict TypeScript base for a Xonovex project.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/ts-config-base
@@ -10,7 +12,7 @@ npm install -D @xonovex/ts-config-base
 
 ## Usage
 
-Extend in your `tsconfig.json`:
+Extend the package from `tsconfig.json`.
 
 ```json
 {
@@ -20,7 +22,7 @@ Extend in your `tsconfig.json`:
 
 ## Configuration
 
-Provides strict TypeScript settings:
+The base configuration enables these TypeScript settings:
 
 - `strict: true`
 - `noUncheckedIndexedAccess: true`

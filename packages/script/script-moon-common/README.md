@@ -1,8 +1,10 @@
 # moon-scripts-common
 
-Shared utility library used by other moon script packages. Provides CLI argument parsing, logging, package.json utilities, workspace root detection, and Moon project querying.
+Use this internal library for utilities shared by Moon task script packages, including command-line argument parsing, logging, `package.json` access, workspace root detection, and Moon project queries.
 
 ## Exports
+
+Import the function that owns the required script concern.
 
 - `parseCliArgs` - CLI argument parsing with type definitions
 - `logError`, `logInfo`, `logSuccess`, `logWarning` - logging utilities

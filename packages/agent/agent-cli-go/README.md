@@ -1,14 +1,18 @@
 # @xonovex/agent-cli-go
 
-Go implementation of agent-cli. Configures sandboxes, providers, and terminal sessions, then launches the agent.
+Use `agent-cli` to configure a sandbox, model provider, workspace, and terminal session before it launches Claude Code or OpenCode.
 
 ## Installation
+
+Install the command globally from npm.
 
 ```bash
 npm install -g @xonovex/agent-cli-go
 ```
 
 ## Usage
+
+Select only the agent, sandbox axes, workspace, and terminal behavior that the run needs.
 
 ```bash
 # Run with default agent (Claude)
@@ -18,7 +22,7 @@ agent-cli run
 agent-cli run -a claude
 agent-cli run -a opencode
 
-# Run with the three sandbox axes (isolation × provision × network)
+# Run with the three sandbox axes: isolation, provision, and network
 agent-cli run --isolation bwrap --provision command --isolation-bwrap-passthrough --init-command 'command -v claude'
 agent-cli run --isolation docker --provision nix --nix-source packages --nix-rev <rev> --network none
 agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
@@ -35,8 +39,7 @@ agent-cli run -t tmux
 
 ### run
 
-Run an AI coding agent. The sandbox is selected by three orthogonal axes — see
-`packages/agent/AGENTS.md` for the model and the four-guarantee policy.
+Use `run` to start an AI coding agent. Select the sandbox with the three independent isolation, provision, and network axes. See `packages/agent/AGENTS.md` for the model and the four-guarantee policy.
 
 ```
 Options:
@@ -66,7 +69,7 @@ Options:
 
 ### completion
 
-Generate shell completion script.
+Use `completion` to generate a completion script for the current shell.
 
 ```bash
 # Bash
@@ -81,8 +84,7 @@ agent-cli completion fish | source
 
 ## Configuration
 
-Create a config file (YAML, JSON, or TOML). File values provide defaults;
-repeatable CLI bind and environment flags append to their file equivalents:
+Create a YAML, JSON, or TOML file when run defaults must be reusable. File values provide defaults. Repeated command-line bind and environment flags append to their file equivalents.
 
 ```yaml
 provider: gemini
@@ -95,13 +97,15 @@ customEnv:
   - FEATURE_FLAG=true
 ```
 
-Load with:
+Load the file with `--config`.
 
 ```bash
 agent-cli run -c config.yaml
 ```
 
 ## Testing
+
+Run unit tests for local logic and integration tests for complete command behavior.
 
 ```bash
 # Unit tests

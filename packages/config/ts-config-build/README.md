@@ -1,8 +1,10 @@
 # @xonovex/ts-config-build
 
-TypeScript configuration for building packages.
+Use this package to compile a TypeScript package for publishing.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/ts-config-build
@@ -10,7 +12,7 @@ npm install -D @xonovex/ts-config-build
 
 ## Usage
 
-Extend in your `tsconfig.json`:
+Extend the package from `tsconfig.json`, then set the package input and output paths.
 
 ```json
 {
@@ -25,7 +27,7 @@ Extend in your `tsconfig.json`:
 
 ## Features
 
-Extends `@xonovex/ts-config-base` with build settings:
+The configuration extends `@xonovex/ts-config-base` with these build settings:
 
 - Declaration file generation
 - Source maps

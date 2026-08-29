@@ -1,8 +1,10 @@
 # Utility Commands
 
-Manage project instructions, reflect on sessions, author content, and create skills and commands.
+Install these utilities to manage project instructions, capture session lessons, author content, and create skills or commands.
 
 ## Installation
+
+Claude Code installs one utility plugin. Codex installs only the individual skills required for the intended operation.
 
 ### Claude Code
 
@@ -24,19 +26,19 @@ codex plugin add xonovex-skill-skill@xonovex-marketplace
 codex plugin add xonovex-skill-command@xonovex-marketplace
 ```
 
-Install only the skills needed for the intended operation and invoke the matching
-`$...-guide` skill directly. The `/xonovex-utility:*` command namespace is a Claude
-Code surface.
+In Codex, invoke the matching `$...-guide` skill directly. The `/xonovex-utility:*` command namespace is available only in Claude Code.
 
 ### Claude Code dependencies
 
-Each command delegates its procedure to a guideline skill, declared in `plugin.json`
-`dependencies`. Installing this plugin auto-installs those skills; if a depended-on
-skill is missing the command is disabled with `dependency-unsatisfied`.
+Installing the Claude Code plugin installs the guideline skills declared in `plugin.json` dependencies. A command is disabled with `dependency-unsatisfied` when a required skill is missing.
 
 ## Commands
 
+Choose the command group that owns the required operation.
+
 ### Content
+
+Use these commands to edit or create publication content.
 
 | Command                   | Description                                                                 |
 | ------------------------- | --------------------------------------------------------------------------- |
@@ -45,6 +47,8 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 | `content-travelguide-add` | Create a comprehensive, multi-language travel guide for a topic or location |
 
 ### Instructions
+
+Use these commands to create or maintain project instruction files.
 
 | Command                    | Description                                               |
 | -------------------------- | --------------------------------------------------------- |
@@ -56,6 +60,8 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 
 ### Reflect
 
+Use these commands to convert session evidence into reusable guidance.
+
 | Command                   | Description                                                  |
 | ------------------------- | ------------------------------------------------------------ |
 | `reflect-extract`         | Analyze session for development mistakes and lessons learned |
@@ -63,6 +69,8 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 | `reflect-to-skill`        | Convert insights into a progressive disclosure skill         |
 
 ### Skills
+
+Use these commands to create and maintain Agent Skills.
 
 | Command            | Description                                                          |
 | ------------------ | -------------------------------------------------------------------- |
@@ -75,6 +83,8 @@ skill is missing the command is disabled with `dependency-unsatisfied`.
 | `skill-evaluate`   | Seed a skill's evals.json output-eval file                           |
 
 ### Slash Commands
+
+Use these commands to create and maintain reusable slash commands.
 
 | Command                   | Description                                                |
 | ------------------------- | ---------------------------------------------------------- |

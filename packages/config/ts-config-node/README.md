@@ -1,8 +1,10 @@
 # @xonovex/ts-config-node
 
-TypeScript configuration for Node.js applications.
+Use this package to compile a TypeScript application for Node.js.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/ts-config-node
@@ -10,7 +12,7 @@ npm install -D @xonovex/ts-config-node
 
 ## Usage
 
-Extend in your `tsconfig.json`:
+Extend the package from `tsconfig.json`, then set the application input and output paths.
 
 ```json
 {
@@ -25,7 +27,7 @@ Extend in your `tsconfig.json`:
 
 ## Features
 
-Extends `@xonovex/ts-config-base` with Node.js settings:
+The configuration extends `@xonovex/ts-config-base` with these Node.js settings:
 
 - Node.js types included
 - CommonJS interop enabled

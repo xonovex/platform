@@ -1,8 +1,10 @@
 # moon-version-detect
 
-Detects Moon projects that have version changes between the current state and a specified git reference (defaults to `HEAD~1`).
+Use this command to list Moon projects whose versions differ from a Git base reference. The default base is `HEAD~1`.
 
 ## Usage
+
+Run without a flag for `HEAD~1`, or set an explicit base reference.
 
 ```bash
 npx moon-version-detect

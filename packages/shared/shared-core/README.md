@@ -1,10 +1,8 @@
 # @xonovex/core
 
-Core library functions for Xonovex TypeScript scripts running with Node.js.
+Use `@xonovex/core` for common Node.js utilities in Xonovex TypeScript packages.
 
-## Overview
-
-This package provides common utilities used across all TypeScript scripts in the Xonovex platform:
+The package provides these utilities:
 
 - **Colors**: ANSI color codes for terminal output
 - **Logging**: Structured logging with color-coded levels
@@ -14,9 +12,11 @@ This package provides common utilities used across all TypeScript scripts in the
 
 ## Installation
 
-This package is designed to be imported directly by other script packages in the monorepo workspace.
+Import this internal package directly from another package in the monorepo. It is not a standalone application dependency.
 
 ## Usage
+
+Import only the functions that the script uses.
 
 ```typescript
 import {
@@ -54,6 +54,8 @@ die("Fatal error occurred", 1);
 
 ### Logging Functions
 
+Use the logging functions to produce consistent terminal output.
+
 - `logInfo(...args)` - Log info message (blue)
 - `logSuccess(...args)` - Log success message (green)
 - `logWarning(...args)` - Log warning message (yellow)
@@ -65,6 +67,8 @@ die("Fatal error occurred", 1);
 
 ### Platform Detection
 
+Use the platform functions when behavior must vary by operating system.
+
 - `isMacOS()` - Check if running on macOS
 - `isLinux()` - Check if running on Linux
 - `isWindows()` - Check if running on Windows
@@ -72,6 +76,8 @@ die("Fatal error occurred", 1);
 - `getOS()` - Get current OS name
 
 ### Error Handling
+
+Use these functions to validate prerequisites and stop with an explicit error.
 
 - `die(message, exitCode?)` - Exit with error message
 - `requireCommand(cmd, package?)` - Verify command exists
@@ -82,6 +88,8 @@ die("Fatal error occurred", 1);
 - `validateRepository(repo, platformRoot?)` - Validate git repository
 
 ### Path Utilities
+
+Use the path functions to locate the workspace and its files.
 
 - `getScriptDir(importMeta)` - Get script directory path
 - `getPlatformRoot(startDir?)` - Find platform root directory
@@ -96,6 +104,8 @@ die("Fatal error occurred", 1);
 
 ### Colors
 
+Use `Colors` only when direct ANSI color control is required.
+
 ```typescript
 import {Colors} from "@xonovex/core";
 
@@ -109,12 +119,18 @@ Available colors:
 
 ## Environment Variables
 
+Set these variables to control debugging and workspace discovery.
+
 - `DEBUG` - Enable debug logging
 - `PLATFORM_ROOT` - Override platform root detection
 
 ## Examples
 
+These examples show the common script and error-handling patterns.
+
 ### Simple Script
+
+Resolve the platform root before work that depends on repository paths.
 
 ```typescript
 #!/usr/bin/env node
@@ -133,6 +149,8 @@ main();
 ```
 
 ### Script with Error Handling
+
+Validate required tools and paths before the main operation.
 
 ```typescript
 #!/usr/bin/env node
@@ -160,6 +178,8 @@ main();
 ```
 
 ## Development
+
+Run the package gates from this directory.
 
 ```bash
 # Build

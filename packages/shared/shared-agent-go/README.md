@@ -1,8 +1,10 @@
 # Shared Agent Go
 
-Shared Go library for agent infrastructure, used by [agent-cli-go](../../agent/agent-cli-go/) and [agent-operator-go](../../agent/agent-operator-go/).
+Use this shared Go library to build agent infrastructure for [agent-cli-go](../../agent/agent-cli-go/) and [agent-operator-go](../../agent/agent-operator-go/).
 
 ## Packages
+
+Import the package that owns the required agent concern.
 
 | Package          | Description                                      |
 | ---------------- | ------------------------------------------------ |

@@ -1,16 +1,18 @@
 # Agent Operator
 
-Kubernetes operator for running AI coding agents (Claude, OpenCode) as Jobs with managed workspaces, provider secrets, and namespace-level defaults. Supports shared multi-agent workspaces where multiple agents coordinate via a common git checkout and shared config/state directories. Supports sandboxed execution via gVisor, Kata Containers, or Confidential Containers (CoCo) with AMD SEV-SNP / Intel TDX runtime classes. Supports [Jujutsu (jj)](https://github.com/jj-vcs/jj) as an alternative VCS for automatic snapshotting and operation-log based undo.
+Use the Agent Operator to run Claude Code or OpenCode as policy-governed Kubernetes Jobs with managed workspaces, provider secrets, and reusable execution configuration.
 
-**API Group:** `agent.xonovex.com/v1alpha1`
+Every execution namespace requires exactly one `AgentPolicy`. The operator supports isolated gVisor, Kata Containers, and [Confidential Containers (CoCo)](https://github.com/confidential-containers) runtime classes. Runs can use standalone or shared multi-agent workspaces with Git or [Jujutsu](https://github.com/jj-vcs/jj).
+
+**API group:** `agent.xonovex.com/v1alpha1`
 
 ## Custom Resources
 
-AgentRun references four concerns via ref or inline: **harness**, **provider**, **workspace**, and **toolchain**.
+Create an `AgentRun` for each execution request. A run defines or references four independent concerns: harness, provider, workspace, and toolchain.
 
 ### AgentRun
 
-The primary workload resource. Each AgentRun creates a Job with an init container (git clone) and a main container (agent binary). Runs can be standalone (own PVC) or reference a shared AgentWorkspace.
+Submit an `AgentRun` to create one agent Job. The Job contains a workspace initialization container and the agent container. A standalone run owns a persistent volume claim, while a shared run references an `AgentWorkspace`.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -37,23 +39,19 @@ spec:
       memory: "2Gi"
 ```
 
-**Lifecycle phases:** `Pending` -> `Initializing` -> `Running` -> `Succeeded` | `Failed` | `TimedOut`
+The lifecycle moves from `Pending` to `Initializing` to `Running`, then ends as `Succeeded`, `Failed`, or `TimedOut`.
 
 #### Submission boundary
 
-`AgentRun` is the operator's execution request API. Manual tools, harness hooks,
-CI/CD systems, webhook handlers, Kubernetes CronJobs, and other external
-integrations create `AgentRun` resources through the Kubernetes API. The
-operator has no scheduling or event-ingress listener and does not interpret
-caller-specific trigger metadata.
+External systems submit work by creating `AgentRun` resources through the Kubernetes API. The operator does not schedule requests, listen for external events, or interpret caller-specific trigger metadata. Manual tools, harness hooks, continuous integration systems, webhook handlers, and Kubernetes CronJobs remain outside this boundary.
 
-The operator admits and reconciles the submitted run specification. Any
-additional approval, policy, evidence, or escalation requirements belong to
-the caller or the native platform that submits the run.
+The operator admits and reconciles the submitted run specification. The caller or submitting platform owns any additional approval, policy, evidence, or escalation requirements.
 
 Every execution namespace must contain exactly one `AgentPolicy`. Admission rejects AgentRuns and AgentWorkspaces when the policy is absent or ambiguous, because the operator cannot safely determine runtime-class or Secret authority otherwise.
 
 #### Full spec reference
+
+Use these fields to define or reference each execution concern and its runtime limits.
 
 | Field              | Type     | Description                                                                                       |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------- |
@@ -76,7 +74,7 @@ Every execution namespace must contain exactly one `AgentPolicy`. Admission reje
 
 ### AgentHarness
 
-Agent type defaults (image, timeout, runtimeClassName, env). Multiple harnesses can coexist in a namespace for different agent types.
+Create an `AgentHarness` to reuse agent type, image, timeout, runtime class, and environment defaults. A namespace can contain different harnesses for different agent types.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -96,6 +94,8 @@ spec:
 
 #### Full spec reference
 
+Use these fields to set defaults that an `AgentRun` can inherit through `harnessRef`.
+
 | Field                     | Type     | Description                                       |
 | ------------------------- | -------- | ------------------------------------------------- |
 | `type`                    | string   | Agent type (`claude`, `opencode`)                 |
@@ -108,7 +108,7 @@ spec:
 
 ### AgentProvider
 
-Reusable provider configuration with Kubernetes-native secret management. Auth tokens are read from Secrets instead of environment variables.
+Create an `AgentProvider` to reuse model endpoint and credential configuration. The controller reads authentication tokens from Kubernetes Secrets and exposes them to the agent through the selected environment variable.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -132,6 +132,8 @@ The controller validates that the referenced Secret exists and contains the spec
 
 #### Full spec reference
 
+Use these fields to select a provider preset or define its credential and environment mapping.
+
 | Field                | Type   | Description                                                         |
 | -------------------- | ------ | ------------------------------------------------------------------- |
 | `presetRef`          | string | Portable shared provider preset; host-loopback presets are rejected |
@@ -144,7 +146,7 @@ The controller validates that the referenced Secret exists and contains the spec
 
 ### AgentWorkspace
 
-Owns a shared git checkout (ReadWriteMany PVC) and optional shared volumes for agent config/state directories. Multiple AgentRuns reference the workspace via `workspaceRef`, each creating its own git worktree for isolation.
+Create an `AgentWorkspace` when concurrent runs need one shared checkout and optional shared configuration or state volumes. The workspace owns a ReadWriteMany persistent volume claim. Each referenced `AgentRun` gets an isolated Git worktree or Jujutsu workspace.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -171,9 +173,11 @@ spec:
       storageSize: 512Mi
 ```
 
-**Lifecycle phases:** `Pending` -> `Initializing` -> `Ready` | `Failed`
+The lifecycle moves from `Pending` to `Initializing`, then ends as `Ready` or `Failed`.
 
 #### Full spec reference
+
+Use these fields to configure the repository, storage, runtime class, and shared volumes.
 
 | Field                             | Type   | Description                                                                               |
 | --------------------------------- | ------ | ----------------------------------------------------------------------------------------- |
@@ -192,6 +196,8 @@ spec:
 
 #### Volume layout
 
+The main persistent volume contains the checkout and per-run worktrees. Optional persistent volumes mount agent-specific configuration or state.
+
 ```
 workspace PVC (RWX):
   /workspace/              <- main git checkout (from init Job)
@@ -208,7 +214,7 @@ For a private HTTPS repository, the referenced Secret key contains a standard gi
 
 ### AgentToolchain
 
-Reusable toolchain configuration. The `nix` toolchain provisions via a **pre-built, digest-pinned OCI image** (no per-pod install).
+Create an `AgentToolchain` to reuse a pre-built, digest-pinned Nix image. The operator does not install Nix packages in each pod.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -227,6 +233,8 @@ spec:
 
 #### Full spec reference
 
+Use these fields to prove the Nix source and select the exact runtime image.
+
 | Field                        | Type   | Description                                                                                          |
 | ---------------------------- | ------ | ---------------------------------------------------------------------------------------------------- |
 | `type`                       | string | Toolchain type (`nix`)                                                                               |
@@ -235,11 +243,11 @@ spec:
 | `nix.flakeRef` / `nix.shell` | string | Project flake + devShell (project-flake source; mutually exclusive with `packages`)                  |
 | `nix.image`                  | string | Pre-built, digest-pinned agent OCI image the pod runs (required; satisfies `RequirePinnedProvision`) |
 
-The `nix` toolchain selects the pre-built image as the pod image — the **same content-addressed store-path closure** the CLI resolves (built from the same `flake.lock` + `nix/agent-env.nix`, verified with `nix path-info -r`). The pod starts by image pull: **no `nix-env` emptyDir, no `nixos/nix` init container, no per-pod `nix profile install`**. The AgentRun and AgentToolchain webhooks reject a `NixSpec` without `nixpkgsRev`, exactly one packages/flake source, and an `@sha256:` image digest. Build/push the image with `npx moon run agent-operator-go:agent-image-build` (→ `nix build .#legacyPackages.<sys>.agentImage` + skopeo push).
+The `nix` toolchain uses the pre-built image as the pod image. It contains the same content-addressed store-path closure that the CLI resolves from `flake.lock` and `nix/agent-env.nix`, verified with `nix path-info -r`. The pod starts with an image pull. It does not use a `nix-env` emptyDir, a `nixos/nix` initialization container, or a per-pod `nix profile install`. The `AgentRun` and `AgentToolchain` webhooks reject a `NixSpec` without `nixpkgsRev`, exactly one packages or flake source, and an `@sha256:` image digest. Build and push the image with `npx moon run agent-operator-go:agent-image-build`, which runs `nix build .#legacyPackages.<sys>.agentImage` and a skopeo push.
 
 ### AgentPolicy
 
-Namespace-scoped admission policy for AgentRuns and AgentWorkspaces. Exactly one AgentPolicy is required per execution namespace; missing or multiple policies reject admission because the effective authority would be unknown.
+Create exactly one `AgentPolicy` in each execution namespace. Admission rejects `AgentRun` and `AgentWorkspace` resources when the policy is absent or ambiguous because the operator cannot determine the effective authority.
 
 ```yaml
 apiVersion: agent.xonovex.com/v1alpha1
@@ -286,7 +294,11 @@ Admission configuration and the webhook endpoint must be reachable for these con
 
 ## Installation
 
+Install cert-manager, apply the custom resource definitions, and then deploy the operator with its admission webhook.
+
 ### Prerequisites
+
+Provide these cluster tools before installation.
 
 - Kubernetes cluster (v1.28+)
 - `kubectl` configured to access the cluster
@@ -295,29 +307,32 @@ Admission configuration and the webhook endpoint must be reachable for these con
 
 ### Install CRDs
 
+Apply the custom resource definitions from the repository release path.
+
 ```bash
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
 ```
 
 ### Deploy the operator
 
+Deploy the controller and admission webhook from the default Kustomize overlay.
+
 ```bash
 # Deploy with kustomize (pulls from GHCR)
 kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
 ```
 
-The default overlay deploys the admission service and uses cert-manager to issue
-its serving certificate and inject the CA bundle into the webhook configurations.
-The manager deployment uses the digest-pinned image declared in
-`config/manager/manager.yaml`.
+The default overlay deploys the admission service and uses cert-manager to issue its serving certificate and inject the certificate authority bundle into the webhook configurations. The manager deployment uses the digest-pinned image declared in `config/manager/manager.yaml`.
 
-To build locally:
+Build a local image only when developing the operator image.
 
 ```bash
 docker build -f packages/agent/agent-operator-go/Dockerfile -t ghcr.io/xonovex/agent-operator-go:latest .
 ```
 
 ### Run locally (for development)
+
+Install the custom resource definitions, then run the controller against the current Kubernetes configuration.
 
 ```bash
 # Install CRDs first
@@ -331,10 +346,11 @@ go run ./cmd/operator/ \
 
 ## Usage
 
+Start with a standalone run, then add reusable or shared resources only when the workload needs them.
+
 ### Standalone agent run (direct submission)
 
-Create a Secret, an AgentProvider, optionally an AgentHarness for defaults, then
-submit an AgentRun directly.
+Create a Secret and an `AgentProvider`, optionally create an `AgentHarness` for defaults, then submit an `AgentRun`.
 
 ```bash
 # 1. Create a Secret for your provider credentials
@@ -468,10 +484,10 @@ spec:
 
 Run agents inside a Trusted Execution Environment (TEE) using [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP or Intel TDX hardware. This works across cloud providers (AKS, EKS, GKE) and on-prem clusters with TEE-capable nodes.
 
-Use the existing `runtimeClassName` and `nodeSelector` fields — no special configuration is needed:
+Use the existing `runtimeClassName` and `nodeSelector` fields. No special configuration is needed.
 
 ```yaml
-# RuntimeClass (cluster setup — cloud providers may create these automatically)
+# RuntimeClass; cloud providers can create these automatically during cluster setup
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass
 metadata:
@@ -777,6 +793,8 @@ spec:
 
 ### Monitoring runs
 
+Watch the custom resource for status and inspect the generated Job or Pod for runtime details.
+
 ```bash
 # Watch AgentRun status
 kubectl get agentruns -w
@@ -795,13 +813,15 @@ kubectl logs job/fix-auth-bug -c git-clone
 
 ## Testing
 
+Run the smallest suite that proves the changed behavior, then run the required integration or end-to-end suite for changes that cross the Kubernetes API or runtime boundary.
+
 ```bash
 # Unit tests
 go test ./...
 
 # Integration tests (envtest, real API server, no kubelet)
 # Requires: setup-envtest, provided by the nix devshell (nix/k8s.nix)
-# The moon task wires KUBEBUILDER_ASSETS itself — no manual export needed:
+# The Moon task sets KUBEBUILDER_ASSETS; no manual export is needed:
 npx moon run agent-operator-go:go-test-integration
 # Direct invocation outside moon:
 KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
@@ -830,6 +850,8 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 
 ### What the tests cover
 
+Each test tier covers a distinct execution boundary.
+
 - **Unit:** Builders (PVC, Job, containers, env vars, workspace PVC/Job/worktree), policy/admission bypass cases, webhooks, resolvers, providers, and toolchains.
 - **Integration:** Reconciler logic against a real API server, including resource creation, phase transitions, provider resolution, harness defaults, terminal phases, and shared workspaces.
 - **E2E:** Full cluster scheduling, storage, initialization, owner cleanup, image deployment, multi-agent workspaces, and the full agent pipeline.
@@ -837,40 +859,23 @@ go test -tags=e2e_coco -v -timeout=600s ./test/e2e-coco/
 
 ### Known host issue: Kind node exec fails (`setns process: exec: already started`)
 
-On affected hosts every Kind-based e2e suite fails at cluster creation ("Writing
-configuration") before running a single test, with:
+On affected hosts every Kind-based e2e suite fails at cluster creation ("Writing configuration") before running a single test, with:
 
 ```
 OCI runtime exec failed: exec failed: unable to start container process: error starting setns process: exec: already started
 ```
 
-Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo
-(cgroup v2, nsdelegate). Findings from the investigation:
+Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo (cgroup v2, nsdelegate). Findings from the investigation:
 
-- `docker exec` into a plain container (alpine) works, with or without
-  `--privileged`.
-- `docker exec` into a Kind node container fails identically with or without
-  `--privileged`, on both `kindest/node:v1.35.0` and `v1.31.9` — the node-image
-  version is irrelevant.
-- The node container runs systemd in a private cgroup namespace: its PID 1
-  sits in the child cgroup `init.scope` while controllers are enabled on the
-  container's root cgroup, so attaching an exec'd process to that root cgroup
-  violates cgroup v2's internal-process constraint. The `exec: already started`
-  text is Go's `os/exec` error for a second `Start` on one `Cmd`, which places
-  the fault in runc's exec/cgroup-attach retry path, not in the kernel setns
-  call itself.
-- Best hypothesis: a runc 1.4.0 exec bug triggered by systemd containers on
-  this kernel/cgroup layout. Portage carries runc 1.4.2 (stable) and 1.4.3
-  (~testing); upgrading and restarting docker is the untested candidate fix —
-  it needs root, so it was not applied.
-- Separately, the kata suite extracts a multi-GB Kata release into `$TMPDIR`;
-  on a small tmpfs `/tmp` it fails at `tar` (ENOSPC) before reaching Kind. Set
-  `TMPDIR` to a disk-backed path to get past that and reach the same Kind
-  failure as the other suites.
+- `docker exec` into a plain container (alpine) works, with or without `--privileged`.
+- `docker exec` into a Kind node container fails identically with or without `--privileged`, on both `kindest/node:v1.35.0` and `v1.31.9`. The node image version is irrelevant.
+- The node container runs systemd in a private cgroup namespace: its PID 1 sits in the child cgroup `init.scope` while controllers are enabled on the container's root cgroup, so attaching an exec'd process to that root cgroup violates cgroup v2's internal-process constraint. The `exec: already started` text is Go's `os/exec` error for a second `Start` on one `Cmd`, which places the fault in runc's exec/cgroup-attach retry path, not in the kernel setns call itself.
+- Best hypothesis: a runc 1.4.0 exec bug triggered by systemd containers on this kernel/cgroup layout. Portage carries runc 1.4.2 (stable) and 1.4.3 (`~testing`). Upgrading and restarting Docker is the untested candidate fix. it needs root, so it was not applied.
+- Separately, the kata suite extracts a multi-GB Kata release into `$TMPDIR`; on a small tmpfs `/tmp` it fails at `tar` (ENOSPC) before reaching Kind. Set `TMPDIR` to a disk-backed path to get past that and reach the same Kind failure as the other suites.
 
 ## Architecture
 
-Each AgentRun reconciles along one of two paths:
+Each `AgentRun` follows either a standalone reconciliation path or a shared-workspace reconciliation path.
 
 **Standalone path** (no `workspaceRef`):
 
@@ -910,6 +915,8 @@ AgentRun                            AgentWorkspace
 ```
 
 ## Cleanup
+
+Delete runs or workspaces independently, or remove the operator and custom resource definitions from the cluster.
 
 ```bash
 # Delete a specific run (also cleans up its Job via owner references)

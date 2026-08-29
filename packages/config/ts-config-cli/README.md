@@ -1,8 +1,10 @@
 # @xonovex/ts-config-cli
 
-TypeScript configuration for CLI tools and scripts.
+Use this package to compile TypeScript command-line tools and scripts.
 
 ## Installation
+
+Install the package as a development dependency.
 
 ```bash
 npm install -D @xonovex/ts-config-cli
@@ -10,7 +12,7 @@ npm install -D @xonovex/ts-config-cli
 
 ## Usage
 
-Extend in your `tsconfig.json`:
+Extend the package from `tsconfig.json`, then set the script input and output paths.
 
 ```json
 {
@@ -25,7 +27,7 @@ Extend in your `tsconfig.json`:
 
 ## Features
 
-Extends `@xonovex/ts-config-base` with CLI-specific settings:
+The configuration extends `@xonovex/ts-config-base` with these command-line settings:
 
 - Node.js types included
 - Optimized for executable scripts
