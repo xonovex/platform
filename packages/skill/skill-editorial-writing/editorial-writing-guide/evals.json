@@ -1,0 +1,33 @@
+{
+  "skill_name": "editorial-writing-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it is a game-changer, and studies show productivity has never been better.'",
+      "assertions": [
+        "The rewrite drops marketing puffery such as 'seamless', 'unlock their full potential', and 'game-changer'",
+        "The vague attributions 'experts agree' and 'studies show' are removed or replaced by a supplied named source",
+        "No statistic, source, publication, or quote is invented"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "This blog paragraph feels robotic. Make it sound human without changing the facts: 'The release was pivotal. It was not just faster, but also cleaner and more reliable. This delivers a robust, seamless experience: creating value, while ensuring users remain engaged. Overall, the future looks promising.'",
+      "assertions": [
+        "The rewrite removes negative parallelism and the reflexive three-item list",
+        "The trailing participle clauses and generic conclusion are removed or replaced with concrete supplied facts",
+        "The rewrite does not introduce invented facts, fake typos, or forced fragments"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Edit this museum review for a warm but credible publication voice. Preserve the facts that entry costs 12 euros, the visit took 90 minutes, and the west gallery was closed. Remove generic praise and do not turn the review into marketing copy.",
+      "assertions": [
+        "The final prose has a clear editorial voice without promotional claims",
+        "The price, visit duration, and west gallery closure are preserved",
+        "The rewrite does not invent an opinion, facility, quote, or visitor detail"
+      ]
+    }
+  ]
+}

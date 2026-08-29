@@ -1,0 +1,110 @@
+[
+  {
+    "query": "Make this paragraph clearer and shorter without changing its meaning or tone.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "general prose clarity"
+  },
+  {
+    "query": "Remove filler and repeated conclusions from this internal update.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "general concision"
+  },
+  {
+    "query": "These sentences use customer, client, and account holder for the same person. Make the terminology consistent.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "stable terminology"
+  },
+  {
+    "query": "Rewrite this note so every pronoun has a clear referent and each sentence makes one point.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "sentence and referent clarity"
+  },
+  {
+    "query": "Tighten this recommendation and keep each measurement beside the claim it supports.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "claim and evidence alignment"
+  },
+  {
+    "query": "Can you turn this wordy message into plain, direct prose while preserving every fact?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "plain writing request"
+  },
+  {
+    "query": "Fix the ambiguous comparisons in this short report and state which baseline each percentage uses.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "precise comparison context"
+  },
+  {
+    "query": "Edit this memo so it uses active subjects, concrete verbs, and no setup narration.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "plain prose mechanics"
+  },
+  {
+    "query": "Write a destination guide for Lisbon with current prices, opening hours, and multilingual frontmatter.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "travel writing workflow"
+  },
+  {
+    "query": "Add three bilingual news posts about this week's battery announcements.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "news writing workflow"
+  },
+  {
+    "query": "Rewrite this engineering incident report so impact and current status come before the timeline.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "technical writing structure"
+  },
+  {
+    "query": "Make this lifestyle article sound less robotic and give it a warmer editorial voice.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "editorial writing specialization"
+  },
+  {
+    "query": "Fix the type errors in this TypeScript module and run its unit tests.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code implementation"
+  },
+  {
+    "query": "Create a pull request description with testing and rollout sections.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "pull request artifact"
+  },
+  {
+    "query": "Translate this paragraph from English to Dutch without editing it.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "translation only"
+  },
+  {
+    "query": "Split this product request into user stories with acceptance criteria.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "user story authoring"
+  },
+  {
+    "query": "Humanize this venue description, remove travel cliches, and preserve all verified details.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by editorial-writing-guide"
+  },
+  {
+    "query": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by user-stories-guide"
+  }
+]

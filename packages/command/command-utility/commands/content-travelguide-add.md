@@ -30,6 +30,6 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `content-guide` skill (plugin `xonovex-skill-content`) and perform its
-**travelguide-add** operation with these arguments. The skill is the source of truth for the
+Load the `travel-writing-guide` skill (plugin `xonovex-skill-travel-writing`) and perform its
+**create** operation with these arguments. The skill is the source of truth for the
 procedure, output format, and gotchas. Do not restate them.

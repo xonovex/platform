@@ -1,0 +1,33 @@
+{
+  "skill_name": "writing-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rewrite this note for clarity without changing its meaning: 'In order to facilitate a reduction in avoidable delays, it is important to note that all team members should make use of the same request name when they communicate about the request.'",
+      "assertions": [
+        "The rewrite removes filler such as 'in order to' and 'it is important to note'",
+        "The rewrite uses one consistent term for the request",
+        "The rewrite preserves the requirement that all team members use the same name"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Tighten this update: 'We think the campaign worked well. Sign-ups rose 18 percent. This was compared with the previous four-week average. There were several things that may have contributed. The new landing page launched on the same day, so the campaign might be the cause.'",
+      "assertions": [
+        "The 18 percent increase remains beside its four-week comparison baseline",
+        "The rewrite identifies campaign causation as an inference rather than a verified fact",
+        "The rewrite removes vague setup text without inventing a cause"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Make this paragraph concise and unambiguous: 'The coordinator sent the editor the revised brief after they reviewed it. This was useful. The document contained the deadline of Friday and the publication date of Monday. In conclusion, the revised brief was useful for the work.'",
+      "assertions": [
+        "The rewrite resolves or explicitly reports the ambiguous referent of 'they'",
+        "The Friday deadline and Monday publication date remain distinct",
+        "The rewrite removes the vague and duplicated usefulness statements"
+      ]
+    }
+  ]
+}

@@ -3,10 +3,12 @@ language: unknown
 tags: [command]
 dependsOn:
   - skill-command
-  - skill-content
+  - skill-editorial-writing
   - skill-instruction
+  - skill-news-writing
   - skill-reflect
   - skill-skill
+  - skill-travel-writing
 tasks:
   build:
     command: echo 'build complete'

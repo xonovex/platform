@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-memory-management",
-  "version": "5.2.0",
-  "description": "Xonovex Memory management skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Memory management skills",
   "type": "module",
   "keywords": [
     "xonovex",

@@ -1,15 +1,17 @@
 {
   "name": "xonovex-utility",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "description": "Xonovex utility commands: skills, commands, instructions, reflect, content",
   "author": {
     "name": "Xonovex"
   },
   "dependencies": [
-    "xonovex-skill-content",
-    "xonovex-skill-reflect",
+    "xonovex-skill-command",
+    "xonovex-skill-editorial-writing",
     "xonovex-skill-instruction",
+    "xonovex-skill-news-writing",
+    "xonovex-skill-reflect",
     "xonovex-skill-skill",
-    "xonovex-skill-command"
+    "xonovex-skill-travel-writing"
   ]
 }

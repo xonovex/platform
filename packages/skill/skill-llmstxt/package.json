@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-llmstxt",
-  "version": "5.2.0",
-  "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification",
   "type": "module",
   "keywords": [
     "xonovex",

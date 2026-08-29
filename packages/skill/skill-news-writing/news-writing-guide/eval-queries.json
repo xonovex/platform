@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Add two short news posts about recent electric vehicle developments to our bilingual content site.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "multilingual news creation"
+  },
+  {
+    "query": "Research the latest semiconductor announcements and curate three verified stories from the past week.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "current news curation"
+  },
+  {
+    "query": "Create English and Dutch Markdown news files with matching frontmatter and slugs.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "news files and frontmatter"
+  },
+  {
+    "query": "Find three credible sources for this story before drafting a concise news article.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "news triangulation"
+  },
+  {
+    "query": "Refresh this news post with developments from the last 48 hours and keep both language versions aligned.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "news refresh and multilingual consistency"
+  },
+  {
+    "query": "Our editor needs a publishable update on today's rail strike with sources, summary metadata, and a hero image.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "publishable current news"
+  },
+  {
+    "query": "Curate recent product announcements, reject unsupported claims, and write one file per locale.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "news verification and localization"
+  },
+  {
+    "query": "Write a B1 news summary from these verified sources and use slug.lang.md filenames.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "news readability and file contract"
+  },
+  {
+    "query": "Write a comprehensive Barcelona travel guide with itineraries and current venue details.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "travel writing"
+  },
+  {
+    "query": "Humanize this opinion article and remove repetitive AI phrasing.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "editorial revision"
+  },
+  {
+    "query": "Make this engineering recommendation lead with the decision blocker.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "technical writing"
+  },
+  {
+    "query": "Shorten this memo and make its terminology consistent.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "general writing"
+  },
+  {
+    "query": "Summarize this supplied article without searching for newer information.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "simple summarization"
+  },
+  {
+    "query": "Translate this existing news paragraph into Dutch without creating content files.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "translation only"
+  },
+  {
+    "query": "Open a GitHub issue about the incorrect publication date.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "GitHub issue operation"
+  },
+  {
+    "query": "Write a press release announcing our new office.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "press release is not news curation"
+  }
+]

@@ -85,7 +85,7 @@
   },
   {
     "query": "Rewrite this Dutch news article's intro so it reads naturally while keeping every frontmatter field intact.",
-    "rationale": "near miss owned by content-guide",
+    "rationale": "near miss owned by editorial-writing-guide",
     "should_trigger": false,
     "split": "validation"
   },

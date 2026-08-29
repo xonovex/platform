@@ -1,0 +1,122 @@
+[
+  {
+    "query": "Rewrite this engineering status update so the blocker and required action come first, with the evidence after them.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "outcome-first technical status writing"
+  },
+  {
+    "query": "Turn these benchmark notes into a concise technical report that leads with the result and then gives the measurements.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "technical report structure and evidence order"
+  },
+  {
+    "query": "Use bottom line up front to explain why the API migration is delayed, but do not add a visible BLUF heading.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "explicit bottom-line-first request"
+  },
+  {
+    "query": "Reorganize this architecture explanation so the decision and tradeoff come before the supporting context.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "decision-first standalone technical explanation"
+  },
+  {
+    "query": "Write an operational handoff that starts with current status and the next action, then records the investigation details.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "status-first technical handoff"
+  },
+  {
+    "query": "This diagnosis reads like a diary. Rewrite it so the confirmed cause and fix appear before the chronology.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "outcome-first diagnostic prose"
+  },
+  {
+    "query": "Make this technical documentation section answer the reader's question in its opening sentence and put detail in descending importance.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "outcome-first technical documentation"
+  },
+  {
+    "query": "Create an executive summary for this performance investigation. The result is still uncertain, so make the unknown and next measurement clear.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "honest outcome-first writing under uncertainty"
+  },
+  {
+    "query": "Can you make the bottom line obvious before the caveats in this infrastructure explanation without hiding the decisive caveat?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "lead and caveat placement"
+  },
+  {
+    "query": "Write a concise engineering update from these notes. Lead with what changed and only name an owner or deadline if the notes provide one.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "technical update with evidence discipline"
+  },
+  {
+    "query": "Write a bilingual travel guide with structured frontmatter and B1 Dutch prose.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "multilingual travel content belongs to travel-writing-guide"
+  },
+  {
+    "query": "Create a pull request description with What, Why, Changes, and Testing sections.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "pull-request artifact structure belongs to pull-request-guide"
+  },
+  {
+    "query": "Review this pull request and write blocking inline feedback for the author.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "review feedback belongs to code-review-guide"
+  },
+  {
+    "query": "Add repository setup and validation commands to AGENTS.md.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "project instructions belong to instruction-guide"
+  },
+  {
+    "query": "Write an implementation plan for replacing the cache over three milestones.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "implementation planning belongs to plan-guide"
+  },
+  {
+    "query": "Split this feature request into INVEST user stories with acceptance criteria.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "story authoring belongs to user-stories-guide"
+  },
+  {
+    "query": "Translate this short paragraph from English to Dutch.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "simple translation is not technical-writing structure work"
+  },
+  {
+    "query": "Open a GitHub issue for this bug and add it to the project board.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "GitHub issue operations belong to github-guide"
+  },
+  {
+    "query": "Humanize this AI-generated lifestyle article and remove repetitive prose patterns.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "editorial humanization belongs to editorial-writing-guide"
+  },
+  {
+    "query": "Fix the type errors in this TypeScript function and run its tests.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code implementation belongs to typescript-guide"
+  }
+]

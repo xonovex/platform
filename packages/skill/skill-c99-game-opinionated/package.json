@@ -1,12 +1,12 @@
 {
   "name": "@xonovex/skill-c99-game-opinionated",
-  "version": "5.2.0",
-  "description": "Xonovex C99 game opinionated skills",
+  "version": "5.3.0",
   "private": true,
-  "type": "module",
   "dependencies": {
-    "@xonovex/skill-c99": "5.2.0"
+    "@xonovex/skill-c99": "5.3.0"
   },
+  "description": "Xonovex C99 game opinionated skills",
+  "type": "module",
   "keywords": [
     "xonovex",
     "skill",

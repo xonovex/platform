@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-data-oriented-design",
-  "version": "5.2.0",
-  "description": "Xonovex Data-oriented design skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Data-oriented design skills",
   "type": "module",
   "keywords": [
     "xonovex",

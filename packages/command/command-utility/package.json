@@ -1,15 +1,17 @@
 {
   "name": "@xonovex/command-utility",
-  "version": "5.2.0",
-  "description": "Xonovex utility commands: skills, commands, instructions, reflect, content",
+  "version": "5.3.0",
   "private": true,
   "dependencies": {
-    "@xonovex/skill-command": "5.2.0",
-    "@xonovex/skill-content": "5.2.0",
-    "@xonovex/skill-instruction": "5.2.0",
-    "@xonovex/skill-reflect": "5.2.0",
-    "@xonovex/skill-skill": "5.2.0"
+    "@xonovex/skill-command": "5.3.0",
+    "@xonovex/skill-editorial-writing": "5.3.0",
+    "@xonovex/skill-instruction": "5.3.0",
+    "@xonovex/skill-news-writing": "5.3.0",
+    "@xonovex/skill-reflect": "5.3.0",
+    "@xonovex/skill-skill": "5.3.0",
+    "@xonovex/skill-travel-writing": "5.3.0"
   },
+  "description": "Xonovex utility commands: skills, commands, instructions, reflect, content",
   "keywords": [
     "xonovex",
     "command",

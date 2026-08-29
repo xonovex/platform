@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-copilot",
-  "version": "5.2.0",
-  "description": "Xonovex GitHub Copilot hook skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex GitHub Copilot hook skills",
   "type": "module",
   "keywords": [
     "xonovex",

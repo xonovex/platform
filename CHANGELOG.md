@@ -5,6 +5,29 @@ Release notes for the plugin catalog line: the `packages/skill/*` and
 `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The
 agent line keeps its own notes in `packages/agent/agent-cli-go/CHANGELOG.md`.
 
+## 5.3.0 - 2026-08-29
+
+77 skill and command plugins. Previous catalog version: 5.2.0.
+
+### Added
+
+#### Skills
+
+- `xonovex-skill-writing` owns shared clarity, terminology, evidence, and concision rules.
+- `xonovex-skill-editorial-writing` owns editorial voice, register, readability, multilingual consistency, and humanization.
+- `xonovex-skill-news-writing` owns current-news research, verification, multilingual files, and publication metadata.
+- `xonovex-skill-travel-writing` owns destination and venue research, practical facts, itineraries, and multilingual guide files.
+- `xonovex-skill-technical-writing` owns outcome-first technical prose, decisive caveats, and exact technical meaning.
+
+### Changed
+
+- The content utility commands keep their public names and now delegate to the matching editorial, news, or travel writing skill.
+- `xonovex-skill-code-quality` adds a comment inventory that distinguishes removable narration from licenses, shebangs, formatter directives, lint suppressions, coverage markers, and tool annotations.
+
+### Removed
+
+- `xonovex-skill-content` is replaced by the focused editorial, news, and travel writing plugins. Installed copies keep working, but the plugin no longer resolves from either marketplace.
+
 ## 5.2.0 - 2026-08-23
 
 73 skill and command plugins. Previous catalog version: 5.1.0.

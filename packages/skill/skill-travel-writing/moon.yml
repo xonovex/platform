@@ -1,0 +1,10 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [skill]
+dependsOn:
+  - skill-editorial-writing
+tasks:
+  build:
+    command: echo 'build complete'
+    options:
+      cache: false

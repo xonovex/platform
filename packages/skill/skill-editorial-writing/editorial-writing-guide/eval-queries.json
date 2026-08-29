@@ -1,0 +1,122 @@
+[
+  {
+    "query": "Rewrite this article so it sounds like a person wrote it, not an AI.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "editorial humanization"
+  },
+  {
+    "query": "This blog post is full of generic filler and marketing puffery. Give it a natural voice without changing the facts.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "editorial voice and fact preservation"
+  },
+  {
+    "query": "Copy-edit this review for rhythm, register, and a more specific point of view.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "editorial copy editing"
+  },
+  {
+    "query": "Adapt this English article to B1 readability and keep the Dutch version aligned on every fact.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "multilingual editorial consistency"
+  },
+  {
+    "query": "Remove repetitive AI writing patterns from this lifestyle piece but keep the publication's casual tone.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "AI pattern removal"
+  },
+  {
+    "query": "Edit this feature article so its voice fits a specialist audience without becoming stiff.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "audience and register fit"
+  },
+  {
+    "query": "Humanize this venue description, remove travel cliches, and preserve all verified details.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "natural editorial prose"
+  },
+  {
+    "query": "Review this newsletter draft for voice, pacing, filler, and an ending that does not repeat the opening.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "editorial revision"
+  },
+  {
+    "query": "Research and add two bilingual news posts about recent electric vehicle developments.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "news writing workflow"
+  },
+  {
+    "query": "Create a complete Porto travel guide with current hours, prices, itineraries, and frontmatter.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "travel writing workflow"
+  },
+  {
+    "query": "Rewrite this incident report so impact, status, and required action come first.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "technical writing structure"
+  },
+  {
+    "query": "Make this internal note shorter and resolve its ambiguous pronouns.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "general writing mechanics"
+  },
+  {
+    "query": "Translate this paragraph from Dutch to English without changing its style.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "translation only"
+  },
+  {
+    "query": "Write acceptance criteria for this checkout user story.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "user story authoring"
+  },
+  {
+    "query": "Review this pull request and write blocking inline comments.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code review"
+  },
+  {
+    "query": "Fix this React component and add a loading state.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "code implementation"
+  },
+  {
+    "query": "Can you turn this wordy message into plain, direct prose while preserving every fact?",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by writing-guide"
+  },
+  {
+    "query": "Our editor needs a publishable update on today's rail strike with sources, summary metadata, and a hero image.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by news-writing-guide"
+  },
+  {
+    "query": "Publish a B1 visitor guide for the Louvre with practical logistics and a recorded research date.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by travel-writing-guide"
+  },
+  {
+    "query": "Make this technical documentation section answer the reader's question in its opening sentence and put detail in descending importance.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "exact routing near miss owned by technical-writing-guide"
+  }
+]

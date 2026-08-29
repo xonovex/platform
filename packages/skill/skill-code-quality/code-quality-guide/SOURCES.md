@@ -81,10 +81,10 @@
 ## Xonovex cleanup-inventory conventions
 
 - **Provenance:** Repository-original read-only detector procedures maintained within skill-code-quality
-- **Last reviewed:** 2026-07-22
-- **Used for:** `references/cleanup-inventories.md`
-- **References:** cleanup-inventories.md
-- **Aspects extracted:** Barrel, redundant-comment, shared-extraction, and TODO/FIXME inventories remain evidence-linked and read-only.
+- **Last reviewed:** 2026-08-29
+- **Used for:** `references/comment-inventory.md`, `references/cleanup-inventories.md`
+- **References:** comment-inventory.md, cleanup-inventories.md
+- **Aspects extracted:** Comment, barrel, shared-extraction, and TODO/FIXME inventories remain evidence-linked and read-only. Comment classification preserves functional or ambiguous text by default and grades prose findings by maintenance risk.
 
 ## Refresh Workflow
 

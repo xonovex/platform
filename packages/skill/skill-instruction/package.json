@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-instruction",
-  "version": "5.2.0",
-  "description": "Xonovex Instruction skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Instruction skills",
   "type": "module",
   "keywords": [
     "xonovex",

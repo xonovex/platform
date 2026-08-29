@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-lua",
-  "version": "5.2.0",
-  "description": "Xonovex Lua skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Lua skills",
   "type": "module",
   "keywords": [
     "xonovex",

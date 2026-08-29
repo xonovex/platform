@@ -15,7 +15,9 @@ claude plugin install xonovex-utility@xonovex-marketplace
 
 ```bash
 codex plugin marketplace add xonovex/platform
-codex plugin add xonovex-skill-content@xonovex-marketplace
+codex plugin add xonovex-skill-editorial-writing@xonovex-marketplace
+codex plugin add xonovex-skill-news-writing@xonovex-marketplace
+codex plugin add xonovex-skill-travel-writing@xonovex-marketplace
 codex plugin add xonovex-skill-instruction@xonovex-marketplace
 codex plugin add xonovex-skill-reflect@xonovex-marketplace
 codex plugin add xonovex-skill-skill@xonovex-marketplace

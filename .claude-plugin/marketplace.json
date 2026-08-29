@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Official Xonovex development tools",
-    "version": "5.2.0"
+    "version": "5.3.0"
   },
   "plugins": [
     {
@@ -94,11 +94,6 @@
       "description": "Xonovex Connascence skills"
     },
     {
-      "name": "xonovex-skill-content",
-      "source": "./packages/skill/skill-content",
-      "description": "Xonovex Content skills"
-    },
-    {
       "name": "xonovex-skill-copilot",
       "source": "./packages/skill/skill-copilot",
       "description": "Xonovex GitHub Copilot hook skills"
@@ -147,6 +142,11 @@
       "name": "xonovex-skill-editor-viewport",
       "source": "./packages/skill/skill-editor-viewport",
       "description": "Xonovex Editor viewport skills"
+    },
+    {
+      "name": "xonovex-skill-editorial-writing",
+      "source": "./packages/skill/skill-editorial-writing",
+      "description": "Xonovex editorial writing skills"
     },
     {
       "name": "xonovex-skill-fp",
@@ -254,6 +254,11 @@
       "description": "Xonovex Moon skills"
     },
     {
+      "name": "xonovex-skill-news-writing",
+      "source": "./packages/skill/skill-news-writing",
+      "description": "Xonovex news writing skills"
+    },
+    {
       "name": "xonovex-skill-node-graph",
       "source": "./packages/skill/skill-node-graph",
       "description": "Xonovex Node graph skills"
@@ -329,6 +334,11 @@
       "description": "Xonovex Test-driven development skills"
     },
     {
+      "name": "xonovex-skill-technical-writing",
+      "source": "./packages/skill/skill-technical-writing",
+      "description": "Xonovex Technical writing skills"
+    },
+    {
       "name": "xonovex-skill-terraform",
       "source": "./packages/skill/skill-terraform",
       "description": "Xonovex Terraform skills"
@@ -342,6 +352,11 @@
       "name": "xonovex-skill-threejs",
       "source": "./packages/skill/skill-threejs",
       "description": "Xonovex Three.js skills"
+    },
+    {
+      "name": "xonovex-skill-travel-writing",
+      "source": "./packages/skill/skill-travel-writing",
+      "description": "Xonovex travel writing skills"
     },
     {
       "name": "xonovex-skill-typescript",
@@ -367,6 +382,11 @@
       "name": "xonovex-skill-vitest",
       "source": "./packages/skill/skill-vitest",
       "description": "Xonovex Vitest skills"
+    },
+    {
+      "name": "xonovex-skill-writing",
+      "source": "./packages/skill/skill-writing",
+      "description": "Xonovex writing skills"
     },
     {
       "name": "xonovex-skill-zod",

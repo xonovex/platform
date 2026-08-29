@@ -1,0 +1,36 @@
+{
+  "skill_name": "technical-writing-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Rewrite these notes as a concise technical incident update:\n\nAt 09:00 an expired signing key caused checkout requests to fail. We first checked database saturation, then traced 401 responses to the signer. Checkout returned to normal at 09:27 after the key was replaced. Eighteen percent of checkout requests failed during the incident. Before the next deployment, the release operator must verify the replacement key in production. No owner or deadline beyond that is known.",
+      "assertions": [
+        "The first substantive sentence states that checkout is restored and gives the customer impact or incident duration",
+        "The required pre-deployment key verification appears before the diagnostic chronology",
+        "The database and signer investigation appears only as supporting evidence after the outcome and action",
+        "The response does not use a visible BLUF label and does not invent an owner or deadline"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write an outcome-first recommendation from these architecture notes:\n\nCache A reduced median latency by 30 percent in the representative test. Cache B reduced it by 18 percent and used 40 percent less memory. Peak-memory data for Cache A is missing, and the service has a strict 2 GiB limit. The team cannot make the final selection until that measurement exists. The next action is to measure Cache A under peak production load.",
+      "assertions": [
+        "The opening says that the decision is not final and identifies the peak-memory measurement as the blocker or next action",
+        "The response does not present Cache A as an unconditional final decision",
+        "The latency and Cache B memory results follow as evidence rather than preceding the decision status",
+        "The 2 GiB limit remains adjacent to the missing-memory caveat because it can change the decision"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Rewrite this technical documentation paragraph for engineers:\n\nThere are a few things to know about retries. The client has several settings. Requests can sometimes fail after the server has accepted them. We use an idempotency key. This means callers should reuse the same key when retrying a timed-out write. A new key can create a duplicate record. The timeout is 10 seconds. Read requests do not need a key.\n\nLead with the reader action, keep the decisive warning near it, and do not add a BLUF heading.",
+      "assertions": [
+        "The opening instructs callers to reuse the same idempotency key when retrying a timed-out write",
+        "The duplicate-record risk appears with or immediately after the opening instruction",
+        "The timeout and read-request details follow the main instruction",
+        "The prose uses one consistent term for the key and has no visible BLUF heading or repeated closing summary"
+      ]
+    }
+  ]
+}

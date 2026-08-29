@@ -200,19 +200,6 @@
       "category": "Productivity"
     },
     {
-      "name": "xonovex-skill-content",
-      "source": {
-        "source": "local",
-        "path": "./packages/skill/skill-content"
-      },
-      "description": "Xonovex Content skills",
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    },
-    {
       "name": "xonovex-skill-copilot",
       "source": {
         "source": "local",
@@ -336,6 +323,19 @@
         "path": "./packages/skill/skill-editor-viewport"
       },
       "description": "Xonovex Editor viewport skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-editorial-writing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-editorial-writing"
+      },
+      "description": "Xonovex editorial writing skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -616,6 +616,19 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-news-writing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-news-writing"
+      },
+      "description": "Xonovex news writing skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-node-graph",
       "source": {
         "source": "local",
@@ -811,6 +824,19 @@
       "category": "Productivity"
     },
     {
+      "name": "xonovex-skill-technical-writing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-technical-writing"
+      },
+      "description": "Xonovex Technical writing skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "xonovex-skill-terraform",
       "source": {
         "source": "local",
@@ -843,6 +869,19 @@
         "path": "./packages/skill/skill-threejs"
       },
       "description": "Xonovex Three.js skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-travel-writing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-travel-writing"
+      },
+      "description": "Xonovex travel writing skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
@@ -908,6 +947,19 @@
         "path": "./packages/skill/skill-vitest"
       },
       "description": "Xonovex Vitest skills",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "xonovex-skill-writing",
+      "source": {
+        "source": "local",
+        "path": "./packages/skill/skill-writing"
+      },
+      "description": "Xonovex writing skills",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

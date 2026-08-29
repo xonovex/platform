@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-docker",
-  "version": "5.2.0",
-  "description": "Xonovex Docker skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Docker skills",
   "type": "module",
   "keywords": [
     "xonovex",

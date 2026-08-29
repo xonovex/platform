@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-imgui",
-  "version": "5.2.0",
-  "description": "Xonovex immediate-mode GUI skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex immediate-mode GUI skills",
   "type": "module",
   "keywords": [
     "xonovex",

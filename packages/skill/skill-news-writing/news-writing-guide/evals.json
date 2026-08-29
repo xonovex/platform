@@ -1,0 +1,33 @@
+{
+  "skill_name": "news-writing-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add two short news posts about recent electric vehicle developments to our content site. We publish in English and Dutch, and each post is a Markdown file with frontmatter.",
+      "assertions": [
+        "Each story has separate English and Dutch Markdown files",
+        "Filenames use the slug.lang.md pattern",
+        "Each file has lang, slug, title, summary, and created_at frontmatter"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Research one news article about a battery announcement from the last seven days. Draft only after you can verify the central claim through at least three credible sources. Record what should happen if only one source supports it.",
+      "assertions": [
+        "The workflow requires at least three credible sources before drafting",
+        "The response rejects, defers, or clearly withholds a story supported by only one source",
+        "The response applies a seven-day lookback to the research"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Prepare English and Dutch versions of the same news post. Use one verified source-language draft, keep all dates and numbers aligned, and validate the frontmatter against the site's schema.",
+      "assertions": [
+        "The workflow creates and verifies one source-language draft before translation",
+        "The translated version preserves the same dates, numbers, and claims",
+        "The final workflow validates frontmatter against the available content schema"
+      ]
+    }
+  ]
+}

@@ -42,6 +42,12 @@
     "rationale": "read-only TODO and FIXME cleanup inventory"
   },
   {
+    "query": "Audit comments under src without changing them. Flag code narration and plan history, but preserve tool directives and comments that explain a real invariant.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "read-only redundant-comment inventory with functional-comment safeguards"
+  },
+  {
     "query": "write a plan to refactor the auth module over the next sprint",
     "should_trigger": false,
     "split": "train",

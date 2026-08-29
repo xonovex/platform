@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-hexagonal-pattern",
-  "version": "5.2.0",
-  "description": "Xonovex Hexagonal architecture skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex Hexagonal architecture skills",
   "type": "module",
   "keywords": [
     "xonovex",

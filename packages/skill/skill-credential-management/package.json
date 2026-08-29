@@ -1,8 +1,8 @@
 {
   "name": "@xonovex/skill-credential-management",
-  "version": "5.2.0",
-  "description": "Xonovex credential lifecycle skills",
+  "version": "5.3.0",
   "private": true,
+  "description": "Xonovex credential lifecycle skills",
   "type": "module",
   "keywords": [
     "xonovex",

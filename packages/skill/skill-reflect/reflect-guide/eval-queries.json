@@ -55,7 +55,7 @@
   },
   {
     "query": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
-    "rationale": "near miss owned by content-guide",
+    "rationale": "near miss owned by editorial-writing-guide",
     "should_trigger": false,
     "split": "train"
   },
@@ -79,7 +79,7 @@
   },
   {
     "query": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
-    "rationale": "near miss owned by content-guide",
+    "rationale": "near miss owned by editorial-writing-guide",
     "should_trigger": false,
     "split": "validation"
   },

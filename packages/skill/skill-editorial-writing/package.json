@@ -1,0 +1,19 @@
+{
+  "name": "@xonovex/skill-editorial-writing",
+  "version": "5.3.0",
+  "private": true,
+  "dependencies": {
+    "@xonovex/skill-writing": "5.3.0"
+  },
+  "description": "Xonovex editorial writing skills",
+  "type": "module",
+  "keywords": [
+    "xonovex",
+    "skill",
+    "editorial-writing"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

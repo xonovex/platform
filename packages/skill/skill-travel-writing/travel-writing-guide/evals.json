@@ -1,0 +1,33 @@
+{
+  "skill_name": "travel-writing-guide",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a travel guide for visitors to Porto that we can publish on our multilingual content site.",
+      "assertions": [
+        "The guide covers an introduction, logistics, main attractions, itineraries, and essential practical information",
+        "Critical practical details such as costs, opening hours, and names are emphasized",
+        "The output records the date when time-sensitive information was researched or verified"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Research a visitor guide for a museum. Include opening hours, ticket prices, transport, visit duration, and accessibility only when each fact is current and verifiable. Explain what to do with an accessibility claim that has no reliable source.",
+      "assertions": [
+        "The workflow verifies time-sensitive practical facts against current sources",
+        "The workflow omits or clearly marks an unsupported accessibility claim instead of inventing it",
+        "The output records a research or verification date"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create English and Dutch versions of a city guide with matching facts and structured frontmatter. Research once, write the source version first, and prevent a repeated destination slug from overwriting an existing guide.",
+      "assertions": [
+        "The workflow creates the source-language version before translation and does not research each language independently",
+        "Both versions preserve the same practical facts and slug",
+        "The workflow checks for an existing slug and avoids silent overwrite"
+      ]
+    }
+  ]
+}

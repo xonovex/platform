@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-skill-editorial-writing",
+  "version": "5.3.0",
+  "description": "Xonovex editorial writing skills",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": ["./editorial-writing-guide"],
+  "dependencies": ["xonovex-skill-writing"]
+}

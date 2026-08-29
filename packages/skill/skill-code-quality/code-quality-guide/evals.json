@@ -33,6 +33,16 @@
         "Reports findings without producing a rewritten/fixed version of the module (stays read-only)",
         "Groups or labels each finding by a severity level (e.g. high/medium/low) and/or a category, rather than a flat unranked list"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "Give me a read-only comment inventory for this file. Grade the findings and explain what must stay.\n\n```ts\n#!/usr/bin/env node\n/* Copyright 2026 Example. SPDX-License-Identifier: MIT */\n\n// eslint-disable-next-line security/detect-object-injection\nconst handler = handlers[input.kind];\n\n// Load the current configuration.\nconst config = loadCurrentConfiguration();\n\n// Phase 2 follows roadmap item R3 and the migration plan.\ninitializeCache(config);\n\n// Hash encoded bytes because the remote signature covers bytes, not Unicode code points.\nconst digest = hash(encoder.encode(config.value));\n\n// formatter-ignore-next\nconst matrix = [[1, 0], [0, 1]];\n\n// tool-that-may-not-be-installed: preserve-next\nrunCompatibilityCase();\n\n// const legacyConfig = loadLegacyConfiguration();\n```",
+      "assertions": [
+        "Preserves the shebang, license header, ESLint suppression, formatter directive, and unknown tool annotation; treats the unknown annotation as functional or ambiguous rather than redundant",
+        "Preserves the byte-signature comment because it explains a non-obvious invariant",
+        "Flags the loadCurrentConfiguration restatement, roadmap/phase narration, and commented-out legacy code with evidence-linked severity and a recommended action",
+        "Remains read-only and does not return a rewritten source file"
+      ]
     }
   ]
 }

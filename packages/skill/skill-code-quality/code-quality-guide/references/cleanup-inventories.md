@@ -11,14 +11,6 @@ delete, extract, or scaffold code during the audit.
 - Map every indirect import to the concrete source file and report the deletion and
   import-migration surface.
 
-## Redundant comments
-
-- Detect the language's comment syntax and separate directives from prose.
-- Preserve functional directives and non-obvious rationale, invariants, workarounds,
-  and caveats.
-- Flag comments that restate well-named code, narrate provenance or future work, or
-  leave old code commented out.
-
 ## Shared extraction candidates
 
 - Find repeated functions, components, hooks, middleware, types, and constants by
