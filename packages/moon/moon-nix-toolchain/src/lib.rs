@@ -120,7 +120,8 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
 }
 
 /// Return the flake to wrap the task with, or `None` when the task must run
-/// unchanged: already inside a dev shell that provides the command, already wrapped,
+/// unchanged: already inside a dev shell that provides the command for a command task,
+/// already wrapped,
 /// `nix` is unavailable for a non-opted project, or no real path resolves.
 /// Returns `Err` when `nix` is unavailable but the project opted into fail-closed
 /// nix (see `fail_closed_opted_in`). When the task's project has its own `flake.nix`,
@@ -136,11 +137,11 @@ fn resolve_wrap_target(
     let in_nix_shell = !get_host_env_var("IN_NIX_SHELL")?
         .unwrap_or_default()
         .is_empty();
-    let command_available = required_command
+    let task_available = required_command
         .map(|command| command_exists(host_environment, command))
-        .unwrap_or(true);
+        .unwrap_or(false);
     let facts = WrapFacts {
-        in_nix_shell: in_nix_shell && command_available,
+        in_nix_shell: in_nix_shell && task_available,
         already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
         nix_available: command_exists(host_environment, "nix"),
     };

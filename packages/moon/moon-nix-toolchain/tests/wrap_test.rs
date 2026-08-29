@@ -185,6 +185,32 @@ async fn wraps_when_current_nix_shell_lacks_the_command() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
+async fn wraps_script_when_already_in_nix_shell() {
+    reset_wrap_env();
+    std::env::set_var("IN_NIX_SHELL", "impure");
+    let restore = stub_only_command("nix");
+
+    let sandbox = create_empty_moon_sandbox();
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let output = plugin
+        .extend_task_script(ExtendTaskScriptInput {
+            script: "shellcheck script.sh".into(),
+            ..Default::default()
+        })
+        .await;
+
+    restore();
+    std::env::remove_var("IN_NIX_SHELL");
+
+    assert!(output.script.as_deref().is_some_and(|script| {
+        script.starts_with("nix develop ") && script.contains("shellcheck script.sh")
+    }));
+    assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
 async fn no_op_when_sentinel_set() {
     reset_wrap_env();
     std::env::set_var(SENTINEL, "1");
@@ -619,7 +645,7 @@ async fn register_toolchain_preserves_public_metadata() {
     let output = plugin.register_toolchain(input).await;
 
     assert_eq!(output.name, "Nix");
-    assert_eq!(output.plugin_version, "0.8.2");
+    assert_eq!(output.plugin_version, "0.8.3");
     assert_eq!(
         output.description.as_deref(),
         Some("Runs every task inside the project's or workspace's nix flake dev shell.")

@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.8.3
+
+### Patch Changes
+
+- Enter the selected flake for script tasks even when `IN_NIX_SHELL` is set. A script can require several tools, so the plugin cannot use one executable probe to prove that an unrelated Nix shell satisfies it.
+
 ## 0.8.2
 
 ### Patch Changes
