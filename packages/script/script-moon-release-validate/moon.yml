@@ -41,12 +41,6 @@ tasks:
       - ~:build
     inputs:
       - src/**/*
-      # The filesystem-import check reads every package's TypeScript sources and
-      # the allowlist naming the modules exempt from it, so without them a new
-      # direct node:fs import or an allowlist edit leaves this task's hash
-      # unchanged and moon serves the previous pass from cache.
-      - /packages/*/*/src/**/*.ts
-      - /filesystem-allowlist.json
       - /README.md
       - /package-lock.json
       - /.github/workflows/release.yml

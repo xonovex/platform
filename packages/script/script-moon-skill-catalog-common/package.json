@@ -15,10 +15,6 @@
     "./drift-files": {
       "types": "./src/drift-files.ts",
       "default": "./dist/src/drift-files.js"
-    },
-    "./drift-vocabulary": {
-      "types": "./src/drift-vocabulary.ts",
-      "default": "./dist/src/drift-vocabulary.js"
     }
   },
   "dependencies": {

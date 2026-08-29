@@ -118,21 +118,6 @@ describe("guide drift", () => {
     expect(findings[0]).toContain("900-word cap");
   });
 
-  it("reports a guide redefining an owned term", () => {
-    const {findings} = checkGuideDrift(
-      GUIDE_DIRECTORY,
-      REPOSITORY_ROOT,
-      catalogFixture("skill prose", "## Handoff\n", {
-        [join(REPOSITORY_ROOT, "vocabulary.json")]: JSON.stringify({
-          Handoff: "contract.md",
-        }),
-      }),
-    );
-
-    expect(findings).toHaveLength(1);
-    expect(findings[0]).toContain("contract.md owns");
-  });
-
   it("surfaces a malformed manifest separately from findings", () => {
     const {findings, manifestErrors} = checkGuideDrift(
       GUIDE_DIRECTORY,

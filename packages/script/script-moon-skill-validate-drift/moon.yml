@@ -32,7 +32,6 @@ tasks:
       XONOVEX_LINT_MODE: enforce
     inputs:
       - /budgets.json
-      - /vocabulary.json
       - /packages/command/*/commands/*.md
       - /packages/skill/*/*/SKILL.md
       - /packages/skill/*/*/references/*.md

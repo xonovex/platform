@@ -66,7 +66,6 @@ tasks:
       - "**/*.json"
       - "**/*.py"
       - /budgets.json
-      - /vocabulary.json
     options:
       cache: false
   skill-audit-sources:

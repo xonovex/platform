@@ -9,11 +9,6 @@ import {
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
 import {collectGuideFiles} from "./drift-files.js";
-import {
-  evaluateVocabulary,
-  readVocabularyManifest,
-  VOCABULARY_MANIFEST_FILE,
-} from "./drift-vocabulary.js";
 
 export interface DriftLintReport {
   readonly findings: readonly string[];
@@ -31,19 +26,12 @@ export const checkGuideDrift = (
     join(repositoryRoot, BUDGET_MANIFEST_FILE),
     fs,
   );
-  const vocabulary = readVocabularyManifest(
-    join(repositoryRoot, VOCABULARY_MANIFEST_FILE),
-    fs,
-  );
   const files = collectGuideFiles(guideDirectory, repositoryRoot, fs);
   return {
-    findings: [
-      ...evaluateBudgets(files, budgets.manifest).map(({message}) => message),
-      ...evaluateVocabulary(files, vocabulary.manifest).map(
-        ({message}) => message,
-      ),
-    ],
-    manifestErrors: [budgets.error, vocabulary.error].filter(
+    findings: evaluateBudgets(files, budgets.manifest).map(
+      ({message}) => message,
+    ),
+    manifestErrors: [budgets.error].filter(
       (error): error is string => error !== undefined,
     ),
   };

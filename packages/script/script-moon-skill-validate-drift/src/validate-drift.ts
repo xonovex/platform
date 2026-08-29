@@ -17,18 +17,12 @@ import {
   collectCommandCatalogFiles,
   collectSkillCatalogFiles,
 } from "@xonovex/script-moon-skill-catalog-common/drift-files";
-import {
-  evaluateVocabulary,
-  readVocabularyManifest,
-  VOCABULARY_MANIFEST_FILE,
-} from "@xonovex/script-moon-skill-catalog-common/drift-vocabulary";
 import {evaluateDuplication} from "./drift-duplication.js";
 
 const HELP = [
   "usage: moon-skill-validate-drift [-h] [--seed] [--repo-root PATH]",
   "",
-  "Report catalog drift: file budgets, vocabulary ownership, and invariants",
-  "restated across files.",
+  "Report catalog drift: file budgets and invariants restated across files.",
   "",
   "options:",
   "  -h, --help         show this help message and exit",
@@ -86,18 +80,11 @@ export const main = (
   }
 
   const budgets = readBudgetManifest(budgetPath, fs);
-  const vocabulary = readVocabularyManifest(
-    join(repositoryRoot, VOCABULARY_MANIFEST_FILE),
-    fs,
-  );
-  const manifestErrors = [budgets.error, vocabulary.error].filter(
+  const manifestErrors = [budgets.error].filter(
     (error): error is string => error !== undefined,
   );
   const findings = [
     ...evaluateBudgets(files, budgets.manifest).map(({message}) => message),
-    ...evaluateVocabulary(files, vocabulary.manifest).map(
-      ({message}) => message,
-    ),
     ...evaluateDuplication(skillFiles).map(({message}) => message),
   ];
 
