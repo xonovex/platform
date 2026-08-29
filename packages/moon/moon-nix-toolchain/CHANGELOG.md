@@ -1,5 +1,11 @@
 # @xonovex/moon-nix-toolchain
 
+## 0.8.4
+
+### Patch Changes
+
+- Reuse a Nix environment only when `MOON_NIX_SHELL_ID` identifies the exact resolved flake and devShell. `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` no longer let an unrelated outer shell bypass project-shell selection or fail-closed enforcement.
+
 ## 0.8.3
 
 ### Patch Changes

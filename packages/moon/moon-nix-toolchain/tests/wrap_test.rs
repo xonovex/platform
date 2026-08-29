@@ -2,13 +2,15 @@ use moon_pdk_test_utils::*;
 use serial_test::serial;
 
 const SENTINEL: &str = "MOON_NIX_WRAPPED";
+const SHELL_IDENTITY: &str = "MOON_NIX_SHELL_ID";
+const SHELL_IDENTITY_PREFIX: &str = "moon_nix_toolchain:v1:";
 
-/// Reset the env so the next call takes the wrapping path: outside any dev shell
-/// and not already wrapped. Tests that need `nix` present rely on running inside
-/// the flake (`nix develop --command cargo test`).
+/// Reset the env so the next call has no reusable toolchain identity. Tests that
+/// need `nix` present rely on running inside the flake.
 fn reset_wrap_env() {
     std::env::remove_var("IN_NIX_SHELL");
     std::env::remove_var(SENTINEL);
+    std::env::remove_var(SHELL_IDENTITY);
 }
 
 /// Simulate a host without `nix`: point PATH at a dir whose only `which` reports
@@ -134,11 +136,15 @@ async fn wraps_command_task_in_nix_develop() {
     assert_eq!(args[8], "--version");
 
     assert_eq!(output.env.get(SENTINEL).map(String::as_str), Some("1"));
+    assert_eq!(
+        output.env.get(SHELL_IDENTITY).map(String::as_str),
+        Some(format!("{SHELL_IDENTITY_PREFIX}{}", args[5]).as_str())
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn no_op_when_already_in_nix_shell() {
+async fn ambient_nix_shell_does_not_suppress_project_shell_selection() {
     reset_wrap_env();
     std::env::set_var("IN_NIX_SHELL", "impure");
 
@@ -151,17 +157,14 @@ async fn no_op_when_already_in_nix_shell() {
 
     std::env::remove_var("IN_NIX_SHELL");
 
-    assert_eq!(
-        output.command, None,
-        "task must run unchanged inside a dev shell"
-    );
-    assert!(output.args.is_none());
-    assert!(output.env.is_empty());
+    assert_eq!(output.command.as_deref(), Some("nix"));
+    assert!(output.args.is_some());
+    assert!(output.env.contains_key(SHELL_IDENTITY));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn wraps_when_current_nix_shell_lacks_the_command() {
+async fn ambient_nix_shell_wraps_when_the_command_is_unavailable() {
     reset_wrap_env();
     std::env::set_var("IN_NIX_SHELL", "impure");
     let restore = stub_only_command("nix");
@@ -211,7 +214,7 @@ async fn wraps_script_when_already_in_nix_shell() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn no_op_when_sentinel_set() {
+async fn boolean_sentinel_does_not_suppress_shell_selection() {
     reset_wrap_env();
     std::env::set_var(SENTINEL, "1");
 
@@ -224,11 +227,93 @@ async fn no_op_when_sentinel_set() {
 
     std::env::remove_var(SENTINEL);
 
-    assert_eq!(
-        output.command, None,
-        "an already-wrapped task must not be re-wrapped"
+    assert_eq!(output.command.as_deref(), Some("nix"));
+    assert!(output.args.is_some());
+    assert!(output.env.contains_key(SHELL_IDENTITY));
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn exact_shell_identity_suppresses_nested_wrapping() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
+    std::env::set_var(
+        SHELL_IDENTITY,
+        format!("{SHELL_IDENTITY_PREFIX}{expected_root}"),
     );
+    let plugin = sandbox.create_toolchain("nix").await;
+
+    let output = plugin
+        .extend_task_command(command_input("echo", &["hi"]))
+        .await;
+
+    std::env::remove_var(SHELL_IDENTITY);
+
+    assert_eq!(output.command, None);
     assert!(output.args.is_none());
+    assert!(output.env.is_empty());
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn different_shell_identity_selects_the_required_shell() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
+    std::env::set_var(
+        SHELL_IDENTITY,
+        format!("{SHELL_IDENTITY_PREFIX}{expected_root}"),
+    );
+    let plugin = sandbox.create_toolchain("nix").await;
+    let mut input = command_input("golangci-lint", &["run"]);
+    input.toolchain_config = serde_json::json!({ "shell": "go" });
+
+    let output = plugin.extend_task_command(input).await;
+
+    std::env::remove_var(SHELL_IDENTITY);
+
+    assert_eq!(output.command.as_deref(), Some("nix"));
+    assert!(flake_ref(&output).ends_with("#go"));
+    assert_eq!(
+        output.env.get(SHELL_IDENTITY).map(String::as_str),
+        Some(format!("{SHELL_IDENTITY_PREFIX}{expected_root}#go").as_str())
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+#[serial]
+async fn exact_shell_identity_remains_valid_without_nix() {
+    reset_wrap_env();
+
+    let sandbox = create_empty_moon_sandbox();
+    let expected_root = format!("{}/", sandbox.root.to_string_lossy());
+    std::env::set_var(
+        SHELL_IDENTITY,
+        format!("{SHELL_IDENTITY_PREFIX}{expected_root}"),
+    );
+    let restore = stub_missing_nix();
+    let plugin = sandbox.create_toolchain("nix").await;
+    let mut input = command_input("echo", &["hi"]);
+    input.context = plugin.create_context();
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "" })).unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("proj:test")).unwrap();
+
+    let result: Result<ExtendTaskCommandOutput, _> = plugin
+        .plugin
+        .call_func_with("extend_task_command", input)
+        .await;
+
+    restore();
+    std::env::remove_var(SHELL_IDENTITY);
+
+    let output = result.expect("a matching identity does not need another nix invocation");
+    assert_eq!(output.command, None);
+    assert!(output.args.is_none());
+    assert!(output.env.is_empty());
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -645,7 +730,7 @@ async fn register_toolchain_preserves_public_metadata() {
     let output = plugin.register_toolchain(input).await;
 
     assert_eq!(output.name, "Nix");
-    assert_eq!(output.plugin_version, "0.8.3");
+    assert_eq!(output.plugin_version, "0.8.4");
     assert_eq!(
         output.description.as_deref(),
         Some("Runs every task inside the project's or workspace's nix flake dev shell.")
@@ -763,10 +848,8 @@ async fn no_op_when_not_opted_in_and_nix_absent() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn in_nix_shell_outranks_fail_closed() {
+async fn ambient_nix_shell_does_not_bypass_fail_closed() {
     reset_wrap_env();
-    // The current shell supplies cmake, so `IN_NIX_SHELL` wins above the nix probe
-    // and the opted-in task remains a no-op when nix itself is absent.
     std::env::set_var("IN_NIX_SHELL", "impure");
     let restore = stub_only_command("cmake");
 
@@ -777,17 +860,20 @@ async fn in_nix_shell_outranks_fail_closed() {
     let plugin = sandbox.create_toolchain("nix").await;
 
     let mut input = command_input("cmake", &["--build", "."]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "" })).unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("proj:test")).unwrap();
     input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
-    let output = plugin.extend_task_command(input).await;
+    let result: Result<ExtendTaskCommandOutput, _> = plugin
+        .plugin
+        .call_func_with("extend_task_command", input)
+        .await;
 
     restore();
     std::env::remove_var("IN_NIX_SHELL");
 
-    assert_eq!(
-        output.command, None,
-        "a sufficient Nix shell must win over fail-closed: no wrap and no error"
-    );
-    assert!(output.args.is_none());
+    let err = result.expect_err("an ambient Nix shell must not bypass fail-closed");
+    assert!(format!("{err:?}").contains("nix is required"));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -830,10 +916,8 @@ async fn fails_closed_when_opted_in_by_language_and_nix_absent() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 #[serial]
-async fn sentinel_outranks_fail_closed() {
+async fn boolean_sentinel_does_not_bypass_fail_closed() {
     reset_wrap_env();
-    // Already wrapped: the MOON_NIX_WRAPPED guard wins above the nix probe, so an
-    // opted-in, nix-absent task is a no-op rather than a fail-closed error.
     std::env::set_var(SENTINEL, "1");
     let restore = stub_missing_nix();
 
@@ -844,17 +928,20 @@ async fn sentinel_outranks_fail_closed() {
     let plugin = sandbox.create_toolchain("nix").await;
 
     let mut input = command_input("cmake", &["--build", "."]);
+    input.project =
+        serde_json::from_value(serde_json::json!({ "id": "proj", "source": "" })).unwrap();
+    input.task.target = serde_json::from_value(serde_json::json!("proj:test")).unwrap();
     input.toolchain_config = serde_json::json!({ "failClosedByTag": ["cmake"] });
-    let output = plugin.extend_task_command(input).await;
+    let result: Result<ExtendTaskCommandOutput, _> = plugin
+        .plugin
+        .call_func_with("extend_task_command", input)
+        .await;
 
     restore();
     std::env::remove_var(SENTINEL);
 
-    assert_eq!(
-        output.command, None,
-        "MOON_NIX_WRAPPED must win over fail-closed: no wrap and no error"
-    );
-    assert!(output.args.is_none());
+    let err = result.expect_err("a Boolean marker must not bypass fail-closed");
+    assert!(format!("{err:?}").contains("nix is required"));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

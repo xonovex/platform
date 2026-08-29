@@ -1,5 +1,7 @@
 use extism_pdk::*;
-use moon_nix_runtime::guard::{decide_wrap, WrapFacts, WrapGuard, SENTINEL};
+use moon_nix_runtime::guard::{
+    decide_identity_wrap, IdentityWrapFacts, WrapGuard, SENTINEL, SHELL_IDENTITY,
+};
 use moon_nix_runtime::serialize::escape_nix_string;
 use moon_nix_runtime::target::{resolve_flake_target as resolve_runtime_flake_target, FlakeTarget};
 use moon_nix_runtime::wrap::{
@@ -10,6 +12,14 @@ use moon_pdk_api::*;
 use schematic::{Config, SchemaBuilder};
 use std::collections::HashMap;
 use std::path::PathBuf;
+
+const SHELL_IDENTITY_PREFIX: &str = "moon_nix_toolchain:v1:";
+
+struct ResolvedWrapTarget {
+    target: FlakeTarget,
+    shell: Option<String>,
+    identity: String,
+}
 
 /// Typed `nix` toolchain configuration, validated against the schema returned by
 /// `define_toolchain_config`. The devShell selectors are resolved most-specific
@@ -95,6 +105,22 @@ fn fail_closed_opted_in(project_id: &str, config: &NixToolchainConfig) -> AnyRes
     Ok(tag_opt_in || language_opt_in)
 }
 
+fn enforce_missing_nix(
+    project_id: &str,
+    target_id: &str,
+    config: &NixToolchainConfig,
+) -> AnyResult<()> {
+    if fail_closed_opted_in(project_id, config)? {
+        return Err(anyhow!(
+            "nix is required for `{target_id}` but `nix` was not found on PATH; \
+             this project opted into fail-closed nix \
+             (failClosedByTag / failClosedByLanguage)"
+        ));
+    }
+
+    Ok(())
+}
+
 #[plugin_fn]
 pub fn register_toolchain(
     Json(_): Json<RegisterToolchainInput>,
@@ -119,55 +145,77 @@ pub fn define_toolchain_config() -> FnResult<Json<DefineToolchainConfigOutput>> 
     }))
 }
 
-/// Return the flake to wrap the task with, or `None` when the task must run
-/// unchanged: already inside a dev shell that provides the command for a command task,
-/// already wrapped,
-/// `nix` is unavailable for a non-opted project, or no real path resolves.
+/// Return the exact flake and devShell to wrap the task with, or `None` when the task
+/// already carries that environment identity, `nix` is unavailable for a non-opted
+/// project, or no real path resolves.
 /// Returns `Err` when `nix` is unavailable but the project opted into fail-closed
 /// nix (see `fail_closed_opted_in`). When the task's project has its own `flake.nix`,
 /// that project flake wins over the workspace flake.
 fn resolve_wrap_target(
     context: &MoonContext,
     project: &ProjectFragment,
-    target_id: &str,
+    task: &TaskFragment,
     config: &NixToolchainConfig,
-    required_command: Option<&str>,
-) -> AnyResult<Option<FlakeTarget>> {
+) -> AnyResult<Option<ResolvedWrapTarget>> {
+    let current_identity = get_host_env_var(SHELL_IDENTITY)?.unwrap_or_default();
     let host_environment = get_host_environment()?;
-    let in_nix_shell = !get_host_env_var("IN_NIX_SHELL")?
-        .unwrap_or_default()
-        .is_empty();
-    let task_available = required_command
-        .map(|command| command_exists(host_environment, command))
-        .unwrap_or(false);
-    let facts = WrapFacts {
-        in_nix_shell: in_nix_shell && task_available,
-        already_wrapped: get_host_env_var(SENTINEL)?.unwrap_or_default() == "1",
-        nix_available: command_exists(host_environment, "nix"),
+    let nix_available = command_exists(host_environment, "nix");
+
+    if current_identity.is_empty() && !nix_available {
+        enforce_missing_nix(project.id.as_str(), task.target.as_str(), config)?;
+        return Ok(None);
+    }
+
+    let Some(target) = resolve_flake_target(context, project.source.as_str())? else {
+        return Ok(None);
     };
 
-    match decide_wrap(facts) {
+    let configured_shell = resolve_shell(
+        task.target.get_task_id().ok(),
+        &task.toolchains,
+        project.id.as_str(),
+        config,
+    )?;
+    let configured_identity = shell_identity(&target, configured_shell.as_deref());
+    let facts = IdentityWrapFacts {
+        current_identity: (!current_identity.is_empty()).then_some(current_identity.as_str()),
+        required_identity: &configured_identity,
+        nix_available,
+    };
+
+    match decide_identity_wrap(facts) {
         WrapGuard::Unchanged => Ok(None),
-        WrapGuard::Ready => resolve_flake_target(context, project.source.as_str()),
-        WrapGuard::MissingNix => {
-            if fail_closed_opted_in(project.id.as_str(), config)? {
-                return Err(anyhow!(
-                    "nix is required for `{target_id}` but `nix` was not found on PATH; \
-                     this project opted into fail-closed nix \
-                     (failClosedByTag / failClosedByLanguage)"
-                ));
+        WrapGuard::Ready => {
+            let shell = effective_shell(&target, configured_shell)?;
+            let identity = shell_identity(&target, shell.as_deref());
+
+            if current_identity == identity {
+                return Ok(None);
             }
 
+            Ok(Some(ResolvedWrapTarget {
+                target,
+                shell,
+                identity,
+            }))
+        }
+        WrapGuard::MissingNix => {
+            enforce_missing_nix(project.id.as_str(), task.target.as_str(), config)?;
             Ok(None)
         }
     }
 }
 
+fn shell_identity(target: &FlakeTarget, shell: Option<&str>) -> String {
+    format!("{SHELL_IDENTITY_PREFIX}{}", flake_ref(&target.root, shell))
+}
+
 /// Resolve the flake that wraps a task purely from paths, with no runtime guards:
 /// the project flake when `<project>/flake.nix` exists, else the workspace flake.
 /// Shared by `resolve_wrap_target` (after its guards) and `hash_task_contents`,
-/// whose cache key must not depend on transient env (`IN_NIX_SHELL`/`MOON_NIX_WRAPPED`)
-/// or on whether `nix` is installed on the hashing host.
+/// whose cache key must not depend on transient env (`IN_NIX_SHELL`,
+/// `MOON_NIX_WRAPPED`, or `MOON_NIX_SHELL_ID`) or on whether `nix` is installed
+/// on the hashing host.
 fn resolve_flake_target(
     context: &MoonContext,
     project_source: &str,
@@ -403,7 +451,7 @@ fn workspace_module_contents(workspace_root: &str) -> Vec<serde_json::Value> {
     )
 }
 
-fn command_output(decision: WrapDecision) -> ExtendTaskCommandOutput {
+fn command_output(decision: WrapDecision, identity: &str) -> ExtendTaskCommandOutput {
     let mut output = ExtendTaskCommandOutput::default();
     let WrapDecision::Command { command, args } = decision else {
         return output;
@@ -412,10 +460,11 @@ fn command_output(decision: WrapDecision) -> ExtendTaskCommandOutput {
     output.command = Some(command);
     output.args = Some(Extend::Replace(args));
     output.env.insert(SENTINEL.into(), "1".into());
+    output.env.insert(SHELL_IDENTITY.into(), identity.into());
     output
 }
 
-fn script_output(decision: WrapDecision) -> ExtendTaskScriptOutput {
+fn script_output(decision: WrapDecision, identity: &str) -> ExtendTaskScriptOutput {
     let mut output = ExtendTaskScriptOutput::default();
     let WrapDecision::Script(script) = decision else {
         return output;
@@ -423,6 +472,7 @@ fn script_output(decision: WrapDecision) -> ExtendTaskScriptOutput {
 
     output.script = Some(script);
     output.env.insert(SENTINEL.into(), "1".into());
+    output.env.insert(SHELL_IDENTITY.into(), identity.into());
     output
 }
 
@@ -432,31 +482,18 @@ pub fn extend_task_command(
 ) -> FnResult<Json<ExtendTaskCommandOutput>> {
     let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
 
-    let target = resolve_wrap_target(
-        &input.context,
-        &input.project,
-        input.task.target.id.as_str(),
-        &config,
-        Some(input.command.as_str()),
-    )?;
-
-    let decision = match target {
-        Some(target) => {
-            let shell = effective_shell(
-                &target,
-                resolve_shell(
-                    input.task.target.get_task_id().ok(),
-                    &input.task.toolchains,
-                    input.project.id.as_str(),
-                    &config,
-                )?,
-            )?;
-            plan_command(Some(&target), shell.as_deref(), input.command, input.args)
-        }
-        None => WrapDecision::Unchanged,
+    let Some(resolved) = resolve_wrap_target(&input.context, &input.project, &input.task, &config)?
+    else {
+        return Ok(Json(ExtendTaskCommandOutput::default()));
     };
+    let decision = plan_command(
+        Some(&resolved.target),
+        resolved.shell.as_deref(),
+        input.command,
+        input.args,
+    );
 
-    Ok(Json(command_output(decision)))
+    Ok(Json(command_output(decision, &resolved.identity)))
 }
 
 #[plugin_fn]
@@ -465,31 +502,17 @@ pub fn extend_task_script(
 ) -> FnResult<Json<ExtendTaskScriptOutput>> {
     let config: NixToolchainConfig = parse_toolchain_config_schema(input.toolchain_config.clone())?;
 
-    let target = resolve_wrap_target(
-        &input.context,
-        &input.project,
-        input.task.target.id.as_str(),
-        &config,
-        None,
-    )?;
-
-    let decision = match target {
-        Some(target) => {
-            let shell = effective_shell(
-                &target,
-                resolve_shell(
-                    input.task.target.get_task_id().ok(),
-                    &input.task.toolchains,
-                    input.project.id.as_str(),
-                    &config,
-                )?,
-            )?;
-            plan_script(Some(&target), shell.as_deref(), &input.script)
-        }
-        None => WrapDecision::Unchanged,
+    let Some(resolved) = resolve_wrap_target(&input.context, &input.project, &input.task, &config)?
+    else {
+        return Ok(Json(ExtendTaskScriptOutput::default()));
     };
+    let decision = plan_script(
+        Some(&resolved.target),
+        resolved.shell.as_deref(),
+        &input.script,
+    );
 
-    Ok(Json(script_output(decision)))
+    Ok(Json(script_output(decision, &resolved.identity)))
 }
 
 #[plugin_fn]
