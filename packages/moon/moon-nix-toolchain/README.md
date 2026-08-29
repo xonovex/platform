@@ -21,11 +21,12 @@ The toolchain plugin models Nix as an explicit task toolchain and hashes the res
 
 The plugin registers a `Nix` toolchain and rewrites selected tasks to run inside `nix develop <root> --command ...`. Binaries resolve from the flake's devShell instead of the developer's `PATH`. The plugin resolves the root at runtime and carries no consumer-specific configuration. A project that contains `flake.nix` uses that flake. Other projects use the workspace flake.
 
-It leaves the task **unchanged** when any guard trips:
+It leaves the task **unchanged** when either guard trips:
 
-- `IN_NIX_SHELL` is set and a command task's command exists in that shell: avoids double entry for a sufficient outer `nix develop`. A missing command is wrapped with the selected flake. Script tasks are always wrapped because the plugin cannot reliably infer every command that a script needs.
-- `MOON_NIX_WRAPPED=1`: already wrapped by this plugin.
+- `MOON_NIX_SHELL_ID` identifies the exact resolved flake and devShell: avoids nested entry only when the current environment matches the task's required environment.
 - `nix` is not on `PATH`: does not fail on a host without Nix, unless the project enabled [fail-closed enforcement](#fail-closed-enforcement).
+
+`IN_NIX_SHELL` and the legacy `MOON_NIX_WRAPPED=1` marker do not prove which flake or devShell is active, so they never suppress wrapping by themselves.
 
 ## Usage
 
@@ -101,11 +102,11 @@ nix:
   # failClosedByLanguage: [c, cpp]
 ```
 
-When `nix` is absent for a task in an opted-in project, the plugin reports `nix is required for <project>:<task> ...` and the task fails instead of using host tools. Tasks in projects outside both allowlists keep the silent no-op. `MOON_NIX_WRAPPED` always prevents another wrap. For command tasks, `IN_NIX_SHELL` prevents wrapping when the command is available in that shell. Script tasks are always wrapped because their complete tool requirements cannot be inferred reliably. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
+When `nix` is absent for a task in an opted-in project, the plugin reports `nix is required for <project>:<task> ...` and the task fails instead of using host tools. Tasks in projects outside both allowlists keep the silent no-op. An exact `MOON_NIX_SHELL_ID` match prevents another wrap because it proves that the task already has its required environment. Ambient `IN_NIX_SHELL` and `MOON_NIX_WRAPPED` values do not bypass fail-closed enforcement. Both allowlists are validated against the published schema and default to empty, so existing consumers are unaffected until they opt in.
 
 ## Cache coherence
 
-The plugin invalidates a task's Moon cache when the resolved flake or devShell changes. It does not invalidate the cache for an unrelated edit. The `hash_task_contents` hook resolves the same flake root and devShell selector as the wrapping hooks. It adds the resolved flake root, selected shell, `flake.lock`, and the flake's `nix/**/*.nix` modules to the task cache key. The key does not depend on `IN_NIX_SHELL`, `MOON_NIX_WRAPPED`, or the availability of `nix` on the hashing host. The `setup_environment` hook starts a non-blocking build of the resolved devShell so the first wrapped task is not a cold `nix develop`.
+The plugin invalidates a task's Moon cache when the resolved flake or devShell changes. It does not invalidate the cache for an unrelated edit. The `hash_task_contents` hook resolves the same flake root and devShell selector as the wrapping hooks. It adds the resolved flake root, selected shell, `flake.lock`, and the flake's `nix/**/*.nix` modules to the task cache key. The key does not depend on `IN_NIX_SHELL`, `MOON_NIX_WRAPPED`, `MOON_NIX_SHELL_ID`, or the availability of `nix` on the hashing host. The `setup_environment` hook starts a non-blocking build of the resolved devShell so the first wrapped task is not a cold `nix develop`.
 
 When the resolved root is a project flake, the workspace's own `nix/**/*.nix` is also part of the cache key. A project flake usually composes the workspace devShells through a relative `path:` input. Since Nix 2.26, these inputs resolve against the parent source tree instead of an independent locked tree, so they have no `narHash`. Editing a shared module such as `nix/cc.nix` can therefore change the resolved devShell while leaving the project's `flake.nix` and `flake.lock` unchanged. Hashing only `<projectRoot>/**` produced cache hits from the previous toolchain. Shared-module paths are relative to the workspace root, so the key remains stable between continuous integration and a developer's machine.
 
@@ -114,7 +115,7 @@ When the resolved root is a project flake, the workspace's own `nix/**/*.nix` is
 Keep these operational constraints with the plugin configuration.
 
 - The flake must provide every binary a wrapped task runs.
-- Locally, each uncached wrapped task enters `nix develop` (sub-second warm; slower on a dirty tree). CI enters once via the outer shell, so the plugin no-ops there.
+- Each task enters its selected `nix develop` environment unless it already carries the exact matching `MOON_NIX_SHELL_ID`. An unrelated outer CI shell does not suppress project-shell selection.
 - The pin is deliberate, like `flake.lock`; bump the `@<tag>` to upgrade. The cargo crate / `.wasm` / release tag use underscores (`moon_nix_toolchain`); the moon project directory uses hyphens.
 
 ## License
