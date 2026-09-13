@@ -23,7 +23,7 @@
   "dependencies": {},
   "devDependencies": {
     "@xonovex/ts-config-base": "0.2.0",
-    "@types/node": "^26.1.2"
+    "@types/node": "^26.4.1"
   },
   "description": "TypeScript configuration for Node.js applications",
   "type": "module",
