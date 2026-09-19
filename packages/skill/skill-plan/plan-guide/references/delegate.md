@@ -1,6 +1,6 @@
 # delegate: Supervise Roadmap Execution by Delegation
 
-Walk a roadmap's normative ordering, handing each item to an implementation agent and verifying the result before accepting it. **You are the supervisor: select, brief, review, record; never implement**, however small the item: doing it yourself spends the context the next brief needs.
+Walk a roadmap's normative ordering, handing each item to an implementation agent and verifying the result before accepting it. **You are the supervisor: select, brief, review, record; do not implement**, except an item of a few edits in files you already read: a new agent first pays its whole startup context and its own discovery, which costs more than those edits.
 
 Target: a roadmap (`type: roadmap`), a single plan, or an explicit list of subplans.
 
@@ -25,7 +25,8 @@ The agent starts with no context, so the brief carries all of it:
 - [ ] **Skills**: every entry in `skills_to_consult`, loaded before implementation
 - [ ] **Hard constraints**: governing decisions restated concretely (units a value carries, versions pinned, which module sees which type, what a hot path may not do), never cited by number
 - [ ] **Deliverables and tests**: the subplan's tasks and success criteria, verbatim
-- [ ] **Validation commands**: every task that must be green, strictest presets, format checks, dependent packages' suites
+- [ ] **Validation commands**: the fast checks of the touched package, strictest presets and format checks; the slow and dependent packages' suites stay with the supervisor, because an agent waiting minutes on a build loses its prompt cache and reprocesses its whole context
+- [ ] **Output discipline**: filter long command output to its failures and summary lines, and read files by range after a search, because every line an agent reads stays in the context of all its later calls
 - [ ] **Working agreement**: the current branch; do not commit, do not push
 - [ ] **Document update**: set `status` and `validation` frontmatter, tick only criteria met, add a Results section in the siblings' factual style, leave `in_progress` with reasons if one is unmet
 - [ ] **Required return**: status; files touched; each criterion met or not-met with its evidencing test; validation results; deviations with rationale; downstream impact
@@ -34,9 +35,9 @@ The agent starts with no context, so the brief carries all of it:
 
 The report is input to review, never a substitute: re-running is the one step that cannot be delegated.
 
-- Re-run the key suites yourself, strictest presets included.
+- Re-run the key suites yourself, strictest presets included, and the slow and dependent packages' suites the agent did not run.
 - Open the captures behind a visual criterion: an assertion passes while its screenshot shows an empty panel.
-- Read the diff against the criteria and the repo's code and writing conventions.
+- Read the diff against the criteria and the repo's code and writing conventions. Review from the diff and the test output; open a whole file only where the diff leaves a question.
 - Check the document is honest: unmet criteria unticked, deviations and their downstream impact written down, `validation` matching what you ran.
 - Distrust editor and stale-index diagnostics; settle disputes with a real build.
 - Send findings to the **same** agent: a fresh one repeats discovery and reintroduces the finding.
@@ -46,7 +47,7 @@ The report is input to review, never a substitute: re-running is the one step th
 - Sequential. Parallel-by-group on request, and only for genuinely disjoint file sets: check the sets, not the label.
 - Plain implementation agents; scripted orchestration on request.
 - Run until the ordering is exhausted or something blocks, absent a stop condition (a count, or a plan to finish on).
-- The implementation model is a parameter with a strong default, never hardcoded; the supervisor stays on the stronger model.
+- The implementation model is a parameter, never hardcoded, defaulting to the mid tier (Sonnet in Claude Code): a briefed item needs execution more than judgement, and the agents make most of the calls. The supervisor stays on the stronger model.
 
 ## Output (per item)
 

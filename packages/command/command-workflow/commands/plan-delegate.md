@@ -27,7 +27,7 @@ argument-hint: >-
 ## Arguments
 
 - `roadmap-path` (required): Path to the roadmap, plan, or explicit subplan list to work through.
-- `--model <model>` (optional): Model for the implementation agents (defaults to the strongest implementation model available; the supervisor keeps its own).
+- `--model <model>` (optional): Model for the implementation agents (defaults to the mid-tier implementation model, Sonnet in Claude Code; the supervisor keeps its own).
 - `--order <sequential|parallel>` (optional): Item ordering (defaults to `sequential`; `parallel` runs a `parallel_group` concurrently when its file sets are disjoint).
 - `--orchestration <agents|workflow>` (optional): Delegation mechanism (defaults to `agents`; `workflow` uses a scripted multi-agent orchestration).
 - `--stop-after <count-or-plan>` (optional): Stop after N items or after a named plan (defaults to running until the ordering is exhausted or something blocks).
