@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "4.7.1",
-    "prettier-plugin-astro": "0.14.1",
+    "prettier-plugin-astro": "1.0.0",
     "prettier-plugin-tailwindcss": "0.8.1",
     "@xonovex/eslint-config-base": "0.2.0",
     "@xonovex/ts-config-build": "0.2.0"

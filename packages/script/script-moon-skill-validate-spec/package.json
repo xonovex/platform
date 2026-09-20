@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@xonovex/script-moon-common": "0.0.0",
-    "yaml": "^2.9.0",
+    "yaml": "^2.9.1",
     "@xonovex/script-moon-skill-catalog-common": "0.0.0"
   },
   "keywords": [
