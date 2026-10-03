@@ -1,0 +1,19 @@
+{
+  "name": "xonovex-integrations",
+  "version": "5.3.0",
+  "description": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/",
+  "dependencies": ["xonovex-core"],
+  "interface": {
+    "displayName": "Integrations",
+    "shortDescription": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.",
+    "longDescription": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.",
+    "developerName": "Xonovex",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "Use the applicable skills from this plugin for my task."
+  }
+}

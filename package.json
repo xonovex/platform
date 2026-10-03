@@ -5,14 +5,13 @@
   "type": "module",
   "workspaces": [
     "packages/asset/*",
-    "packages/skill/*",
-    "packages/command/*",
     "packages/config/*",
-    "packages/agent/agent-cli-go",
-    "packages/agent/agent-cli-go-github",
-    "packages/agent/agent-operator-go-docker",
-    "packages/shared/*",
-    "packages/script/*"
+    "packages/library/*",
+    "packages/runtime/plugin/*",
+    "packages/tooling/cli/agent-cli-go",
+    "packages/tooling/cli/agent-cli-go-github",
+    "packages/tooling/script/*",
+    "packages/sandbox/image/*"
   ],
   "engines": {
     "node": ">=20.0.0",

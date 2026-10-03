@@ -1,0 +1,19 @@
+{
+  "name": "@xonovex/plugin-game-engine",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "game-engine"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@xonovex/plugin-native": "5.3.0"
+  }
+}

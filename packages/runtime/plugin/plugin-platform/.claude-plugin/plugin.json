@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-platform",
+  "version": "5.3.0",
+  "description": "Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/"
+}

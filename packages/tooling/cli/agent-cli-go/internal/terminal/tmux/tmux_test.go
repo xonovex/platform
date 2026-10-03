@@ -1,0 +1,307 @@
+package tmux
+
+import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
+)
+
+func TestSanitizeName(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "alphanumeric unchanged",
+			input:    "myproject",
+			expected: "myproject",
+		},
+		{
+			name:     "dots replaced with hyphens",
+			input:    "my.project.name",
+			expected: "my-project-name",
+		},
+		{
+			name:     "spaces replaced with hyphens",
+			input:    "my project",
+			expected: "my-project",
+		},
+		{
+			name:     "special chars replaced",
+			input:    "project@v1.0!test",
+			expected: "project-v1-0-test",
+		},
+		{
+			name:     "multiple hyphens collapsed",
+			input:    "my...project",
+			expected: "my-project",
+		},
+		{
+			name:     "leading/trailing hyphens removed",
+			input:    ".project.",
+			expected: "project",
+		},
+		{
+			name:     "underscores preserved",
+			input:    "my_project_name",
+			expected: "my_project_name",
+		},
+		{
+			name:     "empty string returns agent",
+			input:    "",
+			expected: "agent",
+		},
+		{
+			name:     "only special chars returns agent",
+			input:    "...",
+			expected: "agent",
+		},
+		{
+			name:     "long names truncated",
+			input:    "this-is-a-very-long-project-name-that-exceeds-thirty-characters",
+			expected: "this-is-a-very-long-project-na",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := sanitizeName(tt.input)
+			if result != tt.expected {
+				t.Errorf("sanitizeName(%q) = %q, want %q", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestGenerateSessionName(t *testing.T) {
+	// Test with a non-git directory (fallback behavior)
+	t.Run("non-git directory falls back to agent prefix", func(t *testing.T) {
+		result := generateSessionName("/tmp")
+		// Should use fallback naming since /tmp is not a git repo
+		if !strings.HasPrefix(result, "agent-") && !strings.Contains(result, "/") {
+			t.Errorf("generateSessionName(/tmp) = %q, want either 'agent-*' prefix or '<repo>/<branch>' format", result)
+		}
+	})
+
+	// Test with current directory (which is a git repo)
+	t.Run("git directory uses repo/branch format", func(t *testing.T) {
+		cwd, _ := os.Getwd()
+		result := generateSessionName(cwd)
+		// Should contain a slash for repo/branch format
+		if !strings.Contains(result, "/") {
+			t.Errorf("generateSessionName(%q) = %q, want '<repo>/<branch>' format with slash", cwd, result)
+		}
+	})
+}
+
+func TestGenerateWindowName(t *testing.T) {
+	// Test with a non-git directory (fallback behavior)
+	t.Run("non-git directory uses basename", func(t *testing.T) {
+		result := generateWindowName("/tmp")
+		// Should use fallback naming since /tmp is not a git repo
+		if result != "tmp" && !strings.Contains(result, "/") {
+			t.Errorf("generateWindowName(/tmp) = %q, want 'tmp' or '<branch>/<commit>' format", result)
+		}
+	})
+
+	// Test with current directory (which is a git repo)
+	t.Run("git directory uses branch/commit format", func(t *testing.T) {
+		cwd, _ := os.Getwd()
+		result := generateWindowName(cwd)
+		// Should contain a slash for branch/commit format
+		if !strings.Contains(result, "/") {
+			t.Errorf("generateWindowName(%q) = %q, want '<branch>/<commit>' format with slash", cwd, result)
+		}
+	})
+}
+
+func TestGetGitInfo(t *testing.T) {
+	t.Run("returns nil for non-git directory", func(t *testing.T) {
+		info := getGitInfo("/tmp")
+		if info != nil {
+			t.Errorf("getGitInfo(/tmp) = %+v, want nil", info)
+		}
+	})
+
+	t.Run("returns info for git directory", func(t *testing.T) {
+		cwd, _ := os.Getwd()
+		info := getGitInfo(cwd)
+		if info == nil {
+			t.Fatal("getGitInfo(cwd) = nil, want non-nil")
+		}
+		if info.parentDir == "" {
+			t.Error("getGitInfo(cwd).parentDir is empty")
+		}
+		if info.repoName == "" {
+			t.Error("getGitInfo(cwd).repoName is empty")
+		}
+		if info.branchName == "" {
+			t.Error("getGitInfo(cwd).branchName is empty")
+		}
+		if info.shortCommit == "" {
+			t.Error("getGitInfo(cwd).shortCommit is empty")
+		}
+	})
+}
+
+func TestBuildShellCommand_QuotesAllArgs(t *testing.T) {
+	result := buildShellCommand([]string{"echo", "hello"})
+	if result != "'echo' 'hello'" {
+		t.Errorf("buildShellCommand quoted = %q, want %q", result, "'echo' 'hello'")
+	}
+}
+
+func TestBuildShellCommand(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     []string
+		expected string
+	}{
+		{
+			name:     "simple command",
+			args:     []string{"echo", "hello"},
+			expected: "'echo' 'hello'",
+		},
+		{
+			name:     "command with path",
+			args:     []string{"/usr/bin/claude", "--model", "opus"},
+			expected: "'/usr/bin/claude' '--model' 'opus'",
+		},
+		{
+			name:     "command with spaces in arg",
+			args:     []string{"echo", "hello world"},
+			expected: "'echo' 'hello world'",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := buildShellCommand(tt.args)
+			if result != tt.expected {
+				t.Errorf("buildShellCommand(%v) = %q, want %q", tt.args, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
+	installFakeTmux(t, false)
+
+	if !NewExecutor().IsAvailable() {
+		t.Error("IsAvailable() = false, want true when tmux resolves on PATH")
+	}
+}
+
+func TestExecutorIsUnavailableWhenTmuxDoesNotResolve(t *testing.T) {
+	t.Setenv("PATH", t.TempDir())
+
+	if NewExecutor().IsAvailable() {
+		t.Error("IsAvailable() = true, want false when tmux does not resolve on PATH")
+	}
+}
+
+func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
+	t.Setenv("TMUX", "")
+	if NewExecutor().IsInside() {
+		t.Error("IsInside() = true, want false when TMUX is empty")
+	}
+
+	t.Setenv("TMUX", "/tmp/tmux-1000/default,123,0")
+	if !NewExecutor().IsInside() {
+		t.Error("IsInside() = false, want true when TMUX is set")
+	}
+}
+
+func TestExecutorExecuteKeepsEnvironmentOutOfTmuxArguments(t *testing.T) {
+	tmuxArguments := installFakeTmux(t, false)
+	outputPath := filepath.Join(t.TempDir(), "result")
+	secret := "provider-secret-value"
+	executor := NewExecutor()
+	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
+
+	exitCode, err := executor.Execute(
+		config,
+		[]string{"/bin/sh", "-c", "printf '%s' \"$PROVIDER_TOKEN\" > \"$1\"", "sh", outputPath},
+		[]string{"PROVIDER_TOKEN=" + secret},
+		t.TempDir(),
+		true,
+	)
+
+	if err != nil || exitCode != 0 {
+		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	}
+	result, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Fatalf("read command output: %v", err)
+	}
+	if string(result) != secret {
+		t.Fatalf("command output = %q, want secret value", result)
+	}
+	arguments, err := os.ReadFile(tmuxArguments)
+	if err != nil {
+		t.Fatalf("read fake tmux arguments: %v", err)
+	}
+	if strings.Contains(string(arguments), secret) || strings.Contains(string(arguments), "PROVIDER_TOKEN") {
+		t.Fatalf("tmux arguments contain environment secret: %q", arguments)
+	}
+}
+
+func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
+	tmuxArguments := installFakeTmux(t, true)
+	truePath, err := exec.LookPath("true")
+	if err != nil {
+		t.Fatalf("resolve true executable: %v", err)
+	}
+	executor := NewExecutor()
+	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
+
+	exitCode, err := executor.Execute(config, []string{truePath}, nil, t.TempDir(), false)
+
+	if err != nil || exitCode != 0 {
+		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	}
+	arguments, err := os.ReadFile(tmuxArguments)
+	if err != nil {
+		t.Fatalf("read fake tmux arguments: %v", err)
+	}
+	if !strings.HasPrefix(string(arguments), "new-window\n") {
+		t.Fatalf("tmux arguments = %q, want new-window", arguments)
+	}
+}
+
+func installFakeTmux(t *testing.T, sessionExists bool) string {
+	t.Helper()
+	directory := t.TempDir()
+	argumentsPath := filepath.Join(directory, "arguments")
+	script := `#!/bin/sh
+if [ "$1" = "has-session" ]; then
+  if [ "${FAKE_TMUX_SESSION_EXISTS:-}" = "1" ]; then
+    exit 0
+  fi
+  exit 1
+fi
+printf '%s\n' "$@" > "$FAKE_TMUX_ARGUMENTS"
+for argument do
+  launch_script="$argument"
+done
+case "$1" in
+  new-session|new-window) /bin/sh "$launch_script" ;;
+esac
+`
+	if err := os.WriteFile(filepath.Join(directory, "tmux"), []byte(script), 0o700); err != nil {
+		t.Fatalf("write fake tmux: %v", err)
+	}
+	t.Setenv("PATH", directory+string(os.PathListSeparator)+os.Getenv("PATH"))
+	t.Setenv("FAKE_TMUX_ARGUMENTS", argumentsPath)
+	if sessionExists {
+		t.Setenv("FAKE_TMUX_SESSION_EXISTS", "1")
+	} else {
+		t.Setenv("FAKE_TMUX_SESSION_EXISTS", "")
+	}
+	return argumentsPath
+}

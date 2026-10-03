@@ -1,0 +1,19 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin]
+tasks:
+  ci-check:
+    deps:
+      - skill-asset-pipeline:ci-check
+      - skill-audio:ci-check
+      - skill-c99-game-opinionated:ci-check
+      - skill-data-model:ci-check
+      - skill-ecs:ci-check
+      - skill-editor-viewport:ci-check
+      - skill-game-networking:ci-check
+      - skill-gpu-rendering:ci-check
+      - skill-gpu-rendering-vulkan:ci-check
+      - skill-imgui:ci-check
+      - skill-node-graph:ci-check
+    options:
+      mergeDeps: append

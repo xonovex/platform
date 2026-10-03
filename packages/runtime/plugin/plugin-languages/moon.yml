@@ -1,0 +1,14 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin]
+tasks:
+  ci-check:
+    deps:
+      - skill-lua:ci-check
+      - skill-lua-opinionated:ci-check
+      - skill-python:ci-check
+      - skill-shell-scripting:ci-check
+      - skill-sql-postgresql:ci-check
+      - skill-typescript-to-lua:ci-check
+    options:
+      mergeDeps: append

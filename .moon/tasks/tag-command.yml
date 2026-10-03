@@ -37,7 +37,7 @@ tasks:
       - package.json
       - .claude-plugin/plugin.json
       - /budgets.json
-      - /packages/skill/*/*/SKILL.md
+      - /packages/runtime/plugin/*/skills/*/SKILL.md
     env:
       XONOVEX_LINT_MODE: enforce
     options:

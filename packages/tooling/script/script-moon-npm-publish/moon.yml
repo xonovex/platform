@@ -1,0 +1,27 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script, typescript-integration]
+dependsOn:
+  - script-moon-common
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/tooling/script/script-moon-common/src/**/*
+tasks:
+  # These floors cover the unit tier alone. The defaultDependencies in src/cli.ts
+  # are the fs and npm plumbing behind the PublishDependencies port, which reads
+  # and writes relative to the process directory; only test/specs/integration can
+  # drive them, so the function total sits well under what publish.ts reaches.
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "54"
+      TS_COVERAGE_MIN_BRANCHES: "90"
+      TS_COVERAGE_MIN_STATEMENTS: "85"

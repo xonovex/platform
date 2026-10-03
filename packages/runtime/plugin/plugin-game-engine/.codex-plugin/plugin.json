@@ -1,0 +1,19 @@
+{
+  "name": "xonovex-game-engine",
+  "version": "5.3.0",
+  "description": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/",
+  "dependencies": ["xonovex-native"],
+  "interface": {
+    "displayName": "Game Engine",
+    "shortDescription": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",
+    "longDescription": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",
+    "developerName": "Xonovex",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "defaultPrompt": "Use the applicable skills from this plugin for my task."
+  }
+}

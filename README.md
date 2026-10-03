@@ -10,10 +10,10 @@ Xonovex supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) a
 
 The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md). Skills provide instructions, references, scripts, and setup capabilities; installing one is not proof that a policy executes or blocks an action.
 
-- **[agent-cli-go](packages/agent/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
-- **[agent-operator-go](packages/agent/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
-- **[moon-nix-toolchain](packages/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
-- **[Skills](packages/skill/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring all live here as consolidated skill packages
+- **[agent-cli-go](packages/tooling/cli/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
+- **[agent-operator-go](packages/sandbox/operator/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
+- **[moon-nix-toolchain](packages/tooling/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
+- **[Plugins](packages/runtime/plugin/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring live in grouped plugins
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --isolation bwrap --provider gemini
 ```
 
-Select the sandbox with three independent axes: `--isolation {none,bwrap,docker}`, `--provision {none,nix,command}`, and `--network {host,none,proxy}`. See `packages/agent/AGENTS.md` for the complete model.
+Select the sandbox with three independent axes: `--isolation {none,bwrap,docker}`, `--provision {none,nix,command}`, and `--network {host,none,proxy}`. See `packages/tooling/cli/AGENTS.md` for the complete model.
 
 ![Three Claude Code agents in a tiled tmux session, each in its own git worktree: one under bwrap, one under bwrap with a Nix-provisioned toolchain, and one under Docker, routed to two different model providers](packages/asset/asset-images/multiple-agents.png)
 
@@ -44,8 +44,8 @@ export XONOVEX_RUNTIME_CLASS='gvisor'
 
 # Requires cert-manager v1.16+ with its CA injector enabled
 # Install CRDs and deploy the operator
-kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/crd
-kubectl apply -k https://github.com/xonovex/platform//packages/agent/agent-operator-go/config/default
+kubectl apply -k https://github.com/xonovex/platform//packages/sandbox/operator/agent-operator-go/config/crd
+kubectl apply -k https://github.com/xonovex/platform//packages/sandbox/operator/agent-operator-go/config/default
 
 # Create one policy-governed namespace and provider credential
 kubectl create namespace ai-agents --dry-run=client -o yaml | kubectl apply -f -
@@ -123,90 +123,46 @@ The `network: host` value permits unrestricted egress so this example can reach 
 
 ### Agent Plugins
 
-Install only the plugins required for the intended operations. A compatible harness can route to an installed skill when its description matches the task. User-invocable commands load their required skill dependencies explicitly. Harness support, loading behavior, permissions, and native enforcement remain product-specific. The skills follow the [Agent Skills specification](https://agentskills.io/specification).
+Install the grouped plugins your tasks need. Each plugin owns related skills and commands. A skill keeps its existing name, and a command uses the namespace of the plugin that owns it.
+
+| Plugin                                                                          | Purpose                                                                                                       |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| [`xonovex-agentic`](packages/runtime/plugin/plugin-agentic/README.md)           | Configure coding-agent harnesses and author their skills, commands, and project instructions.                 |
+| [`xonovex-core`](packages/runtime/plugin/plugin-core/README.md)                 | Apply software design, testing, review, version control, credentials, and accessibility practices.            |
+| [`xonovex-game-engine`](packages/runtime/plugin/plugin-game-engine/README.md)   | Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.           |
+| [`xonovex-integrations`](packages/runtime/plugin/plugin-integrations/README.md) | Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.                        |
+| [`xonovex-languages`](packages/runtime/plugin/plugin-languages/README.md)       | Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua.                                      |
+| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md)             | Write C99 and build portable native systems with explicit memory, concurrency, and data layouts.              |
+| [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md)         | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
+| [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md)     | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests.                         |
+| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md)         | Research, plan, implement, validate, and close out work, then integrate lessons from the session.             |
+| [`xonovex-writing`](packages/runtime/plugin/plugin-writing/README.md)           | Revise prose and write technical documents, articles, news, and travel guides.                                |
 
 #### Claude Code
 
-Add the marketplace, then install the required command and skill plugins.
+Add the marketplace, then install the plugins needed for the task:
 
 ```bash
-# Add the Xonovex plugin marketplace
 claude plugin marketplace add xonovex/platform
-
-# Install only the independent capabilities you need
-claude plugin install xonovex-workflow@xonovex-marketplace            # explicit operations, context forwarding, publishing, and workspace commands
-claude plugin install xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
-claude plugin install xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
-claude plugin install xonovex-skill-github@xonovex-marketplace        # GitHub issues, Projects, PRs/reviews, durable context, enforcement
-claude plugin install xonovex-skill-gitlab@xonovex-marketplace        # GitLab issues/work items, boards, MRs/reviews, durable context, enforcement
-claude plugin install xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
-claude plugin install xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
-claude plugin install xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
-claude plugin install xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
-claude plugin install xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
-claude plugin install xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
-claude plugin install xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
-claude plugin install xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
-
-# Install language / framework guides (apply automatically when editing those files)
-claude plugin install xonovex-skill-typescript@xonovex-marketplace
-claude plugin install xonovex-skill-react@xonovex-marketplace
-claude plugin install xonovex-skill-hono@xonovex-marketplace
-claude plugin install xonovex-skill-zod@xonovex-marketplace
-claude plugin install xonovex-skill-vitest@xonovex-marketplace
-# ... see .claude-plugin/marketplace.json for the full list
+claude plugin install xonovex-core@xonovex-marketplace
+claude plugin install xonovex-workflow@xonovex-marketplace
+claude plugin install xonovex-typescript@xonovex-marketplace
 ```
 
 #### Codex
 
-Add the marketplace, then install the required skill plugins.
+Add the marketplace, then install the plugins needed for the task:
 
 ```bash
-# Add the Xonovex plugin marketplace
 codex plugin marketplace add xonovex/platform
-
-# Install only the independent capabilities you need
-codex plugin add xonovex-skill-plan@xonovex-marketplace          # research, create, critique, revise, expand, continue, update, validate
-codex plugin add xonovex-skill-git@xonovex-marketplace           # commit, merge-resolve, feature-worktree create/merge/abandon/cleanup
-codex plugin add xonovex-skill-github@xonovex-marketplace        # GitHub issues, Projects, PRs/reviews, durable context, enforcement
-codex plugin add xonovex-skill-gitlab@xonovex-marketplace        # GitLab issues/work items, boards, MRs/reviews, durable context, enforcement
-codex plugin add xonovex-skill-instruction@xonovex-marketplace   # AGENTS.md init / sync / simplify / consolidate / merge
-codex plugin add xonovex-skill-reflect@xonovex-marketplace       # session reflection: extract lessons, fold into AGENTS.md or a skill
-codex plugin add xonovex-skill-code-review@xonovex-marketplace   # Conventional Comments feedback: blocking vs non-blocking, summary + inline
-codex plugin add xonovex-skill-pull-request@xonovex-marketplace  # PR authoring: description, size/atomicity, testing evidence, tradeoffs, self-review
-codex plugin add xonovex-skill-command@xonovex-marketplace        # author / merge / simplify reusable prompt files (cross-harness format reference)
-codex plugin add xonovex-skill-skill@xonovex-marketplace         # author / extract / merge / simplify / validate Agent Skills
-codex plugin add xonovex-skill-content@xonovex-marketplace       # multilingual articles, news, travel guides, prose humanization
-codex plugin add xonovex-skill-llmstxt@xonovex-marketplace       # /llms.txt files and per-page markdown mirrors
-
-# Install language / framework guides (apply automatically when editing those files)
-codex plugin add xonovex-skill-typescript@xonovex-marketplace
-codex plugin add xonovex-skill-react@xonovex-marketplace
-codex plugin add xonovex-skill-hono@xonovex-marketplace
-codex plugin add xonovex-skill-zod@xonovex-marketplace
-codex plugin add xonovex-skill-vitest@xonovex-marketplace
-# ... see .agents/plugins/marketplace.json for the full list
+codex plugin add xonovex-core@xonovex-marketplace
+codex plugin add xonovex-workflow@xonovex-marketplace
+codex plugin add xonovex-typescript@xonovex-marketplace
 ```
 
-### Upgrades and retired skill plugins
+#### Upgrade from individual plugins
 
-Upgrade the marketplace and selected plugins together, then start a new session. Remove the four retired pre-5.x plugin names before installing their replacements.
-
-| Retired plugin              | Replacement             |
-| --------------------------- | ----------------------- |
-| `xonovex-skill-general-fp`  | `xonovex-skill-fp`      |
-| `xonovex-skill-general-oop` | `xonovex-skill-oop`     |
-| `xonovex-skill-insights`    | `xonovex-skill-reflect` |
-| `xonovex-skill-prompt`      | `xonovex-skill-command` |
-
-In Codex CLI, open `codex`, run `/plugins`, select each retired installed entry, and choose **Uninstall plugin**; then install its replacement. For Claude Code user-scope installations:
-
-```bash
-claude plugin uninstall xonovex-skill-general-fp@xonovex-marketplace
-claude plugin uninstall xonovex-skill-general-oop@xonovex-marketplace
-claude plugin uninstall xonovex-skill-insights@xonovex-marketplace
-claude plugin uninstall xonovex-skill-prompt@xonovex-marketplace
-```
+The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The `xonovex-workflow` plugin now contains the planning and reflection skills and their commands. Git commands and the existing `plan-worktree-*` commands belong to `xonovex-core`; authoring commands belong to `xonovex-agentic`; content commands belong to `xonovex-writing`.
 
 ## Development
 

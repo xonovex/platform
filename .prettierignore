@@ -44,7 +44,7 @@ reports/
 .cache/
 .moon/cache/
 .moon/docker/
-packages/moon/moon-nix-extension/tests/fixtures/
+packages/tooling/moon/moon-nix-extension/tests/fixtures/
 .parcel-cache/
 .fusebox/
 .dynamodb/

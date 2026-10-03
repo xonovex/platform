@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-native",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Write C99 and build portable native systems with explicit memory, concurrency, and data layouts.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "native"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

@@ -1,0 +1,12 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin]
+tasks:
+  ci-check:
+    deps:
+      - skill-moon:ci-check
+      - skill-docker:ci-check
+      - skill-kubernetes:ci-check
+      - skill-terraform:ci-check
+    options:
+      mergeDeps: append

@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-typescript",
+  "version": "5.3.0",
+  "description": "Develop the TypeScript stack, its frameworks, package tooling, validation, and tests.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/"
+}

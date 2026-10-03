@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-debugging",
-  "version": "5.3.0",
-  "description": "Xonovex Debugging skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": ["./debugging-guide"]
-}

@@ -3,7 +3,7 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/agent/agent-cli-go"
+      "path": "./packages/tooling/cli/agent-cli-go"
     },
     {
       "path": "./packages/config/eslint-config-base"
@@ -24,58 +24,58 @@
       "path": "./packages/config/vitest-config-node"
     },
     {
-      "path": "./packages/script/script-moon-command-validate"
+      "path": "./packages/tooling/script/script-moon-command-validate"
     },
     {
-      "path": "./packages/script/script-moon-common"
+      "path": "./packages/tooling/script/script-moon-common"
     },
     {
-      "path": "./packages/script/script-moon-npm-check"
+      "path": "./packages/tooling/script/script-moon-npm-check"
     },
     {
-      "path": "./packages/script/script-moon-npm-publish"
+      "path": "./packages/tooling/script/script-moon-npm-publish"
     },
     {
-      "path": "./packages/script/script-moon-release-validate"
+      "path": "./packages/tooling/script/script-moon-release-validate"
     },
     {
-      "path": "./packages/script/script-moon-skill-audit-sources"
+      "path": "./packages/tooling/script/script-moon-skill-audit-sources"
     },
     {
-      "path": "./packages/script/script-moon-skill-catalog-common"
+      "path": "./packages/tooling/script/script-moon-skill-catalog-common"
     },
     {
-      "path": "./packages/script/script-moon-skill-eval-common"
+      "path": "./packages/tooling/script/script-moon-skill-eval-common"
     },
     {
-      "path": "./packages/script/script-moon-skill-eval-outputs"
+      "path": "./packages/tooling/script/script-moon-skill-eval-outputs"
     },
     {
-      "path": "./packages/script/script-moon-skill-eval-routing"
+      "path": "./packages/tooling/script/script-moon-skill-eval-routing"
     },
     {
-      "path": "./packages/script/script-moon-skill-eval-triggers"
+      "path": "./packages/tooling/script/script-moon-skill-eval-triggers"
     },
     {
-      "path": "./packages/script/script-moon-skill-validate-drift"
+      "path": "./packages/tooling/script/script-moon-skill-validate-drift"
     },
     {
-      "path": "./packages/script/script-moon-skill-validate-links"
+      "path": "./packages/tooling/script/script-moon-skill-validate-links"
     },
     {
-      "path": "./packages/script/script-moon-skill-validate-routing"
+      "path": "./packages/tooling/script/script-moon-skill-validate-routing"
     },
     {
-      "path": "./packages/script/script-moon-skill-validate-spec"
+      "path": "./packages/tooling/script/script-moon-skill-validate-spec"
     },
     {
-      "path": "./packages/script/script-moon-version-bump"
+      "path": "./packages/tooling/script/script-moon-version-bump"
     },
     {
-      "path": "./packages/script/script-moon-version-detect"
+      "path": "./packages/tooling/script/script-moon-version-detect"
     },
     {
-      "path": "./packages/shared/shared-core"
+      "path": "./packages/library/shared-core"
     }
   ]
 }

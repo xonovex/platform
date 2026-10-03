@@ -4,14 +4,15 @@
 
 ### Packages
 
-- **`agent`**: Agent CLI (`agent-cli-go`, five per-platform binary packages, `agent-cli-go-github`), `agent-operator-go` + image
-- **`asset`**: Diagrams and images; private, pinned `0.0.0`, outside the lockstep release line
-- **`command`**: Slash commands (`command-utility`, `command-workflow`); lockstep with the skill plugins and `.claude-plugin/marketplace.json`
-- **`config`**: Shared ESLint, Prettier, TypeScript, Vite, Vitest config
-- **`moon`**: moonrepo nix plugins (`moon-nix-toolchain`, `moon-nix-extension`, `moon-nix-runtime`), versioned from `Cargo.toml`
-- **`script`**: moon task binaries `moon-<domain>-<action>-<subject>`; no binary means shared code (`script-moon-common`)
-- **`shared`**: TypeScript (`shared-core`) and Go (`shared-core-go`, `shared-agent-go`) libraries
-- **`skill`**: Agent skills catalog (`skill-*`)
+- **`runtime/plugin`**: Grouped plugins with skills under `skills/` and commands under `commands/`; lockstep with both marketplaces
+- **`tooling/cli`**: Agent CLI, platform binary packages, and GitHub Action wrapper
+- **`tooling/script`**: Moon task binaries and their shared code
+- **`tooling/moon`**: Moon Nix plugins, versioned from `Cargo.toml`
+- **`sandbox/operator`**: Kubernetes agent operator
+- **`sandbox/image`**: Operator image build and publishing
+- **`library`**: TypeScript and Go libraries
+- **`config`**: Shared ESLint, Prettier, TypeScript, Vite, and Vitest configuration
+- **`asset`**: Private diagrams and images, pinned at `0.0.0`
 
 ### Workflow
 
@@ -52,4 +53,4 @@
 
 ## Integration Points
 
-- config -> shared -> agent
+- The library packages use the config packages. The CLI and operator packages use the library packages.

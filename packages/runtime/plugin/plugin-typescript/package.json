@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-typescript",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Develop the TypeScript stack, its frameworks, package tooling, validation, and tests.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "typescript"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

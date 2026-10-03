@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-workflow",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "workflow"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

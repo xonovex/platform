@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-writing",
+  "version": "5.3.0",
+  "description": "Revise prose and write technical documents, articles, news, and travel guides.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/"
+}

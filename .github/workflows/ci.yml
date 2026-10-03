@@ -49,7 +49,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
-          workspaces: packages/moon/moon-nix-toolchain
+          workspaces: packages/tooling/moon/moon-nix-toolchain
           cmd-format: nix develop --no-update-lock-file -c {0}
           key: ${{ hashFiles('flake.lock') }}
           # Save only on main; PRs restore from main's cache (avoids every PR branch

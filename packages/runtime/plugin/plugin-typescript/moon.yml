@@ -1,0 +1,17 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin]
+tasks:
+  ci-check:
+    deps:
+      - skill-astro:ci-check
+      - skill-hono:ci-check
+      - skill-hono-opinionated:ci-check
+      - skill-npm:ci-check
+      - skill-react:ci-check
+      - skill-threejs:ci-check
+      - skill-typescript:ci-check
+      - skill-vitest:ci-check
+      - skill-zod:ci-check
+    options:
+      mergeDeps: append

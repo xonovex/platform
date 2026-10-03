@@ -1,9 +1,0 @@
-{
-  "name": "xonovex-skill-lua",
-  "version": "5.3.0",
-  "description": "Xonovex Lua skills",
-  "author": {
-    "name": "Xonovex"
-  },
-  "skills": "./lua-guide"
-}

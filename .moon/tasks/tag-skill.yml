@@ -5,21 +5,23 @@ implicitInputs:
   - /package-lock.json
 tasks:
   skill-format:
-    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
+    script: npx prettier --write "$projectRoot" --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.md"
+      - "**/*.json"
+      - "**/*.yml"
       - "*.config.*"
-      - package.json
     outputs: []
     options:
       cache: false
       runInCI: false
   skill-format-check:
-    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
+    script: npx prettier --check "$projectRoot" --ignore-path "$workspaceRoot/.prettierignore"
     inputs:
       - "**/*.md"
+      - "**/*.json"
+      - "**/*.yml"
       - "*.config.*"
-      - package.json
     outputs: []
   format:
     command: noop
@@ -50,8 +52,8 @@ tasks:
       mergeArgs: replace
   skill-validate:
     command:
-      - npx
-      - moon-skill-validate-spec
+      - node
+      - $workspaceRoot/packages/tooling/script/script-moon-skill-validate-spec/bin.js
       - --strict
     deps:
       - target: ~:build
@@ -70,8 +72,8 @@ tasks:
       cache: false
   skill-audit-sources:
     command:
-      - npx
-      - moon-skill-audit-sources
+      - node
+      - $workspaceRoot/packages/tooling/script/script-moon-skill-audit-sources/bin.js
     deps:
       - target: ~:build
         optional: true
@@ -80,8 +82,8 @@ tasks:
       cache: false
   skill-eval-triggers:
     command:
-      - npx
-      - moon-skill-eval-triggers
+      - node
+      - $workspaceRoot/packages/tooling/script/script-moon-skill-eval-triggers/bin.js
       - --batch-size
       - "8"
     deps:
@@ -93,10 +95,10 @@ tasks:
       runInCI: false
   skill-eval-outputs:
     command:
-      - npx
-      - moon-skill-eval-outputs
+      - node
+      - $workspaceRoot/packages/tooling/script/script-moon-skill-eval-outputs/bin.js
       - --plugin-dir
-      - .
+      - ../..
     deps:
       - target: ~:build
         optional: true
@@ -106,42 +108,42 @@ tasks:
       runInCI: false
   ci-skill-eval-trigger:
     script: >-
-      npx moon-skill-eval-triggers
+      node "$workspaceRoot/packages/tooling/script/script-moon-skill-eval-triggers/bin.js"
       --split validation
       --runs 3
       --max-budget-usd 0.05
       --batch-size 8
       --workspace ".skill-eval-results/trigger/${SKILL_EVAL_HARNESS:-claude}"
-      --plugin-dir .
-      --catalog-root "$workspaceRoot/packages/skill"
+      --plugin-dir ../..
+      --catalog-root "$workspaceRoot/packages/runtime/plugin"
     deps:
       - target: ~:build
         optional: true
       - script-moon-skill-eval-triggers:build
     inputs:
-      - /packages/skill/AGENTS.md
-      - /packages/skill/skill-skill/skill-guide/scripts/**/*
+      - /packages/runtime/plugin/AGENTS.md
+      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/**/*
     options:
       cache: false
       runInCI: false
   ci-skill-eval-output:
     script: >-
-      npx moon-skill-eval-outputs
+      node "$workspaceRoot/packages/tooling/script/script-moon-skill-eval-outputs/bin.js"
       --runs 2
       --concurrency 2
       --max-budget-usd 0.10
       --judge-max-budget-usd 0.10
       --batch-size 3
       --workspace ".skill-eval-results/output/${SKILL_EVAL_HARNESS:-claude}"
-      --plugin-dir .
+      --plugin-dir ../..
       --eval-cwd "$workspaceRoot"
     deps:
       - target: ~:build
         optional: true
       - script-moon-skill-eval-outputs:build
     inputs:
-      - /packages/skill/AGENTS.md
-      - /packages/skill/skill-skill/skill-guide/scripts/**/*
+      - /packages/runtime/plugin/AGENTS.md
+      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/**/*
     options:
       cache: false
       runInCI: false

@@ -1,0 +1,110 @@
+[
+  {
+    "query": "create a new skill for our GraphQL resolver conventions: SKILL.md plus a few reference files",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: authoring a new skill"
+  },
+  {
+    "query": "the SKILL.md body is ~700 lines: push the detail into references with load-when triggers and keep the body an index",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "implicit: progressive disclosure / simplify without naming the skill guide"
+  },
+  {
+    "query": "editing packages/runtime/plugin/plugin-typescript/skills/zod-guide/SKILL.md and it never seems to fire: can you tighten the description so it routes better?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "context cue: editing under a skills dir + description tuning"
+  },
+  {
+    "query": "audit our skill catalog for duplicated reference files and split them into general/language/framework tiers, cross-linking the owner",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "catalog-level work: the broadened composability/audit scope"
+  },
+  {
+    "query": "two of our skills overlap a lot: pull the useful rules from one into the other but keep the target's voice and structure",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "merge/assimilate one skill into another"
+  },
+  {
+    "query": "audit every guide in our skill set for ambiguous descriptions, dangling named handoffs, and exact hard dependencies that should only be optional runtime selections",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "skill-set routing and dependency composition"
+  },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "security audit of an untrusted skill + allowed-tools least privilege"
+  },
+  {
+    "query": "simplify our AGENTS.md: it's gotten verbose and repeats itself across sections",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: project instructions, should match instruction-guide"
+  },
+  {
+    "query": "tune this system prompt so the model stops apologizing and follows the output format",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: prompt engineering, should match command-guide"
+  },
+  {
+    "query": "create a /deploy slash command that wraps our release steps and asks for a target env",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: slash command authoring, should match slashcommand-guide"
+  },
+  {
+    "query": "audit our app's npm dependencies for known CVEs and bump the vulnerable ones",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: software supply-chain/dependency audit, not an Agent Skill"
+  },
+  {
+    "query": "write trigger-eval queries for our new docker-guide and check the description routes them correctly",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: evaluating trigger rate"
+  },
+  {
+    "query": "this guide re-explains the immutability rules that fp-guide already owns: factor them out and cross-reference it",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "validation positive: implicit de-duplication / composability"
+  },
+  {
+    "query": "our workflow needs any installed evidence-review skill; define required versus preferred description matching, ambiguity handling, and how this differs from an exact plugin dependency",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "soft description-based selection versus exact hard dependency"
+  },
+  {
+    "query": "consolidate the duplicated AGENTS.md files across our packages into one canonical set",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "validation negative: project instructions, should match instruction-guide"
+  },
+  {
+    "query": "simplify this verbose prompt template we reuse for support replies",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "validation negative: near-miss, should match command-guide"
+  },
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "near miss owned by reflect-guide",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+    "rationale": "near miss owned by command-guide",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

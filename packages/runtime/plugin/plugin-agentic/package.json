@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-agentic",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Configure coding-agent harnesses and author their skills, commands, and project instructions.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "agentic"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

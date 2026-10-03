@@ -9,389 +9,54 @@
   },
   "plugins": [
     {
-      "name": "xonovex-utility",
-      "source": "./packages/command/command-utility",
-      "description": "Xonovex utility commands: skills, commands, instructions, reflect, content"
+      "name": "xonovex-agentic",
+      "source": "./packages/runtime/plugin/plugin-agentic",
+      "description": "Configure coding-agent harnesses and author their skills, commands, and project instructions."
+    },
+    {
+      "name": "xonovex-core",
+      "source": "./packages/runtime/plugin/plugin-core",
+      "description": "Apply software design, testing, review, version control, credentials, and accessibility practices."
+    },
+    {
+      "name": "xonovex-game-engine",
+      "source": "./packages/runtime/plugin/plugin-game-engine",
+      "description": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking."
+    },
+    {
+      "name": "xonovex-integrations",
+      "source": "./packages/runtime/plugin/plugin-integrations",
+      "description": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration."
+    },
+    {
+      "name": "xonovex-languages",
+      "source": "./packages/runtime/plugin/plugin-languages",
+      "description": "Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua."
+    },
+    {
+      "name": "xonovex-native",
+      "source": "./packages/runtime/plugin/plugin-native",
+      "description": "Write C99 and build portable native systems with explicit memory, concurrency, and data layouts."
+    },
+    {
+      "name": "xonovex-platform",
+      "source": "./packages/runtime/plugin/plugin-platform",
+      "description": "Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure."
+    },
+    {
+      "name": "xonovex-typescript",
+      "source": "./packages/runtime/plugin/plugin-typescript",
+      "description": "Develop the TypeScript stack, its frameworks, package tooling, validation, and tests."
     },
     {
       "name": "xonovex-workflow",
-      "source": "./packages/command/command-workflow",
-      "description": "Xonovex workflow commands: planning, code analysis, git"
+      "source": "./packages/runtime/plugin/plugin-workflow",
+      "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session."
     },
     {
-      "name": "xonovex-skill-accessibility",
-      "source": "./packages/skill/skill-accessibility",
-      "description": "Xonovex accessibility assurance skills"
-    },
-    {
-      "name": "xonovex-skill-asset-pipeline",
-      "source": "./packages/skill/skill-asset-pipeline",
-      "description": "Xonovex Asset pipeline skills"
-    },
-    {
-      "name": "xonovex-skill-astro",
-      "source": "./packages/skill/skill-astro",
-      "description": "Xonovex Astro skills"
-    },
-    {
-      "name": "xonovex-skill-audio",
-      "source": "./packages/skill/skill-audio",
-      "description": "Xonovex Low-level audio skills"
-    },
-    {
-      "name": "xonovex-skill-bdd",
-      "source": "./packages/skill/skill-bdd",
-      "description": "Xonovex Behaviour/acceptance-driven development skills"
-    },
-    {
-      "name": "xonovex-skill-c99",
-      "source": "./packages/skill/skill-c99",
-      "description": "Xonovex C99 skills"
-    },
-    {
-      "name": "xonovex-skill-c99-game-opinionated",
-      "source": "./packages/skill/skill-c99-game-opinionated",
-      "description": "Xonovex C99 game opinionated skills"
-    },
-    {
-      "name": "xonovex-skill-c99-opinionated",
-      "source": "./packages/skill/skill-c99-opinionated",
-      "description": "Xonovex C99 opinionated skills"
-    },
-    {
-      "name": "xonovex-skill-claude-code",
-      "source": "./packages/skill/skill-claude-code",
-      "description": "Xonovex Claude Code hook skills"
-    },
-    {
-      "name": "xonovex-skill-cmake",
-      "source": "./packages/skill/skill-cmake",
-      "description": "Xonovex CMake skills"
-    },
-    {
-      "name": "xonovex-skill-code-quality",
-      "source": "./packages/skill/skill-code-quality",
-      "description": "Xonovex Code quality skills"
-    },
-    {
-      "name": "xonovex-skill-code-review",
-      "source": "./packages/skill/skill-code-review",
-      "description": "Xonovex Code review skills"
-    },
-    {
-      "name": "xonovex-skill-codex",
-      "source": "./packages/skill/skill-codex",
-      "description": "Xonovex Codex hook skills"
-    },
-    {
-      "name": "xonovex-skill-command",
-      "source": "./packages/skill/skill-command",
-      "description": "Xonovex Command skill: author, merge, simplify reusable user-invocable prompt files (slash commands)"
-    },
-    {
-      "name": "xonovex-skill-connascence",
-      "source": "./packages/skill/skill-connascence",
-      "description": "Xonovex Connascence skills"
-    },
-    {
-      "name": "xonovex-skill-copilot",
-      "source": "./packages/skill/skill-copilot",
-      "description": "Xonovex GitHub Copilot hook skills"
-    },
-    {
-      "name": "xonovex-skill-credential-management",
-      "source": "./packages/skill/skill-credential-management",
-      "description": "Xonovex credential lifecycle skills"
-    },
-    {
-      "name": "xonovex-skill-cross-platform",
-      "source": "./packages/skill/skill-cross-platform",
-      "description": "Xonovex Cross-platform / portability skills"
-    },
-    {
-      "name": "xonovex-skill-data-model",
-      "source": "./packages/skill/skill-data-model",
-      "description": "Xonovex Data-model skills"
-    },
-    {
-      "name": "xonovex-skill-data-oriented-design",
-      "source": "./packages/skill/skill-data-oriented-design",
-      "description": "Xonovex Data-oriented design skills"
-    },
-    {
-      "name": "xonovex-skill-ddd",
-      "source": "./packages/skill/skill-ddd",
-      "description": "Xonovex Domain-driven design skills"
-    },
-    {
-      "name": "xonovex-skill-debugging",
-      "source": "./packages/skill/skill-debugging",
-      "description": "Xonovex Debugging skills"
-    },
-    {
-      "name": "xonovex-skill-docker",
-      "source": "./packages/skill/skill-docker",
-      "description": "Xonovex Docker skills"
-    },
-    {
-      "name": "xonovex-skill-ecs",
-      "source": "./packages/skill/skill-ecs",
-      "description": "Xonovex Entity-Component-System skills"
-    },
-    {
-      "name": "xonovex-skill-editor-viewport",
-      "source": "./packages/skill/skill-editor-viewport",
-      "description": "Xonovex Editor viewport skills"
-    },
-    {
-      "name": "xonovex-skill-editorial-writing",
-      "source": "./packages/skill/skill-editorial-writing",
-      "description": "Xonovex editorial writing skills"
-    },
-    {
-      "name": "xonovex-skill-fp",
-      "source": "./packages/skill/skill-fp",
-      "description": "Xonovex Functional programming skills"
-    },
-    {
-      "name": "xonovex-skill-game-networking",
-      "source": "./packages/skill/skill-game-networking",
-      "description": "Xonovex Game networking skills"
-    },
-    {
-      "name": "xonovex-skill-git",
-      "source": "./packages/skill/skill-git",
-      "description": "Xonovex Git skills"
-    },
-    {
-      "name": "xonovex-skill-github",
-      "source": "./packages/skill/skill-github",
-      "description": "Xonovex GitHub host delivery skills"
-    },
-    {
-      "name": "xonovex-skill-gitlab",
-      "source": "./packages/skill/skill-gitlab",
-      "description": "Xonovex GitLab host delivery skills"
-    },
-    {
-      "name": "xonovex-skill-gpu-rendering",
-      "source": "./packages/skill/skill-gpu-rendering",
-      "description": "Xonovex GPU rendering skills"
-    },
-    {
-      "name": "xonovex-skill-gpu-rendering-vulkan",
-      "source": "./packages/skill/skill-gpu-rendering-vulkan",
-      "description": "Xonovex GPU rendering (Vulkan) skills"
-    },
-    {
-      "name": "xonovex-skill-hexagonal-pattern",
-      "source": "./packages/skill/skill-hexagonal-pattern",
-      "description": "Xonovex Hexagonal architecture skills"
-    },
-    {
-      "name": "xonovex-skill-hono",
-      "source": "./packages/skill/skill-hono",
-      "description": "Xonovex Hono skills"
-    },
-    {
-      "name": "xonovex-skill-hono-opinionated",
-      "source": "./packages/skill/skill-hono-opinionated",
-      "description": "Xonovex Hono opinionated skills"
-    },
-    {
-      "name": "xonovex-skill-imgui",
-      "source": "./packages/skill/skill-imgui",
-      "description": "Xonovex immediate-mode GUI skills"
-    },
-    {
-      "name": "xonovex-skill-instruction",
-      "source": "./packages/skill/skill-instruction",
-      "description": "Xonovex Instruction skills"
-    },
-    {
-      "name": "xonovex-skill-kiro",
-      "source": "./packages/skill/skill-kiro",
-      "description": "Xonovex Kiro hook skills"
-    },
-    {
-      "name": "xonovex-skill-kubernetes",
-      "source": "./packages/skill/skill-kubernetes",
-      "description": "Xonovex Kubernetes skills"
-    },
-    {
-      "name": "xonovex-skill-llmstxt",
-      "source": "./packages/skill/skill-llmstxt",
-      "description": "Xonovex llms.txt skill: author and maintain /llms.txt files (and per-page markdown mirrors) per the llmstxt.org specification"
-    },
-    {
-      "name": "xonovex-skill-lock-free",
-      "source": "./packages/skill/skill-lock-free",
-      "description": "Xonovex Lock-free / wait-free concurrency skills"
-    },
-    {
-      "name": "xonovex-skill-lua",
-      "source": "./packages/skill/skill-lua",
-      "description": "Xonovex Lua skills"
-    },
-    {
-      "name": "xonovex-skill-lua-opinionated",
-      "source": "./packages/skill/skill-lua-opinionated",
-      "description": "Xonovex Lua opinionated skills"
-    },
-    {
-      "name": "xonovex-skill-memory-management",
-      "source": "./packages/skill/skill-memory-management",
-      "description": "Xonovex Memory management skills"
-    },
-    {
-      "name": "xonovex-skill-microkernel-pattern",
-      "source": "./packages/skill/skill-microkernel-pattern",
-      "description": "Xonovex Microkernel architecture skills"
-    },
-    {
-      "name": "xonovex-skill-moon",
-      "source": "./packages/skill/skill-moon",
-      "description": "Xonovex Moon skills"
-    },
-    {
-      "name": "xonovex-skill-news-writing",
-      "source": "./packages/skill/skill-news-writing",
-      "description": "Xonovex news writing skills"
-    },
-    {
-      "name": "xonovex-skill-node-graph",
-      "source": "./packages/skill/skill-node-graph",
-      "description": "Xonovex Node graph skills"
-    },
-    {
-      "name": "xonovex-skill-npm",
-      "source": "./packages/skill/skill-npm",
-      "description": "Xonovex npm publishing skills"
-    },
-    {
-      "name": "xonovex-skill-oop",
-      "source": "./packages/skill/skill-oop",
-      "description": "Xonovex Object-oriented programming skills"
-    },
-    {
-      "name": "xonovex-skill-opencode",
-      "source": "./packages/skill/skill-opencode",
-      "description": "Xonovex OpenCode plugin skills"
-    },
-    {
-      "name": "xonovex-skill-orthogonal-pattern",
-      "source": "./packages/skill/skill-orthogonal-pattern",
-      "description": "Xonovex Orthogonal pattern skills"
-    },
-    {
-      "name": "xonovex-skill-pi",
-      "source": "./packages/skill/skill-pi",
-      "description": "Xonovex Pi extension skills"
-    },
-    {
-      "name": "xonovex-skill-plan",
-      "source": "./packages/skill/skill-plan",
-      "description": "Xonovex implementation-planning skills"
-    },
-    {
-      "name": "xonovex-skill-pull-request",
-      "source": "./packages/skill/skill-pull-request",
-      "description": "Xonovex Pull request skills"
-    },
-    {
-      "name": "xonovex-skill-python",
-      "source": "./packages/skill/skill-python",
-      "description": "Xonovex Python skills"
-    },
-    {
-      "name": "xonovex-skill-react",
-      "source": "./packages/skill/skill-react",
-      "description": "Xonovex React skills"
-    },
-    {
-      "name": "xonovex-skill-reflect",
-      "source": "./packages/skill/skill-reflect",
-      "description": "Xonovex Reflect skills"
-    },
-    {
-      "name": "xonovex-skill-shell-scripting",
-      "source": "./packages/skill/skill-shell-scripting",
-      "description": "Xonovex Shell scripting skills"
-    },
-    {
-      "name": "xonovex-skill-skill",
-      "source": "./packages/skill/skill-skill",
-      "description": "Xonovex Skill skill: author, extract, assimilate, simplify, validate Agent Skills via progressive disclosure"
-    },
-    {
-      "name": "xonovex-skill-sql-postgresql",
-      "source": "./packages/skill/skill-sql-postgresql",
-      "description": "Xonovex PostgreSQL skills"
-    },
-    {
-      "name": "xonovex-skill-tdd",
-      "source": "./packages/skill/skill-tdd",
-      "description": "Xonovex Test-driven development skills"
-    },
-    {
-      "name": "xonovex-skill-technical-writing",
-      "source": "./packages/skill/skill-technical-writing",
-      "description": "Xonovex Technical writing skills"
-    },
-    {
-      "name": "xonovex-skill-terraform",
-      "source": "./packages/skill/skill-terraform",
-      "description": "Xonovex Terraform skills"
-    },
-    {
-      "name": "xonovex-skill-testing",
-      "source": "./packages/skill/skill-testing",
-      "description": "Xonovex Testing skills"
-    },
-    {
-      "name": "xonovex-skill-threejs",
-      "source": "./packages/skill/skill-threejs",
-      "description": "Xonovex Three.js skills"
-    },
-    {
-      "name": "xonovex-skill-travel-writing",
-      "source": "./packages/skill/skill-travel-writing",
-      "description": "Xonovex travel writing skills"
-    },
-    {
-      "name": "xonovex-skill-typescript",
-      "source": "./packages/skill/skill-typescript",
-      "description": "Xonovex TypeScript skills"
-    },
-    {
-      "name": "xonovex-skill-typescript-to-lua",
-      "source": "./packages/skill/skill-typescript-to-lua",
-      "description": "Xonovex TypeScript to Lua skills"
-    },
-    {
-      "name": "xonovex-skill-user-stories",
-      "source": "./packages/skill/skill-user-stories",
-      "description": "Xonovex User story skills"
-    },
-    {
-      "name": "xonovex-skill-versioning",
-      "source": "./packages/skill/skill-versioning",
-      "description": "Xonovex versioning skills"
-    },
-    {
-      "name": "xonovex-skill-vitest",
-      "source": "./packages/skill/skill-vitest",
-      "description": "Xonovex Vitest skills"
-    },
-    {
-      "name": "xonovex-skill-writing",
-      "source": "./packages/skill/skill-writing",
-      "description": "Xonovex writing skills"
-    },
-    {
-      "name": "xonovex-skill-zod",
-      "source": "./packages/skill/skill-zod",
-      "description": "Xonovex Zod skills"
+      "name": "xonovex-writing",
+      "source": "./packages/runtime/plugin/plugin-writing",
+      "description": "Revise prose and write technical documents, articles, news, and travel guides."
     }
   ]
 }

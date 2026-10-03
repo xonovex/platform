@@ -1,0 +1,10 @@
+{
+  "name": "xonovex-game-engine",
+  "version": "5.3.0",
+  "description": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/",
+  "dependencies": ["xonovex-native"]
+}

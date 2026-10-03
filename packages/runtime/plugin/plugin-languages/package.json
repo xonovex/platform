@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-languages",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "languages"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

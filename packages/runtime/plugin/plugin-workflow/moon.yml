@@ -1,0 +1,13 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin, command]
+tasks:
+  ci-check:
+    deps:
+      - command-validate
+      - build
+      - format-check
+      - skill-plan:ci-check
+      - skill-reflect:ci-check
+    options:
+      mergeDeps: append

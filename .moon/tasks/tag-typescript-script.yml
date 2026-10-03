@@ -31,7 +31,7 @@ tasks:
       - "@globs(sources)"
       - "@globs(tests)"
       - "@globs(configs)"
-      - bin.js
+      - bin*.js
     options:
       mergeDeps: replace
   ts-lint-fix:
@@ -42,7 +42,7 @@ tasks:
       - "@globs(sources)"
       - "@globs(tests)"
       - "@globs(configs)"
-      - bin.js
+      - bin*.js
     options:
       mergeDeps: replace
   ts-typecheck:

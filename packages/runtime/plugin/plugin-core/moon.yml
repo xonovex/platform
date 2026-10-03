@@ -1,0 +1,30 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: unknown
+tags: [plugin, command]
+tasks:
+  ci-check:
+    deps:
+      - command-validate
+      - build
+      - format-check
+      - skill-accessibility:ci-check
+      - skill-bdd:ci-check
+      - skill-code-quality:ci-check
+      - skill-code-review:ci-check
+      - skill-connascence:ci-check
+      - skill-credential-management:ci-check
+      - skill-ddd:ci-check
+      - skill-debugging:ci-check
+      - skill-fp:ci-check
+      - skill-git:ci-check
+      - skill-hexagonal-pattern:ci-check
+      - skill-microkernel-pattern:ci-check
+      - skill-oop:ci-check
+      - skill-orthogonal-pattern:ci-check
+      - skill-pull-request:ci-check
+      - skill-tdd:ci-check
+      - skill-testing:ci-check
+      - skill-user-stories:ci-check
+      - skill-versioning:ci-check
+    options:
+      mergeDeps: append

@@ -1,0 +1,35 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+implicitInputs:
+  - /package-lock.json
+tasks:
+  build:
+    command: noop
+  plugin-format:
+    script: npx prettier --write . --ignore-path "$workspaceRoot/.prettierignore"
+    options:
+      cache: false
+      runInCI: false
+  plugin-format-check:
+    script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
+    inputs: ["**/*.md", "**/*.json", "**/*.yml"]
+  format:
+    command: noop
+    deps: [plugin-format]
+    options:
+      cache: false
+      runInCI: false
+      mergeDeps: append
+  format-check:
+    command: noop
+    deps: [plugin-format-check]
+    options:
+      cache: false
+      mergeDeps: append
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [build, format-check]
+    options:
+      cache: false
+      mergeArgs: replace
+inheritedBy:
+  tag: plugin

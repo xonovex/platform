@@ -2,45 +2,26 @@
 
 ## Structure
 
-Every group directory carries an `AGENTS.md` describing the rules that hold across
-its packages, paired with a `CLAUDE.md` that points at it.
+Every group directory carries an `AGENTS.md` describing the rules that hold across its packages, paired with a `CLAUDE.md` that points at it.
 
 ```
 packages/
-  agent/                # Agent CLI, operator, and delivery packages
-    agent-cli-go/       # Agent sandbox CLI (Go)
-    agent-cli-go-*/     # Platform-specific Go binaries and the GitHub Action wrapper
-    agent-operator-go/  # Kubernetes operator (Go)
-    agent-operator-go-docker/ # Operator image publishing
-  asset/                # Static assets, private and unversioned
-    asset-diagrams/     # Agent sandbox isolation diagrams (.dot sources, rendered PNGs)
-    asset-images/       # Shared images
-  config/               # Shared configuration packages
-    eslint-config-*/    # ESLint configurations
-    ts-config-*/        # TypeScript configurations
-    vitest-config-*/    # Vitest configurations
-    prettier-config/    # Prettier configuration
-    vite-config-base/   # Vite configuration
-  skill/                # Coding guidelines and skills
-    skill-*/            # Skill packages (instructions, references, scripts, and assets)
-  command/              # Workflow and utility commands
-    command-utility/    # Utility commands (content, instructions, slash commands)
-    command-workflow/   # Explicit workflow operation commands
-  script/               # Moon task scripts, each shipping one binary
-    script-moon-*-common/ # Shared script code, shipping no binary
-    script-moon-npm-*/  # Publishing and dependency checks
-    script-moon-version-*/ # Version bump and change detection
-    script-moon-skill-eval-*/ # Skill trigger, routing, and output evaluation
-    script-moon-skill-validate-*/ # Skill spec, link, drift, and routing validation
-    script-moon-*-validate/ # Command and release validation
-  moon/                 # Shared Moon toolchains and task extensions
-    moon-nix-extension/ # Preferred: lazily composed Nix environments
-    moon-nix-runtime/   # Shared runtime for the Nix plugins
-    moon-nix-toolchain/ # Flake-pinned task execution, kept for compatibility
-  shared/               # Shared libraries
-    shared-core/        # Core TypeScript library
-    shared-core-go/     # Core Go library
-    shared-agent-go/    # Shared agent, provider, policy, and provisioning types
+  runtime/
+    plugin/
+      plugin-*/               # Installable groups of related skills and commands
+        skills/*-guide/       # Skill instructions, references, scripts, and evals
+        commands/             # Commands that load skills from the owning plugin
+  tooling/
+    cli/                      # Agent CLI, platform binaries, and GitHub Action
+    script/                   # Moon task binaries and shared script code
+    moon/                     # Nix toolchains, extensions, and their runtime
+  sandbox/
+    operator/                 # Kubernetes agent operator
+    image/                    # Operator image build and publishing
+  library/                    # Shared TypeScript and Go libraries
+  config/                     # Shared configuration packages
+  asset/                      # Private diagrams and images
+
 ```
 
 ## Development
@@ -80,12 +61,7 @@ type(scope): description
 
 ## Version Bump and Release
 
-The repository has three release lines, each versioned in lockstep within itself:
-the skill and command plugin packages, the `npm`-tagged `config` packages together
-with `shared-core`, and the agent CLI with its platform binaries. Version changes
-must be submitted through a reviewed `version packages` pull request. Merging
-that pull request to `main` runs the release workflow; do not publish or tag
-packages directly.
+The repository has three release lines, each versioned in lockstep within itself: the grouped plugin packages, the `npm`-tagged `config` packages together with `shared-core`, and the agent CLI with its platform binaries. Version changes must be submitted through a reviewed `version packages` pull request. Merging that pull request to `main` runs the release workflow; do not publish or tag packages directly.
 
 The versioning workflow:
 
@@ -97,12 +73,11 @@ Changed-version packages are detected by comparing each `package.json` `version`
 
 ## Agent Skills
 
-Each package in `packages/skill/` contains a harness-neutral `SKILL.md` and any
-focused references, scripts, or assets needed by that capability.
+Each plugin in `packages/runtime/plugin/` owns related skills under `skills/` and commands under `commands/`. Each skill keeps its harness-neutral `SKILL.md`, references, scripts, assets, and evaluations together. Skill Moon project identifiers remain `skill-<topic>`; plugin project identifiers are `plugin-<group>`.
 
 ## Code Style
 
-- **Paradigm**: Functional programming (see `packages/skill/skill-fp/fp-guide/SKILL.md`)
+- **Paradigm**: Functional programming (see `packages/runtime/plugin/plugin-core/skills/fp-guide/SKILL.md`)
 - **Imports**: Direct from source, no re-exports
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

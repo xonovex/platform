@@ -1,0 +1,42 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script, typescript-acceptance, typescript-integration]
+dependsOn:
+  - script-moon-common
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/tooling/script/script-moon-common/src/**/*
+tasks:
+  ts-test-integration:
+    inputs:
+      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/*.py
+    options:
+      mergeInputs: append
+  # The acceptance tier asserts against the live skill catalog rather than a
+  # fixture, reading each skill's SKILL.md, eval-queries.json and reference names.
+  # Without these inputs a skill edit leaves this project's hash unchanged and moon
+  # serves the previous pass from cache. The unit tier and its coverage floor read
+  # only fixtures they build, so neither takes these inputs.
+  ts-test-acceptance:
+    inputs:
+      - /packages/runtime/plugin/**/SKILL.md
+      - /packages/runtime/plugin/**/eval-queries.json
+      - /packages/runtime/plugin/**/references/*.md
+  # These floors cover the unit tier alone, and src/trigger-process.ts is spawn
+  # plumbing only test/specs/integration reaches, so the project totals sit lower
+  # than the logic modules do. vitest.config.ts holds the per-file floors that keep
+  # src/trigger-scan.ts and src/validation.ts near full coverage.
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "70"
+      TS_COVERAGE_MIN_FUNCTIONS: "70"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "70"

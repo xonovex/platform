@@ -1,0 +1,44 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/tooling/script/script-moon-common/src/**/*
+    - /packages/tooling/script/script-moon-skill-catalog-common/src/**/*
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "85"
+      TS_COVERAGE_MIN_FUNCTIONS: "90"
+      TS_COVERAGE_MIN_BRANCHES: "75"
+      TS_COVERAGE_MIN_STATEMENTS: "80"
+  composition-check:
+    command:
+      - node
+      - packages/tooling/script/script-moon-skill-validate-links/dist/src/index.js
+      - .
+    deps: [build]
+    inputs:
+      - /packages/runtime/plugin/*/package.json
+      - /packages/runtime/plugin/*/.claude-plugin/plugin.json
+      - /packages/runtime/plugin/*/.codex-plugin/plugin.json
+      - /packages/runtime/plugin/*/skills/*/SKILL.md
+      - /packages/runtime/plugin/*/skills/*/SOURCES.md
+      - /packages/runtime/plugin/*/skills/*/references/*.md
+    options:
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps: [composition-check]
+    options:
+      mergeDeps: append

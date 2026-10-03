@@ -2,16 +2,92 @@ $schema: https://moonrepo.dev/schemas/workspace.json
 projects:
   globs:
     - packages/asset/*
-    - packages/skill/*
-    - packages/command/*
     - packages/config/*
-    - packages/agent/*
-    - packages/shared/*
-    - packages/script/*
-    - packages/moon/*
+    - packages/library/*
+    - packages/runtime/plugin/*
+    - packages/tooling/cli/*
+    - packages/tooling/script/*
+    - packages/tooling/moon/*
+    - packages/sandbox/operator/*
+    - packages/sandbox/image/*
     # Project globs exclude tenant files so discovered locations stay directories.
     - "!**/*.md"
   sources:
+    skill-accessibility: packages/runtime/plugin/plugin-core/skills/accessibility-guide
+    skill-asset-pipeline: packages/runtime/plugin/plugin-game-engine/skills/asset-pipeline-guide
+    skill-astro: packages/runtime/plugin/plugin-typescript/skills/astro-guide
+    skill-audio: packages/runtime/plugin/plugin-game-engine/skills/audio-guide
+    skill-bdd: packages/runtime/plugin/plugin-core/skills/bdd-guide
+    skill-c99: packages/runtime/plugin/plugin-native/skills/c99-guide
+    skill-c99-game-opinionated: packages/runtime/plugin/plugin-game-engine/skills/c99-game-opinionated-guide
+    skill-c99-opinionated: packages/runtime/plugin/plugin-native/skills/c99-opinionated-guide
+    skill-claude-code: packages/runtime/plugin/plugin-agentic/skills/claude-code-guide
+    skill-cmake: packages/runtime/plugin/plugin-native/skills/cmake-guide
+    skill-code-quality: packages/runtime/plugin/plugin-core/skills/code-quality-guide
+    skill-code-review: packages/runtime/plugin/plugin-core/skills/code-review-guide
+    skill-codex: packages/runtime/plugin/plugin-agentic/skills/codex-guide
+    skill-command: packages/runtime/plugin/plugin-agentic/skills/command-guide
+    skill-connascence: packages/runtime/plugin/plugin-core/skills/connascence-guide
+    skill-copilot: packages/runtime/plugin/plugin-agentic/skills/copilot-guide
+    skill-credential-management: packages/runtime/plugin/plugin-core/skills/credential-management-guide
+    skill-cross-platform: packages/runtime/plugin/plugin-native/skills/cross-platform-guide
+    skill-data-model: packages/runtime/plugin/plugin-game-engine/skills/data-model-guide
+    skill-data-oriented-design: packages/runtime/plugin/plugin-native/skills/data-oriented-design-guide
+    skill-ddd: packages/runtime/plugin/plugin-core/skills/ddd-guide
+    skill-debugging: packages/runtime/plugin/plugin-core/skills/debugging-guide
+    skill-docker: packages/runtime/plugin/plugin-platform/skills/docker-guide
+    skill-ecs: packages/runtime/plugin/plugin-game-engine/skills/ecs-guide
+    skill-editor-viewport: packages/runtime/plugin/plugin-game-engine/skills/editor-viewport-guide
+    skill-editorial-writing: packages/runtime/plugin/plugin-writing/skills/editorial-writing-guide
+    skill-fp: packages/runtime/plugin/plugin-core/skills/fp-guide
+    skill-game-networking: packages/runtime/plugin/plugin-game-engine/skills/game-networking-guide
+    skill-git: packages/runtime/plugin/plugin-core/skills/git-guide
+    skill-github: packages/runtime/plugin/plugin-integrations/skills/github-guide
+    skill-gitlab: packages/runtime/plugin/plugin-integrations/skills/gitlab-guide
+    skill-gpu-rendering: packages/runtime/plugin/plugin-game-engine/skills/gpu-rendering-guide
+    skill-gpu-rendering-vulkan: packages/runtime/plugin/plugin-game-engine/skills/gpu-rendering-vulkan-guide
+    skill-hexagonal-pattern: packages/runtime/plugin/plugin-core/skills/hexagonal-pattern-guide
+    skill-hono: packages/runtime/plugin/plugin-typescript/skills/hono-guide
+    skill-hono-opinionated: packages/runtime/plugin/plugin-typescript/skills/hono-opinionated-guide
+    skill-imgui: packages/runtime/plugin/plugin-game-engine/skills/imgui-guide
+    skill-instruction: packages/runtime/plugin/plugin-agentic/skills/instruction-guide
+    skill-kiro: packages/runtime/plugin/plugin-agentic/skills/kiro-guide
+    skill-kubernetes: packages/runtime/plugin/plugin-platform/skills/kubernetes-guide
+    skill-llmstxt: packages/runtime/plugin/plugin-agentic/skills/llmstxt-guide
+    skill-lock-free: packages/runtime/plugin/plugin-native/skills/lock-free-guide
+    skill-lua: packages/runtime/plugin/plugin-languages/skills/lua-guide
+    skill-lua-opinionated: packages/runtime/plugin/plugin-languages/skills/lua-opinionated-guide
+    skill-memory-management: packages/runtime/plugin/plugin-native/skills/memory-management-guide
+    skill-microkernel-pattern: packages/runtime/plugin/plugin-core/skills/microkernel-pattern-guide
+    skill-moon: packages/runtime/plugin/plugin-platform/skills/moon-guide
+    skill-news-writing: packages/runtime/plugin/plugin-writing/skills/news-writing-guide
+    skill-node-graph: packages/runtime/plugin/plugin-game-engine/skills/node-graph-guide
+    skill-npm: packages/runtime/plugin/plugin-typescript/skills/npm-guide
+    skill-oop: packages/runtime/plugin/plugin-core/skills/oop-guide
+    skill-opencode: packages/runtime/plugin/plugin-agentic/skills/opencode-guide
+    skill-orthogonal-pattern: packages/runtime/plugin/plugin-core/skills/orthogonal-pattern-guide
+    skill-pi: packages/runtime/plugin/plugin-agentic/skills/pi-guide
+    skill-plan: packages/runtime/plugin/plugin-workflow/skills/plan-guide
+    skill-pull-request: packages/runtime/plugin/plugin-core/skills/pull-request-guide
+    skill-python: packages/runtime/plugin/plugin-languages/skills/python-guide
+    skill-react: packages/runtime/plugin/plugin-typescript/skills/react-guide
+    skill-reflect: packages/runtime/plugin/plugin-workflow/skills/reflect-guide
+    skill-shell-scripting: packages/runtime/plugin/plugin-languages/skills/shell-scripting-guide
+    skill-skill: packages/runtime/plugin/plugin-agentic/skills/skill-guide
+    skill-sql-postgresql: packages/runtime/plugin/plugin-languages/skills/sql-postgresql-guide
+    skill-tdd: packages/runtime/plugin/plugin-core/skills/tdd-guide
+    skill-technical-writing: packages/runtime/plugin/plugin-writing/skills/technical-writing-guide
+    skill-terraform: packages/runtime/plugin/plugin-platform/skills/terraform-guide
+    skill-testing: packages/runtime/plugin/plugin-core/skills/testing-guide
+    skill-threejs: packages/runtime/plugin/plugin-typescript/skills/threejs-guide
+    skill-travel-writing: packages/runtime/plugin/plugin-writing/skills/travel-writing-guide
+    skill-typescript: packages/runtime/plugin/plugin-typescript/skills/typescript-guide
+    skill-typescript-to-lua: packages/runtime/plugin/plugin-languages/skills/typescript-to-lua-guide
+    skill-user-stories: packages/runtime/plugin/plugin-core/skills/user-stories-guide
+    skill-versioning: packages/runtime/plugin/plugin-core/skills/versioning-guide
+    skill-vitest: packages/runtime/plugin/plugin-typescript/skills/vitest-guide
+    skill-writing: packages/runtime/plugin/plugin-writing/skills/writing-guide
+    skill-zod: packages/runtime/plugin/plugin-typescript/skills/zod-guide
     github-actions: .github
     gitlab-ci: .gitlab
     repository-shell: .hooks

@@ -1,0 +1,49 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script, typescript-acceptance]
+dependsOn:
+  - script-moon-common
+  - script-moon-skill-catalog-common
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/tooling/script/script-moon-common/src/**/*
+    - /packages/tooling/script/script-moon-skill-catalog-common/src/**/*
+tasks:
+  coverage:
+    command: noop
+    deps: [ts-coverage]
+    options:
+      cache: false
+  ts-test:
+    inputs:
+      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/assets/**/*
+      # index.test.ts validates these two skills as they stand in the catalog, so
+      # an edit to either must invalidate this project's cached result.
+      - /packages/runtime/plugin/plugin-core/**/*
+      - /packages/runtime/plugin/plugin-agentic/**/*
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "75"
+      TS_COVERAGE_MIN_FUNCTIONS: "89"
+      TS_COVERAGE_MIN_BRANCHES: "60"
+      TS_COVERAGE_MIN_STATEMENTS: "75"
+    inputs:
+      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/assets/**/*
+      # index.test.ts validates these two skills as they stand in the catalog, so
+      # an edit to either must invalidate this project's cached result.
+      - /packages/runtime/plugin/plugin-core/**/*
+      - /packages/runtime/plugin/plugin-agentic/**/*
+  # The acceptance tier validates the catalog's own skill packages and the shipped
+  # templates rather than a fixture, so a catalog edit has to change this project's
+  # hash or moon serves the previous pass from cache.
+  ts-test-acceptance:
+    inputs:
+      - /packages/runtime/plugin/**/*

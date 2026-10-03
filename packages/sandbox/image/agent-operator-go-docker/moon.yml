@@ -1,0 +1,71 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: bash
+tags: [shell]
+layer: unknown
+dependsOn:
+  - agent-operator-go
+fileGroups:
+  operator-image:
+    - /packages/sandbox/operator/agent-operator-go/Dockerfile
+    - /packages/sandbox/operator/agent-operator-go/**/*.go
+    - /packages/sandbox/operator/agent-operator-go/go.mod
+    - /packages/sandbox/operator/agent-operator-go/go.sum
+    - /packages/library/shared-agent-go/**/*.go
+    - /packages/library/shared-agent-go/go.mod
+    - /packages/library/shared-agent-go/go.sum
+    - /packages/library/shared-core-go/**/*.go
+    - /packages/library/shared-core-go/go.mod
+    - /packages/library/shared-core-go/go.sum
+tasks:
+  docker-build:
+    script: bash packages/sandbox/image/agent-operator-go-docker/scripts/docker-build.sh "$workspaceRoot"
+    deps:
+      - agent-operator-go:go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(operator-image)"
+      - /packages/sandbox/operator/agent-operator-go/Dockerfile
+      - /packages/sandbox/operator/agent-operator-go/go.mod
+      - /packages/sandbox/operator/agent-operator-go/go.sum
+      - /packages/library/shared-agent-go/go.mod
+      - /packages/library/shared-agent-go/go.sum
+      - /packages/library/shared-core-go/go.mod
+      - /packages/library/shared-core-go/go.sum
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: true
+  docker-publish:
+    script: bash packages/sandbox/image/agent-operator-go-docker/scripts/docker-publish.sh "$workspaceRoot"
+    deps:
+      - agent-operator-go:go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(operator-image)"
+      - /packages/sandbox/operator/agent-operator-go/Dockerfile
+      - /packages/sandbox/operator/agent-operator-go/go.mod
+      - /packages/sandbox/operator/agent-operator-go/go.sum
+      - /packages/library/shared-agent-go/go.mod
+      - /packages/library/shared-agent-go/go.sum
+      - /packages/library/shared-core-go/go.mod
+      - /packages/library/shared-core-go/go.sum
+    outputs: []
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: true
+  ci-publish:
+    command: echo 'ci-publish complete'
+    deps:
+      - docker-publish
+    options:
+      cache: false
+      runInCI: true
+  ci-publish-dry-run:
+    command: echo 'ci-publish complete'
+    deps:
+      - docker-build
+    options:
+      cache: false
+      runInCI: true

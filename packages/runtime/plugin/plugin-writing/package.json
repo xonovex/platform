@@ -1,0 +1,16 @@
+{
+  "name": "@xonovex/plugin-writing",
+  "version": "5.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Revise prose and write technical documents, articles, news, and travel guides.",
+  "keywords": [
+    "xonovex",
+    "plugin",
+    "writing"
+  ],
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  }
+}

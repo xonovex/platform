@@ -1,0 +1,9 @@
+{
+  "name": "xonovex-workflow",
+  "version": "5.3.0",
+  "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
+  "author": {
+    "name": "Xonovex"
+  },
+  "skills": "./skills/"
+}
