@@ -5,6 +5,8 @@ description: "Use when editing or reviewing TypeScript in Node.js ESM projects. 
 
 # TypeScript Coding Guidelines
 
+Write strict TypeScript modules with explicit types, direct imports, and checked errors.
+
 ## Requirements
 
 - Node.js ESM, TypeScript ≥ 5.8, Vitest ≥ 3, Zod ≥ 4.

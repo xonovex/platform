@@ -5,6 +5,8 @@ description: "Use when editing C99 game-engine or runtime code in projects that 
 
 # C99 Game Engine Opinionated Guidelines
 
+Build C99 game runtimes with caller-owned memory, contiguous data, and explicit engine boundaries. Apply **c99-guide** for the shared C99 foundation.
+
 ## Requirements
 
 - **Overlay on c99-guide** - This guide carries only the game/engine opinionated decisions; for generic C99 idioms: `const`-correctness, designated initializers (ZII), fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **c99-guide**

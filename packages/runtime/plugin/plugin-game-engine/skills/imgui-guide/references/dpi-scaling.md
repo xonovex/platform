@@ -1,7 +1,5 @@
 # dpi-scaling: Own Per-Monitor DPI Scaling
 
-## Guideline
-
 The application owns DPI scaling, not the OS. Lay out the UI in virtual coordinates (1:1 at 100% / 96 DPI), apply the per-monitor scale at the edges (vertex shader and rect conversion), and key the font atlas by DPI so text stays sharp. Per-monitor awareness matters because a window can straddle or move between monitors with different DPIs.
 
 ## How to Apply

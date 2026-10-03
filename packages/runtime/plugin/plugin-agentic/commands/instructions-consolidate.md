@@ -15,6 +15,8 @@ argument-hint: "[--dry-run] [--path <directory>]"
 
 # /xonovex-agentic:instructions-consolidate - Consolidate project instruction files
 
+Remove redundant instruction files and keep each rule in the directory that owns it.
+
 ## Arguments
 
 - `--dry-run` (optional): Preview without modifying
@@ -22,6 +24,4 @@ argument-hint: "[--dry-run] [--path <directory>]"
 
 ## Delegation
 
-Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its
-**consolidate** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its **consolidate** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

@@ -1,5 +1,7 @@
 # Automation, Rotation, and Exposure Response
 
+Use short-lived identities for automation where possible and keep rotation, revocation, and exposure response tied to every credential consumer.
+
 ## CI and services
 
 Prefer a job-scoped workload identity or managed identity. Constrain its trust policy to the intended repository, workflow, ref, environment, audience, and subject, then grant only the target permissions needed by that job.

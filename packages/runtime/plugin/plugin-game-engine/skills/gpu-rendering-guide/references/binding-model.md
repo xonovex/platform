@@ -1,7 +1,5 @@
 # binding-model: Pipeline State and the Descriptor/Binding Model
 
-## Guideline
-
 Bake render state into immutable pipeline-state objects that are precompiled and cached so no compile happens on the hot path; describe shader resource access with binding groups organized by update frequency; prefer large bindless arrays indexed by handle for material/texture access; and route small, frequently-changing per-draw data through inline constants instead of binding updates.
 
 ## Rationale

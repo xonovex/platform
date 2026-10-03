@@ -1,7 +1,5 @@
 # references-and-ownership: Stable Ids, Ownership, and Resolving References
 
-## Guideline
-
 Link objects to each other by a stable id (local id within a file, GUID across files/sessions), never by raw pointer, and distinguish owning sub-objects (strong) from non-owning references (weak) so deletion has well-defined, dangle-free semantics.
 
 ## Rationale

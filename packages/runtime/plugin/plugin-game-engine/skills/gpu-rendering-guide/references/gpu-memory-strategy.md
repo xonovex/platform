@@ -1,7 +1,5 @@
 # gpu-memory-strategy: GPU Memory Strategy and Uploads
 
-## Guideline
-
 Allocate a small number of large GPU memory blocks and sub-allocate resources out of them with correct placement alignment; choose the memory tier by access pattern (device-local for GPU-resident data, host-visible for CPU-written data); upload static data through a staging buffer into device-local memory; keep dynamic per-frame data in persistently-mapped ring buffers, never one allocation per resource.
 
 ## Rationale

@@ -1,7 +1,5 @@
 # dev-iteration-and-observability: Virtual Networking, Latency Simulation, and Packet Inspection
 
-## Guideline
-
 Make multiplayer debuggable and iterable by abstracting the wire behind the network API so many nodes can run in one process and behave like remote machines, by simulating adverse conditions (added latency, bandwidth caps) on demand, by exposing a packet inspector for acks/order/counts, and by letting one project run single-player or multiplayer through a topology branch with no code changes.
 
 ## Rationale

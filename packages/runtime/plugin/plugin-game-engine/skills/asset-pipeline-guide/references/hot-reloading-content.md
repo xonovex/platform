@@ -1,7 +1,5 @@
 # hot-reloading-content: Watching, Recompiling, and Swapping Live Runtime Data
 
-## Guideline
-
 Watch source files for changes, recompile only the affected dependency closure in the background, then publish the new runtime resource and atomically repoint references: retiring the old version only once no in-flight work still reads it, so content updates while the running application stays live.
 
 ## Rationale

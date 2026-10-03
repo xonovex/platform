@@ -1,5 +1,7 @@
 # instruction-patterns: Structural Patterns for Skill Bodies
 
+Choose templates, checklists, and validation loops that make the required output and procedure explicit.
+
 ## Contents
 
 [Templates for Output Format](#templates-for-output-format) · [Checklists for Multi-Step Workflows](#checklists-for-multi-step-workflows) · [Validation Loops](#validation-loops) · [Plan-Validate-Execute](#plan-validate-execute) · [When to Use Which](#when-to-use-which) · [Gotchas](#gotchas)

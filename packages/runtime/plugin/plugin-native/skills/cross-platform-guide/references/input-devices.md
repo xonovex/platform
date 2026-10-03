@@ -1,7 +1,5 @@
 # input-devices: Enumerating and Reading Input Devices
 
-## Guideline
-
 Treat device input as another platform backend behind the input-source interface: enumerate devices via the OS's device directory (on Linux, evdev nodes under `/dev/input`, preferring stable `by-id`/`by-path` symlinks), probe capabilities before trusting a device, read events non-blocking, detect hotplug by watching the device directory, and translate raw OS codes to your engine's buttons/axes through a data-driven mapping table rather than scattered conditionals.
 
 ## How to Apply

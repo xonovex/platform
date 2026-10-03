@@ -1,7 +1,5 @@
 # device-and-queues: Instance, Device, and Queue Families
 
-## Guideline
-
 Create a `VkInstance`, select a `VkPhysicalDevice`, create a logical `VkDevice` with the queues you need, and pick queue families by capability: a graphics family, and where the hardware exposes them a dedicated async-compute and a dedicated transfer family. Requesting only the features/extensions you use.
 
 ## Rationale

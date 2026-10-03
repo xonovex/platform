@@ -1,7 +1,5 @@
 # change-tracking-and-sync: Mirroring ECS State to External Systems
 
-## Guideline
-
 When a stateful external system (physics, renderer, audio) must mirror ECS data, default to re-pushing the matching entities every frame; add change-tracking machinery only where profiling shows the external call dominates. Never propagate changes through observer callbacks in parallel systems.
 
 ## Rationale

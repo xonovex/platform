@@ -1,6 +1,6 @@
 # @xonovex/prettier-config
 
-Use this package to apply the shared Xonovex Prettier configuration to a project.
+Use this package to apply the shared Xonovex Prettier configuration to a project. Current Markdown uses one line per paragraph or list item. Fenced examples keep their literal formatting; changelogs, provenance files, plans, and test fixtures keep their existing prose layout.
 
 ## Installation
 

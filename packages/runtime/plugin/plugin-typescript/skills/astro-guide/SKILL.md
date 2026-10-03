@@ -5,6 +5,8 @@ description: "Use when editing or scaffolding Astro sites with islands architect
 
 # Astro Coding Guidelines
 
+Build Astro pages as static HTML and hydrate only the components that need client interaction.
+
 ## Essentials
 
 - **Islands architecture** - Default to static HTML, hydrate only where needed, see [references/islands-architecture.md](references/islands-architecture.md)

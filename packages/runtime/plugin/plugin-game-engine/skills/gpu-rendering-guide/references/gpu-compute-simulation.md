@@ -1,7 +1,5 @@
 # gpu-compute-simulation: GPU-Resident Simulation with Compute
 
-## Guideline
-
 For large element counts (particles, agents, cloth), keep the simulation state resident in GPU storage buffers, advance it with compute dispatches, and let the GPU drive its own draw/dispatch counts via indirect arguments, so the CPU never enumerates elements or stalls on readback.
 
 ## Rationale

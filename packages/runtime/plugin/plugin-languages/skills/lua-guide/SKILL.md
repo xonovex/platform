@@ -5,6 +5,8 @@ description: "Use when editing general-purpose Lua 5.4+: modules, scripts, confi
 
 # Lua Coding Guidelines
 
+Write Lua modules with local state, explicit error handling, and clear interfaces.
+
 ## Requirements
 
 - Lua ≥ 5.4.

@@ -1,7 +1,5 @@
 # typing-and-connections: Pin Types, Connection Validity, Conversions, and Variant Nodes
 
-## Guideline
-
 Give every pin a stable type identity (a type hash), permit a wire only when the producer's output type satisfies the consumer's input type, insert explicit conversion nodes instead of silently coercing, and let a node resolve concrete pin types from what is wired into it when it is genuinely polymorphic.
 
 ## Rationale

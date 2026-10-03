@@ -1,0 +1,38 @@
+digraph diagram {
+  graph [bgcolor="white", rankdir=TB, pad=0.25, nodesep=0.4, ranksep=0.4, splines=polyline]
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=17, color="#0063d3", fillcolor="#eef6ff", fontcolor="#1d253c", margin="0.22,0.16", group=steps]
+  edge [fontname="DejaVu Sans", fontsize=16, color="#3f5f90", fontcolor="#1d253c", penwidth=1.5, arrowsize=0.7]
+
+  next [label="Select target\nLoad plan context and skills"]
+  implement [label="Implement one target: /plan-continue\nSupervise a roadmap: /plan-delegate"]
+  validate [label="Validate\nChecks and success criteria"]
+  gates [label="Gates\npass?", shape=diamond, style=filled, fillcolor="#fff3bf", color="#a76d00", margin="0.14,0.06"]
+  update [label="/plan-update\nRecord progress and evidence\nPersist separately when requested"]
+  complete [label="Development complete\nContinue to quality review", fillcolor="#fff3bf", color="#a76d00"]
+
+  node [shape=point, width=0, height=0, label="", style=invis]
+  resume_top [group=resume]
+  resume_bottom [group=resume]
+  retry_top [group=retry]
+  retry_bottom [group=retry]
+
+  { rank=same; resume_top; next }
+  { rank=same; implement; retry_top }
+  { rank=same; gates; retry_bottom }
+  { rank=same; resume_bottom; update }
+
+  next -> implement -> validate -> gates [weight=20]
+  gates -> update [label="Yes"]
+  update -> complete [label="All subplans complete"]
+
+  resume_bottom -> update [style=invis]
+  implement -> retry_top [style=invis]
+
+  edge [color="#a76d00", style=dashed]
+  gates:e -> retry_bottom [arrowhead=none, constraint=false]
+  retry_top -> retry_bottom [label="No: fix\nand retry", arrowhead=none, weight=20]
+  retry_top -> implement:e [constraint=false]
+  update:w -> resume_bottom [arrowhead=none, constraint=false]
+  resume_top -> resume_bottom [label="More targets:\nresume context", arrowhead=none, weight=20]
+  resume_top -> next:w
+}

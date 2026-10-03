@@ -1,7 +1,5 @@
 # progress-guarantees: Progress Guarantees
 
-## Guideline
-
 Classify every concurrent algorithm by its progress guarantee, and only pay for a stronger one when the workload demands it.
 
 ## Rationale

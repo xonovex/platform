@@ -1,7 +1,5 @@
 # raw-vs-runtime-formats: Separating Editable Source From Compiled Runtime Data
 
-## Guideline
-
 Keep two distinct representations of every asset: an editable raw/intermediate form that stays as close as possible to the original authored file, and a derived runtime form produced by a compile step, and never let runtime data be edited directly or treated as the source of truth.
 
 ## Rationale

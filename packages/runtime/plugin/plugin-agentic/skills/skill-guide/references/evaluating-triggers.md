@@ -1,5 +1,7 @@
 # evaluating-triggers: Eval-Driven Trigger-Rate Optimization
 
+Measure whether the skill activates on realistic intended requests and stays inactive on near misses.
+
 ## Scope
 
 This is about **whether the skill activates** for a given prompt, not whether its outputs are good once activated.

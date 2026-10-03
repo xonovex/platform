@@ -12,7 +12,7 @@ argument-hint: "[plan-file] [reason]"
 
 # /xonovex-workflow:plan-reject - Reject a Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → **reject** → (revise / discard)
+Record plan rejection and its reason while preserving the plan for revision or review.
 
 ## Arguments
 
@@ -21,6 +21,4 @@ argument-hint: "[plan-file] [reason]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**reject** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **reject** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

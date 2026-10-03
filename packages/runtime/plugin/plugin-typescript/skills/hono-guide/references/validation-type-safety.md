@@ -1,7 +1,5 @@
 # validation-type-safety: Request Validation and Type Safety with Zod
 
-## Guideline
-
 Chain `zValidator` inline on the route so `c.req.valid('json')` is typed by inference through the route generics, no cast. Only when a controller is imported from a separate file and receives the base `Context` (where inference cannot flow) fall back to casting `c.req.valid`, and treat that cast as an unchecked assertion that can hide schema/type drift.
 
 Chaining threads the schema's inferred type into the handler's `Context` generics; a separately-imported controller sees only the base `Context`, whose `c.req.valid()` returns `any`. Schema design (`z.infer`, `safeParse`, transforms, refinements) belongs to **zod-guide**. This file covers only the Hono glue.

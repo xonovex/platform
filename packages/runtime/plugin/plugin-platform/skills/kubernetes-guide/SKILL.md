@@ -5,6 +5,8 @@ description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on
 
 # Kubernetes Coding Guidelines
 
+Manage Kubernetes workloads through declarative manifests with explicit resource, rollout, and security settings.
+
 ## Requirements
 
 - Kubernetes ≥ 1.28, Kustomize ≥ 5, GitOps (Flux).

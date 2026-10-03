@@ -5,6 +5,8 @@ description: "Use when designing a central in-memory data model / object databas
 
 # Data-Model Guidelines
 
+Keep editor and tool state in one typed object model with stable identity, explicit ownership, and reversible changes.
+
 ## Essentials
 
 - **One central model** - Route tool/editor state through a single typed object store, not scattered structs, see [references/object-model.md](references/object-model.md)

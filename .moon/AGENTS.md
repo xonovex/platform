@@ -1,5 +1,7 @@
 # Moon Configuration
 
+Define tasks through shared tags, declare their inputs and outputs, and keep the continuous integration check closure free of external side effects.
+
 - Tasks inherit from `tasks/tag-*.yml` based on `tags` in `moon.yml`
 - Tags: `cli`, `command`, `go`, `npm`, `shell`, `skill`, `tsconfig`, `typescript-config`, `typescript-integration`, `typescript-script`, `typescript`
 - TypeScript specs live in `test/specs/<tier>/`, never beside the source: `unit` is what `ci-check` runs, `integration` is the `typescript-integration` tier for cases that spawn a process. `tsconfig.json` covers `src` and `test` for typecheck; `tsconfig.build.json` narrows to `src` so `dist` holds no specs, and it must restate `include` and `references` because `extends` inherits neither.

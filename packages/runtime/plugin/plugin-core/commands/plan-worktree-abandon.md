@@ -11,6 +11,8 @@ argument-hint: "[reason] [--remove-worktree] [--no-plan] [--commit] [--dry-run]"
 
 # /xonovex-core:plan-worktree-abandon - Abandon Feature with Documentation
 
+Record why feature work stops and preserve its lessons before abandoning the worktree.
+
 ## Arguments
 
 - `reason` (optional): Concise reason for abandonment (prompted if not provided)
@@ -21,6 +23,4 @@ argument-hint: "[reason] [--remove-worktree] [--no-plan] [--commit] [--dry-run]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its
-**worktree-abandon** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-abandon** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

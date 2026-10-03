@@ -1,7 +1,5 @@
 # create: open a pull request on GitHub
 
-## Guideline
-
 Push the branch (that's `git-guide`'s job, prerequisite: clean branch rebased onto the latest target), then open the PR with `gh pr create`, which auto-pushes the source branch if the remote ref is missing (prompting where to push / offering to fork) and sets reviewers/labels/assignees in one call. The raw `POST /repos/{owner}/{repo}/pulls` does none of that. The PR description content is `pull-request-guide`'s.
 
 ## `gh pr create` flags

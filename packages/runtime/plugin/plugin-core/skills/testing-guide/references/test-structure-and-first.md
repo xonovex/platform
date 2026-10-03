@@ -1,5 +1,7 @@
 # test-structure-and-first: AAA / Four-Phase Shape and the FIRST Qualities
 
+Arrange one scenario, perform one action, and assert its result; release any external resources the test acquires.
+
 ## Arrange-Act-Assert
 
 1. **Arrange**: build the SUT and inputs, wire up doubles, set starting state.

@@ -14,6 +14,8 @@ argument-hint: "[source] [--name <name>] [--dry-run]"
 
 # /xonovex-agentic:skill-create - Create Guideline Skill from Document
 
+Create a reusable guideline skill from the supplied document or URL.
+
 ## Arguments
 
 - `source` (required): URL or file path to the source document
@@ -22,6 +24,4 @@ argument-hint: "[source] [--name <name>] [--dry-run]"
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its
-**create** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

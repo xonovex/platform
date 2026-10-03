@@ -1,5 +1,7 @@
 # Claude Code Transactional Onboarding
 
+Inspect the installed Claude Code runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover and diagnose
 
 - Run `claude --version`; record absence as `not-installed`.

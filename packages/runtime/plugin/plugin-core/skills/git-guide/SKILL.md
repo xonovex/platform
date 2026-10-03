@@ -5,6 +5,8 @@ description: "Use when running git operations or resolving repo-state issues. Tr
 
 # Git Guidelines
 
+Create conventional commits, resolve conflicts, and manage worktrees with explicit validation and publication steps.
+
 ## Core Principles
 
 - **Conventional Commits** - Use type prefixes (feat, fix, chore, docs, refactor, test, ci), see [references/commit.md](references/commit.md)

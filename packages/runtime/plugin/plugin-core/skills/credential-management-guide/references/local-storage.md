@@ -1,5 +1,7 @@
 # Local Credential Storage
 
+Keep local credentials in the operating system keychain or an approved secret manager and inject them only where needed.
+
 ## Preferred stores
 
 - **macOS** - Use the login Keychain through a provider CLI or `security`. Store with a hidden prompt; retrieve by stable service and account attributes.

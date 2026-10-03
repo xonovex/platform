@@ -1,7 +1,5 @@
 # object-picking: GPU Id-Buffer Picking and Read-Back
 
-## Guideline
-
 To find what the user clicked, render each object's stable id into a GPU buffer during a picking pass and read back the single pixel under the cursor asynchronously, instead of CPU ray-casting against physics or acceleration-structure proxies, so picking is pixel-perfect, matches exactly what is drawn (alpha masks, skinning, deformation, voxels), and needs no separate spatial structure. CPU ray picking silently fails for anything without a proxy (alpha-cut foliage, GPU-skinned characters, voxel terrain); a synchronous read-back the same frame flushes the pipeline, so queue it and consume it a frame or two later.
 
 ## How to Apply

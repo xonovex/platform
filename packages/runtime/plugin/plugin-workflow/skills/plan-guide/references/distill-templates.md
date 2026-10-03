@@ -1,8 +1,6 @@
 # Distill Templates: Suite File Skeletons
 
-The layout follows the portable Agent Skills convention: a directory per skill, `SKILL.md` with
-`name`/`description` frontmatter, supporting files alongside, placed in whatever skills directory
-the consuming harness reads.
+The layout follows the portable Agent Skills convention: a directory per skill, `SKILL.md` with `name`/`description` frontmatter, supporting files alongside, placed in whatever skills directory the consuming harness reads.
 
 ## Suite layout
 

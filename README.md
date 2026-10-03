@@ -1,19 +1,23 @@
 # Xonovex Platform Monorepo
 
+Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills and commands.
+
 ![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.26%2B-00ADD8)
 
-> Run AI coding agents with explicit sandbox, provider, workspace, toolchain, and orchestration controls.
+## Choose an entry point
 
-Use the Agent CLI for local runs, the Agent Operator for policy-governed Kubernetes Jobs, and the plugin catalog for reusable commands and skills.
+Choose the component that matches the task. Skills provide instructions and supporting resources; installed guidance alone does not enforce a policy.
 
-Xonovex supports [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenCode](https://github.com/anomalyco/opencode). It provides bubblewrap and Docker sandboxes, gVisor and Kata Containers isolation, [Confidential Containers (CoCo)](https://github.com/confidential-containers) with AMD SEV-SNP and Intel TDX, model routing through providers such as Gemini, GLM, and GPT, Git and [Jujutsu](https://github.com/jj-vcs/jj) workspaces, Nix toolchains, and Kubernetes orchestration.
+| Task | Start here |
+| --- | --- |
+| Run Claude Code or OpenCode locally | [Agent CLI](packages/tooling/cli/agent-cli-go/README.md) |
+| Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
+| Install skills and commands | [Plugin catalog](#agent-plugins) |
+| Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
+| Run Moon tasks in pinned Nix environments | [Moon Nix toolchain](packages/tooling/moon/moon-nix-toolchain/README.md) |
+| Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
-The included skills are token-efficient, harness-neutral, and based on current research and best practices (Agent Skills spec, agentskills.io, agents.md). Skills provide instructions, references, scripts, and setup capabilities; installing one is not proof that a policy executes or blocks an action.
-
-- **[agent-cli-go](packages/tooling/cli/agent-cli-go/)** configures sandboxes, providers, and terminal sessions, then launches the agent
-- **[agent-operator-go](packages/sandbox/operator/agent-operator-go/)** orchestrates agents as Kubernetes Jobs with managed workspaces, provider secrets, shared multi-agent workspaces, namespace-level policy enforcement, network isolation, and Nix toolchain provisioning
-- **[moon-nix-toolchain](packages/tooling/moon/moon-nix-toolchain/)** wraps every Moon task in the repository's Nix flake dev shell, giving reproducible flake-pinned toolchains in local runs, pre-commit hooks, and CI
-- **[Plugins](packages/runtime/plugin/)** give agents coding guidelines they follow automatically; plan-driven development with worktrees, project-instruction management, insight extraction, and skill authoring live in grouped plugins
+The CLI and operator support Claude Code and OpenCode, model-provider routing, Git and Jujutsu workspaces, and Nix provisioning. The CLI offers bubblewrap and Docker isolation. The operator uses cluster-provided gVisor, Kata, and Confidential Containers runtime classes. Each component documents its requirements and guarantees.
 
 ## Quick Start
 
@@ -28,7 +32,7 @@ npm install -g @xonovex/agent-cli-go
 agent-cli run --agent claude --isolation bwrap --provider gemini
 ```
 
-Select the sandbox with three independent axes: `--isolation {none,bwrap,docker}`, `--provision {none,nix,command}`, and `--network {host,none,proxy}`. See `packages/tooling/cli/AGENTS.md` for the complete model.
+Select isolation, provisioning, and network behavior independently. Use `agent-cli run --dry-run` to inspect the resolved configuration. The [CLI reference](packages/tooling/cli/agent-cli-go/README.md#run) lists supported flags, and the [agent execution policy](packages/AGENTS.md#agent-execution-policy) defines the guarantees.
 
 ![Three Claude Code agents in a tiled tmux session, each in its own git worktree: one under bwrap, one under bwrap with a Nix-provisioned toolchain, and one under Docker, routed to two different model providers](packages/asset/asset-images/multiple-agents.png)
 
@@ -36,107 +40,24 @@ Each pane is a separate worktree with its own axis combination and provider, so 
 
 ### Agent Kubernetes Operator
 
-Install the operator only after the cluster has a digest-pinned agent image and a sandboxed RuntimeClass such as gVisor or Kata. Set these variables to values available in the cluster.
-
-```bash
-export XONOVEX_AGENT_IMAGE='ghcr.io/your-org/xonovex-agent@sha256:<64-hex-digest>'
-export XONOVEX_RUNTIME_CLASS='gvisor'
-
-# Requires cert-manager v1.16+ with its CA injector enabled
-# Install CRDs and deploy the operator
-kubectl apply -k https://github.com/xonovex/platform//packages/sandbox/operator/agent-operator-go/config/crd
-kubectl apply -k https://github.com/xonovex/platform//packages/sandbox/operator/agent-operator-go/config/default
-
-# Create one policy-governed namespace and provider credential
-kubectl create namespace ai-agents --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n ai-agents create secret generic anthropic-credentials \
-  --from-literal=api-key='your-key' \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-kubectl apply -f - <<EOF
-apiVersion: agent.xonovex.com/v1alpha1
-kind: AgentPolicy
-metadata:
-  name: sandbox-policy
-  namespace: ai-agents
-spec:
-  enforced:
-    runtimeClassName: ${XONOVEX_RUNTIME_CLASS}
-    requireSecurityContext: true
-    requireNetworkPolicy: true
-    maxTimeout: 1h0m0s
-    maxResources:
-      cpu: "2"
-      memory: 4Gi
-    allowedImages:
-      - ${XONOVEX_AGENT_IMAGE}
-    allowedRuntimeClassNames:
-      - ${XONOVEX_RUNTIME_CLASS}
-    allowedSecretNames:
-      - anthropic-credentials
-  defaults:
-    image: ${XONOVEX_AGENT_IMAGE}
-    runtimeClassName: ${XONOVEX_RUNTIME_CLASS}
-    timeout: 30m0s
----
-apiVersion: agent.xonovex.com/v1alpha1
-kind: AgentProvider
-metadata:
-  name: anthropic-provider
-  namespace: ai-agents
-spec:
-  displayName: Anthropic Claude
-  authTokenSecretRef:
-    name: anthropic-credentials
-    key: api-key
-  authTokenEnv: ANTHROPIC_API_KEY
-  environment:
-    ANTHROPIC_BASE_URL: https://api.anthropic.com
----
-apiVersion: agent.xonovex.com/v1alpha1
-kind: AgentRun
-metadata:
-  name: review-code
-  namespace: ai-agents
-spec:
-  harness:
-    type: claude
-  providerRef: anthropic-provider
-  workspace:
-    type: git
-    repository:
-      url: https://github.com/xonovex/platform.git
-      branch: main
-  prompt: "Review the codebase and suggest improvements"
-  network: host
-  resources:
-    requests:
-      cpu: 500m
-      memory: 512Mi
-    limits:
-      cpu: "2"
-      memory: 2Gi
-EOF
-```
-
-The `network: host` value permits unrestricted egress so this example can reach the public model API. Production namespaces should use an enforceable cluster-level egress proxy or a fully qualified domain name aware policy.
+Follow the [operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) to install the operator, create an execution policy, configure credentials, and submit an AgentRun. It requires cert-manager, a digest-pinned agent image, and a sandboxed RuntimeClass already available in the cluster.
 
 ### Agent Plugins
 
 Install the grouped plugins your tasks need. Each plugin owns related skills and commands. A skill keeps its existing name, and a command uses the namespace of the plugin that owns it.
 
-| Plugin                                                                          | Purpose                                                                                                       |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| [`xonovex-agentic`](packages/runtime/plugin/plugin-agentic/README.md)           | Configure coding-agent harnesses and author their skills, commands, and project instructions.                 |
-| [`xonovex-core`](packages/runtime/plugin/plugin-core/README.md)                 | Apply software design, testing, review, version control, credentials, and accessibility practices.            |
-| [`xonovex-game-engine`](packages/runtime/plugin/plugin-game-engine/README.md)   | Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.           |
-| [`xonovex-integrations`](packages/runtime/plugin/plugin-integrations/README.md) | Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.                        |
-| [`xonovex-languages`](packages/runtime/plugin/plugin-languages/README.md)       | Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua.                                      |
-| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md)             | Write C99 and build portable native systems with explicit memory, concurrency, and data layouts.              |
-| [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md)         | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
-| [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md)     | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests.                         |
-| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md)         | Research, plan, implement, validate, and close out work, then integrate lessons from the session.             |
-| [`xonovex-writing`](packages/runtime/plugin/plugin-writing/README.md)           | Revise prose and write technical documents, articles, news, and travel guides.                                |
+| Plugin | Purpose |
+| --- | --- |
+| [`xonovex-agentic`](packages/runtime/plugin/plugin-agentic/README.md) | Configure coding-agent harnesses and author their skills, commands, and project instructions. |
+| [`xonovex-core`](packages/runtime/plugin/plugin-core/README.md) | Apply software design, testing, review, version control, credentials, and accessibility practices. |
+| [`xonovex-game-engine`](packages/runtime/plugin/plugin-game-engine/README.md) | Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking. |
+| [`xonovex-integrations`](packages/runtime/plugin/plugin-integrations/README.md) | Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration. |
+| [`xonovex-languages`](packages/runtime/plugin/plugin-languages/README.md) | Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua. |
+| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write C99 and build portable native systems with explicit memory, concurrency, and data layouts. |
+| [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md) | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
+| [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md) | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests. |
+| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Research, plan, implement, validate, and close out work, then integrate lessons from the session. |
+| [`xonovex-writing`](packages/runtime/plugin/plugin-writing/README.md) | Revise prose and write technical documents, articles, news, and travel guides. |
 
 #### Claude Code
 
@@ -173,7 +94,7 @@ git clone https://github.com/xonovex/platform.git
 cd platform && npm install
 ```
 
-[Moon](https://moonrepo.dev/) manages project tasks.
+[Moon](https://moonrepo.dev/) manages project tasks. The [contributing guide](CONTRIBUTING.md) describes validation and release rules.
 
 ```bash
 npx moon run <project>:<task>    # run a specific task
@@ -185,7 +106,5 @@ npx moon query projects          # list all projects
 ## License
 
 The repository uses the MIT License.
-
----
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development setup and contribution guidelines.

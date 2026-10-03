@@ -1,7 +1,5 @@
 # locks-and-backoff: Locks and Backoff
 
-## Guideline
-
 A lock is often the right answer; when you spin, spin politely (test-and-test-and-set + exponential backoff + `pause`), and when contention is high reach for a queue lock that doesn't bounce a single cache line across cores.
 
 ## Rationale

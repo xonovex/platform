@@ -1,7 +1,5 @@
 # cache-behavior: The Memory Wall and Cache Behavior
 
-## Guideline
-
 Treat data movement through the cache hierarchy, not arithmetic, as the dominant cost, and lay out data so the bytes you touch arrive together in cache lines.
 
 ## Rationale

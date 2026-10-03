@@ -1,7 +1,5 @@
 # scalable-architecture: Scalable Architecture
 
-## Guideline
-
 Scale by _removing sharing_, not by making shared access faster: the fastest synchronization is none. Partition state per-thread/per-core, and only synchronize on the rare path.
 
 ## Rationale

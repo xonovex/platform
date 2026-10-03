@@ -1,5 +1,7 @@
 # GitHub Copilot Onboarding
 
+Inspect the installed GitHub Copilot runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover
 
 - Probe `copilot --version`, account/organization policy, surface, operating system, repository trust, and cloud-agent availability.

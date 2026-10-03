@@ -1,7 +1,5 @@
 # manipulation-gizmos: Move/Rotate/Scale Gizmos Decoupled From Object Type
 
-## Guideline
-
 Keep gizmo rendering and interaction central and generic; let any object plug into it by implementing a tiny get/set-transform interface (queried, not inherited) instead of giving each component its own gizmo, so one move/rotate/scale tool manipulates transforms, spline control points, wire endpoints, or any custom "position" concept with identical behavior. The interface is a function-pointer table looked up by name (not a base class), so a component opts in without the editor knowing it exists. `get_transform` returns both world and local so the same gizmo operates in either coordinate space on a modifier key; a priority value resolves the ambiguous case of an object with several transformable aspects.
 
 ## How to Apply

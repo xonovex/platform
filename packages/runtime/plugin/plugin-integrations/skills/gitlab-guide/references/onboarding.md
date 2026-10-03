@@ -1,5 +1,7 @@
 # Safe Onboarding and Operations
 
+Inspect the GitLab offering and project controls, preview the exact changes, and verify native enforcement before relying on it.
+
 ## Lifecycle
 
 1. **Discover** offering (GitLab.com, Self-Managed, or Dedicated), edition/tier/version and feature flags, group/project scope, includes and resolved component refs, policy projects and linked scopes, compliance frameworks, protected branches/tags/environments, push rules, approval rules and required approvals, CODEOWNERS, runners, roles, project/group access tokens and `CI_JOB_TOKEN` allowlists, masked/protected CI/CD variables, `id_token` cloud trust, webhooks, deploy keys/tokens, and audit-event sinks, from an authenticated read ([first-time-setup.md](first-time-setup.md) covers a fresh `glab` install and login).

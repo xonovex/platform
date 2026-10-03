@@ -1,7 +1,6 @@
 ---
 description: >-
-  Execution: work a roadmap as supervisor, brief an implementation agent per
-  item, verify its work independently, then record and commit it
+  Execution: work a roadmap as supervisor, brief an implementation agent per item, verify its work independently, then record and commit it
 allowed-tools:
   - Read
   - Write
@@ -15,14 +14,12 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  <roadmap-path> [--model <model>] [--order <sequential|parallel>]
-  [--orchestration <agents|workflow>] [--stop-after <count-or-plan>]
-  [--commit <per-plan|batch>]
+  <roadmap-path> [--model <model>] [--order <sequential|parallel>] [--orchestration <agents|workflow>] [--stop-after <count-or-plan>] [--commit <per-plan|batch>]
 ---
 
 # /xonovex-workflow:plan-delegate - Supervise Roadmap Execution by Delegation
 
-> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue / **delegate** → update → validate
+Supervise roadmap implementation, verify each agent result independently, and record progress.
 
 ## Arguments
 
@@ -35,6 +32,4 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**delegate** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **delegate** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

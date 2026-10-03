@@ -1,5 +1,7 @@
 # Packages
 
+Keep each package in the group that owns its concern and update every integration path when moving it.
+
 - Use `packages/<kind>/<package>/` for libraries, configuration, and assets. Use `packages/<group>/<kind>/<package>/` for runtime components, development tools, and execution environments.
 - Keep a package basename and its published name stable when only its parent directory changes. After moving code, update relative paths, workspace discovery, task inputs, and documentation links.
 

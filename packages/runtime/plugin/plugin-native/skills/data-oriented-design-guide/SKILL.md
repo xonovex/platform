@@ -5,6 +5,8 @@ description: "Use when designing or refactoring performance-critical data layout
 
 # Data-Oriented Design Guidelines
 
+Organize data around access patterns and measure cache traffic before changing performance-critical layouts.
+
 ## Essentials
 
 - **The problem is data movement** - Optimize cache traffic, not instruction count, see [references/cache-behavior.md](references/cache-behavior.md)

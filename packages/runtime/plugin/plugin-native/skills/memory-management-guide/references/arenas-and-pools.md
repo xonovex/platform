@@ -1,7 +1,5 @@
 # arenas-and-pools: Arenas, Pools, and Bulk Allocators
 
-## Guideline
-
 Allocate from arena/bump and pool allocators over contiguous blocks and reclaim by lifetime reset, instead of per-object general-purpose `malloc`/`free`.
 
 ## Rationale

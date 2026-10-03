@@ -12,7 +12,7 @@ argument-hint: "[plan-file]"
 
 # /xonovex-workflow:plan-accept - Approve a Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → **accept** → subplans-create → continue → update → validate
+Record plan approval after a final review; implementation remains a separate operation.
 
 ## Arguments
 
@@ -20,6 +20,4 @@ argument-hint: "[plan-file]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**accept** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **accept** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

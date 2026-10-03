@@ -1,7 +1,5 @@
 # caller-owns-memory: Caller-Owns-Memory
 
-## Guideline
-
 A library never allocates; the caller provides all storage and the library operates on it. Functions take pointers + capacities and return status codes, never freshly allocated pointers.
 
 ## Rationale

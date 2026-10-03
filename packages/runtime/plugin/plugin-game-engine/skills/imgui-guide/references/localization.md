@@ -1,7 +1,5 @@
 # localization: Localizing an Immediate-Mode GUI
 
-## Guideline
-
 Wrap every user-visible string in a `LOCALIZE(...)` marker that hashes the _source string itself_ as the lookup key, resolve it each frame through a swappable localizer interface that falls back to the source string on a miss, and verify coverage with a pseudo-localization ("gibberish") mode plus an extraction tool, rather than managing numeric string IDs.
 
 ## How to Apply

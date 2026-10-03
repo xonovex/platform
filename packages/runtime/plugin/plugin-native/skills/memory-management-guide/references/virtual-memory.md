@@ -1,7 +1,5 @@
 # virtual-memory: Virtual-Memory Tricks Beyond Reserve/Commit
 
-## Guideline
-
 Treat address-space reservation as nearly free (especially on 64-bit) and exploit it: back cap-free arrays by reserving a huge range and committing on touch, grow buffers in page multiples, alias a second mapping for a gapless ring buffer, and use an end-of-page allocator to catch overruns. For the reserve/commit basics see [arenas-and-pools.md](./arenas-and-pools.md); this is the toolbox built on top.
 
 ## Rationale

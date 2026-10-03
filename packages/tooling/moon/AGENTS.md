@@ -1,5 +1,7 @@
 # Moon Plugins
 
+Keep Rust versions, changelogs, and pinned Moon plugin references aligned when changing the Moon release line.
+
 - For a version bump, update `Cargo.toml` and `Cargo.lock`, add the exact `## <version>` CHANGELOG header required by `github-check`, then update each `@<plugin>-v<version>` pin in `.moon/toolchains.yml` or `.moon/extensions.yml` only after the release tag exists.
 - Release only through a reviewed PR whose title contains `version packages`; merging to `main` runs `.github/workflows/release.yml`. Never publish directly or update consumer pins before tag assets exist.
 - Every workspace uses exactly one Xonovex Nix plugin.

@@ -1,7 +1,5 @@
 # state-replication: Replicating Object and Component State
 
-## Guideline
-
 Replicate the game by synchronizing the state of opted-in objects and their components across nodes: make replication an explicit per-component capability and a per-object opt-in flag, detect changes on the owning node, and send those changes only to nodes that are interested in that object. Defaulting to a simple whole-object copy and allowing a per-field description when bandwidth matters.
 
 ## Rationale

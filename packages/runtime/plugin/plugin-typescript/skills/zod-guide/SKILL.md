@@ -5,6 +5,8 @@ description: "Use when defining or editing Zod 4.0+ schemas for runtime validati
 
 # Zod Coding Guidelines
 
+Validate external data with Zod schemas and derive application types from the validated shape.
+
 ## Requirements
 
 - Zod ≥ 4.0

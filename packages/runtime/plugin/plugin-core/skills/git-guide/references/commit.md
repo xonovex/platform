@@ -26,8 +26,7 @@ git add -A && git commit -m "<type>: <description>"
 git push -o ci.skip <remote> HEAD:<branch>
 ```
 
-When the staged change needs more context than the subject can carry, use a concise
-multi-line body derived from the diff and the user's stated intent:
+When the staged change needs more context than the subject can carry, use a concise multi-line body derived from the diff and the user's stated intent:
 
 ```
 feat: implement email+password flow with TOTP

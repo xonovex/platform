@@ -1,7 +1,5 @@
 # resampling-and-dsp: Sample-Rate Conversion, Pitch, and Per-Voice DSP
 
-## Guideline
-
 Resample every source to the mixer's internal rate by reading it with a fractional, per-voice playback step and interpolating between source samples; one knob: the step size: gives both rate conversion and pitch/speed control.
 
 ## Rationale

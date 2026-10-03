@@ -1,7 +1,5 @@
 # single-vs-multiple-components: One Component Instance Per Type
 
-## Guideline
-
 Allow at most one instance of a given component type per entity. Represent "many of a thing" with child entities or a single list-holding component, not by attaching the same component type twice.
 
 ## Rationale

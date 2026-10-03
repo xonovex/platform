@@ -1,7 +1,5 @@
 # synchronization: VkSemaphore, VkFence, and Submit-Time Waits
 
-## Guideline
-
 Use the right Vulkan primitive for each relationship: pipeline barriers for in-queue hazards (covered in resources-and-barriers), binary `VkSemaphore` for queue→queue and swapchain ordering, timeline `VkSemaphore` for monotonic counter waits that the CPU can also wait on, and `VkFence` for GPU→CPU completion. Wiring waits and signals through `VkSubmitInfo2`/`vkQueueSubmit2` scoped to exactly the work that must wait.
 
 ## Rationale

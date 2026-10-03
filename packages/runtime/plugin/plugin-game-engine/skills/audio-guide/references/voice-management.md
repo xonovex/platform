@@ -1,7 +1,5 @@
 # voice-management: Voice Pools, Lifetime, and Stealing
 
-## Guideline
-
 Play every sound through a voice drawn from a fixed-size, preallocated pool; cap concurrency at the pool size, steal the least important voice when the pool is full, and ramp a stopped voice to silence before returning its slot.
 
 ## Rationale

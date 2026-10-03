@@ -1,7 +1,5 @@
 # lock-free-stack: Lock-Free Stack
 
-## Guideline
-
 Build a lock-free LIFO by CAS-ing a new node onto `head`; but recognize that the _pop_ path has both an ABA hazard and a use-after-free hazard, so a lock-free stack that frees nodes REQUIRES a memory-reclamation scheme.
 
 ## Rationale

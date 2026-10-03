@@ -30,15 +30,9 @@ A skill or command relates to another capability in three distinct ways. Never c
 
 Hard dependencies point **upward only**: a specific skill may require a general one; the general tier never requires a specific one, and the manifest graph has no cycles. Advisory handoffs may be reciprocal because they do not promise installation or loading. Every named handoff and declared dependency must resolve to an existing registered skill. The composition validator enforces matching package-derived manifest names, matching dependency lists, named hard-dependency handoffs, no missing targets, dependency-first order, and no cycles. Whether a workflow truly cannot complete without a dependency and whether an edge points upward remain author-review decisions.
 
-Soft selection is deliberately descriptive rather than another dependency graph. Do
-not infer suitability from package order, reference filenames, or an "opinionated"
-label. When two descriptions fit equally well, ask or report the ambiguity instead of
-silently selecting one.
+Soft selection is deliberately descriptive rather than another dependency graph. Do not infer suitability from package order, reference filenames, or an "opinionated" label. When two descriptions fit equally well, ask or report the ambiguity instead of silently selecting one.
 
-An opinionated or layered guide is not a separate overlay mechanism. It is an ordinary
-specific skill whose routing description names the narrower context and whose manifest
-hard-depends on its general foundation only when it cannot stand alone. Precedence
-comes from the more specific applicable guidance, not separate overlay metadata.
+An opinionated or layered guide is not a separate overlay mechanism. It is an ordinary specific skill whose routing description names the narrower context and whose manifest hard-depends on its general foundation only when it cannot stand alone. Precedence comes from the more specific applicable guidance, not separate overlay metadata.
 
 ## Generalize-or-link decision
 

@@ -1,5 +1,7 @@
 # Kiro Onboarding
 
+Inspect the installed Kiro runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover
 
 - Probe `kiro-cli --version`, active IDE/CLI surface, v3 mode where relevant, workspace roots, and hook schema.

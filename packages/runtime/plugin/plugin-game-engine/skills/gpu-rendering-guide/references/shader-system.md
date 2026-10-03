@@ -1,7 +1,5 @@
 # shader-system: Shaders as Compiled Build Artifacts
 
-## Guideline
-
 Treat shaders as a build artifact: author in a source language, compile to a binary intermediate offline (e.g. SPIR-V, DXIL), reflect the binary to derive binding/layout information, manage feature variants explicitly, key pipeline-state objects on shader-plus-state, and support hot-reload by recompiling and rebuilding affected pipelines.
 
 ## Rationale

@@ -1,7 +1,5 @@
 # porting-strategy: Order of Operations for a New Target
 
-## Guideline
-
 Port to a new OS by working through the abstraction interface in interactivity order: get a window on screen, then input, then the rest of the OS services, then audio/dialogs. Stubbing each interface first and replacing stubs incrementally, while pinning down toolchain differences (compiler strictness, pointer width, struct layout) and wiring a per-target CI build before declaring the platform done.
 
 ## How to Apply

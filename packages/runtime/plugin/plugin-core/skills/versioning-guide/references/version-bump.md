@@ -14,10 +14,10 @@ Compute the next version for a package, propagate the change to every workspace 
 
 ## Choosing the Next Version
 
-| Input                       | Result                                                                                      |
-| --------------------------- | ------------------------------------------------------------------------------------------- |
-| `--exact X.Y.Z[-tag.N]`     | set exactly that version (validate it first)                                                |
-| `--preid <id>`              | first prerelease `X.Y.Z-id.0`; on a matching existing prerelease, increment the counter     |
+| Input | Result |
+| --- | --- |
+| `--exact X.Y.Z[-tag.N]` | set exactly that version (validate it first) |
+| `--preid <id>` | first prerelease `X.Y.Z-id.0`; on a matching existing prerelease, increment the counter |
 | `major` / `minor` / `patch` | increment that field and reset lower fields; on an existing prerelease, finalize to `X.Y.Z` |
 
 Default level is `patch`. Validate any version string before writing, see [semver.md](semver.md).

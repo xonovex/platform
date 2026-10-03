@@ -1,7 +1,5 @@
 # device-memory: VkDeviceMemory, Memory Types, and Staging
 
-## Guideline
-
 Query `VkPhysicalDeviceMemoryProperties`, allocate a few large `VkDeviceMemory` blocks of the right memory type, and sub-allocate every `VkImage`/`VkBuffer` out of them honoring `VkMemoryRequirements.alignment`; upload static data via a `HOST_VISIBLE` staging buffer copied with `vkCmdCopyBuffer`/`vkCmdCopyBufferToImage` into a `DEVICE_LOCAL` resource; persistently map host-visible blocks. Never call `vkAllocateMemory` per resource.
 
 ## Rationale

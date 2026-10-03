@@ -1,7 +1,5 @@
 # measurement-and-profiling: Measurement and Profiling
 
-## Guideline
-
 You cannot optimize what you do not measure: drive every layout change with a profiler and hardware counters, comparing before/after on representative data.
 
 ## Rationale

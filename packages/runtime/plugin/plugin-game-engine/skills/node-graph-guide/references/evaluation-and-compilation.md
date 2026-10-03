@@ -1,7 +1,5 @@
 # evaluation-and-compilation: Compiling a Graph, Topological Evaluation, and Validity-Hash Caching
 
-## Guideline
-
 Do not walk the editor graph directly every time you run it; lower (compile) it into a flattened, ordered executable form, evaluate nodes in dependency order so every input is resolved before its consumer runs, and cache each output behind a validity hash that folds in the node's own settings plus the validity hashes of all its inputs, so an unchanged subtree is reused instead of recomputed.
 
 ## Rationale

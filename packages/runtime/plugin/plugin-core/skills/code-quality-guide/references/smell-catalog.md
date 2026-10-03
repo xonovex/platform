@@ -6,48 +6,48 @@ Owner key: `robustness.md` = this skill's robustness dimension · **oop-guide** 
 
 ## Bloaters: grown too large
 
-| Smell               | Detector signal                                                 | Owner                                                             |
-| ------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Long Method         | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells)                                     |
-| Primitive Obsession | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide**                           |
-| Long Parameter List | more than ~4 params, especially boolean flag params             | `robustness.md` + **connascence-guide** (connascence of position) |
-| Data Clumps         | the same group of values always travels together                | **connascence-guide**                                             |
+| Smell | Detector signal | Owner |
+| --- | --- | --- |
+| Long Method | function over ~30 lines; high cyclomatic / cognitive complexity | `robustness.md` (code smells) |
+| Primitive Obsession | a domain concept carried as a raw string/number; magic literals | `robustness.md` / **connascence-guide** |
+| Long Parameter List | more than ~4 params, especially boolean flag params | `robustness.md` + **connascence-guide** (connascence of position) |
+| Data Clumps | the same group of values always travels together | **connascence-guide** |
 
 ## Object-Orientation Abusers
 
-| Smell                                     | Detector signal                                                 | Owner                                                  |
-| ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
-| Switch on a type code                     | the same type-switch duplicated in several places               | **oop-guide** (polymorphism)                           |
-| Refused Bequest                           | subclass ignores or throws on inherited members (LSP violation) | **oop-guide** (LSP)                                    |
-| Downcasting                               | a cast that breaks the abstraction model                        | **oop-guide** (LSP): _supplementary; cited in SOURCES_ |
-| Temporary Field                           | a field set/used only in some circumstances, empty otherwise    | **oop-guide**                                          |
-| Alternative Classes, Different Interfaces | two classes do the same job with unswappable APIs               | **oop-guide**                                          |
+| Smell | Detector signal | Owner |
+| --- | --- | --- |
+| Switch on a type code | the same type-switch duplicated in several places | **oop-guide** (polymorphism) |
+| Refused Bequest | subclass ignores or throws on inherited members (LSP violation) | **oop-guide** (LSP) |
+| Downcasting | a cast that breaks the abstraction model | **oop-guide** (LSP): _supplementary; cited in SOURCES_ |
+| Temporary Field | a field set/used only in some circumstances, empty otherwise | **oop-guide** |
+| Alternative Classes, Different Interfaces | two classes do the same job with unswappable APIs | **oop-guide** |
 
 ## Change Preventers
 
-| Smell                            | Detector signal                                   | Owner                                          |
-| -------------------------------- | ------------------------------------------------- | ---------------------------------------------- |
-| Divergent Change                 | one class edited for many unrelated reasons       | **oop-guide** (SRP)                            |
-| Shotgun Surgery                  | one conceptual change smeared across many modules | **connascence-guide** (locality at a distance) |
-| Parallel Inheritance Hierarchies | every new subclass forces a mirrored subclass     | **oop-guide**                                  |
+| Smell | Detector signal | Owner |
+| --- | --- | --- |
+| Divergent Change | one class edited for many unrelated reasons | **oop-guide** (SRP) |
+| Shotgun Surgery | one conceptual change smeared across many modules | **connascence-guide** (locality at a distance) |
+| Parallel Inheritance Hierarchies | every new subclass forces a mirrored subclass | **oop-guide** |
 
 ## Dispensables: remove for free (this skill owns the detector)
 
-| Smell                    | Detector signal                                                                                                  | Owner                                                          |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| Speculative Generality   | abstraction / hook with no current user                                                                          | _here_ (OVER-ENGINEERING)                                      |
-| Comments (noise)         | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT): rename to self-document, or delete |
-| Lazy Class / Data Class  | a class too thin to justify itself, or only fields                                                               | **oop-guide**                                                  |
-| Magic Numbers / Literals | unnamed constants begging for a name                                                                             | `robustness.md`: _supplementary; cited in SOURCES_             |
+| Smell | Detector signal | Owner |
+| --- | --- | --- |
+| Speculative Generality | abstraction / hook with no current user | _here_ (OVER-ENGINEERING) |
+| Comments (noise) | a comment restating a well-named declaration, narrating a plan / provenance, or denser than the surrounding code | _here_ (REDUNDANT COMMENT): rename to self-document, or delete |
+| Lazy Class / Data Class | a class too thin to justify itself, or only fields | **oop-guide** |
+| Magic Numbers / Literals | unnamed constants begging for a name | `robustness.md`: _supplementary; cited in SOURCES_ |
 
 ## Couplers
 
-| Smell                  | Detector signal                                                | Owner                                  |
-| ---------------------- | -------------------------------------------------------------- | -------------------------------------- |
-| Feature Envy           | a method more interested in another object's data than its own | **connascence-guide**                  |
-| Inappropriate Intimacy | two classes reach into each other's internals                  | **connascence-guide**                  |
-| Message Chains         | `a.b().c().d()` train-wreck navigation                         | **connascence-guide** (Law of Demeter) |
-| Middle Man             | a class that mostly just forwards to one collaborator          | **connascence-guide**                  |
+| Smell | Detector signal | Owner |
+| --- | --- | --- |
+| Feature Envy | a method more interested in another object's data than its own | **connascence-guide** |
+| Inappropriate Intimacy | two classes reach into each other's internals | **connascence-guide** |
+| Message Chains | `a.b().c().d()` train-wreck navigation | **connascence-guide** (Law of Demeter) |
+| Middle Man | a class that mostly just forwards to one collaborator | **connascence-guide** |
 
 ## Grade and report
 

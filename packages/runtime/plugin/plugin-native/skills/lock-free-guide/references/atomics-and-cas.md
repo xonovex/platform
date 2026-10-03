@@ -1,7 +1,5 @@
 # atomics-and-cas: Atomics and Compare-and-Swap
 
-## Guideline
-
 Use the narrowest atomic primitive that expresses the operation; for conditional updates use a `compare_exchange_weak` retry loop that reloads the expected value on every failure.
 
 ## Rationale

@@ -1,7 +1,5 @@
 # frame-delay: Resolve Ordering with a One-Frame Delay
 
-## Guideline
-
 When a decision depends on a control that hasn't been issued yet this frame (occlusion, focus transitions), record the intent into a "next" field and promote it at frame end, so the decision uses complete information one frame later.
 
 ## How to Apply

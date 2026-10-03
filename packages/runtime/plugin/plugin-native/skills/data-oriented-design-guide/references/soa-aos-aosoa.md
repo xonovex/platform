@@ -1,7 +1,5 @@
 # soa-aos-aosoa: AoS vs SoA vs AoSoA
 
-## Guideline
-
 Choose the layout by how the hot loop accesses fields: AoS when you touch most fields of one record at a time, SoA when you stream one or few fields across many records, AoSoA when you need both cache and SIMD efficiency.
 
 ## Rationale

@@ -1,7 +1,5 @@
 # delta-and-snapshots: Delta Changes vs. Full Snapshots
 
-## Guideline
-
 Stream per-frame deltas of changed state to nodes already in sync, and send a full snapshot only when a node first becomes interested (a fresh connection) and so has no baseline to diff against; reuse the same change-tracking and load path the engine already uses for save/load.
 
 ## Rationale

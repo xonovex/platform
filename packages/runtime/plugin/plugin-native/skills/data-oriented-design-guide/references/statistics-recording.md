@@ -1,7 +1,5 @@
 # statistics-recording: Minimal-Overhead Statistics Recording
 
-## Guideline
-
 For always-on in-app counters (draw calls, allocations, subsystem timings), accumulate one value per counter per frame and let recording be a single `*ptr += value` through a cached accumulator pointer, so a hot path pays one add, the API surface stays tiny, and only counters someone is actually viewing cost any history memory.
 
 ## How to Apply

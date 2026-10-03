@@ -1,7 +1,5 @@
 # authoring-and-introspection: Data-Driven Node Types, Default Inputs, Asset Granularity, Introspection, and Hot-Iteration
 
-## Guideline
-
 Define node kinds as data a registry consumes (pins, defaults, evaluate callback) so any plugin extends the toolbox; let an unwired input fall back to an inline-edited constant so literals need no node; let the author choose asset granularity (one resource per graph, or a coarse "uber-graph" of many); build introspection that previews the value at any pin; and make graphs hot-iterable so an edit re-evaluates without a rebuild.
 
 ### Rationale

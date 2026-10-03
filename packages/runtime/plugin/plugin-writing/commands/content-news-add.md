@@ -11,11 +11,12 @@ allowed-tools:
   - TodoWrite
   - Skill
 argument-hint: >-
-  [topic] [--path <path>] [--lang <en,nl>] [--days <days>] [--max <max>] [--slug
-  <slug>]
+  [topic] [--path <path>] [--lang <en,nl>] [--days <days>] [--max <max>] [--slug <slug>]
 ---
 
 # /xonovex-writing:content-news-add - Auto-curate latest news stories
+
+Research current news on the topic and produce the required bilingual content.
 
 ## Arguments
 
@@ -28,6 +29,4 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `news-writing-guide` skill (plugin `xonovex-writing`) and perform its
-**create** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `news-writing-guide` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

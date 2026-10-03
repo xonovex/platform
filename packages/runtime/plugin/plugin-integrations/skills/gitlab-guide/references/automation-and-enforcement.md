@@ -6,13 +6,13 @@ Use GitLab-native controls as an adapter for semantic governance intent. Compone
 
 Record offering (GitLab.com, Self-Managed, or Dedicated), edition/tier/version, group/project scope, tested date, component project/ref, policy project and linked scopes, pipeline strategy and conflict behavior, compliance frameworks, protected environments, runner trust, roles/tokens/secrets, evidence resources, and rollback/drift behavior.
 
-| Intent                                   | GitLab mechanism                                                               | Native evidence                                                        |
-| ---------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| Reusable validation                      | Versioned CI/CD component with `spec:inputs`                                   | Pipeline configuration, component SHA/version, job and artifact/report |
-| Mandatory project-independent validation | Group/project pipeline execution policy                                        | Effective policy/project revision, pipeline and policy job             |
-| Scope/report governance                  | Compliance framework and framework controls/reporting                          | Framework assignment/control status; not legal certification           |
-| Protected target change                  | Protected branch/tag/environment, deployment approvals, provider roles         | Exact commit/artifact, actor/approval, job/deployment and audit event  |
-| Supply-chain evidence                    | Pinned component/image/dependency, job artifacts/reports, releases/deployments | Full commit SHA, artifact digest, pipeline/job/deployment references   |
+| Intent | GitLab mechanism | Native evidence |
+| --- | --- | --- |
+| Reusable validation | Versioned CI/CD component with `spec:inputs` | Pipeline configuration, component SHA/version, job and artifact/report |
+| Mandatory project-independent validation | Group/project pipeline execution policy | Effective policy/project revision, pipeline and policy job |
+| Scope/report governance | Compliance framework and framework controls/reporting | Framework assignment/control status; not legal certification |
+| Protected target change | Protected branch/tag/environment, deployment approvals, provider roles | Exact commit/artifact, actor/approval, job/deployment and audit event |
+| Supply-chain evidence | Pinned component/image/dependency, job artifacts/reports, releases/deployments | Full commit SHA, artifact digest, pipeline/job/deployment references |
 
 Feature availability and behavior vary by version, offering, tier, and feature flag. Detect them before selecting a mandatory control; a configured but unsupported feature is not enforcement.
 

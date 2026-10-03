@@ -1,8 +1,6 @@
 # Review-refine: refine findings before posting
 
-Return a refined copy of findings in the shared contract so a later Publish operation
-can deliver them without edit-after-posting churn. Do not mutate an input file or
-provider resource, and post nothing.
+Return a refined copy of findings in the shared contract so a later Publish operation can deliver them without edit-after-posting churn. Do not mutate an input file or provider resource, and post nothing.
 
 ## Per-finding operations
 

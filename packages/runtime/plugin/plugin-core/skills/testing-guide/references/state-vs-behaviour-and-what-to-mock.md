@@ -1,5 +1,7 @@
 # state-vs-behaviour-and-what-to-mock: Verify the Outcome, Mock the Seam
 
+Check observable state by default and verify interactions only when collaboration is the behavior under test.
+
 - **State verification**: after the action, is the _result_ correct? Inspect the return value or the state of the SUT/Fake.
 - **Behaviour verification**: did the SUT make the _right calls_ on its collaborators (`gateway.charge(1250, 'EUR')` exactly once)?
 

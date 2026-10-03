@@ -5,6 +5,8 @@ description: "Use when editing or reviewing general-purpose C99: libraries, CLI 
 
 # C99 Coding Guidelines
 
+Write portable C99 with explicit ownership, bounded operations, and checked errors.
+
 ## Essentials
 
 - **Memory management** - Free all heap allocations, avoid leaks, see [references/memory-management.md](references/memory-management.md)

@@ -1,7 +1,5 @@
 # handles-and-indices: Handles and Indices Instead of Pointers
 
-## Guideline
-
 Reference entities by integer index or generational handle (index + generation) into a contiguous array, never by raw pointer.
 
 ## Rationale

@@ -12,7 +12,7 @@ argument-hint: "[plan-file]"
 
 # /xonovex-workflow:plan-followup - Close Out a Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue → update → validate → **followup**
+Return a closeout record with status, evidence, remaining work, and follow-up seeds.
 
 ## Arguments
 
@@ -22,8 +22,4 @@ argument-hint: "[plan-file]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**followup** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them. The record
-is returned inline; hand plan seeds to `/plan-create` and other sections to the
-caller's publish step if persistence is wanted.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **followup** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them. The record is returned inline; hand plan seeds to `/plan-create` and other sections to the caller's publish step if persistence is wanted.

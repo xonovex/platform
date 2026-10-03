@@ -1,7 +1,5 @@
 # gizmo-math: The Linear Algebra Behind Robust Gizmos
 
-### Guideline
-
 Do gizmo drag geometry in screen space: project the gizmo's axis to 2D, project the 2D cursor onto that 2D line, then lift the result back to world space and intersect with the world axis, never build a 3D "mouse ray" from an arbitrary cursor z and intersect it with the axis. Drive the object by the _delta_ of the projected parameter from drag-start, and guard every division with an epsilon so near-parallel axes and zero-length directions cannot explode.
 
 ### How to Apply

@@ -5,6 +5,8 @@ description: "Use when editing CMake build files for C/C++ projects on CMake 3.2
 
 # CMake Coding Guidelines
 
+Define builds through CMake targets with explicit dependencies, visibility, and installation rules.
+
 ## Requirements
 
 - CMake ≥ 3.20; modern target-based usage.

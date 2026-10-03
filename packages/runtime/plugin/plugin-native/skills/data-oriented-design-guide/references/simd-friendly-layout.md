@@ -1,7 +1,5 @@
 # simd-friendly-layout: SIMD-Friendly Data Layout
 
-## Guideline
-
 Lay data out as contiguous, aligned, same-typed columns (SoA or AoSoA) so loops vectorize with cheap aligned loads instead of expensive gathers.
 
 ## Rationale

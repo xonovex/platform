@@ -6,10 +6,10 @@ A user story has three components, not one. Treating the card as the whole story
 - **Conversation**: the verbal discussion over time where the real value is co-created between the people who want the feature and those who build it, supplemented by sketches and tests. This exercises **Negotiable**.
 - **Confirmation**: the acceptance test that confirms the story is done. The Confirmation **is** the acceptance test: the same idea as INVEST **Testable**. Concrete examples from the conversation become the acceptance criteria.
 
-| C            | Produced artifact                             | Owner reference                                                            |
-| ------------ | --------------------------------------------- | -------------------------------------------------------------------------- |
-| Card         | the "As a / I want / so that" sentence        | [template-and-acceptance-criteria.md](template-and-acceptance-criteria.md) |
-| Conversation | shared understanding, split decisions         | [splitting-flowchart.md](splitting-flowchart.md)                           |
+| C | Produced artifact | Owner reference |
+| --- | --- | --- |
+| Card | the "As a / I want / so that" sentence | [template-and-acceptance-criteria.md](template-and-acceptance-criteria.md) |
+| Conversation | shared understanding, split decisions | [splitting-flowchart.md](splitting-flowchart.md) |
 | Confirmation | acceptance criteria (happy/boundary/error/UI) | [template-and-acceptance-criteria.md](template-and-acceptance-criteria.md) |
 
 Acceptance criteria from the Confirmation can be expressed as Given-When-Then for automation, but that notation is owned by **bdd-guide**. This skill only names the handoff.

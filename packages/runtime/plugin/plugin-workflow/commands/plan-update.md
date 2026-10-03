@@ -13,7 +13,7 @@ argument-hint: "[document-path] [--dry-run]"
 
 # /xonovex-workflow:plan-update - Update Plan Progress
 
-> Lifecycle: research → decide → create → revise ⇄ critique → accept → subplans-create → continue → **update** → validate
+Refresh the plan progress and validation evidence from the current implementation.
 
 ## Arguments
 
@@ -24,6 +24,4 @@ argument-hint: "[document-path] [--dry-run]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**update** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **update** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

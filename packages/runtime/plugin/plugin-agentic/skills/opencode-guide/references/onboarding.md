@@ -1,5 +1,7 @@
 # OpenCode Onboarding
 
+Inspect the installed OpenCode runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover
 
 - Probe `opencode --version`, global/project configuration, global/project plugin directories, npm plugin list, config-directory package dependencies, Bun cache, custom tools, and effective load order.

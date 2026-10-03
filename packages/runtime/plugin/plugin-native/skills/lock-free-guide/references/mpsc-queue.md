@@ -1,7 +1,5 @@
 # mpsc-queue: Multi-Producer Single-Consumer Queue
 
-## Guideline
-
 For many producers feeding one consumer, use an intrusive MPSC queue: producers publish with a single atomic exchange on the tail; the consumer walks `next` pointers, no CAS, no per-node allocation in the queue itself.
 
 ## Rationale

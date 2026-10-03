@@ -1,7 +1,5 @@
 # object-model: Typed Objects Described by Runtime Schemas
 
-## Guideline
-
 Represent every piece of tool/editor state as a typed object whose shape is described by a runtime type definition (a schema), not by a hand-written C struct, and store instance data as plain values keyed by property.
 
 ## Rationale

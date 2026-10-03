@@ -1,7 +1,5 @@
 # events-and-focus: Keyboard Focus, Responder Chains, Event Trickling
 
-## Guideline
-
 Track keyboard focus as a responder chain (root → focused control) built from an explicit scope stack, trickle events through it by processing them in the `end_*()` functions, and consume an event by clearing its flag. Feed one input event per frame. Processing events in `end_*()` runs them in reverse of issue order, giving outer/earlier controls first refusal; clearing the flag consumes the event so nothing else reacts.
 
 ## How to Apply

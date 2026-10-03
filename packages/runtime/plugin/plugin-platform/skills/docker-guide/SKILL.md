@@ -5,6 +5,8 @@ description: "Use when writing or editing Docker images and Compose files for pr
 
 # Docker Coding Guidelines
 
+Build small, reproducible Docker images with explicit runtime permissions and validated health behavior.
+
 ## Essentials
 
 - **Build optimization** - Multi-stage builds, small base images (alpine/distroless), see [references/multi-stage-builds.md](references/multi-stage-builds.md)

@@ -1,5 +1,7 @@
 # writing-descriptions: Writing Skill Descriptions That Trigger Reliably
 
+Describe the user intent and trigger language precisely so the router selects the skill for the right requests.
+
 ## Writing Principles
 
 - **Imperative phrasing**: start with "Use when..." / "Use this skill when...", not "This skill does..."

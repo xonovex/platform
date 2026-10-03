@@ -5,6 +5,8 @@ description: "Use when writing or editing POSIX shell or Bash automation. Trigge
 
 # Shell Scripting Coding Guidelines
 
+Write portable shell scripts with quoted arguments, explicit failure handling, and ShellCheck and shfmt validation.
+
 ## Essentials
 
 - **POSIX compatibility** - Use POSIX sh, lint with shellcheck, format with shfmt, see [references/posix-compatibility.md](references/posix-compatibility.md)

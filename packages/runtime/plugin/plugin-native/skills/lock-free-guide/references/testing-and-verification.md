@@ -1,7 +1,5 @@
 # testing-and-verification: Testing and Verification
 
-## Guideline
-
 Concurrency bugs are non-deterministic and rare; a single happy-path test proves nothing. Every lock-free structure must ship with a stress test and pass under a race detector.
 
 ## Rationale

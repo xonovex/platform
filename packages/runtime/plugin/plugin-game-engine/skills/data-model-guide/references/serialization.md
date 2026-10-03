@@ -1,7 +1,5 @@
 # serialization: Save, Load, Versioning, and Migration
 
-## Guideline
-
 Persist the model through a stable, versioned on-disk schema; serialize references by id, migrate older files forward into the current schema on load, and emit deterministic output so saved files diff cleanly under version control.
 
 ## Rationale

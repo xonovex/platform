@@ -1,7 +1,5 @@
 # content-hash-and-cache: Content-Addressed Caching of Cooked Output
 
-## Guideline
-
 Compute a content hash over (source bytes + settings + the content hashes of every dependency) and store each cooked output under that hash in a content-addressed cache, so identical inputs always hit the same entry and the cache is reproducible and shareable across machines.
 
 ## Rationale

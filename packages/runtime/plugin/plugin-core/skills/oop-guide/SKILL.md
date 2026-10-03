@@ -5,6 +5,8 @@ description: "Use when designing class hierarchies or applying OOP principles. T
 
 # General Object-Oriented Programming Guidelines
 
+Use composition, focused interfaces, and encapsulated state to keep object-oriented code easy to change.
+
 ## Stances
 
 - Prefer composition over inheritance; program to interfaces, reserving abstract classes for shared implementation.

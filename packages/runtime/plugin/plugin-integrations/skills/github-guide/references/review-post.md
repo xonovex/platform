@@ -1,7 +1,5 @@
 # review-post: publish a structured review on GitHub
 
-## Guideline
-
 Batch the summary body, every line-anchored inline comment, and the verdict into ONE `POST .../pulls/{n}/reviews` object: anchored to the PR HEAD sha. This realizes the findings authored per **`code-review-guide`** on GitHub; that skill owns the labels, severity, and blocking decoration: this file only anchors and submits them.
 
 `gh pr review` posts only the review-level body (no inline support, cli/cli#12396), and the standalone `.../pulls/{n}/comments` endpoint 422s on `line`/`side` (cli/cli#13358), so build the inline comments inside the one `.../reviews` object.

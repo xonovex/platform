@@ -1,5 +1,7 @@
 # Governed Learning Promotion
 
+Apply ordinary reviewable lessons directly; send managed or executable changes through their owner validation and promotion controls.
+
 ## Gather candidates from operational evidence
 
 Extract reusable candidates from the current session and, when provided, lifecycle results, onboarding outcomes, policy denials, incidents, exceptions, emergency-exception reviews, drift, rollbacks, support cases, and module failures. Preserve the exact source reference/version, scope, observed outcome, discovery, proposed lesson, affected owners, confidence, conflicts, privacy limits, and expiry.

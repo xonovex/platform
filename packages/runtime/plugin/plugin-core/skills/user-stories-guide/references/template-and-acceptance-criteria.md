@@ -1,5 +1,7 @@
 # user-stories: Story Template and Acceptance Criteria
 
+Describe the user, capability, and value, then confirm the story with concrete acceptance criteria.
+
 ```
 As a [type of user], I want [goal / capability], so that [reason / business value].
 ```

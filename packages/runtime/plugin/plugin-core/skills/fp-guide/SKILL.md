@@ -5,6 +5,8 @@ description: "Use when writing functional-style code or reviewing for FP cleanli
 
 # General Functional Programming Guidelines
 
+Compose pure functions with immutable data and explicit context so each operation is easy to test and reason about.
+
 ## Core principles
 
 - Prefer module-level functions over classes; pass context explicitly; avoid inheritance.

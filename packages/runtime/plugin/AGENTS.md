@@ -1,5 +1,7 @@
 # Plugins
 
+Give each concept one owning skill and package related skills and commands as one installable plugin.
+
 - Use the [Skill guide](plugin-agentic/skills/skill-guide/SKILL.md) for authoring mechanics; this file defines repository split and packaging rules.
 - Keep one cohesive concern per skill. Each concept has one owner; cross-reference the owner by skill name instead of copying content.
 - Move language/API-independent guidance into a general skill. Specific skills keep only their specialization and may depend on the general skill; general skills never depend on a specific one.

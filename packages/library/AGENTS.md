@@ -1,5 +1,7 @@
 # Shared Libraries
 
+Provide shared code to the CLI and operator without creating a dependency cycle through the Moon task scripts.
+
 - Shared libraries consume the config packages and provide code to the CLI and operator packages. These libraries use `layer: library`.
 - No package under `packages/tooling/script/` may depend on `shared-core`. `shared-core` is tagged `npm`, so its `npm-check`, publish, and version tasks already depend on the script packages; the reverse edge makes moon reject the project graph with `would_cycle`. Duplicate the helper into `script-moon-common` instead.
 - The TypeScript and Go cores are separate packages with no bridge between them: `shared-core` for TypeScript, `shared-core-go` for Go. `shared-agent-go` holds the agent, provider, policy, and provisioning types and depends on `shared-core-go`.

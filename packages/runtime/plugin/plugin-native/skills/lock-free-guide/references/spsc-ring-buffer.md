@@ -1,7 +1,5 @@
 # spsc-ring-buffer: SPSC Ring Buffer
 
-## Guideline
-
 For exactly one producer thread and one consumer thread, use a bounded ring buffer with plain atomic head/tail indices and acquire/release ordering, no CAS, no locks.
 
 ## Rationale

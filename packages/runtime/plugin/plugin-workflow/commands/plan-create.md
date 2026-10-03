@@ -14,7 +14,7 @@ argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>
 
 # /xonovex-workflow:plan-create - Create Plan with Research
 
-> Lifecycle: research → decide → **create** → revise ⇄ critique → accept → subplans-create → continue → update → validate
+Create one high-level plan from research for review before expanding it into subplans.
 
 ## Arguments
 
@@ -25,6 +25,4 @@ argument-hint: "[spec-file-or-requirements] [--interactive] [--depends-on <plan>
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**create** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

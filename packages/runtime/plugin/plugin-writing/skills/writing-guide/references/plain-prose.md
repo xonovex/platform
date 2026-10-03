@@ -1,5 +1,7 @@
 # plain-prose: Write Clear and Verifiable Prose
 
+Use active sentences, stable terms, and evidence beside each claim; remove words that add no meaning.
+
 ## Make Each Sentence Do One Job
 
 - Use one main idea per sentence.

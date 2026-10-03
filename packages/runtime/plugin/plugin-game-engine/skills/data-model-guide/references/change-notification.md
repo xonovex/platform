@@ -1,7 +1,5 @@
 # change-notification: Making Mutations Observable
 
-## Guideline
-
 Route every mutation through the model so it can record what changed and tell interested parties, via change events, dirty flags, and dependency-driven recomputation.
 
 ## Rationale

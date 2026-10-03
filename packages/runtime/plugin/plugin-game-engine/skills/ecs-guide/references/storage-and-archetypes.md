@@ -1,7 +1,5 @@
 # storage-and-archetypes: Group Entities by Component Set
 
-## Guideline
-
 Represent an entity's type as the bitmask of components it has, and store all entities sharing a type contiguously so a system can walk the matching component arrays linearly with no per-entity lookup.
 
 ## Rationale

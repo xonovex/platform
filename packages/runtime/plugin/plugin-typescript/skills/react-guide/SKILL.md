@@ -5,6 +5,8 @@ description: "Use when building or editing React 19+ components, hooks, or app r
 
 # React Coding Guidelines
 
+Build React interfaces with focused components, explicit state ownership, and predictable effects.
+
 ## Requirements
 
 - React ≥ 19, Vite ≥ 6, Tailwind ≥ 4, Headless UI.
@@ -17,16 +19,16 @@ description: "Use when building or editing React 19+ components, hooks, or app r
 
 ## Quick Reference
 
-| Feature             | React 18                          | React 19+                         |
-| ------------------- | --------------------------------- | --------------------------------- |
-| Memoization         | Manual (`useMemo`, `useCallback`) | React Compiler (automatic)        |
-| Forward refs        | `forwardRef()` wrapper            | `ref` as regular prop             |
-| Context provider    | `<Context.Provider value={}>`     | `<Context value={}>`              |
-| Form state          | Custom `useState`                 | `useActionState` hook             |
-| Optimistic updates  | Manual state                      | `useOptimistic` hook              |
-| Read promises       | Not possible                      | `use()` hook                      |
-| Conditional context | Not possible                      | `use(Context)` after conditionals |
-| Form pending        | Manual tracking                   | `useFormStatus` hook              |
+| Feature | React 18 | React 19+ |
+| --- | --- | --- |
+| Memoization | Manual (`useMemo`, `useCallback`) | React Compiler (automatic) |
+| Forward refs | `forwardRef()` wrapper | `ref` as regular prop |
+| Context provider | `<Context.Provider value={}>` | `<Context value={}>` |
+| Form state | Custom `useState` | `useActionState` hook |
+| Optimistic updates | Manual state | `useOptimistic` hook |
+| Read promises | Not possible | `use()` hook |
+| Conditional context | Not possible | `use(Context)` after conditionals |
+| Form pending | Manual tracking | `useFormStatus` hook |
 
 ## Example
 

@@ -1,5 +1,7 @@
 # Safe Onboarding and Operations
 
+Inspect the GitHub host and repository controls, preview the exact changes, and verify native enforcement before relying on it.
+
 ## Lifecycle
 
 1. **Discover** host/product (github.com or Enterprise Server), version/plan features, organization/repository scope, Actions and pinning policy, workflows and resolved `uses:` refs, rulesets/branch protections, required checks and their source apps, bypass actors, environments, runners, CODEOWNERS/required reviewers, App/PAT/`GITHUB_TOKEN` permissions, Actions/Dependabot secrets, OIDC trust, webhooks, deploy keys, and evidence sinks, from an authenticated read ([first-time-setup.md](first-time-setup.md) covers a fresh `gh` install and login).

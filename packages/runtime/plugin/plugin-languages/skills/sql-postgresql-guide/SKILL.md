@@ -5,6 +5,8 @@ description: "Use when editing PostgreSQL 15+ queries, schemas, or migrations. T
 
 # PostgreSQL Coding Guidelines
 
+Write PostgreSQL queries and schemas with explicit constraints, transactional changes, and measured query plans.
+
 ## Requirements
 
 - PostgreSQL ≥ 15.

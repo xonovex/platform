@@ -1,7 +1,5 @@
 # memory-model: The C11 Memory Model
 
-## Guideline
-
 A data race is undefined behavior; make every location that two threads access (where at least one writes) either atomic or protected by a lock that establishes happens-before.
 
 ## Rationale

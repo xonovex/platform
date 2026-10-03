@@ -1,7 +1,6 @@
 ---
 description: >-
-  Create a comprehensive, multi-language travel guide for a specified topic or
-  location
+  Create a comprehensive, multi-language travel guide for a specified topic or location
 allowed-tools:
   - WebSearch
   - WebFetch
@@ -13,11 +12,12 @@ allowed-tools:
   - TodoWrite
   - Skill
 argument-hint: >-
-  [topic] [subject] [--path <path>] [--lang <en,nl>] [--research-only] [--slug
-  <slug>]
+  [topic] [subject] [--path <path>] [--lang <en,nl>] [--research-only] [--slug <slug>]
 ---
 
 # /xonovex-writing:content-travelguide-add - Comprehensive Travel Guide Generator
+
+Create a verified travel guide for the topic or location in the required languages.
 
 ## Arguments
 
@@ -30,6 +30,4 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `travel-writing-guide` skill (plugin `xonovex-writing`) and perform its
-**create** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `travel-writing-guide` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

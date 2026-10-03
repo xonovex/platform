@@ -1,5 +1,7 @@
 # evaluating-outputs: Eval-Driven Iteration on Output Quality
 
+Measure output quality after activation with realistic prompts, binary assertions, and matched runs with and without the skill.
+
 ## Contents
 
 [Scope](#scope) · [Test Case Shape](#test-case-shape) · [Automated Runner](#automated-runner) · [Designing Prompts](#designing-prompts) · [Workspace Layout](#workspace-layout) · [Running Eval Pairs](#running-eval-pairs) · [Writing Assertions](#writing-assertions) · [Grading](#grading) · [Aggregating](#aggregating-benchmarkjson) · [Pattern Analysis](#pattern-analysis) · [Human Review](#human-review) · [Iteration Signals](#iteration-signals) · [Iteration Principles](#iteration-principles) · [Gotchas](#gotchas)

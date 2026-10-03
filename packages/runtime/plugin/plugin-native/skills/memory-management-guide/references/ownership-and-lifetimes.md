@@ -1,7 +1,5 @@
 # ownership-and-lifetimes: Ownership and Lifetimes
 
-## Guideline
-
 Every allocation has exactly one owner responsible for freeing it, and a clearly-bounded lifetime; everyone else borrows. Decide both explicitly, never leave ownership implicit.
 
 ## Rationale

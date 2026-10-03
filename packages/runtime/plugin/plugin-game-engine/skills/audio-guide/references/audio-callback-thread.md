@@ -1,7 +1,5 @@
 # audio-callback-thread: The Real-Time Audio Callback Contract
 
-## Guideline
-
 Treat the OS audio callback (or the dedicated render thread that feeds it) as a hard real-time context: it must produce a fixed block of samples within a fixed deadline, and everything it touches must already be allocated and resident (pre-touched) so it never page-faults on its path.
 
 ## Rationale

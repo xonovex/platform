@@ -5,11 +5,12 @@ allowed-tools:
   - Read
   - Skill
 argument-hint: >-
-  [message] [--type <feat|fix|docs|chore|refactor|test|ci>] [--path <path>]
-  [--remote <remote>] [--branch <branch>] [--push] [--dry-run] [--interactive]
+  [message] [--type <feat|fix|docs|chore|refactor|test|ci>] [--path <path>] [--remote <remote>] [--branch <branch>] [--push] [--dry-run] [--interactive]
 ---
 
 # /xonovex-core:git-commit - Auto-Commit with Smart Messages
+
+Create a conventional commit from the changes; use `--push` only when publication is requested.
 
 ## Arguments
 
@@ -26,6 +27,4 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its **commit**
-operation with these arguments. The skill is the source of truth for the procedure,
-output format, and gotchas. Do not restate them.
+Load the `git-guide` skill (plugin `xonovex-core`) and perform its **commit** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

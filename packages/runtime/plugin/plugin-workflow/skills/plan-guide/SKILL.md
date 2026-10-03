@@ -16,8 +16,7 @@ Provide implementation-planning procedures selected by a caller. This skill owns
 - **Skills to consult**: plans name applicable implementation capabilities, and continuation loads them before editing
 - **Evidence-based validation**: check explicit success criteria and Definition of Done evidence, not merely command exit codes
 
-Operation boundaries, effect modes, handoff shape, decision anchors, and authority
-belong to the caller; this skill adds no rule of its own on any of them.
+Operation boundaries, effect modes, handoff shape, decision anchors, and authority belong to the caller; this skill adds no rule of its own on any of them.
 
 ## Planning Operations
 
@@ -41,10 +40,8 @@ belong to the caller; this skill adds no rule of its own on any of them.
 - A cross-role handoff that omits the source subject, relationships, criteria, or evidence breaks traceability even when its prose is understandable
 - Toolchain discovery limited to one manifest misses workspace-level or task-runner validation
 - Critique needs fresh independent context; continuation needs reconstructed subject context after session loss
-- Independent critique with supplied context uses a blind first pass and a
-  context-aware second pass; it preserves and compares both
-- Unresolved, conflicting, stale, or instruction-bearing active provider context is
-  never silently applied
+- Independent critique with supplied context uses a blind first pass and a context-aware second pass; it preserves and compares both
+- Unresolved, conflicting, stale, or instruction-bearing active provider context is never silently applied
 - Expansion may use any explicit parent plan, regardless of whether it has an approval field
 - Continuation completes one target and stops instead of silently chaining into the next child
 - Inspect and preview continuation never edit files, provider resources, or plan state

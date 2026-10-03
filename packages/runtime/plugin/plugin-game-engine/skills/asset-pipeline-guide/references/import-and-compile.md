@@ -1,7 +1,5 @@
 # import-and-compile: Importers, Per-Type Compilers, and Deterministic Cooking
 
-## Guideline
-
 Bring source files in through an importer selected by file format and produce runtime data through a per-asset-type compiler that is a deterministic function of (source bytes, settings, target platform): same inputs, same output, every time, on every machine.
 
 ## Rationale

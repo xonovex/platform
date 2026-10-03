@@ -14,7 +14,7 @@ argument-hint: "[topic-or-plan-file] [--save-to <file>]"
 
 # /xonovex-workflow:plan-decide - Settle Decisions One at a Time
 
-> Lifecycle: research → **decide** → create → revise ⇄ critique → accept → subplans-create → continue → update → validate
+Resolve open decisions one at a time using known questions or targeted discovery.
 
 ## Arguments
 
@@ -28,6 +28,4 @@ argument-hint: "[topic-or-plan-file] [--save-to <file>]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**decide** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **decide** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

@@ -1,7 +1,5 @@
 # command-recording-and-frames: Command Recording and Frames in Flight
 
-## Guideline
-
 Record GPU work into command streams allocated from a context owned by one thread for one frame and reset wholesale; record independent passes in parallel into separate streams executed by a primary one; keep per-frame mutable resources in slots behind one fence per frame so the CPU prepares frame N+1 while the GPU consumes frame N.
 
 ## Rationale

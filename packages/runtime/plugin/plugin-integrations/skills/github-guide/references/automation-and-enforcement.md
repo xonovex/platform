@@ -6,13 +6,13 @@ Use GitHub-native controls as an adapter for semantic governance intent. Workflo
 
 Record the GitHub host/product, plan/features, repository/organization scope, tested date, Actions policy, reusable module revision, runner trust, ruleset IDs, environments, required-check names and source applications, bypass actors, token permissions, evidence resources, and rollback/drift behavior.
 
-| Intent                       | GitHub mechanism                                                                                                | Native evidence                                                                      |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Reusable validation          | `workflow_call` reusable workflow; composite action for reusable steps inside a job                             | Workflow run, job/check suite and check run bound to head SHA                        |
-| Mandatory merge validation   | Active ruleset or branch protection requiring exact status checks and review/conversation rules                 | Effective ruleset/protection, check run source and conclusion, pull request head SHA |
-| Protected release/deployment | Environment protection rules, required reviewer/custom protection, deployment branch/tag restrictions           | Environment/deployment, reviewer/protection result, artifact digest                  |
-| Least-privilege execution    | Job/workflow `permissions`, named secrets, environment secrets after approval, OIDC for short-lived credentials | Workflow permissions/config revision, OIDC subject/audience, provider audit record   |
-| Supply-chain evidence        | Immutable action/workflow refs, artifact attestations, signed release or deployment evidence                    | Full commit SHA, artifact digest, attestation and producing run                      |
+| Intent | GitHub mechanism | Native evidence |
+| --- | --- | --- |
+| Reusable validation | `workflow_call` reusable workflow; composite action for reusable steps inside a job | Workflow run, job/check suite and check run bound to head SHA |
+| Mandatory merge validation | Active ruleset or branch protection requiring exact status checks and review/conversation rules | Effective ruleset/protection, check run source and conclusion, pull request head SHA |
+| Protected release/deployment | Environment protection rules, required reviewer/custom protection, deployment branch/tag restrictions | Environment/deployment, reviewer/protection result, artifact digest |
+| Least-privilege execution | Job/workflow `permissions`, named secrets, environment secrets after approval, OIDC for short-lived credentials | Workflow permissions/config revision, OIDC subject/audience, provider audit record |
+| Supply-chain evidence | Immutable action/workflow refs, artifact attestations, signed release or deployment evidence | Full commit SHA, artifact digest, attestation and producing run |
 
 Repository feature and plan availability varies. Discover it before proposing a mandatory control; an unavailable or evaluation-only rule is not enforcing.
 

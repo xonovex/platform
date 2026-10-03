@@ -5,6 +5,8 @@ description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on 
 
 # Terraform Coding Guidelines
 
+Manage infrastructure through Terraform plans with pinned providers, protected state, and validated changes.
+
 ## Requirements
 
 - Terraform ≥ 1.12; remote state; pinned providers; fmt/validate.

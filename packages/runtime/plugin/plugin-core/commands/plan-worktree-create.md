@@ -10,6 +10,8 @@ argument-hint: "[feature-name] [--from <branch>]"
 
 # /xonovex-core:plan-worktree-create - Create Feature Worktree
 
+Create an isolated worktree for a feature branch.
+
 ## Arguments
 
 `/plan-worktree-create [feature-name] [--from <branch>]`
@@ -19,6 +21,4 @@ argument-hint: "[feature-name] [--from <branch>]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its
-**worktree-create** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

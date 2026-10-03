@@ -1,8 +1,6 @@
 # Findings schema: the review's data contract
 
-The canonical inline shape returned by Review analysis and refinement. A later Publish
-or Execute operation may use this shape as its subject, but Review never persists or
-delivers it.
+The canonical inline shape returned by Review analysis and refinement. A later Publish or Execute operation may use this shape as its subject, but Review never persists or delivers it.
 
 ## Shape
 
@@ -29,5 +27,4 @@ delivers it.
 
 Anchors are **new-file** line numbers (the side a host inline comment attaches to), never old-file or absolute: a `+` line is `lineType: ADDED`, an unchanged in-hunk line is `CONTEXT`; a `path` / `line` that is not a real ADDED/CONTEXT diff line orphans when posted.
 
-Return valid JSON inline. Use a serializer when one is already available in the
-calling environment; never hand-splice escaped strings.
+Return valid JSON inline. Use a serializer when one is already available in the calling environment; never hand-splice escaped strings.

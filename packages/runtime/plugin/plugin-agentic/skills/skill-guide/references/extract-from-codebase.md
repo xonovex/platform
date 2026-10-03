@@ -1,5 +1,7 @@
 # extract-from-codebase: Distill a Skill from Codebase Patterns
 
+Extract recurring, verified codebase patterns into a reusable skill with traceable source guidance.
+
 ## Contents
 
 [Spec Constraints](#spec-constraints) · [Core Workflow](#core-workflow) · [Pattern Extraction](#pattern-extraction) · [Skill Structure](#skill-structure) · [Implementation Details](#implementation-details) · [Interactive Mode](#interactive-mode) · [Error Handling](#error-handling)

@@ -8,6 +8,8 @@ argument-hint: "[--merged] [--stale] [--prune] [--yes] [--dry-run]"
 
 # /xonovex-core:plan-worktree-cleanup - Remove Stale and Merged Worktrees
 
+Remove eligible stale or merged worktrees and prune their remaining Git metadata.
+
 ## Arguments
 
 `/plan-worktree-cleanup [--merged] [--stale] [--prune] [--yes] [--dry-run]`
@@ -20,6 +22,4 @@ argument-hint: "[--merged] [--stale] [--prune] [--yes] [--dry-run]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its
-**worktree-cleanup** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-cleanup** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

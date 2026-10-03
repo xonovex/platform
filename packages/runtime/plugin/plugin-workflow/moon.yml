@@ -7,7 +7,26 @@ tasks:
       - command-validate
       - build
       - format-check
+      - graph-build
       - skill-plan:ci-check
       - skill-reflect:ci-check
     options:
       mergeDeps: append
+  graph-build:
+    script: |
+      shopt -s nullglob
+      sources=(diagrams/*.dot)
+      if [ "${#sources[@]}" -eq 0 ]; then
+        echo 'No workflow diagram sources found' >&2
+        exit 1
+      fi
+      for source in "${sources[@]}"; do
+        dot -Tsvg -o "${source%.dot}.svg" "$source"
+        dot -Tpng -Gdpi=150 -o "${source%.dot}.png" "$source"
+      done
+    toolchain: [system, nix]
+    inputs:
+      - "diagrams/*.dot"
+    outputs:
+      - "diagrams/*.svg"
+      - "diagrams/*.png"

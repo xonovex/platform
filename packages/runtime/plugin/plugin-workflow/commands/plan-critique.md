@@ -13,7 +13,7 @@ argument-hint: "[plan-file] [--mode <mode>]"
 
 # /xonovex-workflow:plan-critique - Adversarially Critique a Plan
 
-> Lifecycle: research → decide → create → revise ⇄ **critique** → accept → subplans-create → continue → update → validate
+Stress-test a plan independently and report findings for a separate revision.
 
 ## Arguments
 
@@ -22,8 +22,4 @@ argument-hint: "[plan-file] [--mode <mode>]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**critique** operation with these arguments. Run this as a fresh session /
-independent agent that did not author the plan. Self-critique defends instead of
-attacks. The skill is the source of truth for the procedure, output format, and
-gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **critique** operation with these arguments. Run this as a fresh session / independent agent that did not author the plan. Self-critique defends instead of attacks. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

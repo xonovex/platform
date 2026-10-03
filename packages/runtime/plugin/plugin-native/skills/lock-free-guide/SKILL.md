@@ -5,6 +5,8 @@ description: "Use when writing or reviewing shared-memory concurrent code: atomi
 
 # Lock-Free / Wait-Free Concurrency Guidelines
 
+Choose concurrency primitives by their progress guarantees, memory ordering, and reclamation requirements; verify them under contention.
+
 ## Requirements
 
 - C11 atomics (`<stdatomic.h>`); applies to systems code with atomic, threading, and job-scheduling primitives.

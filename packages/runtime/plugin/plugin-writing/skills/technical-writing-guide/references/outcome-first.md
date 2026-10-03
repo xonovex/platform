@@ -1,5 +1,7 @@
 # outcome-first: Put the Main Message First
 
+Put the answer, result, decision, action, or status first, then order the evidence by its effect on the reader.
+
 ## Choose the Lead
 
 Open with the information the reader needs to act or understand:

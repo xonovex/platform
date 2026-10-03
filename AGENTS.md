@@ -1,5 +1,7 @@
 # Xonovex Platform Monorepo
 
+Work within the package boundaries below, run the required checks, and follow the release and Git rules before delivering a change.
+
 ## Structure
 
 ### Packages
@@ -38,6 +40,7 @@
 
 ### Writing
 
+- **Lead**: put the answer, result, decision, action, or status in the first sentence. Keep a decisive caveat beside it, then give evidence and background in order of importance. Use task tables and links to detailed procedures when they help the reader choose an action.
 - **Prose**: plain sentences; comma, colon, or full stop over an em dash; colon after a label; three periods for an ellipsis; straight quotes. ASD-STE100 in replies and reports: approved words in their approved sense, one idea per sentence, active voice, simple present or past, one term per thing
 - **Line breaks**: no hard-wrapped Markdown; one paragraph or list item per line
 - **Length**: match the output to the task: brief and focused, outcome first then detail, short caveats, a high-level summary unless asked for depth; no filler, redundant summary, or boilerplate. One progress sentence before the first tool call, then only an important find or a change of direction

@@ -1,5 +1,7 @@
 # Codex Onboarding
 
+Inspect the installed Codex runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover
 
 - Run `codex --version`; preserve `not-installed` when absent.

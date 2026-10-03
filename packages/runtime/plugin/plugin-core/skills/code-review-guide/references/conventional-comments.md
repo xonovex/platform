@@ -14,15 +14,15 @@ In a multi-paragraph markdown body, put `<label> (decoration)` as its own bold f
 
 ## Labels
 
-| Label        | Use for                                        | Typically blocking? |
-| ------------ | ---------------------------------------------- | ------------------- |
-| `praise`     | Something done well (genuine, not padding).    | No                  |
-| `nitpick`    | Trivial, preference-level.                     | No                  |
-| `suggestion` | A proposed improvement.                        | Sometimes           |
-| `issue`      | A problem (bug, regression, gap).              | Often               |
-| `todo`       | A small, necessary change before merge.        | Usually             |
-| `thought`    | A non-actionable idea or observation.          | No                  |
-| `chore`      | A process task (changelog, rebase, generated). | Varies              |
+| Label | Use for | Typically blocking? |
+| --- | --- | --- |
+| `praise` | Something done well (genuine, not padding). | No |
+| `nitpick` | Trivial, preference-level. | No |
+| `suggestion` | A proposed improvement. | Sometimes |
+| `issue` | A problem (bug, regression, gap). | Often |
+| `todo` | A small, necessary change before merge. | Usually |
+| `thought` | A non-actionable idea or observation. | No |
+| `chore` | A process task (changelog, rebase, generated). | Varies |
 
 Diverge when it helps. Most-used: `issue`, `suggestion`, `question`.
 

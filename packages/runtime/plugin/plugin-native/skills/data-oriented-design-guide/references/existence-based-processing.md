@@ -1,7 +1,5 @@
 # existence-based-processing: Existence-Based Processing
 
-## Guideline
-
 Process every item that exists together by grouping items by type or state, so per-item conditionals disappear and branches become loops.
 
 ## Rationale

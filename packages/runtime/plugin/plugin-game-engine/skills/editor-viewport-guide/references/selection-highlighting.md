@@ -1,7 +1,5 @@
 # selection-highlighting: Outline Rendering by Id Edge Detection
 
-## Guideline
-
 Highlight the selection with a crisp constant-width outline by rendering selected objects' ids into a separate single-channel target, then edge-detecting that id target in one fullscreen pass after post-processing: comparing each pixel's id to its neighbors' to find silhouette edges, and comparing selection depth to scene depth so an occluded outline is dimmed rather than dropped. Edges fall exactly on silhouette boundaries (where the id changes) and outline width comes from the sampling kernel, not the geometry. For occlusion, a direct selection-vs-scene depth compare shimmers because TAA jitters depth per frame; take the closest selection depth over a small neighborhood before comparing.
 
 ## How to Apply

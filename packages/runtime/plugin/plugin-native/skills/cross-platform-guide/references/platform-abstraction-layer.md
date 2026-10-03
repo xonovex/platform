@@ -1,7 +1,5 @@
 # platform-abstraction-layer: A Single Interface for All OS Calls
 
-## Guideline
-
 Route every operating-system and windowing call through one narrow abstraction interface: a struct of function pointers (or a header whose implementation is selected at build time), and forbid application, renderer, and engine code from ever calling an OS API directly or guarding logic with platform `#ifdef`s.
 
 ## How to Apply

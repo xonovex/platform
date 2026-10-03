@@ -1,7 +1,6 @@
 ---
 description: >-
-  Augment project instructions with elements from another project's instructions
-  while preserving structure and style
+  Augment project instructions with elements from another project's instructions while preserving structure and style
 allowed-tools:
   - Read
   - Edit
@@ -11,11 +10,12 @@ allowed-tools:
   - AskUserQuestion
   - Skill
 argument-hint: >-
-  [target-instructions] [source-instructions] [--aspects <aspects>]
-  [--percentage <percent>] [--interactive] [--dry-run]
+  [target-instructions] [source-instructions] [--aspects <aspects>] [--percentage <percent>] [--interactive] [--dry-run]
 ---
 
 # /xonovex-agentic:instructions-assimilate - Augment Project Instructions
+
+Add useful guidance from another project while preserving the target instructions and their structure.
 
 ## Arguments
 
@@ -28,6 +28,4 @@ argument-hint: >-
 
 ## Delegation
 
-Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its
-**merge** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its **merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

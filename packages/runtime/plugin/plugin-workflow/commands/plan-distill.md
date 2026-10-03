@@ -14,7 +14,7 @@ argument-hint: "[plan-source] [skills-dir]"
 
 # /xonovex-workflow:plan-distill - Distill Completed Work Into Skills
 
-> Lifecycle: research → decide → create → ... → validate → followup → **distill** (post-lifecycle; consumes the finished work and its records)
+Turn a completed implementation into a replayable skill suite with traceable sources.
 
 ## Arguments
 
@@ -25,6 +25,4 @@ argument-hint: "[plan-source] [skills-dir]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**distill** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **distill** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

@@ -1,7 +1,5 @@
 # subgraphs-and-functions: Subgraphs as Nodes, Function Graphs, Flattening, and Instancing
 
-## Guideline
-
 Let a graph contain another graph behind a typed input/output interface so a subgraph appears as a single node in its parent (the data-flow analog of a function call); generate the subgraph node's pins from that interface; flatten subgraphs into the parent at compile time by inlining their nodes and patching boundary wires; and promote a subgraph to a reusable asset that many graphs instance and locally override.
 
 ### Guideline (detail)

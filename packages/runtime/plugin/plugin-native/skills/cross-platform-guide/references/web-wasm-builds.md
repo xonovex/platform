@@ -1,7 +1,5 @@
 # web-wasm-builds: Building Native C/C++ to WebAssembly
 
-## Guideline
-
 Treat the browser as just another platform backend, but restructure the parts the web cannot host: hand the frame loop to the browser via a cooperative main-loop callback, make all file and network access asynchronous, map your explicit-API renderer down to GL ES / WebGL (or WebGPU), typically by routing only the 2D/UI path, and account for a 32-bit, single-address-space, single-threaded sandbox with growable but fully-committed memory.
 
 ## Toolchain and Serving

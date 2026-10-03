@@ -1,7 +1,5 @@
 # accessibility: Accessibility for an Immediate-Mode GUI
 
-## Guideline
-
 **accessibility-guide** owns accessibility requirements, evidence, exceptions, and conformance claims. This reference owns the IMGUI implementation delta: each frame, as you draw a control, also register it (role, label, rect, state) into a small side list that _is_ a retained semantic tree, expose that list to platform accessibility APIs and to automation/virtual input, and reuse the DPI-scale and theme machinery you already have for zoom and high contrast.
 
 ## How to Apply

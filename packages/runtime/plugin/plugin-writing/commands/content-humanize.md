@@ -13,6 +13,8 @@ argument-hint: "[text-or-file] [--tone <formal|casual|technical>] [--in-place] [
 
 # /xonovex-writing:content-humanize - Remove AI writing patterns
 
+Write or revise publication prose for a natural voice while preserving its facts.
+
 ## Arguments
 
 - `text-or-file` (required): Inline text, a file path, or `-` to read from stdin
@@ -22,6 +24,4 @@ argument-hint: "[text-or-file] [--tone <formal|casual|technical>] [--in-place] [
 
 ## Delegation
 
-Load the `editorial-writing-guide` skill (plugin `xonovex-writing`) and perform its
-**humanize** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `editorial-writing-guide` skill (plugin `xonovex-writing`) and perform its **humanize** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

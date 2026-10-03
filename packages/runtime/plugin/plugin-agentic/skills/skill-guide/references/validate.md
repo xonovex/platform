@@ -1,5 +1,7 @@
 # validate: Validate Skill Against Spec and Best Practices
 
+Audit the skill metadata, instructions, references, and bundled resources; report each failure with its location.
+
 ## Contents
 
 [Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Checks](#composition-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)

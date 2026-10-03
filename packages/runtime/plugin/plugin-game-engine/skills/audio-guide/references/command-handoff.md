@@ -1,7 +1,5 @@
 # command-handoff: Lock-Free Command Handoff to the Audio Thread
 
-## Guideline
-
 The game thread never touches voice state directly; it posts immutable commands (play, stop, set-gain, set-pitch, set-position) into a single-producer/single-consumer lock-free queue that the audio thread drains at the top of each render block.
 
 ## Rationale

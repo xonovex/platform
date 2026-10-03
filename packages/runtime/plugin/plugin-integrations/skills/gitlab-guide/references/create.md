@@ -1,7 +1,5 @@
 # create: Push and open the merge request
 
-## Guideline
-
 Push the branch yourself, then open the MR with `glab mr create`, capturing the `iid`. glab does NOT push by default, MR creation is NOT idempotent, and the description / labels are replace-only on update. The MR description content is `pull-request-guide`'s craft; the pure-git push and rebase are `git-guide`'s push reference: name them, don't restate them here.
 
 ## Push first

@@ -1,7 +1,5 @@
 # nested-arrays: Variable-Length Nested Data in Bulk Arrays
 
-## Guideline
-
 Store objects that own variable-length child lists in fixed-size bulk arrays plus an application-specific chunked allocator, not as per-object heap-allocated pointers; size chunks to a cache line, and intern immutable strings so identity is a pointer compare.
 
 ## Rationale

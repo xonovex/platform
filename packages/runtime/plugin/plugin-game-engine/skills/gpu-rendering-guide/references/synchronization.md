@@ -1,7 +1,5 @@
 # synchronization: Explicit GPU↔CPU and GPU↔GPU Synchronization
 
-## Guideline
-
 Synchronize everything explicitly with the right primitive for the relationship: resource barriers for dependencies within a queue (scoped source/destination stage+access plus image-layout transitions), cross-queue waits to order work between submissions and across queues, a monotonic timeline value for counter-style waits, and fences for GPU→CPU completion. Scoping each to exactly the work that must wait, neither more nor less.
 
 ## Rationale

@@ -1,5 +1,7 @@
 # tdd: The Test List and Letting Tests Drive Design
 
+Keep a test list of missing behavior and choose the next small example that advances the design.
+
 ## The test list (to-do list)
 
 Before starting, write down every test you can think of: operations, edge cases, variants, error conditions. You **list** them; you do not write them. The list is a parking lot for test _ideas_.

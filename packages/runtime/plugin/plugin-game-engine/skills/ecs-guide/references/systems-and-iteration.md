@@ -1,7 +1,5 @@
 # systems-and-iteration: Filter-and-Batch System Loops
 
-## Guideline
-
 A system is a filter (a required component mask) plus a batch loop over the matched, co-located component arrays. Keep the loop branch-light and free of per-element lookups, and split the work across worker cores.
 
 ## Rationale

@@ -1,7 +1,5 @@
 # false-sharing: False Sharing
 
-## Guideline
-
 Give each hot per-thread or independently-written atomic field its own cache line; pad and align to `CACHE_LINE_SIZE`.
 
 ## Rationale

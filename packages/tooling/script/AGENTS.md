@@ -1,5 +1,7 @@
 # Moon Task Scripts
 
+Ship one Moon task binary per script package and share infrastructure through the script common packages.
+
 - One package ships one binary, named `moon-<domain>-<action>-<subject>`. A package that ships none is shared code: `script-moon-common` for anything cross-cutting, `script-moon-skill-eval-common` for the eval harness, `script-moon-skill-catalog-common` for catalog file and budget reading.
 - No script package may depend on `shared-core`. `shared-core` is tagged `npm`, so its `npm-check`, publish, and version tasks depend on the script packages, and the reverse edge makes moon reject the project graph with `would_cycle`. Duplicate the few helpers a script needs into `script-moon-common` instead.
 - Reach the filesystem through `script-moon-common`'s `FileSystem` port as a defaulted last parameter, `fs: FileSystem = nodeFileSystem`, so a production caller passes nothing, a unit spec drives `memoryFileSystem`, and only the integration tier reaches a real disk.

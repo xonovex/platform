@@ -1,7 +1,5 @@
 # prototypes: Prototype / Instance / Override Inheritance
 
-## Guideline
-
 Let any object act as a prototype for another object of the same type, where the instance inherits every property and stores only its _overrides_: tracked by a per-property bitmask, with sub-object collections tracked as inherited / instantiated / removed, so a change to the prototype propagates to all instances except the values they deliberately changed, and a save records only the deltas.
 
 ## Rationale

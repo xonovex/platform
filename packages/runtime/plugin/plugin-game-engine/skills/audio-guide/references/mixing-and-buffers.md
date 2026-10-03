@@ -1,7 +1,5 @@
 # mixing-and-buffers: Mixing Voices Into the Output Buffer
 
-## Guideline
-
 Mix in a single internal format (deinterleaved 32-bit float, fixed internal sample rate), accumulate every active voice into the output channels through a per-voice gain matrix, ramp all gain changes over many samples, and scale to fit before converting to the device's integer format.
 
 ## Rationale

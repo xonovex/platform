@@ -5,6 +5,8 @@ description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/`
 
 # Moon Build System Guidelines
 
+Define reusable Moon tasks through tags, explicit dependencies, and declared cache inputs and outputs.
+
 ## Requirements
 
 - Moon ≥ 2.0, Node.js for JavaScript/TypeScript projects.

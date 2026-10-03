@@ -1,7 +1,5 @@
 # access-patterns: Linear Access and Avoiding Pointer Chasing
 
-## Guideline
-
 Iterate data sequentially over contiguous arrays and avoid pointer chasing and random access, so the hardware prefetcher and cache hide memory latency.
 
 ## Rationale

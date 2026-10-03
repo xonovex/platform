@@ -1,5 +1,7 @@
 # Assessment and Evidence
 
+Assess the exact accessibility scope against applicable criteria and retain current evidence for every result.
+
 ## Resolve the target before testing
 
 Pin the standard, version, conformance level, organizational additions, exact subject revision, scope, complete processes, supported environments, dependencies, and applicable criteria. Record exclusions and unresolved applicability explicitly.

@@ -1,7 +1,5 @@
 # pipelines: VkPipeline, Pipeline Cache, and Dynamic Rendering
 
-## Guideline
-
 Build immutable `VkPipeline` objects (graphics/compute) at load, backed by a `VkPipelineCache` persisted to disk so no compile happens on the hot path; prefer dynamic rendering (`VK_KHR_dynamic_rendering`) over `VkRenderPass`/`VkFramebuffer` objects; and declare frequently-changing state as dynamic (`VkPipelineDynamicStateCreateInfo`) so one pipeline covers many viewport/scissor/etc. values.
 
 ## Rationale

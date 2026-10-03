@@ -1,7 +1,5 @@
 # node-model: Nodes, Typed Pins, Connections, and the Graph as Data
 
-## Guideline
-
 Model the graph as plain serialized data (a node list, a connection list, and per-node settings) where each node is a typed object exposing named, typed input and output pins, and dedicated terminal "output" nodes hand finished results to the system that owns the graph.
 
 ## Rationale

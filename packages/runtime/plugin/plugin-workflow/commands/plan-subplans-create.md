@@ -13,7 +13,7 @@ argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 
 # /xonovex-workflow:plan-subplans-create - Generate Detailed Subplans from Parent Plan
 
-> Lifecycle: research → decide → create → revise ⇄ critique → accept → **subplans-create** → continue → update → validate
+Expand a parent plan into focused subplans with dependencies and parallel groups.
 
 ## Arguments
 
@@ -23,6 +23,4 @@ argument-hint: "[parent-plan-file] [--by-phase] [--dry-run]"
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its
-**expand** operation with these arguments. The skill is the source of
-truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **expand** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

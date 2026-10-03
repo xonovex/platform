@@ -28,13 +28,13 @@ Both are Stubs; the difference is the value injected. **Responder** feeds valid 
 
 Reconciles authoritative usage with loose talk so a review can translate one team's vocabulary into another's.
 
-| Kind  | Authoritative meaning                           | Common / loose usage             | Verifies                       |
-| ----- | ----------------------------------------------- | -------------------------------- | ------------------------------ |
-| Dummy | Filler value, never used by the receiver        | "placeholder", "null object"     | nothing                        |
-| Stub  | Canned answers; supplies indirect inputs        | often called a "mock"            | state (indirect input)         |
-| Spy   | Stub that records calls for the test to assert  | "mock", "recorder"               | indirect output (test asserts) |
-| Mock  | Pre-set expectations the double itself enforces | any double of any kind           | behaviour (indirect output)    |
-| Fake  | Real, shortcut implementation (in-memory store) | "stub", "mock", "in-memory mock" | state (real logic)             |
+| Kind | Authoritative meaning | Common / loose usage | Verifies |
+| --- | --- | --- | --- |
+| Dummy | Filler value, never used by the receiver | "placeholder", "null object" | nothing |
+| Stub | Canned answers; supplies indirect inputs | often called a "mock" | state (indirect input) |
+| Spy | Stub that records calls for the test to assert | "mock", "recorder" | indirect output (test asserts) |
+| Mock | Pre-set expectations the double itself enforces | any double of any kind | behaviour (indirect output) |
+| Fake | Real, shortcut implementation (in-memory store) | "stub", "mock", "in-memory mock" | state (real logic) |
 
 These are points on a continuum, not crisp boxes (a Spy is "a Stub that records"; a Fake can be stubbed). What matters: does the double supply inputs (Stub/Fake) or let you check outputs (Spy/Mock), and does the checking live in the double (Mock) or the test (Spy)?
 

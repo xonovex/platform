@@ -6,13 +6,13 @@ Read the project's own `AGENTS.md` / guidelines / linter + type-checker config *
 
 ## What to flag
 
-| Category           | Signals to flag                                                                                                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Type safety**    | `any` / dynamic / untyped escapes, implicit-any params, unchecked type assertions/casts, non-null assertions on untrusted values, `unknown` never narrowed, stringly-typed enums  |
-| **Validation**     | unvalidated external input, no schema at the boundary, missing guards/range/null checks, validating after use, trusting parsed shape without parsing                              |
-| **Error handling** | swallowed/empty catch, caught-and-logged-then-continue, bare re-throw losing context, unhandled rejection/async error, broad catch hiding distinct failures                       |
-| **Logging**        | error path with no log, log missing context (id/operation/cause), inconsistent levels (errors at `info`, noise at `error`), secrets/PII in logs, log-and-rethrow double-reporting |
-| **Code smells**    | long function (>30 lines), deep nesting (>3 levels), high cyclomatic complexity, boolean/flag params steering branches, primitive obsession at boundaries, duplicated guard logic |
+| Category | Signals to flag |
+| --- | --- |
+| **Type safety** | `any` / dynamic / untyped escapes, implicit-any params, unchecked type assertions/casts, non-null assertions on untrusted values, `unknown` never narrowed, stringly-typed enums |
+| **Validation** | unvalidated external input, no schema at the boundary, missing guards/range/null checks, validating after use, trusting parsed shape without parsing |
+| **Error handling** | swallowed/empty catch, caught-and-logged-then-continue, bare re-throw losing context, unhandled rejection/async error, broad catch hiding distinct failures |
+| **Logging** | error path with no log, log missing context (id/operation/cause), inconsistent levels (errors at `info`, noise at `error`), secrets/PII in logs, log-and-rethrow double-reporting |
+| **Code smells** | long function (>30 lines), deep nesting (>3 levels), high cyclomatic complexity, boolean/flag params steering branches, primitive obsession at boundaries, duplicated guard logic |
 
 ## Grading by severity
 

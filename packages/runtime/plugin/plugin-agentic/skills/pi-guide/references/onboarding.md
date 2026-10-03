@@ -1,5 +1,7 @@
 # Pi Onboarding
 
+Inspect the installed Pi runtime and configuration, then verify the selected integration before enabling it.
+
 ## Discover
 
 - Probe `pi --version`, interactive/non-interactive mode, user settings, project settings, saved trust decision, local extensions, installed packages, skills, prompts, themes, and CLI `-e` resources.

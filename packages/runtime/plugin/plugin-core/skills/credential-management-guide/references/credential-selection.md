@@ -1,5 +1,7 @@
 # Credential Selection
 
+Choose the shortest-lived credential that supports the exact identity, target, and operation.
+
 ## Selection order
 
 1. Use the provider's interactive browser or device login for a person when its refresh cache is native, protected, and revocable.

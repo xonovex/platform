@@ -1,7 +1,5 @@
 # memory-ordering: Memory Ordering
 
-## Guideline
-
 Pick the weakest ordering that is correct; reserve seq_cst for code whose correctness depends on a single global total order over all seq_cst operations. Annotate every ordering with _why_.
 
 ## Rationale

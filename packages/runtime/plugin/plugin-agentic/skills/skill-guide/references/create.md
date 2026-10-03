@@ -1,5 +1,7 @@
 # create: Create Skill from Source
 
+Create a reusable skill with a focused SKILL.md, references for detail, and bundled resources only where the procedure needs them.
+
 ## Goal
 
 - Build any kind of skill: guideline, workflow, capability, processor, or task automation
@@ -18,8 +20,7 @@ Spec limits (name / description / body / optional-field rules) live in the paren
 - **Capability**: task-specific automation with bundled scripts
 - **Processor**: transforms input to output
 
-These are authoring shapes, not metadata classifications. Choose the shape that best
-fits the skill's single concern.
+These are authoring shapes, not metadata classifications. Choose the shape that best fits the skill's single concern.
 
 ## Core Workflow
 

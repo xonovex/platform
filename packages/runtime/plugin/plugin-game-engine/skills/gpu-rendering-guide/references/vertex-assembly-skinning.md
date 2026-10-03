@@ -1,7 +1,5 @@
 # vertex-assembly-skinning: Programmable Vertex Fetch and GPU Skinning
 
-## Guideline
-
 Fetch vertex data yourself from storage buffers in the shader (programmable vertex pull) behind a small loader interface, instead of binding fixed-function vertex input; this lets one shader read any packing, any channel set, and any vertex: which is what makes flexible GPU skinning and morph targets fall out cleanly.
 
 ## Rationale

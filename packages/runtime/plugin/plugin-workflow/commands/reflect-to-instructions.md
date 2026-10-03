@@ -13,19 +13,16 @@ argument-hint: "[category] [--from-reflections] [--persist] [--dry-run] [--agent
 
 # /xonovex-workflow:reflect-to-instructions - Convert Insights to AGENTS.md
 
+Apply session lessons to the relevant AGENTS.md files, or preview them with `--dry-run`.
+
 ## Arguments
 
-- `category` (optional): Focus on one category (e.g., `testing`, `typescript`). Default: all
-  session insights, each routed to the nearest AGENTS.md via its `applies_to`.
-- `--from-reflections`: Source insights from existing `reflections/*.md` files instead of
-  extracting from the session (the explicit two-step flow after `reflect-extract`).
-- `--persist [<dir>]`: Also write the insights as `reflections/*.md` for an audit trail
-  (default: off, apply directly without storing).
+- `category` (optional): Focus on one category (e.g., `testing`, `typescript`). Default: all session insights, each routed to the nearest AGENTS.md via its `applies_to`.
+- `--from-reflections`: Source insights from existing `reflections/*.md` files instead of extracting from the session (the explicit two-step flow after `reflect-extract`).
+- `--persist [<dir>]`: Also write the insights as `reflections/*.md` for an audit trail (default: off, apply directly without storing).
 - `--dry-run`: Preview without modifying.
 - `--agents-file <path>`: Target AGENTS.md (default: auto-detect from `applies_to`).
 
 ## Delegation
 
-Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its
-**integrate-instructions** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its **integrate-instructions** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

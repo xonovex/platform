@@ -1,7 +1,5 @@
 # descriptors: Descriptor Sets, Layouts, Pools, Bindless, and Push Constants
 
-## Guideline
-
 Describe shader resource access with `VkDescriptorSetLayout`s grouped by update frequency, allocate `VkDescriptorSet`s from a `VkDescriptorPool` sized for the worst case, bind heavy sets rarely; for material/texture access use a large update-after-bind descriptor array (descriptor indexing) indexed by handle; route tiny per-draw data through push constants.
 
 ## Rationale

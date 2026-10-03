@@ -1,7 +1,5 @@
 # commands-and-swapchain: VkCommandPool, Command Buffers, and the Swapchain
 
-## Guideline
-
 Allocate command buffers from one `VkCommandPool` per recording thread per frame slot and reset the whole pool with `vkResetCommandPool` once the slot's `VkFence` signals; record independent passes into secondary `VkCommandBuffer`s executed by a primary; drive presentation with `vkAcquireNextImageKHR`/`vkQueuePresentKHR` over a `VkSwapchainKHR`, keeping N frame slots in flight each with its own pools, per-frame resources, and a fence.
 
 ## Rationale

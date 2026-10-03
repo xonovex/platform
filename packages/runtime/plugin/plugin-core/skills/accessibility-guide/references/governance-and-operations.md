@@ -1,5 +1,7 @@
 # Governance and Operations
 
+Assign accessibility requirements, findings, exceptions, and production monitoring to accountable owners with explicit evidence.
+
 ## Compose an accessibility profile
 
 The profile selects the standard/version/level, scope, applicable criteria, platform support, required user journeys, evaluator classes, environments, assessor roles, independence, evidence freshness, release behavior, exception authority, monitoring, and reassessment triggers.

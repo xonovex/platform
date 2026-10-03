@@ -1,7 +1,5 @@
 # transport-and-channels: UDP Transport, Pipes, Packet Types, and Delivery Guarantees
 
-## Guideline
-
 Build the wire layer on UDP and expose a small transport API where the caller opens a one-way pipe between two nodes, tags every payload with a packet type, and the packet type carries the delivery guarantee (none / ordered / reliable-deliver-all), so reliability and ordering are per-message policy layered over UDP, not a single fixed channel.
 
 ## Rationale

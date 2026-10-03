@@ -1,7 +1,6 @@
 ---
 description: >-
-  Split a multi-concern skill into several single-owner composable skills, each
-  owning one concept and cross-referencing the others by name
+  Split a multi-concern skill into several single-owner composable skills, each owning one concept and cross-referencing the others by name
 allowed-tools:
   - Read
   - Write
@@ -17,6 +16,8 @@ argument-hint: "[skill-file] [--into <names>] [--dry-run]"
 
 # /xonovex-agentic:skill-decompose - Decompose a Skill into Composable Skills
 
+Split a skill into focused skills with one owner per concept and explicit cross-references.
+
 ## Arguments
 
 - `skill-file` (required): Path to the SKILL.md or skill directory to decompose.
@@ -25,6 +26,4 @@ argument-hint: "[skill-file] [--into <names>] [--dry-run]"
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its
-**decompose** operation with these arguments. The skill is the source of truth for the
-procedure, output format, and gotchas. Do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **decompose** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

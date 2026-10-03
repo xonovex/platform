@@ -10,10 +10,7 @@ Produce a read-only, planning-oriented report from an inline subject or an opaqu
 4. **Separate evidence from synthesis**: distinguish observed facts, inferred implications, constraints, uncertainty, and unresolved questions.
 5. **Return one report**: include current stack, relevant locations, options or recommendation, risks, skills to consult, and sources. Use a separate Publish operation if the result must be persisted.
 
-If the request is a general hardening, simplification, alignment, duplication, comment,
-barrel, or TODO audit rather than research for an explicit future plan, hand it to
-**code-quality-guide**. Planning research may cite an existing quality-audit result as
-evidence without redefining its detectors.
+If the request is a general hardening, simplification, alignment, duplication, comment, barrel, or TODO audit rather than research for an explicit future plan, hand it to **code-quality-guide**. Planning research may cite an existing quality-audit result as evidence without redefining its detectors.
 
 ## Example
 
@@ -33,8 +30,7 @@ Skills to consult: typescript-guide, testing-guide
 Sources: src/queue/batcher.ts@a1b2c3; vendor feed spec v2 (2026-01)
 ```
 
-Facts carry file anchors; options carry a recommendation; anything
-unverified stays under Unresolved rather than becoming a claim.
+Facts carry file anchors; options carry a recommendation; anything unverified stays under Unresolved rather than becoming a claim.
 
 ## Gotchas
 

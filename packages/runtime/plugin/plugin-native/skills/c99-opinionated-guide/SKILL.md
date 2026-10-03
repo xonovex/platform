@@ -5,6 +5,8 @@ description: "Use when editing systems or embedded C99 code in projects that fol
 
 # C99 Opinionated Guidelines (Systems/Game/Embedded)
 
+Apply caller-owned memory, data-oriented layouts, and explicit builders to systems C99. Apply **c99-guide** for the shared language foundation.
+
 ## Essentials
 
 - **Overlay on c99-guide** - This guide carries only the opinionated decisions. For the shared C99 idioms: `const`-correctness, designated initializers (ZII), `inline`-over-macros, compound literals, fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **c99-guide**

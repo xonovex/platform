@@ -8,6 +8,8 @@ argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"
 
 # /xonovex-core:plan-worktree-merge - Merge Feature Worktree Back to Source
 
+Integrate a feature worktree into its source worktree and validate the combined result.
+
 ## Arguments
 
 `/plan-worktree-merge [--squash] [--remove-worktree] [--delete-remote] [--dry-run]`
@@ -19,6 +21,4 @@ argument-hint: "[--squash] [--remove-worktree] [--delete-remote] [--dry-run]"
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its
-**worktree-merge** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

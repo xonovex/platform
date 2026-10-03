@@ -1,7 +1,5 @@
 # hdr-output: HDR Output and Display Color Spaces
 
-## Guideline
-
 To drive an HDR display, present to a wide-gamut swapchain: PQ-encoded Rec.2020 at ≥10-bit, or extended-linear scRGB at FP16. Keep the entire scene pipeline in linear, scene-referred light, and convert to the display's primaries and transfer function yourself in one final pass scaled to the display's real peak luminance. Never rely on an automatic sRGB backbuffer for HDR.
 
 ## Rationale

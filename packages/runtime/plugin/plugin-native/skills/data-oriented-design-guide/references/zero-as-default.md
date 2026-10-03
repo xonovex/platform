@@ -1,7 +1,5 @@
 # zero-as-default: Make All-Zero a Valid Default
 
-## Guideline
-
 Design data so that an all-zero state is a sensible, valid default. Reserve `0` to mean "none / not found / neutral" instead of picking magic sentinels, so zero-initialization produces correct defaults and special cases disappear.
 
 ## How to Apply

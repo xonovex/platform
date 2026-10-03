@@ -5,6 +5,8 @@ description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScrip
 
 # Hono Coding Guidelines
 
+Build typed Hono APIs with explicit validation, middleware order, and error responses.
+
 ## Requirements
 
 - Hono ≥ 4.0, @hono/node-server, @hono/zod-validator, TypeScript ≥ 5.8

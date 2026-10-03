@@ -13,20 +13,17 @@ argument-hint: "[category] [--from-reflections] [--persist] [--dry-run] [--force
 
 # /xonovex-workflow:reflect-to-skill - Convert Insights to Skill
 
+Apply reusable session lessons to their owning skills, or preview them with `--dry-run`.
+
 ## Arguments
 
-- `category` (optional) - Focus on one category (e.g., `testing`, `typescript`). Default: all
-  session insights, each routed to the existing skill that owns its domain.
-- `--from-reflections` - Source insights from existing `reflections/*.md` files instead of
-  extracting from the session (the explicit two-step flow after `reflect-extract`).
-- `--persist [<dir>]` - Also write the insights as `reflections/*.md` for an audit trail
-  (default: off, apply directly without storing).
-- `--dry-run` - Preview without writing.
-- `--force` - Overwrite an existing skill instead of merging.
-- `--output <path>` - Custom output path for a newly created skill.
+- `category` (optional): Focus on one category (e.g., `testing`, `typescript`). Default: all session insights, each routed to the existing skill that owns its domain.
+- `--from-reflections`: Source insights from existing `reflections/*.md` files instead of extracting from the session (the explicit two-step flow after `reflect-extract`).
+- `--persist [<dir>]`: Also write the insights as `reflections/*.md` for an audit trail (default: off, apply directly without storing).
+- `--dry-run`: Preview without writing.
+- `--force`: Overwrite an existing skill instead of merging.
+- `--output <path>`: Custom output path for a newly created skill.
 
 ## Delegation
 
-Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its
-**integrate-skills** operation with these arguments. The skill is the source of truth for
-the procedure, output format, and gotchas. Do not restate them.
+Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its **integrate-skills** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

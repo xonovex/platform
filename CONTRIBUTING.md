@@ -1,5 +1,19 @@
 # Contributing
 
+Install the workspace dependencies, change the package that owns the concern, and run its checks before creating a conventional commit. Submit version changes through the reviewed release workflow.
+
+## Validate a change
+
+Run package checks while editing, then run the repository gate before delivery. Use the Nix development shell when the host lacks the required toolchains.
+
+```bash
+npm install
+npx moon run <project>:ci-check --force
+nix develop --no-update-lock-file --command npx moon run :ci-check --force
+```
+
+Integration and acceptance suites use separate task tags. Run the applicable suites for changes that affect process execution or external integration. A skipped or cached check is not new validation evidence.
+
 ## Structure
 
 Every group directory carries an `AGENTS.md` describing the rules that hold across its packages, paired with a `CLAUDE.md` that points at it.
@@ -26,7 +40,7 @@ packages/
 
 ## Development
 
-Uses [moonrepo](https://moonrepo.dev/) for task orchestration.
+Use [moonrepo](https://moonrepo.dev/) to run a package task, query projects, or run an aggregate task across the workspace.
 
 ```bash
 npm install                         # Setup
@@ -37,7 +51,7 @@ npx moon query projects             # List all projects
 
 ## Commit Convention
 
-Uses [Conventional Commits](https://www.conventionalcommits.org/).
+Write a [Conventional Commit](https://www.conventionalcommits.org/) that states the resulting behavior or the purpose of the change.
 
 ```
 type(scope): description
@@ -61,7 +75,9 @@ type(scope): description
 
 ## Version Bump and Release
 
-The repository has three release lines, each versioned in lockstep within itself: the grouped plugin packages, the `npm`-tagged `config` packages together with `shared-core`, and the agent CLI with its platform binaries. Version changes must be submitted through a reviewed `version packages` pull request. Merging that pull request to `main` runs the release workflow; do not publish or tag packages directly.
+Submit version changes through a reviewed `version packages` pull request. Merging that pull request to `main` runs the release workflow; do not publish or tag packages directly.
+
+The repository has three release lines, each versioned in lockstep within itself: the grouped plugin packages, the `npm`-tagged `config` packages together with `shared-core`, and the agent CLI with its platform binaries.
 
 The versioning workflow:
 

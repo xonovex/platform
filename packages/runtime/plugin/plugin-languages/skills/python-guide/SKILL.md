@@ -5,6 +5,8 @@ description: "Use when writing or editing Python 3.12+ for APIs, data processing
 
 # Python Coding Guidelines
 
+Write typed Python with focused functions, explicit errors, and tests that check observable behavior.
+
 ## Requirements
 
 - Python ≥ 3.12; pytest ≥ 8.

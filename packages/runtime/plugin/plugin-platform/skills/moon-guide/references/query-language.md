@@ -15,14 +15,14 @@ moon run :lint --query "tags~shared && projectLayer=library"
 
 ## Fields (Moon 2.0)
 
-| Field           | Notes                               | Example                                |
-| --------------- | ----------------------------------- | -------------------------------------- |
-| `language`      | project language                    | `language=typescript`                  |
-| `projectId`     | project id (was `projectName`)      | `projectId=core`                       |
-| `projectLayer`  | layer (was `projectType`)           | `projectLayer=library`                 |
-| `projectAlias`  | package name alias                  | `projectAlias~@scope/*`                |
-| `projectSource` | source path                         | `projectSource~packages/tooling/cli/*` |
-| `tags`          | project tags                        | `tags~frontend`                        |
-| `taskToolchain` | task toolchain (was `taskPlatform`) | `taskToolchain=node`                   |
+| Field | Notes | Example |
+| --- | --- | --- |
+| `language` | project language | `language=typescript` |
+| `projectId` | project id (was `projectName`) | `projectId=core` |
+| `projectLayer` | layer (was `projectType`) | `projectLayer=library` |
+| `projectAlias` | package name alias | `projectAlias~@scope/*` |
+| `projectSource` | source path | `projectSource~packages/tooling/cli/*` |
+| `tags` | project tags | `tags~frontend` |
+| `taskToolchain` | task toolchain (was `taskPlatform`) | `taskToolchain=node` |
 
 Prefer exact `=` over regex `~` when possible.

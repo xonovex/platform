@@ -1,7 +1,6 @@
 ---
 description: >-
-  Create or update a skill by extracting patterns from codebase and project
-  instructions
+  Create or update a skill by extracting patterns from codebase and project instructions
 allowed-tools:
   - Read
   - Write
@@ -18,6 +17,8 @@ argument-hint: "[skill-name] [source-path] [--update] [--interactive] [--dry-run
 
 # /xonovex-agentic:skill-extract - Extract Skill from Codebase
 
+Create or update a skill from recurring code and project-instruction patterns.
+
 ## Arguments
 
 - `skill-name` (required): Name for skill (e.g., `example-guide`)
@@ -28,6 +29,4 @@ argument-hint: "[skill-name] [source-path] [--update] [--interactive] [--dry-run
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its
-**extract-from-codebase** operation with these arguments. The skill is the source of truth
-for the procedure, output format, and gotchas. Do not restate them.
+Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **extract-from-codebase** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

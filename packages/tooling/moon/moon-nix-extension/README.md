@@ -8,14 +8,14 @@ Version 0.2.0 is qualified against Moon 2.4.5 and Moon PDK 2.0.4. The Moon WASM 
 
 Choose `moon_nix_extension` for a central component registry, explicit project coverage, and lazy realization. Choose `moon_nix_toolchain` for automatic exact cache inputs, automatic project-flake discovery, selector-based routing, and eager realization. Every workspace must use exactly one plugin, and switching plugins must be one atomic reviewed change.
 
-| Aspect         | `moon_nix_extension`                                                                                                                                              | `moon_nix_toolchain`                                                                                              |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Task selection | Detected native toolchains mapped to components, plus typed per-project and per-task overrides, all in one validated file                                         | Explicit `nix` toolchain selection, routed by task, toolchain, tag, and language selectors                        |
-| Environment    | Centrally composed components through `lib.mkMoonShell`, or an explicit installable (`path:` self-contained copy, `dir:` resolved through the workspace git tree) | Workspace devShell, or a project's own `flake.nix` discovered automatically; the devShell picked by selector      |
-| Cache contract | Consumer declares central and project Nix inputs by hand; a Moon extension cannot contribute task hash contents, so a missed input is a silently stale cache      | Plugin folds the resolved flake root, devShell, and `flake.lock` into every task hash automatically and precisely |
-| Realization    | Lazy, when an active task runs                                                                                                                                    | Eager pre-build through `setup_environment`, so the first wrapped task is warm                                    |
-| New projects   | Must be added to the config; an unlisted project silently runs on host tools                                                                                      | Wrap by tag or language; adding the tag is the whole opt-in                                                       |
-| Fail-closed    | One global `failClosed` flag                                                                                                                                      | Opt-in per tag and language allowlists                                                                            |
+| Aspect | `moon_nix_extension` | `moon_nix_toolchain` |
+| --- | --- | --- |
+| Task selection | Detected native toolchains mapped to components, plus typed per-project and per-task overrides, all in one validated file | Explicit `nix` toolchain selection, routed by task, toolchain, tag, and language selectors |
+| Environment | Centrally composed components through `lib.mkMoonShell`, or an explicit installable (`path:` self-contained copy, `dir:` resolved through the workspace git tree) | Workspace devShell, or a project's own `flake.nix` discovered automatically; the devShell picked by selector |
+| Cache contract | Consumer declares central and project Nix inputs by hand; a Moon extension cannot contribute task hash contents, so a missed input is a silently stale cache | Plugin folds the resolved flake root, devShell, and `flake.lock` into every task hash automatically and precisely |
+| Realization | Lazy, when an active task runs | Eager pre-build through `setup_environment`, so the first wrapped task is warm |
+| New projects | Must be added to the config; an unlisted project silently runs on host tools | Wrap by tag or language; adding the tag is the whole opt-in |
+| Fail-closed | One global `failClosed` flag | Opt-in per tag and language allowlists |
 
 The extension models Nix as an environment concern instead of a task toolchain. It does not support arbitrary replacement of a peer command.
 

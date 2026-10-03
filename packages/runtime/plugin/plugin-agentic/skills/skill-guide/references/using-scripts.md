@@ -1,5 +1,7 @@
 # using-scripts: Bundling Executables in Skills
 
+Bundle repeated or complex executable logic in a script; keep simple one-off commands inline.
+
 ## When to Bundle a Script vs Inline a Command
 
 - **One-off command**: existing tool, ≤2-3 flags, easy to get right inline (`npx eslint@9 --fix .`)

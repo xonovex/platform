@@ -1,5 +1,7 @@
 # mpmc-bounded-queue: Bounded MPMC Queue
 
+Use a bounded array with per-cell sequence numbers for a multi-producer, multi-consumer queue that avoids node reclamation.
+
 ## Contents
 
 [Guideline](#guideline) · [Rationale](#rationale) · [How it works](#how-it-works) · [Example](#example) · [Gotchas](#gotchas) · [Related](#related)

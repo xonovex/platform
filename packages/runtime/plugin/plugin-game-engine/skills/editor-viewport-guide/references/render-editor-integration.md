@@ -1,7 +1,5 @@
 # render-editor-integration: The Seam Between a Real-Time Renderer and an Interactive Editor
 
-## Guideline
-
 Bridge the renderer and the editor with a thin, render-pipeline-agnostic API: the editor describes what it wants with plain old data (transforms, colors, ids), and a viewport layer translates that into passes, draws, and read-backs, so editor code never touches command buffers, constant buffers, or pipeline state, and a single feature can serve many viewports at once.
 
 ## Rationale

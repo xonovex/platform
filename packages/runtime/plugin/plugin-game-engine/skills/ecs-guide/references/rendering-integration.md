@@ -1,7 +1,5 @@
 # rendering-integration: Feeding the Renderer from ECS Data
 
-## Guideline
-
 Let rendering-relevant components implement renderer-facing interfaces, cull once per viewer into a visibility bitmask, and extend the render graph by injecting modules, rather than walking a scene graph or pushing draw calls per object.
 
 ## Rationale

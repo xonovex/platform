@@ -1,7 +1,5 @@
 # safe-memory-reclamation: Safe Memory Reclamation
 
-## Guideline
-
 In a lock-free structure, removing a node from the logical structure is not the same as freeing it; defer the actual `free` until you can prove no other thread holds a reference. Pick a reclamation scheme deliberately.
 
 ## Rationale

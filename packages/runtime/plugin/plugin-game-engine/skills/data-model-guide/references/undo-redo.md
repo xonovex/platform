@@ -1,7 +1,5 @@
 # undo-redo: Transactional Edits and the Undo Journal
 
-## Guideline
-
 Make edits transactional: record either the inverse of each operation or a before/after snapshot of what changed into an undo journal, group the operations of one user action into a single transaction, and maintain a redo stack so undone transactions can be re-applied.
 
 ## Rationale

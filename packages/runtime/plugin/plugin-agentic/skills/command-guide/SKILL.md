@@ -11,12 +11,10 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 
 - **Generic by Default**: strip project-specific paths, domain terms, and tech names at author time so prompts reuse across projects
 - **Match Style and Voice**: preserve the target's structure, voice, formatting when merging
-- **Structure Integrity**: frontmatter, Arguments, and Delegation are the essential
-  thin-command sections; the owning skill carries the procedure, output, and errors
+- **Structure Integrity**: frontmatter, Arguments, and Delegation are the essential thin-command sections; the owning skill carries the procedure, output, and errors
 - **Safe Modifications**: preview changes (`--dry-run`) before applying
 - **Deletion-first editing**: a simplify or distill pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **skill-guide** owns this rule
-- **Bound the Body**: target 15-40 lines for a delegating command and <150 lines for
-  a harness that cannot delegate
+- **Bound the Body**: target 15-40 lines for a delegating command and <150 lines for a harness that cannot delegate
 - **Delegate, Don't Duplicate**: a command owns its argument contract and delegates the procedure to a guideline skill via the `Skill` tool; the skill is the single source of truth, the command a thin, stable interface
 - **Depend on Skills Two Ways**: depend **hard** (name the exact skill, and add it to the plugin's `dependencies` when the harness installs them) when one specific skill is always required, or **soft** (describe the capability and let the agent select an installed skill, degrading gracefully) when several interchangeable skills fit; if the harness distributes skills but not commands, publish and invoke the skill directly; either way load the selected skill at run time (install ≠ in-context), see [references/distill.md](references/distill.md)
 - **Validate the public contract**: keep argument-hint and Arguments names identical; express optional supporting capabilities in delegation prose, not command metadata
@@ -38,8 +36,7 @@ Author, merge, simplify, and distill reusable user-invocable prompt files (somet
 
 ## Progressive Disclosure
 
-- Read [references/create.md](references/create.md) - Load when creating a thin
-  user-invocable command, selecting its owner skill/plugin, or defining its arguments
+- Read [references/create.md](references/create.md) - Load when creating a thin user-invocable command, selecting its owner skill/plugin, or defining its arguments
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one prompt into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose prompt
 - Read [references/distill.md](references/distill.md) - Load when refactoring a self-contained command into a thin delegator that loads its guideline skill at run time

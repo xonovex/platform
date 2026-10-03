@@ -1,7 +1,5 @@
 # data-as-transforms: Data as Transforms (Where There Is One, There Are Many)
 
-## Guideline
-
 Design from the real data and its statistics, modeling each system as a bulk transform from an input stream to an output stream, rather than from an idealized object model.
 
 ## Rationale

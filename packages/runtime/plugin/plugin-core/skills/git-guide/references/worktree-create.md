@@ -8,9 +8,9 @@ Preview or apply creation of a sibling worktree with a feature branch for isolat
 - Branch: `<worktree>/feature/<feature-name>`
 - Use a type-descriptive prefix conveying the kind of change (`feature/`, `fix/`, `docs/`, `hotfix/`), not a single generic `feature` segment
 
-| In worktree | Feature    | Directory                   | Branch                      |
-| ----------- | ---------- | --------------------------- | --------------------------- |
-| `services`  | `auth-fix` | `services-feature-auth-fix` | `services/feature/auth-fix` |
+| In worktree | Feature | Directory | Branch |
+| --- | --- | --- | --- |
+| `services` | `auth-fix` | `services-feature-auth-fix` | `services/feature/auth-fix` |
 
 ## Procedure
 

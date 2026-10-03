@@ -1,5 +1,7 @@
 # Design and Implementation
 
+Turn complete user journeys and access needs into testable accessibility requirements before choosing implementation techniques.
+
 ## Establish the user and product context
 
 Start with affected users, access needs, assistive strategies, devices, environments, languages, content formats, and complete journeys. Define the capability a person must complete, including authentication, errors, help, consent, payment, interruption, recovery, and support; do not assess only isolated screens.

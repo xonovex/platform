@@ -1,7 +1,5 @@
 # draw-batching: One Draw Call via Primitive Buffers
 
-## Guideline
-
 Store the UI as compact, tightly-packed primitive definitions and let the vertex shader synthesize vertices from a metadata-carrying index buffer, so the whole UI submits in a single draw call with no state switches.
 
 ## How to Apply

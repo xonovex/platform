@@ -1,7 +1,5 @@
 # topology-and-authority: Network Nodes, Topology, and Authority
 
-## Guideline
-
 Model a multiplayer session as a graph of network nodes: each node a self-contained simulation bound to an address, and make the topology (who connects to whom, who owns state, who accepts connections) a per-node configuration value rather than a protocol baked into the engine; do not assume a single fixed client/server shape.
 
 ## Rationale

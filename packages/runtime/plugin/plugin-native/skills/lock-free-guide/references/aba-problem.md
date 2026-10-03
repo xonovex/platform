@@ -1,7 +1,5 @@
 # aba-problem: The ABA Problem
 
-## Guideline
-
 Never assume a successful CAS means the location was untouched; if a value can change from A to B and back to A while a thread sleeps, pair the pointer with a version counter (or eliminate reuse with a reclamation scheme).
 
 ## Rationale

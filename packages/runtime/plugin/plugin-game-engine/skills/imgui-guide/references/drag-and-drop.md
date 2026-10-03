@@ -1,7 +1,5 @@
 # drag-and-drop: Build Drag-and-Drop from the Data Model
 
-## Guideline
-
 Start from the data representation: a single global id naming the dragged object(s), not from UI mechanics. The drop is a data-model mutation; the UI just reflects it on the next re-render.
 
 ## How to Apply

@@ -1,7 +1,5 @@
 # dependency-tracking: Recording Dependencies for Exact Incremental Reimport
 
-## Guideline
-
 Record every input each cook actually consumed: source files, included sub-resources, referenced assets, and settings, so that when a source changes you can recompile exactly its dependents (the transitive closure) and leave everything else untouched.
 
 ## Rationale

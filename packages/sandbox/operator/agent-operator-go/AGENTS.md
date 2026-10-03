@@ -1,5 +1,7 @@
 # Agent Operator Go
 
+Accept execution through AgentRun resources and enforce namespace policy across each independent run concern.
+
 - `AgentRun` is the only execution request API; external callers create runs directly through Kubernetes. Scheduling, event ingress, and trigger interpretation stay outside the operator.
 - Keep harness, provider, workspace, and toolchain concerns selectable by reference or inline configuration; workspaces use RWX PVCs for coordination.
 - A Nix toolchain is a pre-built, digest-pinned OCI image, never a per-pod install. `NixSpec` requires `nixpkgsRev`, `packages` XOR `flakeRef`/`shell`, and `image`; the webhook enforces `RequirePinnedProvision`. Build it with `npx moon run agent-operator-go:agent-image-build` (`nix build .#legacyPackages.<sys>.agentImage` plus skopeo push).

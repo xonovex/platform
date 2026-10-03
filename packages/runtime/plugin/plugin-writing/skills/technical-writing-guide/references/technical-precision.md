@@ -1,5 +1,7 @@
 # technical-precision: Preserve Exact Technical Meaning
 
+Preserve exact identifiers, conditions, units, and evidence while shortening technical prose.
+
 ## Preserve Technical Names
 
 - Keep exact identifiers, paths, commands, configuration keys, units, protocol names, and error text when they affect the result.

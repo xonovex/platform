@@ -25,18 +25,18 @@ npx moon-version-bump --lockstep a,b,c --type minor   # move a release line as o
 
 Use these options to select the version, affected packages, and changelog behavior.
 
-| Flag                      | Type    | Description                                                                                   |
-| ------------------------- | ------- | --------------------------------------------------------------------------------------------- |
-| `--type, -t`              | string  | Bump type: patch, minor, or major (default: patch)                                            |
-| `--dry-run, -d`           | boolean | Preview changes without writing files                                                         |
-| `--no-changelog`          | boolean | Skip changelog generation                                                                     |
-| `--no-dependents`         | boolean | Skip updating dependent packages                                                              |
-| `--changelog-path <path>` | string  | Custom changelog filename (default: `CHANGELOG.md`)                                           |
-| `--preid <tag>`           | string  | Prerelease identifier (for example, `beta` produces `1.2.4-beta.0`)                           |
-| `--exact <version>`       | string  | Set exact version instead of bumping                                                          |
-| `--git-base <ref>`        | string  | Override git ref for changelog commit range                                                   |
-| `--include-types <types>` | string  | Comma-separated conventional commit types to include (default: `feat,fix,refactor,perf,docs`) |
-| `--lockstep <packages>`   | string  | Comma-separated packages to move to one shared version in a single write                      |
+| Flag | Type | Description |
+| --- | --- | --- |
+| `--type, -t` | string | Bump type: patch, minor, or major (default: patch) |
+| `--dry-run, -d` | boolean | Preview changes without writing files |
+| `--no-changelog` | boolean | Skip changelog generation |
+| `--no-dependents` | boolean | Skip updating dependent packages |
+| `--changelog-path <path>` | string | Custom changelog filename (default: `CHANGELOG.md`) |
+| `--preid <tag>` | string | Prerelease identifier (for example, `beta` produces `1.2.4-beta.0`) |
+| `--exact <version>` | string | Set exact version instead of bumping |
+| `--git-base <ref>` | string | Override git ref for changelog commit range |
+| `--include-types <types>` | string | Comma-separated conventional commit types to include (default: `feat,fix,refactor,perf,docs`) |
+| `--lockstep <packages>` | string | Comma-separated packages to move to one shared version in a single write |
 
 ## Behavior
 

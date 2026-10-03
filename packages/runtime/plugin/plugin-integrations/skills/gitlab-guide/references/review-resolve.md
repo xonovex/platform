@@ -1,7 +1,5 @@
 # review-resolve: List, match, and resolve threads
 
-## Guideline
-
 Resolution is a plain REST PUT on the discussion, no GraphQL needed on GitLab. List the threads, match a finding to a thread by its `id` (never by line number), resolve, and reply in-thread. Resolution gates merge only when the project opts in.
 
 ## List and match

@@ -1,7 +1,5 @@
 # snapshots-and-threading: Consistent Reads While Writers Mutate
 
-## Guideline
-
 Give reader threads a consistent view of the model while a writer mutates it by publishing immutable snapshots (copy-on-write versions swapped in atomically) or, where that is too costly, a coarse lock; let a simulation/render thread take one read snapshot per frame, and reconcile any external mutations back into the model through the normal edit path.
 
 ## Rationale

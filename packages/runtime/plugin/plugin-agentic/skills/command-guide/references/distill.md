@@ -1,7 +1,6 @@
 # distill: Distill a Fat Command into a Skill Delegator
 
-Move a self-contained command's reusable procedure into one owner skill while keeping
-its public argument contract stable.
+Move a self-contained command's reusable procedure into one owner skill while keeping its public argument contract stable.
 
 ## Goal
 
@@ -25,8 +24,7 @@ Keep in the command:
 - description, allowed tools, and argument hint;
 - argument names, defaults, repeatability, and effect boundary;
 - exact owner skill, owner plugin, and operation;
-- brief natural-language supporting needs that the owner operation should select from
-  installed skill names and descriptions.
+- brief natural-language supporting needs that the owner operation should select from installed skill names and descriptions.
 
 Move to the owner skill:
 
@@ -41,15 +39,11 @@ Move to the owner skill:
 - [ ] Parse the existing public arguments before changing any content.
 - [ ] Resolve one concept owner. Reuse an existing owner rather than copying.
 - [ ] Resolve the owner plugin separately and verify that it distributes the guide.
-- [ ] Move the reusable procedure to the owner's operation reference and register the
-      operation in its progressive-disclosure index.
-- [ ] Describe supporting interchangeable skills in Delegation. Use exact
-      dependencies only when the procedure cannot complete without one named guide.
-- [ ] Replace the command body with Arguments and Delegation while preserving its
-      argument contract.
+- [ ] Move the reusable procedure to the owner's operation reference and register the operation in its progressive-disclosure index.
+- [ ] Describe supporting interchangeable skills in Delegation. Use exact dependencies only when the procedure cannot complete without one named guide.
+- [ ] Replace the command body with Arguments and Delegation while preserving its argument contract.
 - [ ] Add the skill-loading capability and wire supported plugin dependencies.
-- [ ] Preview or apply, then validate command syntax, argument parity, links,
-      manifests, and the skill.
+- [ ] Preview or apply, then validate command syntax, argument parity, links, manifests, and the skill.
 
 ## Output
 
@@ -68,8 +62,7 @@ Report:
 - No concept owner → create or extend the owner skill first.
 - Multiple possible owners → stop and ask; never merge ownership by prompt order.
 - Plugin does not distribute the named guide → stop and report the mismatch.
-- Public argument drift → restore the original contract or declare a separate
-  migration.
+- Public argument drift → restore the original contract or declare a separate migration.
 
 ## Gotchas
 

@@ -1,7 +1,5 @@
 # render-graph: Render Graphs and Transient Resource Aliasing
 
-## Guideline
-
 Express a frame as a graph of passes that each declare which resources they read and write, and let the graph derive execution order, insert barriers and image-layout transitions, prune unused passes, and alias transient render targets whose lifetimes do not overlap, instead of hand-sequencing barriers and managing target memory by hand.
 
 ## Rationale

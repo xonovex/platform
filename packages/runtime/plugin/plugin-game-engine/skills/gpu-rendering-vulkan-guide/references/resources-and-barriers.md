@@ -1,7 +1,5 @@
 # resources-and-barriers: Images, Buffers, Pipeline Barriers, and Layout Transitions
 
-## Guideline
-
 Create `VkImage`/`VkBuffer` with the right usage flags and views (`VkImageView`/`VkBufferView`), track each image's current `VkImageLayout`, and synchronize every write→read and read→write with `VkImageMemoryBarrier2`/`VkBufferMemoryBarrier2` carrying scoped `srcStageMask`/`srcAccessMask` and `dstStageMask`/`dstAccessMask`, the layout transition, and any queue-family ownership transfer.
 
 ## Rationale

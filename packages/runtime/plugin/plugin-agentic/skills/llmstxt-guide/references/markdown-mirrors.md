@@ -4,12 +4,12 @@ Each page that `/llms.txt` references must have a clean markdown version served 
 
 ## URL Convention
 
-| Original URL                       | Markdown mirror URL                         |
-| ---------------------------------- | ------------------------------------------- |
-| `https://site.com/docs/intro.html` | `https://site.com/docs/intro.html.md`       |
-| `https://site.com/docs/intro`      | `https://site.com/docs/intro.md`            |
-| `https://site.com/docs/intro/`     | `https://site.com/docs/intro/index.html.md` |
-| `https://site.com/` (root)         | `https://site.com/index.html.md`            |
+| Original URL | Markdown mirror URL |
+| --- | --- |
+| `https://site.com/docs/intro.html` | `https://site.com/docs/intro.html.md` |
+| `https://site.com/docs/intro` | `https://site.com/docs/intro.md` |
+| `https://site.com/docs/intro/` | `https://site.com/docs/intro/index.html.md` |
+| `https://site.com/` (root) | `https://site.com/index.html.md` |
 
 Rule: append `.md` to the original URL. If the URL has no filename (ends in `/`), append `index.html.md` instead.
 
