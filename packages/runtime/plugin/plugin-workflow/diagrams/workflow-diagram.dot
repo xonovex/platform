@@ -1,7 +1,7 @@
 digraph Workflow {
-  graph [bgcolor="white", rankdir=TB, pad=0.3, nodesep=0.3, ranksep=0.4, splines=polyline, compound=true, newrank=true, fontname="DejaVu Sans", fontsize=22, fontcolor="#1d253c", color="#0063d3"];
-  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=17, color="#0063d3", fillcolor="#ffffff", fontcolor="#1d253c", margin="0.18,0.13"];
-  edge [fontname="DejaVu Sans", fontsize=15, color="#3f5f90", fontcolor="#1d253c", penwidth=1.5, arrowsize=0.7];
+  graph [bgcolor="white", rankdir=TB, pad=0.3, nodesep=0.3, ranksep=0.4, splines=polyline, compound=true, newrank=true, fontname="Space Grotesk,sans-serif", fontsize=22, fontcolor="#000000", color="#d1d5db"];
+  node [shape=box, style="rounded,filled", fontname="Inter,sans-serif", fontsize=17, color="#d1d5db", fillcolor="#ffffff", fontcolor="#000000", margin="0.18,0.13"];
+  edge [fontname="Inter,sans-serif", fontsize=15, color="#374151", fontcolor="#000000", penwidth=1.5, arrowsize=0.7];
 
   subgraph cluster_research {
     research_top [shape=point, width=0, height=0, label="", style=invis, group=phase_spine];
@@ -11,13 +11,13 @@ digraph Workflow {
     research_top -> research_bottom [style=invis, weight=10000];
     research_top -> setup [style=invis];
     research_note -> research_bottom [style=invis];
-    graph [label="1. Research and decisions", style=rounded, bgcolor="#eef6ff", margin=20, sortv=1];
+    graph [fontname="Space Grotesk,sans-serif", label="1. Research and decisions", style=rounded, bgcolor="#f9fafb", margin=20, sortv=1];
 
     setup [label="Select harness, model and sandbox"];
     research [label="/plan-research\nExplore code, viability and alternatives"];
     decide [label="/plan-decide\nResolve questions and agree direction"];
-    proceed [label="Proceed?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    to_planning [label="2. Create and review a plan", fillcolor="#fff3bf", color="#a76d00"];
+    proceed [label="Proceed?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    to_planning [label="2. Create and review a plan", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     stop_research [label="Not pursued", shape=oval];
     research_note [shape=note, label="Xonovex Workflow owns /plan-* commands.\nNew sessions are optional. Reconstruct context\nwhen resuming. Commands do not grant authority\nto push or perform other restricted actions."];
 
@@ -30,9 +30,9 @@ digraph Workflow {
     { rank=same; research_retry_bottom; proceed; }
     research_retry_top -> research [style=invis];
     research_retry_bottom -> proceed [style=invis];
-    proceed:w -> research_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#a76d00"];
-    research_retry_top -> research_retry_bottom [label="Investigate", arrowhead=none, weight=100, style=dashed, color="#a76d00"];
-    research_retry_top -> research:w [constraint=false, style=dashed, color="#a76d00"];
+    proceed:w -> research_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#2563eb"];
+    research_retry_top -> research_retry_bottom [label="Investigate", arrowhead=none, weight=100, style=dashed, color="#2563eb"];
+    research_retry_top -> research:w [constraint=false, style=dashed, color="#2563eb"];
     to_planning -> research_note [style=invis];
   }
 
@@ -44,18 +44,18 @@ digraph Workflow {
     planning_top -> planning_bottom [style=invis, weight=10000];
     planning_top -> create [style=invis];
     planning_note -> planning_bottom [style=invis];
-    graph [label="2. Create and review a plan", style=rounded, bgcolor="#eef6ff", margin=20, sortv=2];
+    graph [fontname="Space Grotesk,sans-serif", label="2. Create and review a plan", style=rounded, bgcolor="#f9fafb", margin=20, sortv=2];
 
     create [label="/plan-create\nDefine criteria; use BDD or TDD when appropriate"];
     critique [label="/plan-critique\nIndependent review"];
-    review [label="Review outcome?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
+    review [label="Review outcome?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
     revise [label="/plan-revise\nApply feedback"];
     reject [label="/plan-reject\nRecord reason"];
     accept [label="/plan-accept\nRecord approval"];
     rejected [label="Rejected\nStop or return to /plan-revise", shape=oval];
     expand [label="/plan-subplans-create (optional)\nSplit work and identify parallel groups"];
     commit_plan [label="Core: /git-commit\nCommit plans when persisted"];
-    to_execution [label="3. Implement and validate", fillcolor="#fff3bf", color="#a76d00"];
+    to_execution [label="3. Implement and validate", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     planning_note [shape=note, label="Open decision: use /plan-decide, then revise.\nStatus metadata alone does not authorize work."];
 
     create -> critique -> review;
@@ -67,9 +67,9 @@ digraph Workflow {
     revise -> reject -> accept [style=invis, weight=100];
     review_retry_top -> critique [style=invis];
     review_retry_bottom -> revise [style=invis];
-    revise:w -> review_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#a76d00"];
-    review_retry_top -> review_retry_bottom [arrowhead=none, weight=100, style=dashed, color="#a76d00"];
-    review_retry_top -> critique:w [constraint=false, style=dashed, color="#a76d00"];
+    revise:w -> review_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#2563eb"];
+    review_retry_top -> review_retry_bottom [arrowhead=none, weight=100, style=dashed, color="#2563eb"];
+    review_retry_top -> critique:w [constraint=false, style=dashed, color="#2563eb"];
     review -> reject [label="Reject"];
     reject -> rejected;
     review -> accept [label="Accept"];
@@ -85,18 +85,18 @@ digraph Workflow {
     execution_top -> execution_bottom [style=invis, weight=10000];
     execution_top -> worktree [style=invis];
     execution_note -> execution_bottom [style=invis];
-    graph [label="3. Implement and validate", style=rounded, bgcolor="#eef6ff", margin=20, sortv=3];
+    graph [fontname="Space Grotesk,sans-serif", label="3. Implement and validate", style=rounded, bgcolor="#f9fafb", margin=20, sortv=3];
 
     worktree [label="Core: /plan-worktree-create (optional)\nEnter worktree and associate the plan"];
-    mode [label="Execution mode?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
+    mode [label="Execution mode?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
     continuation [label="/plan-continue\nRequest apply; implement one target\nLoad plan context and relevant skills"];
     delegation [label="/plan-delegate\nBrief agents; independently verify work\nCommit per item or batch as requested"];
     validate [label="/plan-validate\nCheck criteria and report evidence"];
-    passes [label="Checks pass?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
+    passes [label="Checks pass?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
     update [label="/plan-update\nRefresh progress and evidence\nPersist with plan when requested"];
-    next [label="Next step?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    to_quality [label="4. Quality and delivery", fillcolor="#fff3bf", color="#a76d00"];
-    to_pause [label="5. Closeout\nPause or hand off", fillcolor="#fff3bf", color="#a76d00"];
+    next [label="Next step?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    to_quality [label="4. Quality and delivery", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
+    to_pause [label="5. Closeout\nPause or hand off", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     execution_note [shape=note, label="Delegation: sequential or parallel ordering.\nParallel groups require disjoint file sets.\nUse isolated worktrees when needed.\nFinish dependencies before the next group.\nAbandoning a worktree: use panel 4."];
 
     worktree -> mode;
@@ -111,9 +111,9 @@ digraph Workflow {
     { rank=same; execution_retry_bottom; passes; }
     execution_retry_top -> mode [style=invis];
     execution_retry_bottom -> passes [style=invis];
-    passes:w -> execution_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#a76d00"];
-    execution_retry_top -> execution_retry_bottom [label="Fix and retry", arrowhead=none, weight=100, style=dashed, color="#a76d00"];
-    execution_retry_top -> mode:w [constraint=false, style=dashed, color="#a76d00"];
+    passes:w -> execution_retry_bottom [arrowhead=none, constraint=false, style=dashed, color="#2563eb"];
+    execution_retry_top -> execution_retry_bottom [label="Fix and retry", arrowhead=none, weight=100, style=dashed, color="#2563eb"];
+    execution_retry_top -> mode:w [constraint=false, style=dashed, color="#2563eb"];
     passes -> update [label="Yes"];
     update -> next;
     execution_resume_top [shape=point, width=0, height=0, label="", style=invis, group=execution_resume];
@@ -122,9 +122,9 @@ digraph Workflow {
     { rank=same; next; execution_resume_bottom; }
     mode -> execution_resume_top [style=invis];
     next -> execution_resume_bottom [style=invis];
-    next:e -> execution_resume_bottom [arrowhead=none, constraint=false, style=dashed, color="#a76d00"];
-    execution_resume_top -> execution_resume_bottom [label="More work", arrowhead=none, weight=100, style=dashed, color="#a76d00"];
-    execution_resume_top -> mode:e [constraint=false, style=dashed, color="#a76d00"];
+    next:e -> execution_resume_bottom [arrowhead=none, constraint=false, style=dashed, color="#2563eb"];
+    execution_resume_top -> execution_resume_bottom [label="More work", arrowhead=none, weight=100, style=dashed, color="#2563eb"];
+    execution_resume_top -> mode:e [constraint=false, style=dashed, color="#2563eb"];
     next -> to_quality [label="Complete"];
     next -> to_pause [label="Pause"];
     to_quality -> execution_note [style=invis];
@@ -138,26 +138,26 @@ digraph Workflow {
     delivery_top -> delivery_bottom [style=invis, weight=10000];
     delivery_top -> quality [style=invis];
     to_closeout -> delivery_bottom [style=invis];
-    graph [label="4. Quality and delivery", style=rounded, bgcolor="#eef6ff", margin=20, sortv=4];
+    graph [fontname="Space Grotesk,sans-serif", label="4. Quality and delivery", style=rounded, bgcolor="#f9fafb", margin=20, sortv=4];
 
     quality [label="Core: code-quality-guide\nAudit simplification and hardening"];
-    quality_result [label="Findings?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    fixes [label="3. Implement bounded fixes\n1. Research broader changes", fillcolor="#fff3bf", color="#a76d00"];
-    delivery [label="Delivery path?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
+    quality_result [label="Findings?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    fixes [label="3. Implement bounded fixes\n1. Research broader changes", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
+    delivery [label="Delivery path?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
     merge [label="Core: /plan-worktree-merge\nIntegrate into parent"];
     abandon [label="Core: /plan-worktree-abandon\nRecord reason; preserve lessons"];
     abandoned [label="Work abandoned\n6. Reflect on lessons", shape=oval];
     integrated [label="/plan-validate\nCheck integrated work on parent"];
-    integration_passes [label="Checks pass?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    parent_fix [label="3. Fix on parent\nThen repeat integrated validation", fillcolor="#fff3bf", color="#a76d00"];
+    integration_passes [label="Checks pass?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    parent_fix [label="3. Fix on parent\nThen repeat integrated validation", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     cleanup [label="Core: /plan-worktree-cleanup (optional)\nRemove remaining eligible worktrees"];
     commit [label="Core: /git-commit\nAdd --push only when requested"];
     publish [label="Optional publication\nGitHub / GitLab integration\nOpen a pull or merge request"];
     review_code [label="Core: code-review-guide\nReview code and address findings"];
-    review_ready [label="Review and checks pass?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    review_fixes [label="3. Apply review fixes\nValidate, commit and repeat review", fillcolor="#fff3bf", color="#a76d00"];
+    review_ready [label="Review and checks pass?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    review_fixes [label="3. Apply review fixes\nValidate, commit and repeat review", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     land [label="Integrations: GitHub / GitLab\nMerge through repository controls"];
-    to_closeout [label="5. Closeout", fillcolor="#fff3bf", color="#a76d00"];
+    to_closeout [label="5. Closeout", fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
 
     quality -> quality_result;
     quality_result -> fixes [label="Changes needed"];
@@ -194,12 +194,12 @@ digraph Workflow {
     closeout_top -> closeout_bottom [style=invis, weight=10000];
     closeout_top -> followup [style=invis];
     followup_note -> closeout_bottom [style=invis];
-    graph [label="5. Closeout and follow-up", style=rounded, bgcolor="#eef6ff", margin=20, sortv=5];
+    graph [fontname="Space Grotesk,sans-serif", label="5. Closeout and follow-up", style=rounded, bgcolor="#f9fafb", margin=20, sortv=5];
 
     followup [label="/plan-followup\nCompleted, paused or handed-over work"];
     record [label="Return status, evidence, decisions,\nremaining work and follow-up seeds\nPublish separately when requested"];
-    outcome [label="Outcome?", shape=diamond, fillcolor="#fff3bf", color="#a76d00"];
-    complete [label="Feature complete", shape=oval, fillcolor="#fff3bf", color="#a76d00"];
+    outcome [label="Outcome?", shape=diamond, fillcolor="#eff6ff", color="#2563eb"];
+    complete [label="Feature complete", shape=oval, fillcolor="#111827", color="#111827", fontcolor="#ffffff"];
     paused [label="Paused / handed over\nResume through panel 3", shape=oval];
     distill [label="/plan-distill (optional)\nCompleted implementation\nto replayable skill suite"];
     followup_note [shape=note, label="Follow-up seeds: panel 2, /plan-create.\nUnresolved research: panel 1, /plan-research.\nDistillation captures a replayable implementation,\nnot just the session lessons in panel 6."];
@@ -212,15 +212,15 @@ digraph Workflow {
   }
 
   subgraph cluster_learning {
-    graph [label="6. Continuous learning (any phase)", style=rounded, bgcolor="#eef6ff", margin=20, sortv=6];
+    graph [fontname="Space Grotesk,sans-serif", label="6. Continuous learning (any phase)", style=rounded, bgcolor="#f9fafb", margin=20, sortv=6];
 
     lessons [label="Session lessons\nFrom any phase, including stopped work"];
     extract [label="/reflect-extract (optional)\nExtract lessons separately"];
     instructions [label="/reflect-to-instructions\nUpdate relevant AGENTS.md files"];
     skills [label="/reflect-to-skill\nUpdate reusable skills"];
-    guidance [label="Improved guidance\nfor future sessions", fillcolor="#fff3bf", color="#a76d00"];
+    guidance [label="Improved guidance\nfor future sessions", fillcolor="#f0fdf4", color="#15803d"];
     simplify [label="Agentic Plugin, as needed\n/instructions-simplify\n/skill-simplify\n/slashcommand-simplify"];
-    learning_note [shape=note, label="Integration commands extract and apply directly.\nUse --from-reflections after separate extraction.\nBlue arrows: normal flow. Dashed gold: retry.\nGold handoff boxes name another numbered panel."];
+    learning_note [shape=note, label="Integration commands extract and apply directly.\nUse --from-reflections after separate extraction.\nGray arrows: normal flow. Dashed blue: retry.\nDark handoff boxes name another numbered panel."];
 
     lessons -> instructions [label="Apply directly"];
     lessons -> skills [label="Apply directly"];

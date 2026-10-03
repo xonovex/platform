@@ -14,6 +14,7 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
 | Install skills and commands | [Plugin catalog](#agent-plugins) |
 | Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
+| Create or update visual documentation | [Xonovex design](DESIGN.md) |
 | Run Moon tasks in pinned Nix environments | [Moon Nix toolchain](packages/tooling/moon/moon-nix-toolchain/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 

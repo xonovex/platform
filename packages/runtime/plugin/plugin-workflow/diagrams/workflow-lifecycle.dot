@@ -1,13 +1,13 @@
 digraph diagram {
-  graph [bgcolor="white", rankdir=LR, pad=0.2, nodesep=0.25, ranksep=0.35, splines=polyline]
-  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=19, color="#0063d3", fillcolor="#eef6ff", fontcolor="#1d253c", margin="0.17,0.14"]
-  edge [color="#3f5f90", penwidth=1.5, arrowsize=0.7]
+  graph [bgcolor="white", rankdir=LR, pad=0.2, nodesep=0.25, ranksep=0.35, splines=polyline, fontname="Space Grotesk,sans-serif", fontcolor="#000000"]
+  node [shape=box, style="rounded,filled", fontname="Inter,sans-serif", fontsize=19, color="#d1d5db", fillcolor="#ffffff", fontcolor="#000000", margin="0.17,0.14"]
+  edge [fontname="Inter,sans-serif", color="#374151", penwidth=1.5, arrowsize=0.7]
 
   research [label="Research\nand decide"]
   plan [label="Plan\nand review"]
-  cycle [label="Implement\nand validate", fillcolor="#fff3bf", color="#a76d00"]
+  cycle [label="Implement\nand validate", fillcolor="#111827", color="#111827", fontcolor="#ffffff"]
   quality [label="Quality\nand delivery"]
-  done [label="Closeout\nand follow-up", fillcolor="#fff3bf", color="#a76d00"]
+  done [label="Closeout\nand follow-up", fillcolor="#111827", color="#111827", fontcolor="#ffffff"]
 
   research -> plan -> cycle -> quality -> done
 }

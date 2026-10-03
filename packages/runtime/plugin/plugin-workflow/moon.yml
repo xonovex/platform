@@ -14,6 +14,13 @@ tasks:
       mergeDeps: append
   graph-build:
     script: |
+      export FONTCONFIG_FILE="${XONOVEX_DIAGRAM_FONTCONFIG_FILE:?The Nix environment must supply the diagram fonts}"
+      for family in Inter 'Space Grotesk'; do
+        if [ "$(fc-match --format '%{family[0]}' "$family")" != "$family" ]; then
+          echo "Missing diagram font: $family" >&2
+          exit 1
+        fi
+      done
       shopt -s nullglob
       sources=(diagrams/*.dot)
       if [ "${#sources[@]}" -eq 0 ]; then
@@ -27,6 +34,9 @@ tasks:
     toolchain: [system, nix]
     inputs:
       - "diagrams/*.dot"
+      - "/DESIGN.md"
+      - "/nix/general.nix"
+      - "/flake.lock"
     outputs:
       - "diagrams/*.svg"
       - "diagrams/*.png"

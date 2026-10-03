@@ -107,4 +107,4 @@ Run the plugin gate from the repository root. It checks commands, formatting, ow
 npx moon run plugin-workflow:ci-check --force
 ```
 
-Edit diagram sources under [`diagrams/`](diagrams/README.md), then run `npx moon run plugin-workflow:graph-build --force` to refresh SVG and PNG outputs.
+Edit diagram sources under [`diagrams/`](diagrams/README.md) using the [Xonovex design](../../../../DESIGN.md), then run `nix develop --no-update-lock-file --command npx moon run plugin-workflow:graph-build --force` to refresh SVG and PNG outputs with the supplied fonts.
