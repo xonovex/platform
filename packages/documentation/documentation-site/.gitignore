@@ -1,0 +1,4 @@
+content/
+.vitepress/cache/
+.vitepress/.temp/
+.vitepress/dist/

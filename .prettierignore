@@ -24,6 +24,10 @@ out/
 .cache/
 .docusaurus/
 .vuepress/dist/
+**/.vitepress/cache/
+**/.vitepress/.temp/
+**/.vitepress/*.timestamp-*.mjs
+packages/documentation/documentation-site/content/
 
 # Testing and Coverage
 coverage/

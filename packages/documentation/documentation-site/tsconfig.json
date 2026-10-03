@@ -1,0 +1,21 @@
+{
+  "extends": "@xonovex/ts-config-node",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "composite": false,
+    "incremental": false,
+    "declaration": false,
+    "declarationMap": false,
+    "rootDir": "."
+  },
+  "include": [
+    "src",
+    "test",
+    ".vitepress/**/*.ts",
+    ".vitepress/**/*.vue",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules", ".vitepress/dist", ".vitepress/cache"]
+}

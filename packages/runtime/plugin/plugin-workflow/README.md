@@ -54,17 +54,31 @@ Use `reflect-to-instructions` for project-specific lessons and `reflect-to-skill
 
 Reflection captures session lessons. `plan-distill` reconstructs a completed implementation as a replayable skill suite. Use the Agentic Plugin's instruction, skill, and slash-command simplification commands when the resulting guidance needs shortening.
 
+<!-- xonovex:installation:start -->
+
 ## Install
 
-Add the [Xonovex marketplace](../../../../README.md#agent-plugins) once, then install this plugin in the selected harness.
+Add the Xonovex marketplace once, then install `xonovex-workflow` in the selected harness. The bundle version is `5.3.0`.
+
+### Claude Code
+
+Install this bundle in Claude Code. The harness discovers its bundled skills and commands.
 
 ```bash
-# Claude Code
+claude plugin marketplace add xonovex/platform
 claude plugin install xonovex-workflow@xonovex-marketplace
+```
 
-# Codex
+### Codex
+
+Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.
+
+```bash
+codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
+
+<!-- xonovex:installation:end -->
 
 ## Skills
 

@@ -3,6 +3,7 @@ projects:
   globs:
     - packages/asset/*
     - packages/config/*
+    - packages/documentation/*
     - packages/library/*
     - packages/runtime/plugin/*
     - packages/tooling/cli/*
@@ -138,6 +139,10 @@ hasher:
     - "**/reports/**"
     - "**/.nyc_output/**"
     - "**/.cache/**"
+    - "packages/documentation/documentation-site/content/**"
+    - "**/.vitepress/cache/**"
+    - "**/.vitepress/.temp/**"
+    - "**/.vitepress/*.timestamp-*.mjs"
     - "**/*-guide-workspace/**"
     - ".moon/cache/**"
     - ".moon/docker/**"

@@ -25,6 +25,8 @@ packages/
       plugin-*/               # Installable groups of related skills and commands
         skills/*-guide/       # Skill instructions, references, scripts, and evals
         commands/             # Commands that load skills from the owning plugin
+  documentation/
+    documentation-site/       # Website and catalogs generated from repository sources
   tooling/
     cli/                      # Agent CLI, platform binaries, and GitHub Action
     script/                   # Moon task binaries and shared script code
@@ -90,6 +92,8 @@ Changed-version packages are detected by comparing each `package.json` `version`
 ## Agent Skills
 
 Each plugin in `packages/runtime/plugin/` owns related skills under `skills/` and commands under `commands/`. Each skill keeps its harness-neutral `SKILL.md`, references, scripts, assets, and evaluations together. Skill Moon project identifiers remain `skill-<topic>`; plugin project identifiers are `plugin-<group>`.
+
+Run `npm run docs:generate` after changing plugin versions, names, dependencies, or harness support. This updates the marked installation section in each plugin README. The documentation website also discovers component files and reference Markdown automatically. Follow [DESIGN.md](DESIGN.md) when changing either theme or workflow diagrams.
 
 ## Code Style
 

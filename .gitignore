@@ -17,6 +17,12 @@
 .moon/docker/
 .artifacts/
 
+# Generated documentation site sources and build cache
+packages/documentation/documentation-site/content/
+**/.vitepress/cache/
+**/.vitepress/.temp/
+**/.vitepress/*.timestamp-*.mjs
+
 # Docker image scanning artifacts
 trivy.sarif
 sbom.spdx.json

@@ -7,6 +7,7 @@ Work within the package boundaries below, run the required checks, and follow th
 ### Packages
 
 - **`runtime/plugin`**: Grouped plugins with skills under `skills/` and commands under `commands/`; lockstep with both marketplaces
+- **`documentation`**: VitePress website generated from repository documents, component metadata, and `DESIGN.md`
 - **`tooling/cli`**: Agent CLI, platform binary packages, and GitHub Action wrapper
 - **`tooling/script`**: Moon task binaries and their shared code
 - **`tooling/moon`**: Moon Nix plugins, versioned from `Cargo.toml`

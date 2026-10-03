@@ -15,6 +15,7 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Install skills and commands | [Plugin catalog](#agent-plugins) |
 | Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
 | Create or update visual documentation | [Xonovex design](DESIGN.md) |
+| Browse searchable documentation and component catalogs | [Documentation website](packages/documentation/documentation-site/README.md) |
 | Run Moon tasks in pinned Nix environments | [Moon Nix toolchain](packages/tooling/moon/moon-nix-toolchain/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
@@ -87,6 +88,19 @@ codex plugin add xonovex-typescript@xonovex-marketplace
 The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The `xonovex-workflow` plugin now contains the planning and reflection skills and their commands. Git commands and the existing `plan-worktree-*` commands belong to `xonovex-core`; authoring commands belong to `xonovex-agentic`; content commands belong to `xonovex-writing`.
 
 ## Development
+
+### Documentation website
+
+Run the VitePress website to browse plugins, skills, commands, and agent tools. It generates pages from the existing Markdown and metadata, updates plugin README installation sections, and uses the light and dark Xonovex themes defined in [DESIGN.md](DESIGN.md).
+
+```bash
+npm install
+npm run docs:dev
+```
+
+Use `npm run docs:build` for a static build and `npm run docs:check` to check installation sections for drift. Edit the original documents; the generated website content is ignored by Git. The [website guide](packages/documentation/documentation-site/README.md) describes source ownership and validation.
+
+### Repository tasks
 
 Install workspace dependencies before running Moon tasks and repository gates.
 

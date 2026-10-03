@@ -1,0 +1,83 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+layer: application
+tags: [typescript, documentation]
+toolchains:
+  typescript: false
+fileGroups:
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/vitest-config-base/src/**/*
+    - /packages/config/vitest-config-node/src/**/*
+  documentation:
+    - /README.md
+    - /CONTRIBUTING.md
+    - /DESIGN.md
+    - /AGENTS.md
+    - /packages/**/*.md
+    - /packages/runtime/plugin/**/plugin.json
+    - /packages/runtime/plugin/**/*.json
+    - /packages/**/package.json
+    - /packages/**/*.{svg,png,jpg,jpeg,gif,webp,dot,pdf}
+    - /.claude-plugin/marketplace.json
+    - /.agents/plugins/marketplace.json
+tasks:
+  generate:
+    script: npx tsx src/generate.ts
+    inputs: [src/**/*, "@globs(documentation)"]
+    options:
+      cache: false
+      runInCI: false
+  generate-check:
+    script: npx tsx src/generate.ts --check
+    inputs: [src/**/*, "@globs(documentation)"]
+    options:
+      cache: false
+  ts-build:
+    script: npx vitepress build
+    deps: [generate-check]
+    inputs: [src/**/*, .vitepress/**/*, "@globs(documentation)"]
+    outputs: [dist]
+    options:
+      mergeDeps: replace
+      cache: true
+  ts-typecheck:
+    script: npx vue-tsc --noEmit
+    deps: [generate-check]
+    inputs: [src/**/*, test/**/*, .vitepress/**/*, tsconfig*.json]
+    options:
+      mergeDeps: replace
+  ts-lint:
+    script: npx eslint src test '.vitepress/**/*.ts' '.vitepress/**/*.vue' --no-error-on-unmatched-pattern
+    deps: [generate-check]
+    inputs: [src/**/*, test/**/*, .vitepress/**/*, eslint.config.ts]
+    options:
+      mergeDeps: replace
+  dev:
+    script: npm run dev
+    preset: server
+    options:
+      persistent: true
+      runInCI: false
+      cache: false
+  preview:
+    script: npm run preview
+    preset: server
+    options:
+      persistent: true
+      runInCI: false
+      cache: false
+  ci-check:
+    deps: [generate-check, ts-coverage]
+    options:
+      mergeDeps: append
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "80"
+      TS_COVERAGE_MIN_FUNCTIONS: "85"
+      TS_COVERAGE_MIN_BRANCHES: "70"
+      TS_COVERAGE_MIN_STATEMENTS: "80"

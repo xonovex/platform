@@ -1,0 +1,297 @@
+:root {
+  --vp-c-bg: var(--xonovex-canvas);
+  --vp-c-bg-alt: var(--xonovex-surface);
+  --vp-c-bg-elv: var(--xonovex-canvas);
+  --vp-c-bg-soft: var(--xonovex-surface);
+  --vp-c-text-1: var(--xonovex-text);
+  --vp-c-text-2: var(--xonovex-secondary);
+  --vp-c-text-3: var(--xonovex-muted);
+  --vp-c-divider: var(--xonovex-border);
+  --vp-c-border: var(--xonovex-border);
+  --vp-c-brand-1: var(--xonovex-blue-strong);
+  --vp-c-brand-2: var(--xonovex-blue-strong);
+  --vp-c-brand-3: var(--xonovex-blue);
+  --vp-c-brand-soft: var(--xonovex-blue-soft);
+  --vp-button-brand-bg: var(--xonovex-text);
+  --vp-button-brand-text: var(--xonovex-canvas);
+  --vp-button-brand-border: var(--xonovex-text);
+  --vp-button-brand-hover-bg: var(--xonovex-secondary);
+  --vp-button-brand-hover-text: var(--xonovex-canvas);
+  --vp-button-brand-hover-border: var(--xonovex-secondary);
+  --vp-font-family-base: "Inter", sans-serif;
+  --vp-home-hero-name-color: var(--xonovex-text);
+  --vp-home-hero-name-background: none;
+  --vp-nav-logo-height: 36px;
+}
+
+h1,
+h2,
+h3,
+.VPHomeHero .name,
+.VPHomeHero .text {
+  font-family: "Space Grotesk", sans-serif;
+}
+.VPHomeHero .name .clip {
+  -webkit-text-fill-color: var(--xonovex-text);
+}
+.VPHomeHero .text {
+  letter-spacing: -0.045em;
+}
+.VPHomeHero .name {
+  width: fit-content;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--xonovex-blue);
+}
+.VPHomeHero .tagline {
+  max-width: 650px;
+}
+.VPHomeHero {
+  padding-bottom: 48px;
+}
+.VPFeature {
+  border-color: var(--xonovex-border);
+  border-radius: 12px;
+}
+.VPDoc.has-aside .content-container {
+  max-width: 960px;
+}
+.component-catalog {
+  margin: 28px 0 48px;
+}
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+  background: var(--xonovex-surface);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 12px;
+}
+.catalog-filters label {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+  min-width: 170px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.catalog-filters .catalog-search {
+  flex: 2;
+  min-width: 220px;
+}
+.catalog-filters input,
+.catalog-filters select {
+  width: 100%;
+  height: 42px;
+  padding: 8px 12px;
+  color: var(--xonovex-text);
+  background: var(--xonovex-canvas);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.catalog-filters input::placeholder {
+  color: var(--xonovex-muted);
+}
+.catalog-results {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0;
+  color: var(--xonovex-secondary);
+  font-size: 13px;
+}
+.catalog-results p {
+  margin: 0;
+}
+.catalog-results button,
+.catalog-empty button {
+  color: var(--xonovex-blue-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.catalog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 24px;
+  background: var(--xonovex-canvas);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 12px;
+  transition: border-color 150ms;
+}
+.catalog-card:hover {
+  border-color: var(--xonovex-blue);
+}
+.catalog-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.catalog-kind,
+.catalog-eyebrow {
+  color: var(--xonovex-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.catalog-version {
+  color: var(--xonovex-muted);
+  font-size: 12px;
+}
+.catalog-card h2,
+.catalog-card h3 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 19px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.catalog-card h2 a,
+.catalog-card h3 a {
+  color: var(--xonovex-text);
+  text-decoration: none;
+}
+.catalog-card h2 a:hover,
+.catalog-card h3 a:hover {
+  color: var(--xonovex-blue-strong);
+}
+.catalog-card p {
+  flex: 1;
+  margin: 0;
+  color: var(--xonovex-secondary);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.catalog-owner {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.catalog-harnesses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.catalog-harnesses li {
+  margin: 0;
+  padding: 3px 8px;
+  color: var(--xonovex-secondary);
+  background: var(--xonovex-surface);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 4px;
+  font-size: 11px;
+}
+.catalog-empty {
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--xonovex-surface);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 12px;
+}
+.catalog-empty h2 {
+  font-size: 20px;
+}
+.component-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 18px;
+  color: var(--xonovex-muted);
+  font-size: 12px;
+}
+.component-meta a {
+  color: var(--xonovex-blue-strong);
+}
+.document-source {
+  display: inline-block;
+  margin: 28px 0;
+  color: var(--xonovex-blue-strong);
+  font-size: 13px;
+}
+.theme-diagram {
+  display: block;
+  margin: 24px 0;
+  padding: 12px;
+  background: var(--xonovex-canvas);
+  border: 1px solid var(--xonovex-border);
+  border-radius: 10px;
+}
+.theme-diagram img {
+  width: 100%;
+  height: auto;
+}
+.home-catalog {
+  max-width: 1152px;
+  margin: 56px auto 80px;
+  padding: 0 24px;
+}
+.home-catalog-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.home-catalog-heading h2 {
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+.home-catalog-heading a {
+  color: var(--xonovex-blue-strong);
+  font-size: 14px;
+}
+.home-catalog .catalog-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--xonovex-blue-strong);
+  outline-offset: 3px;
+}
+
+@media (width <= 760px) {
+  .catalog-grid,
+  .home-catalog .catalog-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .catalog-filters {
+    flex-direction: column;
+  }
+  .catalog-filters label,
+  .catalog-filters .catalog-search {
+    min-width: 0;
+  }
+  .home-catalog {
+    margin-top: 40px;
+  }
+  .home-catalog-heading h2 {
+    font-size: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-card {
+    transition: none;
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "@xonovex/documentation-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Repository-generated documentation and agent component catalogs",
+  "scripts": {
+    "generate": "tsx src/generate.ts",
+    "generated:check": "tsx src/generate.ts --check",
+    "dev": "tsx src/dev.ts",
+    "build": "tsx src/generate.ts && vitepress build",
+    "preview": "vitepress preview",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run test/specs/unit",
+    "lint": "eslint src test '.vitepress/**/*.ts' '.vitepress/**/*.vue' --no-error-on-unmatched-pattern",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.0",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.43",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@xonovex/eslint-config-cli": "0.2.0",
+    "@xonovex/prettier-config": "0.2.0",
+    "@xonovex/ts-config-node": "0.2.0",
+    "@xonovex/vitest-config-node": "0.2.0",
+    "eslint-plugin-vue": "^10.5.1",
+    "typescript-eslint": "^8.57.0",
+    "vue-tsc": "^3.3.12"
+  }
+}
