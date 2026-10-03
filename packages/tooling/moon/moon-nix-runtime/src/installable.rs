@@ -156,11 +156,18 @@ pub fn moon_shell_environment(
         .collect::<Result<Vec<_>, InstallableError>>()?
         .join(",");
 
+    // getFlake treats a bare path as a path input, so Git must be explicit here.
+    let mut flake_reference = String::from("git+file://");
+    for byte in canonical_workspace.to_string_lossy().bytes() {
+        if byte.is_ascii_alphanumeric() || b"-._~/".contains(&byte) {
+            flake_reference.push(char::from(byte));
+        } else {
+            flake_reference.push_str(&format!("%{byte:02X}"));
+        }
+    }
+
     Ok(BTreeMap::from([
-        (
-            MOON_FLAKE_ENV.to_owned(),
-            format!("path:{}", canonical_workspace.to_string_lossy()),
-        ),
+        (MOON_FLAKE_ENV.to_owned(), flake_reference),
         (
             MOON_COMPONENTS_ENV.to_owned(),
             format!("[{serialized_components}]"),

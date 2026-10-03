@@ -96,7 +96,7 @@ fn moon_shell_environment_serializes_validated_flake_and_component_values() {
 
     assert_eq!(
         environment.get(MOON_FLAKE_ENV).map(String::as_str),
-        Some("path:/workspace with spaces")
+        Some("git+file:///workspace%20with%20spaces")
     );
     assert_eq!(
         environment.get(MOON_COMPONENTS_ENV).map(String::as_str),
@@ -113,5 +113,15 @@ fn moon_shell_environment_allows_an_explicit_empty_component_set() {
     assert_eq!(
         environment.get(MOON_COMPONENTS_ENV).map(String::as_str),
         Some("[]")
+    );
+}
+
+#[test]
+fn moon_shell_environment_encodes_url_delimiters_and_unicode_in_workspace_paths() {
+    let environment = moon_shell_environment(Path::new("/workspace#?%/café"), &[]).unwrap();
+
+    assert_eq!(
+        environment.get(MOON_FLAKE_ENV).map(String::as_str),
+        Some("git+file:///workspace%23%3F%25/caf%C3%A9")
     );
 }

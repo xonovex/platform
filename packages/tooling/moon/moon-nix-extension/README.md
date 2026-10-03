@@ -79,6 +79,8 @@ env:
 
 Expose `lib.mkMoonShell = system: names: ...` from the workspace flake. A small central registry keeps component names stable and rejects unknown names.
 
+Central components require a Git workspace and read it through an explicit `git+file:` reference. Nix includes tracked files and excludes untracked dependency and build directories.
+
 ```nix
 # flake.nix
 {

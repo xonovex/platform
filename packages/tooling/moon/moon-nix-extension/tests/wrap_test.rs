@@ -149,7 +149,7 @@ async fn detected_node_task_resolves_general_and_node_without_system() {
     assert!(output
         .env
         .get(MOON_FLAKE_ENV)
-        .is_some_and(|flake| flake.starts_with("path:")));
+        .is_some_and(|flake| flake.starts_with("git+file:///")));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

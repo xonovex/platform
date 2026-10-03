@@ -9,6 +9,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
       };
       mkMoonShell = system: names:
+        assert !(builtins.pathExists ./node_modules || builtins.pathExists ./build || builtins.pathExists ./.git);
         let
           pkgs = nixpkgs.legacyPackages.${system};
           components = componentsFor system;

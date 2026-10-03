@@ -101,6 +101,10 @@ git -C "$workspace" init -q
 git -C "$workspace" add --all
 git -C "$workspace" -c user.name=Fixture -c user.email=fixture@example.test commit -qm fixture
 
+mkdir -p "$workspace/node_modules" "$workspace/build"
+printf 'untracked dependency\n' > "$workspace/node_modules/ignored.txt"
+printf 'untracked build\n' > "$workspace/build/ignored.txt"
+
 export MOON_HOME="$temp_root/moon-home"
 export PROTO_HOME="$temp_root/proto-home"
 export MOON_FIXTURE_COUNTER_DIR="$counters"
