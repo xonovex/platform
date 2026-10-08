@@ -47,6 +47,7 @@ projects:
     skill-gitlab: packages/runtime/plugin/plugin-integrations/skills/gitlab-guide
     skill-gpu-rendering: packages/runtime/plugin/plugin-game-engine/skills/gpu-rendering-guide
     skill-gpu-rendering-vulkan: packages/runtime/plugin/plugin-game-engine/skills/gpu-rendering-vulkan-guide
+    skill-herdr: packages/runtime/plugin/plugin-agentic/skills/herdr-guide
     skill-hexagonal-pattern: packages/runtime/plugin/plugin-core/skills/hexagonal-pattern-guide
     skill-hono: packages/runtime/plugin/plugin-typescript/skills/hono-guide
     skill-hono-opinionated: packages/runtime/plugin/plugin-typescript/skills/hono-opinionated-guide

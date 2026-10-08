@@ -11,6 +11,7 @@ tasks:
       - skill-codex:ci-check
       - skill-command:ci-check
       - skill-copilot:ci-check
+      - skill-herdr:ci-check
       - skill-instruction:ci-check
       - skill-kiro:ci-check
       - skill-llmstxt:ci-check

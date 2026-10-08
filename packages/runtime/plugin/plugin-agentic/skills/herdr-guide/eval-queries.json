@@ -1,0 +1,98 @@
+[
+  {
+    "query": "Create two Herdr tabs running Codex and submit each task.md file as its native goal.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "requested terminal topology and native agent goal submission"
+  },
+  {
+    "query": "Use Herdr to read the build agent's latest response without switching my active tab.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "agent output inspection with focus preservation"
+  },
+  {
+    "query": "Move the running reviewer in Herdr into its own space without terminating it.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "workspace move with process and identity preservation"
+  },
+  {
+    "query": "Run npm test in another Herdr pane and read the result when it finishes.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "ordinary terminal command rather than an agent launch"
+  },
+  {
+    "query": "The Herdr agent prompt timed out. Check whether the task already started before sending it again.",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "reconciliation after uncertain prompt delivery"
+  },
+  {
+    "query": "Organize the current Herdr agents into project spaces and give the batch tabs short names.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "requested organization of existing agents"
+  },
+  {
+    "query": "Start a Codex agent in a new Herdr tab using my requested model and reasoning effort, then submit the prompt file as a goal.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "terminal control owns launch and submission; native arguments remain agent-specific"
+  },
+  {
+    "query": "Use Herdr to inspect which agents are working, blocked, or ready for another prompt.",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "recognized agent lifecycle inspection"
+  },
+  {
+    "query": "Configure Codex sandbox and approval settings in config.toml for this repository.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "native harness configuration rather than Herdr control"
+  },
+  {
+    "query": "Write a reusable skill for submitting research prompts to an agent.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "skill authoring does not request terminal control"
+  },
+  {
+    "query": "Create a tmux session with two windows and run npm test in the second one.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "different terminal manager explicitly requested"
+  },
+  {
+    "query": "Implement the API endpoints; parallel work might help if the repository instructions allow it.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "parallel work alone does not request Herdr"
+  },
+  {
+    "query": "Update the Pi subagent extension's concurrency limits and cancellation behavior.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "extension implementation rather than live terminal management"
+  },
+  {
+    "query": "Set Codex sandbox and approval behavior so it may edit this workspace and run tests but must not access unrelated directories or push to remotes.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by codex-guide"
+  },
+  {
+    "query": "Create a ChatGPT Space to organize the research documents.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "document space rather than a Herdr workspace"
+  },
+  {
+    "query": "Improve the mobile browser layout so all twelve tabs fit on the screen.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "application interface change rather than live Herdr tab organization"
+  }
+]

@@ -100,5 +100,11 @@
     "rationale": "validation near miss owned by opencode-guide",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Start a Codex agent in a new Herdr tab using my requested model and reasoning effort, then submit the prompt file as a goal.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by herdr-guide"
   }
 ]

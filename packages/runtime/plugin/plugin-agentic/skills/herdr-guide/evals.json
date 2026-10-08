@@ -1,0 +1,35 @@
+{
+  "skill_name": "herdr-guide",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Describe the commands to start two Codex agents in new Herdr tabs in this repository, preserving my current focus. Use the model and reasoning effort I requested. Each agent must receive the entire contents of its separate prompt file through the native /goal command. Do not run the commands yet.",
+      "assertions": [
+        "Checks HERDR_ENV=1 and uses the installed Herdr guidance and native agent help rather than guessing supported flags.",
+        "Creates the requested tabs with an explicit working directory and no focus, then starts agents in the pane IDs returned by those creation calls.",
+        "Preserves the requested model and reasoning effort, waits for interactive readiness, and submits /goal followed by each file's full contents as one safely quoted argument.",
+        "Verifies the native goal and launch settings instead of treating prompt submission as proof of task activation."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Explain how to move the existing reviewer agent in Herdr into a new workspace named Review without terminating it. Its current pane is w1:p7. Do not run the move yet.",
+      "assertions": [
+        "Inspects the live target before the move and uses pane move with --new-workspace, the requested label, and --no-focus.",
+        "Continues with the pane ID returned by the move or the live agent name, rather than reusing w1:p7 as a general target.",
+        "Verifies the new workspace and preserved agent process or native session without closing, restarting, or killing the agent."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A Herdr prompt submission timed out while the reviewer was already working. I also need npm test running in a separate terminal. Explain the next steps without resubmitting the prompt or running commands yet.",
+      "assertions": [
+        "Reads the reviewer's current state and output before any retry and recognizes that timeout does not prove failed delivery.",
+        "Explains that a wait on an already-working agent can settle on the current turn rather than the submitted follow-up.",
+        "Uses the pane surface for npm test with an explicit working directory and preserved focus, rather than creating another coding agent.",
+        "Uses bounded waits and checks the command result or artifacts rather than assuming a matched output line proves success."
+      ]
+    }
+  ]
+}

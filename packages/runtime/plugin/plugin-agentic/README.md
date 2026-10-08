@@ -38,6 +38,7 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [codex-guide](skills/codex-guide/SKILL.md) | Configuring Codex hooks, plugins, skills, config layers, or managed requirements. |
 | [command-guide](skills/command-guide/SKILL.md) | Authoring, reviewing, merging, simplifying, or distilling reusable user-invocable prompt files (a.k.a. slash commands: files an agent harness exposes as `/command` invocations). |
 | [copilot-guide](skills/copilot-guide/SKILL.md) | Configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
+| [herdr-guide](skills/herdr-guide/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
 | [instruction-guide](skills/instruction-guide/SKILL.md) | Authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. |
 | [kiro-guide](skills/kiro-guide/SKILL.md) | Configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
 | [llmstxt-guide](skills/llmstxt-guide/SKILL.md) | Authoring, reviewing, or maintaining an `/llms.txt` file or per-page markdown mirrors per the llmstxt.org specification. |
