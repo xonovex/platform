@@ -41,6 +41,13 @@ tasks:
       cache: false
       runFromWorkspaceRoot: true
       runInCI: false
+  # The tests create temporary git repositories, so the task is explicit.
+  mirror-test:
+    command: [bash, .moon/scripts/mirror/test/mirror-test.sh]
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false
   ci-check:
     command: noop
     deps: [format-check]

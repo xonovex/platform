@@ -1,0 +1,34 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  # Checks the copies against mirror.json alone, so CI runs it without a checkout.
+  mirror-check:
+    command: [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-check.sh"]
+    toolchain: [system, nix]
+    options:
+      cache: false
+  # These two need the drodan-platform checkout, which CI does not have, so
+  # they run only by explicit invocation.
+  mirror-sync:
+    command: [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-sync.sh"]
+    toolchain: [system, nix]
+    options:
+      cache: false
+      runInCI: false
+  mirror-source-check:
+    command:
+      [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-source-check.sh"]
+    toolchain: [system, nix]
+    options:
+      cache: false
+      runInCI: false
+  ci-check:
+    command: echo 'ci-check complete'
+    deps: [mirror-check]
+    options:
+      cache: false
+      # Replacing args keeps the command single when a project inherits two
+      # templates that both own ci-check.
+      mergeArgs: replace
+      mergeDeps: append
+inheritedBy:
+  tag: asset-mirror
