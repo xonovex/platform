@@ -1,0 +1,20 @@
+{
+  "name": "@xonovex/script-moon-plugin-sync-installation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "moon-plugin-sync-installation": "./bin.js"
+  },
+  "dependencies": {
+    "@xonovex/script-moon-common": "0.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "xonovex",
+    "script",
+    "moon",
+    "plugin"
+  ]
+}

@@ -12,7 +12,7 @@ Follow the full workflow from research through closeout, including review outcom
 
 Read the numbered phases from top to bottom. Dark gray arrows show the normal flow. Dashed blue arrows show retries. A dark box that starts with a number names a return to another phase; other dark boxes mark a selected stage or the completed feature. Blue diamonds mark decisions; a pale green box marks improved guidance. Continuous learning can run during any phase. Core, Agentic, and Integrations labels identify companion plugins; unqualified commands belong to the Workflow Plugin.
 
-The palette, typography, shapes, and export rules follow [Xonovex design](../../../../../DESIGN.md).
+The palette, typography, shapes, and export rules follow the Xonovex design system in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`), as mirrored in `packages/asset/asset-brand/diagrams/style.gvpr`.
 
 The [workflow guide](../README.md) explains how to select commands and reconstruct context when resuming a task.
 

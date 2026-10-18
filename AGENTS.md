@@ -7,7 +7,6 @@ Work within the package boundaries below, run the required checks, and follow th
 ### Packages
 
 - **`runtime/plugin`**: Grouped plugins with skills under `skills/` and commands under `commands/`; lockstep with both marketplaces
-- **`documentation`**: VitePress website generated from repository documents, component metadata, and `DESIGN.md`
 - **`tooling/cli`**: Agent CLI, platform binary packages, and GitHub Action wrapper
 - **`tooling/script`**: Moon task binaries and their shared code
 - **`tooling/moon`**: Moon Nix plugins, versioned from `Cargo.toml`
@@ -41,7 +40,7 @@ Work within the package boundaries below, run the required checks, and follow th
 
 ### Writing
 
-- **Visual design**: follow [DESIGN.md](DESIGN.md) for documentation and diagrams. Keep diagram sources and rendered exports together.
+- **Visual design**: diagrams follow the Xonovex design system through the mirrored style (`packages/asset/asset-brand/diagrams/style.gvpr`), and diagram sources name roles only. The Xonovex design system guide lives in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`). Keep diagram sources and rendered exports together.
 - **Lead**: put the answer, result, decision, action, or status in the first sentence. Keep a decisive caveat beside it, then give evidence and background in order of importance. Use task tables and links to detailed procedures when they help the reader choose an action.
 - **Prose**: plain sentences; comma, colon, or full stop over an em dash; colon after a label; three periods for an ellipsis; straight quotes. ASD-STE100 in replies and reports: approved words in their approved sense, one idea per sentence, active voice, simple present or past, one term per thing
 - **Line breaks**: no hard-wrapped Markdown; one paragraph or list item per line

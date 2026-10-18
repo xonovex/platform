@@ -1,0 +1,57 @@
+$schema: https://moonrepo.dev/schemas/project.json
+language: typescript
+tags: [typescript-script]
+dependsOn:
+  - script-moon-common
+fileGroups:
+  # The src of every internal package this project reads: what dependsOn
+  # reaches, plus the config packages its own config files name.
+  dependencySources:
+    - /packages/config/eslint-config-base/src/**/*
+    - /packages/config/eslint-config-cli/src/**/*
+    - /packages/config/prettier-config/src/**/*
+    - /packages/config/ts-config-build/src/**/*
+    - /packages/config/ts-config-cli/src/**/*
+    - /packages/config/ts-config-node/src/**/*
+    - /packages/tooling/script/script-moon-common/src/**/*
+tasks:
+  ts-coverage:
+    env:
+      TS_COVERAGE_MIN_LINES: "95"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "94"
+      TS_COVERAGE_MIN_STATEMENTS: "95"
+  # Writes the marked installation section of every plugin README. Run it after
+  # changing a plugin's version, name, dependencies, or harness support.
+  plugin-installation-sync:
+    command:
+      - node
+      - packages/tooling/script/script-moon-plugin-sync-installation/dist/src/index.js
+    deps:
+      - ~:build
+    options:
+      cache: false
+      runInCI: false
+      runFromWorkspaceRoot: true
+  plugin-installation-check:
+    command:
+      - node
+      - packages/tooling/script/script-moon-plugin-sync-installation/dist/src/index.js
+      - --check
+    deps:
+      - ~:build
+    inputs:
+      - /.claude-plugin/marketplace.json
+      - /.agents/plugins/marketplace.json
+      - /packages/runtime/plugin/**/plugin.json
+      - /packages/runtime/plugin/**/README.md
+      - /packages/runtime/plugin/**/.claude-plugin/plugin.json
+      - /packages/runtime/plugin/**/.codex-plugin/plugin.json
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  ci-check:
+    deps:
+      - plugin-installation-check
+    options:
+      mergeDeps: append

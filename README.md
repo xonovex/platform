@@ -14,8 +14,6 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
 | Install skills and commands | [Plugin catalog](#agent-plugins) |
 | Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
-| Create or update visual documentation | [Xonovex design](DESIGN.md) |
-| Browse searchable documentation and component catalogs | [Documentation website](packages/documentation/documentation-site/README.md) |
 | Run Moon tasks in pinned Nix environments | [Moon Nix toolchain](packages/tooling/moon/moon-nix-toolchain/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
@@ -91,14 +89,7 @@ The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonove
 
 ### Documentation website
 
-Run the VitePress website to browse plugins, skills, commands, and agent tools. It generates pages from the existing Markdown and metadata, updates plugin README installation sections, and uses the light and dark Xonovex themes defined in [DESIGN.md](DESIGN.md).
-
-```bash
-npm install
-npm run docs:dev
-```
-
-Use `npm run docs:build` for a static build and `npm run docs:check` to check installation sections for drift. Edit the original documents; the generated website content is ignored by Git. The [website guide](packages/documentation/documentation-site/README.md) describes source ownership and validation.
+The searchable documentation website of this repository is built by the package `packages/xonovex/xonovex-docs` of the `drodan-platform` repository from this repository's content at a recorded commit.
 
 ### Repository tasks
 

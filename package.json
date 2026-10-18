@@ -6,7 +6,6 @@
   "workspaces": [
     "packages/asset/*",
     "packages/config/*",
-    "packages/documentation/*",
     "packages/library/*",
     "packages/runtime/plugin/*",
     "packages/tooling/cli/agent-cli-go",
@@ -51,11 +50,6 @@
     "typescript": "6.0.3"
   },
   "scripts": {
-    "docs:dev": "npm run dev --workspace @xonovex/documentation-site",
-    "docs:build": "npm run build --workspace @xonovex/documentation-site",
-    "docs:preview": "npm run preview --workspace @xonovex/documentation-site",
-    "docs:generate": "npm run generate --workspace @xonovex/documentation-site",
-    "docs:check": "npm run generated:check --workspace @xonovex/documentation-site",
     "deps:check": "npm-check-updates --workspaces --dep prod,dev,optional,packageManager",
     "deps:update": "npm-check-updates --workspaces -u --dep prod,dev,optional,packageManager",
     "nix:shell": "nix --extra-experimental-features 'nix-command flakes' develop",
