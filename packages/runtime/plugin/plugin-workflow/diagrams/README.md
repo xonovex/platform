@@ -10,7 +10,7 @@ Follow the full workflow from research through closeout, including review outcom
 
 ## Read the flow
 
-Read the numbered phases from top to bottom. Dark gray arrows show the normal flow. Dashed blue arrows show retries, and dark boxes name a return to another phase. Blue diamonds mark decisions; a pale green box marks improved guidance. Continuous learning can run during any phase. Core, Agentic, and Integrations labels identify companion plugins; unqualified commands belong to the Workflow Plugin.
+Read the numbered phases from top to bottom. Dark gray arrows show the normal flow. Dashed blue arrows show retries. A dark box that starts with a number names a return to another phase; other dark boxes mark a selected stage or the completed feature. Blue diamonds mark decisions; a pale green box marks improved guidance. Continuous learning can run during any phase. Core, Agentic, and Integrations labels identify companion plugins; unqualified commands belong to the Workflow Plugin.
 
 The palette, typography, shapes, and export rules follow [Xonovex design](../../../../../DESIGN.md).
 
@@ -18,7 +18,7 @@ The [workflow guide](../README.md) explains how to select commands and reconstru
 
 ## Render changes
 
-Edit the `.dot` sources and run the render task from the repository root in the Nix environment. The task uses the supplied Inter and Space Grotesk fonts and renders every source to SVG and PNG; the plugin check includes it.
+Edit the `.dot` sources and run the render task from the repository root in the Nix environment. A source names a role, such as `role=decision`, and sets no colour and no font; `diagram-role-check` fails on either and on an unknown role. The render task applies the Graphviz style that `@xonovex/asset-brand` mirrors from the Xonovex design system, uses the supplied Inter and Space Grotesk fonts, and renders every source to SVG and PNG. The plugin check includes both tasks.
 
 ```bash
 nix develop --no-update-lock-file --command npx moon run plugin-workflow:graph-build --force

@@ -3,35 +3,33 @@ digraph GVisor {
   splines=false;
   nodesep=0.3;
   ranksep=0.5;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
-  edge [fontname="Helvetica", fontsize=9, color="#666666"];
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="gVisor (runsc) — User-Space Kernel";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent", fillcolor="#4FC3F7"];
-  sentry [label="Sentry (user-space kernel)", fillcolor="#FFF9C4"];
+  agent [label="AI Agent", role="actor"];
+  sentry [label="Sentry (user-space kernel)"];
 
   subgraph {
     rank=same;
-    gofer [label="Gofer\n(file proxy, 9P)", fillcolor="#FFE082", width=1.4];
-    netstack [label="Netstack\n(user-space TCP/IP)", fillcolor="#FFE082", width=1.4];
+    gofer [label="Gofer\n(file proxy, 9P)", width=1.4];
+    netstack [label="Netstack\n(user-space TCP/IP)", width=1.4];
   }
 
-  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
-  kernel [label="Host Kernel (~60 syscalls)", fillcolor="#FF8A65", fontcolor=white];
-  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
+  sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="Host Kernel (~60 syscalls)", role="strong"];
+  hw [label="Hardware", role="panel"];
 
   agent -> sentry [label="  syscalls (intercepted)"];
   sentry -> gofer;
   sentry -> netstack;
   gofer -> sb [label="  file I/O"];
   netstack -> sb [style=invis];
-  sb -> kernel [style=dashed, color="#C62828", label="  minimal surface"];
+  sb -> kernel [role="risk", style=dashed, label="  minimal surface"];
   kernel -> hw;
 }

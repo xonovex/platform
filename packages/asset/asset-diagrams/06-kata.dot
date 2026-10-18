@@ -3,28 +3,26 @@ digraph Kata {
   splines=false;
   nodesep=0.3;
   ranksep=0.5;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
-  edge [fontname="Helvetica", fontsize=9, color="#666666"];
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="Kata Containers — Lightweight VM Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent", fillcolor="#4FC3F7"];
-  guest [label="Guest Kernel (separate)", fillcolor="#FFE0B2"];
-  sb [label="sandbox (VM boundary)", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
-  vmm [label="QEMU / Cloud-Hypervisor (VMM)", fillcolor="#FFCC80"];
-  kvm [label="KVM", fillcolor="#FFB74D"];
-  kernel [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
-  hw [label="Hardware (VT-x / AMD-V)", fillcolor="#78909C", fontcolor=white];
+  agent [label="AI Agent", role="actor"];
+  guest [label="Guest Kernel (separate)"];
+  sb [label="sandbox (VM boundary)", role="risk", style="rounded,filled,dashed", fontsize=10];
+  vmm [label="QEMU / Cloud-Hypervisor (VMM)"];
+  kvm [label="KVM"];
+  kernel [label="Host Kernel", role="strong"];
+  hw [label="Hardware (VT-x / AMD-V)", role="panel"];
 
   agent -> guest [label="  syscalls (guest only)"];
   guest -> sb [label="  virtio-blk, virtio-net"];
-  sb -> vmm [style=dashed, color="#C62828"];
+  sb -> vmm [role="risk", style=dashed];
   vmm -> kvm;
   kvm -> kernel;
   kernel -> hw;

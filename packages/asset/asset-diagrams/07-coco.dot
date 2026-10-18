@@ -3,27 +3,25 @@ digraph CoCo {
   splines=false;
   nodesep=0.3;
   ranksep=0.5;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
-  edge [fontname="Helvetica", fontsize=9, color="#666666"];
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="Confidential Containers — TEE Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent (encrypted memory)", fillcolor="#4FC3F7"];
-  guest [label="Attested Guest Kernel (measured)", fillcolor="#FFCCBC"];
-  sb [label="sandbox (TEE boundary)", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
-  vmm [label="Hypervisor (cannot read TEE memory)", fillcolor="#FFCC80"];
-  kernel [label="Host Kernel (cannot read TEE memory)", fillcolor="#FF8A65", fontcolor=white];
-  hw [label="CPU + Memory Encryption HW\n(Intel TDX / AMD SEV-SNP)", fillcolor="#78909C", fontcolor=white];
+  agent [label="AI Agent (encrypted memory)", role="actor"];
+  guest [label="Attested Guest Kernel (measured)"];
+  sb [label="sandbox (TEE boundary)", role="risk", style="rounded,filled,dashed", fontsize=10];
+  vmm [label="Hypervisor (cannot read TEE memory)"];
+  kernel [label="Host Kernel (cannot read TEE memory)", role="strong"];
+  hw [label="CPU + Memory Encryption HW\n(Intel TDX / AMD SEV-SNP)", role="panel"];
 
   agent -> guest [label="  syscalls"];
   guest -> sb [label="  encrypted VM"];
-  sb -> vmm [style=dashed, color="#C62828"];
+  sb -> vmm [role="risk", style=dashed];
   vmm -> kernel [label="  KVM (limited)"];
   kernel -> hw [label="  remote attestation\n  (root of trust)"];
 }

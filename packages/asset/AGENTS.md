@@ -13,4 +13,4 @@ Keep asset sources and rendered outputs together, validate every committed image
 - The direction is one way: drodan-platform names no mirror.
 - `mirror-check` is in `ci-check`. It proves the copies against `mirror.json` without a checkout, and it fails on a changed file and on a file outside the manifest.
 - The comparison with the source is `mirror-source-check`. It is explicit, because the checkout may be missing.
-- A diagram source in this group names roles, never a colour or a font. It renders with the mirrored Graphviz style, and its render is committed beside it.
+- A diagram source in this group names roles, never a colour or a font. It renders with the mirrored Graphviz style, and its render is committed beside it. `diagram-role-check`, which every project with the tag `diagram` runs in `ci-check`, fails on a colour or font attribute, on a colour literal and on a role that the mirrored style does not know.

@@ -1,14 +1,26 @@
 $schema: https://moonrepo.dev/schemas/project.json
 language: unknown
+tags: [diagram]
 tasks:
   ci-check:
     command: noop
-    deps: [graph-build]
+    deps: [diagram-role-check, graph-build]
     options:
       cache: false
   graph-build:
     # Every .dot source is rendered, so a new diagram cannot enter unrendered.
+    # The mirrored Xonovex style gives each role its colours and the fonts;
+    # the exports use its light mode on a white background.
     script: |
+      set -euo pipefail
+      export FONTCONFIG_FILE="${XONOVEX_DIAGRAM_FONTCONFIG_FILE:?The Nix environment must supply the diagram fonts}"
+      for family in Inter 'Space Grotesk'; do
+        if [ "$(fc-match --format '%{family[0]}' "$family")" != "$family" ]; then
+          echo "Missing diagram font: $family" >&2
+          exit 1
+        fi
+      done
+      style="$workspaceRoot/packages/asset/asset-brand/diagrams/style.gvpr"
       shopt -s nullglob
       sources=(*.dot)
       if [ "${#sources[@]}" -eq 0 ]; then
@@ -16,11 +28,14 @@ tasks:
         exit 1
       fi
       for source in "${sources[@]}"; do
-        dot -Tpng -Gdpi=150 -o "${source%.dot}.png" "$source"
+        gvpr -c -a light -f "$style" "$source" | dot -Gbgcolor=white -Gdpi=150 -Tpng -o "${source%.dot}.png"
       done
     toolchain: [system, nix]
     inputs:
       - "*.dot"
+      - "/packages/asset/asset-brand/diagrams/style.gvpr"
+      - "/nix/general.nix"
+      - "/flake.lock"
     outputs:
       - "*.png"
     options:

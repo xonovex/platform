@@ -1,0 +1,238 @@
+/* Generated from tokens.json by design-tokens. Do not edit. */
+
+BEGIN {
+  string mode;
+  string fontFamily;
+  string headingFamily;
+  string validRoles;
+  string roleName;
+  string clusterStyle;
+  int known[string];
+  string shapeOf[string];
+  string fillOf[string];
+  string borderOf[string];
+  string textOf[string];
+  string lineOf[string];
+  graph_t stack[int];
+  graph_t g;
+  int top;
+
+  fontFamily = "Inter,sans-serif";
+  headingFamily = "Space Grotesk,sans-serif";
+  validRoles = "default, panel, decision, retry, strong, positive, terminal, note, actor, risk, caption";
+  known["default"] = 1;
+  known["panel"] = 1;
+  known["decision"] = 1;
+  known["retry"] = 1;
+  known["strong"] = 1;
+  known["positive"] = 1;
+  known["terminal"] = 1;
+  known["note"] = 1;
+  known["actor"] = 1;
+  known["risk"] = 1;
+  known["caption"] = 1;
+  shapeOf["default"] = "box";
+  shapeOf["panel"] = "box";
+  shapeOf["decision"] = "diamond";
+  shapeOf["retry"] = "box";
+  shapeOf["strong"] = "box";
+  shapeOf["positive"] = "box";
+  shapeOf["terminal"] = "oval";
+  shapeOf["note"] = "note";
+  shapeOf["actor"] = "box";
+  shapeOf["risk"] = "box";
+  shapeOf["caption"] = "plaintext";
+
+  if (ARGC > 0) {
+    mode = ARGV[0];
+  } else {
+    mode = "light";
+  }
+  if (strcmp(mode, "light") == 0) {
+    fillOf["default"] = "#ffffff";
+    borderOf["default"] = "#d1d5db";
+    textOf["default"] = "#000000";
+    lineOf["default"] = "#374151";
+    fillOf["panel"] = "#f9fafb";
+    borderOf["panel"] = "#d1d5db";
+    textOf["panel"] = "#000000";
+    lineOf["panel"] = "#374151";
+    fillOf["decision"] = "#eff6ff";
+    borderOf["decision"] = "#2563eb";
+    textOf["decision"] = "#000000";
+    lineOf["decision"] = "#374151";
+    fillOf["retry"] = "#ffffff";
+    borderOf["retry"] = "#2563eb";
+    textOf["retry"] = "#000000";
+    lineOf["retry"] = "#2563eb";
+    fillOf["strong"] = "#111827";
+    borderOf["strong"] = "#111827";
+    textOf["strong"] = "#ffffff";
+    lineOf["strong"] = "#374151";
+    fillOf["positive"] = "#f0fdf4";
+    borderOf["positive"] = "#15803d";
+    textOf["positive"] = "#000000";
+    lineOf["positive"] = "#15803d";
+    fillOf["terminal"] = "#ffffff";
+    borderOf["terminal"] = "#d1d5db";
+    textOf["terminal"] = "#000000";
+    lineOf["terminal"] = "#374151";
+    fillOf["note"] = "#ffffff";
+    borderOf["note"] = "#d1d5db";
+    textOf["note"] = "#000000";
+    lineOf["note"] = "#374151";
+    fillOf["actor"] = "#eff6ff";
+    borderOf["actor"] = "#2563eb";
+    textOf["actor"] = "#000000";
+    lineOf["actor"] = "#2563eb";
+    fillOf["risk"] = "#fef2f2";
+    borderOf["risk"] = "#b91c1c";
+    textOf["risk"] = "#b91c1c";
+    lineOf["risk"] = "#b91c1c";
+    fillOf["caption"] = "#ffffff";
+    borderOf["caption"] = "#ffffff";
+    textOf["caption"] = "#6b7280";
+    lineOf["caption"] = "#6b7280";
+  } else if (strcmp(mode, "dark") == 0) {
+    fillOf["default"] = "#0b0f19";
+    borderOf["default"] = "#374151";
+    textOf["default"] = "#f9fafb";
+    lineOf["default"] = "#d1d5db";
+    fillOf["panel"] = "#111827";
+    borderOf["panel"] = "#374151";
+    textOf["panel"] = "#f9fafb";
+    lineOf["panel"] = "#d1d5db";
+    fillOf["decision"] = "#172554";
+    borderOf["decision"] = "#93c5fd";
+    textOf["decision"] = "#f9fafb";
+    lineOf["decision"] = "#d1d5db";
+    fillOf["retry"] = "#0b0f19";
+    borderOf["retry"] = "#93c5fd";
+    textOf["retry"] = "#f9fafb";
+    lineOf["retry"] = "#93c5fd";
+    fillOf["strong"] = "#f9fafb";
+    borderOf["strong"] = "#f9fafb";
+    textOf["strong"] = "#0b0f19";
+    lineOf["strong"] = "#d1d5db";
+    fillOf["positive"] = "#052e16";
+    borderOf["positive"] = "#86efac";
+    textOf["positive"] = "#f9fafb";
+    lineOf["positive"] = "#86efac";
+    fillOf["terminal"] = "#0b0f19";
+    borderOf["terminal"] = "#374151";
+    textOf["terminal"] = "#f9fafb";
+    lineOf["terminal"] = "#d1d5db";
+    fillOf["note"] = "#0b0f19";
+    borderOf["note"] = "#374151";
+    textOf["note"] = "#f9fafb";
+    lineOf["note"] = "#d1d5db";
+    fillOf["actor"] = "#172554";
+    borderOf["actor"] = "#93c5fd";
+    textOf["actor"] = "#f9fafb";
+    lineOf["actor"] = "#93c5fd";
+    fillOf["risk"] = "#450a0a";
+    borderOf["risk"] = "#fca5a5";
+    textOf["risk"] = "#fca5a5";
+    lineOf["risk"] = "#fca5a5";
+    fillOf["caption"] = "#0b0f19";
+    borderOf["caption"] = "#0b0f19";
+    textOf["caption"] = "#9ca3af";
+    lineOf["caption"] = "#9ca3af";
+  } else {
+    printf(2, "design-tokens: unknown mode \"%s\", valid modes are light, dark\n", mode);
+    exit(1);
+  }
+}
+
+BEG_G {
+  stack[0] = $G;
+  top = 1;
+  while (top > 0) {
+    top = top - 1;
+    g = stack[top];
+    roleName = hasAttr(g, "role") ? aget(g, "role") : "";
+    if (strcmp(roleName, "") != 0 && known[roleName] == 0) {
+      printf(2, "design-tokens: unknown role \"%s\" on graph \"%s\", valid roles are %s\n", roleName, g.name, validRoles);
+      exit(1);
+    }
+    if (!hasAttr(g, "bgcolor") || strcmp(aget(g, "bgcolor"), "") == 0) {
+      aset(g, "bgcolor", "transparent");
+    }
+    if (!hasAttr(g, "fontname") || strcmp(aget(g, "fontname"), "") == 0) {
+      aset(g, "fontname", headingFamily);
+    }
+    if (!hasAttr(g, "fontcolor") || strcmp(aget(g, "fontcolor"), "") == 0) {
+      aset(g, "fontcolor", textOf["default"]);
+    }
+    if (strcmp(roleName, "") != 0 && index(g.name, "cluster") == 0) {
+      aset(g, "bgcolor", fillOf[roleName]);
+      aset(g, "pencolor", borderOf[roleName]);
+      aset(g, "fontcolor", textOf[roleName]);
+      clusterStyle = hasAttr(g, "style") ? aget(g, "style") : "";
+      if (strcmp(clusterStyle, "") == 0) {
+        aset(g, "style", "filled");
+      } else if (index(clusterStyle, "filled") < 0) {
+        aset(g, "style", sprintf("%s,filled", clusterStyle));
+      }
+    }
+    g = fstsubg(g);
+    while (g) {
+      stack[top] = g;
+      top = top + 1;
+      g = nxtsubg(g);
+    }
+  }
+}
+
+N {
+  roleName = hasAttr($, "role") ? aget($, "role") : "";
+  if (strcmp(roleName, "") != 0 && known[roleName] == 0) {
+    printf(2, "design-tokens: unknown role \"%s\" on node \"%s\", valid roles are %s\n", roleName, $.name, validRoles);
+    exit(1);
+  }
+  if (!hasAttr($, "shape") || strcmp(aget($, "shape"), "") == 0) {
+    aset($, "shape", shapeOf["default"]);
+  }
+  if (!hasAttr($, "style") || strcmp(aget($, "style"), "") == 0) {
+    aset($, "style", "filled");
+  }
+  if (!hasAttr($, "fillcolor") || strcmp(aget($, "fillcolor"), "") == 0) {
+    aset($, "fillcolor", fillOf["default"]);
+  }
+  if (!hasAttr($, "color") || strcmp(aget($, "color"), "") == 0) {
+    aset($, "color", borderOf["default"]);
+  }
+  if (!hasAttr($, "fontcolor") || strcmp(aget($, "fontcolor"), "") == 0) {
+    aset($, "fontcolor", textOf["default"]);
+  }
+  if (!hasAttr($, "fontname") || strcmp(aget($, "fontname"), "") == 0) {
+    aset($, "fontname", fontFamily);
+  }
+  if (strcmp(roleName, "") != 0) {
+    aset($, "shape", shapeOf[roleName]);
+    aset($, "fillcolor", fillOf[roleName]);
+    aset($, "color", borderOf[roleName]);
+    aset($, "fontcolor", textOf[roleName]);
+  }
+}
+
+E {
+  roleName = hasAttr($, "role") ? aget($, "role") : "";
+  if (strcmp(roleName, "") != 0 && known[roleName] == 0) {
+    printf(2, "design-tokens: unknown role \"%s\" on edge \"%s\", valid roles are %s\n", roleName, $.name, validRoles);
+    exit(1);
+  }
+  if (!hasAttr($, "color") || strcmp(aget($, "color"), "") == 0) {
+    aset($, "color", lineOf["default"]);
+  }
+  if (!hasAttr($, "fontcolor") || strcmp(aget($, "fontcolor"), "") == 0) {
+    aset($, "fontcolor", textOf["default"]);
+  }
+  if (!hasAttr($, "fontname") || strcmp(aget($, "fontname"), "") == 0) {
+    aset($, "fontname", fontFamily);
+  }
+  if (strcmp(roleName, "") != 0) {
+    aset($, "color", lineOf[roleName]);
+    aset($, "fontcolor", textOf[roleName]);
+  }
+}

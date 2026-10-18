@@ -3,29 +3,27 @@ digraph Docker {
   splines=false;
   nodesep=0.3;
   ranksep=0.5;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
-  edge [fontname="Helvetica", fontsize=9, color="#666666"];
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="Docker — Container Isolation";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent", fillcolor="#4FC3F7"];
-  ns [label="All 6 namespaces (PID, Mount, UTS, IPC, Net, User)", fillcolor="#BBDEFB", fontsize=10];
-  cgroups [label="cgroups (CPU, memory, I/O limits)", fillcolor="#90CAF9"];
-  seccomp [label="seccomp (syscall filter)", fillcolor="#64B5F6", fontcolor=white];
-  sb [label="sandbox boundary", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
-  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
-  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
+  agent [label="AI Agent", role="actor"];
+  ns [label="All 6 namespaces (PID, Mount, UTS, IPC, Net, User)", fontsize=10];
+  cgroups [label="cgroups (CPU, memory, I/O limits)"];
+  seccomp [label="seccomp (syscall filter)"];
+  sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="Host Kernel (shared)", role="strong"];
+  hw [label="Hardware", role="panel"];
 
   agent -> ns;
   ns -> cgroups;
   cgroups -> seccomp;
   seccomp -> sb [label="  filtered syscalls"];
-  sb -> kernel [style=dashed, color="#C62828"];
+  sb -> kernel [role="risk", style=dashed];
   kernel -> hw;
 }

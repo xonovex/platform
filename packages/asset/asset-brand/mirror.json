@@ -1,0 +1,12 @@
+{
+  "source": {
+    "repository": "drodan/drodan-platform",
+    "commit": "896f438867a2d87a84bc5313b8622572dd69b81a"
+  },
+  "files": {
+    "diagrams/style.gvpr": {
+      "source": "packages/xonovex/xonovex-design-system/src/diagrams/style.gvpr",
+      "sha256": "28fa2bcaa935af92ec09c6a17bf7d2b01907b91202d5913ca953466baaef5ef8"
+    }
+  }
+}

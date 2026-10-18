@@ -3,76 +3,74 @@ digraph Overview {
   splines=false;
   nodesep=0.4;
   ranksep=0.4;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=11, width=1.4, height=0.4];
-  edge [fontname="Helvetica", fontsize=9];
+  node [shape=box, style="rounded,filled", fontsize=11, width=1.4, height=0.4];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="AI Agent Sandbox: Isolation Axis (1 of 3 orthogonal axes)";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
   // Column headers — the ISOLATION axis. Provision {none,nix,command} and
   // Network {host,none,proxy} are ORTHOGONAL axes, not points on this spectrum.
   subgraph {
     rank=same;
-    h1 [label="None", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h2 [label="Bubblewrap", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h3 [label="Docker\n(runc)", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h4 [label="bwrap\n+ nix (provisioned)", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h5 [label="gVisor", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
-    h6 [label="Kata / CoCo", shape=plaintext, fontsize=10, fontname="Helvetica-Bold"];
+    h1 [label=<<b>None</b>>, shape=plaintext, fontsize=10, group=c1];
+    h2 [label=<<b>Bubblewrap</b>>, shape=plaintext, fontsize=10, group=c2];
+    h3 [label=<<b>Docker<br/>(runc)</b>>, shape=plaintext, fontsize=10, group=c3];
+    h4 [label=<<b>bwrap<br/>+ nix (provisioned)</b>>, shape=plaintext, fontsize=10, group=c4];
+    h5 [label=<<b>gVisor</b>>, shape=plaintext, fontsize=10, group=c5];
+    h6 [label=<<b>Kata / CoCo</b>>, shape=plaintext, fontsize=10, group=c6];
   }
 
   // Application layer
   subgraph {
     rank=same;
-    a1 [label="AI Agent", fillcolor="#4FC3F7"];
-    a2 [label="AI Agent", fillcolor="#4FC3F7"];
-    a3 [label="AI Agent", fillcolor="#4FC3F7"];
-    a4 [label="AI Agent", fillcolor="#4FC3F7"];
-    a5 [label="AI Agent", fillcolor="#4FC3F7"];
-    a6 [label="AI Agent", fillcolor="#4FC3F7"];
+    a1 [label="AI Agent", role="actor", group=c1];
+    a2 [label="AI Agent", role="actor", group=c2];
+    a3 [label="AI Agent", role="actor", group=c3];
+    a4 [label="AI Agent", role="actor", group=c4];
+    a5 [label="AI Agent", role="actor", group=c5];
+    a6 [label="AI Agent", role="actor", group=c6];
   }
 
   // Sandbox / isolation layer
   subgraph {
     rank=same;
-    s1 [label="(no sandbox)", fillcolor="#FFCDD2", style="filled,dashed"];
-    s2 [label="Namespaces\n+ bind mounts", fillcolor="#C8E6C9"];
-    s3 [label="Namespaces\ncgroups, seccomp", fillcolor="#BBDEFB"];
-    s4 [label="Namespaces\n+ /nix/store (ro)", fillcolor="#D1C4E9"];
-    s5 [label="Sentry\n(user-space kernel)", fillcolor="#FFF9C4"];
-    s6 [label="Guest Kernel\n(separate VM)", fillcolor="#FFE0B2"];
+    s1 [label="(no sandbox)", role="risk", style="rounded,filled,dashed", group=c1];
+    s2 [label="Namespaces\n+ bind mounts", group=c2];
+    s3 [label="Namespaces\ncgroups, seccomp", group=c3];
+    s4 [label="Namespaces\n+ /nix/store (ro)", group=c4];
+    s5 [label="Sentry\n(user-space kernel)", group=c5];
+    s6 [label="Guest Kernel\n(separate VM)", group=c6];
   }
 
   // Kernel layer
   subgraph {
     rank=same;
-    k1 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
-    k2 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
-    k3 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
-    k4 [label="Host Kernel", fillcolor="#FF8A65", fontcolor=white];
-    k5 [label="Host Kernel\n(~60 syscalls)", fillcolor="#FF8A65", fontcolor=white];
-    k6 [label="Hypervisor\n+ Host Kernel", fillcolor="#FF8A65", fontcolor=white];
+    k1 [label="Host Kernel", role="strong", group=c1];
+    k2 [label="Host Kernel", role="strong", group=c2];
+    k3 [label="Host Kernel", role="strong", group=c3];
+    k4 [label="Host Kernel", role="strong", group=c4];
+    k5 [label="Host Kernel\n(~60 syscalls)", role="strong", group=c5];
+    k6 [label="Hypervisor\n+ Host Kernel", role="strong", group=c6];
   }
 
   // Hardware
   subgraph {
     rank=same;
-    hw1 [label="Hardware", fillcolor="#78909C", fontcolor=white];
-    hw2 [label="Hardware", fillcolor="#78909C", fontcolor=white];
-    hw3 [label="Hardware", fillcolor="#78909C", fontcolor=white];
-    hw4 [label="Hardware", fillcolor="#78909C", fontcolor=white];
-    hw5 [label="Hardware", fillcolor="#78909C", fontcolor=white];
-    hw6 [label="Hardware\n(VT-x / TEE)", fillcolor="#78909C", fontcolor=white];
+    hw1 [label="Hardware", role="panel", group=c1];
+    hw2 [label="Hardware", role="panel", group=c2];
+    hw3 [label="Hardware", role="panel", group=c3];
+    hw4 [label="Hardware", role="panel", group=c4];
+    hw5 [label="Hardware", role="panel", group=c5];
+    hw6 [label="Hardware\n(VT-x / TEE)", role="panel", group=c6];
   }
 
   // Vertical flows
   h1 -> a1 [style=invis];
-  a1 -> s1 [style=dashed, color="#C62828", label="  no\n  barrier", fontcolor="#C62828"];
+  a1 -> s1 [role="risk", style=dashed, label="  no\n  barrier"];
   s1 -> k1;
   k1 -> hw1;
 
@@ -109,15 +107,15 @@ digraph Overview {
   hw1 -> hw2 -> hw3 -> hw4 -> hw5 -> hw6 [style=invis];
 
   // Isolation arrow
-  arrow_label [label="Isolation strength →", shape=plaintext, fontsize=10, fontcolor="#546E7A"];
+  arrow_label [label="Isolation strength →", role="caption", fontsize=10];
   hw1 -> arrow_label [style=invis];
 
   // Three-axis model + policy footnote.
-  caption [shape=note, fillcolor="#ECEFF1", fontsize=9, fontname="Helvetica", label=<
+  caption [role="note", fontsize=9, label=<
     <b>Three orthogonal axes:</b> Isolation {none, bwrap, docker} (above) ×<br/>
     Provision {none, nix, command} × Network {host, none, proxy}, + hostPassthrough.<br/>
     <b>Four guarantees (fail closed):</b> RequirePinnedProvision, RequireHostToolsUnreachable,<br/>
-    RequireEgressRestricted (Network ∈ none/proxy), RequireKernelIsolation (gVisor/Kata, NOT bwrap/runc).<br/>
+    RequireEgressRestricted (Network is none or proxy), RequireKernelIsolation (gVisor/Kata, NOT bwrap/runc).<br/>
     <b>Threat model:</b> untrusted model-generated code. bwrap/runc = attack-surface reduction, not a<br/>
     kernel boundary; "host tools unreachable" ≠ "host unreachable". CLI binds the resolved closure;<br/>
     operator bakes the SAME content-addressed closure into a streamLayeredImage OCI image.

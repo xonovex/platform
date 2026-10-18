@@ -1,0 +1,54 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+tasks:
+  # A diagram source names roles of the mirrored Graphviz style and sets no
+  # colour and no font, so the style alone decides how a diagram looks. The
+  # known roles are the validRoles list of the style itself.
+  diagram-role-check:
+    script: |
+      set -euo pipefail
+      shopt -s globstar nullglob
+      style="$workspaceRoot/packages/asset/asset-brand/diagrams/style.gvpr"
+      known=$(sed -n 's/^  validRoles = "\(.*\)";$/\1/p' "$style")
+      if [ -z "$known" ]; then
+        echo "No role list in $style" >&2
+        exit 1
+      fi
+      sources=()
+      for source in **/*.dot; do
+        case "$source" in
+          node_modules/* | */node_modules/*) ;;
+          *) sources+=("$source") ;;
+        esac
+      done
+      if [ "${#sources[@]}" -eq 0 ]; then
+        echo 'No .dot sources found' >&2
+        exit 1
+      fi
+      failed=0
+      if grep -nHiE '(^|[^[:alnum:]_-])(color|fillcolor|fontcolor|bgcolor|pencolor|labelfontcolor|colorscheme|fontname|labelfontname|face)[[:space:]]*=' "${sources[@]}"; then
+        echo 'These lines set a colour or a font; name a role with role="..." instead.' >&2
+        failed=1
+      fi
+      if grep -nHE '#[[:xdigit:]]{3,8}\b' "${sources[@]}"; then
+        echo 'These lines hold a colour literal.' >&2
+        failed=1
+      fi
+      while IFS=: read -r path line name; do
+        case ", $known, " in
+          *", $name, "*) ;;
+          *)
+            echo "$path:$line: role \"$name\" is not a role of the style (known: $known)" >&2
+            failed=1
+            ;;
+        esac
+      done < <(grep -noHE '(^|[^[:alnum:]_-])role[[:space:]]*=[[:space:]]*"?[[:alnum:]_-]*' "${sources[@]}" | sed -E 's/:[^:]*role[[:space:]]*=[[:space:]]*"?/:/')
+      exit "$failed"
+    toolchain: [system, nix]
+    inputs:
+      - "**/*.dot"
+      - "!node_modules/**/*"
+      - "/packages/asset/asset-brand/diagrams/style.gvpr"
+    options:
+      cache: true
+inheritedBy:
+  tag: diagram

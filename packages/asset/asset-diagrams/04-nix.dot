@@ -3,29 +3,27 @@ digraph Nix {
   splines=false;
   nodesep=0.3;
   ranksep=0.5;
-  bgcolor="white";
   margin=0.3;
 
-  node [shape=box, style="filled", fontname="Helvetica", fontsize=12, width=3, height=0.5];
-  edge [fontname="Helvetica", fontsize=9, color="#666666"];
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="bwrap × nix — flake.lock-pinned closure, mounted read-only";
   labelloc=t;
   fontsize=14;
-  fontname="Helvetica-Bold";
 
-  agent [label="AI Agent", fillcolor="#4FC3F7"];
-  env [label="closure PATH entries (the pinned tools)", fillcolor="#D1C4E9"];
-  store [label="closure requisites ONLY (nix path-info -r), read-only\nNOT the whole /nix/store, no nix daemon socket", fillcolor="#CE93D8", fontcolor=white, fontsize=10];
-  ns [label="PID | IPC | UTS | cgroup | net namespaces", fillcolor="#B39DDB", fontsize=10];
-  sb [label="sandbox boundary (deny-default: --clearenv, sandbox-local HOME)", style="dashed,filled", fillcolor="#F5F5F5", fontcolor="#C62828", fontsize=10, color="#C62828"];
-  kernel [label="Host Kernel (shared)", fillcolor="#FF8A65", fontcolor=white];
-  hw [label="Hardware", fillcolor="#78909C", fontcolor=white];
+  agent [label="AI Agent", role="actor"];
+  env [label="closure PATH entries (the pinned tools)"];
+  store [label="closure requisites ONLY (nix path-info -r), read-only\nNOT the whole /nix/store, no nix daemon socket", fontsize=10];
+  ns [label="PID | IPC | UTS | cgroup | net namespaces", fontsize=10];
+  sb [label="sandbox boundary (deny-default: --clearenv, sandbox-local HOME)", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="Host Kernel (shared)", role="strong"];
+  hw [label="Hardware", role="panel"];
 
   agent -> env [label="  binaries from the closure"];
   env -> store;
   store -> ns;
   ns -> sb [label="  all syscalls (shared kernel)"];
-  sb -> kernel [style=dashed, color="#C62828"];
+  sb -> kernel [role="risk", style=dashed];
   kernel -> hw;
 }
