@@ -106,5 +106,11 @@
     "rationale": "validation near miss owned by defining-work-items",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "cut the address-lookup migration by outcome not by platform, hang the items under work/address-lookup-rollout-k3ne. propose first",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

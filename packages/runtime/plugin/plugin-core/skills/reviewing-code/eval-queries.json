@@ -100,5 +100,11 @@
     "rationale": "near miss owned by auditing-code-quality",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "I wrote plans/saved-searches myself so I'm biased. can something independent stress-test its assumptions before sign-off?",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

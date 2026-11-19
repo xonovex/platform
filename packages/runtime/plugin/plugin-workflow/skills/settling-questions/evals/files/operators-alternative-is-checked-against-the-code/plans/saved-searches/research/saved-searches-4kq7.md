@@ -12,7 +12,7 @@ questions:
 
 # Bottom line
 
-Three questions remain.
+One question remains.
 
 # Open decisions
 

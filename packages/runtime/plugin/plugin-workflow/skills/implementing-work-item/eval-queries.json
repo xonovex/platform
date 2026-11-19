@@ -1,103 +1,133 @@
 [
   {
-    "query": "Implement work/capped-total-api-7k2f from plans/fare-capping. Split it into tasks, delegate the independent ones to subagents and leave everything uncommitted in its worktree.",
-    "rationale": "implementing a defined work item with delegation",
+    "query": "implement work/capped-total-api-7k2f, tell me what runs in parallel before you start, and leave everything uncommitted",
+    "rationale": "implement one ready work item, with a stated task split",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Pick up the next ready work item in the loyalty-service plan and build it. Check first that the items it depends on are done.",
-    "rationale": "pick up the next ready item with a precondition check",
+    "query": "grab the next ready item for loyalty-service and build it, make sure what it depends on is finished first",
+    "rationale": "pick up the next ready item and check blockers",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Carry out the work file work/points-balance-endpoint-3m4q in its own worktree, run the checks its criteria name and record which decisions shaped the code.",
-    "rationale": "carry out a work file and record decision notes",
+    "query": "build work/points-balance-endpoint-3m4q in its own worktree and run whatever checks its criteria list",
+    "rationale": "build a work file in its worktree and run its named checks",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "We have a stable work item with three criteria and a clean worktree. Build it task by task, one subagent per task, and make sure tasks that touch the same file do not run at the same time.",
-    "rationale": "sequenced and parallel tasks",
+    "query": "split the capped-total item into tasks, cap.py is shared so those go in order and export.py can run alongside",
+    "rationale": "sequence tasks that share a file",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Start on the story for the offline till sync. Brief a subagent for each concern with the files it needs, set a model and effort for each, and verify what they return yourself.",
-    "rationale": "briefing subagents per concern and verifying",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Work through the implementation of the saved-searches work item without delegating, since no other agent can start here. Keep the changes uncommitted and write the implementation notes.",
-    "rationale": "in-order implementation without subagents",
+    "query": "no subagents here, so do the saved-searches work item yourself step by step and write the implementation notes",
+    "rationale": "in-order work when no worker can start, with notes",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Build the work item for the receipt export, run its acceptance checks, and tell me which criteria you could self-check and which you could not.",
+    "query": "build the receipt export story from its work file, run the acceptance checks and say which criteria you could not check",
     "rationale": "build and self-check against criteria",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Implement the ready item in plans/fare-capping/work and keep a note wherever a settled decision changed how the code is written, with the file and line.",
+    "query": "implement work/night-fare-cap-5r6s on branch pricing-service/feature/night-fare-cap, no commits please",
+    "rationale": "implement a work item on its own branch uncommitted",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the work item says round down per decision 4h2k, so build it and note where in src/cap.py that decision shows up",
     "rationale": "decision notes with locations",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "The outline lists three rows for the loyalty plan. Turn them into complete work items with criteria, verification, repositories and dependencies.",
-    "rationale": "near miss owned by defining-work-items",
+    "query": "pick up the ready item for the offline till sync, brief a worker per part with a model and effort each and recheck what they send back yourself",
+    "rationale": "delegate per concern and verify the result",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "carry on with work/fare-rules-model-3m4q, it is the ready one, and write the notes when it is done",
+    "rationale": "carry out a ready work file and record notes",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "make a worktree for pricing-service/feature/capped-total-api-7k2f off main so I can start on it",
+    "rationale": "near miss owned by using-git",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Check the capped-total work item against its criteria from a fresh context that did not build it, and write the verdict with the tree hash.",
+    "query": "the night-fare-cap branch is merged, remove its old worktree and delete the branch",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I built work/capped-total-api-7k2f, check it against its criteria from a fresh context and give me a verdict",
     "rationale": "near miss owned by validating-work-item",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The work item is built and verified. Write the commit message and the pull request description with the decision IDs and the plan link.",
+    "query": "did the capped-total change really meet c1 to c3? re-run the tests on your own and write down the verdict",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "turn the three rows in the loyalty outline into full work files with criteria, repository and dependencies",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "that session taught us a few things about the cap rounding, add them as rules to AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "turn what we learned building the cap logic into a reusable skill with a SKILL.md",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "work is done and checked, give me the commit message and command for pricing-service",
     "rationale": "near miss owned by preparing-delivery",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Push the branch of the capped-total work item to GitHub and open the pull request with the description we prepared.",
+    "query": "push pricing-service/feature/capped-total-api-7k2f to GitHub and open the pull request",
     "rationale": "near miss owned by using-github",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write the plan for the receipt export from the research and the settled decisions, with an objective, scope and success criteria.",
-    "rationale": "near miss owned by writing-plan",
+    "query": "write a user story for riders who want to see a daily capped total, with acceptance criteria",
+    "rationale": "near miss owned by writing-user-stories",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The till service written in C crashes with a segfault when two discounts apply. Find the cause of the crash and explain it.",
-    "rationale": "near miss owned by debugging-native-code",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Review the diff on this branch for bugs and style problems and list your findings.",
+    "query": "review the diff on pricing-service/feature/capped-total-api-7k2f for bugs and list what you find",
     "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Rename the helper formatPrice to formatAmount in src/pricing.ts and update its callers.",
-    "rationale": "near miss owned by writing-typescript",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "The worktree changed after the validation ran. Redo the pull request description so it does not claim the criteria are met.",
-    "rationale": "near miss owned by preparing-delivery",
+    "query": "did work/saved-searches-4t7p meet its criteria? only look at the diff and run the checks, report failures but dont touch src/search.ts",
+    "rationale": "near miss owned by validating-work-item",
     "should_trigger": false,
     "split": "validation"
   }

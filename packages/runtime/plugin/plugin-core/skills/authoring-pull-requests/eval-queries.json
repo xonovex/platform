@@ -94,5 +94,11 @@
     "rationale": "near miss owned by using-git",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "describe this change for the reviewers of the loyalty ledger work: what it does, which decisions it follows, how it was tested. keep it under what the host accepts",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

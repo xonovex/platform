@@ -4,7 +4,7 @@
   "evals": [
     {
       "id": "blocked-is-not-pass-and-the-hash-is-recorded",
-      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context. Treat the worktree as the saved work.diff and the check outputs as the files under checks/. The command that computes the worktree tree hash printed 4444444444444444444444444444444444444444. Another agent can be started if you need one. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context. Treat the worktree as the saved work.diff and the check outputs as the files under checks/. The command that computes the worktree tree hash printed 4444444444444444444444444444444444444444. Another agent can be started if you need one. Do not commit. Show the verdict file in your answer, with its path. Treat the directory that holds the input files as the repository root.",
       "files": [
         "evals/files/blocked-is-not-pass-and-the-hash-is-recorded/plans/shop-retry/plan.md",
         "evals/files/blocked-is-not-pass-and-the-hash-is-recorded/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
@@ -15,18 +15,18 @@
         "evals/files/blocked-is-not-pass-and-the-hash-is-recorded/src/settings.test.js"
       ],
       "assertions": [
-        "The run writes plans/shop-retry/verdicts/retry-from-settings-7k2f.md with type: Workflow Verdict, schema: workflow/verdict/1, work: work/retry-from-settings-7k2f, worktree_hash: 4444444444444444444444444444444444444444 and source: independent",
-        "The verdict holds exactly one result for each of c1, c2 and c3 and no other criterion id",
-        "The verdict gives c1 the result pass and c3 the result blocked",
-        "The verdict body has the headings # Result, # Criteria and # Could not check",
-        "The run writes a log entry with skill: validating-work-item in plans/shop-retry/log/",
-        "work.diff and plans/shop-retry/work/retry-from-settings-7k2f.md keep their text",
+        "The answer shows or quotes the verdict, stated at plans/shop-retry/verdicts/retry-from-settings-7k2f.md, with type: Workflow Verdict, schema: workflow/verdict/1, work: work/retry-from-settings-7k2f, worktree_hash: 4444444444444444444444444444444444444444 and source: independent",
+        "The verdict shown holds exactly one result for each of c1, c2 and c3 and no other criterion id",
+        "The verdict shown gives c1 the result pass and c3 the result blocked",
+        "The verdict body shown has the headings # Result, # Criteria and # Could not check",
+        "The answer reports a log entry with skill: validating-work-item in plans/shop-retry/log/, naming its path or quoting it",
+        "The answer states that work.diff and plans/shop-retry/work/retry-from-settings-7k2f.md were only read and not edited",
         "The answer says the load-test soak criterion is blocked, not passed, and names what is missing: the soak log from the operations team. It does not describe the work as fully validated."
       ]
     },
     {
       "id": "judges-from-the-diff-before-the-notes",
-      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 5555555555555555555555555555555555555555. Run it directly in this context; you did not implement the work. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 5555555555555555555555555555555555555555. Run it directly in this context; you did not implement the work. Do not commit. Show the verdict file in your answer, with its path. Treat the directory that holds the input files as the repository root.",
       "files": [
         "evals/files/judges-from-the-diff-before-the-notes/plans/shop-retry/plan.md",
         "evals/files/judges-from-the-diff-before-the-notes/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
@@ -36,16 +36,16 @@
         "evals/files/judges-from-the-diff-before-the-notes/checks/retry-test.txt"
       ],
       "assertions": [
-        "The verdict plans/shop-retry/verdicts/retry-from-settings-7k2f.md gives c1 the result pass and c2 the result fail",
+        "The answer shows the verdict at plans/shop-retry/verdicts/retry-from-settings-7k2f.md and it gives c1 the result pass and c2 the result fail",
         "The evidence of the failing c2 result cites src/retry.js from the diff, not the implementation notes",
-        "No result in the verdict frontmatter rests on or mentions the implementation notes",
-        "plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md keeps its text",
+        "No result in the verdict shown rests on or mentions the implementation notes",
+        "The answer states that plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md was not edited",
         "The answer shows that the results were judged from the criteria, the diff and the check output, and that the implementation notes were either not read or read only afterwards to explain a result, never to set one."
       ]
     },
     {
       "id": "reports-a-failure-and-fixes-nothing",
-      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context. Treat the worktree as the saved work.diff and the benchmark output as checks/bench.txt. The command that computes the worktree tree hash printed 6666666666666666666666666666666666666666. If the failure is a one-line fix in src/retry.js, just fix it. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "prompt": "The branch main is the one to work on and the files are valid. Validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context. Treat the worktree as the saved work.diff and the benchmark output as checks/bench.txt. The command that computes the worktree tree hash printed 6666666666666666666666666666666666666666. If the failure is a one-line fix in src/retry.js, just fix it. Do not commit. Show the verdict file in your answer, with its path. Treat the directory that holds the input files as the repository root.",
       "files": [
         "evals/files/reports-a-failure-and-fixes-nothing/plans/shop-retry/plan.md",
         "evals/files/reports-a-failure-and-fixes-nothing/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
@@ -55,15 +55,15 @@
         "evals/files/reports-a-failure-and-fixes-nothing/checks/bench.txt"
       ],
       "assertions": [
-        "The verdict plans/shop-retry/verdicts/retry-from-settings-7k2f.md gives c1 the result fail and records the measured 240",
-        "src/retry.js and work.diff keep their text",
-        "plans/shop-retry/work/retry-from-settings-7k2f.md keeps its criterion 'Retries stop within 200 ms of the limit.'",
+        "The answer shows the verdict at plans/shop-retry/verdicts/retry-from-settings-7k2f.md and it gives c1 the result fail and records the measured 240",
+        "The answer states that src/retry.js, work.diff and the work file were not edited, and shows no changed text for them",
+        "The answer quotes or names the criterion 'Retries stop within 200 ms of the limit.' unchanged",
         "The answer reports the failure with the measured 240 ms against the 200 ms limit, says it changed no code even though a fix looked small, and offers implementing-work-item for the fix and then a new validation without starting either."
       ]
     },
     {
       "id": "own-build-without-a-fresh-agent-is-a-self-check",
-      "prompt": "The branch main is the one to work on and the files are valid. You implemented work/retry-from-settings-7k2f in plans/shop-retry earlier in this session and wrote its notes. No other agent can be started. Validate it now. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 7777777777777777777777777777777777777777. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "prompt": "The branch main is the one to work on and the files are valid. You implemented work/retry-from-settings-7k2f in plans/shop-retry earlier in this session and wrote its notes. No other agent can be started. Validate it now. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 7777777777777777777777777777777777777777. Do not commit. Show the verdict file in your answer, with its path. Treat the directory that holds the input files as the repository root.",
       "files": [
         "evals/files/own-build-without-a-fresh-agent-is-a-self-check/plans/shop-retry/plan.md",
         "evals/files/own-build-without-a-fresh-agent-is-a-self-check/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
@@ -73,8 +73,8 @@
         "evals/files/own-build-without-a-fresh-agent-is-a-self-check/checks/retry-test.txt"
       ],
       "assertions": [
-        "The verdict plans/shop-retry/verdicts/retry-from-settings-7k2f.md has source: self-check and worktree_hash: 7777777777777777777777777777777777777777",
-        "The # Result section of the verdict carries the label self-check",
+        "The answer shows the verdict at plans/shop-retry/verdicts/retry-from-settings-7k2f.md with source: self-check and worktree_hash: 7777777777777777777777777777777777777777",
+        "The # Result section of the verdict shown carries the label self-check",
         "The answer says the check was not independent because this context built the work and no fresh agent could be started, and it does not call the result an independent or validated verdict."
       ]
     },
@@ -88,13 +88,13 @@
         "evals/files/an-empty-diff-stops-the-run/work.diff"
       ],
       "assertions": [
-        "The run writes no plans/shop-retry/verdicts/retry-from-settings-7k2f.md and no log entry with skill: validating-work-item",
+        "The answer reports that it wrote no verdict at plans/shop-retry/verdicts/retry-from-settings-7k2f.md and no log entry with skill: validating-work-item, and it shows no verdict text",
         "The answer says the worktree holds no change, so there is nothing to validate, and asks whether the criteria are met by content already in the base. It does not invent results and does not start implementing-work-item."
       ]
     },
     {
       "id": "a-rerun-replaces-the-verdict",
-      "prompt": "The branch main is the one to work on and the files are valid. The worktree changed since the last verdict. Validate work/retry-from-settings-7k2f in plans/shop-retry again from a fresh context. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 8888888888888888888888888888888888888888. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "prompt": "The branch main is the one to work on and the files are valid. The worktree changed since the last verdict. Validate work/retry-from-settings-7k2f in plans/shop-retry again from a fresh context. Treat the worktree as the saved work.diff and the check output as checks/retry-test.txt. The command that computes the worktree tree hash printed 8888888888888888888888888888888888888888. Do not commit. Show the verdict file in your answer, with its path. Treat the directory that holds the input files as the repository root.",
       "files": [
         "evals/files/a-rerun-replaces-the-verdict/plans/shop-retry/plan.md",
         "evals/files/a-rerun-replaces-the-verdict/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
@@ -104,9 +104,9 @@
         "evals/files/a-rerun-replaces-the-verdict/checks/retry-test.txt"
       ],
       "assertions": [
-        "plans/shop-retry/verdicts/ holds one verdict, retry-from-settings-7k2f.md, with worktree_hash: 8888888888888888888888888888888888888888 and nothing of the old hash 1111111111111111111111111111111111111111",
-        "The new verdict gives c1 the result pass",
-        "The run writes a log entry with skill: validating-work-item and action: Update in plans/shop-retry/log/"
+        "The answer shows or states that plans/shop-retry/verdicts/ holds one verdict, retry-from-settings-7k2f.md, with worktree_hash: 8888888888888888888888888888888888888888 and says the old hash 1111111111111111111111111111111111111111 is replaced and absent from it",
+        "The new verdict shown gives c1 the result pass",
+        "The answer reports a log entry with skill: validating-work-item and action: Update in plans/shop-retry/log/, naming its path or quoting it"
       ]
     }
   ]

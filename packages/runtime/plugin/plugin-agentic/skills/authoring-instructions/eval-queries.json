@@ -190,5 +190,23 @@
     "rationale": "near miss owned by recording-handoff",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "new change: loyalty-points. set up the folder and the first log entry, nothing else yet",
+    "rationale": "near miss owned by recording-handoff",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
+    "rationale": "near miss owned by authoring-commands",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

@@ -124,5 +124,11 @@
     "rationale": "near miss owned by researching-change",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "move webhook delivery off the legacy relay onto events-gateway. which consumers depend on the relay's payload and which of them are on old app versions?",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

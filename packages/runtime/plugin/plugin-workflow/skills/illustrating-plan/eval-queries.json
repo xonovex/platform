@@ -1,104 +1,122 @@
 [
   {
-    "query": "Draw the lead diagram for the reminder plan: only what is settled, the booking service, the queue and the sender, and render it next to the plan.",
-    "rationale": "the lead diagram of the settled state",
+    "query": "draw the settled stuff for plans/notify-v2 - checkout-api, the kafka topic, the mailer. just the lead picture, svg next to the puml",
+    "rationale": "lead diagram of the settled state",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "The decision on who triggers the reminder is still open: either the booking service triggers it or a scheduler reads the booking store. Make a picture of the two options so the reviewers can see who calls whom.",
-    "rationale": "a set of options that changes the topology",
+    "query": "retry decision is still open: either payment-gateway retries itself or a retry-worker polls the outbox. can you sketch both so the reviewers see who calls who",
+    "rationale": "one option diagram for a decision that changes the topology",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Render the PlantUML files in the diagrams folder of the checkout plan to SVG. Docker is not installed on this laptop, so use whatever renderer there is or tell me what to install.",
-    "rationale": "render with a local renderer or a container runtime",
+    "query": "we flipped the auth decision to the token-exchange service yesterday, so diagrams/auth-option.puml is stale now. redraw them",
+    "rationale": "redraw after a decision changed",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "render the .puml files under plans/search-index/diagrams to svg. no plantuml on this box but podman is there",
+    "rationale": "render with a container runtime",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "which of the open decisions in plans/billing-sync actually need a picture? some are just field lists",
+    "rationale": "choosing which decisions deserve a diagram",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "confluence won't show svg, give me png renders of the invoice-feed diagrams and the embed lines",
+    "rationale": "PNG on request",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "sequence diagram for order-router comes out cut off on the right at 4096px, fix the layout and re-render",
+    "rationale": "wide diagram cropped by the renderer",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "We settled the transport question yesterday, so the option picture for it is wrong now. Update the diagrams so the lead shows the queue and the old option picture goes away.",
-    "rationale": "a diagram that went stale after a decision settled",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Three of the decisions in the plan are about who calls whom and two are about message fields. Which of them deserve a diagram? Draw the ones that do.",
-    "rationale": "choosing which decisions get a picture",
+    "query": "one structurizr model for the fulfillment change please, so the lead and both option views come from the same system model",
+    "rationale": "system model feeding several views",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Build a Structurizr model of the new order flow with tags for settled, open and future, export the views to PlantUML and render them for the design review.",
-    "rationale": "a system model with exported views",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "The plan needs a diagram for the decision on where the retry runs. Draw it as a PlantUML sequence with one branch for each option and check the image fits.",
-    "rationale": "an option diagram for an open decision",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Our sequence diagram renders cropped on the right. Redraw it top to bottom with shorter labels and render it again with podman.",
-    "rationale": "a cropped render and a container runtime",
+    "query": "need a picture of where rate limiting sits today vs the two options for the edge-proxy change before tomorrow's review",
+    "rationale": "lead and option diagrams of a change, no workflow vocabulary",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Our wiki cannot show SVG. Render the diagrams of plans/checkout as PNG instead and give me the lines to embed them.",
-    "rationale": "PNG on request instead of the SVG default",
+    "query": "plans/reminders has the decisions done, make the diagrams for it",
+    "rationale": "diagrams for a change directory",
     "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "embed diagrams/notify-lead.svg in plan.md under the objective and fold in the FIXME notes I left",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write the plan from the research and the settled decisions: objective, scope, success criteria and the first outline of the work.",
+    "query": "plot p95 latency per endpoint from this csv as a line chart for the ops dashboard",
+    "rationale": "near miss: a chart of measured data, which this skill does not draw",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "write the plan for the billing-sync change from the research and the settled decisions",
     "rationale": "near miss owned by writing-plan",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The lead diagram is rendered. Add it to plans/reminders/plan.md under the objective and fold in the two decisions we settled yesterday.",
-    "rationale": "near miss owned by revising-plan",
+    "query": "before we approve the edge-proxy plan, poke holes in it: what breaks if the cache is cold",
+    "rationale": "near miss owned by critiquing-plan",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Make a bar chart of weekly crash counts per app version from the attached CSV and colour it for a dashboard.",
-    "rationale": "near miss: a chart of measured data, which no workflow skill draws",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Fold the decisions we settled yesterday into the plan and update the work files that wait on them.",
-    "rationale": "near miss owned by revising-plan",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Take me through the open questions one at a time and record my answer to each as a decision.",
+    "query": "ask me the open questions on the retry design one by one and write down what I pick",
     "rationale": "near miss owned by settling-questions",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Explain in two sentences what a sequence diagram is and when to use one.",
-    "rationale": "near miss: a general question that needs no files",
+    "query": "add an architecture section with a component diagram to the README of order-router",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "look at the diff on feat/retry-worker and tell me if the polling loop can double-send",
+    "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Find out how the reminder is sent today across the booking service and the two apps and write down what is certain and what is only likely.",
+    "query": "figure out how search-index is fed today across the crawler and the two apps before we choose anything",
     "rationale": "near miss owned by researching-change",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Review the plan like a sceptic and list how it could fail, with the evidence for each finding.",
-    "rationale": "near miss owned by critiquing-plan",
+    "query": "we kept redrawing pictures by hand this session, turn that lesson into a rule in AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
     "should_trigger": false,
-    "split": "train"
+    "split": "validation"
+  },
+  {
+    "query": "turn the way we picked which decisions get a diagram today into a reusable skill",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

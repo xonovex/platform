@@ -9,10 +9,14 @@
         "The answer lists all three questions up front in an order and gives the reason for the order, such as that where searches live shapes the others.",
         "The answer presents exactly one brief for one question, with lettered options that each state what they gain and cost, and a single recommendation that names the trade-off it accepts. It does not present a second question's brief.",
         "The answer tells the operator they may leave the question open for an owner or pause it until a fact is known.",
-        "The run writes no decision file under plans/saved-searches/decisions before the operator answers."
+        "The answer reports no decision file written and waits for the operator's answer before any write."
       ],
       "files": [
+        "evals/files/one-brief-then-stop/plans/saved-searches/index.md",
+        "evals/files/one-brief-then-stop/plans/saved-searches/log.md",
         "evals/files/one-brief-then-stop/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/one-brief-then-stop/plans/saved-searches/log/index.md",
+        "evals/files/one-brief-then-stop/plans/saved-searches/research/index.md",
         "evals/files/one-brief-then-stop/plans/saved-searches/research/saved-searches-4kq7.md"
       ]
     },
@@ -20,14 +24,18 @@
       "id": "settled-answer-becomes-a-claim-in-a-file",
       "prompt": "The branch main is the one to work on and the files are valid. You asked where saved searches should live: I choose the account, option B, so that they follow the user to a new phone. My id is human:jdoe. Record it. Do not commit. Treat the directory that holds the input files as the repository root.",
       "assertions": [
-        "The run writes one decision file under plans/saved-searches/decisions with schema: workflow/decision/1, state: settled, generated.by settling-questions/<version> and a verified entry for human:jdoe.",
-        "The # Decision section of the new file is one sentence in the form \"When ..., ... shall ...\".",
+        "The answer gives the path of one new decision file under plans/saved-searches/decisions/ and shows or states its key values: schema: workflow/decision/1, state: settled, generated.by settling-questions/<version> and a verified entry for human:jdoe.",
+        "The answer shows or quotes the # Decision section of the new file as one sentence in the form \"When ..., ... shall ...\".",
         "The answer announces the write in one line naming the path, says what the answer changes for the remaining questions or that nothing changes, and then presents the next brief and stops.",
-        "The run writes a log entry under plans/saved-searches/log with skill: settling-questions.",
-        "The run writes no plans/saved-searches/plan.md and no work file."
+        "The answer reports a log entry under plans/saved-searches/log/ with skill: settling-questions.",
+        "The answer does not report writing or changing plans/saved-searches/plan.md or any work file."
       ],
       "files": [
+        "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/index.md",
+        "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/log.md",
         "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/log/index.md",
+        "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/research/index.md",
         "evals/files/settled-answer-becomes-a-claim-in-a-file/plans/saved-searches/research/saved-searches-4kq7.md"
       ]
     },
@@ -35,26 +43,34 @@
       "id": "answer-to-an-open-decision-supersedes-it",
       "prompt": "The branch main is the one to work on and the files are valid. The search team has validated it: saved searches live in the account. I am human:jdoe and I confirm that. Record the answer. Do not commit. Treat the directory that holds the input files as the repository root.",
       "assertions": [
-        "A new decision file has state: settled and lists decisions/where-saved-searches-live-k2m3 in supersedes.",
-        "The old file plans/saved-searches/decisions/where-saved-searches-live-k2m3.md gains status: deprecated and superseded_by pointing at the new decision.",
-        "Nothing else in the old file changes: it keeps state: open, its generated.at of 2026-10-22T09:00:00+02:00 and its options table.",
-        "The log entry of the run lists both the new and the old decision in touched."
+        "The answer gives the path of a new decision file and shows or states that it has state: settled and lists decisions/where-saved-searches-live-k2m3 in supersedes.",
+        "The answer states that plans/saved-searches/decisions/where-saved-searches-live-k2m3.md gains only status: deprecated and superseded_by pointing at the new decision.",
+        "The answer says the old file is not otherwise edited: it keeps state: open, its generated.at and its options table.",
+        "The answer reports a log entry whose touched list names both the new and the old decision."
       ],
       "files": [
+        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/decisions/index.md",
         "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/decisions/where-saved-searches-live-k2m3.md",
-        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md"
+        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/index.md",
+        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/log.md",
+        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/answer-to-an-open-decision-supersedes-it/plans/saved-searches/log/index.md"
       ]
     },
     {
       "id": "paused-until-a-fact-is-known",
       "prompt": "The branch main is the one to work on and the files are valid. You asked whether the app should notify on new results. I cannot decide until I know whether the push service can send to a single device at all. Pause it. My id is human:jdoe. Record that and say what is next. Do not commit. Treat the directory that holds the input files as the repository root.",
       "assertions": [
-        "The run writes one decision file with state: paused whose reason says it is paused until it is known whether the push service can send to a single device.",
-        "The new decision is not recorded as settled.",
+        "The answer gives the path of one new decision file and shows or states that it has state: paused and a reason that says it is paused until it is known whether the push service can send to a single device.",
+        "The answer does not record or describe the decision as settled.",
         "The answer does not claim to know whether the push service can send to a single device, and says who gathers the fact or offers research as the next step without starting it."
       ],
       "files": [
+        "evals/files/paused-until-a-fact-is-known/plans/saved-searches/index.md",
+        "evals/files/paused-until-a-fact-is-known/plans/saved-searches/log.md",
         "evals/files/paused-until-a-fact-is-known/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/paused-until-a-fact-is-known/plans/saved-searches/log/index.md",
+        "evals/files/paused-until-a-fact-is-known/plans/saved-searches/research/index.md",
         "evals/files/paused-until-a-fact-is-known/plans/saved-searches/research/saved-searches-4kq7.md"
       ]
     },
@@ -64,10 +80,14 @@
       "assertions": [
         "The answer adds the operator's idea as its own lettered candidate (C) with the operator's wording kept.",
         "The answer states from search-api/src/accounts.go that the account service has no endpoint that accepts a bulk upload, so option C needs a new endpoint, and does not claim it is free.",
-        "The run writes no decision file under plans/saved-searches/decisions."
+        "The answer reports no decision file written under plans/saved-searches/decisions/."
       ],
       "files": [
+        "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/index.md",
+        "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/log.md",
         "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/log/index.md",
+        "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/research/index.md",
         "evals/files/operators-alternative-is-checked-against-the-code/plans/saved-searches/research/saved-searches-4kq7.md",
         "evals/files/operators-alternative-is-checked-against-the-code/search-api/src/accounts.go"
       ]

@@ -1,102 +1,150 @@
 [
   {
-    "query": "The capped-total work item is built in its worktree. Check it against its acceptance criteria from a context that did not build it, and give me a verdict per criterion.",
-    "rationale": "independent check of a work item against its criteria",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Validate work/points-balance-endpoint-3m4q. Run the verification each criterion names, report pass, fail or blocked with evidence, and tie the result to the tree you checked.",
-    "rationale": "verdict bound to the worktree tree hash",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Did the story for the receipt export actually meet its acceptance criteria? I do not want the implementer's word for it, I want someone to run the checks.",
-    "rationale": "independent evidence instead of the implementer's word",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Give me an independent verdict on the offline-till-sync work item. Do not read the implementation notes until you have judged the criteria from the diff and the checks.",
+    "query": "feature/retry-from-settings is done in its worktree. check work/retry-from-settings-7k2f against its criteria and dont read the implementation notes first",
     "rationale": "blind first assessment of a work item",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "The loyalty ledger item is done in its worktree. Run its acceptance checks from a fresh agent and tell me which criteria are blocked and what would unblock them.",
+    "query": "run every acceptance check of work/points-balance-endpoint-3m4q from a fresh agent and give me pass, fail or blocked per criterion with the command output",
+    "rationale": "per-criterion verdict from a fresh reader",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "i built the receipt export item myself so dont take my word for it, get an independent verdict on work/receipt-export-9d1c",
+    "rationale": "independent evidence instead of the implementer's word",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "re-validate work/invoice-rounding-5h8e, i pushed a fix to src/round.ts after the last verdict so the old one shouldnt count",
+    "rationale": "rerun after the worktree changed",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "need the tree hash of the worktree stored with the verdict so the pr only shows met marks for this exact content, item is work/offline-till-sync-2c6v",
+    "rationale": "verdict bound to the worktree tree hash",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "did work/saved-searches-4t7p meet its criteria? only look at the diff and run the checks, report failures but dont touch src/search.ts",
+    "rationale": "report a failure and fix nothing",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "loyalty ledger item is finished in ../ledger-wt. which criteria are blocked because the staging db isnt reachable and what would unblock them",
     "rationale": "blocked results with what would unblock them",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Re-validate the invoice-rounding work item. The worktree changed since the last verdict, so the old verdict must not count.",
-    "rationale": "a rerun that replaces a verdict for changed content",
+    "query": "can you tell me for each criterion of the cart-merge item if its a pass, and what the npm test run in the worktree really asserts",
+    "rationale": "reads what a passing test asserts",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Check the work item against its criteria and record the hash of the worktree you checked, so the pull request can only show marks for this exact content.",
-    "rationale": "records the tree hash for later matching",
+    "query": "validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context, no fixes",
+    "rationale": "independent check of one work item in a change directory",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Verify the saved-searches work item with a validator that only gets the criteria and the worktree. Report failures but do not fix anything.",
-    "rationale": "read-only validator that fixes nothing",
+    "query": "independent verdict on the cart-merge item before we deliver it, put the verdict file in plans/cart-merge, no commits",
+    "rationale": "verdict file saved in the change directory",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Implement the cache-warmup work item in its worktree, split it into tasks and run the checks its criteria name.",
-    "rationale": "near miss owned by implementing-work-item",
+    "query": "all work items of the checkout package have verdicts, now check the whole package against the success criteria in plans/checkout-v2",
+    "rationale": "near miss owned by validating-work-package",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The work item is validated and every criterion passed. Write the commit message and the pull request description with the criteria marked.",
-    "rationale": "near miss owned by preparing-delivery",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "All work items of the loyalty package have verdicts. Check the whole package against the plan's success criteria and write the close-out record.",
+    "query": "every item of the loyalty package says done, does it all work together end to end against what the plan promised",
     "rationale": "near miss owned by validating-work-package",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Red-team the written plan before we approve it, with a reviewer that did not write it, and rank the findings by severity.",
-    "rationale": "near miss owned by critiquing-plan",
+    "query": "review my diff on feature/till-sync for bugs and naming problems, src/sync/queue.ts especially",
+    "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Review this pull request diff for bugs and style problems and give me comments I can paste into the review.",
+    "query": "look over the invoice rounding change and tell me if the null handling in src/round.ts is wrong",
     "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "The till service crashes with a segfault on CI and runs fine locally. Here is the core dump backtrace. Find the cause and fix it.",
-    "rationale": "near miss owned by debugging-native-code",
+    "query": "implement work/cache-warmup-8f2a in its worktree and make the criteria pass in src/warmup.ts",
+    "rationale": "near miss owned by implementing-work-item",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write unit tests for the rounding helper of the payments module, with a test double for the currency service.",
-    "rationale": "near miss owned by authoring-tests",
+    "query": "criterion c2 of the work item failed, fix the timeout in src/retry.js and rerun its tests",
+    "rationale": "near miss owned by implementing-work-item",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Write the acceptance criteria for the receipt export work item and say how each is verified.",
-    "rationale": "near miss owned by defining-work-items",
+    "query": "we spent the whole session on the flaky ci cache, turn what we learned into rules for AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Every work item of the checkout package says done, but I do not trust that. Check the plan's success criteria and whether the pieces work together, using a reviewer that did not build them.",
+    "query": "turn what we learned this session about rebasing the release branch into a reusable skill",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the item is validated and every criterion passed, write the commit message and the pr text for feature/loyalty-ledger",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "red-team the written plan for the shop migration before we approve it and rank what you find",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "write the user story for the receipt export as a cashier, with acceptance criteria",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "split the approved plan into work items, each with criteria and how it is verified",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "no subagents here, so do the saved-searches work item yourself step by step and write the implementation notes",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the implementer's test output is in the notes for profile-sync, write the PR text and show which checks are self-checks and which were validated independently",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "is the plan done? check each success criterion in plans/fare-capping/plan.md against what is on main right now",
     "rationale": "near miss owned by validating-work-package",
     "should_trigger": false,
     "split": "validation"

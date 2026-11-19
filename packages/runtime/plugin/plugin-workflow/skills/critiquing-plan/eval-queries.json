@@ -1,109 +1,145 @@
 [
   {
-    "query": "We have a written plan for moving saved searches to the new index service. Before we approve it, red-team it with a reviewer that did not write it and give me findings with severity.",
-    "rationale": "a red-team of a written plan before approval",
+    "query": "plans/fare-capping/plan.md is done, red-team it before alex signs off",
+    "rationale": "red-team review of a written plan",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Run a pre-mortem on plans/fare-capping/plan.md: assume the rollout failed and trace the likely causes back to what the plan says or leaves out.",
-    "rationale": "a pre-mortem of a plan",
+    "query": "pre-mortem on the checkout-v2 rollout doc: assume it blew up in six months, what went wrong?",
+    "rationale": "pre-mortem lens without the word plan",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Poke holes in the loyalty-service plan before the owners sign it off. Which success criteria could pass while the thing is still broken?",
-    "rationale": "poke holes before approval",
+    "query": "poke holes in the orders-db migration approach before we approve it",
+    "rationale": "adversarial review before approval without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "what could go wrong with the plan for moving search onto opensearch? don't change it, just give me the risks graded by severity",
+    "rationale": "graded findings without revising",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "get a fresh agent that didn't write it to review plans/rate-limits/plan.md, blind first and then with the decisions",
+    "rationale": "independent two-pass review",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "steelman the weakest section of the invoice-feed plan, what's the smallest change that would make it hold up",
+    "rationale": "steelman lens",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I wrote plans/saved-searches myself so I'm biased. can something independent stress-test its assumptions before sign-off?",
+    "rationale": "independent stress test of assumptions",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "Look at the success criteria of the import plan and find concrete inputs, sequences or recovery cases where the plan is followed and a criterion still fails.",
-    "rationale": "falsify the success criteria",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "The scope section of the checkout-cleanup plan feels thin. Find the smallest change that would strengthen it, and critique the rest while you are there.",
-    "rationale": "steelman for the weakest section",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "Review the plan blind first, with only the plan and our review criteria, then again with the decisions folder, and tell me which first findings held up.",
-    "rationale": "independent two-pass review with decisions",
+    "query": "try to falsify the success criteria in the notifications rollout, can anyone actually observe them?",
+    "rationale": "falsify lens without the word plan",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "I wrote this plan with an agent, so I do not trust that agent to judge it. Start a fresh read-only reviewer and record what it finds about the plan.",
-    "rationale": "a fresh reviewer is the point",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "What could go wrong with the notification-migration plan? Give me a ranked list of risks, each with the section it affects and how it would fail.",
-    "rationale": "what could go wrong with this plan",
+    "query": "the plan got revised yesterday after the last review, critique the new version from scratch",
+    "rationale": "a new critique of a revised plan",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "The critique found six problems in the plan. Apply the ones we agreed with to plan.md and the work files, and record what you did with each.",
+    "query": "which inputs or orderings does the cache-layer proposal miss? grade each one",
+    "rationale": "missed inputs and sequences without the word plan",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "apply the critique findings to plans/fare-capping/plan.md and tighten the success criteria",
     "rationale": "near miss owned by revising-plan",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The review exposed that nobody decided who owns the retry budget. Take me through that question and record my answer as a decision.",
+    "query": "I left FIXME notes all over plans/invoice-feed, fold them into the plan and the work files",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the review raised three open questions about retention, go through them with me one at a time",
     "rationale": "near miss owned by settling-questions",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "All questions are settled. Write the plan with its objective, scope and success criteria, and the first outline of the work.",
-    "rationale": "near miss owned by writing-plan",
+    "query": "interview me about the unresolved choices for the payout schedule before anything gets written",
+    "rationale": "near miss owned by settling-questions",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Review this pull request diff for bugs and style problems and give me comments I can paste into the review.",
+    "query": "review the diff on my pricing-service branch for bugs before I open the PR",
     "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The checkout test fails on CI and passes locally. Here is the stack trace. Find the cause and fix it.",
-    "rationale": "near miss owned by debugging-native-code",
+    "query": "look over the changes to src/cap.kt for race conditions and missing error handling",
+    "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Audit the payments module against our quality standards and give me a ranked list of the smells with a severity for each.",
-    "rationale": "near miss owned by auditing-code-quality",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "The first work package is finished. Check that it meets its criteria and give me a verdict.",
+    "query": "check that the daily-cap-api work item meets its acceptance criteria in its worktree",
     "rationale": "near miss owned by validating-work-item",
     "should_trigger": false,
-    "split": "validation"
+    "split": "train"
   },
   {
-    "query": "Proofread the plan for typos and inconsistent heading levels and fix them.",
-    "rationale": "near miss owned by writing-prose",
+    "query": "all items of the loyalty package are merged, did we actually hit the success criteria? write the close-out",
+    "rationale": "near miss owned by validating-work-package",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "The critique of the import plan is written. Go through its findings, apply the ones the evidence supports and tell me for each of the others why you left it.",
-    "rationale": "near miss owned by revising-plan",
+    "query": "research and decisions for invoice-feed are in, write plan.md and outline the work",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this session kept going wrong the same way, turn those lessons into rules in our AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "We settled the cache design last week and two questions stay open for the platform team. Write plan.md for the cache change and make a draft work file for each team, naming the open decisions each one waits on.",
+    "query": "review the description of my new SKILL.md, I think it triggers on too many prompts",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want a fourth option for the cache question: keep it in redis but one per region. check that against cache-gateway before you recommend anything",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "reporting module cleanup: quality research is done and the decisions are recorded. write up the objective, in and out of scope and measurable success criteria, plus draft work files for each team",
     "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "critique of the import plan is done. go through the findings, apply what the evidence backs and tell me why you skipped the rest",
+    "rationale": "near miss owned by revising-plan",
     "should_trigger": false,
     "split": "validation"
   }

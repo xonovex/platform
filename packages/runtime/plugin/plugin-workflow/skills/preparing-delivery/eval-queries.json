@@ -1,102 +1,126 @@
 [
   {
-    "query": "The saved-searches work item is implemented in its worktree and validated. Write the commit message for it, with the decisions it carries out and the link to the plan.",
+    "query": "retry-from-settings-7k2f is finished in ../shop-app-wt, write me the commit message with the decisions it follows and the link to the plan",
     "rationale": "commit message for a finished work item",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Prepare the pull request description for the cache-warmup work item. Mark the acceptance criteria only if the verdict really covers the code as it is now.",
+    "query": "need a PR description for the saved-searches item, only tick the criteria if the verdict still matches what's in the worktree now",
     "rationale": "description with verdict matching",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "We deliver by pull request. Draft the delivery text for the checkout clean-up item: the commit message, the description and a reviewer comment where the module split needs an explanation.",
-    "rationale": "all three delivery files",
-    "should_trigger": true,
-    "split": "train"
-  },
-  {
-    "query": "The worktree changed after the validation ran. Redo the pull request description so it does not claim the criteria are met.",
-    "rationale": "stale verdict handled",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Our project delivers straight to trunk. Write the commit message for the invoice-rounding work item and keep the reasoning behind the two decisions in it.",
+    "query": "we ship straight to main here so just the commit message for invoice-rounding, put why we picked banker's rounding in the body",
     "rationale": "trunk mode, commit message only",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "Add an inline review comment explaining why the retry limit comes from the settings and not from a constant, and keep it so a rerun updates it instead of adding another.",
-    "rationale": "inline comment with a marker",
-    "should_trigger": true,
-    "split": "validation"
-  },
-  {
-    "query": "Describe this change for the reviewers of the loyalty ledger work item: what it delivers, which decisions it follows, how it was tested. Keep it short enough for the host to accept.",
-    "rationale": "short description within the limit",
+    "query": "write the commit msg and PR text for feature/checkout-cleanup plus a reviewer comment on the module split in src/checkout/index.ts",
+    "rationale": "all three delivery files",
     "should_trigger": true,
     "split": "train"
   },
   {
-    "query": "The implementer's own test run is in the notes. Write the delivery text for the profile-sync item and make clear which checks are the implementer's and which are independent.",
+    "query": "i changed src/cache/warm.ts after validation ran, redo the PR description so it doesn't claim the criteria pass",
+    "rationale": "stale verdict handled",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "add a comment for the reviewer on line 42 of src/ledger/post.ts explaining why we round before summing, and make it so a rerun updates it instead of adding a second one",
+    "rationale": "inline comment with a marker",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "describe this change for the reviewers of the loyalty ledger work: what it does, which decisions it follows, how it was tested. keep it under what the host accepts",
+    "rationale": "short description within the limit",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the implementer's test output is in the notes for profile-sync, write the PR text and show which checks are self-checks and which were validated independently",
     "rationale": "self-check labelling",
     "should_trigger": true,
     "split": "validation"
   },
   {
-    "query": "The delivery files are ready and I approve them. Commit the change, push the branch and open the pull request on GitHub.",
+    "query": "prep the delivery for work/points-balance-endpoint-3m4q: commit message, description, anything the reviewer needs to know",
+    "rationale": "all delivery files for one work item",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "before i open the PR for feature/sso-timeout, write the description from the work file and the verdict. don't push or commit anything yet",
+    "rationale": "description only, nothing applied",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "delivery files look good, commit it, push feature/retry-from-settings-7k2f and open the PR on github",
     "rationale": "near miss owned by using-github",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Check whether the saved-searches work item meets its acceptance criteria and give me a verdict for the current worktree.",
-    "rationale": "near miss owned by validating-work-item",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Implement the cache-warmup work item in its worktree, split it into tasks and run the checks it names.",
-    "rationale": "near miss owned by implementing-work-item",
-    "should_trigger": false,
-    "split": "train"
-  },
-  {
-    "query": "Review this pull request diff for bugs and style problems, and leave comments I can paste into the review.",
-    "rationale": "near miss owned by reviewing-code",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Squash my last five commits into one and rewrite the history so the branch is clean.",
+    "query": "squash my last 4 commits on feature/ledger-rounding into one and force push with lease",
     "rationale": "near miss owned by using-git",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write an ADR that records why we chose queue-based retries over a scheduler, with the options we rejected.",
-    "rationale": "near miss owned by writing-technical-docs",
-    "should_trigger": false,
-    "split": "validation"
-  },
-  {
-    "query": "Write the plan for the loyalty ledger change with its objective, scope and success criteria.",
-    "rationale": "near miss owned by writing-plan",
+    "query": "write a PR description for my hotfix branch fix/session-cookie, no work file or anything, just go from the diff",
+    "rationale": "near miss owned by authoring-pull-requests",
     "should_trigger": false,
     "split": "train"
   },
   {
-    "query": "Write release notes for version 2.4 of the shop app for our customers, based on the merged pull requests.",
-    "rationale": "near miss owned by managing-versions",
+    "query": "post these two review comments on MR 214 in our gitlab project for src/billing/invoice.ts",
+    "rationale": "near miss owned by using-gitlab",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "turn what we learned in this session about the retry settings into rules for AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "post this comment on line 30 of src/retry.ts in the open github PR #88",
+    "rationale": "near miss owned by using-github",
     "should_trigger": false,
     "split": "validation"
   },
   {
-    "query": "Carry out the work file work/points-balance-endpoint-3m4q in its own worktree, run the checks its criteria name and record which decisions shaped the code.",
+    "query": "review the diff in src/billing/invoice.ts for bugs and leave comments i can paste",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "turn the lessons from this session into a new skill so the next agent doesn't repeat the cache-key mistake",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "check if the points-balance-endpoint item really meets its criteria and give me a verdict for the worktree",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "git commit the staged changes in the shop-app worktree with a conventional message for the fix in src/cart.ts",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "build work/points-balance-endpoint-3m4q in its own worktree and run whatever checks its criteria list",
     "rationale": "near miss owned by implementing-work-item",
     "should_trigger": false,
     "split": "validation"
