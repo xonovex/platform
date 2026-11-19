@@ -835,10 +835,9 @@ go test ./...
 
 # Integration tests (envtest, real API server, no kubelet)
 # Requires: setup-envtest, provided by the nix devshell (nix/k8s.nix)
-# The Moon task sets KUBEBUILDER_ASSETS; no manual export is needed:
+# The Moon task downloads the control plane binaries to .cache/envtest in the
+# workspace root and sets KUBEBUILDER_ASSETS; no manual export is needed:
 npx moon run agent-operator-go:go-test-integration
-# Direct invocation outside moon:
-KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
 
 # E2E tests (Kind, full cluster with scheduling and garbage collection)
 # Requires: kind, kubectl, Docker

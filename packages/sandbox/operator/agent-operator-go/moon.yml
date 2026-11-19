@@ -132,8 +132,15 @@ tasks:
       runInCI: false
       cache: false
       runFromWorkspaceRoot: true
+  # envtest starts the control plane of the Kubernetes minor that k8s.io/api
+  # names in go.mod. setup-envtest keeps those binaries in the ignored .cache
+  # directory of the workspace, so the task writes nothing to a home directory.
   go-test-integration:
-    script: KUBEBUILDER_ASSETS="$(setup-envtest use -i -p path)" go test -tags=integration -v -timeout=300s ./test/integration/
+    script: |
+      set -euo pipefail
+      minor="$(go list -m -f '{{.Version}}' k8s.io/api | cut -d. -f2)"
+      assets="$(setup-envtest use "1.${minor}.x" -p path --bin-dir "$workspaceRoot/.cache/envtest")"
+      KUBEBUILDER_ASSETS="$assets" go test -tags=integration -v -timeout=300s ./test/integration/
     deps:
       - go-build
     inputs:
