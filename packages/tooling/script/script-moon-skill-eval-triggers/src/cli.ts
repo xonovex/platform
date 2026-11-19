@@ -2,7 +2,7 @@ const PROGRAM = "moon-skill-eval-triggers";
 
 const USAGE = `Usage: ${PROGRAM} [queries.json] [skill_name] [split] [options]
     queries.json = path to eval-queries.json (default: ./eval-queries.json)
-    skill_name   = bare ("git-commit") or plugin-namespaced ("plugin:git-commit")
+    skill_name   = bare ("using-git") or plugin-namespaced ("plugin:using-git")
                    (default: the "name" frontmatter from ./SKILL.md)
     split        = train | validation | all   (default: all)
 

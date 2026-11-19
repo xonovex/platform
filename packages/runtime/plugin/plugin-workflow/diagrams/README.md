@@ -14,7 +14,7 @@ Read the numbered phases from top to bottom. Dark gray arrows show the normal fl
 
 The palette, typography, shapes, and export rules follow the Xonovex design system in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`), as mirrored in `packages/asset/asset-brand/diagrams/style.gvpr`.
 
-The [workflow guide](../README.md) explains how to select commands and reconstruct context when resuming a task.
+The [workflow guide](../README.md) explains how to select skills and reconstruct context when resuming a task.
 
 ## Render changes
 

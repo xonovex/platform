@@ -7,7 +7,7 @@
 
 Usage:
     eval-outputs.py <evals.json> <skill_name> [iteration] [options]
-        skill_name = bare ("git-commit") or plugin-namespaced ("myplugin:git-commit")
+        skill_name = bare ("using-git") or plugin-namespaced ("myplugin:using-git")
         iteration  = name for this run's workspace dir (default: auto "iteration-N")
 
 evals.json shape:
@@ -120,7 +120,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("evals", help="path to evals.json with skill_name, tier, and evals")
     p.add_argument(
         "skill_name",
-        help="bare ('git-commit') or plugin-namespaced ('plugin:git-commit')",
+        help="bare ('using-git') or plugin-namespaced ('plugin:using-git')",
     )
     p.add_argument(
         "iteration",

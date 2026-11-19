@@ -2,6 +2,15 @@
 
 Auto-curate the latest news and developments on a given topic, then produce CEFR B1-B2 bilingual articles as Markdown with structured frontmatter.
 
+## Inputs
+
+- **Topic** (required): the subject to search news for
+- **Destination** (required): the directory for the generated files
+- **Languages** (optional): the languages to write, such as English and Dutch; defaults to English
+- **Days** (optional): the number of days to look back; defaults to 7
+- **Maximum** (optional): the maximum number of stories; defaults to 3
+- **Slug** (optional): the slug for the generated files; derived from the title when absent
+
 ## Goal
 
 - Fetch the latest news on a specified `topic`

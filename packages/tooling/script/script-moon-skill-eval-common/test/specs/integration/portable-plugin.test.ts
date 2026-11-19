@@ -27,7 +27,6 @@ describe("portable evaluation plugin loading", () => {
           dependencies: ["xonovex-native"],
         }),
       );
-      write("plugin-core/commands/git-commit.md", "Commit the change.");
       write("plugin-core/skills/using-alpha/SKILL.md", "# Alpha");
       write(
         "plugin-core/skills/using-alpha/references/details.md",
@@ -59,10 +58,8 @@ with staged_plugin_directories([native, core], "using-alpha") as staged:
     assert (staged[0] / "skills/writing-c99/SKILL.md").is_file()
     assert (staged[1] / "skills/using-alpha/references/details.md").read_text() == "Alpha details."
     assert not (staged[1] / "skills/using-beta").exists()
-    assert not (staged[1] / "commands").exists()
     assert json.loads((staged[1] / ".claude-plugin/plugin.json").read_text())["skills"] == ["./skills/using-alpha"]
 assert all(not directory.exists() for directory in staged)
-assert (core / "commands/git-commit.md").is_file()
 (core / "hooks").mkdir()
 try:
     read_plugin_manifest(core)

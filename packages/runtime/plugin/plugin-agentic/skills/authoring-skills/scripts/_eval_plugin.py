@@ -41,8 +41,7 @@ def read_plugin_manifest(directory: Path) -> tuple[str, list[str], bool]:
     ):
         raise ValueError(f"Claude plugin dependencies are invalid: {manifest_path}")
     executable = next(
-        (entry for entry in EXECUTABLE_COMPONENTS
-         if not (grouped and entry == "commands") and (directory / entry).exists()),
+        (entry for entry in EXECUTABLE_COMPONENTS if (directory / entry).exists()),
         None,
     )
     if executable is not None:

@@ -7,7 +7,7 @@
 
 Usage:
     eval-triggers.py <queries.json> <skill_name> [split] [options]
-        skill_name = bare ("git-commit") or plugin-namespaced ("myplugin:git-commit")
+        skill_name = bare ("using-git") or plugin-namespaced ("myplugin:using-git")
         split      = train | validation | all   (default: all)
 
 Options (flag overrides env; env keeps the loop/CI ergonomics):
@@ -67,7 +67,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("queries", help="path to eval-queries.json")
     p.add_argument(
         "skill_name",
-        help="bare ('git-commit') or plugin-namespaced ('plugin:git-commit')",
+        help="bare ('using-git') or plugin-namespaced ('plugin:using-git')",
     )
     p.add_argument(
         "split",

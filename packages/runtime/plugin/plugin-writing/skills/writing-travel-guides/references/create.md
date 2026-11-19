@@ -2,6 +2,15 @@
 
 Create detailed, multilingual travel guides combining engaging narrative with practical, web-verifiable information.
 
+## Inputs
+
+- **Topic** (required): the type of travel guide, such as a port, a city, or a museum
+- **Subject** (required): the subject of the guide, such as Barcelona or the Louvre
+- **Destination** (required): the directory for the generated files
+- **Languages** (optional): the languages to write, such as English and Dutch; defaults to English
+- **Research only** (optional): do the research and present the findings without creating a file
+- **Slug** (optional): the slug for the generated files; derived from the subject when absent
+
 ## Goal
 
 - Create a detailed travel guide for the specified `topic` and `subject` (e.g. topic=`City`, subject=`Barcelona`)

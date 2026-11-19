@@ -1,20 +1,20 @@
 # Workflow Plugin
 
-Use `xonovex-workflow` to take a task from research to validated delivery and closeout. Choose `plan-continue` for one implementation target or `plan-delegate` for supervised roadmap execution. Use the [Core Plugin](../plugin-core/README.md) for Git operations, worktrees, and code-quality review.
+Use `xonovex-workflow` to take a task from research to validated delivery and closeout. Each step has its own skill, and the harness loads the skill that matches the request. Choose `implementing-plan` for one implementation target or `delegating-plan` for supervised roadmap execution. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to maintain instructions and skills.
 
 ![Research and decide, plan and review, implement and validate, review quality and deliver, then close out](diagrams/workflow-lifecycle.svg)
 
 ## Follow the workflow
 
-Work through the phases below and return to implementation when checks or review find a gap. Continuous learning can run during any phase. Diagram labels omit the plugin namespace; command titles use `xonovex-workflow`, `xonovex-core`, or `xonovex-agentic` as shown in their owning catalog.
+Work through the phases below and return to implementation when checks or review find a gap. Continuous learning can run during any phase. A diagram label names the skill that owns the step, and a `Core:` prefix names a skill of the Core Plugin.
 
 | Phase | Action and result |
 | --- | --- |
-| Research and decisions | Use `plan-research` to investigate the task and `plan-decide` to resolve questions. Continue only when the work has a clear purpose and direction. |
-| Planning and review | Use `plan-create`, independently critique the plan with `plan-critique`, and apply feedback with `plan-revise`. Record the decision with `plan-accept` or `plan-reject`. Use `plan-subplans-create` when the work needs smaller targets. |
-| Implementation and validation | Use `plan-continue` for one target or `plan-delegate` for a supervised roadmap. Load the applicable skills, implement the target, and check success criteria with `plan-validate`. Fix failures and refresh evidence with `plan-update`. |
-| Quality and delivery | Use the Core Plugin's `auditing-code-quality` for an audit. Fix bounded findings or return to research for broader changes. Integrate isolated work when applicable, validate the combined result, and commit within the granted authority. For requested publication, use the Integrations Plugin for pull or merge requests and the Core Plugin's `reviewing-code` for review findings. |
-| Closeout and follow-up | Use `plan-followup` to return status, evidence, remaining work, and follow-up seeds for completed, paused, or handed-over work. Use `plan-distill` when a completed implementation should become a replayable skill suite. |
+| Research and decisions | Use `researching-changes` to investigate the task and `settling-questions` to resolve questions. Continue only when the work has a clear purpose and direction. |
+| Planning and review | Use `writing-plan`, independently critique the plan with `critiquing-plan`, and apply feedback with `revising-plan`. Record the decision with `approving-plan`. Use `defining-subplans` when the work needs smaller targets. |
+| Implementation and validation | Use `implementing-plan` for one target or `delegating-plan` for a supervised roadmap. Load the applicable skills, implement the target, and check success criteria with `validating-plan`. Fix failures and refresh evidence with the progress update of `implementing-plan` before selecting more work. |
+| Quality and delivery | Use the Core Plugin's `auditing-code-quality` for an audit. Fix bounded findings or return to research for broader changes. Integrate isolated work when applicable, validate the combined result, and commit within the granted authority. |
+| Closeout and follow-up | Use `closing-plan` to return status, evidence, remaining work, and follow-up seeds for completed, paused, or handed-over work. Use `distilling-plan` when a completed implementation should become a replayable skill suite. |
 
 A plan approval records a review decision. Status metadata does not grant authority to implement, create branches, merge, push, or publish. Use the authority already granted by the user and the project rules.
 
@@ -28,31 +28,31 @@ Read the main phases from top to bottom. The diagram includes acceptance and rej
 
 ## Choose an execution mode
 
-Use `plan-continue` for one selected plan or subplan. Request the `apply` effect for implementation; the planning procedure defaults to `inspect`. Reconstruct the target context and load its applicable skills before editing. Stop after the selected target rather than advancing silently to another subplan.
+Use `implementing-plan` for one selected plan or subplan. Request the apply effect for implementation; the skill defaults to inspect. Reconstruct the target context and load its applicable skills before editing. Stop after the selected target rather than continuing into another child plan.
 
-Use `plan-delegate` for supervised roadmap execution. The supervisor briefs implementation agents, independently verifies their results, and records progress. Sequential ordering is the default. Parallel groups need disjoint file sets and completed dependencies; use isolated worktrees where needed and allowed.
+Use `delegating-plan` for supervised roadmap execution. The supervisor briefs implementation agents, independently verifies their results, and records progress. Sequential ordering is the default. Parallel groups need disjoint file sets and completed dependencies.
 
 ![Choose one target or a supervised roadmap, validate criteria, fix failures, and record progress before advancing](diagrams/development-cycle.svg)
 
-Validate explicit success criteria, not just test exit codes. `plan-update` returns refreshed progress and evidence. Persist the result separately when requested so another session can reconstruct the remaining work.
+Validate explicit success criteria, not just test exit codes. The progress update of `implementing-plan` returns refreshed progress and evidence. Persist the result separately when requested so another session can reconstruct the remaining work.
 
 ## Deliver isolated work
 
-Use the Core Plugin's worktree commands when isolation is needed and branch creation is within the granted authority.
+Use the worktree operations of the Core Plugin's [`using-git`](../plugin-core/skills/using-git/SKILL.md) skill when isolation is needed and branch creation is within the granted authority.
 
-| Command | Result |
+| Operation | Result |
 | --- | --- |
-| [`plan-worktree-create`](../plugin-core/commands/plan-worktree-create.md) | Create an isolated worktree before implementation. |
-| [`plan-worktree-merge`](../plugin-core/commands/plan-worktree-merge.md) | Integrate into the source worktree. Validate the combined result before declaring completion. |
-| [`plan-worktree-abandon`](../plugin-core/commands/plan-worktree-abandon.md) | Record why work stops and retain useful lessons. Worktree removal is a separate option. |
-| [`plan-worktree-cleanup`](../plugin-core/commands/plan-worktree-cleanup.md) | Remove eligible stale or merged worktrees when cleanup is requested. |
-| [`git-commit`](../plugin-core/commands/git-commit.md) | Commit validated work. Add `--push` only when publication is requested. |
+| Create a worktree | Create an isolated worktree before implementation. |
+| Merge a worktree | Integrate into the source worktree. Validate the combined result before declaring completion. |
+| Abandon a worktree | Record why work stops and retain useful lessons. Worktree removal is a separate option. |
+| Clean up worktrees | Remove eligible stale or merged worktrees when cleanup is requested. |
+| Commit | Commit validated work. Push only when publication is requested. |
 
 ## Carry lessons into future work
 
-Use `reflect-to-instructions` for project-specific lessons and `reflect-to-skill` for reusable procedures. Both commands extract and apply directly. Use `--dry-run` to preview changes. Run `reflect-extract` first only when separate extraction is useful, then integrate with `--from-reflections`.
+Use `reflecting-on-sessions` to carry session lessons forward: it applies project-specific lessons to the relevant `AGENTS.md` files and reusable procedures to their owning skills. Both operations extract and apply directly, and each has a preview. Extract the lessons to files first only when a separate extraction is useful, then integrate the stored reflections.
 
-Reflection captures session lessons. `plan-distill` reconstructs a completed implementation as a replayable skill suite. Use the Agentic Plugin's instruction, skill, and slash-command simplification commands when the resulting guidance needs shortening.
+Reflection captures session lessons. `distilling-plan` reconstructs a completed implementation as a replayable skill suite. Use the Agentic Plugin's `authoring-instructions` and `authoring-skills` when the resulting guidance needs shortening.
 
 <!-- xonovex:installation:start -->
 
@@ -62,7 +62,7 @@ Add the Xonovex marketplace once, then install `xonovex-workflow` in the selecte
 
 ### Claude Code
 
-Install this bundle in Claude Code. The harness discovers its bundled skills and commands.
+Install this bundle in Claude Code. The harness discovers its bundled skills.
 
 ```bash
 claude plugin marketplace add xonovex/platform
@@ -71,7 +71,7 @@ claude plugin install xonovex-workflow@xonovex-marketplace
 
 ### Codex
 
-Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.
+Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.
 
 ```bash
 codex plugin marketplace add xonovex/platform
@@ -86,36 +86,23 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [planning-work](skills/planning-work/SKILL.md) | Researching, creating, critiquing, revising, expanding, continuing, updating, validating, closing out, or distilling an implementation plan. |
+| [approving-plan](skills/approving-plan/SKILL.md) | Recording the user's approval or rejection of a reviewed plan. |
+| [closing-plan](skills/closing-plan/SKILL.md) | Closing out a completed, paused, or handed-over plan with a follow-up record. |
+| [critiquing-plan](skills/critiquing-plan/SKILL.md) | A written plan needs an independent adversarial review before anyone approves or implements it. |
+| [defining-subplans](skills/defining-subplans/SKILL.md) | Expanding a parent plan into focused child plans with their execution order. |
+| [delegating-plan](skills/delegating-plan/SKILL.md) | Supervising the execution of a roadmap, a plan, or a list of subplans by handing each item to an implementation agent and verifying its result. |
+| [distilling-plan](skills/distilling-plan/SKILL.md) | Turning a completed plan's implementation (its branch, plan record, and execution logs) into a replayable suite of skills. |
+| [implementing-plan](skills/implementing-plan/SKILL.md) | Implementing, resuming, or previewing work from an existing plan or subplan, one target at a time, and when refreshing the plan's progress from implementation evidence. |
 | [reflecting-on-sessions](skills/reflecting-on-sessions/SKILL.md) | Reflecting on a session or distilling lessons into reusable form. |
-
-## Commands
-
-Use the command name exposed by the harness. Command titles use the `xonovex-workflow` namespace.
-
-| Command | Purpose |
-| --- | --- |
-| `plan-accept` | [Record plan approval after a final review; implementation remains a separate operation.](commands/plan-accept.md) |
-| `plan-continue` | [Resume one plan or subplan with its context and implementation skills, then stop after that target.](commands/plan-continue.md) |
-| `plan-create` | [Create one high-level plan from research for review before expanding it into subplans.](commands/plan-create.md) |
-| `plan-critique` | [Stress-test a plan independently and report findings for a separate revision.](commands/plan-critique.md) |
-| `plan-decide` | [Resolve open decisions one at a time using known questions or targeted discovery.](commands/plan-decide.md) |
-| `plan-delegate` | [Supervise roadmap implementation, verify each agent result independently, and record progress.](commands/plan-delegate.md) |
-| `plan-distill` | [Turn a completed implementation into a replayable skill suite with traceable sources.](commands/plan-distill.md) |
-| `plan-followup` | [Return a closeout record with status, evidence, remaining work, and follow-up seeds.](commands/plan-followup.md) |
-| `plan-reject` | [Record plan rejection and its reason while preserving the plan for revision or review.](commands/plan-reject.md) |
-| `plan-research` | [Research code and external evidence for requirements without creating a plan.](commands/plan-research.md) |
-| `plan-revise` | [Revise a plan from explicit annotations and feedback; approval remains a separate operation.](commands/plan-revise.md) |
-| `plan-subplans-create` | [Expand a parent plan into focused subplans with dependencies and parallel groups.](commands/plan-subplans-create.md) |
-| `plan-update` | [Refresh the plan progress and validation evidence from the current implementation.](commands/plan-update.md) |
-| `plan-validate` | [Check the plan success criteria and report evidence without changing the plan.](commands/plan-validate.md) |
-| `reflect-extract` | [Extract reusable lessons from the session mistakes, discoveries, and corrections.](commands/reflect-extract.md) |
-| `reflect-to-instructions` | [Apply session lessons to the relevant AGENTS.md files, or preview them with `--dry-run`.](commands/reflect-to-instructions.md) |
-| `reflect-to-skill` | [Apply reusable session lessons to their owning skills, or preview them with `--dry-run`.](commands/reflect-to-skill.md) |
+| [researching-changes](skills/researching-changes/SKILL.md) | Researching a codebase and external sources to ground a future implementation plan, without writing the plan or changing code. |
+| [revising-plan](skills/revising-plan/SKILL.md) | Applying explicit feedback, annotations, or critique findings to an existing plan as a traceable new revision. |
+| [settling-questions](skills/settling-questions/SKILL.md) | Open decisions for a plan need an answer from the user, one at a time, each with a recommendation. |
+| [validating-plan](skills/validating-plan/SKILL.md) | Checking a plan's success criteria and Definition of Done against implementation evidence without changing the plan. |
+| [writing-plan](skills/writing-plan/SKILL.md) | Writing one high-level implementation plan from requirements, research, or settled decisions, before any detailed subplan exists. |
 
 ## Validation
 
-Run the plugin gate from the repository root. It checks commands, formatting, owned skills, and diagram rendering.
+Run the plugin gate from the repository root. It checks the plugin documents, formatting, owned skills, and diagram rendering.
 
 ```bash
 npx moon run plugin-workflow:ci-check --force

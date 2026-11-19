@@ -2,6 +2,14 @@
 
 Preview or apply removal of exact feature worktree and branch targets. Default to `preview`; never turn a broad pattern or age heuristic directly into a destructive command.
 
+## Inputs
+
+- **Merged** (optional): remove each worktree whose branch is already merged into its base
+- **Stale** (optional): remove each worktree whose branch or directory is gone or abandoned
+- **Prune** (optional): run `git worktree prune` to clear stale administrative metadata
+- **Confirmed** (optional): skip the confirmation and remove immediately
+- **Preview** (optional): list what the cleanup removes and change nothing
+
 ## Procedure
 
 1. Inventory worktrees and branches, then resolve exact requested targets. A `*-feature-*` pattern or more than 30 days without commits is only a candidate signal.

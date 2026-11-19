@@ -4,10 +4,10 @@ digraph diagram {
   edge [fontsize=16, penwidth=1.5, arrowsize=0.7]
 
   next [label="Select target\nLoad plan context and skills"]
-  implement [label="Implement one target: /plan-continue\nSupervise a roadmap: /plan-delegate"]
+  implement [label="Implement one target: implementing-plan\nSupervise a roadmap: delegating-plan"]
   validate [label="Validate\nChecks and success criteria"]
   gates [label="Gates\npass?", role="decision", style=filled, margin="0.14,0.06"]
-  update [label="/plan-update\nRecord progress and evidence\nPersist separately when requested"]
+  update [label="implementing-plan\nRecord progress and evidence\nPersist separately when requested"]
   complete [label="Development complete\nContinue to quality review", role="strong"]
 
   node [shape=point, width=0, height=0, label="", style=invis]

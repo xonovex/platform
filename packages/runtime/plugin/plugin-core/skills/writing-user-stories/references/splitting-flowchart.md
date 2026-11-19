@@ -43,4 +43,4 @@ Stories 2–4 are independently shippable and can be reordered or dropped by val
 
 - SPIDR, the compact starter set this flowchart subsumes: [splitting-spidr.md](splitting-spidr.md).
 - INVEST, the gate a story must fail (Small) before you split: [invest-and-smart.md](invest-and-smart.md).
-- Plan and subplan decomposition, a different splitting lens: **planning-work**.
+- Plan and subplan decomposition, a different splitting lens: **defining-subplans**.

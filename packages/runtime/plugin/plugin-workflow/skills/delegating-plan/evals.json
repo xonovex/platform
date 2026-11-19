@@ -1,0 +1,30 @@
+{
+  "skill_name": "delegating-plan",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Work plans/roadmap.md as supervisor. Items: 01 token store (status complete), 02 session API (needs 01), 03 UI (needs 02). Sequential, and stop after one item.",
+      "assertions": [
+        "Item 02 is selected after its prerequisite is verified from the frontmatter of that plan, an implementation agent is briefed from the supervisor's own reading, and the supervisor reviews its result",
+        "The run stops after one accepted item, with a conventional commit and without a push"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "The agent for item 04 reports done. Its report says p95 is 212 ms, and the criterion says under 200 ms. Accept it and move on?",
+      "assertions": [
+        "The item is not accepted: a measurement that is close to the criterion but short of it is recorded as a miss with its number",
+        "The loop stops and reports instead of papering over the unmet criterion"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Run group 2 of the roadmap in parallel: subplan 05 edits src/api/routes.ts and src/api/auth.ts, subplan 06 edits src/api/auth.ts and the docs.",
+      "assertions": [
+        "The file sets are checked and found to overlap, so the two subplans are sequenced instead of run concurrently",
+        "The supervisor does not implement the items itself"
+      ]
+    }
+  ]
+}

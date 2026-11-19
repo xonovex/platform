@@ -2,6 +2,11 @@
 
 Reduce AGENTS.md file count by deleting those with no unique content and standardizing the rest to a consistent bullet-list format.
 
+## Inputs
+
+- **Root directory** (optional): the directory to scan; defaults to the workspace root
+- **Preview** (optional): show the result without modifying a file
+
 ## Core Workflow
 
 Discover all AGENTS.md files (glob) → classify each as unique or redundant → delete redundant → standardize unique → report.

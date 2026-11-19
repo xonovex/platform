@@ -2,6 +2,13 @@
 
 Rewrite AI-generated or stiff prose so it reads as a human wrote it. Goal: prose that fits its medium and reader, not prose that beats detectors.
 
+## Inputs
+
+- **Text** (required): inline text, a file path, or standard input
+- **Tone** (optional): formal, casual, or technical; inferred from the text when absent
+- **In place** (optional): overwrite the source file in place of printing the result
+- **Audit** (optional): include the pass that names what made the text read as generated
+
 ## Checklist
 
 - [ ] Identify the medium, audience, intended tone, and facts that must not change.

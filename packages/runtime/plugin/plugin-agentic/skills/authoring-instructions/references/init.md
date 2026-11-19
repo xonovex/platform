@@ -2,6 +2,12 @@
 
 Generate a concise AGENTS.md for a directory by scanning its structure, config files, and code.
 
+## Inputs
+
+- **Directory** (required): the target directory
+- **Recursive** (optional): also create an AGENTS.md for each subdirectory with unique content
+- **Preview** (optional): show the result without writing a file
+
 ## Core Workflow
 
 1. Verify no AGENTS.md exists (abort if present: use sync or simplify instead)

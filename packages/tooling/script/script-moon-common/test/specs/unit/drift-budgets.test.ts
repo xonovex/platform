@@ -54,13 +54,13 @@ describe("drift budgets", () => {
   it("caps each kind separately", () => {
     const findings = evaluateBudgets(
       [
-        {kind: "command", path: "c.md", text: words(260)},
-        {kind: "skill", path: "s.md", text: words(260)},
+        {kind: "reference", path: "r.md", text: words(660)},
+        {kind: "skill", path: "s.md", text: words(660)},
       ],
       {},
     );
 
-    expect(findings.map(({path}) => path)).toEqual(["c.md"]);
+    expect(findings.map(({path}) => path)).toEqual(["r.md"]);
   });
 
   it("seeds sorted budgets from current sizes and skips empty files", () => {

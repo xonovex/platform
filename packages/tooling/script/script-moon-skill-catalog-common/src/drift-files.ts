@@ -68,35 +68,3 @@ export const collectSkillCatalogFiles = (
     ),
   );
 };
-
-// collectCommandCatalogFiles walks every command document under packages/runtime/plugin.
-export const collectCommandCatalogFiles = (
-  repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
-): readonly BudgetedFile[] => {
-  const commandRoot = join(repositoryRoot, "packages", "runtime", "plugin");
-  return listing(commandRoot, fs).flatMap((packageName) =>
-    collectCommandPackageFiles(
-      join(commandRoot, packageName),
-      repositoryRoot,
-      fs,
-    ),
-  );
-};
-
-// collectCommandPackageFiles returns the command documents of one package.
-export const collectCommandPackageFiles = (
-  packageDirectory: string,
-  repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
-): readonly BudgetedFile[] =>
-  listing(join(packageDirectory, "commands"), fs)
-    .filter((entry) => entry.endsWith(".md"))
-    .flatMap((entry) =>
-      readBudgeted(
-        repositoryRoot,
-        join(packageDirectory, "commands", entry),
-        "command",
-        fs,
-      ),
-    );

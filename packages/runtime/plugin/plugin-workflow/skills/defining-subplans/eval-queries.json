@@ -1,0 +1,90 @@
+[
+  {
+    "query": "This parent plan has no status field. Expand it into focused subplans and sequence any children that touch the same packages.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Break plans/auth.md into subplans of five to seven tasks each, with dependencies and parallel groups.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Split the approved migration plan by its phase markers into child plans and give the execution order.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Which of these child plans can run at the same time? Derive the groups from their files and dependencies.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Expand the parent plan into independently completable pieces. Preview only, do not write files.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Create the detailed subplans for the importer plan; each needs tasks, validation and success criteria.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the plan is too big to implement in one go, break it down into workable parts and order them",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The previous chat is gone. Apply exactly one child from tracker plan:782 at revision 9f31, baseline the repo first, then stop.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by implementing-plan"
+  },
+  {
+    "query": "Is the rollout plan ready to approve? Check for open annotations and missing criteria, then set the status.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by approving-plan"
+  },
+  {
+    "query": "Work through the roadmap as supervisor: one implementation agent per subplan, review each result yourself, commit per item.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by delegating-plan"
+  },
+  {
+    "query": "Revise this inline rollout plan from the six review comments, preserve unresolved feedback, and return the new plan inline.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by revising-plan"
+  },
+  {
+    "query": "Check every success criterion of plans/auth.md against the current branch and report pass, fail or blocked with evidence.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by validating-plan"
+  },
+  {
+    "query": "Red-team plans/cache-redesign.md in a fresh context and report concrete failure modes without editing it.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by critiquing-plan"
+  },
+  {
+    "query": "The delegated run landed its last commit. Close the plan out: evidenced status per criterion, what is still blocked and by what, and the open decisions with owners.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by closing-plan"
+  },
+  {
+    "query": "Audit packages/worker for weak error handling and validation before we plan hardening work; grade findings by severity and make no edits.",
+    "rationale": "General read-only code-quality audit without an explicit planning-research deliverable",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -1,0 +1,89 @@
+[
+  {
+    "query": "The delegated run landed its last commit. Close the plan out: evidenced status per criterion, what is still blocked and by what, and the open decisions with owners.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "This plan is pausing until the rollout holds; I am handing it over. Assemble the follow-up record a cold reader needs, including follow-up plan seeds with sequencing.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We are done here. Write down what is left: status per criterion, open decisions, residue and seeds for follow-up plans.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The plan is blocked on a vendor approval. Close it out for now with the gate chain and who performs each step.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Prepare the review brief and the retrospective for the finished migration plan.",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Hand this plan over to the next team with a record a cold reader can act on.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Wrap up the plan at the last landed commit: what is met and evidenced, what is gated, what is open and who owns it.",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "which decisions did we never write down during this plan? capture them in the follow-up record with the open ones",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Distill last year's finished upgrade plan into a replay playbook of granular skills so next year is a controlled process instead of archaeology.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by distilling-plan"
+  },
+  {
+    "query": "Validate every success criterion in this plan against commit 8a02 and report pass, fail, or blocked with evidence.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by validating-plan"
+  },
+  {
+    "query": "Before we plan the move to the new queue library, map which modules call the old client and what the current release changed. Read only, no plan yet.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by researching-changes"
+  },
+  {
+    "query": "Work through the roadmap as supervisor: one implementation agent per subplan, review each result yourself, commit per item.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by delegating-plan"
+  },
+  {
+    "query": "The research left five open questions. Walk me through them one at a time, each with the files involved, options, and your recommendation.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by settling-questions"
+  },
+  {
+    "query": "Resume this plan in a new session using its versioned architecture-decision context notes, but ignore an invalidated assumption.",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by implementing-plan"
+  },
+  {
+    "query": "Create a high-level implementation plan from the migration notes below, including risks, validation, and the coding skills the implementer must consult.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by writing-plan"
+  },
+  {
+    "query": "Refactor this React form into smaller components and replace the local state with a reducer.",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

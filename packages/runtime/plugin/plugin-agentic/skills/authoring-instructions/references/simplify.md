@@ -2,6 +2,12 @@
 
 Reduce AGENTS.md verbosity by 40-50% while preserving structure, workflows, and project-specific technology names.
 
+## Inputs
+
+- **Instruction file** (required): the path to the AGENTS.md file
+- **Target reduction** (optional): the share of words to remove, 30 to 60 percent; defaults to 45
+- **Preview** (optional): show the result without modifying the file
+
 ## Core Workflow
 
 Measure baseline → analyze sections (Structure, Subdirectories, Workflow, Integration Points) → apply simplification rules → preview or write → report metrics. Skip files <15 lines.

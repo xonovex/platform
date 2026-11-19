@@ -10,7 +10,7 @@ Add the Xonovex marketplace once, then install `xonovex-agentic` in the selected
 
 ### Claude Code
 
-Install this bundle in Claude Code. The harness discovers its bundled skills and commands.
+Install this bundle in Claude Code. The harness discovers its bundled skills.
 
 ```bash
 claude plugin marketplace add xonovex/platform
@@ -19,7 +19,7 @@ claude plugin install xonovex-agentic@xonovex-marketplace
 
 ### Codex
 
-Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.
+Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.
 
 ```bash
 codex plugin marketplace add xonovex/platform
@@ -46,29 +46,6 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [configuring-pi](skills/configuring-pi/SKILL.md) | Configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. |
 | [using-herdr](skills/using-herdr/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
 
-## Commands
-
-Use the command name exposed by the harness. Command titles use the `xonovex-agentic` namespace.
-
-| Command | Purpose |
-| --- | --- |
-| `instructions-assimilate` | [Add useful guidance from another project while preserving the target instructions and their structure.](commands/instructions-assimilate.md) |
-| `instructions-consolidate` | [Remove redundant instruction files and keep each rule in the directory that owns it.](commands/instructions-consolidate.md) |
-| `instructions-init` | [Create AGENTS.md from the directory structure, tools, and project conventions.](commands/instructions-init.md) |
-| `instructions-simplify` | [Shorten AGENTS.md while preserving its rules, commands, and project context.](commands/instructions-simplify.md) |
-| `instructions-sync` | [Update AGENTS.md to match the current directory structure and project state.](commands/instructions-sync.md) |
-| `skill-assimilate` | [Add useful guidance from another skill while preserving the target skill and its structure.](commands/skill-assimilate.md) |
-| `skill-create` | [Create a reusable guideline skill from the supplied document or URL.](commands/skill-create.md) |
-| `skill-decompose` | [Split a skill into focused skills with one owner per concept and explicit cross-references.](commands/skill-decompose.md) |
-| `skill-evaluate` | [Create or refresh output evaluations with realistic prompts, binary assertions, and explicit tiers.](commands/skill-evaluate.md) |
-| `skill-extract` | [Create or update a skill from recurring code and project-instruction patterns.](commands/skill-extract.md) |
-| `skill-optimize` | [Keep the guidance the weakest target model needs and verify each removal through evaluation.](commands/skill-optimize.md) |
-| `skill-simplify` | [Remove redundant guidance and move detailed examples into references while preserving the skill behavior.](commands/skill-simplify.md) |
-| `slashcommand-assimilate` | [Add useful guidance from another command while preserving the target argument contract and delegation.](commands/slashcommand-assimilate.md) |
-| `slashcommand-create` | [Create a thin command that defines its arguments and delegates its procedure to one owning skill.](commands/slashcommand-create.md) |
-| `slashcommand-distill` | [Move a command procedure into one owning skill and keep the command as a thin interface.](commands/slashcommand-distill.md) |
-| `slashcommand-simplify` | [Shorten a slash command while preserving its arguments and behavior.](commands/slashcommand-simplify.md) |
-
 ## Validation
 
-Run `npx moon run plugin-agentic:ci-check --force` from the repository root to check the plugin manifests, formatting, and owned skills and commands.
+Run `npx moon run plugin-agentic:ci-check --force` from the repository root to check the plugin manifests, formatting, and owned skills.

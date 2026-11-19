@@ -43,27 +43,27 @@
   },
   {
     "query": "the existing AGENTS.md in packages/core is out of date: refresh it",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match instructions-sync"
+    "rationale": "direct sync"
   },
   {
     "query": "the AGENTS.md in apps/web is way too verbose: trim it",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match instructions-simplify"
+    "rationale": "direct simplify"
   },
   {
     "query": "merge the patterns from project-a/AGENTS.md into project-b/AGENTS.md",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match instructions-assimilate"
+    "rationale": "direct merge"
   },
   {
     "query": "we have AGENTS.md scattered all over the monorepo: clean them up and dedupe",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: should match instructions-consolidate"
+    "rationale": "direct consolidate"
   },
   {
     "query": "write a README.md for the new service",
@@ -118,5 +118,29 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "different doc type"
+  },
+  {
+    "query": "write a SKILL.md that packages our deploy procedure so any agent can reuse it",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "skill authoring has a separate owner"
+  },
+  {
+    "query": "add a PreToolUse hook to the harness settings that blocks force pushes",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "harness configuration has a separate owner"
+  },
+  {
+    "query": "publish an llms.txt index for the documentation site",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "llms.txt authoring has a separate owner"
+  },
+  {
+    "query": "rewrite the onboarding guide for new engineers so it leads with the setup result",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "human documentation, not agent instructions"
   }
 ]

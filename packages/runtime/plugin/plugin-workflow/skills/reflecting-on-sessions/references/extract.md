@@ -2,6 +2,11 @@
 
 Analyze the current session for development mistakes, how they were discovered, and the lesson; extract each insight's `category`, `topic`, and `applies_to`; save as individual files with frontmatter.
 
+## Inputs
+
+- **Category** (optional): one mistake category to focus on, such as tool usage, dependencies, or validation
+- **Output directory** (optional): the directory for the insight files; defaults to `reflections/`
+
 ## Output Format
 
 ```markdown

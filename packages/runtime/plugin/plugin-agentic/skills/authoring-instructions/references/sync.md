@@ -2,6 +2,13 @@
 
 Update AGENTS.md files to reflect current directory structure, files, and configuration state. Maintain project-specific technology names.
 
+## Inputs
+
+- **Instruction file** (optional): the path to one AGENTS.md file to update
+- **All files** (optional): update every AGENTS.md file in the repository
+- **Refresh workflows** (optional): refresh the listed commands from `package.json` and the configuration files
+- **Preview** (optional): show the result without modifying a file
+
 ## Core Workflow
 
 1. **Discover:** scan subdirectories, read `package.json` / config files, identify patterns
@@ -50,7 +57,7 @@ check recent commits for directory/file additions not reflected in AGENTS.md
 ## Implementation
 
 - Diff output: show added (`+`), removed (`-`), updated (`~`)
-- `--all` mode: report locations missing an AGENTS.md
+- All files mode: report locations missing an AGENTS.md
 - On parse errors, preserve manual content rather than overwriting
 
 ## Gotchas

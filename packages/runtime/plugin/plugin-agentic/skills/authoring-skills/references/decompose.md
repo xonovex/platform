@@ -2,6 +2,12 @@
 
 Break one oversized or multi-concern skill into several single-owner skills, each owning one concept and cross-referencing the others by name. The inverse of `merge`, and the single-skill version of the split move in [catalog-audit.md](catalog-audit.md). The target shape is [composability.md](composability.md): one concept, one owner, dependencies pointing upward through the general → language → framework tiers.
 
+## Inputs
+
+- **Skill** (required): the path to the `SKILL.md` or the skill directory to decompose
+- **Target names** (optional): the names of the skills to split into; inferred from the concern map when absent
+- **Preview** (optional): show the proposed split (new skills, moved references, cross-links) without writing a file
+
 ## When to decompose
 
 - A `SKILL.md` mixes concerns that route differently: its description needs "and" to cover unrelated triggers.

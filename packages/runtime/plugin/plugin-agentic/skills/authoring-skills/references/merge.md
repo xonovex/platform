@@ -2,6 +2,15 @@
 
 Extracts elements from a source skill and integrates them into a target skill while strictly preserving the target's structure, style, and voice.
 
+## Inputs
+
+- **Target skill** (required): the skill file or directory to augment
+- **Source skill** (required): the skill file or directory that provides the elements
+- **Aspects** (optional): the aspects to focus on, such as error handling or validation
+- **Intensity** (optional): how much of the source to bring over, 10 to 100 percent; defaults to 50
+- **Interactive** (optional): ask clarifying questions before merging
+- **Preview** (optional): show the result without modifying a file
+
 ## Core Workflow
 
 1. Track steps in a task list

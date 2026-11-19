@@ -81,29 +81,17 @@ const manifest = (
     skills: skill,
   });
 
-const commandNames = ["create", "review"] as const;
-
-const commandFiles = (
-  overrides: Readonly<Record<string, string>> = {},
-): Record<string, string> =>
-  Object.fromEntries(
-    commandNames.map((name) => [
-      `packages/runtime/plugin/plugin-test/commands/${name}.md`,
-      overrides[name] ?? `# ${name}\n`,
-    ]),
-  );
-
 describe("checkMarkdownFilesForCrossPackageLinks", () => {
   it("resolves a boundary-crossing link to an existing target", () => {
     const fs = makeRepo({
       "packages/runtime/plugin/plugin-x/skills/using-x/references/actors.md":
         "# Actors\n",
-      "packages/runtime/plugin/plugin-test/commands/foo.md":
+      "packages/runtime/plugin/plugin-test/docs/foo.md":
         "See [actors](../../plugin-x/skills/using-x/references/actors.md).",
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
@@ -118,12 +106,12 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("fails a boundary-crossing link whose target is missing, naming the source and link", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-test/commands/foo.md":
+      "packages/runtime/plugin/plugin-test/docs/foo.md":
         "See [actors](../../plugin-x/skills/using-x/references/actors.md).",
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
@@ -135,7 +123,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
     expect(counts.broken).toBe(1);
     expect(report.fails).toHaveLength(1);
     expect(report.fails[0]).toContain(
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     expect(report.fails[0]).toContain(
       "../../plugin-x/skills/using-x/references/actors.md",
@@ -144,7 +132,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("ignores link-shaped text inside a fenced block or an inline span", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-test/commands/foo.md": [
+      "packages/runtime/plugin/plugin-test/docs/foo.md": [
         "```c",
         "  m->listeners[i](../../plugin-x/skills/using-x/references/gone.md);",
         "```",
@@ -154,7 +142,7 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
 
@@ -232,19 +220,18 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 });
 
 describe("checkCrossPackageLinks", () => {
-  it("scans command packages and retained planning references", () => {
+  it("scans plugin documents and skill references", () => {
     const fs = makeRepo({
-      ...commandFiles(),
       "packages/runtime/plugin/plugin-test/README.md":
-        "See the [command model](../../../asset/asset-diagrams/command-model.png).\n",
+        "See the [plugin model](../../../asset/asset-diagrams/plugin-model.png).\n",
       "packages/runtime/plugin/plugin-test/docs/invocation.md":
         "See the [submission boundary](../../../../sandbox/operator/agent-operator-go/README.md).\n",
-      "packages/asset/asset-diagrams/command-model.png": "image",
+      "packages/asset/asset-diagrams/plugin-model.png": "image",
       "packages/sandbox/operator/agent-operator-go/README.md": "# Operator\n",
-      "packages/runtime/plugin/plugin-workflow/skills/planning-work/SKILL.md":
-        "# Plan\nSee [create](references/create.md).\n",
-      "packages/runtime/plugin/plugin-workflow/skills/planning-work/references/create.md":
-        "# create\n",
+      "packages/runtime/plugin/plugin-workflow/skills/writing-plan/SKILL.md":
+        "# Plan\nSee [example](references/example.md).\n",
+      "packages/runtime/plugin/plugin-workflow/skills/writing-plan/references/example.md":
+        "# example\n",
       "packages/runtime/plugin/plugin-workflow/.claude-plugin/plugin.json":
         manifest("xonovex-workflow", [], "claude"),
       "packages/runtime/plugin/plugin-workflow/.codex-plugin/plugin.json":

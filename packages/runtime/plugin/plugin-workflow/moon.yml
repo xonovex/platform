@@ -1,16 +1,26 @@
 $schema: https://moonrepo.dev/schemas/v2/project.json
 language: unknown
-tags: [plugin, command, diagram]
+tags: [plugin, diagram]
 tasks:
   ci-check:
     deps:
-      - command-validate
       - build
       - format-check
       - diagram-role-check
       - graph-build
-      - skill-planning-work:ci-check
+      - skill-approving-plan:ci-check
+      - skill-closing-plan:ci-check
+      - skill-critiquing-plan:ci-check
+      - skill-defining-subplans:ci-check
+      - skill-delegating-plan:ci-check
+      - skill-distilling-plan:ci-check
+      - skill-implementing-plan:ci-check
       - skill-reflecting-on-sessions:ci-check
+      - skill-researching-changes:ci-check
+      - skill-revising-plan:ci-check
+      - skill-settling-questions:ci-check
+      - skill-validating-plan:ci-check
+      - skill-writing-plan:ci-check
     options:
       mergeDeps: append
   graph-build:

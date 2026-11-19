@@ -10,7 +10,7 @@ Add the Xonovex marketplace once, then install `xonovex-core` in the selected ha
 
 ### Claude Code
 
-Install this bundle in Claude Code. The harness discovers its bundled skills and commands.
+Install this bundle in Claude Code. The harness discovers its bundled skills.
 
 ```bash
 claude plugin marketplace add xonovex/platform
@@ -19,7 +19,7 @@ claude plugin install xonovex-core@xonovex-marketplace
 
 ### Codex
 
-Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.
+Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.
 
 ```bash
 codex plugin marketplace add xonovex/platform
@@ -54,18 +54,6 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [using-git](skills/using-git/SKILL.md) | Running git operations or resolving repo-state issues. |
 | [writing-user-stories](skills/writing-user-stories/SKILL.md) | Writing, evaluating, splitting, or refining user stories: applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting-pattern flowchart, and refining the backlog into ready items. |
 
-## Commands
-
-Use the command name exposed by the harness. Command titles use the `xonovex-core` namespace.
-
-| Command | Purpose |
-| --- | --- |
-| `git-commit` | [Create a conventional commit from the changes; use `--push` only when publication is requested.](commands/git-commit.md) |
-| `plan-worktree-abandon` | [Record why feature work stops and preserve its lessons before abandoning the worktree.](commands/plan-worktree-abandon.md) |
-| `plan-worktree-cleanup` | [Remove eligible stale or merged worktrees and prune their remaining Git metadata.](commands/plan-worktree-cleanup.md) |
-| `plan-worktree-create` | [Create an isolated worktree for a feature branch.](commands/plan-worktree-create.md) |
-| `plan-worktree-merge` | [Integrate a feature worktree into its source worktree and validate the combined result.](commands/plan-worktree-merge.md) |
-
 ## Validation
 
-Run `npx moon run plugin-core:ci-check --force` from the repository root to check the plugin manifests, formatting, and owned skills and commands.
+Run `npx moon run plugin-core:ci-check --force` from the repository root to check the plugin manifests, formatting, and owned skills.

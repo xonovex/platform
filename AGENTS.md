@@ -6,7 +6,7 @@ Work within the package boundaries below, run the required checks, and follow th
 
 ### Packages
 
-- **`runtime/plugin`**: Grouped plugins with skills under `skills/` and commands under `commands/`; lockstep with both marketplaces
+- **`runtime/plugin`**: Grouped plugins that hold only skills, under `skills/`; lockstep with both marketplaces
 - **`tooling/cli`**: Agent CLI, platform binary packages, and GitHub Action wrapper
 - **`tooling/script`**: Moon task binaries and their shared code
 - **`sandbox/operator`**: Kubernetes agent operator

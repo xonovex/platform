@@ -2,7 +2,6 @@ import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
-  collectCommandCatalogFiles,
   collectSkillCatalogFiles,
   collectSkillFiles,
   manifestPath,
@@ -23,8 +22,8 @@ const SKILL_DIRECTORY = join(
   "using-demo",
 );
 
-// A miniature repository with one skill and one command, which is the smallest
-// tree the catalog walks recognize.
+// A miniature repository with one skill, which is the smallest tree the
+// catalog walks recognize.
 const catalogFixture = (
   skillText: string,
   referenceText = "reference prose",
@@ -34,15 +33,6 @@ const catalogFixture = (
     files: {
       [join(SKILL_DIRECTORY, "SKILL.md")]: skillText,
       [join(SKILL_DIRECTORY, "references", "topic.md")]: referenceText,
-      [join(
-        REPOSITORY_ROOT,
-        "packages",
-        "runtime",
-        "plugin",
-        "plugin-demo",
-        "commands",
-        "run.md",
-      )]: "command prose",
       ...extra,
     },
   });
@@ -73,24 +63,16 @@ describe("drift files", () => {
     ]);
   });
 
-  it("walks the skill and command catalogs", () => {
+  it("walks the skill catalog", () => {
     const fs = catalogFixture("skill prose");
 
     expect(collectSkillCatalogFiles(REPOSITORY_ROOT, fs)).toHaveLength(2);
-    expect(collectCommandCatalogFiles(REPOSITORY_ROOT, fs)).toEqual([
-      {
-        kind: "command",
-        path: "packages/runtime/plugin/plugin-demo/commands/run.md",
-        text: "command prose",
-      },
-    ]);
   });
 
   it("returns nothing when the catalogs are absent", () => {
     const empty = memoryFileSystem({directories: [REPOSITORY_ROOT]});
 
     expect(collectSkillCatalogFiles(REPOSITORY_ROOT, empty)).toEqual([]);
-    expect(collectCommandCatalogFiles(REPOSITORY_ROOT, empty)).toEqual([]);
   });
 
   it("ignores a catalog entry that holds no SKILL.md", () => {

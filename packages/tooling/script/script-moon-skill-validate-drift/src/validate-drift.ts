@@ -13,10 +13,7 @@ import {
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
-import {
-  collectCommandCatalogFiles,
-  collectSkillCatalogFiles,
-} from "@xonovex/script-moon-skill-catalog-common/drift-files";
+import {collectSkillCatalogFiles} from "@xonovex/script-moon-skill-catalog-common/drift-files";
 import {evaluateDuplication} from "./drift-duplication.js";
 
 const HELP = [
@@ -59,11 +56,7 @@ export const main = (
         )
       : resolve(argv[rootIndex + 1] ?? ".");
 
-  const skillFiles = collectSkillCatalogFiles(repositoryRoot, fs);
-  const files = [
-    ...skillFiles,
-    ...collectCommandCatalogFiles(repositoryRoot, fs),
-  ];
+  const files = collectSkillCatalogFiles(repositoryRoot, fs);
   if (files.length === 0) {
     process.stderr.write(`Error: no catalog files under ${repositoryRoot}\n`);
     return 2;
@@ -85,7 +78,7 @@ export const main = (
   );
   const findings = [
     ...evaluateBudgets(files, budgets.manifest).map(({message}) => message),
-    ...evaluateDuplication(skillFiles).map(({message}) => message),
+    ...evaluateDuplication(files).map(({message}) => message),
   ];
 
   const mode = resolveDriftLintMode(process.env[DRIFT_LINT_MODE_ENV]);

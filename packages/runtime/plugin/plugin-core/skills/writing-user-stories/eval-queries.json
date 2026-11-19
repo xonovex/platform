@@ -75,7 +75,7 @@
     "query": "break this epic into a parent plan and child plans with explicit parallel groups",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: plan decomposition is owned by planning-work"
+    "rationale": "near-miss: plan decomposition is owned by defining-subplans"
   },
   {
     "query": "these two stories keep breaking each other: analyse the coupling between the modules",
@@ -103,7 +103,7 @@
   },
   {
     "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
-    "rationale": "validation near miss owned by planning-work",
+    "rationale": "validation near miss owned by defining-subplans",
     "should_trigger": false,
     "split": "validation"
   }

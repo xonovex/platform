@@ -12,6 +12,23 @@ tasks:
   plugin-format-check:
     script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
     inputs: ["**/*.md", "**/*.json", "**/*.yml"]
+  plugin-validate:
+    command:
+      - npx
+      - moon-plugin-validate
+      - .
+    deps:
+      - target: ~:build
+        optional: true
+      - script-moon-plugin-validate:build
+    inputs:
+      - README.md
+      - docs/**/*.md
+      - package.json
+      - .claude-plugin/plugin.json
+      - skills/*/SKILL.md
+    options:
+      cache: false
   format:
     command: noop
     deps: [plugin-format]
@@ -27,7 +44,7 @@ tasks:
       mergeDeps: append
   ci-check:
     command: echo 'ci-check complete'
-    deps: [build, format-check]
+    deps: [build, plugin-validate, format-check]
     options:
       cache: false
       mergeArgs: replace

@@ -2,6 +2,14 @@
 
 Extract recurring, verified codebase patterns into a reusable skill with traceable source guidance.
 
+## Inputs
+
+- **Skill name** (required): the name for the skill, such as `using-example`
+- **Source path** (required): the path to analyze, such as `packages/example`
+- **Update** (optional): update the existing skill in place of creating a new one
+- **Interactive** (optional): ask which patterns to include before writing
+- **Preview** (optional): show the result without writing a file
+
 ## Contents
 
 [Spec Constraints](#spec-constraints) · [Core Workflow](#core-workflow) · [Pattern Extraction](#pattern-extraction) · [Skill Structure](#skill-structure) · [Implementation Details](#implementation-details) · [Interactive Mode](#interactive-mode) · [Error Handling](#error-handling)

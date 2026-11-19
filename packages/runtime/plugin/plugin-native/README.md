@@ -10,7 +10,7 @@ Add the Xonovex marketplace once, then install `xonovex-native` in the selected 
 
 ### Claude Code
 
-Install this bundle in Claude Code. The harness discovers its bundled skills and commands.
+Install this bundle in Claude Code. The harness discovers its bundled skills.
 
 ```bash
 claude plugin marketplace add xonovex/platform
@@ -19,7 +19,7 @@ claude plugin install xonovex-native@xonovex-marketplace
 
 ### Codex
 
-Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.
+Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.
 
 ```bash
 codex plugin marketplace add xonovex/platform

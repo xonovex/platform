@@ -1,0 +1,30 @@
+{
+  "skill_name": "researching-changes",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Research the code in packages/tooling/script/script-moon-skill-eval-triggers/src and the current official documentation needed to plan a per-query retry budget for it. Return the report inline and do not edit anything.",
+      "assertions": [
+        "The report separates observed code or source evidence from inference, uncertainty, and unresolved questions",
+        "The operation remains read-only and stops without creating a plan or changing code"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Research what a move from the fixed-size batcher to backpressure touches in src/import and src/queue. I only need a report for a later plan. The feed vendor published a new spec last month.",
+      "assertions": [
+        "The report separates observed facts with file anchors from inferred implications, options, and unresolved questions, and records the provenance of the external spec",
+        "The work stops after the report: no plan is authored and no file is changed"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "We want a plan next week for general hardening of packages/worker. First audit it for weak error handling, duplication and TODO comments and grade the findings.",
+      "assertions": [
+        "The request is recognized as a general code-quality audit and is handed to auditing-code-quality instead of being run as planning research",
+        "The answer does not redefine audit detectors or grading rules"
+      ]
+    }
+  ]
+}

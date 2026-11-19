@@ -1,0 +1,30 @@
+{
+  "skill_name": "revising-plan",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revise the plan below from the feedback below it. Two comments are unresolved, and I need a traceable result rather than an overwrite.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n\nFeedback:\n  1. \"Retry-After is not in the success criteria, either drop it from the tasks or add the criterion.\"\n  2. \"Unresolved: do we shed load per route or per client? The plan assumes per route without saying so.\"\n  3. \"Unresolved: no criterion covers what happens when the bucket store is unavailable.\"\nWork only from the text above; do not read or edit any files.",
+      "assertions": [
+        "Every feedback item receives an applied, deferred, rejected, unresolved, or scope-change disposition with rationale",
+        "The output preserves the source and returns a distinct revised plan without assigning approval semantics to status"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Plan: scope is reader backpressure; the criterion is no dropped rows; the estimate is 8 days. Feedback: 1. cover the replay producer too. 2. ship this week. Revise the plan.",
+      "assertions": [
+        "Each feedback item gets a disposition (applied, deferred, rejected, unresolved question, or scope change) with a rationale",
+        "The accepted change is propagated through scope, risks, and criteria, and the source revision is preserved beside the new one"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Reviewer A: remove the metrics subplan. Reviewer B: the metrics subplan must land first. Revise the plan accordingly.",
+      "assertions": [
+        "The materially conflicting instructions are enumerated and the revision stops on the conflict instead of averaging it away",
+        "No implementation is started"
+      ]
+    }
+  ]
+}

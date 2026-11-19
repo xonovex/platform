@@ -12,7 +12,7 @@ import {describe, expect, it} from "vitest";
 import {stageClaudePluginArguments} from "../../../src/claude-plugin.js";
 
 describe("Claude plugin staging", () => {
-  it("copies the selected skill and its resources without commands or other skills", () => {
+  it("copies the selected skill and its resources without the other skills", () => {
     const root = mkdtempSync(join(tmpdir(), "moon-common-claude-plugin-"));
     const plugin = join(root, "source");
     const write = (path: string, content: string): void => {
@@ -25,7 +25,6 @@ describe("Claude plugin staging", () => {
         ".claude-plugin/plugin.json",
         JSON.stringify({name: "xonovex-core", skills: "./skills/"}),
       );
-      write("commands/git-commit.md", "Commit the change.");
       write("skills/using-git/SKILL.md", "# Git");
       write(
         "skills/using-git/references/commits.md",
@@ -48,7 +47,6 @@ describe("Claude plugin staging", () => {
           "utf8",
         ),
       ).toBe("Use conventional commits.");
-      expect(existsSync(join(staged, "commands"))).toBe(false);
       expect(existsSync(join(staged, "skills/authoring-tests"))).toBe(false);
       expect(
         JSON.parse(

@@ -1,0 +1,31 @@
+{
+  "skill_name": "closing-plan",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Close out the plan below. The last commit has landed. Return the follow-up record inline; do not read or edit any files.\n\nPlan: replace the hand-rolled queue in packages/worker with a broker.\n  Success criteria: (1) all jobs flow through the broker, (2) no message loss during deploy, (3) the legacy queue module is deleted, (4) p95 job latency unchanged.\n  State: criteria 1 and 4 verified by the load test on commit 4f2a. Criterion 2 needs a production deploy window that operations has not scheduled. Criterion 3 is blocked because the billing service still imports the legacy module directly; its team has not been asked. During the work we found the retry logic double-charges on timeout and did not fix it. Two counts of migrated job types circulate: the plan says 14, the dashboard says 16.",
+      "assertions": [
+        "Every success criterion lands in exactly one bucket: met with named evidence, gated with a named gate, or open with a named owner",
+        "The record distinguishes the human gate from the cross-team dependency, records the unfixed double-charge defect with an owner, and reports the disagreeing counts rather than picking one",
+        "The operation returns the record inline and does not claim to have written files or changed plan state"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Pause this plan and hand it over. Criteria 1 and 2 are done, criterion 3 waits for a security sign-off by the platform team, and we never decided who owns the staging feed.",
+      "assertions": [
+        "The record gives each criterion one of three states (met and evidenced, gated with the gate named, or open with an owner) and never a flat done",
+        "The unmade decision appears in an open-decision register with options, a recommendation, an owner, and a literal 'Call: (unrecorded)' line, and no file is changed"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Write the follow-up seeds for what the finished plan left: the replay producer was attempted twice and never landed, and the docs sweep was dropped.",
+      "assertions": [
+        "Each seed has an objective, an evidenced current state, known traps, a success-criteria sketch, validation, gating, and sequencing, and the work attempted twice is flagged as needing planning",
+        "The seeds are handed to writing-plan for persistence instead of being written as plans here"
+      ]
+    }
+  ]
+}

@@ -95,7 +95,7 @@ const readClaudePluginManifest = (
     throw new Error(`Claude plugin skills are invalid: ${manifestPath}`);
   }
   const executableComponents = [
-    ...(grouped ? [] : ["commands"]),
+    "commands",
     "agents",
     "hooks",
     ".mcp.json",

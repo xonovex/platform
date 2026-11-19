@@ -2,6 +2,13 @@
 
 Preview or apply integration of a feature branch from a `<worktree>-feature-*` worktree into its recorded source branch. Default to `preview`; only explicit `apply` may change refs or worktrees.
 
+## Inputs
+
+- **Squash** (optional): squash all feature commits into one commit
+- **Remove worktree** (optional): remove the feature worktree directory after the merge; the default keeps it
+- **Delete remote branch** (optional): also delete the remote feature branch, which must exist
+- **Preview** (optional): show the changes without modifying a file
+
 ## Procedure
 
 1. Resolve and report the exact feature worktree, feature branch, feature revision, recorded source branch, source worktree, source revision, remote, and merge strategy.

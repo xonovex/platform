@@ -2,6 +2,12 @@
 
 Create a reusable skill with a focused SKILL.md, references for detail, and bundled resources only where the procedure needs them.
 
+## Inputs
+
+- **Source** (required): the URL or file path of the source document
+- **Skill name** (required): the name of the skill, a gerund and then its object, such as `using-react`
+- **Preview** (optional): show the generated structure without writing a file
+
 ## Goal
 
 - Build any kind of skill: guideline, workflow, capability, processor, or task automation

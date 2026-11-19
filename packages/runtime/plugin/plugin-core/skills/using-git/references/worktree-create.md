@@ -2,6 +2,11 @@
 
 Preview or apply creation of a sibling worktree with a feature branch for isolated development. Default to `preview`; only explicit `apply` may mutate repository state.
 
+## Inputs
+
+- **Feature name** (required): the name of the feature, used in the directory name and the branch name
+- **Base branch** (optional): the branch to create the feature from; defaults to the current branch
+
 ## Naming convention
 
 - Worktree directory: `<worktree>-feature-<feature-name>` (kebab-case name)

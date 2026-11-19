@@ -2,6 +2,14 @@
 
 Inspect an abandoned feature and return a recovery record. This operation is read-only: it never commits, resets, removes, tags, pushes, or changes provider state.
 
+## Inputs
+
+- **Reason** (optional): a concise reason for the abandonment; asked for when absent
+- **Remove worktree** (optional): remove the feature worktree after the documentation
+- **No plan** (optional): skip the plan update, for a feature without a plan
+- **Commit** (optional): commit the current state before the abandonment
+- **Preview** (optional): show the changes without modifying a file
+
 ## Steps
 
 1. Verify the exact feature worktree (`*-feature-*`) and get the reason from the caller.

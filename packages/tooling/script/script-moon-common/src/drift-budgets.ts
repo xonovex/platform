@@ -13,7 +13,6 @@ export const resolveDriftLintMode = (
 // Absolute ceilings for files absent from the budget manifest, from the p90 of
 // the catalog at the time the ratchet was introduced.
 export const DRIFT_WORD_CAPS = {
-  command: 250,
   reference: 650,
   skill: 900,
 } as const;

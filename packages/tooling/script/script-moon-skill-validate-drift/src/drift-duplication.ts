@@ -69,11 +69,6 @@ interface Cluster {
 
 // evaluateDuplication clusters near-identical normative sentences and reports
 // any invariant restated across at least DUPLICATION_MIN_FILES files.
-//
-// Pass skill prose only. A command document must restate its own argument
-// contract — command-validate requires every flag in both the argument-hint and
-// the Arguments section — so shared flag wording across commands is a required
-// interface, not drift.
 export const evaluateDuplication = (
   files: readonly DuplicationFile[],
 ): readonly DuplicationFinding[] => {

@@ -2,6 +2,15 @@
 
 Extracts organizational patterns from a source AGENTS.md and integrates them into a target file while strictly preserving the target's structure, style, and project-specific context.
 
+## Inputs
+
+- **Target instructions** (required): the AGENTS.md file to augment
+- **Source instructions** (required): the AGENTS.md file that provides the patterns
+- **Aspects** (optional): the aspects to focus on, such as workflow, structure, or integration
+- **Intensity** (optional): how much of the source to bring over, 10 to 100 percent; defaults to 45
+- **Interactive** (optional): ask clarifying questions before merging
+- **Preview** (optional): show the result without modifying a file
+
 ## Core Workflow
 
 Read target + source → analyze target's DNA (structure, style, voice, formatting, conventions, project context) → extract source's organizational patterns → filter by aspect/percentage → (ask clarifying questions if interactive) → rewrite in target's voice with target's tech names → preview or apply → report.

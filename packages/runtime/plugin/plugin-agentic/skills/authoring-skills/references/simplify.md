@@ -4,6 +4,12 @@ Reduce a verbose skill to its essentials: condense the `SKILL.md` body and trim 
 
 Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md: re-check after edits.
 
+## Inputs
+
+- **Skill** (required): the path to the `SKILL.md` file or the skill directory
+- **Target reduction** (optional): the share of words to remove, 50 to 90 percent; defaults to 70
+- **Preview** (optional): show the result without modifying a file
+
 ## Contents
 
 - [Condensing SKILL.md](#condensing-skillmd): 60-80% reduction, bullet format, extract examples to references

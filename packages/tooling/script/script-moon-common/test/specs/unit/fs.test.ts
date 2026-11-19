@@ -25,13 +25,12 @@ const pluginPath = (directory: string): string =>
 const tree = (value: MemoryTree) => memoryFileSystem(value);
 
 describe("filesystem helpers", () => {
-  it("finds a skill's grouped plugin and accepts its command directory", () => {
+  it("finds a skill's grouped plugin", () => {
     const plugin = join(ROOT, "plugin-core");
     const skill = join(plugin, "skills", "using-git");
     const fs = tree({
       files: {
         [pluginPath(plugin)]: manifest("xonovex-core", {skills: "./skills/"}),
-        [join(plugin, "commands", "git-commit.md")]: "command",
         [join(skill, "SKILL.md")]: "skill",
       },
     });
@@ -150,6 +149,20 @@ describe("filesystem helpers", () => {
 
     expect(() => resolveClaudePluginDirectories(target, fs)).toThrow(
       "contains hooks",
+    );
+  });
+
+  it("rejects a plugin that holds a commands directory", () => {
+    const plugin = join(ROOT, "plugin-core");
+    const fs = tree({
+      files: {
+        [pluginPath(plugin)]: manifest("xonovex-core", {skills: "./skills/"}),
+        [join(plugin, "commands", "run.md")]: "command",
+      },
+    });
+
+    expect(() => resolveClaudePluginDirectories(plugin, fs)).toThrow(
+      "contains commands",
     );
   });
 

@@ -198,7 +198,6 @@ describe("evaluation configuration", () => {
           skills: "./skills/",
           dependencies: ["xonovex-native"],
         }),
-        [join(plugin, "commands", "build.md")]: "Build the project.",
         [join(directory, "SKILL.md")]: "---\nname: test-skill\n---\n",
         [join(directory, "evals.json")]: JSON.stringify(
           evalFile([validEvaluation()]),

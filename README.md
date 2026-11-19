@@ -1,6 +1,6 @@
 # Xonovex Platform Monorepo
 
-Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills and commands.
+Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills.
 
 ![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.27%2B-00ADD8)
 
@@ -12,7 +12,7 @@ Choose the component that matches the task. Skills provide instructions and supp
 | --- | --- |
 | Run Claude Code or OpenCode locally | [Agent CLI](packages/tooling/cli/agent-cli-go/README.md) |
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
-| Install skills and commands | [Plugin catalog](#agent-plugins) |
+| Install skills | [Plugin catalog](#agent-plugins) |
 | Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
@@ -43,7 +43,7 @@ Follow the [operator quick start](packages/sandbox/operator/agent-operator-go/do
 
 ### Agent Plugins
 
-Install the grouped plugins your tasks need. Each plugin owns related skills and commands. A skill keeps its existing name, and a command uses the namespace of the plugin that owns it.
+Install the grouped plugins your tasks need. Each plugin owns related skills and ships no slash commands.
 
 | Plugin | Purpose |
 | --- | --- |
@@ -82,7 +82,7 @@ codex plugin add xonovex-typescript@xonovex-marketplace
 
 #### Upgrade from individual plugins
 
-The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The `xonovex-workflow` plugin now contains the planning and reflection skills and their commands. Git commands and the existing `plan-worktree-*` commands belong to `xonovex-core`; authoring commands belong to `xonovex-agentic`; content commands belong to `xonovex-writing`.
+The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The plugins ship no slash commands: the skill that owned the procedure of a former command now takes the request directly. The `xonovex-workflow` plugin holds the planning and reflection skills. The Git skill with its worktree operations belongs to `xonovex-core`, the authoring skills belong to `xonovex-agentic`, and the content skills belong to `xonovex-writing`.
 
 ## Development
 

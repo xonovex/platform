@@ -1,10 +1,9 @@
 $schema: https://moonrepo.dev/schemas/v2/project.json
 language: unknown
-tags: [plugin, command]
+tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - command-validate
       - build
       - format-check
       - skill-authoring-commands:ci-check

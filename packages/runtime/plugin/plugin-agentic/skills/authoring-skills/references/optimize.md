@@ -4,6 +4,15 @@ Cut everything the target model already produces unprompted; keep only what it l
 
 The flow runs in five phases: **Baseline → Scope → Excise → Gate → Ablate.** Baseline (skill absent) and Ablate (trimmed skill present) are the two measurements that bracket the cut. Separate passes at catalog scale, or the two arms of one ablation for a single skill.
 
+## Inputs
+
+- **Skill** (required unless the whole catalog is selected): the path to a `SKILL.md` or a skill directory
+- **Whole catalog** (optional): optimize every skill in the catalog, each one separately and in parallel
+- **Weakest model** (optional): the model to measure and ablate against; defaults to `haiku`
+- **Tier** (optional): the trim depth; defaults to `auto`, which classifies each skill
+- **Report only** (optional): ablate and report the regressions without restoring the cuts
+- **Preview** (optional): show the cuts without writing a file
+
 ## Principle
 
 A guideline skill mostly encodes conventions and non-obvious facts, not novel capability: the model can already write the code; the skill's value is the rule (a nudge) plus the facts it does not reliably know. So cutting rationale and generic procedure is safe: the model never needed them. The only risk is removing a non-obvious fact the model would get wrong without. Keep those, and verify.

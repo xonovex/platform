@@ -2,6 +2,17 @@
 
 Auto-commit with a conventional message `<type>: <description>` inferred from changed files. **Default: commit immediately without prompting**; show suggestions and prompt only when interactive mode is explicitly requested.
 
+## Inputs
+
+- **Message** (optional): the commit description; generated from the changes when absent, and the best suggestion is used
+- **Type** (optional): the commit type; detected from the changes when absent
+- **Directory** (optional): the directory in which the git commands run; defaults to the current directory
+- **Push** (optional): push after the commit, only when publication is requested
+- **Remote** (optional): the remote to push to; defaults to `origin`
+- **Branch** (optional): the remote branch to push to; defaults to the current branch
+- **Interactive** (optional): show the suggested messages and ask for a selection before the commit
+- **Preview** (optional): show the commit without creating it
+
 ## Type detection
 
 Infer `<type>` from changed files (default `chore` if nothing matches):

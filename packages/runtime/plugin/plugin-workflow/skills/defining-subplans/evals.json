@@ -1,0 +1,30 @@
+{
+  "skill_name": "defining-subplans",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Expand the parent plan below into detailed child plans. It has no approval or status field; sequence children that overlap on mutable files.\n\nPlan: cap request rate on packages/api\n  Objective: reject traffic over a per-route ceiling before it reaches handlers.\n  Tasks: (1) add a token-bucket middleware, (2) make the ceiling configurable per\n  route, (3) return 429 with a Retry-After header, (4) add load-shedding metrics.\n  Success criteria: requests over the limit return 429; the limit is configurable\n  per route; existing routes keep current behaviour; p99 latency unchanged.\n  Validation: unit tests for the bucket, an integration test per route group.\n  Note: tasks 1 and 4 both edit packages/api/src/middleware/index.ts.\nWork only from the text above; do not read or edit any files.",
+      "assertions": [
+        "Expansion proceeds from the explicit parent without requiring approval or a particular status value",
+        "Children contain roughly five to seven focused tasks and are grouped or sequenced from dependencies and overlapping mutable resources"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Expand this parent plan, preview only. Components: A, the reader pull seam, touches src/import. B, the batcher rework, touches src/queue and needs A. C, the documentation, touches docs/. The plan lists 19 tasks in total.",
+      "assertions": [
+        "The child plans hold roughly five to seven tasks each, with validation, success criteria, and dependencies",
+        "B is sequenced after A, C can run concurrently because its files do not overlap, and nothing is implemented or written"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Should one subplan hold all 14 tasks of the storage migration? They all touch the same package.",
+      "assertions": [
+        "The answer recommends focused children of about five to seven tasks and explains the risk of silent drops in a larger subplan",
+        "Children with overlapping mutable files are sequenced instead of being run concurrently"
+      ]
+    }
+  ]
+}

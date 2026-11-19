@@ -11,8 +11,8 @@ const harnessSection = (harness: Harness, selector: string): string => {
       : "codex plugin marketplace add ";
   const contents =
     harness === "Claude Code"
-      ? "Install this bundle in Claude Code. The harness discovers its bundled skills and commands."
-      : "Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.";
+      ? "Install this bundle in Claude Code. The harness discovers its bundled skills."
+      : "Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.";
   return (
     "### " +
     harness +

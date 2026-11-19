@@ -14,12 +14,12 @@ digraph Workflow {
     graph [label="1. Research and decisions", style=rounded, role=panel, margin=20, sortv=1];
 
     setup [label="Select harness, model and sandbox"];
-    research [label="/plan-research\nExplore code, viability and alternatives"];
-    decide [label="/plan-decide\nResolve questions and agree direction"];
+    research [label="researching-changes\nExplore code, viability and alternatives"];
+    decide [label="settling-questions\nResolve questions and agree direction"];
     proceed [label="Proceed?", role=decision];
     to_planning [label="2. Create and review a plan", role=strong];
     stop_research [label="Not pursued", role=terminal];
-    research_note [role=note, label="Xonovex Workflow owns /plan-* commands.\nNew sessions are optional. Reconstruct context\nwhen resuming. Commands do not grant authority\nto push or perform other restricted actions."];
+    research_note [role=note, label="Each box names the skill that owns the step.\nNew sessions are optional. Reconstruct context\nwhen resuming. Skills do not grant authority\nto push or perform other restricted actions."];
 
     setup -> research -> decide -> proceed;
     proceed -> to_planning [label="Yes"];
@@ -46,17 +46,17 @@ digraph Workflow {
     planning_note -> planning_bottom [style=invis];
     graph [label="2. Create and review a plan", style=rounded, role=panel, margin=20, sortv=2];
 
-    create [label="/plan-create\nDefine criteria; use BDD or TDD when appropriate"];
-    critique [label="/plan-critique\nIndependent review"];
+    create [label="writing-plan\nDefine criteria; use BDD or TDD when appropriate"];
+    critique [label="critiquing-plan\nIndependent review"];
     review [label="Review outcome?", role=decision];
-    revise [label="/plan-revise\nApply feedback"];
-    reject [label="/plan-reject\nRecord reason"];
-    accept [label="/plan-accept\nRecord approval"];
-    rejected [label="Rejected\nStop or return to /plan-revise", role=terminal];
-    expand [label="/plan-subplans-create (optional)\nSplit work and identify parallel groups"];
-    commit_plan [label="Core: /git-commit\nCommit plans when persisted"];
+    revise [label="revising-plan\nApply feedback"];
+    reject [label="approving-plan\nRecord rejection and reason"];
+    accept [label="approving-plan\nRecord approval"];
+    rejected [label="Rejected\nStop or return to revising-plan", role=terminal];
+    expand [label="defining-subplans (optional)\nSplit work and identify parallel groups"];
+    commit_plan [label="Core: using-git\nCommit plans when persisted"];
     to_execution [label="3. Implement and validate", role=strong];
-    planning_note [role=note, label="Open decision: use /plan-decide, then revise.\nStatus metadata alone does not authorize work."];
+    planning_note [role=note, label="Open decision: use settling-questions, then revise.\nStatus metadata alone does not authorize work."];
 
     create -> critique -> review;
     review -> revise [label="Revise"];
@@ -87,13 +87,13 @@ digraph Workflow {
     execution_note -> execution_bottom [style=invis];
     graph [label="3. Implement and validate", style=rounded, role=panel, margin=20, sortv=3];
 
-    worktree [label="Core: /plan-worktree-create (optional)\nEnter worktree and associate the plan"];
+    worktree [label="Core: using-git (optional)\nEnter worktree and associate the plan"];
     mode [label="Execution mode?", role=decision];
-    continuation [label="/plan-continue\nRequest apply; implement one target\nLoad plan context and relevant skills"];
-    delegation [label="/plan-delegate\nBrief agents; independently verify work\nCommit per item or batch as requested"];
-    validate [label="/plan-validate\nCheck criteria and report evidence"];
+    continuation [label="implementing-plan\nRequest apply; implement one target\nLoad plan context and relevant skills"];
+    delegation [label="delegating-plan\nBrief agents; independently verify work\nCommit per item or batch as requested"];
+    validate [label="validating-plan\nCheck criteria and report evidence"];
     passes [label="Checks pass?", role=decision];
-    update [label="/plan-update\nRefresh progress and evidence\nPersist with plan when requested"];
+    update [label="implementing-plan\nRefresh progress and evidence\nPersist with plan when requested"];
     next [label="Next step?", role=decision];
     to_quality [label="4. Quality and delivery", role=strong];
     to_pause [label="5. Closeout\nPause or hand off", role=strong];
@@ -148,14 +148,14 @@ digraph Workflow {
     // below "Findings?" and left of "Delivery path?".
     subgraph quality_audit { quality; quality_result; fixes; }
     delivery [label="Delivery path?", role=decision];
-    merge [label="Core: /plan-worktree-merge\nIntegrate into parent"];
-    abandon [label="Core: /plan-worktree-abandon\nRecord reason; preserve lessons"];
+    merge [label="Core: using-git\nMerge the worktree into its parent"];
+    abandon [label="Core: using-git\nAbandon: record reason; preserve lessons"];
     abandoned [label="Work abandoned\n6. Reflect on lessons", role=terminal];
-    integrated [label="/plan-validate\nCheck integrated work on parent"];
+    integrated [label="validating-plan\nCheck integrated work on parent"];
     integration_passes [label="Checks pass?", role=decision];
     parent_fix [label="3. Fix on parent\nThen repeat integrated validation", role=strong];
-    cleanup [label="Core: /plan-worktree-cleanup (optional)\nRemove remaining eligible worktrees"];
-    commit [label="Core: /git-commit\nAdd --push only when requested"];
+    cleanup [label="Core: using-git (optional)\nRemove remaining eligible worktrees"];
+    commit [label="Core: using-git\nCommit; push only when requested"];
     publish [label="Optional publication\nGitHub / GitLab integration\nOpen a pull or merge request"];
     review_code [label="Core: reviewing-code\nReview code and address findings"];
     review_ready [label="Review and checks pass?", role=decision];
@@ -200,13 +200,13 @@ digraph Workflow {
     followup_note -> closeout_bottom [style=invis];
     graph [label="5. Closeout and follow-up", style=rounded, role=panel, margin=20, sortv=5];
 
-    followup [label="/plan-followup\nCompleted, paused or handed-over work"];
+    followup [label="closing-plan\nCompleted, paused or handed-over work"];
     record [label="Return status, evidence, decisions,\nremaining work and follow-up seeds\nPublish separately when requested"];
     outcome [label="Outcome?", role=decision];
     complete [label="Feature complete", role=strong];
     paused [label="Paused / handed over\nResume through panel 3", role=terminal];
-    distill [label="/plan-distill (optional)\nCompleted implementation\nto replayable skill suite"];
-    followup_note [role=note, label="Follow-up seeds: panel 2, /plan-create.\nUnresolved research: panel 1, /plan-research.\nDistillation captures a replayable implementation,\nnot just the session lessons in panel 6."];
+    distill [label="distilling-plan (optional)\nCompleted implementation\nto replayable skill suite"];
+    followup_note [role=note, label="Follow-up seeds: panel 2, writing-plan.\nUnresolved research: panel 1, researching-changes.\nDistillation captures a replayable implementation,\nnot just the session lessons in panel 6."];
 
     followup -> record -> outcome;
     outcome -> complete [label="Done"];
@@ -219,18 +219,18 @@ digraph Workflow {
     graph [label="6. Continuous learning (any phase)", style=rounded, role=panel, margin=20, sortv=6];
 
     lessons [label="Session lessons\nFrom any phase, including stopped work"];
-    extract [label="/reflect-extract (optional)\nExtract lessons separately"];
-    instructions [label="/reflect-to-instructions\nUpdate relevant AGENTS.md files"];
-    skills [label="/reflect-to-skill\nUpdate reusable skills"];
+    extract [label="reflecting-on-sessions (optional)\nExtract lessons separately"];
+    instructions [label="reflecting-on-sessions\nUpdate relevant AGENTS.md files"];
+    skills [label="reflecting-on-sessions\nUpdate reusable skills"];
     guidance [label="Improved guidance\nfor future sessions", role=positive];
-    simplify [label="Agentic Plugin, as needed\n/instructions-simplify\n/skill-simplify\n/slashcommand-simplify"];
-    learning_note [role=note, label="Integration commands extract and apply directly.\nUse --from-reflections after separate extraction.\nGray arrows: normal flow. Dashed blue: retry.\nDark handoff boxes name another numbered panel."];
+    simplify [label="Agentic Plugin, as needed\nauthoring-instructions\nauthoring-skills"];
+    learning_note [role=note, label="The integration operations extract and apply directly.\nIntegrate stored reflections after a separate extraction.\nGray arrows: normal flow. Dashed blue: retry.\nDark handoff boxes name another numbered panel."];
 
     lessons -> instructions [label="Apply directly"];
     lessons -> skills [label="Apply directly"];
     lessons -> extract [label="Extract separately"];
-    extract -> instructions [label="--from-reflections"];
-    extract -> skills [label="--from-reflections"];
+    extract -> instructions [label="Stored reflections"];
+    extract -> skills [label="Stored reflections"];
     instructions -> guidance;
     skills -> guidance;
     guidance -> simplify;

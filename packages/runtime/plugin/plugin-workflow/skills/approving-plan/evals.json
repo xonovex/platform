@@ -1,0 +1,30 @@
+{
+  "skill_name": "approving-plan",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Approve plans/order-import-backpressure.md. Its frontmatter has an empty skills_to_consult list, and the Risk Assessment section holds a line that starts with FIXME:.",
+      "assertions": [
+        "The sanity check reports the empty skills_to_consult list and the open annotation, and the plan is not approved",
+        "revising-plan is named as the way to fix them, and no plan content is changed"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Reject the cache redesign plan.",
+      "assertions": [
+        "A reason is asked for in one sentence, because a rejection without a reason is not actionable",
+        "The plan is not deleted"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The importer plan passed the final check: skills listed, criteria present, no open annotations. Record my approval.",
+      "assertions": [
+        "Only the status and the updated date change, and a one-line confirmation names the next step",
+        "The answer starts no expansion or implementation and does not treat the approval as authority for another action"
+      ]
+    }
+  ]
+}

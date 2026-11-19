@@ -87,7 +87,7 @@
     "query": "Write an implementation plan for replacing the cache over three milestones.",
     "should_trigger": false,
     "split": "train",
-    "rationale": "implementation planning belongs to planning-work"
+    "rationale": "implementation planning belongs to writing-plan"
   },
   {
     "query": "Split this feature request into INVEST user stories with acceptance criteria.",

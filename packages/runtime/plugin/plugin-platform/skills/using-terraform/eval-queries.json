@@ -97,7 +97,7 @@
   },
   {
     "query": "recover a plan decision and its evidence references from the plan document after restart",
-    "rationale": "validation near miss owned by planning-work",
+    "rationale": "validation near miss owned by implementing-plan",
     "should_trigger": false,
     "split": "validation"
   }

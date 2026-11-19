@@ -576,9 +576,9 @@ const collectSkillMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
   return files;
 };
 
-// collectCommandMarkdown returns the published Markdown surface of every command
-// package so cross-package references do not depend on one special command family.
-const collectCommandMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
+// collectPluginDocuments returns the README and docs Markdown of every plugin
+// package, the published prose that sits beside its skills.
+const collectPluginDocuments = (repoRoot: string, fs: FileSystem): string[] => {
   const root = join(repoRoot, "packages", "runtime", "plugin");
   if (!fs.isDirectory(root)) return [];
   return fs
@@ -590,7 +590,6 @@ const collectCommandMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
       return [
         join(base, "README.md"),
         ...markdownEntries(join(base, "docs"), fs),
-        ...markdownEntries(join(base, "commands"), fs),
       ].filter((path) => fs.isFile(path));
     });
 };
@@ -671,7 +670,7 @@ export const checkCrossPackageLinks = (
 ): void => {
   const files = [
     ...collectSkillMarkdown(repoRoot, fs),
-    ...collectCommandMarkdown(repoRoot, fs),
+    ...collectPluginDocuments(repoRoot, fs),
   ];
   const {resolved, broken} = checkMarkdownFilesForCrossPackageLinks(
     files,

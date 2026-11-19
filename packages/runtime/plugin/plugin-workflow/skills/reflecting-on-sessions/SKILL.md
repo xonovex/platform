@@ -10,7 +10,7 @@ Reflect on a session to capture development lessons (insights) and integrate the
 ## Core Principles
 
 - **Extract from the session**: analyze actual mistakes, discoveries, and corrections, not hypotheticals; keep only patterns that apply beyond the current task
-- **Apply directly by default**: `integrate-instructions` / `integrate-skills` extract and write STRAIGHT to AGENTS.md / the owning skill; persisting `reflections/*.md` first is the optional `--persist` audit step, not a prerequisite. Use `extract` only for the stored files, `--from-reflections` to integrate already-stored ones
+- **Apply directly by default**: `integrate-instructions` / `integrate-skills` extract and write STRAIGHT to AGENTS.md / the owning skill; persisting `reflections/*.md` first is the optional persist audit step, not a prerequisite. Use `extract` only for the stored files, and the from-reflections input to integrate already-stored ones
 - **Route by `applies_to`**: each insight's `category` / `topic` / `applies_to` picks the nearest AGENTS.md or the owning skill
 - **Two paths**: small one-off lessons → AGENTS.md; recurring patterns with 3-7 worth-keeping bullets → guideline skill
 - **`applied: false`**: the pending flag, persisted insights only; flip it after integration

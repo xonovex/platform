@@ -51,7 +51,7 @@
     "query": "write a plan to refactor the auth module over the next sprint",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: authoring a plan -> planning-work, not a read-only quality audit"
+    "rationale": "near-miss: authoring a plan -> writing-plan, not a read-only quality audit"
   },
   {
     "query": "review this pull request and leave inline comments on the diff",
@@ -121,7 +121,7 @@
   },
   {
     "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by planning-work",
+    "rationale": "near miss owned by researching-changes",
     "should_trigger": false,
     "split": "validation"
   }
