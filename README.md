@@ -14,7 +14,6 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
 | Install skills and commands | [Plugin catalog](#agent-plugins) |
 | Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
-| Run Moon tasks in pinned Nix environments | [Moon Nix toolchain](packages/tooling/moon/moon-nix-toolchain/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
 The CLI and operator support Claude Code and OpenCode, model-provider routing, Git and Jujutsu workspaces, and Nix provisioning. The CLI offers bubblewrap and Docker isolation. The operator uses cluster-provided gVisor, Kata, and Confidential Containers runtime classes. Each component documents its requirements and guarantees.

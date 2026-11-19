@@ -39,7 +39,6 @@ tasks:
       - zizmor
       - --offline
       - .
-    toolchain: [system, nix]
     inputs:
       - "**/*"
       - /flake.lock
@@ -56,7 +55,6 @@ tasks:
       - check
       - --no-update-lock-file
       - --print-build-logs
-    toolchain: [system, nix]
     inputs:
       - /flake.lock
       - /flake.nix

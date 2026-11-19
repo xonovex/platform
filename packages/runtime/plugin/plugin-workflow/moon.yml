@@ -37,7 +37,6 @@ tasks:
         printf '%s\n' "$styled" | dot -Gbgcolor=white -Tsvg -o "${source%.dot}.svg"
         printf '%s\n' "$styled" | dot -Gbgcolor=white -Gdpi=150 -Tpng -o "${source%.dot}.png"
       done
-    toolchain: [system, nix]
     inputs:
       - "diagrams/*.dot"
       - "/packages/asset/asset-brand/diagrams/style.gvpr"

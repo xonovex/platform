@@ -3,21 +3,18 @@ tasks:
   # Checks the copies against mirror.json alone, so CI runs it without a checkout.
   mirror-check:
     command: [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-check.sh"]
-    toolchain: [system, nix]
     options:
       cache: false
   # These two need the drodan-platform checkout, which CI does not have, so
   # they run only by explicit invocation.
   mirror-sync:
     command: [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-sync.sh"]
-    toolchain: [system, nix]
     options:
       cache: false
       runInCI: false
   mirror-source-check:
     command:
       [bash, "$workspaceRoot/.moon/scripts/mirror/mirror-source-check.sh"]
-    toolchain: [system, nix]
     options:
       cache: false
       runInCI: false

@@ -48,7 +48,6 @@ tasks:
       - /.moon/scripts/strip-generated-coverage.sh
     options:
       cache: true
-    toolchain: [system, nix]
   coverage:
     command: noop
     deps:
@@ -144,7 +143,6 @@ tasks:
     options:
       cache: false
       runInCI: false
-    toolchain: [system, nix]
   go-test-e2e:
     command:
       - go
@@ -164,7 +162,6 @@ tasks:
     options:
       runInCI: false
       cache: false
-    toolchain: [system, nix]
   go-test-e2e-gvisor:
     command:
       - go
@@ -184,7 +181,6 @@ tasks:
     options:
       runInCI: false
       cache: false
-    toolchain: [system, nix]
   go-test-e2e-kata:
     command:
       - go
@@ -204,7 +200,6 @@ tasks:
     options:
       runInCI: false
       cache: false
-    toolchain: [system, nix]
   go-test-e2e-coco:
     command:
       - go
@@ -224,4 +219,3 @@ tasks:
     options:
       runInCI: false
       cache: false
-    toolchain: [system, nix]

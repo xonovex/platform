@@ -1,6 +1,6 @@
 { pkgs }:
 {
-  # gh for the moon-plugin GitHub releases.
+  # gh creates the GitHub release of the agent CLI.
   packages = [
     pkgs.gh
   ];

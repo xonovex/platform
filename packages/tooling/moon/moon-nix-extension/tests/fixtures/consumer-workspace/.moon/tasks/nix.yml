@@ -1,7 +1,0 @@
-$schema: https://moonrepo.dev/schemas/tasks.json
-implicitInputs:
-  - /flake.nix
-  - /flake.lock
-  - /nix/**/*
-  - /.moon/extensions.yml
-  - /.moon/extensions-base.yml

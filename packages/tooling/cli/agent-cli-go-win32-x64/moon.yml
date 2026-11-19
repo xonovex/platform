@@ -4,7 +4,6 @@ language: go
 layer: unknown
 tags:
   - npm
-  - npm-platform
 env:
   GOOS: windows
   GOARCH: amd64
@@ -31,7 +30,6 @@ tasks:
       - bin/
     options:
       cache: true
-    toolchain: [system, nix]
   ci-check:
     command: echo 'ci-check complete'
     deps:

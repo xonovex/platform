@@ -4,7 +4,7 @@ Install the workspace dependencies, change the package that owns the concern, an
 
 ## Validate a change
 
-Run package checks while editing, then run the repository gate before delivery. Use the Nix development shell when the host lacks the required toolchains.
+Run package checks while editing, then run the repository gate before delivery. The root `flake.nix` provides every build tool in one development shell. direnv enters the shell through `.envrc` after `direnv allow`; without direnv, run a command through `nix develop`.
 
 ```bash
 npm install
@@ -28,7 +28,6 @@ packages/
   tooling/
     cli/                      # Agent CLI, platform binaries, and GitHub Action
     script/                   # Moon task binaries and shared script code
-    moon/                     # Nix toolchains, extensions, and their runtime
   sandbox/
     operator/                 # Kubernetes agent operator
     image/                    # Operator image build and publishing

@@ -18,7 +18,7 @@ let
 in
 {
   packages = [
-    pkgs.git # git for the moon-plugin release tasks
+    pkgs.git # git for the mirror tasks and the tests that build temporary repositories
     pkgs.graphviz # dot renders the diagram renders of asset-diagrams and plugin-workflow from their .dot sources
     pkgs.fontconfig # fc-match verifies diagram fonts before rendering
     pkgs.file # file reads the MIME type the asset-images check asserts

@@ -14,7 +14,6 @@ tasks:
       else
         shellcheck -x "${files[@]}"
       fi
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
       - "/.editorconfig"
@@ -25,7 +24,6 @@ tasks:
       - shfmt
       - -w
       - .
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
     options:
@@ -36,7 +34,6 @@ tasks:
       - shfmt
       - -d
       - .
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
     options:

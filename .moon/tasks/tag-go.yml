@@ -19,7 +19,6 @@ tasks:
       - go
       - build
       - ./...
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
       - go.mod
@@ -33,7 +32,6 @@ tasks:
       - test
       - -v
       - ./...
-    toolchain: [system, nix]
     deps:
       - ^:go-build
     inputs:
@@ -55,7 +53,6 @@ tasks:
     # files are stripped first, so the floor measures hand-written code.
     env:
       GO_COVERAGE_MIN: "55"
-    toolchain: [system, nix]
     deps:
       - ^:go-build
     inputs:
@@ -72,7 +69,6 @@ tasks:
       - run
       - --allow-parallel-runners
       - ./...
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -85,7 +81,6 @@ tasks:
       - go
       - fmt
       - ./...
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -98,7 +93,6 @@ tasks:
       - bash
       - -c
       - test -z "$(gofmt -l .)"
-    toolchain: [system, nix]
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
@@ -110,7 +104,6 @@ tasks:
       - go
       - vet
       - ./...
-    toolchain: [system, nix]
     deps:
       - ^:go-build
     inputs:
@@ -124,7 +117,6 @@ tasks:
       - go
       - mod
       - tidy
-    toolchain: [system, nix]
     inputs:
       - go.mod
       - go.sum

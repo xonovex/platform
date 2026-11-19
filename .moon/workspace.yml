@@ -7,7 +7,6 @@ projects:
     - packages/runtime/plugin/*
     - packages/tooling/cli/*
     - packages/tooling/script/*
-    - packages/tooling/moon/*
     - packages/sandbox/operator/*
     - packages/sandbox/image/*
     # Project globs exclude tenant files so discovered locations stay directories.
@@ -141,6 +140,7 @@ hasher:
     - "**/.cache/**"
     - "**/*-guide-workspace/**"
     - ".moon/cache/**"
+    - ".direnv/**"
     - ".moon/docker/**"
     - ".moon/toolchain/**"
     - ".artifacts/**"

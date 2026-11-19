@@ -10,8 +10,9 @@ describe("package layout", () => {
     const fs = memoryFileSystem({
       files: {
         "/repo/packages/config/config-base/package.json": "{}",
-        "/repo/packages/tooling/moon/moon-nix/moon.yml": "",
-        "/repo/packages/tooling/moon/moon-nix/tests/fixture/package.json": "{}",
+        "/repo/packages/tooling/cli/agent-cli-go/moon.yml": "",
+        "/repo/packages/tooling/cli/agent-cli-go/tests/fixture/package.json":
+          "{}",
         "/repo/packages/runtime/plugin/plugin-core/package.json": "{}",
       },
     });
@@ -22,12 +23,12 @@ describe("package layout", () => {
         "/repo/packages/runtime",
         "/repo/packages/runtime/plugin",
         "/repo/packages/tooling",
-        "/repo/packages/tooling/moon",
+        "/repo/packages/tooling/cli",
       ],
       packages: [
         "/repo/packages/config/config-base",
         "/repo/packages/runtime/plugin/plugin-core",
-        "/repo/packages/tooling/moon/moon-nix",
+        "/repo/packages/tooling/cli/agent-cli-go",
       ],
     });
   });

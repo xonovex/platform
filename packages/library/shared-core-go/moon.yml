@@ -27,7 +27,6 @@ tasks:
     options:
       cache: true
       runInCI: true
-    toolchain: [system, nix]
   coverage:
     deps:
       - go-package-coverage

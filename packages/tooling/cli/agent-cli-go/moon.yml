@@ -102,7 +102,6 @@ tasks:
       - /.moon/scripts/strip-generated-coverage.sh
     options:
       cache: true
-    toolchain: [system, nix]
   go-integration:
     script: |
       set -euo pipefail
@@ -119,7 +118,6 @@ tasks:
     options:
       cache: false
       runInCI: false
-    toolchain: [system, nix]
   coverage:
     command: noop
     deps:

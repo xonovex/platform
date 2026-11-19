@@ -22,7 +22,6 @@ tasks:
           exit 1
         fi
       done
-    toolchain: [system, nix]
     inputs:
       - "*.png"
       - "*.svg"

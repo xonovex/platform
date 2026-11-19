@@ -11,6 +11,9 @@
 .env.local
 .env.*.local
 
+# direnv and nix-direnv cache
+.direnv/
+
 # moonrepo cache and build artifacts
 .moon/cache/
 .moon/toolchain/

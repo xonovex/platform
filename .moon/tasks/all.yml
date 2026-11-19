@@ -1,0 +1,7 @@
+$schema: https://moonrepo.dev/schemas/tasks.json
+# Every task runs with the tools of the root development shell, so a change to
+# its flake, its lock or a module in nix/ is a change to every task.
+implicitInputs:
+  - /flake.nix
+  - /flake.lock
+  - /nix/*.nix

@@ -1,10 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nixShells = {
-      url = "path:./nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # Agent packaging (claude-code, codex, …). Packaging ONLY — isolation is out
     # of scope upstream. Pinned by flake.lock to a rev; consumers pin via the
     # lock alone. Do NOT set `inputs.nixpkgs.follows` against it — that breaks its
@@ -14,30 +10,31 @@
     llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = { nixpkgs, nixShells, llm-agents, ... }:
+  outputs = { nixpkgs, llm-agents, ... }:
     let
+      inherit (nixpkgs) lib;
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      mkMoonShell = system: names:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          shells = nixShells.devShells.${system};
-          missingNames = builtins.filter (name: !(builtins.hasAttr name shells)) names;
-        in
-        if missingNames != [ ] then
-          throw "unknown Moon Nix environment component(s): ${builtins.concatStringsSep ", " missingNames}"
-        else
-          pkgs.mkShell {
-            inputsFrom = map (name: shells.${name}) names;
-            # mkMoonShell disables the shared evaluation cache because Moon may
-            # enter several dev shells concurrently.
-            NIX_CONFIG = "eval-cache = false";
-          };
+      forAllSystems = lib.genAttrs supportedSystems;
+
+      # One module per tool group. A module returns `packages` and `shellHook`,
+      # each optional. The shell hooks run in this order.
+      modules = [
+        ./nix/general.nix
+        ./nix/node.nix
+        ./nix/go.nix
+        ./nix/k8s.nix
+        ./nix/shell.nix
+        ./nix/release.nix
+        ./nix/ci.nix
+        ./nix/docker.nix
+      ];
+      load = system:
+        map (file: import file { pkgs = nixpkgs.legacyPackages.${system}; }) modules;
 
       # The agent image (dockerTools) is Linux-only; scope the smoke outputs that
       # realize it to Linux systems.
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
-      forLinux = nixpkgs.lib.genAttrs linuxSystems;
+      forLinux = lib.genAttrs linuxSystems;
 
       # A lightweight agent env (hello stands in for an llm-agents agent) that
       # exercises agent-env.nix + mkAgentImage.nix end to end without a heavy
@@ -51,24 +48,19 @@
         };
     in
     {
-      lib.mkMoonShell = mkMoonShell;
+      devShells = forAllSystems (system:
+        let loaded = load system; in
+        {
+          # The one development shell of the repository. direnv and CI enter it,
+          # and every Moon task runs with its tools.
+          default = nixpkgs.legacyPackages.${system}.mkShell {
+            packages = lib.concatMap (module: module.packages or [ ]) loaded;
+            shellHook = lib.concatStringsSep "\n" (map (module: module.shellHook or "") loaded);
+          };
 
-      devShells = forAllSystems (system: {
-        # Full shell — composed from the shared per-tool devShells in nix/.
-        # The docker component supplies hadolint, which `docker-lint` (folded into
-        # ci-check via the docker tag's `lint` alias) needs on PATH.
-        default = mkMoonShell system [ "node" "go" "k8s" "shell" "rust" "release" "ci" "docker" "general" ];
-
-        # Lean per-purpose shells, selected via the nix toolchain `shellByTag` setting.
-        ci = mkMoonShell system [ "ci" "general" ];
-        docker = mkMoonShell system [ "docker" "general" ];
-        go = mkMoonShell system [ "go" "general" ];
-        shell = mkMoonShell system [ "shell" "general" ];
-        rust = mkMoonShell system [ "rust" "release" "general" ];
-
-        # Smoke: agent-env.nix resolves a devShell from one closure.
-        agentEnvTest = (agentTestEnv system).devShell;
-      });
+          # Smoke: agent-env.nix resolves a devShell from one closure.
+          agentEnvTest = (agentTestEnv system).devShell;
+        });
 
       packages = forLinux (system: {
         # Smoke: mkAgentImage.nix builds a streamLayeredImage from the closure.

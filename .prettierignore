@@ -42,9 +42,9 @@ reports/
 
 # Cache and Temporary Files
 .cache/
+.direnv/
 .moon/cache/
 .moon/docker/
-packages/tooling/moon/moon-nix-extension/tests/fixtures/
 .parcel-cache/
 .fusebox/
 .dynamodb/

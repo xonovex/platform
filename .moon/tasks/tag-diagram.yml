@@ -43,7 +43,6 @@ tasks:
         esac
       done < <(grep -noHE '(^|[^[:alnum:]_-])role[[:space:]]*=[[:space:]]*"?[[:alnum:]_-]*' "${sources[@]}" | sed -E 's/:[^:]*role[[:space:]]*=[[:space:]]*"?/:/')
       exit "$failed"
-    toolchain: [system, nix]
     inputs:
       - "**/*.dot"
       - "!node_modules/**/*"

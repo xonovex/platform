@@ -40,7 +40,7 @@ runs:
 
     - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
       with:
-        primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+        primary-key: nix-${{ runner.os }}-${{ hashFiles('flake.nix', 'flake.lock', 'nix/*.nix') }}
         restore-prefixes-first-match: nix-${{ runner.os }}-
         gc-max-store-size-linux: 5368709120
         purge: true

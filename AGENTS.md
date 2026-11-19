@@ -9,7 +9,6 @@ Work within the package boundaries below, run the required checks, and follow th
 - **`runtime/plugin`**: Grouped plugins with skills under `skills/` and commands under `commands/`; lockstep with both marketplaces
 - **`tooling/cli`**: Agent CLI, platform binary packages, and GitHub Action wrapper
 - **`tooling/script`**: Moon task binaries and their shared code
-- **`tooling/moon`**: Moon Nix plugins, versioned from `Cargo.toml`
 - **`sandbox/operator`**: Kubernetes agent operator
 - **`sandbox/image`**: Operator image build and publishing
 - **`library`**: TypeScript and Go libraries
@@ -19,6 +18,7 @@ Work within the package boundaries below, run the required checks, and follow th
 ### Workflow
 
 - **Setup**: `npm install`
+- **Nix shell**: the root `flake.nix` is the only provider of build tools, and it composes one development shell from the modules in `nix/`. direnv enters it through the root `.envrc`, and CI enters it with `nix develop --command`. No package has a flake, and no task names a toolchain for Nix. `.moon/tasks/all.yml` makes the flake, its lock and the modules inputs of every task
 - **Tasks**: `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`
 - **Query**: `moon query projects --tags "<pattern>"`
 - **Moon**: a `moon.yml` tag `<name>` inherits `.moon/tasks/tag-<name>.yml`; `extends` refines one (`tag-typescript-script.yml`, `tag-typescript-config.yml` -> `tag-typescript.yml`). A redefined task replaces the parent's `deps`, so restate every inherited dep or set `mergeDeps: replace`

@@ -30,7 +30,6 @@ tasks:
       for source in "${sources[@]}"; do
         gvpr -c -a light -f "$style" "$source" | dot -Gbgcolor=white -Gdpi=150 -Tpng -o "${source%.dot}.png"
       done
-    toolchain: [system, nix]
     inputs:
       - "*.dot"
       - "/packages/asset/asset-brand/diagrams/style.gvpr"
