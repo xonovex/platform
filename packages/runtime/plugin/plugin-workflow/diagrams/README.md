@@ -18,10 +18,10 @@ The [workflow guide](../README.md) explains how to select commands and reconstru
 
 ## Render changes
 
-Edit the `.dot` sources and run the render task from the repository root in the Nix environment. A source names a role, such as `role=decision`, and sets no colour and no font; `diagram-role-check` fails on either and on an unknown role. The render task applies the Graphviz style that `@xonovex/asset-brand` mirrors from the Xonovex design system, uses the supplied Inter and Space Grotesk fonts, and renders every source to SVG and PNG. The plugin check includes both tasks.
+Edit the `.dot` sources and run the render task from the repository root in the Nix environment. A source names a role, such as `role=decision`, and sets no colour and no font; `diagram-role-check` fails on either and on an unknown role. The render task applies the Graphviz style that `@xonovex/asset-brand` mirrors from the Xonovex design system, uses the supplied Inter and Space Grotesk fonts, and renders every source to SVG and PNG. It replaces an export only when the render changed, so a run without a change leaves the working tree clean. The plugin check includes both tasks.
 
 ```bash
-nix develop --no-update-lock-file --command npx moon run plugin-workflow:graph-build --force
+nix develop --no-update-lock-file --command npx moon run plugin-workflow:graph-build
 ```
 
 Keep both rendered formats with their sources so documentation readers can view the flow without installing Graphviz.
