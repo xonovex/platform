@@ -15,6 +15,7 @@ Options:
   --targets TARGETS    Comma-separated moon targets (default: :lint-fix,:typecheck,:test,:build)
   --affected           Run on affected files (default)
   --staged             Run on staged files only (for pre-commit)
+  --downstream DEPTH   Also run the dependents of affected tasks: none, direct or deep
   --no-bail            Continue running after failures
   --concurrency N      Max concurrent tasks
   --timeout SECS       Timeout in seconds (default: 600)
@@ -36,6 +37,7 @@ NO_BAIL=0
 CONCURRENCY=""
 TIMEOUT=600
 STATUS_MODE="affected" # "affected" or "staged"
+DOWNSTREAM=""
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -59,6 +61,10 @@ while [[ $# -gt 0 ]]; do
   --staged)
     STATUS_MODE="staged"
     shift
+    ;;
+  --downstream)
+    DOWNSTREAM="$2"
+    shift 2
     ;;
   --no-bail)
     NO_BAIL=1
@@ -111,8 +117,12 @@ fi
 # Build target array from comma-separated string
 IFS=',' read -ra TARGET_ARRAY <<<"$TARGETS"
 
-# Build moon command
-MOON_CMD=("${MOON[@]}" run "${TARGET_ARRAY[@]}")
+# Only `moon exec` can continue after a failed task; `moon run` always stops.
+if ((NO_BAIL)); then
+  MOON_CMD=("${MOON[@]}" exec "${TARGET_ARRAY[@]}" --on-failure continue)
+else
+  MOON_CMD=("${MOON[@]}" run "${TARGET_ARRAY[@]}")
+fi
 
 # Add status mode (affected vs staged)
 if [[ "$STATUS_MODE" == "staged" ]]; then
@@ -121,15 +131,16 @@ else
   MOON_CMD+=(--affected)
 fi
 
+# --downstream alone changes nothing in a run with --affected.
+if [[ -n "$DOWNSTREAM" ]]; then
+  MOON_CMD+=(--include-relations --downstream "$DOWNSTREAM")
+fi
+
 # Suppress progress output - only show on error
 MOON_CMD+=(--log error)
 
 if [[ -n "$CONCURRENCY" ]]; then
   MOON_CMD+=(--concurrency "$CONCURRENCY")
-fi
-
-if ((NO_BAIL)); then
-  MOON_CMD+=(--no-bail)
 fi
 
 # Detect file modifications (lint:fix might modify files)

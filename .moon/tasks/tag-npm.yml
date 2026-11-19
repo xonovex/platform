@@ -1,4 +1,4 @@
-$schema: https://moonrepo.dev/schemas/tasks.json
+$schema: https://moonrepo.dev/schemas/v2/tasks.json
 tasks:
   # Every npm project gates publish readiness; npm-check verifies the packed
   # tarball resolves every exports, bin and relative import target.

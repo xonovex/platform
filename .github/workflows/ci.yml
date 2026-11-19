@@ -48,9 +48,15 @@ jobs:
           cache-workspace: ${{ inputs.cache-workspace }}
 
       - run: rm -f .moon/cache/runReport.json
+      # A push can hold more than one commit, and moon compares with the previous
+      # commit unless it gets a base. The gate also holds the dependents of each
+      # changed project, which moon adds only with --include-relations.
       - run: |
+          git cat-file -e "${BASE}^{commit}" 2>/dev/null || BASE=
           nix develop --no-update-lock-file --command npm ci
-          nix develop --no-update-lock-file --command npx moon ci --color --concurrency 4 :ci-check
+          nix develop --no-update-lock-file --command npx moon ci --color --concurrency 4 --include-relations --downstream deep ${BASE:+--base "$BASE"} :ci-check
+        env:
+          BASE: ${{ github.event_name == 'push' && github.event.before || '' }}
 
       - uses: moonrepo/run-report-action@bbe7e99bf2aca819ec660ec01fc59d84bdd492d6 # v1
         if: success() || failure()
