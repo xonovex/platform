@@ -22,4 +22,4 @@ Create or refresh output evaluations with realistic prompts, binary assertions, 
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **evaluating-outputs** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them. Prefer an installed test-design skill when its routing description fits the requested evaluation work; continue with baseline evaluation design when none is installed.
+Load the `authoring-skills` skill (plugin `xonovex-agentic`) and perform its **evaluating-outputs** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them. Prefer an installed test-design skill when its routing description fits the requested evaluation work; continue with baseline evaluation design when none is installed.

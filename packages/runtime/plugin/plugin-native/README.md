@@ -34,13 +34,13 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [c99-guide](skills/c99-guide/SKILL.md) | Editing or reviewing general-purpose C99: libraries, CLI tools, system code without strong opinions on memory ownership or layout. |
-| [c99-opinionated-guide](skills/c99-opinionated-guide/SKILL.md) | Editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. |
-| [cmake-guide](skills/cmake-guide/SKILL.md) | Editing CMake build files for C/C++ projects on CMake 3.20+. |
-| [cross-platform-guide](skills/cross-platform-guide/SKILL.md) | Making native C/C++ software portable across operating systems and targets: isolating all OS/windowing/input/audio calls behind one platform-abstraction interface, ordering a port to a new OS, building to the web via Emscripten/WebAssembly (cooperative main loop, async file/network, GL ES/WebGPU mapping, 32-bit pointers, memory growth), and reading input devices like gamepads. |
-| [data-oriented-design-guide](skills/data-oriented-design-guide/SKILL.md) | Designing or refactoring performance-critical data layouts for cache efficiency, in any language. |
-| [lock-free-guide](skills/lock-free-guide/SKILL.md) | Writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. |
-| [memory-management-guide](skills/memory-management-guide/SKILL.md) | Deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. |
+| [applying-data-oriented-design](skills/applying-data-oriented-design/SKILL.md) | Designing or refactoring performance-critical data layouts for cache efficiency, in any language. |
+| [managing-memory](skills/managing-memory/SKILL.md) | Deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. |
+| [using-cmake](skills/using-cmake/SKILL.md) | Editing CMake build files for C/C++ projects on CMake 3.20+. |
+| [writing-c99-opinionated](skills/writing-c99-opinionated/SKILL.md) | Editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. |
+| [writing-c99](skills/writing-c99/SKILL.md) | Editing or reviewing general-purpose C99: libraries, CLI tools, system code without strong opinions on memory ownership or layout. |
+| [writing-cross-platform-code](skills/writing-cross-platform-code/SKILL.md) | Making native C/C++ software portable across operating systems and targets: isolating all OS/windowing/input/audio calls behind one platform-abstraction interface, ordering a port to a new OS, building to the web via Emscripten/WebAssembly (cooperative main loop, async file/network, GL ES/WebGPU mapping, 32-bit pointers, memory growth), and reading input devices like gamepads. |
+| [writing-lock-free-code](skills/writing-lock-free-code/SKILL.md) | Writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. |
 
 ## Validation
 

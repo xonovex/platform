@@ -38,10 +38,10 @@ const expectIsolated = (args: readonly string[]): void => {
 describe("generation prompt isolation", () => {
   it("requires the target skill only in the with-skill arm", () => {
     const prompt = "Assess this release candidate.";
-    const skill = "xonovex-core:accessibility-guide";
+    const skill = "xonovex-core:assuring-accessibility";
 
     expect(buildGenerationPrompt(prompt, "with_skill", skill)).toBe(
-      "/xonovex-core:accessibility-guide Assess this release candidate.",
+      "/xonovex-core:assuring-accessibility Assess this release candidate.",
     );
     expect(buildGenerationPrompt(prompt, "without_skill", skill)).toBe(prompt);
   });
@@ -277,13 +277,13 @@ describe("output eval validation", () => {
   it("requires the skill name and optimization tier in the eval envelope", () => {
     expect(
       evalEntries({
-        skill_name: "test-guide",
+        skill_name: "using-test",
         tier: "moderate",
         evals: [{}],
       }),
     ).toEqual({
       success: true,
-      data: {skillName: "test-guide", tier: "moderate", evals: [{}]},
+      data: {skillName: "using-test", tier: "moderate", evals: [{}]},
     });
     expect(evalEntries([{}]).success).toBe(false);
     expect(evalEntries({evals: [{}]}).success).toBe(false);

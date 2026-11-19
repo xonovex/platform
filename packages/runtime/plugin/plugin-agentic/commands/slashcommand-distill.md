@@ -25,4 +25,4 @@ Move a command procedure into one owning skill and keep the command as a thin in
 
 ## Delegation
 
-Load the `command-guide` skill (plugin `xonovex-agentic`) and perform its **distill** operation with these arguments. The skill is the source of truth for the procedure, output, safety, and ownership rules.
+Load the `authoring-commands` skill (plugin `xonovex-agentic`) and perform its **distill** operation with these arguments. The skill is the source of truth for the procedure, output, safety, and ownership rules.

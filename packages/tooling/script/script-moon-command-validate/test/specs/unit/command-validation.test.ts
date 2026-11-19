@@ -27,7 +27,7 @@ argument-hint: "<subject>"
 
 ## Delegation
 
-Load the \`test-guide\` skill (plugin \`xonovex-owner\`) and perform its
+Load the \`using-test\` skill (plugin \`xonovex-owner\`) and perform its
 **Run** operation with these arguments.
 `;
 
@@ -68,12 +68,12 @@ const fixture = ({
   if (skill) {
     write(
       fs,
-      "packages/runtime/plugin/plugin-owner/skills/test-guide/SKILL.md",
+      "packages/runtime/plugin/plugin-owner/skills/using-test/SKILL.md",
       "# Test\n\n- **Run**: run one test, see [run](references/run.md)\n",
     );
     write(
       fs,
-      "packages/runtime/plugin/plugin-owner/skills/test-guide/references/run.md",
+      "packages/runtime/plugin/plugin-owner/skills/using-test/references/run.md",
       "# Run\n",
     );
   }
@@ -96,7 +96,7 @@ describe("validateCommandPackage", () => {
     );
     write(
       fs,
-      "packages/runtime/plugin/plugin-test/skills/test-guide/SKILL.md",
+      "packages/runtime/plugin/plugin-test/skills/using-test/SKILL.md",
       "# Test\n\n- [Run](references/run.md)\n",
     );
     expect(validateCommandPackage(PACKAGE_DIR, ROOT, fs).report.issues).toEqual(
@@ -203,7 +203,7 @@ describe("validateCommandPackage", () => {
     const fs = fixture();
     write(
       fs,
-      "packages/runtime/plugin/plugin-owner/skills/test-guide/SKILL.md",
+      "packages/runtime/plugin/plugin-owner/skills/using-test/SKILL.md",
       "# Test\n",
     );
 

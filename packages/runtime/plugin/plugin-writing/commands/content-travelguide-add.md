@@ -30,4 +30,4 @@ Create a verified travel guide for the topic or location in the required languag
 
 ## Delegation
 
-Load the `travel-writing-guide` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `writing-travel-guides` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

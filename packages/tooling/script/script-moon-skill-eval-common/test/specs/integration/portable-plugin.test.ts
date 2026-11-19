@@ -18,7 +18,7 @@ describe("portable evaluation plugin loading", () => {
         "plugin-native/.claude-plugin/plugin.json",
         JSON.stringify({name: "xonovex-native", skills: "./skills/"}),
       );
-      write("plugin-native/skills/c99-guide/SKILL.md", "# C99");
+      write("plugin-native/skills/writing-c99/SKILL.md", "# C99");
       write(
         "plugin-core/.claude-plugin/plugin.json",
         JSON.stringify({
@@ -28,15 +28,15 @@ describe("portable evaluation plugin loading", () => {
         }),
       );
       write("plugin-core/commands/git-commit.md", "Commit the change.");
-      write("plugin-core/skills/alpha-guide/SKILL.md", "# Alpha");
+      write("plugin-core/skills/using-alpha/SKILL.md", "# Alpha");
       write(
-        "plugin-core/skills/alpha-guide/references/details.md",
+        "plugin-core/skills/using-alpha/references/details.md",
         "Alpha details.",
       );
-      write("plugin-core/skills/beta-guide/SKILL.md", "# Beta");
+      write("plugin-core/skills/using-beta/SKILL.md", "# Beta");
       const scripts = resolve(
         import.meta.dirname,
-        "../../../../../../runtime/plugin/plugin-agentic/skills/skill-guide/scripts",
+        "../../../../../../runtime/plugin/plugin-agentic/skills/authoring-skills/scripts",
       );
 
       const result = execFileSync(
@@ -53,14 +53,14 @@ from _eval_plugin import find_plugin_directory, read_plugin_manifest, resolve_pl
 root = Path(sys.argv[2])
 core = root / "plugin-core"
 native = root / "plugin-native"
-assert find_plugin_directory(core / "skills" / "alpha-guide") == core
+assert find_plugin_directory(core / "skills" / "using-alpha") == core
 assert resolve_plugin_directories(core) == [native, core]
-with staged_plugin_directories([native, core], "alpha-guide") as staged:
-    assert (staged[0] / "skills/c99-guide/SKILL.md").is_file()
-    assert (staged[1] / "skills/alpha-guide/references/details.md").read_text() == "Alpha details."
-    assert not (staged[1] / "skills/beta-guide").exists()
+with staged_plugin_directories([native, core], "using-alpha") as staged:
+    assert (staged[0] / "skills/writing-c99/SKILL.md").is_file()
+    assert (staged[1] / "skills/using-alpha/references/details.md").read_text() == "Alpha details."
+    assert not (staged[1] / "skills/using-beta").exists()
     assert not (staged[1] / "commands").exists()
-    assert json.loads((staged[1] / ".claude-plugin/plugin.json").read_text())["skills"] == ["./skills/alpha-guide"]
+    assert json.loads((staged[1] / ".claude-plugin/plugin.json").read_text())["skills"] == ["./skills/using-alpha"]
 assert all(not directory.exists() for directory in staged)
 assert (core / "commands/git-commit.md").is_file()
 (core / "hooks").mkdir()

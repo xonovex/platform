@@ -9,8 +9,8 @@ tasks:
       - format-check
       - diagram-role-check
       - graph-build
-      - skill-plan:ci-check
-      - skill-reflect:ci-check
+      - skill-planning-work:ci-check
+      - skill-reflecting-on-sessions:ci-check
     options:
       mergeDeps: append
   graph-build:

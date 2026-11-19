@@ -10,13 +10,13 @@ const INVARIANT =
 const ROOT = "/repo";
 
 const repositoryFixture = (
-  guides: Readonly<Record<string, string>>,
+  skills: Readonly<Record<string, string>>,
   extra: Readonly<Record<string, string>> = {},
 ): FileSystem =>
   memoryFileSystem({
     files: {
       ...Object.fromEntries(
-        Object.entries(guides).map(([name, text]) => [
+        Object.entries(skills).map(([name, text]) => [
           join(
             ROOT,
             "packages",
@@ -24,7 +24,7 @@ const repositoryFixture = (
             "plugin",
             `plugin-${name}`,
             "skills",
-            `${name}-guide`,
+            `using-${name}`,
             "SKILL.md",
           ),
           text,
@@ -67,7 +67,7 @@ describe("moon-skill-validate-drift", () => {
       fs.readText(join(ROOT, "budgets.json")),
     );
     expect(manifest).toEqual({
-      "packages/runtime/plugin/plugin-alpha/skills/alpha-guide/SKILL.md": 3,
+      "packages/runtime/plugin/plugin-alpha/skills/using-alpha/SKILL.md": 3,
     });
   });
 

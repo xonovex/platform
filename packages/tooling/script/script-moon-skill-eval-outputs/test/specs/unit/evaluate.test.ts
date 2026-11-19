@@ -114,7 +114,7 @@ const runEvaluator = async (
 ): Promise<{exitCode: number; workspace: string; fs: FileSystem}> => {
   const evaluationsFile = join(ROOT, `${name}.json`);
   const workspace = join(ROOT, name);
-  // resolveEvaluationConfig locates the guide by its SKILL.md, so the tree has
+  // resolveEvaluationConfig locates the skill by its SKILL.md, so the tree has
   // to carry one alongside the evaluations file.
   const fs = memoryFileSystem({
     files: {

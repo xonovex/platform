@@ -23,4 +23,4 @@ Shorten a slash command while preserving its arguments and behavior.
 
 ## Delegation
 
-Load the `command-guide` skill (plugin `xonovex-agentic`) and perform its **simplify** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-commands` skill (plugin `xonovex-agentic`) and perform its **simplify** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

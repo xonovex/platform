@@ -21,7 +21,7 @@ Create or update a skill from recurring code and project-instruction patterns.
 
 ## Arguments
 
-- `skill-name` (required): Name for skill (e.g., `example-guide`)
+- `skill-name` (required): Name for skill (e.g., `using-example`)
 - `source-path` (required): Path to analyze (e.g., `packages/example`)
 - `--update` (optional): Update existing skill instead of creating new
 - `--interactive` (optional): Ask which patterns to include before writing
@@ -29,4 +29,4 @@ Create or update a skill from recurring code and project-instruction patterns.
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **extract-from-codebase** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-skills` skill (plugin `xonovex-agentic`) and perform its **extract-from-codebase** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

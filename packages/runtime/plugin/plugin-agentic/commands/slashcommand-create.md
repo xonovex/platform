@@ -27,4 +27,4 @@ Create a thin command that defines its arguments and delegates its procedure to 
 
 ## Delegation
 
-Load the `command-guide` skill (plugin `xonovex-agentic`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output, safety, and harness-specific format.
+Load the `authoring-commands` skill (plugin `xonovex-agentic`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output, safety, and harness-specific format.

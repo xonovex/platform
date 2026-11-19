@@ -1,0 +1,37 @@
+# user-stories: Story Template and Acceptance Criteria
+
+Describe the user, capability, and value, then confirm the story with concrete acceptance criteria.
+
+```
+As a [type of user], I want [goal / capability], so that [reason / business value].
+```
+
+- **As a**: the user role (a person, not a system component).
+- **I want**: **what** the user needs, expressed as a capability, not an implementation (no screens/tables/endpoints).
+- **so that**: the **why**: motivation and business value. Most often dropped, and the part that lets you challenge, reprioritize, or drop the story.
+
+The template forces What and Why while keeping How open: exactly what makes a story **Negotiable**. A story whose "I want" names a mechanism ("I want a Redis cache") has smuggled the How into the What. The template is a **conversation starter, not a mandatory format**: no method prescribes a fixed story format, and a one-line note can be a fine story when context is shared.
+
+## Acceptance criteria
+
+The Confirmation from the 3 Cs (see [three-cs.md](three-cs.md)) written down.
+
+Criteria CAN be expressed as Given-When-Then (owned by **applying-bdd**); designing the tests themselves: levels, doubles, structure: is owned by **authoring-tests**. This skill stops at "criteria exist".
+
+## Example
+
+```
+As a rider, I want my completed trip charged to my saved card
+  so that I can leave the cab without handling cash.
+
+Acceptance criteria:
+  happy     valid saved card is charged the fare; a receipt is shown
+  boundary  a zero-distance trip is charged the minimum fare
+  error     a declined card blocks ending the trip and prompts a retry
+  UI        the trip screen shows "Paid" and the amount once the charge succeeds
+```
+
+## Cross-references
+
+- The Card and Confirmation the template and criteria realize: [three-cs.md](three-cs.md).
+- Given-When-Then for automation: **applying-bdd**; test design behind the criteria, **authoring-tests**.

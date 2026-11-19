@@ -22,4 +22,4 @@ Stress-test a plan independently and report findings for a separate revision.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **critique** operation with these arguments. Run this as a fresh session / independent agent that did not author the plan. Self-critique defends instead of attacks. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `planning-work` skill (plugin `xonovex-workflow`) and perform its **critique** operation with these arguments. Run this as a fresh session / independent agent that did not author the plan. Self-critique defends instead of attacks. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

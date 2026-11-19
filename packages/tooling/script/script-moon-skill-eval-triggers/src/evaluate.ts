@@ -90,7 +90,7 @@ export const main = async (
             dependencies.checkCodexTriggered({
               args: config.harnessArgs,
               executable: config.harnessExecutable,
-              guideDirectory: config.guideDirectory,
+              skillDirectory: config.skillDirectory,
               query,
               shortName: config.shortName,
             }),

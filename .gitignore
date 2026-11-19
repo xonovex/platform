@@ -34,7 +34,7 @@ image.env
 *.gen.*
 auto-imports.d.ts
 .skill-eval-results/
-*-guide-workspace/
+*-workspace/
 
 # Testing and Coverage
 test-results

@@ -19,9 +19,9 @@ Create a reusable guideline skill from the supplied document or URL.
 ## Arguments
 
 - `source` (required): URL or file path to the source document
-- `--name` (required): Skill name in kebab-case (e.g., `react-guide`, `go-guide`)
+- `--name` (required): Skill name in kebab-case (e.g., `using-react`, `writing-go`)
 - `--dry-run` (optional): Preview generated structure without writing files
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-skills` skill (plugin `xonovex-agentic`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

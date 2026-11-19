@@ -29,4 +29,4 @@ Research current news on the topic and produce the required bilingual content.
 
 ## Delegation
 
-Load the `news-writing-guide` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `writing-news` skill (plugin `xonovex-writing`) and perform its **create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

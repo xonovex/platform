@@ -3,27 +3,27 @@ import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
   collectCommandCatalogFiles,
-  collectGuideFiles,
   collectSkillCatalogFiles,
+  collectSkillFiles,
   manifestPath,
 } from "../../../src/drift-files.js";
-import {checkGuideDrift} from "../../../src/drift-lints.js";
+import {checkSkillDrift} from "../../../src/drift-lints.js";
 
 const words = (count: number) =>
   Array.from({length: count}, () => "word").join(" ");
 
 const REPOSITORY_ROOT = "/repo";
-const GUIDE_DIRECTORY = join(
+const SKILL_DIRECTORY = join(
   REPOSITORY_ROOT,
   "packages",
   "runtime",
   "plugin",
   "plugin-demo",
   "skills",
-  "demo-guide",
+  "using-demo",
 );
 
-// A miniature repository with one guide and one command, which is the smallest
+// A miniature repository with one skill and one command, which is the smallest
 // tree the catalog walks recognize.
 const catalogFixture = (
   skillText: string,
@@ -32,8 +32,8 @@ const catalogFixture = (
 ) =>
   memoryFileSystem({
     files: {
-      [join(GUIDE_DIRECTORY, "SKILL.md")]: skillText,
-      [join(GUIDE_DIRECTORY, "references", "topic.md")]: referenceText,
+      [join(SKILL_DIRECTORY, "SKILL.md")]: skillText,
+      [join(SKILL_DIRECTORY, "references", "topic.md")]: referenceText,
       [join(
         REPOSITORY_ROOT,
         "packages",
@@ -54,9 +54,9 @@ describe("drift files", () => {
     );
   });
 
-  it("collects a guide's SKILL.md and references with their kinds", () => {
-    const files = collectGuideFiles(
-      GUIDE_DIRECTORY,
+  it("collects the SKILL.md of a skill and references with their kinds", () => {
+    const files = collectSkillFiles(
+      SKILL_DIRECTORY,
       REPOSITORY_ROOT,
       catalogFixture("skill prose"),
     );
@@ -64,11 +64,11 @@ describe("drift files", () => {
     expect(files.map(({kind, path}) => [kind, path])).toEqual([
       [
         "skill",
-        "packages/runtime/plugin/plugin-demo/skills/demo-guide/SKILL.md",
+        "packages/runtime/plugin/plugin-demo/skills/using-demo/SKILL.md",
       ],
       [
         "reference",
-        "packages/runtime/plugin/plugin-demo/skills/demo-guide/references/topic.md",
+        "packages/runtime/plugin/plugin-demo/skills/using-demo/references/topic.md",
       ],
     ]);
   });
@@ -93,7 +93,7 @@ describe("drift files", () => {
     expect(collectCommandCatalogFiles(REPOSITORY_ROOT, empty)).toEqual([]);
   });
 
-  it("ignores a catalog entry that is not a guide directory", () => {
+  it("ignores a catalog entry that holds no SKILL.md", () => {
     const fs = memoryFileSystem({
       files: {
         [join(
@@ -104,6 +104,17 @@ describe("drift files", () => {
           "plugin-demo",
           "README.md",
         )]: "prose",
+        [join(
+          REPOSITORY_ROOT,
+          "packages",
+          "runtime",
+          "plugin",
+          "plugin-demo",
+          "skills",
+          "drafting-notes",
+          "references",
+          "notes.md",
+        )]: "a directory without a SKILL.md",
       },
     });
 
@@ -111,20 +122,20 @@ describe("drift files", () => {
   });
 });
 
-describe("guide drift", () => {
-  it("passes a guide within its caps", () => {
+describe("skill drift", () => {
+  it("passes a skill within its caps", () => {
     expect(
-      checkGuideDrift(
-        GUIDE_DIRECTORY,
+      checkSkillDrift(
+        SKILL_DIRECTORY,
         REPOSITORY_ROOT,
         catalogFixture("skill prose"),
       ),
     ).toEqual({findings: [], manifestErrors: []});
   });
 
-  it("reports a guide over the skill cap", () => {
-    const {findings} = checkGuideDrift(
-      GUIDE_DIRECTORY,
+  it("reports a skill over the skill cap", () => {
+    const {findings} = checkSkillDrift(
+      SKILL_DIRECTORY,
       REPOSITORY_ROOT,
       catalogFixture(words(950)),
     );
@@ -134,8 +145,8 @@ describe("guide drift", () => {
   });
 
   it("surfaces a malformed manifest separately from findings", () => {
-    const {findings, manifestErrors} = checkGuideDrift(
-      GUIDE_DIRECTORY,
+    const {findings, manifestErrors} = checkSkillDrift(
+      SKILL_DIRECTORY,
       REPOSITORY_ROOT,
       catalogFixture("skill prose", "reference prose", {
         [join(REPOSITORY_ROOT, "budgets.json")]: "{",

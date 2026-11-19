@@ -34,10 +34,10 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [docker-guide](skills/docker-guide/SKILL.md) | Writing or editing Docker images and Compose files for production. |
-| [kubernetes-guide](skills/kubernetes-guide/SKILL.md) | Editing Kubernetes manifests in GitOps repos. |
-| [moon-guide](skills/moon-guide/SKILL.md) | Configuring moonrepo monorepo tasks. |
-| [terraform-guide](skills/terraform-guide/SKILL.md) | Editing Terraform 1.12+ infrastructure code. |
+| [using-docker](skills/using-docker/SKILL.md) | Writing or editing Docker images and Compose files for production. |
+| [using-kubernetes](skills/using-kubernetes/SKILL.md) | Editing Kubernetes manifests in GitOps repos. |
+| [using-moon](skills/using-moon/SKILL.md) | Configuring moonrepo monorepo tasks. |
+| [using-terraform](skills/using-terraform/SKILL.md) | Editing Terraform 1.12+ infrastructure code. |
 
 ## Validation
 

@@ -34,12 +34,12 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [lua-guide](skills/lua-guide/SKILL.md) | Editing general-purpose Lua 5.4+: modules, scripts, configuration. |
-| [lua-opinionated-guide](skills/lua-opinionated-guide/SKILL.md) | Tuning performance-critical Lua hot paths: the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. |
-| [python-guide](skills/python-guide/SKILL.md) | Writing or editing Python 3.12+ for APIs, data processing, scripting, or tooling. |
-| [shell-scripting-guide](skills/shell-scripting-guide/SKILL.md) | Writing or editing POSIX shell or Bash automation. |
-| [sql-postgresql-guide](skills/sql-postgresql-guide/SKILL.md) | Editing PostgreSQL 15+ queries, schemas, or migrations. |
-| [typescript-to-lua-guide](skills/typescript-to-lua-guide/SKILL.md) | Editing TypeScript that compiles to Lua via TSTL 1.24+ (game scripting, Defold, embedded engines). |
+| [writing-lua-opinionated](skills/writing-lua-opinionated/SKILL.md) | Tuning performance-critical Lua hot paths: the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. |
+| [writing-lua](skills/writing-lua/SKILL.md) | Editing general-purpose Lua 5.4+: modules, scripts, configuration. |
+| [writing-python](skills/writing-python/SKILL.md) | Writing or editing Python 3.12+ for APIs, data processing, scripting, or tooling. |
+| [writing-shell-scripts](skills/writing-shell-scripts/SKILL.md) | Writing or editing POSIX shell or Bash automation. |
+| [writing-sql-postgresql](skills/writing-sql-postgresql/SKILL.md) | Editing PostgreSQL 15+ queries, schemas, or migrations. |
+| [writing-typescript-to-lua](skills/writing-typescript-to-lua/SKILL.md) | Editing TypeScript that compiles to Lua via TSTL 1.24+ (game scripting, Defold, embedded engines). |
 
 ## Validation
 

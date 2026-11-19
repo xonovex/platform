@@ -24,4 +24,4 @@ Write or revise publication prose for a natural voice while preserving its facts
 
 ## Delegation
 
-Load the `editorial-writing-guide` skill (plugin `xonovex-writing`) and perform its **humanize** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `writing-editorials` skill (plugin `xonovex-writing`) and perform its **humanize** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

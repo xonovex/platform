@@ -70,7 +70,7 @@ const JudgeBudgetTextSchema = PositiveNumberTextSchema.pipe(
 );
 
 // A with-skill run spends turns loading the skill and its references before it
-// answers, so a guide with progressive disclosure needs more headroom than a bare
+// answers, so a skill with progressive disclosure needs more headroom than a bare
 // answer. Too low a ceiling reports error_max_turns, which invalidates the batch
 // rather than scoring the arm; the cap stays configurable up to twice the default
 // for skills whose references need extra reads.

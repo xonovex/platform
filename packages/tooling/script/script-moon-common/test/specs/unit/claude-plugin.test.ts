@@ -11,13 +11,13 @@ describe("Claude evaluation plugins", () => {
           skills: "./skills/",
         }),
         "/core/commands/git-commit.md": "command",
-        "/core/skills/git-guide/SKILL.md": "git",
-        "/core/skills/testing-guide/SKILL.md": "testing",
+        "/core/skills/using-git/SKILL.md": "git",
+        "/core/skills/authoring-tests/SKILL.md": "testing",
         "/native/.claude-plugin/plugin.json": JSON.stringify({
           name: "xonovex-native",
           skills: "./skills/",
         }),
-        "/native/skills/c99-guide/SKILL.md": "C99",
+        "/native/skills/writing-c99/SKILL.md": "C99",
       },
     });
     expect(
@@ -31,7 +31,7 @@ describe("Claude evaluation plugins", () => {
           "/core",
         ],
         "/staged",
-        ["git-guide"],
+        ["using-git"],
         fs,
       ),
     ).toEqual({
@@ -47,12 +47,12 @@ describe("Claude evaluation plugins", () => {
         {
           directory: "/staged/plugin-3",
           name: "xonovex-native",
-          guides: ["/native/skills/c99-guide"],
+          skillDirectories: ["/native/skills/writing-c99"],
         },
         {
           directory: "/staged/plugin-5",
           name: "xonovex-core",
-          guides: ["/core/skills/git-guide"],
+          skillDirectories: ["/core/skills/using-git"],
         },
       ],
     });

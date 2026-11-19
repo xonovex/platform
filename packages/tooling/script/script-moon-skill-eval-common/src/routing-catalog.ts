@@ -9,7 +9,7 @@ import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout
 import {parseQueries, type Query} from "./validation.js";
 
 export interface RoutingCandidate {
-  readonly guideDirectory: string;
+  readonly skillDirectory: string;
   readonly pluginDirectory: string;
   readonly shortName: string;
 }
@@ -51,15 +51,15 @@ const catalogCandidates = (
     .map((entry) => join(catalogRoot, entry))
     .filter((path) => isDirectory(path, fs))
     .flatMap((pluginDirectory) =>
-      pluginSkillDirectories(pluginDirectory, fs).flatMap((guideDirectory) => {
-        const skillFile = join(guideDirectory, "SKILL.md");
-        const queriesFile = join(guideDirectory, "eval-queries.json");
+      pluginSkillDirectories(pluginDirectory, fs).flatMap((skillDirectory) => {
+        const skillFile = join(skillDirectory, "SKILL.md");
+        const queriesFile = join(skillDirectory, "eval-queries.json");
         if (!isFile(skillFile, fs) || !isFile(queriesFile, fs)) return [];
         const shortName = parseFrontmatterName(skillFile, fs);
         if (shortName === undefined) {
           throw new Error(`skill name missing from ${skillFile}`);
         }
-        return [{guideDirectory, pluginDirectory, shortName}];
+        return [{skillDirectory, pluginDirectory, shortName}];
       }),
     );
 
@@ -74,7 +74,7 @@ export const buildRoutingScenarios = (
   const occurrencesByQuery = new Map<string, QueryOccurrence[]>();
   for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
-      join(candidate.guideDirectory, "eval-queries.json"),
+      join(candidate.skillDirectory, "eval-queries.json"),
       fs,
     );
     for (const query of queries) {
@@ -126,7 +126,7 @@ export const catalogQueryOwners = (
   const positivesByQuery = new Map<string, string[]>();
   for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
-      join(candidate.guideDirectory, "eval-queries.json"),
+      join(candidate.skillDirectory, "eval-queries.json"),
       fs,
     );
     for (const query of queries) {
@@ -175,7 +175,7 @@ export const conflictingQueryOwners = (
   const claimants = new Map<string, {owners: Set<string>; query: string}>();
   for (const candidate of catalogCandidates(root, fs)) {
     const queries = readQueries(
-      join(candidate.guideDirectory, "eval-queries.json"),
+      join(candidate.skillDirectory, "eval-queries.json"),
       fs,
     );
     for (const query of queries) {
@@ -202,14 +202,11 @@ export interface UnresolvedOperation {
   readonly skill: string;
 }
 
-const OPERATION_MENTION = /`?([a-z0-9]+(?:-[a-z0-9]+)+)`?\s+operation/gu;
+const OPERATION_MENTION = /`([a-z0-9]+(?:-[a-z0-9]+)*)`\s+operation/gu;
 
-const guideTopic = (shortName: string): string =>
-  shortName.replace(/-guide$/u, "");
-
-// Rationales that name an operation of a catalog skill which owns no reference
-// file for it. Scoped to tokens prefixed with a real skill topic so that plain
-// English compounds ('a version-control operation') are not identifiers.
+// Rationales that cite an operation which no catalog skill owns a reference
+// file for. Only a token in backticks cites an operation by name, so a plain
+// English compound ('a version-control operation') is not an identifier.
 export const unresolvedOperationRationales = (
   catalogRoot: string,
   fs: FileSystem = nodeFileSystem,
@@ -219,10 +216,9 @@ export const unresolvedOperationRationales = (
     throw new Error(`catalog root not found: ${root}`);
 
   const candidates = catalogCandidates(root, fs);
-  const topics = candidates.map(({shortName}) => guideTopic(shortName));
   const references = new Set(
-    candidates.flatMap(({guideDirectory}) => {
-      const directory = join(guideDirectory, "references");
+    candidates.flatMap(({skillDirectory}) => {
+      const directory = join(skillDirectory, "references");
       if (!isDirectory(directory, fs)) return [];
       return fs
         .readDirectory(directory)
@@ -234,17 +230,12 @@ export const unresolvedOperationRationales = (
   const findings: UnresolvedOperation[] = [];
   for (const candidate of candidates) {
     const queries = readQueries(
-      join(candidate.guideDirectory, "eval-queries.json"),
+      join(candidate.skillDirectory, "eval-queries.json"),
       fs,
     );
     for (const {rationale} of queries) {
       for (const [, operation] of rationale.matchAll(OPERATION_MENTION)) {
-        if (
-          operation === undefined ||
-          references.has(operation) ||
-          topics.every((topic) => !operation.startsWith(`${topic}-`))
-        )
-          continue;
+        if (operation === undefined || references.has(operation)) continue;
         findings.push({
           operation,
           rationale,

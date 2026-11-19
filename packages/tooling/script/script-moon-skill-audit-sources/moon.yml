@@ -25,4 +25,4 @@ tasks:
       TS_COVERAGE_MIN_STATEMENTS: "75"
   ts-test:
     inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/audit-sources.py
+      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/scripts/audit-sources.py

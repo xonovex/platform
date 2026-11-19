@@ -23,7 +23,7 @@ packages/
   runtime/
     plugin/
       plugin-*/               # Installable groups of related skills and commands
-        skills/*-guide/       # Skill instructions, references, scripts, and evals
+        skills/*/             # Skill instructions, references, scripts, and evals
         commands/             # Commands that load skills from the owning plugin
   tooling/
     cli/                      # Agent CLI, platform binaries, and GitHub Action
@@ -94,7 +94,7 @@ Run `npx moon run script-moon-plugin-sync-installation:plugin-installation-sync`
 
 ## Code Style
 
-- **Paradigm**: Functional programming (see `packages/runtime/plugin/plugin-core/skills/fp-guide/SKILL.md`)
+- **Paradigm**: Functional programming (see `packages/runtime/plugin/plugin-core/skills/applying-fp/SKILL.md`)
 - **Imports**: Direct from source, no re-exports
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

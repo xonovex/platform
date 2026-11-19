@@ -10,7 +10,7 @@ import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {
   findPluginDirectory,
   resolveClaudePluginDirectories,
-  resolveGuideDirectory,
+  resolveSkillDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {catalogQueryOwners} from "@xonovex/script-moon-skill-eval-common/routing-catalog";
@@ -45,7 +45,7 @@ export interface TriggerConfigOptions {
 
 export interface TriggerConfig {
   readonly budget: number;
-  readonly guideDirectory: string;
+  readonly skillDirectory: string;
   readonly harness: "claude" | "codex";
   readonly harnessArgs: readonly string[];
   readonly harnessExecutable: string;
@@ -143,11 +143,11 @@ export const resolveTriggerConfig = (
   const environment = options.environment ?? process.env;
   const workingDirectory = options.workingDirectory ?? resolve(".");
   const fs = options.fs ?? nodeFileSystem;
-  const guideDirectory = resolveGuideDirectory(workingDirectory, fs);
+  const skillDirectory = resolveSkillDirectory(workingDirectory, fs);
   const queriesArgument =
-    cli.positionals[0] ?? join(guideDirectory, "eval-queries.json");
+    cli.positionals[0] ?? join(skillDirectory, "eval-queries.json");
   const queriesFile = resolve(workingDirectory, queriesArgument);
-  const skillMd = join(guideDirectory, "SKILL.md");
+  const skillMd = join(skillDirectory, "SKILL.md");
   const skillName =
     cli.positionals[1] ??
     (fs.isFile(skillMd) ? parseFrontmatterName(skillMd, fs) : undefined);
@@ -220,7 +220,7 @@ export const resolveTriggerConfig = (
   const pluginDirectoryArgument =
     cli.pluginDir ??
     environment.PLUGIN_DIR ??
-    findPluginDirectory(guideDirectory, fs);
+    findPluginDirectory(skillDirectory, fs);
   const pluginDirectory = resolve(workingDirectory, pluginDirectoryArgument);
   if (
     harness === "claude" &&
@@ -292,7 +292,7 @@ export const resolveTriggerConfig = (
     success: true,
     data: {
       budget,
-      guideDirectory,
+      skillDirectory,
       harness,
       harnessArgs:
         harness === "claude"

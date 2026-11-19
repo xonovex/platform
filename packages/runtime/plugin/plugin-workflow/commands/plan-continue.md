@@ -30,4 +30,4 @@ Resume one plan or subplan with its context and implementation skills, then stop
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **continue** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `planning-work` skill (plugin `xonovex-workflow`) and perform its **continue** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

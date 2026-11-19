@@ -21,4 +21,4 @@ Create an isolated worktree for a feature branch.
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `using-git` skill (plugin `xonovex-core`) and perform its **worktree-create** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

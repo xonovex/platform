@@ -21,4 +21,4 @@ Integrate a feature worktree into its source worktree and validate the combined 
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `using-git` skill (plugin `xonovex-core`) and perform its **worktree-merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

@@ -1,6 +1,7 @@
+import {skillNameMentions} from "@xonovex/script-moon-common/skill-name";
+
 const NEGATIVE_ROUTING_CLAUSE_RE =
   /(?:^|[.!?]\s+)(?:skip\b|do not use\b|don't use\b|out[- ]of[- ]scope\b)/i;
-const NAMED_SKILL_RE = /\b[a-z0-9]+(?:-[a-z0-9]+)*-guide\b/gi;
 
 export const descriptionRoutingErrors = (
   description: string,
@@ -15,9 +16,9 @@ export const descriptionRoutingErrors = (
   }
   const namedSkills = [
     ...new Set(
-      [...description.matchAll(NAMED_SKILL_RE)]
-        .map((match) => match[0].toLowerCase())
-        .filter((name) => name !== normalizedOwnSkillName),
+      skillNameMentions(description).filter(
+        (name) => name !== normalizedOwnSkillName,
+      ),
     ),
   ].toSorted();
   if (namedSkills.length > 0) {

@@ -31,7 +31,7 @@ const runNode = (script: string) =>
     process.execPath,
   );
 
-const guideDirectory = (prefix: string, name: string): string => {
+const skillDirectory = (prefix: string, name: string): string => {
   const directory = mkdtempSync(join(tmpdir(), prefix));
   temporaryDirectories.push(directory);
   writeFileSync(
@@ -91,11 +91,11 @@ setInterval(() => {}, 1000);
 });
 
 describe("checkCodexTriggered", () => {
-  it("stages multiple candidate guides while signaling only the target", async () => {
-    const target = guideDirectory("codex-trigger-target-", "target-guide");
-    const competitor = guideDirectory(
+  it("stages multiple candidate skills while signaling only the target", async () => {
+    const target = skillDirectory("codex-trigger-target-", "using-target");
+    const competitor = skillDirectory(
       "codex-trigger-competitor-",
-      "competitor-guide",
+      "using-competitor",
     );
 
     const outcome = await checkCodexTriggered({
@@ -103,8 +103,8 @@ describe("checkCodexTriggered", () => {
         "--eval",
         `
 const {existsSync, readFileSync} = require("node:fs");
-const target = ".agents/skills/target-guide/SKILL.md";
-const competitor = ".agents/skills/competitor-guide/SKILL.md";
+const target = ".agents/skills/using-target/SKILL.md";
+const competitor = ".agents/skills/using-competitor/SKILL.md";
 const passed = existsSync(target) && existsSync(competitor) &&
   readFileSync(target, "utf8").includes("XONOVEX_SKILL_TRIGGERED") &&
   !readFileSync(competitor, "utf8").includes("XONOVEX_SKILL_TRIGGERED") &&
@@ -114,12 +114,12 @@ console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",tex
 `,
       ],
       executable: process.execPath,
-      guideDirectory: target,
+      skillDirectory: target,
       query: "target query",
-      shortName: "target-guide",
-      candidateGuides: [
-        {guideDirectory: target, shortName: "target-guide"},
-        {guideDirectory: competitor, shortName: "competitor-guide"},
+      shortName: "using-target",
+      skillCandidates: [
+        {skillDirectory: target, shortName: "using-target"},
+        {skillDirectory: competitor, shortName: "using-competitor"},
       ],
     });
 
@@ -133,7 +133,7 @@ console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",tex
         'process.stderr.write("authentication failed"); process.exit(3);',
       ],
       executable: process.execPath,
-      guideDirectory: guideDirectory("codex-trigger-guide-", "test-skill"),
+      skillDirectory: skillDirectory("codex-trigger-skill-", "test-skill"),
       query: "test query",
       shortName: "test-skill",
     });

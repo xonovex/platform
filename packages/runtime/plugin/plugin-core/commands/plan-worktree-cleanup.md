@@ -22,4 +22,4 @@ Remove eligible stale or merged worktrees and prune their remaining Git metadata
 
 ## Delegation
 
-Load the `git-guide` skill (plugin `xonovex-core`) and perform its **worktree-cleanup** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `using-git` skill (plugin `xonovex-core`) and perform its **worktree-cleanup** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

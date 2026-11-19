@@ -81,7 +81,7 @@ const createFixture = (): string => {
   });
   writeText(
     root,
-    `${PACKAGE_PATH}/skills/test-guide/SKILL.md`,
+    `${PACKAGE_PATH}/skills/using-test/SKILL.md`,
     "# Test skill\n",
   );
   writeJson(root, `${COMMAND_PATH}/package.json`, commandPackageManifest);
@@ -96,7 +96,7 @@ const createFixture = (): string => {
   });
   writeText(
     root,
-    `${COMMAND_PATH}/skills/command-guide/SKILL.md`,
+    `${COMMAND_PATH}/skills/authoring-commands/SKILL.md`,
     "# Command skill\n",
   );
   writeJson(root, "package-lock.json", {
@@ -315,13 +315,13 @@ tasks:
     }
   });
 
-  it("rejects a skill manifest path that does not resolve to its guide", () => {
+  it("rejects a skill manifest path that does not resolve to its skill", () => {
     const root = createFixture();
     writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, {
       name: "xonovex-test",
       version: VERSION,
       description: "Test skill",
-      skills: "./old-guide",
+      skills: "./using-old",
     });
 
     try {
@@ -331,7 +331,7 @@ tasks:
         `${PACKAGE_PATH} Codex manifest skill paths match ./skills/`,
       );
       expect(result.failures).toContain(
-        `${PACKAGE_PATH} manifest skill path is direct: ./old-guide`,
+        `${PACKAGE_PATH} manifest skill path is direct: ./using-old`,
       );
     } finally {
       rmSync(root, {recursive: true, force: true});

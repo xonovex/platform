@@ -36,7 +36,7 @@ export interface RunContext {
   readonly withArgs: readonly string[];
   readonly withoutArgs: readonly string[];
   readonly cwd: string | undefined;
-  readonly guideDirectory: string;
+  readonly skillDirectory: string;
   readonly harness: "claude" | "codex";
   readonly timeout: number;
   readonly target: string;
@@ -85,7 +85,7 @@ const generate = async (
     // answer for being long, and length is what a thorough skill produces.
     maxOutputCharacters:
       context.harness === "codex" ? GENERATION_OUTPUT_LIMIT : null,
-    skillGuide: expectSkill ? context.guideDirectory : undefined,
+    skillSource: expectSkill ? context.skillDirectory : undefined,
   });
   if (proc.outputLimitExceeded) return generationFailure("output-limit");
   if (proc.timedOut)
@@ -174,7 +174,7 @@ const grade = async (
     cwd: undefined,
     timeoutMs: 300_000,
     maxOutputCharacters: null,
-    skillGuide: undefined,
+    skillSource: undefined,
   });
   if (proc.error) return allFail(`judge process error: ${proc.error}`);
   if (proc.timedOut) return allFail("judge timeout");

@@ -34,17 +34,17 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [claude-code-guide](skills/claude-code-guide/SKILL.md) | Configuring Claude Code hooks, plugins, skills, settings, or managed configuration. |
-| [codex-guide](skills/codex-guide/SKILL.md) | Configuring Codex hooks, plugins, skills, config layers, or managed requirements. |
-| [command-guide](skills/command-guide/SKILL.md) | Authoring, reviewing, merging, simplifying, or distilling reusable user-invocable prompt files (a.k.a. slash commands: files an agent harness exposes as `/command` invocations). |
-| [copilot-guide](skills/copilot-guide/SKILL.md) | Configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
-| [herdr-guide](skills/herdr-guide/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
-| [instruction-guide](skills/instruction-guide/SKILL.md) | Authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. |
-| [kiro-guide](skills/kiro-guide/SKILL.md) | Configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
-| [llmstxt-guide](skills/llmstxt-guide/SKILL.md) | Authoring, reviewing, or maintaining an `/llms.txt` file or per-page markdown mirrors per the llmstxt.org specification. |
-| [opencode-guide](skills/opencode-guide/SKILL.md) | Configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
-| [pi-guide](skills/pi-guide/SKILL.md) | Configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. |
-| [skill-guide](skills/skill-guide/SKILL.md) | Authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. |
+| [authoring-commands](skills/authoring-commands/SKILL.md) | Authoring, reviewing, merging, simplifying, or distilling reusable user-invocable prompt files (a.k.a. slash commands: files an agent harness exposes as `/command` invocations). |
+| [authoring-instructions](skills/authoring-instructions/SKILL.md) | Authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. |
+| [authoring-llmstxt](skills/authoring-llmstxt/SKILL.md) | Authoring, reviewing, or maintaining an `/llms.txt` file or per-page markdown mirrors per the llmstxt.org specification. |
+| [authoring-skills](skills/authoring-skills/SKILL.md) | Authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. |
+| [configuring-claude-code](skills/configuring-claude-code/SKILL.md) | Configuring Claude Code hooks, plugins, skills, settings, or managed configuration. |
+| [configuring-codex](skills/configuring-codex/SKILL.md) | Configuring Codex hooks, plugins, skills, config layers, or managed requirements. |
+| [configuring-copilot](skills/configuring-copilot/SKILL.md) | Configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
+| [configuring-kiro](skills/configuring-kiro/SKILL.md) | Configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
+| [configuring-opencode](skills/configuring-opencode/SKILL.md) | Configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
+| [configuring-pi](skills/configuring-pi/SKILL.md) | Configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. |
+| [using-herdr](skills/using-herdr/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
 
 ## Commands
 

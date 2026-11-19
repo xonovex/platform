@@ -7,10 +7,10 @@ tasks:
       - command-validate
       - build
       - format-check
-      - skill-editorial-writing:ci-check
-      - skill-news-writing:ci-check
-      - skill-technical-writing:ci-check
-      - skill-travel-writing:ci-check
-      - skill-writing:ci-check
+      - skill-writing-editorials:ci-check
+      - skill-writing-news:ci-check
+      - skill-writing-prose:ci-check
+      - skill-writing-technical-docs:ci-check
+      - skill-writing-travel-guides:ci-check
     options:
       mergeDeps: append

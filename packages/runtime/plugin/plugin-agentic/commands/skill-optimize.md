@@ -29,4 +29,4 @@ Keep the guidance the weakest target model needs and verify each removal through
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **optimize** operation with these arguments. The skill is the source of truth for the procedure, tiers, and gotchas. Do not restate them.
+Load the `authoring-skills` skill (plugin `xonovex-agentic`) and perform its **optimize** operation with these arguments. The skill is the source of truth for the procedure, tiers, and gotchas. Do not restate them.

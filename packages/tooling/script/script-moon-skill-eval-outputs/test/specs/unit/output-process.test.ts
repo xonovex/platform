@@ -90,7 +90,7 @@ describe("runJob", () => {
     withArgs: ["--with"],
     withoutArgs: ["--without"],
     cwd: undefined,
-    guideDirectory: join(ITERATION_DIRECTORY, "guide"),
+    skillDirectory: join(ITERATION_DIRECTORY, "guide"),
     harness: "claude",
     timeout: 2,
     target: "test-skill",
@@ -168,7 +168,7 @@ describe("runJob", () => {
     );
 
     expect(requests[0]?.args).toEqual(["--without"]);
-    expect(requests[0]?.skillGuide).toBeUndefined();
+    expect(requests[0]?.skillSource).toBeUndefined();
   });
 
   it.each([
@@ -190,7 +190,7 @@ describe("runJob", () => {
       );
 
       expect(requests).toHaveLength(1);
-      expect(requests[0]?.skillGuide).toBe(runContext.guideDirectory);
+      expect(requests[0]?.skillSource).toBe(runContext.skillDirectory);
       expect(record).toMatchObject({
         pass_rate: 0,
         error,
@@ -199,8 +199,8 @@ describe("runJob", () => {
     },
   );
 
-  it("stages the guide for a Codex run that is expected to use the skill", async () => {
-    const guideDirectory = join(ITERATION_DIRECTORY, "guide");
+  it("stages the skill for a Codex run that is expected to use the skill", async () => {
+    const skillDirectory = join(ITERATION_DIRECTORY, "guide");
     const {runner, requests} = recordingRunner((request) =>
       output({
         stdout: isJudgeRequest(request)
@@ -231,10 +231,10 @@ describe("runJob", () => {
       evaluation("answer the question"),
       "with_skill",
       0,
-      context({harness: "codex", guideDirectory, runHarness: runner}),
+      context({harness: "codex", skillDirectory, runHarness: runner}),
     );
 
-    expect(requests[0]?.skillGuide).toBe(guideDirectory);
+    expect(requests[0]?.skillSource).toBe(skillDirectory);
     expect(requests[0]?.maxOutputCharacters).toBe(10_000);
     expect(record).toMatchObject({
       pass_rate: 1,

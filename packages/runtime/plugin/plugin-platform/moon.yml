@@ -4,9 +4,9 @@ tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - skill-moon:ci-check
-      - skill-docker:ci-check
-      - skill-kubernetes:ci-check
-      - skill-terraform:ci-check
+      - skill-using-docker:ci-check
+      - skill-using-kubernetes:ci-check
+      - skill-using-moon:ci-check
+      - skill-using-terraform:ci-check
     options:
       mergeDeps: append

@@ -60,16 +60,28 @@ Use references/missing_file.md with @references/legacy.md.
     expect(output).toContain("Result: FAIL");
   });
 
+  it("rejects a kebab-case name that does not start with a gerund", () => {
+    const fs = memoryFileSystem({directories: [ROOT]});
+    const skill = join(ROOT, "git-skill");
+    fs.writeFile(join(skill, "SKILL.md"), "---\nname: git-skill\n---\n# Git\n");
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    expect(validateSkill([skill], fs)).toBe(1);
+    expect(log.mock.calls.flat().join("\n")).toContain(
+      "frontmatter: name 'git-skill' is not a gerund and then its object (regex ^[a-z0-9]+ing(-[a-z0-9]+)+$)",
+    );
+  });
+
   it("fails on an em dash or ellipsis anywhere in the package", () => {
     const fs = memoryFileSystem({directories: [ROOT]});
     const packageDir = join(ROOT, "skill-dashed");
-    const skill = join(packageDir, "dashed-guide");
+    const skill = join(packageDir, "using-dashed");
     fs.makeDirectory(join(skill, "references"));
     fs.writeFile(join(packageDir, "package.json"), '{"name": "skill-dashed"}');
     fs.writeFile(
       join(skill, "SKILL.md"),
       `---
-name: dashed-guide
+name: using-dashed
 description: "Use when checking punctuation. Triggers on validator fixtures, even when the user doesn't say punctuation."
 ---
 # Guide
@@ -92,15 +104,15 @@ description: "Use when checking punctuation. Triggers on validator fixtures, eve
     expect(result).toBe(1);
     const output = log.mock.calls.flat().join("\n");
     expect(output).toContain(
-      "punctuation: em dash in dashed-guide/SKILL.md line 7, " +
+      "punctuation: em dash in using-dashed/SKILL.md line 7, " +
         "use a comma, colon, or full stop:",
     );
     expect(output).toContain(
-      "punctuation: ellipsis in dashed-guide/references/one.md line 3, " +
+      "punctuation: ellipsis in using-dashed/references/one.md line 3, " +
         "use three periods:",
     );
     expect(output).toContain(
-      "punctuation: escaped em dash in dashed-guide/eval-queries.json line 1",
+      "punctuation: escaped em dash in using-dashed/eval-queries.json line 1",
     );
   });
 

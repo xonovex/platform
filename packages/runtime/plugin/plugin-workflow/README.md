@@ -13,7 +13,7 @@ Work through the phases below and return to implementation when checks or review
 | Research and decisions | Use `plan-research` to investigate the task and `plan-decide` to resolve questions. Continue only when the work has a clear purpose and direction. |
 | Planning and review | Use `plan-create`, independently critique the plan with `plan-critique`, and apply feedback with `plan-revise`. Record the decision with `plan-accept` or `plan-reject`. Use `plan-subplans-create` when the work needs smaller targets. |
 | Implementation and validation | Use `plan-continue` for one target or `plan-delegate` for a supervised roadmap. Load the applicable skills, implement the target, and check success criteria with `plan-validate`. Fix failures and refresh evidence with `plan-update`. |
-| Quality and delivery | Use the Core Plugin's `code-quality-guide` for an audit. Fix bounded findings or return to research for broader changes. Integrate isolated work when applicable, validate the combined result, and commit within the granted authority. For requested publication, use the Integrations Plugin for pull or merge requests and the Core Plugin's `code-review-guide` for review findings. |
+| Quality and delivery | Use the Core Plugin's `auditing-code-quality` for an audit. Fix bounded findings or return to research for broader changes. Integrate isolated work when applicable, validate the combined result, and commit within the granted authority. For requested publication, use the Integrations Plugin for pull or merge requests and the Core Plugin's `reviewing-code` for review findings. |
 | Closeout and follow-up | Use `plan-followup` to return status, evidence, remaining work, and follow-up seeds for completed, paused, or handed-over work. Use `plan-distill` when a completed implementation should become a replayable skill suite. |
 
 A plan approval records a review decision. Status metadata does not grant authority to implement, create branches, merge, push, or publish. Use the authority already granted by the user and the project rules.
@@ -86,8 +86,8 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [plan-guide](skills/plan-guide/SKILL.md) | Researching, creating, critiquing, revising, expanding, continuing, updating, validating, closing out, or distilling an implementation plan. |
-| [reflect-guide](skills/reflect-guide/SKILL.md) | Reflecting on a session or distilling lessons into reusable form. |
+| [planning-work](skills/planning-work/SKILL.md) | Researching, creating, critiquing, revising, expanding, continuing, updating, validating, closing out, or distilling an implementation plan. |
+| [reflecting-on-sessions](skills/reflecting-on-sessions/SKILL.md) | Reflecting on a session or distilling lessons into reusable form. |
 
 ## Commands
 

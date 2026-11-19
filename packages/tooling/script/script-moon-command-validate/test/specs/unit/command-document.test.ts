@@ -19,7 +19,7 @@ argument-hint: "<subject> [--perspective <selection>...]"
 
 ## Delegation
 
-Load the \`test-guide\` skill (plugin \`xonovex-test\`) and perform its
+Load the \`using-test\` skill (plugin \`xonovex-test\`) and perform its
 **Review** operation with these arguments.
 `;
 
@@ -34,7 +34,7 @@ describe("parseCommandDocument", () => {
       delegation: {
         operation: "Review",
         plugin: "xonovex-test",
-        skill: "test-guide",
+        skill: "using-test",
       },
     });
     expect(result.document?.documentedArguments).toEqual(

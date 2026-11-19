@@ -5,6 +5,7 @@ import {
 } from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {isRecord} from "@xonovex/script-moon-common/records";
+import {boldSkillNameMentions} from "@xonovex/script-moon-common/skill-name";
 import {
   MD_LINK_RE,
   relativeLinkTarget,
@@ -30,7 +31,7 @@ interface SkillPluginManifest {
 }
 
 interface SkillPackageSurface {
-  readonly guideNames: readonly string[];
+  readonly skillNames: readonly string[];
   readonly markdown: string;
   readonly references: readonly {
     readonly path: string;
@@ -44,8 +45,6 @@ interface SkillPackageCheck {
   readonly manifest: SkillPluginManifest | undefined;
   readonly surface: SkillPackageSurface | undefined;
 }
-
-const NAMED_GUIDE_RE = /\*\*([a-z0-9][a-z0-9-]*-guide)\*\*/g;
 
 const readSkillPluginManifest = (
   path: string,
@@ -119,26 +118,26 @@ const skillPackageSurface = (
   pkgDir: string,
   fs: FileSystem,
 ): SkillPackageSurface => {
-  const guideNames = pluginSkillDirectories(pkgDir, fs).map((directory) =>
+  const skillNames = pluginSkillDirectories(pkgDir, fs).map((directory) =>
     basename(directory),
   );
-  const references = guideNames.flatMap((guide) =>
-    markdownEntries(join(pkgDir, "skills", guide, "references"), fs).map(
+  const references = skillNames.flatMap((name) =>
+    markdownEntries(join(pkgDir, "skills", name, "references"), fs).map(
       (path) => ({
         path: relative(pkgDir, path),
         text: fs.readText(path),
       }),
     ),
   );
-  const files = guideNames.flatMap((guide) => {
-    const guideDir = join(pkgDir, "skills", guide);
+  const files = skillNames.flatMap((name) => {
+    const skillDir = join(pkgDir, "skills", name);
     return [
-      join(guideDir, "SKILL.md"),
-      ...markdownEntries(join(guideDir, "references"), fs),
+      join(skillDir, "SKILL.md"),
+      ...markdownEntries(join(skillDir, "references"), fs),
     ];
   });
   return {
-    guideNames,
+    skillNames,
     markdown: files.map((file) => fs.readText(file)).join("\n"),
     references,
   };
@@ -206,8 +205,8 @@ const checkSkillPackage = (
 ): SkillPackageCheck | undefined => {
   const claudePath = join(pkgDir, ".claude-plugin", "plugin.json");
   const codexPath = join(pkgDir, ".codex-plugin", "plugin.json");
-  const hasGuide = fs.isDirectory(join(pkgDir, "skills"));
-  if (!hasGuide && !fs.isFile(claudePath) && !fs.isFile(codexPath)) {
+  const hasSkills = fs.isDirectory(join(pkgDir, "skills"));
+  if (!hasSkills && !fs.isFile(claudePath) && !fs.isFile(codexPath)) {
     return undefined;
   }
   if (!fs.isFile(claudePath) || !fs.isFile(codexPath)) {
@@ -249,7 +248,7 @@ const checkSkillPackage = (
     );
   }
   const surface = skillPackageSurface(pkgDir, fs);
-  if (surface.guideNames.length === 0) {
+  if (surface.skillNames.length === 0) {
     valid = false;
     report.addFail(
       `skill packaging: ${relative(repoRoot, pkgDir)} contains no skills`,
@@ -527,7 +526,7 @@ export const checkSkillDependencies = (
 
 export const checkNamedSkillHandoffs = (
   files: readonly string[],
-  knownGuideNames: ReadonlySet<string>,
+  knownSkillNames: ReadonlySet<string>,
   repoRoot: string,
   report: LinkReport,
   fs: FileSystem = nodeFileSystem,
@@ -536,15 +535,13 @@ export const checkNamedSkillHandoffs = (
   let broken = 0;
   for (const file of files) {
     const text = fs.readText(file);
-    for (const match of text.matchAll(NAMED_GUIDE_RE)) {
-      const guide = match[1];
-      if (guide === undefined) continue;
-      if (knownGuideNames.has(guide)) {
+    for (const name of boldSkillNameMentions(text)) {
+      if (knownSkillNames.has(name)) {
         resolved += 1;
       } else {
         broken += 1;
         report.addFail(
-          `skill handoffs: ${relative(repoRoot, file)} names missing **${guide}**`,
+          `skill handoffs: ${relative(repoRoot, file)} names missing **${name}**`,
         );
       }
     }
@@ -562,7 +559,7 @@ const markdownEntries = (dir: string, fs: FileSystem): string[] =>
         .map((entry) => join(dir, entry))
     : [];
 
-// collectSkillMarkdown returns guide and reference Markdown across skill packages.
+// collectSkillMarkdown returns SKILL.md and reference Markdown across skill packages.
 const collectSkillMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
   const skillRoot = join(repoRoot, "packages", "runtime", "plugin");
   if (!fs.isDirectory(skillRoot)) return [];
@@ -570,10 +567,10 @@ const collectSkillMarkdown = (repoRoot: string, fs: FileSystem): string[] => {
   for (const pkg of fs.readDirectory(skillRoot).toSorted()) {
     const pkgDir = join(skillRoot, pkg);
     if (!fs.isDirectory(pkgDir)) continue;
-    for (const guideDir of pluginSkillDirectories(pkgDir, fs)) {
-      const skillMd = join(guideDir, "SKILL.md");
+    for (const skillDir of pluginSkillDirectories(pkgDir, fs)) {
+      const skillMd = join(skillDir, "SKILL.md");
       if (!fs.isFile(skillMd)) continue;
-      files.push(skillMd, ...markdownEntries(join(guideDir, "references"), fs));
+      files.push(skillMd, ...markdownEntries(join(skillDir, "references"), fs));
     }
   }
   return files;
@@ -687,14 +684,14 @@ export const checkCrossPackageLinks = (
       `cross-package links: ${String(resolved)}/${String(resolved)} link(s) resolve`,
     );
   }
-  const knownGuideNames = new Set(
+  const knownSkillNames = new Set(
     files
       .filter((file) => file.endsWith(`${sep}SKILL.md`))
       .map((file) => basename(dirname(file))),
   );
   const handoffs = checkNamedSkillHandoffs(
     files,
-    knownGuideNames,
+    knownSkillNames,
     repoRoot,
     report,
     fs,

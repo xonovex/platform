@@ -27,4 +27,4 @@ Research code and external evidence for requirements without creating a plan.
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **research** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `planning-work` skill (plugin `xonovex-workflow`) and perform its **research** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

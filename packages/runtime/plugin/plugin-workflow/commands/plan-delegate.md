@@ -32,4 +32,4 @@ Supervise roadmap implementation, verify each agent result independently, and re
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **delegate** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `planning-work` skill (plugin `xonovex-workflow`) and perform its **delegate** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

@@ -22,7 +22,7 @@ const makeSkill = ({
     fs.writeFile(
       join(SKILL_DIR, "evals.json"),
       JSON.stringify({
-        skill_name: "example-guide",
+        skill_name: "using-example",
         tier: "moderate",
         evals: [1, 2, 3].map((id) => ({
           id,
@@ -57,7 +57,7 @@ describe("checkCatalogFiles", () => {
   it("accepts complete output, trigger, and source evidence", () => {
     const fs = makeSkill();
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toEqual([]);
     expect(report.passes).toHaveLength(4);
@@ -73,7 +73,7 @@ describe("checkCatalogFiles", () => {
       ]),
     );
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain("catalog: missing evals.json");
     expect(report.errors).toContain("catalog: missing SOURCES.md");
@@ -90,7 +90,7 @@ describe("checkCatalogFiles", () => {
     fs.makeDirectory(join(SKILL_DIR, "scripts"));
     fs.writeFile(join(SKILL_DIR, "scripts", "probe.sh"), "#!/bin/sh\n");
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain(
       "catalog: scripted skills need compatibility runtime/network metadata",
@@ -107,7 +107,7 @@ describe("checkCatalogFiles", () => {
     fs.writeFile(join(SKILL_DIR, "scripts", "evaluate.mjs"), "");
 
     expect(
-      checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs).errors,
+      checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs).errors,
     ).toContain(
       "catalog: skills must not contain TypeScript or MJS implementation files: scripts/evaluate.mjs, scripts/validate.ts",
     );
@@ -126,7 +126,7 @@ describe("checkCatalogFiles", () => {
     first.query = query;
     fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain(
       `catalog: generic trigger eval query must be replaced: '${query}'`,
@@ -148,7 +148,7 @@ describe("checkCatalogFiles", () => {
     first.query = query;
     fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain(
       `catalog: generic trigger eval query must be replaced: '${query}'`,
@@ -163,11 +163,11 @@ describe("checkCatalogFiles", () => {
       should_trigger: boolean;
     }[];
     for (const query of queries.filter(({should_trigger}) => !should_trigger)) {
-      query.rationale = "near miss owned by one-guide";
+      query.rationale = "near miss owned by using-one";
     }
     fs.writeFile(path, JSON.stringify(queries));
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain(
       "catalog: generated negative routes need at least 3 sibling owners (found 1)",
@@ -180,7 +180,7 @@ describe("checkCatalogFiles", () => {
     const report = checkCatalogFiles(
       SKILL_DIR,
       {
-        name: "example-guide",
+        name: "using-example",
         description: "Use when editing Example 2.4+ projects.",
       },
       fs,
@@ -205,7 +205,7 @@ describe("checkCatalogFiles", () => {
 `,
     );
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toContain(
       "catalog: versioned web source 'Versioned docs' needs Content SHA256 or Checkout + Commit + Watch drift fields",
@@ -219,7 +219,7 @@ describe("checkCatalogFiles", () => {
       '# Example\n\n```bash\necho "$API_TOKEN" | tool login\ntool login < token.txt\nexport API_TOKEN=secret\n```\n',
     );
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toEqual(
       expect.arrayContaining([
@@ -237,7 +237,7 @@ describe("checkCatalogFiles", () => {
       '# Example\n\n```bash\nexport API_TOKEN="${INJECTED_TOKEN}"\nexport SERVICE_PAT="$(secret-store read service)"\n```\n',
     );
 
-    const report = checkCatalogFiles(SKILL_DIR, {name: "example-guide"}, fs);
+    const report = checkCatalogFiles(SKILL_DIR, {name: "using-example"}, fs);
 
     expect(report.errors).toEqual([]);
     expect(report.passes).toContain(

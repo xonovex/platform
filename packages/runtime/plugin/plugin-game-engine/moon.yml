@@ -4,16 +4,16 @@ tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - skill-asset-pipeline:ci-check
-      - skill-audio:ci-check
-      - skill-c99-game-opinionated:ci-check
-      - skill-data-model:ci-check
-      - skill-ecs:ci-check
-      - skill-editor-viewport:ci-check
-      - skill-game-networking:ci-check
-      - skill-gpu-rendering:ci-check
-      - skill-gpu-rendering-vulkan:ci-check
-      - skill-imgui:ci-check
-      - skill-node-graph:ci-check
+      - skill-building-editor-viewports:ci-check
+      - skill-designing-asset-pipelines:ci-check
+      - skill-designing-data-models:ci-check
+      - skill-designing-ecs:ci-check
+      - skill-designing-game-networking:ci-check
+      - skill-designing-gpu-renderers:ci-check
+      - skill-designing-imgui:ci-check
+      - skill-designing-node-graphs:ci-check
+      - skill-implementing-vulkan-renderers:ci-check
+      - skill-mixing-audio:ci-check
+      - skill-writing-c99-game-opinionated:ci-check
     options:
       mergeDeps: append

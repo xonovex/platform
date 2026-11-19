@@ -17,7 +17,7 @@ fileGroups:
 tasks:
   ts-test-integration:
     inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/*.py
+      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/scripts/*.py
     options:
       mergeInputs: append
   # The acceptance tier asserts against the live skill catalog rather than a

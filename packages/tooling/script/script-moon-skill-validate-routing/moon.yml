@@ -32,7 +32,7 @@ tasks:
     inputs:
       - /packages/runtime/plugin/*/skills/*/eval-queries.json
       # The operation check resolves cited names against the reference files,
-      # and skill names come from the guide frontmatter.
+      # and skill names come from the SKILL.md frontmatter.
       - /packages/runtime/plugin/*/skills/*/SKILL.md
       - /packages/runtime/plugin/*/skills/*/references/*.md
     options:

@@ -72,6 +72,10 @@
       "types": "./src/skill-eval-models.ts",
       "default": "./dist/src/skill-eval-models.js"
     },
+    "./skill-name": {
+      "types": "./src/skill-name.ts",
+      "default": "./dist/src/skill-name.js"
+    },
     "./workspace": {
       "types": "./src/workspace.ts",
       "default": "./dist/src/workspace.js"

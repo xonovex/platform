@@ -25,4 +25,4 @@ Apply session lessons to the relevant AGENTS.md files, or preview them with `--d
 
 ## Delegation
 
-Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its **integrate-instructions** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `reflecting-on-sessions` skill (plugin `xonovex-workflow`) and perform its **integrate-instructions** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

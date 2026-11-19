@@ -14,12 +14,12 @@ import {main} from "../../../src/routing-evaluate.js";
 // These drive the evaluator against a harness binary on PATH. Scenario selection,
 // scoring, and the failure paths are covered without a process in test/specs/unit;
 // what is left here is the composition root, which resolves the harness on PATH,
-// spawns it per scenario, and stages the competing guides a Codex run needs.
+// spawns it per scenario, and stages the competing skills a Codex run needs.
 const addSkill = (root: string, name: string, shouldTrigger: boolean): void => {
   const plugin = join(root, `plugin-${name}`);
-  const guide = join(plugin, "skills", `${name}-guide`);
+  const skill = join(plugin, "skills", `using-${name}`);
   mkdirSync(join(plugin, ".claude-plugin"), {recursive: true});
-  mkdirSync(guide, {recursive: true});
+  mkdirSync(skill, {recursive: true});
   writeFileSync(
     join(plugin, ".claude-plugin", "plugin.json"),
     JSON.stringify({
@@ -29,11 +29,11 @@ const addSkill = (root: string, name: string, shouldTrigger: boolean): void => {
     }),
   );
   writeFileSync(
-    join(guide, "SKILL.md"),
-    `---\nname: ${name}-guide\ndescription: Use for ${name}.\n---\n`,
+    join(skill, "SKILL.md"),
+    `---\nname: using-${name}\ndescription: Use for ${name}.\n---\n`,
   );
   writeFileSync(
-    join(guide, "eval-queries.json"),
+    join(skill, "eval-queries.json"),
     JSON.stringify([
       {
         query: "shared request",
@@ -79,8 +79,8 @@ describe("catalog routing evaluator against a real harness", () => {
     executable(
       "claude",
       `
-console.log(JSON.stringify({type:"system",subtype:"init",skills:["alpha-guide","beta-guide"]}));
-console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",input:{skill:"alpha-guide"}}]}}));
+console.log(JSON.stringify({type:"system",subtype:"init",skills:["using-alpha","using-beta"]}));
+console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",input:{skill:"using-alpha"}}]}}));
 `,
     );
     const workspace = join(directory, "claude-evidence");
@@ -106,17 +106,17 @@ console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",inpu
       failed: 0,
     });
     expect(readFileSync(join(workspace, "results.jsonl"), "utf8")).toContain(
-      '"candidate_skills":["alpha-guide","beta-guide"]',
+      '"candidate_skills":["using-alpha","using-beta"]',
     );
   });
 
-  it("stages competing Codex guides into the run it launches", async () => {
+  it("stages competing Codex skills into the run it launches", async () => {
     executable(
       "codex",
       `
 const {existsSync} = require("node:fs");
-const staged = existsSync(".agents/skills/alpha-guide/SKILL.md") &&
-  existsSync(".agents/skills/beta-guide/SKILL.md");
+const staged = existsSync(".agents/skills/using-alpha/SKILL.md") &&
+  existsSync(".agents/skills/using-beta/SKILL.md");
 console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",text: staged ? "XONOVEX_SKILL_TRIGGERED" : "NOT_APPLICABLE"}}));
 `,
     );

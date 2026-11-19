@@ -1,0 +1,48 @@
+{
+  "skill_name": "auditing-code-quality",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Here is part of a Node/Express service. Of the quality problems in it, which should I address first, and why?\n\n```ts\nfunction buildInvoiceLines(rows: Row[]): string {\n  let out = '';\n  for (const r of rows) {\n    for (const item of r.items) {\n      if (item.qty > 0) {\n        if (item.discount) {\n          out += `${item.name}: ${item.qty} @ ${item.price} (-${item.discount})\\n`;\n        } else {\n          out += `${item.name}: ${item.qty} @ ${item.price}\\n`;\n        }\n      }\n    }\n  }\n  // ...roughly 45 lines total, pure string assembly, no I/O\n  return out;\n}\n\napp.post('/orders', (req, res) => {\n  const qty = req.body.quantity;\n  const total = qty * req.body.price;\n  db.insertOrder({ customerId: req.body.customerId, total });\n  res.json({ total });\n});\n```",
+      "assertions": [
+        "Ranks the unvalidated `/orders` request body (req.body.quantity / price / customerId used without validation) as higher severity than the long buildInvoiceLines function",
+        "Justifies the ranking by impact/blast radius (a trust-boundary input reaching logic) rather than by the function's line count or length"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "This config loader is riddled with `any` and my linter flags it in about 20 spots. How should I characterize the type-safety problem and what is the right fix?\n\n```ts\nconst data: any = JSON.parse(await readFile(configPath, 'utf8'));\nconst host = data.server.host;\nconst port: any = data.server.port;\nconst retries = data.server.retries;\nconst endpoints: any[] = data.endpoints;\nconst timeout = data.limits.timeout;\n// ...~15 more reads of fields off `data`, each typed any\n```",
+      "assertions": [
+        "Recommends adding a single schema / parse / validation step at the boundary where the file is parsed (the JSON.parse of the config), rather than annotating or asserting a type at each field access / call site",
+        "Frames the ~20 `any` uses as one missing-schema finding at the boundary, not as many separate per-site type findings"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Do a read-only audit of the error handling in this file and tell me which catches are genuinely a problem worth fixing.\n\n```ts\ntry {\n  await refreshCache(key);\n} catch (err) {\n  // cache refresh is best-effort; a miss is fine and we recompute later\n}\n\nasync function loadUser(id: string) {\n  try {\n    return await db.getUser(id);\n  } catch (err) {\n    return null;\n  }\n}\n```",
+      "assertions": [
+        "Flags the loadUser catch as a problem: a real error is swallowed and mapped to a sentinel (null) so a failure looks like a legitimate 'not found', losing the cause",
+        "Does NOT treat the commented best-effort refreshCache catch as a high-severity swallowed error; accepts it (or grades it low) because the comment documents an intentional best-effort/no-data-loss case"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Run a code-smell audit over this module and summarize what you find. Don't change anything yet. I just want to know what's there.\n\n```ts\nexport function parseA(s: string) { /* ~10 lines */ }\nexport function parseB(s: string) { /* near-identical to parseA */ }\nfunction legacyNormalize(s: string) { /* defined, never referenced */ }\nclass ReportManager {\n  // 26 methods spanning formatting, persistence, email, and metrics\n}\n```",
+      "assertions": [
+        "Reports findings without producing a rewritten/fixed version of the module (stays read-only)",
+        "Groups or labels each finding by a severity level (e.g. high/medium/low) and/or a category, rather than a flat unranked list"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Give me a read-only comment inventory for this file. Grade the findings and explain what must stay.\n\n```ts\n#!/usr/bin/env node\n/* Copyright 2026 Example. SPDX-License-Identifier: MIT */\n\n// eslint-disable-next-line security/detect-object-injection\nconst handler = handlers[input.kind];\n\n// Load the current configuration.\nconst config = loadCurrentConfiguration();\n\n// Phase 2 follows roadmap item R3 and the migration plan.\ninitializeCache(config);\n\n// Hash encoded bytes because the remote signature covers bytes, not Unicode code points.\nconst digest = hash(encoder.encode(config.value));\n\n// formatter-ignore-next\nconst matrix = [[1, 0], [0, 1]];\n\n// tool-that-may-not-be-installed: preserve-next\nrunCompatibilityCase();\n\n// const legacyConfig = loadLegacyConfiguration();\n```",
+      "assertions": [
+        "Preserves the shebang, license header, ESLint suppression, formatter directive, and unknown tool annotation; treats the unknown annotation as functional or ambiguous rather than redundant",
+        "Preserves the byte-signature comment because it explains a non-obvious invariant",
+        "Flags the loadCurrentConfiguration restatement, roadmap/phase narration, and commented-out legacy code with evidence-linked severity and a recommended action",
+        "Remains read-only and does not return a rewritten source file"
+      ]
+    }
+  ]
+}

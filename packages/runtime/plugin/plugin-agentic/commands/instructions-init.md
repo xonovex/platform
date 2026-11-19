@@ -24,4 +24,4 @@ Create AGENTS.md from the directory structure, tools, and project conventions.
 
 ## Delegation
 
-Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its **init** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-instructions` skill (plugin `xonovex-agentic`) and perform its **init** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

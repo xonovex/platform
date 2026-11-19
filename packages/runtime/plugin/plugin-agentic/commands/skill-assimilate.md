@@ -29,4 +29,4 @@ Add useful guidance from another skill while preserving the target skill and its
 
 ## Delegation
 
-Load the `skill-guide` skill (plugin `xonovex-agentic`) and perform its **merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-skills` skill (plugin `xonovex-agentic`) and perform its **merge** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

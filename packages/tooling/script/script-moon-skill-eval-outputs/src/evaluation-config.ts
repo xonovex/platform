@@ -8,7 +8,7 @@ import {
 } from "@xonovex/script-moon-common/file-system";
 import {
   resolveClaudePluginDirectories,
-  resolveGuideDirectory,
+  resolveSkillDirectory,
 } from "@xonovex/script-moon-common/fs";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
 import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/validation";
@@ -62,7 +62,7 @@ export interface EvaluationConfigOptions {
 export interface EvaluationConfig {
   readonly benchmarkPath: string;
   readonly budget: number;
-  readonly guideDirectory: string;
+  readonly skillDirectory: string;
   readonly harness: "claude" | "codex";
   readonly concurrency: number;
   readonly cwd: string | undefined;
@@ -285,9 +285,9 @@ export const resolveEvaluationConfig = (
   const workingDirectory = options.workingDirectory ?? resolve(".");
   const fs = options.fs ?? nodeFileSystem;
   const {values, positionals} = parseCliArgs(cliDefinition, argv);
-  const guideDirectory = resolveGuideDirectory(workingDirectory, fs);
+  const skillDirectory = resolveSkillDirectory(workingDirectory, fs);
   const evaluationsArgument =
-    positionals[0] ?? join(guideDirectory, "evals.json");
+    positionals[0] ?? join(skillDirectory, "evals.json");
   const evaluationsFile = resolve(workingDirectory, evaluationsArgument);
 
   if (!fs.isFile(evaluationsFile)) {
@@ -308,7 +308,7 @@ export const resolveEvaluationConfig = (
   }
 
   const skillArgument = positionals[1];
-  const skillMd = join(guideDirectory, "SKILL.md");
+  const skillMd = join(skillDirectory, "SKILL.md");
   const skillName =
     skillArgument && skillArgument.length > 0
       ? skillArgument
@@ -435,7 +435,7 @@ export const resolveEvaluationConfig = (
     data: {
       benchmarkPath: join(iterationDirectory, "benchmark.json"),
       budget,
-      guideDirectory,
+      skillDirectory,
       harness,
       concurrency,
       cwd: evaluationWorkingDirectory || undefined,

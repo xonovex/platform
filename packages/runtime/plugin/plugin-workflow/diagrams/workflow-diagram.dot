@@ -140,7 +140,7 @@ digraph Workflow {
     to_closeout -> delivery_bottom [style=invis];
     graph [label="4. Quality and delivery", style=rounded, role=panel, margin=20, sortv=4];
 
-    quality [label="Core: code-quality-guide\nAudit simplification and hardening"];
+    quality [label="Core: auditing-code-quality\nAudit simplification and hardening"];
     quality_result [label="Findings?", role=decision];
     fixes [label="3. Implement bounded fixes\n1. Research broader changes", role=strong];
     // The style pass writes subgraphs before loose nodes. This subgraph keeps
@@ -157,7 +157,7 @@ digraph Workflow {
     cleanup [label="Core: /plan-worktree-cleanup (optional)\nRemove remaining eligible worktrees"];
     commit [label="Core: /git-commit\nAdd --push only when requested"];
     publish [label="Optional publication\nGitHub / GitLab integration\nOpen a pull or merge request"];
-    review_code [label="Core: code-review-guide\nReview code and address findings"];
+    review_code [label="Core: reviewing-code\nReview code and address findings"];
     review_ready [label="Review and checks pass?", role=decision];
     review_fixes [label="3. Apply review fixes\nValidate, commit and repeat review", role=strong];
     land [label="Integrations: GitHub / GitLab\nMerge through repository controls"];

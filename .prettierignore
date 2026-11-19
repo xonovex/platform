@@ -113,5 +113,5 @@ docs/_build/
 .assetsignore
 
 # Skill eval run artifacts
-*-guide-workspace/
+*-workspace/
 .skill-eval-results/

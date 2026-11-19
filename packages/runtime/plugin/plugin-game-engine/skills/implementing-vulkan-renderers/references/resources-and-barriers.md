@@ -1,0 +1,26 @@
+# resources-and-barriers: Images, Buffers, Pipeline Barriers, and Layout Transitions
+
+Create `VkImage`/`VkBuffer` with the right usage flags and views (`VkImageView`/`VkBufferView`), track each image's current `VkImageLayout`, and synchronize every write→read and read→write with `VkImageMemoryBarrier2`/`VkBufferMemoryBarrier2` carrying scoped `srcStageMask`/`srcAccessMask` and `dstStageMask`/`dstAccessMask`, the layout transition, and any queue-family ownership transfer.
+
+## Rationale
+
+Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) that must match the next use: sampling needs `SHADER_READ_ONLY_OPTIMAL`, rendering needs `COLOR_ATTACHMENT_OPTIMAL`, a copy destination needs `TRANSFER_DST_OPTIMAL`, presenting needs `PRESENT_SRC_KHR`, and the only way to change it (and to make a prior write visible to a later read) is a pipeline barrier. The barrier's masks define the dependency: `src` is the producer stages/access that must complete and be made available; `dst` is the consumer stages/access that wait and to which it is made visible. The agnostic model (why scopes must be tight, the producer/consumer framing) is in designing-gpu-renderers (synchronization).
+
+## Techniques
+
+- **Usage flags** - Set `VkImageUsageFlags`/`VkBufferUsageFlags` for every use (e.g. `COLOR_ATTACHMENT_BIT | SAMPLED_BIT`, `TRANSFER_DST_BIT`); a use without its flag is invalid.
+- **Views** - Create a `VkImageView` per (format, aspect, mip/layer range) the shader/attachment needs; buffers use `VkBufferView` only for texel buffers.
+- **Buffer barrier** - `VkBufferMemoryBarrier2` for buffer write→read hazards (no layout); often a global `VkMemoryBarrier2` is simpler for broad buffer dependencies.
+- **Layout tracking** - Keep the current layout per image (per subresource for partial transitions); `oldLayout` must match it, or pass `UNDEFINED` to discard contents.
+- **Queue-family transfer** - For a resource moving between queue families, emit a release barrier on the source (set `srcQueueFamilyIndex`/`dstQueueFamilyIndex`) and a matching acquire barrier on the destination, see [references/device-and-queues.md](./device-and-queues.md).
+
+## Gotchas
+
+- `oldLayout` must equal the image's actual current layout (or be `UNDEFINED` to discard); a mismatch is undefined behavior the validation layers usually catch.
+- A missing barrier between a write and a dependent read is a hazard that may pass on your GPU and corrupt elsewhere: run synchronization validation.
+- `VK_ACCESS_2_SHADER_READ_BIT` is broad; prefer the specific `SHADER_SAMPLED_READ`/`SHADER_STORAGE_READ` bits where available.
+- A queue-family release without a matching acquire (or vice versa) corrupts the resource on one queue: the pair must match exactly.
+
+## Related
+
+[references/device-memory.md](./device-memory.md), [references/synchronization.md](./synchronization.md), [references/device-and-queues.md](./device-and-queues.md), [references/pipelines.md](./pipelines.md)

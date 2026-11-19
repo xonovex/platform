@@ -23,4 +23,4 @@ Expand a parent plan into focused subplans with dependencies and parallel groups
 
 ## Delegation
 
-Load the `plan-guide` skill (plugin `xonovex-workflow`) and perform its **expand** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `planning-work` skill (plugin `xonovex-workflow`) and perform its **expand** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

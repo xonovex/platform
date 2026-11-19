@@ -20,4 +20,4 @@ Extract reusable lessons from the session mistakes, discoveries, and corrections
 
 ## Delegation
 
-Load the `reflect-guide` skill (plugin `xonovex-workflow`) and perform its **extract** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `reflecting-on-sessions` skill (plugin `xonovex-workflow`) and perform its **extract** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.

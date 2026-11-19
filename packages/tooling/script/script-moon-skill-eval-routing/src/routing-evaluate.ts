@@ -117,10 +117,10 @@ const evaluateScenario = async (
 ): Promise<RoutingRecord | RoutingFailure> => {
   const candidateNames = scenario.candidates.map(({shortName}) => shortName);
   const target = scenario.expectedSkill;
-  const targetGuide = scenario.candidates.find(
+  const targetSkill = scenario.candidates.find(
     ({shortName}) => shortName === target,
   );
-  if (targetGuide === undefined) throw new Error(`owner missing: ${target}`);
+  if (targetSkill === undefined) throw new Error(`owner missing: ${target}`);
 
   const args =
     context.harness === "claude"
@@ -152,10 +152,10 @@ const evaluateScenario = async (
         : await context.dependencies.checkCodexTriggered({
             args,
             executable: context.executable,
-            guideDirectory: targetGuide.guideDirectory,
+            skillDirectory: targetSkill.skillDirectory,
             query: scenario.query,
             shortName: target,
-            candidateGuides: scenario.candidates,
+            skillCandidates: scenario.candidates,
           });
     if (outcome.error !== null) return {error: outcome.error};
     if (outcome.triggered) ownerSelections += 1;

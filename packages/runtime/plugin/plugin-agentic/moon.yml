@@ -7,16 +7,16 @@ tasks:
       - command-validate
       - build
       - format-check
-      - skill-claude-code:ci-check
-      - skill-codex:ci-check
-      - skill-command:ci-check
-      - skill-copilot:ci-check
-      - skill-herdr:ci-check
-      - skill-instruction:ci-check
-      - skill-kiro:ci-check
-      - skill-llmstxt:ci-check
-      - skill-opencode:ci-check
-      - skill-pi:ci-check
-      - skill-skill:ci-check
+      - skill-authoring-commands:ci-check
+      - skill-authoring-instructions:ci-check
+      - skill-authoring-llmstxt:ci-check
+      - skill-authoring-skills:ci-check
+      - skill-configuring-claude-code:ci-check
+      - skill-configuring-codex:ci-check
+      - skill-configuring-copilot:ci-check
+      - skill-configuring-kiro:ci-check
+      - skill-configuring-opencode:ci-check
+      - skill-configuring-pi:ci-check
+      - skill-using-herdr:ci-check
     options:
       mergeDeps: append

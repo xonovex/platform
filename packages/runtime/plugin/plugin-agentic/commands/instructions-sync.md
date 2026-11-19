@@ -25,4 +25,4 @@ Update AGENTS.md to match the current directory structure and project state.
 
 ## Delegation
 
-Load the `instruction-guide` skill (plugin `xonovex-agentic`) and perform its **sync** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
+Load the `authoring-instructions` skill (plugin `xonovex-agentic`) and perform its **sync** operation with these arguments. The skill is the source of truth for the procedure, output format, and gotchas. Do not restate them.
