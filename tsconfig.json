@@ -3,9 +3,6 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/tooling/cli/agent-cli-go"
-    },
-    {
       "path": "./packages/config/eslint-config-base"
     },
     {
@@ -24,6 +21,12 @@
       "path": "./packages/config/vitest-config-node"
     },
     {
+      "path": "./packages/library/shared-core"
+    },
+    {
+      "path": "./packages/tooling/cli/agent-cli-go"
+    },
+    {
       "path": "./packages/tooling/script/script-moon-command-validate"
     },
     {
@@ -34,6 +37,9 @@
     },
     {
       "path": "./packages/tooling/script/script-moon-npm-publish"
+    },
+    {
+      "path": "./packages/tooling/script/script-moon-plugin-sync-installation"
     },
     {
       "path": "./packages/tooling/script/script-moon-release-validate"
@@ -73,9 +79,6 @@
     },
     {
       "path": "./packages/tooling/script/script-moon-version-detect"
-    },
-    {
-      "path": "./packages/library/shared-core"
     }
   ]
 }
