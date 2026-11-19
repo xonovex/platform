@@ -1,0 +1,104 @@
+[
+  {
+    "query": "The research on the invoice feed is saved and the open questions are recorded in plans/invoice-feed. Write the plan with objective, scope and success criteria, and outline the work so I can see what can start now.",
+    "rationale": "a plan from research and decisions",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Turn the research file and the decisions for the login refactor into a plan. Link the decisions instead of copying them, and split the work into ready and waiting on which open decision.",
+    "rationale": "links and a ready or waiting split",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We settled the cache design last week and two questions stay open for the platform team. Write plan.md for the cache change and make a draft work file for each team, naming the open decisions each one waits on.",
+    "rationale": "work outline with waits_on",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The mobile and web clients will behave differently for offline mode. Write the plan with a table of the differences that says which decision settles each row, and keep the success criteria observable.",
+    "rationale": "variants table with decided by",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write the plan for the new parcel-tracking service from the research and the settled decisions. State the end result only, with no rejected options, and outline who starts what.",
+    "rationale": "settled state only and an outline",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Everything for the address-lookup migration is researched and decided or assigned to an owner. Draft the plan and the first work files, one for each team, and tell me what waits on which decision.",
+    "rationale": "a migration plan with a work outline",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "From the quality research and the recorded decisions on the reporting module, write a plan whose success criteria are measurable, plus a first list of work files for each owning team.",
+    "rationale": "a code-quality refactor plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I have the decisions in plans/search-ranking. Create the plan document for it, keep any security finding out of the files, and show me which work can begin before the open questions are answered.",
+    "rationale": "sensitive findings kept out and ready work",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The research file lists nine open questions. Take me through them one at a time and record each answer as a decision.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The plan exists. The product owner left FIXME notes in it and a critique with two findings is waiting. Fold them in and say what you did with each note.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Before we write anything, find out what the billing service does today and which pages are wrong. Read the repositories and report checked facts.",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The plan is written. Give each work file its full acceptance criteria and group the work files into a work package.",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review the plan for weak points. Run an independent adversarial critique and list the findings with severity.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write an ADR that records why we chose a queue over polling for the notification service.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Draw the diagram for the plan: the lead diagram of the settled state and one for each set of options.",
+    "rationale": "near miss owned by illustrating-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write user stories with acceptance criteria for the new saved-searches feature, one story for each user role.",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Render the PlantUML files in the diagrams folder of the checkout plan to SVG. Docker is not installed on this laptop, so use whatever renderer there is or tell me what to install.",
+    "rationale": "near miss owned by illustrating-plan",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

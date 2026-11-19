@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "required": ["type", "schema", "subject", "questions"],
+  "properties": {
+    "type": {"const": "Workflow Research"},
+    "schema": {"const": "workflow/research/1"},
+    "subject": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "minLength": 1},
+    "roles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": {"$ref": "workflow/common#/$defs/kebabName"},
+          "text": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "corrects": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "allOf": [
+          {"$ref": "workflow/common#/$defs/conceptId"},
+          {"x-concept": "research/"}
+        ]
+      }
+    },
+    "skills_to_consult": {"$ref": "workflow/common#/$defs/skillNames"}
+  },
+  "allOf": [{"$ref": "workflow/common#/$defs/header"}]
+}

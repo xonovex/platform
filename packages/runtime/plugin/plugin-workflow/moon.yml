@@ -8,8 +8,14 @@ tasks:
       - format-check
       - diagram-role-check
       - graph-build
+      - skill-critiquing-plan:ci-check
       - skill-distilling-change:ci-check
+      - skill-illustrating-plan:ci-check
       - skill-recording-handoff:ci-check
+      - skill-researching-change:ci-check
+      - skill-revising-plan:ci-check
+      - skill-settling-questions:ci-check
+      - skill-writing-plan:ci-check
       - example-validate
       - example-index-check
       - example-log-check

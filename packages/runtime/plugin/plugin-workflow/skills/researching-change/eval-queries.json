@@ -1,0 +1,158 @@
+[
+  {
+    "query": "We want to move the order publisher from the legacy queue to the new broker. Before we decide anything, find out across orders-api, broker-service and the two apps what the publisher does today and what the broker accepts.",
+    "rationale": "a migration across several repositories",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We are thinking of adding saved searches to the shop app. Look at shop-app and search-api first and tell me what exists today, what is unknown and which decisions are open. Keep what you saw apart from what you infer.",
+    "rationale": "a new feature in existing software",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The checkout module takes minutes to build and nobody knows why. Before we plan a clean-up, work out where the time goes across the build files and the shared library, and give me checked facts, not guesses.",
+    "rationale": "a code-quality improvement that starts with facts",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Orders are sometimes duplicated in production. Find out where, reading orders-api and its message consumer and the incident page I attached, and report what is proven and what is only likely. Do not fix anything.",
+    "rationale": "an investigation of a problem",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We plan a new loyalty service and there is no code yet. Research what the retail and finance teams need, what constraints apply and what comparable services do, and list the questions we still have to decide.",
+    "rationale": "a new project with no existing system",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Before anyone takes a decision on the pricing change, read the existing design pages and the pricing-service code, tell me where the pages and the code disagree, and name the pages that are now wrong.",
+    "rationale": "documents against code, corrections",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Send a few read-only agents to check what each of our three mobile and web clients does when the profile endpoint returns a 404. I want one write-up in the change directory with the open questions in it.",
+    "rationale": "explorers by role, saved to the change directory",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The research file for fare-capping got one thing wrong: the cap is applied before discounts, not after. Check the code again and give me a corrected research file.",
+    "rationale": "a correction as a new research file",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We are thinking of retiring the email send path in the billing publisher. Work out who publishes through it today, what the replacement service accepts and how each client app reacts when the message arrives. Read only: put the findings in a research file, not in code.",
+    "rationale": "migration: retiring a send path across producer, target and clients",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Our notifier is moving to a different delivery provider. I need the findings across the producer, the target and both client apps, with checked facts kept apart from guesses, a table of the gaps with options and a recommendation, and a list of the pages that are now wrong.",
+    "rationale": "migration: the report shape without naming the roles",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The invoice publisher is going to publish through the new messaging service instead of its own mailer. Brief one explorer for the publisher, one for the messaging service and one for each of the mobile and web clients, and ask for anchors with a path and line on separate lines.",
+    "rationale": "migration: briefing the three roles of a migration",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Research moving our reminder jobs from the old scheduler API to the new job service. Include which client app versions are still in use and how often each app releases, so we can work out which versions we have to support.",
+    "rationale": "migration: consumer versions and release cadence in a migration",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The new messaging service has no code yet, only a design record. We still want to move the order publisher onto it. Find out what the publisher and the two client apps do today and what the design record promises, and flag what the record claims that nothing proves.",
+    "rationale": "migration: a target that exists only as a design record",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We are switching the shop's receipt sender from the old relay to the delivery service. Check the repositories for the sender, the service, the mobile client and the web client, and tell me the changes the sender itself will need, plus the risks of the switch.",
+    "rationale": "migration: producer changes and risks of a switch",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Before we cut the stock-alert publisher over to the new broker, I want to know what the broker does when a recipient is unknown or a channel is switched off, and whether the clients cope with the new message shape. Check the code, not the design notes.",
+    "rationale": "migration: target error behavior and client handling in a cutover",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Find out how the retry and backoff logic in our payments-api repository works and where the delays are configured, so I can plan a fix to it.",
+    "rationale": "research inside one repository",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The research file lists nine open questions. Take me through them one at a time, and for the ones my engineers should check, leave them open.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "All the questions are settled and recorded. Write the plan with its objective, scope and success criteria, and the work split into ready and waiting.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Audit the payments module against our code-quality standards and give me a ranked list of the smells with a severity for each.",
+    "rationale": "near miss owned by auditing-code-quality",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Our image decoder written in C segfaults on CI but not locally. Here is the stack trace from the core dump. Find the cause and fix it.",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an ADR that records why we chose Postgres over DynamoDB for the orders service, with the options we rejected.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review this pull request diff for bugs and style problems, and leave comments I can paste into the review.",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The saved-searches design is agreed. Implement the first piece test-first: write the failing test, then the code, one small step at a time.",
+    "rationale": "near miss owned by applying-tdd",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our plan for moving the publisher to the delivery service is written. Stress-test it before we approve it and list what is missing or contradicts the research.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Split the approved delivery service plan into work items for the publisher team, each with criteria that say how it is verified.",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Go through the unresolved decisions in the change with me. For each, recommend one option, name the trade-off you accept, and write my answers down as testable statements.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

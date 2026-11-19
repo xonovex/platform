@@ -3,7 +3,7 @@ type: Workflow Research
 schema: workflow/research/1
 title: Saved search options
 description: What the shop already has for saving a search, and the two questions that are still open.
-generated: {by: researching/0.1.1, at: 2026-10-28T09:02:34Z}
+generated: {by: researching-change/0.1.1, at: 2026-10-28T09:02:34Z}
 subject: What the web shop needs to let a signed-in customer save a product search and open it again.
 kind: feature
 roles:

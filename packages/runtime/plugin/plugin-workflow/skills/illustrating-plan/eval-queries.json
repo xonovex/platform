@@ -1,0 +1,104 @@
+[
+  {
+    "query": "Draw the lead diagram for the reminder plan: only what is settled, the booking service, the queue and the sender, and render it next to the plan.",
+    "rationale": "the lead diagram of the settled state",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The decision on who triggers the reminder is still open: either the booking service triggers it or a scheduler reads the booking store. Make a picture of the two options so the reviewers can see who calls whom.",
+    "rationale": "a set of options that changes the topology",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Render the PlantUML files in the diagrams folder of the checkout plan to SVG. Docker is not installed on this laptop, so use whatever renderer there is or tell me what to install.",
+    "rationale": "render with a local renderer or a container runtime",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We settled the transport question yesterday, so the option picture for it is wrong now. Update the diagrams so the lead shows the queue and the old option picture goes away.",
+    "rationale": "a diagram that went stale after a decision settled",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Three of the decisions in the plan are about who calls whom and two are about message fields. Which of them deserve a diagram? Draw the ones that do.",
+    "rationale": "choosing which decisions get a picture",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Build a Structurizr model of the new order flow with tags for settled, open and future, export the views to PlantUML and render them for the design review.",
+    "rationale": "a system model with exported views",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The plan needs a diagram for the decision on where the retry runs. Draw it as a PlantUML sequence with one branch for each option and check the image fits.",
+    "rationale": "an option diagram for an open decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Our sequence diagram renders cropped on the right. Redraw it top to bottom with shorter labels and render it again with podman.",
+    "rationale": "a cropped render and a container runtime",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Our wiki cannot show SVG. Render the diagrams of plans/checkout as PNG instead and give me the lines to embed them.",
+    "rationale": "PNG on request instead of the SVG default",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Write the plan from the research and the settled decisions: objective, scope, success criteria and the first outline of the work.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The lead diagram is rendered. Add it to plans/reminders/plan.md under the objective and fold in the two decisions we settled yesterday.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Make a bar chart of weekly crash counts per app version from the attached CSV and colour it for a dashboard.",
+    "rationale": "near miss: a chart of measured data, which no workflow skill draws",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Fold the decisions we settled yesterday into the plan and update the work files that wait on them.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Take me through the open questions one at a time and record my answer to each as a decision.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Explain in two sentences what a sequence diagram is and when to use one.",
+    "rationale": "near miss: a general question that needs no files",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Find out how the reminder is sent today across the booking service and the two apps and write down what is certain and what is only likely.",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review the plan like a sceptic and list how it could fail, with the evidence for each finding.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  }
+]

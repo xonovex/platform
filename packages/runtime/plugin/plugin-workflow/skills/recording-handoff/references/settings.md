@@ -42,7 +42,7 @@ repositories:
 delivery:
   mode: pull-request
 skills:
-  researching: [analyzing-connascence]
+  researching-change: [analyzing-connascence]
   writing-plan: [applying-bdd]
   defining-work-items: [writing-user-stories]
   implementing-work-item: [applying-tdd, authoring-tests]
@@ -67,7 +67,7 @@ The defaults name skills of the xonovex catalog. A phase that is not listed has 
 
 | Phase | Default skills |
 | --- | --- |
-| `researching` | `auditing-code-quality`, `analyzing-connascence` |
+| `researching-change` | `auditing-code-quality`, `analyzing-connascence` |
 | `writing-plan` | `applying-orthogonality`, `applying-hexagonal-architecture` |
 | `critiquing-plan` | `analyzing-connascence`, `applying-orthogonality` |
 | `defining-work-items` | `writing-user-stories`, `applying-bdd` |

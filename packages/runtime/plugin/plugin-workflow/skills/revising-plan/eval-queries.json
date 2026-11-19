@@ -1,0 +1,104 @@
+[
+  {
+    "query": "Team Payments sent me their answer on the retry limit and I left it as a FIXME note in the plan. Fold my notes into the plan, update the work that was waiting on that decision, and show me what you did with each.",
+    "rationale": "operator notes folded into the plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I left eleven FIXME notes in plan.md. Apply them, and for every note tell me whether you applied it, only partly applied it, did not apply it or handed it on, with the reason. Keep what each note said.",
+    "rationale": "operator notes with a disposition each",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The critique of the import plan is written. Go through its findings, apply the ones the evidence supports and tell me for each of the others why you left it.",
+    "rationale": "critique findings processed",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The new research file says the cap is applied before discounts, not after. Work out which parts of the plan and the work files rested on the old claim and revise them.",
+    "rationale": "research correction reaches the plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The new research file shows the gateway sheds load after the second request, not the fourth, and our retry decision rested on the old number. Reopen that decision as a new one and put the work that applied it back to waiting.",
+    "rationale": "a research correction reopens a decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Some of my notes in the plan are questions, like 'is this a regression?'. Answer those from the code and only change the plan where the answer changes a decision. Give me a table of what happened to each note.",
+    "rationale": "notes that are questions answered",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We dropped the phased rollout. Take it out of the objective, the success criteria and the work files that mention it, and keep a record of what the notes about it said.",
+    "rationale": "a rejected design removed everywhere",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The critique showed that the storage decision rests on a wrong assumption. Make the plan stop stating it as settled and put the work that depends on it back to waiting.",
+    "rationale": "a critique finding reopens a decision and puts work back to waiting",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The research file lists six open questions. Walk me through them one at a time and record each answer I give as a decision.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "All the decisions are settled and recorded. Write the plan with its objective, scope and success criteria, and the first outline of the work.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Draw a diagram of how the payment, gateway and ledger services talk to each other and render it next to the plan.",
+    "rationale": "near miss owned by illustrating-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review the finished plan as a skeptic who did not write it: what could fail and what is missing? Write down the findings but do not change the plan.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Commit the revised plan files and push the branch to the remote.",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The plan is agreed and the first work item is ready. Implement it and run its tests.",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Before we change anything, find out what the export service does today when the profile endpoint returns a 404 and which pages say otherwise.",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Rewrite this paragraph of my status update so it reads in plain language: shorter sentences, no hype.",
+    "rationale": "near miss owned by writing-prose",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Poke holes in the loyalty-service plan before the owners sign it off. Which success criteria could pass while the thing is still broken?",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

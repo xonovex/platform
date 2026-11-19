@@ -42,7 +42,7 @@ Starting a change creates no other file. The first step after it writes the plan
 ## Shared versus owned
 
 - A schema and a template live here only when more than one skill writes that kind of document: plan, decision, work item and log entry. Any other type has its schema and template in its owner skill, and this skill only lists it.
-- Only the owner skill of a type creates files of that type. Only `writing-plan` and `revising-plan` change `plan.md`.
+- Only the owner skill of a type creates files of that type. Only **writing-plan** and **revising-plan** change `plan.md`.
 - A skill that needs a new key on a shared type adds it here, because the key must be valid for every writer.
 
 ## Available scripts

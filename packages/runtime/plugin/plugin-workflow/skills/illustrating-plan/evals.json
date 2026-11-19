@@ -1,0 +1,102 @@
+{
+  "skill_name": "illustrating-plan",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "draws-topology-and-skips-payload-shapes",
+      "prompt": "The branch main is the one to work on and the files are valid. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The run writes an option source in plans/reminders/diagrams/ whose name ends in -option.puml and whose branches name the scheduler option and the booking service option of the trigger decision.",
+        "No source in plans/reminders/diagrams/ mentions the message field options, minimal ids or full booking.",
+        "The run creates no markdown file in plans/reminders/diagrams/.",
+        "The answer lists each of the three decisions once with either its picture or the reason for none, says that the message fields are better shown in a table, and says that nothing was rendered and gives the command to run.",
+        "The render command that the answer gives and the comment at the top of each source render SVG with --svg, not PNG."
+      ],
+      "files": [
+        "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/message-fields-w3ne.md",
+        "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/transport-kq2d.md",
+        "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/trigger-m7px.md",
+        "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/plan.md"
+      ]
+    },
+    {
+      "id": "lead-diagram-holds-only-settled-elements",
+      "prompt": "The branch main is the one to work on and the files are valid. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the lead diagram for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The run writes a source in plans/reminders/diagrams/ whose name ends in -lead.puml.",
+        "The lead source shows the message queue.",
+        "The lead source holds no open option: no scheduler, no option branch and no message field option.",
+        "The lead source marks its elements as settled in text as well as color, and the answer does not claim an image exists."
+      ],
+      "files": [
+        "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/message-fields-w3ne.md",
+        "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/transport-kq2d.md",
+        "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/trigger-m7px.md",
+        "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/plan.md"
+      ]
+    },
+    {
+      "id": "hands-the-links-on-and-logs-the-run",
+      "prompt": "The branch main is the one to work on and the files are valid. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagram for the open trigger decision of the reminders plan in plans/reminders and put it into the plan. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/reminders/plan.md is unchanged and holds no link into diagrams/.",
+        "The run writes a log entry in plans/reminders/log/ with skill: illustrating-plan.",
+        "The run writes a source in plans/reminders/diagrams/ whose name ends in -option.puml.",
+        "The answer declines to edit the plan itself, gives an embed line for the diagram that the plan could carry with an .svg path, names the plan-writing or plan-revising step as its owner, and does not start that step."
+      ],
+      "files": [
+        "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/message-fields-w3ne.md",
+        "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/transport-kq2d.md",
+        "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/trigger-m7px.md",
+        "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/plan.md"
+      ]
+    },
+    {
+      "id": "keeps-sensitive-details-out-of-the-picture",
+      "prompt": "The branch main is the one to work on and the files are valid. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagram for the open trigger decision of the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "No file in plans/reminders/diagrams/ holds the hostname, the token or the name of the person from the decision note.",
+        "No file in plans/reminders/diagrams/ holds a display number such as 'decision 2'.",
+        "The option source names the scheduler and the booking service by their role and not by an address, and the answer does not repeat the token."
+      ],
+      "files": [
+        "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/message-fields-w3ne.md",
+        "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/transport-kq2d.md",
+        "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/trigger-m7px.md",
+        "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/plan.md"
+      ]
+    },
+    {
+      "id": "stops-when-there-is-no-decision",
+      "prompt": "The branch main is the one to work on. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The run writes no file in plans/reminders/diagrams/.",
+        "The answer says that the plan has no decision file, names the step that writes decisions in words, and stops without drawing anything or inventing options."
+      ],
+      "files": [
+        "evals/files/stops-when-there-is-no-decision/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/stops-when-there-is-no-decision/plans/reminders/plan.md"
+      ]
+    },
+    {
+      "id": "renders-png-only-on-request",
+      "prompt": "The branch main is the one to work on and the files are valid. Our wiki cannot show SVG, so I want PNG images. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The render command that the answer gives uses --png and not --svg, and the comment at the top of each source names the same PNG command.",
+        "The answer gives every image path and embed line with a .png extension and does not mix SVG and PNG.",
+        "The answer says that nothing was rendered and does not claim an image exists."
+      ],
+      "files": [
+        "evals/files/renders-png-only-on-request/plans/reminders/decisions/message-fields-w3ne.md",
+        "evals/files/renders-png-only-on-request/plans/reminders/decisions/transport-kq2d.md",
+        "evals/files/renders-png-only-on-request/plans/reminders/decisions/trigger-m7px.md",
+        "evals/files/renders-png-only-on-request/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/renders-png-only-on-request/plans/reminders/plan.md"
+      ]
+    }
+  ]
+}

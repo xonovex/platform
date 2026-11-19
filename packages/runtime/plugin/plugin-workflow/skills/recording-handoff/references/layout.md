@@ -43,7 +43,7 @@ A schema is shared, and lives in `recording-handoff/assets/schemas/`, only when 
 | Workflow Decision | settling-questions, writing-plan, revising-plan | recording-handoff (shared) |
 | Workflow Work Item | defining-work-items, revising-plan | recording-handoff (shared) |
 | Workflow Log Entry | every skill | recording-handoff (shared) |
-| Workflow Research | researching | researching |
+| Workflow Research | researching-change | researching-change |
 | Workflow Critique | critiquing-plan | critiquing-plan |
 | Workflow Implementation Notes | implementing-work-item | implementing-work-item |
 | Workflow Verdict | validating-work-item | validating-work-item |

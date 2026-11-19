@@ -43,7 +43,7 @@
     "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near miss owned by researching"
+    "rationale": "near miss owned by researching-change"
   },
   {
     "query": "This plan is pausing until the rollout holds; I am handing it over. Assemble the follow-up record a cold reader needs, including follow-up plan seeds with sequencing.",

@@ -121,7 +121,7 @@
   },
   {
     "query": "Research the code paths and current library versions we need before planning rate limiting for packages/api. Keep it read-only and cite the evidence.",
-    "rationale": "near miss owned by researching",
+    "rationale": "near miss owned by researching-change",
     "should_trigger": false,
     "split": "validation"
   }

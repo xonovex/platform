@@ -1,0 +1,141 @@
+{
+  "skill_name": "researching-change",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "asks-one-question-when-the-intent-is-vague",
+      "prompt": "The branch main is the one to work on. Research the notifications thing in task.md before we decide anything. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer asks exactly one question that names what is missing from the request, such as what is changing, what it affects or where to look, and waits for the reply.",
+        "The answer presents no findings about how notifications work and does not claim to have read any repository or started any explorer.",
+        "The run writes no research file."
+      ],
+      "files": [
+        "evals/files/asks-one-question-when-the-intent-is-vague/task.md",
+        "evals/files/asks-one-question-when-the-intent-is-vague/plans/notifications/log/2026-10-20-recording-handoff-a2b3.md"
+      ]
+    },
+    {
+      "id": "new-project-has-no-invented-system",
+      "prompt": "The branch main is the one to work on and the files are valid. We start a new loyalty service for the shop and there is no code yet. Research what the retail and finance teams need from docs/needs-retail.md and docs/needs-finance.md, and save the research file in plans/loyalty-service. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The research file in plans/loyalty-service/research/ has type: Workflow Research, schema: workflow/research/1, a subject and a questions list, and no id key.",
+        "The research file is named <slug>-<suffix> with a lowercase kebab-case slug and a suffix of four characters from a-z and 2-7, generated.by names researching, and the file has no human: actor and no verified entry.",
+        "The research file has the headings # Bottom line, # Observed, # Inference, # Unknowns, # Open decisions and # Not checked.",
+        "The run writes a log entry named <YYYY-MM-DD>-researching-<suffix>.md in plans/loyalty-service/log/.",
+        "The research file says plainly that no existing system exists and invents no current producer, target or consumer; its roles come from the needs of the teams, the constraints or comparable solutions.",
+        "The facts in the file come from the two needs documents with a footnote that names them, and every conclusion carries the label Inference."
+      ],
+      "files": [
+        "evals/files/new-project-has-no-invented-system/docs/needs-retail.md",
+        "evals/files/new-project-has-no-invented-system/docs/needs-finance.md",
+        "evals/files/new-project-has-no-invented-system/plans/loyalty-service/log/2026-10-20-recording-handoff-a2b3.md"
+      ]
+    },
+    {
+      "id": "page-that-disagrees-with-code-is-a-correction",
+      "prompt": "The branch main is the one to work on and the files are valid. Read docs/pricing.md and the code in pricing-service, find out what the fare cap really does, and save the research file in plans/fare-capping. The code is at commit 3fa91c2 and is already cloned in pricing-service. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The # Corrections section of the research file names docs/pricing.md.",
+        "The research file cites pricing-service@3fa91c2:src/cap.kt as a source and has a footnote definition for it.",
+        "The research file has at least one questions entry, and each questions id appears as a row in # Open decisions.",
+        "The research file reports that the code applies the cap before the discounts, states the page's opposite claim as a correction and not as a fact about the system, and does not change docs/pricing.md.",
+        "The file has a Not checked section that says the behavior was read in code and not run, and the answer ends by offering next steps without starting the plan or settling a question."
+      ],
+      "files": [
+        "evals/files/page-that-disagrees-with-code-is-a-correction/docs/pricing.md",
+        "evals/files/page-that-disagrees-with-code-is-a-correction/pricing-service/src/cap.kt",
+        "evals/files/page-that-disagrees-with-code-is-a-correction/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md"
+      ]
+    },
+    {
+      "id": "correction-is-a-new-file",
+      "prompt": "The branch main is the one to work on and the files are valid. The research file research/fare-cap-order-4kq7.md in plans/fare-capping got one thing wrong: the cap is applied before discounts, as pricing-service/src/cap.kt shows. Correct it. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The file plans/fare-capping/research/fare-cap-order-4kq7.md is unchanged.",
+        "A new research file lists research/fare-cap-order-4kq7 in corrects.",
+        "The new research file has type: Workflow Research, schema: workflow/research/1 and a # Corrections heading.",
+        "The new file restates the corrected fact, the cap applied before the discounts, with the code as evidence, and does not repeat the whole earlier research.",
+        "The answer states that the earlier file stays as written and that readers follow corrects from the new file."
+      ],
+      "files": [
+        "evals/files/correction-is-a-new-file/plans/fare-capping/research/fare-cap-order-4kq7.md",
+        "evals/files/correction-is-a-new-file/pricing-service/src/cap.kt",
+        "evals/files/correction-is-a-new-file/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md"
+      ]
+    },
+    {
+      "id": "one-brief-per-role",
+      "prompt": "Prepare the explorer briefs for the research in task.md. Write one brief per role into briefs/ as a markdown file named for the repository it covers. Do not run the explorers and do not read the repositories. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The run writes exactly four briefs in briefs/, one each for order-publisher, delivery-service, shop-app-mobile and shop-app-web.",
+        "Every brief requires Observed, Inference and Unknowns headings and one anchor per line.",
+        "Every brief tells the explorer not to write any file and names what is out of scope.",
+        "The brief for the order publisher asks for the one seam every send goes through and for any place that bypasses it, for the payload fields the clients read, for the stored identifiers, and for what a response triggers. All of these are in the publisher brief in briefs/.",
+        "The brief for the delivery service asks what it accepts and what it does on a rejected or unknown recipient, asks whether documented behavior such as deduplication exists in the code, and asks for capabilities removed in history or on unmerged branches.",
+        "The briefs for the mobile and the web client each ask for the identifiers the client sends, how it handles the old and the new message shape for each version, what a user action on a message does, and the versions in use and the release cadence. This holds for both clients.",
+        "No file under repos/ is added, changed or deleted."
+      ],
+      "files": [
+        "evals/files/one-brief-per-role/task.md",
+        "evals/files/one-brief-per-role/repos/order-publisher/README.md",
+        "evals/files/one-brief-per-role/repos/delivery-service/README.md",
+        "evals/files/one-brief-per-role/repos/shop-app-mobile/README.md",
+        "evals/files/one-brief-per-role/repos/shop-app-web/README.md"
+      ]
+    },
+    {
+      "id": "gap-table-and-corrections",
+      "prompt": "The explorers have returned. Their reports are in explorers/ and the check of the repositories is in git-state.txt. Write the migration research file as plans/order-notices/research/migration-notices.md with the sections a migration research needs. Do not decide anything and do not write a plan. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The file plans/order-notices/research/migration-notices.md has type: Workflow Research, kind: migration and a questions list.",
+        "The research file has the headings ## Current behavior, ## Target contract, ## Consumers, ## Versions and cadence, ## Gap table, ## Producer changes, ## Risks and # Corrections.",
+        "The file has a gap table with one row for each gap between the publisher and the delivery service, each row with at least two options and a recommendation that is labelled as inference. It has a row for deduplication.",
+        "The file reports that the delivery service does not deduplicate on an idempotency key, because its code has no such logic, and it names docs/delivery-design.md under corrections as the page that claims otherwise. It does not state the deduplication as a fact of the service.",
+        "The file names docs/relay-notes.md under corrections because its stamped commit trails the repository head, and does not present the page's description of the relay as a fact.",
+        "The versions and cadence section lists, for the mobile and the web client separately, the released versions and the release cadence as facts, and labels any computed supported window as inference.",
+        "The research file has the headings # Open decisions, # Unknowns and # Not checked.",
+        "The run does not write plans/order-notices/plan.md."
+      ],
+      "files": [
+        "evals/files/gap-table-and-corrections/git-state.txt",
+        "evals/files/gap-table-and-corrections/docs/relay-notes.md",
+        "evals/files/gap-table-and-corrections/docs/delivery-design.md",
+        "evals/files/gap-table-and-corrections/explorers/order-publisher.md",
+        "evals/files/gap-table-and-corrections/explorers/delivery-service.md",
+        "evals/files/gap-table-and-corrections/explorers/shop-app-mobile.md",
+        "evals/files/gap-table-and-corrections/explorers/shop-app-web.md"
+      ]
+    },
+    {
+      "id": "asks-for-the-missing-consumer",
+      "prompt": "Research moving the order publisher from the legacy relay to the new delivery service. The code is in repos/order-publisher and repos/delivery-service. Begin the work. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer notices that the request names a producer and a target but no consumer app, and asks one question about which client apps receive or depend on the notices and where their repositories are.",
+        "The answer presents no findings about the publisher or the delivery service and does not start any explorer.",
+        "The run writes no research file and nothing under plans/."
+      ],
+      "files": [
+        "evals/files/asks-for-the-missing-consumer/repos/order-publisher/README.md",
+        "evals/files/asks-for-the-missing-consumer/repos/delivery-service/README.md"
+      ]
+    },
+    {
+      "id": "design-record-target-and-missing-clone",
+      "prompt": "Brief the explorers for moving the order publisher onto the delivery service, with the clients shop-app-mobile and shop-app-web. Write one brief per role into briefs/ named for the system it covers. repos.txt lists what is cloned. Do not run the explorers. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The brief for delivery-service points at docs/delivery-design.md and says that no running target was read.",
+        "The answer reports that shop-app-web is not cloned as a gap to resolve with the invoker, and does not write a brief that tells an explorer to read files in it as if they were available or guess its behavior.",
+        "The run writes briefs for order-publisher, delivery-service and shop-app-mobile in briefs/.",
+        "Every brief requires Observed, Inference and Unknowns headings."
+      ],
+      "files": [
+        "evals/files/design-record-target-and-missing-clone/repos.txt",
+        "evals/files/design-record-target-and-missing-clone/docs/delivery-design.md",
+        "evals/files/design-record-target-and-missing-clone/repos/order-publisher/README.md",
+        "evals/files/design-record-target-and-missing-clone/repos/delivery-service/README.md",
+        "evals/files/design-record-target-and-missing-clone/repos/shop-app-mobile/README.md"
+      ]
+    }
+  ]
+}

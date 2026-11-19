@@ -1,0 +1,104 @@
+[
+  {
+    "query": "The research for moving our publisher to the new broker ended with eight open questions. Take me through them one at a time, and where I want the engineers to validate an answer, leave it open.",
+    "rationale": "walking a research file's questions",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We want to add offline mode to the shop app but nothing is written down yet. Interview me one question at a time, recommend an answer to each, and record what we agree.",
+    "rationale": "discovering questions by questioning",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Go through the unresolved decisions in the change with me. For each, recommend one option, name the trade-off you accept, and write my answers down as testable statements.",
+    "rationale": "recording answers as testable claims",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I cannot answer the retry question until I know whether the web client ever retried this call. Pause it, record what we have settled so far, and give me a summary of where the decisions stand.",
+    "rationale": "pausing until a fact is known",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The search team validated the storage question and it is account-based. Update the decision record for it, and say what that changes for the other open questions.",
+    "rationale": "an answer to an open decision file",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Two of the decisions are one question really. Merge them, tell me which later decisions this resolves, and reorder what is left.",
+    "rationale": "propagation through the queue",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Half of the open decisions are settled and the rest sit with other teams. Finish the walk, then give me the list for the owners, what can start now and the order of work.",
+    "rationale": "consolidation",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Continue the decision walk we started yesterday. Resume at the first open decision, and add my own option to the options before you recommend.",
+    "rationale": "resuming a walk with an operator alternative",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Before we decide anything, find out what the order publisher does today and what the new broker accepts, across orders-api and broker-service.",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "All the questions are settled and recorded. Write the plan with its objective, scope and success criteria, and the work split into ready and waiting.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Apply the FIXME notes I left in the plan and the findings of the critique, and tell me what you did with each.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Stress-test the plan as a hostile reviewer and list where it would fail, with a severity for each finding.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Draw a diagram that shows how the three storage options differ and render it next to the plan.",
+    "rationale": "near miss owned by illustrating-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write an ADR in docs/adr that records why we chose Postgres over DynamoDB for the orders service, with the options we rejected.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Commit the decision files we wrote today and push the branch to the remote.",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Our C service segfaults on CI but not locally, and the core dump points at a freed buffer. Find the cause and fix it.",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The checkout module takes minutes to build and nobody knows why. Before we plan a clean-up, work out where the time goes across the build files and the shared library, and give me checked facts, not guesses.",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

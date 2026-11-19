@@ -1,0 +1,8 @@
+$ git -C repos/order-publisher log -1 --format='%h %cs'
+3fa21c0 2026-10-20
+$ git -C repos/delivery-service log -1 --format='%h %cs'
+9b7e114 2026-10-22
+$ rg -n 'source_commit' docs/relay-notes.md
+4:source_commit: 11ac0d2
+$ git -C repos/order-publisher log --oneline 11ac0d2..HEAD | wc -l
+14

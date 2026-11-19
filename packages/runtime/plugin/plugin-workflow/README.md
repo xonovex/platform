@@ -1,6 +1,6 @@
 # Workflow Plugin
 
-Use `xonovex-workflow` to take a change from research to validated delivery as a series of standalone skills that keep everything they learn and decide in one directory of files. Record the project settings in the `Workflow` section of your project instructions (see [Record the project settings](#record-the-project-settings)), invoke `recording-handoff` once for the change, and continue with `researching` or `settling-questions`. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to write the skills that `distilling-change` produces.
+Use `xonovex-workflow` to take a change from research to validated delivery as a series of standalone skills that keep everything they learn and decide in one directory of files. Record the project settings in the `Workflow` section of your project instructions (see [Record the project settings](#record-the-project-settings)), invoke `recording-handoff` once for the change, and continue with `researching-change` or `settling-questions`. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to write the skills that `distilling-change` produces.
 
 ## How the steps work
 
@@ -11,7 +11,7 @@ Before its own work, every step runs the entry step of `recording-handoff`: it c
 | Step | What it does and writes |
 | --- | --- |
 | `recording-handoff` | Owns the layout, the schemas, the entry step, the settings and the validator. Writes the generated files and the first log entry of a change. |
-| `researching` | Researches the change with read-only explorers and writes one research file with the open questions. Holds the research of a system migration as a reference. |
+| `researching-change` | Researches the change with read-only explorers and writes one research file with the open questions. Holds the research of a system migration as a reference. |
 | `settling-questions` | Settles open questions with you one at a time and writes each answer as a decision file. |
 | `writing-plan` | Writes `plan.md` from the research and the decisions, and outlines draft work files. |
 | `critiquing-plan` | Reviews the plan in a fresh read-only context and writes one critique file of graded findings. |
@@ -37,7 +37,7 @@ Planning runs once for a change. Execution then repeats for each work item in de
 
 The order is a loop, not a line. Each step lists what must exist before it runs:
 
-1. `researching` and `settling-questions` need only the change directory. `settling-questions` discovers questions when none are known.
+1. `researching-change` and `settling-questions` need only the change directory. `settling-questions` discovers questions when none are known.
 2. `writing-plan` needs at least one research file or decision and no plan yet.
 3. `critiquing-plan` needs `plan.md`. `illustrating-plan` needs `plan.md` and at least one decision.
 4. `revising-plan` needs `plan.md` and something waiting: `FIXME` notes, critique findings or research corrections. Settle new questions and revise again until nothing is open.
@@ -129,7 +129,7 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
-Optional companions: `xonovex-agentic`, `xonovex-integrations`.
+Optional companions: `xonovex-agentic`, `xonovex-core`, `xonovex-integrations`, `xonovex-native`.
 
 <!-- xonovex:installation:end -->
 
@@ -139,5 +139,11 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
+| [critiquing-plan](skills/critiquing-plan/SKILL.md) | A written plan needs an independent adversarial review before anyone approves it: stress-testing its assumptions, tracing how delivery could fail, finding inputs and sequences it misses, or finding the smallest change that would strengthen a weak section. |
 | [distilling-change](skills/distilling-change/SKILL.md) | A change is finished and its work should become reusable skills: an umbrella map skill and granular skills that replay the change on a clean base branch. |
+| [illustrating-plan](skills/illustrating-plan/SKILL.md) | The diagrams of a change are to be drawn or redrawn: a lead diagram of what is settled, one diagram for each set of options whose choice changes who calls whom, and an optional system model, saved as PlantUML sources with rendered SVG images, or PNG on request, in the bundle's diagrams directory. |
 | [recording-handoff](skills/recording-handoff/SKILL.md) | A workflow step reads or writes the directory of a change: the entry step, plan, decision, work item and log files, names, frontmatter, generated indexes, validation, a new change, or the project's `Workflow` settings. |
+| [researching-change](skills/researching-change/SKILL.md) | A change needs checked facts before anyone decides or plans: a migration, a new feature in existing software, a code-quality improvement, an investigation of a problem or a new project. |
+| [revising-plan](skills/revising-plan/SKILL.md) | What is waiting must be folded into the plan and its work files: FIXME notes the operator left in the plan or other files, findings of a critique, or the corrections a later research file lists. |
+| [settling-questions](skills/settling-questions/SKILL.md) | The open questions of a change need settling one at a time with the operator: the questions a research file lists, open, paused or partly settled decision files, or questions found by questioning. |
+| [writing-plan](skills/writing-plan/SKILL.md) | The research is saved and the decisions are recorded, and the plan must now be written: a plan.md that states the objective as the settled picture, the scope, the success criteria and, where variants differ, a table of the differences, with decisions and work linked and never copied, plus the first outline of the work files split into what can start now and what waits on which open decision. |

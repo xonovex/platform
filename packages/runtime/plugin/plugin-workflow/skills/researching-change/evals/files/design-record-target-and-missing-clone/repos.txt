@@ -1,0 +1,4 @@
+repos/order-publisher
+repos/delivery-service
+repos/shop-app-mobile
+(shop-app-web: not cloned)
