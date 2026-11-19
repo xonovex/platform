@@ -1,0 +1,137 @@
+{
+  "skill_name": "preparing-delivery",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "no-marks-without-a-matching-verdict",
+      "prompt": "The branch main is the one to work on and the files are valid. Prepare the delivery for work/retry-from-settings-7k2f in plans/shop-retry. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md has verdict: verdicts/retry-from-settings-7k2f and verdict_matches: false",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md lists the criterion text 'Retries stop after the configured limit.' with no (met) or (missing) mark on any criterion",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md has a line saying that no verdict matches this tree",
+        "The answer says that the worktree changed after the verdict and that a fresh validating-work-item run is needed, and it does not start that validation itself.",
+        "The answer gives no commit command, because the tree hash of the worktree differs from the tree hash the verdict records.",
+        "The run commits, stages and pushes nothing"
+      ],
+      "files": [
+        "evals/files/no-marks-without-a-matching-verdict/AGENTS.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/plan.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/verdicts/retry-from-settings-7k2f.md",
+        "evals/files/no-marks-without-a-matching-verdict/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/no-marks-without-a-matching-verdict/work.diff"
+      ]
+    },
+    {
+      "id": "marks-and-limit-with-a-matching-verdict",
+      "prompt": "The branch main is the one to work on and the files are valid. Prepare the delivery for work/retry-from-settings-7k2f in plans/shop-retry. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md has verdict: verdicts/retry-from-settings-7k2f and verdict_matches: true",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md marks c1 as (met) and c2 as (missing)",
+        "The body of plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md after its frontmatter is under 3,500 characters",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md cites decisions/retry-source-4kq7 and decisions/retry-backoff-m3ab",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md labels the npm test run as self-check and never calls it validated",
+        "The run writes a log entry named <YYYY-MM-DD>-preparing-delivery-<suffix>.md in plans/shop-retry/log/ with a suffix of four characters from a-z and 2-7",
+        "The answer gives the commit command for the worktree with git commit -F and a message file taken from commit-message.md without its frontmatter, without --no-verify, and says to check that the tree of HEAD equals 3333333333333333333333333333333333333333 after the commit.",
+        "The answer names pull-request.md as the text of the pull request and the files under comments/ as the inline comments that using-github or using-gitlab takes, and says the push and the pull request happen only when the user asks.",
+        "The run commits, stages and pushes nothing"
+      ],
+      "files": [
+        "evals/files/marks-and-limit-with-a-matching-verdict/AGENTS.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/plan.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/verdicts/retry-from-settings-7k2f.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/marks-and-limit-with-a-matching-verdict/work.diff"
+      ]
+    },
+    {
+      "id": "trunk-mode-writes-only-a-commit-message",
+      "prompt": "The branch main is the one to work on and the files are valid. Prepare the delivery for work/retry-from-settings-7k2f in plans/shop-retry. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/commit-message.md has type: Workflow Commit Message, schema: workflow/commit-message/1 and a branch value that starts with feature/",
+        "The run writes no plans/shop-retry/deliveries/retry-from-settings-7k2f/pull-request.md and no file under plans/shop-retry/deliveries/ in a comments/ directory",
+        "The body of plans/shop-retry/deliveries/retry-from-settings-7k2f/commit-message.md cites decisions/retry-source-4kq7 and holds a plan link that contains plans/shop-retry/plan",
+        "The commit message body starts with one subject line of at most 72 characters, followed by a blank line and plain sentences that explain why, without a list of criteria or test output.",
+        "The answer gives no commit command, because no verdict exists for the work item."
+      ],
+      "files": [
+        "evals/files/trunk-mode-writes-only-a-commit-message/AGENTS.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/plan.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/trunk-mode-writes-only-a-commit-message/work.diff"
+      ]
+    },
+    {
+      "id": "a-comment-carries-a-marker",
+      "prompt": "The branch main is the one to work on and the files are valid. Prepare the delivery for work/retry-from-settings-7k2f in plans/shop-retry. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/comments/ holds exactly one comment file besides index.md, named with four characters from a-z and 2-7",
+        "The comment file has type: Workflow Inline Comment, path: src/retry.ts, a kebab-case marker, side left or right, and label decision or note",
+        "The comment explains why the limit comes from the settings and cites the decision ID. It does not describe what the code does line by line and does not say the code is correct, safe or complete."
+      ],
+      "files": [
+        "evals/files/a-comment-carries-a-marker/AGENTS.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/plan.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/verdicts/retry-from-settings-7k2f.md",
+        "evals/files/a-comment-carries-a-marker/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/a-comment-carries-a-marker/work.diff"
+      ]
+    },
+    {
+      "id": "a-rerun-updates-the-comment-in-place",
+      "prompt": "The branch main is the one to work on and the files are valid. Run the delivery again for work/retry-from-settings-7k2f in plans/shop-retry; the code moved, so the limit is now on line 11 of src/retry.ts in work.diff. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/comments/ still holds exactly one comment file besides index.md",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/comments/q7ma.md keeps marker: retry-limit-source and now has line: 11",
+        "plans/shop-retry/deliveries/retry-from-settings-7k2f/comments/q7ma.md has a generated entry whose time is no longer 2026-10-22T10:00:00+02:00"
+      ],
+      "files": [
+        "evals/files/a-rerun-updates-the-comment-in-place/AGENTS.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/deliveries/retry-from-settings-7k2f/comments/q7ma.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/plan.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/verdicts/retry-from-settings-7k2f.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/a-rerun-updates-the-comment-in-place/work.diff"
+      ]
+    },
+    {
+      "id": "a-secret-in-the-diff-stops-the-run",
+      "prompt": "The branch main is the one to work on and the files are valid. Prepare the delivery for work/retry-from-settings-7k2f in plans/shop-retry. The delivery mode is in AGENTS.md. The command that computes the worktree tree hash printed 3333333333333333333333333333333333333333. Treat the worktree as the saved work.diff. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The value exampleKeyValue1234567890 appears in no file under plans/shop-retry",
+        "The answer names the file src/client.ts and the line with the credential, tells the invoker to remove it from the worktree and to revoke it if it was real, does not report the delivery as done, and does not repeat the credential value.",
+        "The answer gives no commit command."
+      ],
+      "files": [
+        "evals/files/a-secret-in-the-diff-stops-the-run/AGENTS.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/decisions/retry-backoff-m3ab.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/decisions/retry-source-4kq7.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/implementation/retry-from-settings-7k2f/notes.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/plan.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/verdicts/retry-from-settings-7k2f.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/plans/shop-retry/work/retry-from-settings-7k2f.md",
+        "evals/files/a-secret-in-the-diff-stops-the-run/work.diff"
+      ]
+    }
+  ]
+}

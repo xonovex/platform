@@ -1,0 +1,2 @@
+npm run bench:retry
+p95 retry stop latency: 240 ms

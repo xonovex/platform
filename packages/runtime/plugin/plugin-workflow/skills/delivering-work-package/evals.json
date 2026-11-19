@@ -1,0 +1,86 @@
+{
+  "skill_name": "delivering-work-package",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "missing-delivery-setting-stops-before-agents",
+      "prompt": "Deliver the work package of plans/order-export with agents and commit each item locally. I confirm main is the branch to work on. The project settings are in AGENTS.md, and git-state.txt holds the output of the detect commands. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer names the branch main and reports that the delivery setting is missing from the Workflow section of AGENTS.md, which the delivery text of each item needs and which has no default.",
+        "The answer stops before the first step agent and asks the invoker to record the setting, without guessing a delivery mode from the repository host.",
+        "The answer does not claim that any work item was implemented, validated or committed, and it pushes nothing.",
+        "The run writes no log entry, no implementation notes, no verdict and no delivery file."
+      ],
+      "files": [
+        "evals/files/missing-delivery-setting-stops-before-agents/AGENTS.md",
+        "evals/files/missing-delivery-setting-stops-before-agents/git-state.txt",
+        "evals/files/missing-delivery-setting-stops-before-agents/plans/order-export/plan.md",
+        "evals/files/missing-delivery-setting-stops-before-agents/plans/order-export/work/export-api-r4tq.md",
+        "evals/files/missing-delivery-setting-stops-before-agents/plans/order-export/work/export-model-q3va.md"
+      ]
+    },
+    {
+      "id": "waiting-and-dependent-items-are-skipped",
+      "prompt": "Run the work package in plans/order-export through implementation, validation and delivery, one local commit per item. I confirm main is the branch to work on. git-state.txt holds the output of the detect commands. Before you start the first agent, report the order in which you will run the items and every item you will skip with its reason, then stop there: I want to review the order first. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer runs work/export-model-q3va before work/export-api-r4tq, because export-api-r4tq depends on export-model-q3va.",
+        "The answer skips work/export-format-w5nb because its readiness is waiting on the open decision decisions/file-format-h6tc.",
+        "The answer skips work/export-download-d2xe because it depends on the skipped work/export-format-w5nb, and it does not stop the whole package because of these skips.",
+        "The answer does not settle the file format decision itself and does not start settling-questions; at most it offers it.",
+        "The run starts no step agent, commits nothing and writes no log entry."
+      ],
+      "files": [
+        "evals/files/waiting-and-dependent-items-are-skipped/AGENTS.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/git-state.txt",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/decisions/file-format-h6tc.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/plan.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/work/export-api-r4tq.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/work/export-download-d2xe.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/work/export-format-w5nb.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/work/export-model-q3va.md",
+        "evals/files/waiting-and-dependent-items-are-skipped/plans/order-export/work/order-export-package-k2mz.md"
+      ]
+    },
+    {
+      "id": "stale-verdict-blocks-the-commit",
+      "prompt": "Resume the package run on plans/order-export. I confirm main is the branch to work on. The work item export-model-q3va has its notes, a verdict where every criterion passed and a commit message, so commit it now and go on. git-state.txt holds the output of the commands in the main checkout and in the worktree of the item. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer compares the worktree_hash of the verdict (3f9c2b7e41d0...) with the current tree hash of the worktree (8a17d4e0c93b...) and reports that they differ, so the verdict does not cover the tree.",
+        "The answer does not commit the item, and it does not treat the passing verdict or the existing commit message as enough to commit.",
+        "The answer names a new run of validating-work-item on the current tree as the next step of the item, followed by preparing-delivery, and does not run implementing-work-item for the item again.",
+        "The answer pushes nothing, opens no pull request and does not start validating-work-package.",
+        "The verdict, the notes and the commit message of the item are unchanged."
+      ],
+      "files": [
+        "evals/files/stale-verdict-blocks-the-commit/AGENTS.md",
+        "evals/files/stale-verdict-blocks-the-commit/git-state.txt",
+        "evals/files/stale-verdict-blocks-the-commit/plans/order-export/deliveries/export-model-q3va/commit-message.md",
+        "evals/files/stale-verdict-blocks-the-commit/plans/order-export/implementation/export-model-q3va/notes.md",
+        "evals/files/stale-verdict-blocks-the-commit/plans/order-export/plan.md",
+        "evals/files/stale-verdict-blocks-the-commit/plans/order-export/verdicts/export-model-q3va.md",
+        "evals/files/stale-verdict-blocks-the-commit/plans/order-export/work/export-model-q3va.md"
+      ]
+    },
+    {
+      "id": "failed-verdict-stops-only-its-dependents",
+      "prompt": "Pick up the package run on plans/order-export from the files. I confirm main is the branch to work on. git-state.txt holds the output of the commands in the main checkout and in the worktree of export-model-q3va. Report the state of each work item and the step it needs next, then stop before you start an agent: I choose the models myself this time. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer reports that work/export-model-q3va stopped: its verdict covers the current tree (3f9c2b7e41d0...) and criterion c2 failed with a p95 of 212 ms against 200 ms, and the item is not committed.",
+        "The answer does not accept the self-check of the implementation notes over the verdict, and it does not fix the failure or edit the verdict.",
+        "The answer skips work/export-api-r4tq because it depends on the stopped work/export-model-q3va.",
+        "The answer names implementing-work-item as the next step of work/export-audit-m7pc, which does not depend on the stopped item, so the package goes on.",
+        "The run starts no step agent, commits nothing, pushes nothing and does not start validating-work-package."
+      ],
+      "files": [
+        "evals/files/failed-verdict-stops-only-its-dependents/AGENTS.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/git-state.txt",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/implementation/export-model-q3va/notes.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/plan.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/verdicts/export-model-q3va.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/work/export-api-r4tq.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/work/export-audit-m7pc.md",
+        "evals/files/failed-verdict-stops-only-its-dependents/plans/order-export/work/export-model-q3va.md"
+      ]
+    }
+  ]
+}

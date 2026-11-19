@@ -1,0 +1,98 @@
+[
+  {
+    "query": "The saved-searches work item is implemented in its worktree and validated. Write the commit message for it, with the decisions it carries out and the link to the plan.",
+    "rationale": "commit message for a finished work item",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Prepare the pull request description for the cache-warmup work item. Mark the acceptance criteria only if the verdict really covers the code as it is now.",
+    "rationale": "description with verdict matching",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We deliver by pull request. Draft the delivery text for the checkout clean-up item: the commit message, the description and a reviewer comment where the module split needs an explanation.",
+    "rationale": "all three delivery files",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The worktree changed after the validation ran. Redo the pull request description so it does not claim the criteria are met.",
+    "rationale": "stale verdict handled",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Our project delivers straight to trunk. Write the commit message for the invoice-rounding work item and keep the reasoning behind the two decisions in it.",
+    "rationale": "trunk mode, commit message only",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add an inline review comment explaining why the retry limit comes from the settings and not from a constant, and keep it so a rerun updates it instead of adding another.",
+    "rationale": "inline comment with a marker",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Describe this change for the reviewers of the loyalty ledger work item: what it delivers, which decisions it follows, how it was tested. Keep it short enough for the host to accept.",
+    "rationale": "short description within the limit",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The implementer's own test run is in the notes. Write the delivery text for the profile-sync item and make clear which checks are the implementer's and which are independent.",
+    "rationale": "self-check labelling",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The delivery files are ready and I approve them. Commit the change, push the branch and open the pull request on GitHub.",
+    "rationale": "near miss owned by using-github",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Check whether the saved-searches work item meets its acceptance criteria and give me a verdict for the current worktree.",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Implement the cache-warmup work item in its worktree, split it into tasks and run the checks it names.",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this pull request diff for bugs and style problems, and leave comments I can paste into the review.",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Squash my last five commits into one and rewrite the history so the branch is clean.",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write an ADR that records why we chose queue-based retries over a scheduler, with the options we rejected.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write the plan for the loyalty ledger change with its objective, scope and success criteria.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write release notes for version 2.4 of the shop app for our customers, based on the merged pull requests.",
+    "rationale": "near miss owned by managing-versions",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

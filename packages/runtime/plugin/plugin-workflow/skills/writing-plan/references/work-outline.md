@@ -13,7 +13,7 @@
 
 ## What the outline is for
 
-The outline answers one question before the work items are defined: what can start now, and what waits on which decision. It is the first draft of the work files, written as `status: draft` and completed later by `defining-work-items`, which adds the full criteria and the work packages. The outline invents none of those.
+The outline answers one question before the work items are defined: what can start now, and what waits on which decision. It is the first draft of the work files, written as `status: draft` and completed later by **defining-work-items**, which adds the full criteria and the work packages. The outline invents none of those.
 
 ## Choosing the rows
 
@@ -60,7 +60,7 @@ A paused decision names a fact to wait for; the work waits on the decision, and 
 | `criteria` | At least one `{ id, text, verification }` for a work item; the text is a condition a check can fail, and the verification says the check |
 | `skills_to_consult` | Include when the work needs a skill the plan does not already list |
 
-Body: `# Objective`, one sentence that states the outcome. Leave out `# Notes`; `defining-work-items` adds it when the implementer needs context that the criteria do not carry.
+Body: `# Objective`, one sentence that states the outcome. Leave out `# Notes`; **defining-work-items** adds it when the implementer needs context that the criteria do not carry.
 
 ## An example row
 

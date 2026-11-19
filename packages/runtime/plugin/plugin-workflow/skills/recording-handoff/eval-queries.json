@@ -60,8 +60,8 @@
     "split": "train"
   },
   {
-    "query": "Create a Story in our Azure DevOps board titled 'Add retry to the payment webhook', set its area path and link it to the epic.",
-    "rationale": "near miss: a tracker item belongs to the integration of the tracker, not to the plan directory",
+    "query": "Open a GitHub issue titled 'Add retry to the payment webhook', label it as a bug and add it to the payments project board.",
+    "rationale": "near miss owned by using-github",
     "should_trigger": false,
     "split": "train"
   },

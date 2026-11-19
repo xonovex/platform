@@ -37,4 +37,5 @@ A concept ID is the file path without `.md`. A file is never moved or renamed, b
 - Preserve unknown frontmatter keys.
 - Update `generated.at` when the content changes, and `generated.by` to the editing skill unless a person wrote the change.
 - Write one log entry for each run that changes the bundle. A blocked run that changed nothing writes none.
-- Never commit or stage. Leave the working tree for the invoker to review.
+- A file names the place of a secret or a vulnerability detail, such as a path and line or a variable name, and never its value.
+- Never commit or stage, except **delivering-work-package**, which commits each work item that a verdict covers. Leave the working tree for the invoker to review.

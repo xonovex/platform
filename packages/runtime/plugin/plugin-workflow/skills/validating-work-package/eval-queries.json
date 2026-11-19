@@ -1,0 +1,104 @@
+[
+  {
+    "query": "All the work items of the loyalty-points package are done. Close the package out: for each success criterion in the plan tell me whether it is met, gated or open, with evidence from today.",
+    "rationale": "close out a delivered package",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We are handing the search-migration plan to another team on Monday. Write the handover record: what is finished, what is blocked and by whom, which decisions nobody made and what the follow-up work looks like.",
+    "rationale": "handover record",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Every work item of the checkout package says done, but I do not trust that. Check the plan's success criteria and whether the pieces work together, using a reviewer that did not build them.",
+    "rationale": "independent check of the whole package",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The payments package is paused until the bank approves our certificate. Record where the plan stands, classify what blocks it and write seeds for the work that remains.",
+    "rationale": "paused package with a gate",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Is the plan done? Check each success criterion against the code as it is now and do not just say done, say what is evidenced, what waits on someone else and what is open.",
+    "rationale": "is the plan done",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Wrap up the notification package. List the decisions that are still open with options and a recommendation, and the points that were dropped along the way.",
+    "rationale": "register of unsettled decisions and open points",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The mobile side and the service side each pass their own checks. Verify the contract between them holds and tell me whether the package as a whole meets the plan.",
+    "rationale": "integration between items",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "What is left of the plan after this package? Give me one follow-up seed for each chunk of remaining work, with the current state evidenced and what gates it.",
+    "rationale": "follow-up seeds for remaining work",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Check the retry work item against its three criteria and give me a verdict with the tree hash of the worktree.",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The close-out shows the plan needs a new success criterion. Update the plan and the work files and record what you changed.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Nobody decided who owns the retry budget. Take me through that question and record my answer as a decision.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The work item is finished. Write the commit message and the pull request description for it.",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Red-team the written plan before we approve it and rank what could go wrong.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Review this pull request diff for bugs and style problems and give me comments I can paste into the review.",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The image decoder of the package crashes with a use-after-free under AddressSanitizer on CI. Here is the trace. Find the cause and fix it.",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Summarize what happened in yesterday's standup as a short status update for the team channel, outcome first.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Did the story for the receipt export actually meet its acceptance criteria? I do not want the implementer's word for it, I want someone to run the checks.",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

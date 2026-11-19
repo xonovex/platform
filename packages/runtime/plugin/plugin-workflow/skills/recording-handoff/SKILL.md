@@ -16,7 +16,7 @@ Purpose: every workflow step leaves what it learned and decided in one directory
 - Decisions, research, critiques and log entries are append-only: a change is a new file. Work files and `plan.md` are edited in place, and `index.md` and `log.md` only by the script.
 - Names are `<slug>-<suffix>` with a random four-character suffix. A file is never moved or renamed, and a display number never appears in a name or in frontmatter.
 - Readers derive trust from the `human:` actor prefix: write it only for content a person wrote or confirmed in this session, and never invent the id.
-- Every edit keeps unknown frontmatter keys and updates `generated.at`. Every run that changes the bundle writes one log entry. Never commit or stage.
+- Every edit keeps unknown frontmatter keys and updates `generated.at`. Every run that changes the bundle writes one log entry. Never commit or stage, except **delivering-work-package**.
 
 ## The entry step
 

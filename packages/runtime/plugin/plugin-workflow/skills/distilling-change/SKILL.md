@@ -20,7 +20,7 @@ Purpose: turn a finished change into an umbrella map skill plus granular skills 
 
 ## Procedure
 
-1. **Run the entry step** of **recording-handoff**. The suite is written to a skills directory, so confirm the branch of its repository. Preconditions: `plan.md` and `close-out.md`. A missing `close-out.md` means the change is not finished: report it and stop, and offer `validating-work-package`.
+1. **Run the entry step** of **recording-handoff**. The suite is written to a skills directory, so confirm the branch of its repository. Preconditions: `plan.md` and `close-out.md`. A missing `close-out.md` means the change is not finished: report it and stop, and offer **validating-work-package**.
 2. **Scope the sources, cheap first.** Establish the branch, the merge base and the drift of the base. Read the change directory in this order: `close-out.md`, `plan.md`, the decisions, the work items, the implementation notes and the verdicts. Then find the session logs of each harness that ran the work, the CI runs and the review threads. For each document the work produced, `git cat-file -e <base>:<path>` decides whether it is a worked example or an output. Read [references/sources.md](references/sources.md) when you mine a source.
 3. **Reconstruct by parallel fan-out.** Start one agent for each tier of the work (foundation, the repeated pattern, cleanup and late fixes) and one log miner for what the record omits: failed and superseded approaches, reverts, changes of plan, steering by the operator. Require each agent to report each piece with the facts of the Essentials.
 4. **Write the map before the suite.** As references of the umbrella: the phase map with the dependency graph and the team split; the invariants and the inventory of temporary scaffolding with removal criteria; the safety model that classes each change by what protects code that is not migrated yet; pitfalls as symptom, mechanism and fix; the register of open decisions; the process lessons; and a replay order that improves on the original where the evidence supports it.
@@ -30,7 +30,7 @@ Purpose: turn a finished change into an umbrella map skill plus granular skills 
 
 ## When not to use
 
-- Checking whether the change met its criteria: use `validating-work-package`.
+- Checking whether the change met its criteria: use **validating-work-package**.
 - Folding the lessons of one session into a rule or a skill: use **authoring-instructions** or **authoring-skills**.
 
 ## Gotchas

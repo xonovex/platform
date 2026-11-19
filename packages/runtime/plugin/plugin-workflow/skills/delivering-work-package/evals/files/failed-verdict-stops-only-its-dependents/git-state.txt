@@ -1,0 +1,15 @@
+$ git -C /work/shop-api branch --show-current
+main
+$ git -C /work/shop-api status --short | head -20
+?? plans/order-export/implementation/
+?? plans/order-export/verdicts/
+$ git -C /work/shop-api worktree list
+/work/shop-api                   5d2e8a1 [main]
+/work/shop-api-export-model-q3va 5d2e8a1 [export-model-q3va]
+$ cd /work/shop-api-export-model-q3va && git status --short
+ M src/export/model.ts
+ M src/export/rows.ts
+?? src/export/period.ts
+?? test/export-model.test.ts
+$ cd /work/shop-api-export-model-q3va && (export GIT_INDEX_FILE="$(mktemp -d)/index"; git add -A && git write-tree)
+3f9c2b7e41d05a8c6e2f9b1d7a4c08e5b63f2d91

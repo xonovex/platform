@@ -1,0 +1,98 @@
+[
+  {
+    "query": "The plan for the invoice feed is written and its outline has four rows. I speak for the Billing team. Define our rows with acceptance criteria and show me the proposed cut before you write anything.",
+    "rationale": "complete outline rows after a cut proposal",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Complete the draft work files in plans/login-refactor: each ready row needs criteria with a way to verify them, a repository, and its real dependencies. Group them in a work package.",
+    "rationale": "criteria, dependencies and a package",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Cut the work for the address-lookup migration by outcome rather than by platform. Propose it first, and attach the items to the existing package work/address-lookup-rollout-k3ne.",
+    "rationale": "outcome cut and an existing package",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The reporting-module quality plan has an outline. Turn our team's rows into proper work items, and keep the row that waits on the retention decision as it is.",
+    "rationale": "waiting row stays at its outline",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Add observable acceptance criteria to the work files of the search-ranking change and say how each one is checked. Do not touch the rows of the data team.",
+    "rationale": "criteria for one team only",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Group the parcel-tracking work into a work package and set depends_on only for real blockers. Show me the dependency graph before you write.",
+    "rationale": "dependencies and a package",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The offline-mode outline lists one row for each platform, all in the same app repository. Propose how to cut it into items by outcome, and wait for my approval.",
+    "rationale": "the cut by outcome instead of by platform",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The open questions are settled and the outline is in place. Complete the ready work items for the platform team so we can start implementing next, and mark them confirmed once I say they are right.",
+    "rationale": "definitions then confirmation",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The research file lists nine open questions. Take me through them one at a time and record each answer as a decision.",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write the plan for the cache change from the research and the decisions, and outline the first work files with their teams.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "We settled the retention question yesterday. Fold it into the plan and update which work files still wait.",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Open a GitHub issue for each approved work file in plans/invoice-feed and add them to the milestone of the release.",
+    "rationale": "near miss owned by using-github",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Carry out the work item work/publish-invoice-events-m2qd in its worktree and run the checks its criteria name.",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write the user story and acceptance criteria for a password reset feature in the product backlog format. There is no plan directory.",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review the plan for weak points and list the findings with severity.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Commit the work files we defined today with a conventional commit message.",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  }
+]

@@ -28,14 +28,14 @@ Purpose: turn the research and the recorded decisions into one plan that tells a
 5. **Outline the work.** Choose the file name of every work row first, then draft each file from the shared work item template, so `depends_on` can name rows that do not exist yet. See [references/work-outline.md](references/work-outline.md).
 6. **Write the files.** Write each work file, then `plan.md` from the shared plan template with the generated block rewritten from the work and decision files that exist. Announce every write in one line: the path and what it holds.
 7. **Check.** Run the project's prose check and fix what it reports. Write one `Workflow Log Entry` from the **recording-handoff** template with `skill: writing-plan`, `action: Creation` and every created concept ID in `touched`. Run `index --write` and `log --write`, then `validate`, and fix every finding in your files.
-8. **Report** the outcome first: the plan written, the work that can start now, the work that waits and on which decision, the questions with no decision file, and the sensitive findings kept out, by topic. Offer the next steps: **settling-questions** for the open decisions, **critiquing-plan** for a critique, and `defining-work-items` to complete the work items. Stop.
+8. **Report** the outcome first: the plan written, the work that can start now, the work that waits and on which decision, the questions with no decision file, and the sensitive findings kept out, by topic. Offer the next steps: **settling-questions** for the open decisions, **critiquing-plan** for a critique, and **defining-work-items** to complete the work items. Stop.
 
 ## When not to use
 
 - Facts are missing: use **researching-change** first.
 - A question is open or an answer needs recording: use **settling-questions**.
 - A plan exists and must change from `FIXME` notes, critique findings or research corrections: use **revising-plan**.
-- The work files need full criteria and work packages: use `defining-work-items`. This skill writes only the outline.
+- The work files need full criteria and work packages: use **defining-work-items**. This skill writes only the outline.
 
 ## Gotchas
 

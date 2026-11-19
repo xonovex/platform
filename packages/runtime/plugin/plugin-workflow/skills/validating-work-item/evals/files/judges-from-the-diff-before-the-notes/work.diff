@@ -1,0 +1,6 @@
+diff --git a/src/retry.js b/src/retry.js
+--- a/src/retry.js
++++ b/src/retry.js
+@@ -10,3 +10,5 @@
++const limit = 3;
++export const retry = () => attempts < limit;

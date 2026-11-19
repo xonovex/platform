@@ -1,0 +1,6 @@
+diff --git a/src/client.ts b/src/client.ts
+--- a/src/client.ts
++++ b/src/client.ts
+@@ -1,1 +1,3 @@
++const settings = loadSettings();
++const API_KEY = "exampleKeyValue1234567890";

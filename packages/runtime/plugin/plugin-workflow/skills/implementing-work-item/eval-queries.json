@@ -1,0 +1,110 @@
+[
+  {
+    "query": "Implement work/capped-total-api-7k2f from plans/fare-capping. Split it into tasks, delegate the independent ones to subagents and leave everything uncommitted in its worktree.",
+    "rationale": "implementing a defined work item with delegation",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Pick up the next ready work item in the loyalty-service plan and build it. Check first that the items it depends on are done.",
+    "rationale": "pick up the next ready item with a precondition check",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Carry out the work file work/points-balance-endpoint-3m4q in its own worktree, run the checks its criteria name and record which decisions shaped the code.",
+    "rationale": "carry out a work file and record decision notes",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "We have a stable work item with three criteria and a clean worktree. Build it task by task, one subagent per task, and make sure tasks that touch the same file do not run at the same time.",
+    "rationale": "sequenced and parallel tasks",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Start on the story for the offline till sync. Brief a subagent for each concern with the files it needs, set a model and effort for each, and verify what they return yourself.",
+    "rationale": "briefing subagents per concern and verifying",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Work through the implementation of the saved-searches work item without delegating, since no other agent can start here. Keep the changes uncommitted and write the implementation notes.",
+    "rationale": "in-order implementation without subagents",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Build the work item for the receipt export, run its acceptance checks, and tell me which criteria you could self-check and which you could not.",
+    "rationale": "build and self-check against criteria",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Implement the ready item in plans/fare-capping/work and keep a note wherever a settled decision changed how the code is written, with the file and line.",
+    "rationale": "decision notes with locations",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The outline lists three rows for the loyalty plan. Turn them into complete work items with criteria, verification, repositories and dependencies.",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Check the capped-total work item against its criteria from a fresh context that did not build it, and write the verdict with the tree hash.",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The work item is built and verified. Write the commit message and the pull request description with the decision IDs and the plan link.",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Push the branch of the capped-total work item to GitHub and open the pull request with the description we prepared.",
+    "rationale": "near miss owned by using-github",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write the plan for the receipt export from the research and the settled decisions, with an objective, scope and success criteria.",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The till service written in C crashes with a segfault when two discounts apply. Find the cause of the crash and explain it.",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review the diff on this branch for bugs and style problems and list your findings.",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Rename the helper formatPrice to formatAmount in src/pricing.ts and update its callers.",
+    "rationale": "near miss owned by writing-typescript",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The worktree changed after the validation ran. Redo the pull request description so it does not claim the criteria are met.",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "work through all the ready items of the change while I'm out, one commit each on top of the last, nothing pushed",
+    "rationale": "near miss owned by delivering-work-package",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -31,7 +31,7 @@ Purpose: apply what is waiting to the plan and the work files so the operator se
 
 - A plan that does not exist yet: use **writing-plan**.
 - A question with no recorded answer, or an answer the operator wants to walk through: use **settling-questions**.
-- Cutting the work package or implementing work: use `defining-work-items` or `implementing-work-item`.
+- Cutting the work package or implementing work: use **defining-work-items** or **implementing-work-item**.
 
 ## Gotchas
 

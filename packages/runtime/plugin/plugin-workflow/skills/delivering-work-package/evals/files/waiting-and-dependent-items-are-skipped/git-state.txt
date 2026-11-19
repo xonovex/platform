@@ -1,0 +1,5 @@
+$ git branch --show-current
+main
+$ git status --short | head -20
+$ git worktree list
+/work/shop-api  5d2e8a1 [main]

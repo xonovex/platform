@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": [
+    "type",
+    "schema",
+    "work",
+    "path",
+    "line",
+    "side",
+    "marker",
+    "label"
+  ],
+  "properties": {
+    "type": {"const": "Workflow Inline Comment"},
+    "schema": {"const": "workflow/inline-comment/1"},
+    "work": {"$ref": "workflow/common#/$defs/workId"},
+    "path": {"type": "string", "minLength": 1},
+    "line": {"type": "integer"},
+    "side": {"enum": ["left", "right"]},
+    "marker": {"$ref": "workflow/common#/$defs/kebabName"},
+    "label": {"enum": ["decision", "note"]}
+  },
+  "allOf": [{"$ref": "workflow/common#/$defs/header"}]
+}

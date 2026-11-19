@@ -1,0 +1,104 @@
+[
+  {
+    "query": "The capped-total work item is built in its worktree. Check it against its acceptance criteria from a context that did not build it, and give me a verdict per criterion.",
+    "rationale": "independent check of a work item against its criteria",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Validate work/points-balance-endpoint-3m4q. Run the verification each criterion names, report pass, fail or blocked with evidence, and tie the result to the tree you checked.",
+    "rationale": "verdict bound to the worktree tree hash",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Did the story for the receipt export actually meet its acceptance criteria? I do not want the implementer's word for it, I want someone to run the checks.",
+    "rationale": "independent evidence instead of the implementer's word",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Give me an independent verdict on the offline-till-sync work item. Do not read the implementation notes until you have judged the criteria from the diff and the checks.",
+    "rationale": "blind first assessment of a work item",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "The loyalty ledger item is done in its worktree. Run its acceptance checks from a fresh agent and tell me which criteria are blocked and what would unblock them.",
+    "rationale": "blocked results with what would unblock them",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Re-validate the invoice-rounding work item. The worktree changed since the last verdict, so the old verdict must not count.",
+    "rationale": "a rerun that replaces a verdict for changed content",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Check the work item against its criteria and record the hash of the worktree you checked, so the pull request can only show marks for this exact content.",
+    "rationale": "records the tree hash for later matching",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Verify the saved-searches work item with a validator that only gets the criteria and the worktree. Report failures but do not fix anything.",
+    "rationale": "read-only validator that fixes nothing",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Implement the cache-warmup work item in its worktree, split it into tasks and run the checks its criteria name.",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "The work item is validated and every criterion passed. Write the commit message and the pull request description with the criteria marked.",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "All work items of the loyalty package have verdicts. Check the whole package against the plan's success criteria and write the close-out record.",
+    "rationale": "near miss owned by validating-work-package",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Red-team the written plan before we approve it, with a reviewer that did not write it, and rank the findings by severity.",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Review this pull request diff for bugs and style problems and give me comments I can paste into the review.",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "The till service crashes with a segfault on CI and runs fine locally. Here is the core dump backtrace. Find the cause and fix it.",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write unit tests for the rounding helper of the payments module, with a test double for the currency service.",
+    "rationale": "near miss owned by authoring-tests",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Write the acceptance criteria for the receipt export work item and say how each is verified.",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Every work item of the checkout package says done, but I do not trust that. Check the plan's success criteria and whether the pieces work together, using a reviewer that did not build them.",
+    "rationale": "near miss owned by validating-work-package",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

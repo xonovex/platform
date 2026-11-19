@@ -100,5 +100,11 @@
     "rationale": "near miss owned by illustrating-plan",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Cut the work for the address-lookup migration by outcome rather than by platform. Propose it first, and attach the items to the existing package work/address-lookup-rollout-k3ne.",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

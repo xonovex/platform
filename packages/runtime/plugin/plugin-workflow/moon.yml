@@ -9,12 +9,18 @@ tasks:
       - diagram-role-check
       - graph-build
       - skill-critiquing-plan:ci-check
+      - skill-defining-work-items:ci-check
+      - skill-delivering-work-package:ci-check
       - skill-distilling-change:ci-check
       - skill-illustrating-plan:ci-check
+      - skill-implementing-work-item:ci-check
+      - skill-preparing-delivery:ci-check
       - skill-recording-handoff:ci-check
       - skill-researching-change:ci-check
       - skill-revising-plan:ci-check
       - skill-settling-questions:ci-check
+      - skill-validating-work-item:ci-check
+      - skill-validating-work-package:ci-check
       - skill-writing-plan:ci-check
       - example-validate
       - example-index-check
