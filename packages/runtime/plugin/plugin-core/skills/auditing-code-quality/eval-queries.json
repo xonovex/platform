@@ -96,6 +96,12 @@
     "split": "train"
   },
   {
+    "query": "can you review the session-refresh module and tell me where it gets token expiry wrong?",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
     "query": "how should I mark a review comment so the author knows it must be fixed before merge?",
     "rationale": "near miss owned by reviewing-code",
     "should_trigger": false,

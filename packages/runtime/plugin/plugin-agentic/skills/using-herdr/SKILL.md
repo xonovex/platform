@@ -1,6 +1,6 @@
 ---
 name: using-herdr
-description: "Use when the user asks to use Herdr to inspect or control agents, panes, tabs, workspaces, and terminal commands. Triggers on launching agents in Herdr, submitting prompts or native goals, reading agent status or output, and moving running agents between spaces, even when the user doesn't say 'workspace' and calls it a 'space'."
+description: "Use when using Herdr to launch, inspect, or control agents, panes, tabs, workspaces, and terminal commands. Triggers on `herdr`, sending prompts or native goals to an agent, reading agent status or output, or moving running agents between spaces, even when the user doesn't say 'workspace' and calls it a 'space'."
 ---
 
 # Herdr Terminal and Agent Control

@@ -1,6 +1,6 @@
 ---
 name: debugging-native-code
-description: "Use when chasing a bug in native or low-level software: a crash, access violation, use-after-free, leak, intermittent/heisenbug, or 'works on my machine' failure, and when deciding how to prevent a whole class of bugs by design. Triggers on segfaults, callstacks/.dmp files, freed-memory fill patterns (0xdddddddd), git bisect, minimal repro, assertions, sanitizers (ASan/UBSan/TSan), determinism, and record/replay, even when the user doesn't say 'debugging'."
+description: "Use when finding the cause of a crash, memory corruption, leak, or intermittent bug in native C or C++ code, or making a class of bug impossible by design. Triggers on segfaults, access violations, use-after-free, callstacks, .dmp crash dumps, freed-memory fill patterns (0xdddddddd), heisenbugs, 'works on my machine', git bisect, minimal repro, assertions, ASan/UBSan/TSan, determinism, record/replay, even when the user doesn't say 'debugging'."
 ---
 
 # Debugging Guidelines

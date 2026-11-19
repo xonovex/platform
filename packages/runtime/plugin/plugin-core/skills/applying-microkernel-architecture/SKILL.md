@@ -1,6 +1,6 @@
 ---
 name: applying-microkernel-architecture
-description: "Use when building an extensible system: a minimal core plus interchangeable plug-ins selected through a registry. The microkernel / plug-in architecture. Triggers on plugin/extension-point/registry design, adding a backend or driver without editing the core, open/closed extension, capability negotiation and fail-closed / secure-by-default gating, binding time (compile vs load vs run-time), dependency-injection vs service-locator wiring, lazy activation, or versioning a plug-in contract, even when the user doesn't say 'microkernel' and only says 'plugin architecture'."
+description: "Use when making a system extensible through plug-ins: a small core that loads interchangeable plug-ins from a registry. Triggers on plugin architecture, extension points, a plug-in registry, adding a backend or driver without editing the core, open/closed extension, capability negotiation, dependency injection vs service locator, lazy plug-in loading, or versioning a plug-in contract, even when the user doesn't say 'microkernel' and only says 'plugin architecture'."
 ---
 
 # Microkernel (Plug-in) Architecture

@@ -1,6 +1,6 @@
 ---
 name: authoring-commands
-description: "Use when authoring, reviewing, merging, simplifying, or distilling reusable user-invocable prompt files (a.k.a. slash commands: files an agent harness exposes as `/command` invocations). Triggers on edits to prompt / command files, on prompts to make a slash command, save a workflow as a reusable command, merge across commands, condense a verbose command, or distill a fat command into a thin command that delegates to a skill, even when the user doesn't say 'prompt' or 'slash command'."
+description: "Use when writing, reviewing, merging, shortening, or distilling a slash command or a reusable prompt file. Triggers on `.claude/commands` files, other prompt or command files, '/command' invocations, saving a workflow as a reusable command, or turning a long command into a thin one that delegates to a skill, even when the user doesn't say 'slash command'."
 ---
 
 # Command Guidelines

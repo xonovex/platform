@@ -1,6 +1,6 @@
 ---
 name: applying-data-oriented-design
-description: "Use when designing or refactoring performance-critical data layouts for cache efficiency, in any language. Triggers on prompts about SoA/AoS/AoSoA, cache misses, hot/cold field splitting, data-oriented design, component-storage layout, batch/bulk processing, handles vs pointers, avoiding pointer chasing, even when the user doesn't say 'data-oriented' or 'cache'."
+description: "Use when making data layouts cache-friendly for performance-critical code, in any language. Triggers on SoA vs AoS or AoSoA, cache misses, hot/cold field splitting, component storage layout, batch processing, handles vs pointers, pointer chasing, even when the user doesn't say 'data-oriented' or 'cache'."
 ---
 
 # Data-Oriented Design Guidelines

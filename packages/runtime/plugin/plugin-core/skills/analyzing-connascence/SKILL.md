@@ -1,6 +1,6 @@
 ---
 name: analyzing-connascence
-description: "Use when grading or loosening the coupling between two pieces of code, or judging how cohesive a module is. Triggers on connascence, coupling vs cohesion, 'too tightly coupled', decouple/loosen, the coupling ladder (content/common/control/stamp/data), the cohesion ladder, Law of Demeter / train wrecks like a.b().c(), positional vs named parameters, or reviewing a module boundary for coupling strength, even when the user doesn't say 'connascence' and only says 'tightly coupled'."
+description: "Use when code feels too tightly coupled and the user wants to know how strong the coupling is, how to loosen it, or whether a module is cohesive. Triggers on connascence, coupling vs cohesion, decouple, 'too tightly coupled', Law of Demeter, train wrecks like a.b().c(), positional vs named parameters, or a module boundary that leaks, even when the user doesn't say 'connascence' and only says 'tightly coupled'."
 ---
 
 # Connascence: a Precise Coupling Vocabulary

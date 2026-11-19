@@ -1,6 +1,6 @@
 ---
 name: using-hono
-description: "Use when editing or scaffolding Hono 4.0+ API servers in TypeScript. Triggers on `.ts` files with `hono` or `@hono/*` imports, route handlers, middleware, and prompts about validation, error handling, WebSockets, CORS, or building an HTTP API in Hono, even when the user doesn't say 'Hono'."
+description: "Use when building or editing a Hono 4.0+ HTTP API in TypeScript. Triggers on `.ts` files with `hono` or `@hono/*` imports, route handlers, middleware, request validation, error handling, WebSockets, or CORS, even when the user doesn't say 'Hono'."
 ---
 
 # Hono Coding Guidelines

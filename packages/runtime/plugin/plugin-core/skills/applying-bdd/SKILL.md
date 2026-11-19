@@ -1,6 +1,6 @@
 ---
 name: applying-bdd
-description: "Use when driving software from concrete agreed examples of behaviour: running three-amigos discovery and example mapping before coding, formulating Given-When-Then scenarios in feature files, and treating them as living documentation that tests the team their shared understanding. ATDD and BDD are one practice here. Triggers on BDD, ATDD, Gherkin, Given-When-Then, Cucumber, feature file, scenario / scenario outline, three amigos, example mapping, specification by example, living documentation, acceptance-test-driven, even when the user doesn't say 'BDD'."
+description: "Use when writing Gherkin feature files or Given-When-Then scenarios, or agreeing with the team on concrete examples of behaviour before coding. Triggers on BDD, ATDD, Gherkin, `.feature` files, Given-When-Then, Cucumber, scenario outline, three amigos, example mapping, specification by example, living documentation, or acceptance-test-driven development, even when the user doesn't say 'BDD'."
 ---
 
 # Behaviour- and Acceptance-Driven Development

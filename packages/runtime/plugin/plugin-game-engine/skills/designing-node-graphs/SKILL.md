@@ -1,6 +1,6 @@
 ---
 name: designing-node-graphs
-description: "Use when designing a visual node-based / data-flow graph for content authoring: typed input/output pins, wires between nodes, the graph stored as plain data, compiling/lowering to executable form vs interpreting it, topological evaluation with caching, reusable subgraphs, function graphs with declared inputs/outputs, and parametric/procedural content. Triggers on node editors, pins/connectors/sockets, wiring nodes, type-checking connections, variant/polymorphic nodes, validity hashing, flattening subgraphs, output nodes that emit work, data-driven node definitions, hot-reloading a graph, even when the user doesn't say 'node graph'."
+description: "Use when building a visual node editor or data-flow graph for content authoring or procedural content. Triggers on nodes, pins, sockets, wires, type-checking connections, subgraphs, graph evaluation order and caching, compiling vs interpreting a graph, data-driven node definitions, hot-reloading a graph, even when the user doesn't say 'node graph'."
 ---
 
 # Node graph Guidelines (Visual Data-Flow Authoring)

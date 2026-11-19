@@ -1,6 +1,6 @@
 ---
 name: writing-technical-docs
-description: "Use when structuring or rewriting standalone technical explanations, reports, status updates, documentation, recommendations, or operational handoffs so readers see the outcome, decision, action, or status first. Triggers on bottom line up front, BLUF, outcome-first writing, inverted-pyramid structure, concise technical prose, executive summaries, caveat placement, or requests to lead with the answer, even when the user doesn't say 'technical writing'."
+description: "Use when ordering a technical explanation, report, status update, recommendation, or handoff so the outcome, decision, action, or status comes first. Triggers on bottom line up front, BLUF, lead with the answer, inverted pyramid, executive summary, caveat placement, or a document that buries its point, even when the user doesn't say 'technical writing'."
 ---
 
 # Technical Writing Guidelines

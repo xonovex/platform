@@ -1,17 +1,17 @@
 ---
 name: using-github
-description: "Use when managing GitHub tickets, Projects kanban, pull-request delivery/review, durable issue or PR context comments, or native CI/repository enforcement on github.com or GitHub Enterprise Server. Triggers on GitHub issues, issue relationships, `gh issue`, Projects v2 items/Status/fields, `gh project`, decision or rationale comments, `gh pr`, inline reviews, resolveReviewThread, reusable workflows, rulesets, protected environments, attestations, or GitHub permissions, even when the user doesn't say 'gh'."
+description: "Use when doing the GitHub host mechanics of a task: issues, Projects boards, fetching a pull request, reading its review threads, posting review comments, or repository CI and enforcement. Triggers on github.com or GitHub Enterprise Server, `gh issue`, `gh pr`, `gh project`, `gh api`, Projects v2 Status, resolving review threads, issue context comments, reusable workflows, rulesets, protected environments, attestations, or GitHub permissions, even when the user doesn't say 'gh'."
 ---
 
 # GitHub workflow delivery and enforcement: quick reference
 
 How to realize tickets, kanban, pull-request delivery, durable context projections, and provider-native external enforcement on GitHub. These operations do not teach ticket, review, or PR content craft; they map finished artifacts and workflow intent onto GitHub-native resources.
 
-- _What a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belongs to **reviewing-code**.
+- _Finding the defects in a pull request and what a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belong to **reviewing-code**.
 - _What a good PR description says_ (sizing, how-tested, tradeoffs, self-review) belongs to **authoring-pull-requests**.
 - _The local-git push and rebase_ that get a clean branch onto the remote belong to **using-git**'s push reference.
 
-This skill only takes those finished artifacts and posts them through `gh` / `gh api`.
+This skill fetches a pull request and its review threads for review, and takes those finished artifacts and posts them through `gh` / `gh api`.
 
 The one thing to internalize: **a repository issue, a ProjectV2 item, a project Status field, a pull-request review, and a top-level context comment are separate native objects. Preserve and mutate their exact IDs separately; never turn project status into issue state, context into approval, or an issue comment into an inline review.**
 
@@ -36,6 +36,7 @@ When this skill fires:
 - **Open a PR**: `gh pr create --base <target> --head <source> --title ... --body-file -` auto-pushes the branch if it isn't on the remote and sets reviewers/labels/assignees in one call; the raw `POST /repos/{owner}/{repo}/pulls` does NOT push. See [references/create.md](references/create.md).
 - **Publish durable issue/PR context**: use an append-only top-level issue comment, give it a marker containing canonical ID/version/digest, reconcile exact retries, and return its `html_url` for later human or agent work. See [references/context-comments.md](references/context-comments.md).
 - **Push / rebase first**: the clean branch is **using-git**'s job; this skill assumes the source branch builds on the latest target. See **using-git**'s push reference.
+- **Fetch a pull request for review**: `gh pr view N --json title,body,baseRefName,headRefOid` and `gh pr diff N` (or `gh pr checkout N`) give **reviewing-code** the change; list existing threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
 - **Post a structured review**: `gh pr review` only carries the summary + verdict; batch the summary, every inline comment, and the verdict into one `gh api ... /pulls/{n}/reviews` object. See [references/review-post.md](references/review-post.md).
 - **Write the review content with **reviewing-code****: labels, severity, and blocking decoration are **reviewing-code**'s; this skill only anchors and submits them.
 - **Write the PR body with **authoring-pull-requests****: `gh pr create --body-file` takes a description authored per **authoring-pull-requests**.

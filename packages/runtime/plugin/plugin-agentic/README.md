@@ -34,18 +34,18 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [authoring-commands](skills/authoring-commands/SKILL.md) | Authoring, reviewing, merging, simplifying, or distilling reusable user-invocable prompt files (a.k.a. slash commands: files an agent harness exposes as `/command` invocations). |
-| [authoring-instructions](skills/authoring-instructions/SKILL.md) | Authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. |
-| [authoring-llmstxt](skills/authoring-llmstxt/SKILL.md) | Authoring, reviewing, or maintaining an `/llms.txt` file or per-page markdown mirrors per the llmstxt.org specification. |
-| [authoring-skills](skills/authoring-skills/SKILL.md) | Authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. |
-| [configuring-claude-code](skills/configuring-claude-code/SKILL.md) | Configuring Claude Code hooks, plugins, skills, settings, or managed configuration. |
-| [configuring-codex](skills/configuring-codex/SKILL.md) | Configuring Codex hooks, plugins, skills, config layers, or managed requirements. |
-| [configuring-copilot](skills/configuring-copilot/SKILL.md) | Configuring GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
-| [configuring-kiro](skills/configuring-kiro/SKILL.md) | Configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
-| [configuring-opencode](skills/configuring-opencode/SKILL.md) | Configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
-| [configuring-pi](skills/configuring-pi/SKILL.md) | Configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. |
-| [evaluating-skills](skills/evaluating-skills/SKILL.md) | Measuring an Agent Skill with model runs: trigger evals, output evals with and without the skill, or an ablation after a trim. |
-| [using-herdr](skills/using-herdr/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
+| [authoring-commands](skills/authoring-commands/SKILL.md) | Writing, reviewing, merging, shortening, or distilling a slash command or a reusable prompt file. |
+| [authoring-instructions](skills/authoring-instructions/SKILL.md) | Writing, reviewing, updating, shortening, merging, or porting the AGENTS.md project instructions of a repository. |
+| [authoring-llmstxt](skills/authoring-llmstxt/SKILL.md) | Writing or updating an `llms.txt` file or Markdown copies of site pages for LLMs. |
+| [authoring-skills](skills/authoring-skills/SKILL.md) | Creating, reviewing, extracting, splitting, merging, shortening, or validating an Agent Skill or a set of skills. |
+| [configuring-claude-code](skills/configuring-claude-code/SKILL.md) | Setting up, testing, or debugging Claude Code hooks, plugins, skills, settings, or managed configuration. |
+| [configuring-codex](skills/configuring-codex/SKILL.md) | Setting up or debugging Codex hooks, plugins, skills, config layers, or managed requirements. |
+| [configuring-copilot](skills/configuring-copilot/SKILL.md) | Setting up or debugging GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
+| [configuring-kiro](skills/configuring-kiro/SKILL.md) | Setting up or debugging Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
+| [configuring-opencode](skills/configuring-opencode/SKILL.md) | Writing or debugging OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
+| [configuring-pi](skills/configuring-pi/SKILL.md) | Writing or configuring Pi extensions, packages, skills, settings, or permissions. |
+| [evaluating-skills](skills/evaluating-skills/SKILL.md) | Testing by model runs if a skill triggers or helps: trigger evals, output evals with and without it, or a trim ablation. |
+| [using-herdr](skills/using-herdr/SKILL.md) | Using Herdr to launch, inspect, or control agents, panes, tabs, workspaces, and terminal commands. |
 
 ## Validation
 

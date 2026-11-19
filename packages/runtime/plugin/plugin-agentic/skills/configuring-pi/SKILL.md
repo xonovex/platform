@@ -1,6 +1,6 @@
 ---
 name: configuring-pi
-description: "Use when configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. Triggers on .pi/extensions, pi packages, project_trust, tool_call, tool_result, context, compaction, registerTool, full-system permissions, no built-in sandbox, package pinning, or Pi onboarding, even when the user doesn't say 'Pi extension'."
+description: "Use when writing or configuring Pi extensions, packages, skills, settings, or permissions. Triggers on `.pi/extensions`, pi packages, project_trust, tool_call, tool_result, registerTool, context injection, blocking or changing tool calls, package pinning, or subagents in Pi, even when the user doesn't say 'Pi extension'."
 ---
 
 # Pi Extensions and Tool Interception

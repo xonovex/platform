@@ -1,6 +1,6 @@
 ---
 name: writing-c99-game-opinionated
-description: "Use when editing C99 game-engine or runtime code in projects that follow the opinionated caller-owns-memory, SoA, builder-pattern style. A focused overlay that covers only game/engine house-style decisions, not generic C99 idioms. Triggers on `.c`/`.h` files in game/engine directories and on prompts about vectors, matrices, quaternions, physics, meshes, spatial structures, tagged unions, inverse mass, builder patterns, even when the user doesn't say 'opinionated'."
+description: "Use when writing or editing C99 game-engine math, physics, mesh, or geometry code that writes into caller-owned buffers. Triggers on `.c`/`.h` files with 16-byte aligned vector, matrix or quaternion types, `*_req()`/`*_build()` builder functions, inverse mass, Y-up right-handed coordinates, CCW winding, AoS meshes vs SoA batches, vertex packing, spatial structures, tagged unions, even when the user doesn't say 'opinionated'."
 ---
 
 # C99 Game Engine Opinionated Guidelines

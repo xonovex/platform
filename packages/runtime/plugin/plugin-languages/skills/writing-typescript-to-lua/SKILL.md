@@ -1,6 +1,6 @@
 ---
 name: writing-typescript-to-lua
-description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (game scripting, Defold, embedded engines). Triggers on `.ts` files in game/scripting directories with TSTL config, and on prompts about LuaMultiReturn, namespaces, decorators, stable table layouts, or Lua interop boundaries, even when the user doesn't say 'TSTL'."
+description: "Use when writing or editing TypeScript that compiles to Lua with TSTL 1.24+ for game scripting, Defold, or an embedded engine. Triggers on `.ts` files with a TSTL config, `LuaMultiReturn`, `@noSelf`, namespaces, decorators, or calls across the Lua boundary, even when the user doesn't say 'TSTL'."
 ---
 
 # TypeScript-to-Lua Coding Guidelines

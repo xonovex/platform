@@ -1,6 +1,6 @@
 ---
 name: authoring-tests
-description: "Use when writing or reviewing a single good test independent of any framework: structuring it as Arrange-Act-Assert / Four-Phase, meeting FIRST, naming it, choosing and naming the right test double (Dummy / Stub / Spy / Mock / Fake), deciding what to mock and what not to, telling state from behaviour verification, and spotting test smells. Triggers on test double, mock vs stub vs fake vs spy, what should I mock, over-mocking, AAA, FIRST, fragile/flaky/obscure test, Object Mother, Test Data Builder, fixture setup, even when the user doesn't say 'testing'."
+description: "Use when writing or reviewing a single test in any framework, or choosing what to mock in it. Triggers on test structure, Arrange-Act-Assert, FIRST, test names, test doubles, mock vs stub vs fake vs spy, 'what should I mock', over-mocking, fragile, flaky or obscure tests, fixture setup, Object Mother, or Test Data Builder, even when the user doesn't say 'testing'."
 ---
 
 # Writing a Single Good Test

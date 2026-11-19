@@ -1,6 +1,6 @@
 ---
 name: writing-lock-free-code
-description: "Use when writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. Triggers on prompts about memory ordering (relaxed/acquire/release/seq_cst), CAS/compare-exchange, the ABA problem, SPSC/MPSC/MPMC queues, lock-free stack, hazard pointers / epoch / RCU reclamation, false sharing, spinlocks/backoff, work-stealing, even when the user doesn't say 'lock-free'."
+description: "Use when writing or reviewing shared-memory concurrent code with atomics, lock-free data structures, or custom synchronization. Triggers on memory ordering (relaxed/acquire/release/seq_cst), CAS/compare-exchange, the ABA problem, SPSC/MPSC/MPMC queues, lock-free stacks, hazard pointers, epoch or RCU reclamation, false sharing, spinlocks and backoff, work-stealing, even when the user doesn't say 'lock-free'."
 ---
 
 # Lock-Free / Wait-Free Concurrency Guidelines

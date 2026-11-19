@@ -1,6 +1,6 @@
 ---
 name: building-editor-viewports
-description: "Use when building the interactive 3D viewport that bridges a real-time renderer and an editor: GPU id-buffer object picking, selection outline/highlight rendering, and move/rotate/scale gizmos that work on any object plus the linear algebra behind them. Triggers on click-to-select in a 3D scene, reading back the picked object under the cursor, drawing a crisp selection outline, transform handles/gizmos, dragging an axis at a steep camera angle, constant screen-size handles, ray/plane projection, even when the user doesn't say 'viewport' or 'gizmo'."
+description: "Use when building click-to-select, selection outlines, or move/rotate/scale gizmos in a 3D editor viewport. Triggers on object picking, an id buffer, reading back the object under the cursor, selection highlight, transform handles, dragging an axis at a steep camera angle, constant screen-size handles, ray/plane projection, even when the user doesn't say 'viewport' or 'gizmo'."
 ---
 
 # Editor viewport Guidelines

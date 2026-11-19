@@ -118,5 +118,11 @@
     "should_trigger": false,
     "split": "validation",
     "rationale": "code implementation belongs to writing-typescript"
+  },
+  {
+    "query": "Trim the wordy paragraphs and duplicate explanations out of this README so it is shorter.",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near miss owned by writing-prose"
   }
 ]

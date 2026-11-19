@@ -1,6 +1,6 @@
 ---
 name: implementing-vulkan-renderers
-description: "Use when implementing a Vulkan renderer: the concrete Vulkan API for device/queues, device memory + memory types + staging, images/buffers + pipeline barriers and layout transitions, descriptor sets/layouts + bindless, pipelines + pipeline cache + dynamic rendering, timeline semaphores + fences, command pools/buffers, and the swapchain. Triggers on Vk* types and vkCmd*/vkCreate* calls, VkImageMemoryBarrier2, VkDescriptorSet, VkPipeline, VkSemaphore, VkCommandPool, swapchain acquire/present, even when the user doesn't say 'Vulkan'."
+description: "Use when writing Vulkan code for a renderer: devices and queues, memory and staging, barriers and layout transitions, descriptors, pipelines, synchronization, and the swapchain. Triggers on Vk* types, vkCmd*/vkCreate* calls, VkImageMemoryBarrier2, VkDescriptorSet, bindless, VkPipeline, dynamic rendering, timeline semaphores, fences, VkCommandPool, swapchain acquire/present, even when the user doesn't say 'Vulkan'."
 ---
 
 # Vulkan Rendering Guidelines

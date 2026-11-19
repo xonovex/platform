@@ -1,6 +1,6 @@
 ---
 name: writing-user-stories
-description: "Use when writing, evaluating, splitting, or refining user stories: applying INVEST, the 3 Cs (Card / Conversation / Confirmation), the 'As a / I want / so that' template, writing acceptance criteria, slicing vertically into a walking skeleton, splitting with SPIDR or the splitting pattern flowchart, and refining the backlog into ready items. Triggers on user story, INVEST, story splitting, SPIDR, vertical slice, walking skeleton, acceptance criteria, 'As a... I want... so that...', 3 Cs, backlog refinement / grooming, SMART tasks, even when the user doesn't say 'user story'."
+description: "Use when writing, splitting or refining user stories and their acceptance criteria for a backlog. Triggers on user story, 'As a... I want... so that...', INVEST, acceptance criteria, story splitting, SPIDR, vertical slice, walking skeleton, 3 Cs, backlog refinement or grooming, or a story too big for one sprint, even when the user doesn't say 'user story'."
 ---
 
 # User Stories

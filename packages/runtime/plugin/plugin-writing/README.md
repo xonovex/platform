@@ -34,11 +34,11 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [writing-editorials](skills/writing-editorials/SKILL.md) | Revising articles, posts, reviews, newsletters, marketing copy, or other publication prose for voice, rhythm, register, readability, or a natural human style. |
-| [writing-news](skills/writing-news/SKILL.md) | Researching and authoring current news stories or news posts, especially multilingual Markdown with structured frontmatter. |
-| [writing-prose](skills/writing-prose/SKILL.md) | Revising general prose for clarity, concision, factual discipline, or consistent terminology across documents and messages. |
-| [writing-technical-docs](skills/writing-technical-docs/SKILL.md) | Structuring or rewriting standalone technical explanations, reports, status updates, documentation, recommendations, or operational handoffs so readers see the outcome, decision, action, or status first. |
-| [writing-travel-guides](skills/writing-travel-guides/SKILL.md) | Researching and authoring travel, destination, attraction, or venue guides with current practical information, itineraries, or multilingual publication files. |
+| [writing-editorials](skills/writing-editorials/SKILL.md) | Revising an article, post, review, newsletter, or marketing copy so it reads naturally for its audience. |
+| [writing-news](skills/writing-news/SKILL.md) | Researching and writing a current news story or news post, often as multilingual Markdown with frontmatter. |
+| [writing-prose](skills/writing-prose/SKILL.md) | Making existing text clearer, shorter, or more precise, such as a README, document, message, or note. |
+| [writing-technical-docs](skills/writing-technical-docs/SKILL.md) | Ordering a technical explanation, report, status update, recommendation, or handoff so the outcome, decision, action, or status comes first. |
+| [writing-travel-guides](skills/writing-travel-guides/SKILL.md) | Researching and writing a travel, destination, attraction, or venue guide with current practical facts. |
 
 ## Validation
 

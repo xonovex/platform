@@ -1,6 +1,6 @@
 ---
 name: designing-imgui
-description: "Use when designing or implementing an immediate-mode GUI (IMGUI): batching the whole UI into one draw call with compact primitive buffers, keying controls by stable IDs, resolving ordering with frame-delayed state, keyboard focus / responder chains / event trickling, drag-and-drop, per-monitor DPI scaling, string localization, and screen-reader accessibility. Triggers on immediate-mode widgets, retained-vs-immediate UI, hover/active/focus IDs, UI draw batching, ImGui-style code, localizing UI strings, accessibility/screen-reader support for an IMGUI, even when the user doesn't say 'IMGUI'."
+description: "Use when building an immediate-mode GUI or ImGui-style widgets. Triggers on immediate-mode vs retained UI, widget IDs, hover/active/focus state, batching the UI into one draw call, keyboard focus and event routing, drag-and-drop, per-monitor DPI scaling, localizing UI strings, and screen-reader support, even when the user doesn't say 'IMGUI'."
 ---
 
 # Immediate-Mode GUI Guidelines

@@ -1,6 +1,6 @@
 ---
 name: using-terraform
-description: "Use when editing Terraform 1.12+ infrastructure code. Triggers on `.tf` files, `*.tfvars`, modules, and prompts about module design, environment isolation, remote state, for_each, dynamic blocks, locals, or providers, even when the user doesn't say 'Terraform'."
+description: "Use when writing or editing Terraform 1.12+ infrastructure code. Triggers on `.tf` and `.tfvars` files, modules, remote state, per-environment setup, for_each, dynamic blocks, locals, or providers, even when the user doesn't say 'Terraform'."
 ---
 
 # Terraform Coding Guidelines

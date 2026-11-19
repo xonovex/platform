@@ -1,6 +1,6 @@
 ---
 name: using-vitest
-description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, and prompts about test setup, mocking, HTTP assertions, CORS preflight tests, or type safety in tests, even when the user doesn't say 'Vitest'."
+description: "Use when writing or editing Vitest 3+ tests in TypeScript. Triggers on `.test.ts`, `.spec.ts`, `vitest.config.*` files, test setup, mocks, HTTP or CORS assertions, or type safety in tests, even when the user doesn't say 'Vitest'."
 ---
 
 # Vitest Testing Guidelines

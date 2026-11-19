@@ -1,6 +1,6 @@
 ---
 name: publishing-npm-packages
-description: "Use when publishing an npm package or checking that one is ready to publish. Triggers on prompts about npm publish, publish-readiness or package.json validation (name/version/license/repository/files/publishConfig/private), idempotent publishing (skip if the version already exists), provenance and access flags, dist-tags, or platform-specific (os/cpu/libc) native-binary packages, even when the user doesn't say 'npm'."
+description: "Use when publishing an npm package or checking that one is ready to publish. Triggers on `npm publish`, `package.json` fields such as files, publishConfig, or private, a publish that fails because the version exists, provenance, dist-tags, or per-platform native-binary packages, even when the user doesn't say 'npm'."
 ---
 
 # npm Publishing Guidelines

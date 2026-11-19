@@ -1,6 +1,6 @@
 ---
 name: evaluating-skills
-description: "Use when measuring an Agent Skill with model runs: trigger evals, output evals with and without the skill, or an ablation after a trim. Triggers on eval-queries.json, evals.json, trigger rate, benchmark.json, even when the user doesn't say 'eval'."
+description: "Use when testing by model runs if a skill triggers or helps: trigger evals, output evals with and without it, or a trim ablation. Triggers on eval-queries.json, evals.json, benchmark.json, or trigger rate, even when the user doesn't say 'eval'."
 compatibility: "Python 3.11+ with uv runs the bundled evaluation scripts. Live trigger and output evals require a credentialed Claude or Codex CLI and network access."
 allowed-tools: "Read Bash(uv:*) Bash(claude:*) Bash(codex:*)"
 ---

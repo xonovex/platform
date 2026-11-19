@@ -1,6 +1,6 @@
 ---
 name: using-gitlab
-description: "Use when managing GitLab tickets/work items, issue-board kanban, merge-request delivery/review, durable issue or MR context notes, or native CI/policy enforcement on GitLab.com, Self-Managed, or Dedicated. Triggers on `glab issue`, issue links, work items, board lists/status moves, `glab mr`, Notes/discussions, approvals, CI/CD components, pipeline execution policies, compliance frameworks, protected environments, or GitLab token scopes, even when the user doesn't say 'glab'."
+description: "Use when doing the GitLab host mechanics of a task: issues and work items, issue boards, merge-request delivery and review notes, or CI and policy enforcement. Triggers on GitLab.com, Self-Managed or Dedicated, `glab issue`, `glab mr`, issue links, board lists, notes and discussions, approvals, CI/CD components, pipeline execution policies, compliance frameworks, protected environments, or token scopes, even when the user doesn't say 'glab'."
 ---
 
 # GitLab workflow delivery and enforcement: quick reference

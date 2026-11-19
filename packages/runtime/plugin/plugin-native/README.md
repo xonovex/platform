@@ -36,14 +36,14 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [applying-data-oriented-design](skills/applying-data-oriented-design/SKILL.md) | Designing or refactoring performance-critical data layouts for cache efficiency, in any language. |
-| [debugging-native-code](skills/debugging-native-code/SKILL.md) | Chasing a bug in native or low-level software: a crash, access violation, use-after-free, leak, intermittent/heisenbug, or 'works on my machine' failure, and when deciding how to prevent a whole class of bugs by design. |
-| [managing-memory](skills/managing-memory/SKILL.md) | Deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. |
-| [using-cmake](skills/using-cmake/SKILL.md) | Editing CMake build files for C/C++ projects on CMake 3.20+. |
-| [writing-c99-opinionated](skills/writing-c99-opinionated/SKILL.md) | Editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. |
-| [writing-c99](skills/writing-c99/SKILL.md) | Editing or reviewing general-purpose C99: libraries, CLI tools, system code without strong opinions on memory ownership or layout. |
-| [writing-cross-platform-code](skills/writing-cross-platform-code/SKILL.md) | Making native C/C++ software portable across operating systems and targets: isolating all OS/windowing/input/audio calls behind one platform-abstraction interface, ordering a port to a new OS, building to the web via Emscripten/WebAssembly (cooperative main loop, async file/network, GL ES/WebGPU mapping, 32-bit pointers, memory growth), and reading input devices like gamepads. |
-| [writing-lock-free-code](skills/writing-lock-free-code/SKILL.md) | Writing or reviewing shared-memory concurrent code: atomics, lock-free/wait-free data structures, or scalable synchronization. |
+| [applying-data-oriented-design](skills/applying-data-oriented-design/SKILL.md) | Making data layouts cache-friendly for performance-critical code, in any language. |
+| [debugging-native-code](skills/debugging-native-code/SKILL.md) | Finding the cause of a crash, memory corruption, leak, or intermittent bug in native C or C++ code, or making a class of bug impossible by design. |
+| [managing-memory](skills/managing-memory/SKILL.md) | Deciding how memory is allocated, owned, and freed in manual-memory code, in any language. |
+| [using-cmake](skills/using-cmake/SKILL.md) | Writing or editing CMake builds for C or C++ projects on CMake 3.20+. |
+| [writing-c99-opinionated](skills/writing-c99-opinionated/SKILL.md) | Writing or editing systems or embedded C99 libraries with no hidden allocation, caller-provided buffers, and handle indices. |
+| [writing-c99](skills/writing-c99/SKILL.md) | Writing, editing, or reviewing plain C99 code such as libraries, CLI tools, and system utilities. |
+| [writing-cross-platform-code](skills/writing-cross-platform-code/SKILL.md) | Porting native C or C++ software to another OS or to the web, or putting OS calls behind one platform layer. |
+| [writing-lock-free-code](skills/writing-lock-free-code/SKILL.md) | Writing or reviewing shared-memory concurrent code with atomics, lock-free data structures, or custom synchronization. |
 
 ## Validation
 

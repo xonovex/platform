@@ -1,6 +1,6 @@
 ---
 name: writing-shell-scripts
-description: "Use when writing or editing POSIX shell or Bash automation. Triggers on `.sh` files, `#!/usr/bin/env bash` shebangs, and prompts about scripting CI tasks, build helpers, devops automation, or one-off pipelines, even when the user doesn't say 'shell'. Apply for strict mode, quoting, parameter expansion, exit codes, idempotency, shellcheck/shfmt."
+description: "Use when writing or editing a POSIX shell or Bash script for CI tasks, build helpers, or automation. Triggers on `.sh` files, `#!/usr/bin/env bash` or `#!/bin/sh` shebangs, `set -euo pipefail`, quoting, exit codes, shellcheck, or shfmt, even when the user doesn't say 'shell'."
 ---
 
 # Shell Scripting Coding Guidelines

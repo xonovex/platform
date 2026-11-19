@@ -1,6 +1,6 @@
 ---
 name: designing-game-networking
-description: "Use when architecting real-time multiplayer networking for a game or simulation engine: client/server vs peer topology and per-object authority, replicating a typed world/component state across nodes, snapshot-vs-delta updates with baselines and acks, and reliable/unreliable/ordered channels layered over UDP. Triggers on netcode, network nodes, pipes/connections, packet types, state replication, snapshots and deltas, server authority, ack/out-of-order packets, lag/bandwidth simulation, and single-player-to-multiplayer transitions, even when the user doesn't say 'networking'."
+description: "Use when adding real-time multiplayer networking to a game or simulation engine. Triggers on netcode, client/server or peer-to-peer topology, server authority, state replication, snapshots and deltas, acks and out-of-order packets, reliable and unreliable channels over UDP, lag or bandwidth simulation, and turning a single-player game into multiplayer, even when the user doesn't say 'networking'."
 ---
 
 # Game networking Guidelines

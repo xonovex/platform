@@ -1,6 +1,6 @@
 ---
 name: designing-asset-pipelines
-description: "Use when designing the asset pipeline of a tool or game engine, turning authored sources (FBX, glTF, PNG, WAV, shaders) into runtime-ready data: importers/compilers per asset type, a deterministic compile/cook step, content-addressed caching keyed by a hash of inputs and settings, dependency tracking so an edit reimports only what changed, platform-specific output, and live hot-reloading. Triggers on import, cook/bake, asset/build cache, reimport, dependency invalidation, file watcher, hot-reload of textures/meshes/materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'."
+description: "Use when building the asset pipeline of a game engine or tool: importing FBX, glTF, PNG, WAV or shader sources and cooking them into runtime data. Triggers on import, cook/bake, asset or build cache, reimport, dependency invalidation, file watcher, hot-reload of textures, meshes or materials, and 'why does changing one file rebuild everything', even when the user doesn't say 'asset pipeline'."
 ---
 
 # Asset pipeline Guidelines

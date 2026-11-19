@@ -1,6 +1,6 @@
 ---
 name: using-moon
-description: "Use when configuring moonrepo monorepo tasks. Triggers on `.moon/` config files, `moon.yml`, and prompts about task definitions, project tags, task inheritance, language toolchains, project queries, or task caching, even when the user doesn't say 'moonrepo'."
+description: "Use when adding or changing tasks in a moonrepo monorepo. Triggers on `.moon/` config files, `moon.yml`, `moon run`, `moon query`, task inheritance, project tags, toolchains, or task caching, even when the user doesn't say 'moonrepo'."
 ---
 
 # Moon Build System Guidelines

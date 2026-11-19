@@ -1,6 +1,6 @@
 ---
 name: managing-memory
-description: "Use when deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. Triggers on prompts about caller-owns-memory / caller-provided buffers, arena/bump/linear allocators, object pools and free lists, virtual-memory reserve/commit, scratch/temp allocators, object lifetimes, ownership (single-owner/borrow), leaks/use-after-free/double-free, even when the user doesn't say 'memory' or 'allocator'."
+description: "Use when deciding how memory is allocated, owned, and freed in manual-memory code, in any language. Triggers on caller-provided buffers, arena, bump or linear allocators, object pools, free lists, virtual-memory reserve/commit, scratch allocators, object lifetimes, single ownership and borrowing, leaks, use-after-free, double-free, even when the user doesn't say 'memory' or 'allocator'."
 ---
 
 # Memory Management Guidelines

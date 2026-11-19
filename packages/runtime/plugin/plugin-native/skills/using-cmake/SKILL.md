@@ -1,6 +1,6 @@
 ---
 name: using-cmake
-description: "Use when editing CMake build files for C/C++ projects on CMake 3.20+. Triggers on `CMakeLists.txt`, `*.cmake` files and on prompts about adding targets, linking libraries, dependency fetching, test setup, install rules, or PUBLIC/PRIVATE/INTERFACE visibility, even when the user doesn't say 'CMake'. Apply for FetchContent, find_package, target_link_libraries, CTest."
+description: "Use when writing or editing CMake builds for C or C++ projects on CMake 3.20+. Triggers on `CMakeLists.txt` and `*.cmake` files, adding targets, target_link_libraries, PUBLIC/PRIVATE/INTERFACE visibility, FetchContent, find_package, CTest, install rules, even when the user doesn't say 'CMake'."
 ---
 
 # CMake Coding Guidelines

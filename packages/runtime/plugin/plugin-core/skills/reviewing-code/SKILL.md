@@ -1,11 +1,11 @@
 ---
 name: reviewing-code
-description: "Use when writing, structuring, or labelling code-review feedback on a pull or merge request: Conventional Comments labels (praise / nitpick / suggestion / issue / question / thought / chore / todo), the blocking vs non-blocking vs if-minor decorations, pairing one top-level summary with line-anchored inline comments, cross-linking the summary to its details instead of 'see comment 3', and verifying each claim against an authoritative source before asserting it. Platform-independent review craft. Triggers on PR / MR review, leaving review comments, blocking / non-blocking, nit, severity, request-changes vs approve, or a review summary, even when the user doesn't say 'code review'."
+description: "Use when reviewing the code of a pull request, merge request or diff for defects, or reviewing an existing module or file that is not a change, and writing the review feedback. Triggers on 'review PR 418', 'review this module', code review, review comments, Conventional Comments labels, nit, blocking vs non-blocking, request changes vs approve, or a review summary with inline comments, even when the user doesn't say 'code review'."
 ---
 
 # Code-review feedback: quick reference
 
-Host-independent review-comment craft. **Every comment states its type and its urgency: a reader must never guess whether it blocks the merge.** Review operations return findings inline and never post, edit, resolve, or persist them. A separate Publish operation may select a matching host skill for delivery.
+Host-independent code review: find the defects in a change (a pull request, a merge request or a diff) or in existing code that is not a change, then write the feedback. **Every comment states its type and its urgency: a reader must never guess whether it blocks the merge.** Review operations return findings inline and never post, edit, resolve, or persist them. A separate Publish operation may select a matching host skill for delivery. Fetching a pull request, reading its threads and posting comments belong to the host skill; preparing your own pull request belongs to **authoring-pull-requests**.
 
 ## Essentials
 
@@ -15,6 +15,7 @@ Host-independent review-comment craft. **Every comment states its type and its u
 - **Cross-link, never cross-reference by number** - link the summary to its inline threads; a reader does not see your "comment 3" numbering, see [references/review-structure.md](references/review-structure.md)
 - **Verify before you assert** - check each claim against the branch code / API / design-system source and cite `file:line`; never review from memory, see [references/review-structure.md](references/review-structure.md)
 - **Lead with what works, then be specific** - praise is a label too; for every issue show the fix, not just the problem, see [references/review-structure.md](references/review-structure.md)
+- **Review existing code like a change** - with no diff, analyze the named files or module the same way and anchor each finding to its current line, see [references/review-analyze.md](references/review-analyze.md)
 - **Carry findings in a shared contract** - analyze and refine return one canonical findings shape, anchored to new-file lines; later Publish or Execute operations may pass it to a host skill, see [references/findings-schema.md](references/findings-schema.md), [references/review-analyze.md](references/review-analyze.md), [references/review-refine.md](references/review-refine.md)
 
 ## Gotchas

@@ -1,6 +1,6 @@
 ---
 name: managing-versions
-description: "Use when bumping a package version, cutting a release, or detecting which packages changed version. Triggers on prompts about semantic-version bumps (patch/minor/major, prerelease/preid, exact version), propagating a version change to workspace dependents, generating or updating a CHANGELOG from conventional commits, or finding packages whose version differs between two git refs, even when the user doesn't say 'semver' or 'version'."
+description: "Use when bumping a package version, cutting a release, or finding which packages changed version. Triggers on semver bumps (patch, minor, major, prerelease), propagating a version to workspace dependents, a CHANGELOG from conventional commits, or comparing package versions between two git refs, even when the user doesn't say 'semver' or 'version'."
 ---
 
 # Versioning Guidelines

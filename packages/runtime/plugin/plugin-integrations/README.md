@@ -38,8 +38,8 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [using-github](skills/using-github/SKILL.md) | Managing GitHub tickets, Projects kanban, pull-request delivery/review, durable issue or PR context comments, or native CI/repository enforcement on github.com or GitHub Enterprise Server. |
-| [using-gitlab](skills/using-gitlab/SKILL.md) | Managing GitLab tickets/work items, issue-board kanban, merge-request delivery/review, durable issue or MR context notes, or native CI/policy enforcement on GitLab.com, Self-Managed, or Dedicated. |
+| [using-github](skills/using-github/SKILL.md) | Doing the GitHub host mechanics of a task: issues, Projects boards, fetching a pull request, reading its review threads, posting review comments, or repository CI and enforcement. |
+| [using-gitlab](skills/using-gitlab/SKILL.md) | Doing the GitLab host mechanics of a task: issues and work items, issue boards, merge-request delivery and review notes, or CI and policy enforcement. |
 
 ## Validation
 

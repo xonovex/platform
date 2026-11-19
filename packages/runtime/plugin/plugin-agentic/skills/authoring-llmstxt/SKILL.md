@@ -1,6 +1,6 @@
 ---
 name: authoring-llmstxt
-description: "Use when authoring, reviewing, or maintaining an `/llms.txt` file or per-page markdown mirrors per the llmstxt.org specification. Triggers on edits to `llms.txt` / `llms-full.txt`, on prompts about LLM-friendly site content, providing markdown versions of pages (`.md` suffix), generating expanded context files (`llms-ctx.txt`), or making documentation accessible to LLMs, even when the user doesn't say 'llms.txt'."
+description: "Use when writing or updating an `llms.txt` file or Markdown copies of site pages for LLMs. Triggers on `llms.txt`, `llms-full.txt`, `llms-ctx.txt`, `.md` page mirrors, the llmstxt.org format, or making documentation readable by LLMs, even when the user doesn't say 'llms.txt'."
 ---
 
 # llms.txt Guidelines

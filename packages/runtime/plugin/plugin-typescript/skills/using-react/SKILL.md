@@ -1,6 +1,6 @@
 ---
 name: using-react
-description: "Use when building or editing React 19+ components, hooks, or app routing. Triggers on `.tsx`/`.jsx` files with React imports, Vite/Next configs, Server Components, `'use client'` / `'use server'` directives, and on prompts about Form Actions, useActionState, useOptimistic, use(), Suspense streaming, ref-as-prop, or the React Compiler, even when the user doesn't say 'React'."
+description: "Use when building or editing React 19+ components, hooks, or app routes. Triggers on `.tsx`/`.jsx` files with React imports, `'use client'` / `'use server'` directives, Server Components, form actions, useActionState, useOptimistic, use(), Suspense, or the React Compiler, even when the user doesn't say 'React'."
 ---
 
 # React Coding Guidelines

@@ -1,6 +1,6 @@
 ---
 name: writing-news
-description: "Use when researching and authoring current news stories or news posts, especially multilingual Markdown with structured frontmatter. Triggers on latest news, curating developments, news lookback windows, source triangulation, bilingual news articles, news frontmatter, news slugs, or adding news to a content site, even when the user doesn't say 'news workflow'."
+description: "Use when researching and writing a current news story or news post, often as multilingual Markdown with frontmatter. Triggers on latest news, recent developments, lookback windows, source checks, bilingual news articles, news frontmatter or slugs, or adding news to a content site, even when the user doesn't say 'news workflow'."
 ---
 
 # News Writing Guidelines

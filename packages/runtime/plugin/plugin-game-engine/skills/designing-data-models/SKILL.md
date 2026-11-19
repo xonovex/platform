@@ -1,6 +1,6 @@
 ---
 name: designing-data-models
-description: "Use when designing a central in-memory data model / object database for a tool, editor, or engine: typed objects with properties, stable cross-references and sub-object ownership, change notification, undo/redo, and serialization. Triggers on prompts about a runtime object/property schema, referencing objects by stable id/GUID, observing/notifying changes, transactional edits and undo history, save/load with versioning/migration, or copy-on-write snapshots, even when the user doesn't name a specific model."
+description: "Use when designing the in-memory object model of an editor, tool, or engine: typed objects with properties, references between them, undo/redo, and save/load. Triggers on object/property schemas, stable ids or GUIDs, change notification, transactional edits, undo history, versioned serialization and migration, copy-on-write snapshots, even when the user doesn't say 'data model'."
 ---
 
 # Data-Model Guidelines

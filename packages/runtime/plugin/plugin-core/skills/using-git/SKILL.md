@@ -1,6 +1,6 @@
 ---
 name: using-git
-description: "Use when running git operations or resolving repo-state issues. Triggers on prompts about commit messages, conventional commits (feat/fix/chore/docs), merge conflicts, rebases, worktrees, feature-worktree create / merge / abandon / cleanup, branch cleanup, or history rewrites, even when the user doesn't say 'git'."
+description: "Use when running git commands or fixing repository state. Triggers on commit messages, conventional commits (feat/fix/chore/docs), merge conflicts, rebases, worktrees, creating, merging or cleaning up a feature worktree, branch cleanup, or history rewrites, even when the user doesn't say 'git'."
 ---
 
 # Git Guidelines

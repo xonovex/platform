@@ -1,6 +1,6 @@
 ---
 name: writing-c99-opinionated
-description: "Use when editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. Triggers on `.c`/`.h` files in systems/embedded/DOD projects and on prompts about caller-owns-memory, SoA/SIMD variants, alignment, index/handle references, caller-owned string views/builders, physical design, plugin architecture, strict file naming, and shaping a C API to be bound from other languages (Lua/C#/Python/Rust FFI, generated wrappers), even when the user doesn't say 'opinionated'."
+description: "Use when writing or editing systems or embedded C99 libraries with no hidden allocation, caller-provided buffers, and handle indices. Triggers on `.c`/`.h` files named `*_type.h`, `*_impl.h`, `*_soa.h` or `*_simde.h`, scalar/AoS/SoA/SIMD variants with parity tests, alignment macros, headers that include no headers, opaque handles, function-pointer plugin registries, hot-reloadable modules, and a C API for Lua, C#, Python or Rust FFI bindings, even when the user doesn't say 'opinionated'."
 ---
 
 # C99 Opinionated Guidelines (Systems/Game/Embedded)

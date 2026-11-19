@@ -1,6 +1,6 @@
 ---
 name: using-zod
-description: "Use when defining or editing Zod 4.0+ schemas for runtime validation in TypeScript. Triggers on `.ts` files with `zod` imports and prompts about API input validation, schema composition, type inference (`z.infer`), `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements, even when the user doesn't say 'Zod'."
+description: "Use when writing or editing Zod 4.0+ schemas that validate data at runtime in TypeScript. Triggers on `.ts` files with `zod` imports, API input validation, `z.infer`, `z.uuid()`, `z.email()`, `z.iso.datetime()`, defaults, or refinements, even when the user doesn't say 'Zod'."
 ---
 
 # Zod Coding Guidelines

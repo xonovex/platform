@@ -1,6 +1,6 @@
 ---
 name: writing-travel-guides
-description: "Use when researching and authoring travel, destination, attraction, or venue guides with current practical information, itineraries, or multilingual publication files. Triggers on city guides, visitor guides, destination content, attraction details, opening hours, ticket prices, accessibility facts, travel itineraries, travel frontmatter, or one guide per language, even when the user doesn't say 'travel writing'."
+description: "Use when researching and writing a travel, destination, attraction, or venue guide with current practical facts. Triggers on city or visitor guides, itineraries, opening hours, ticket prices, accessibility facts, travel frontmatter, or one guide per language, even when the user doesn't say 'travel writing'."
 ---
 
 # Travel Writing Guidelines

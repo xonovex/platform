@@ -1,6 +1,6 @@
 ---
 name: writing-lua
-description: "Use when editing Lua 5.4+ or LuaJIT: modules, scripts, configuration, and performance-critical hot paths. Triggers on `.lua` files and prompts about module patterns, local scoping, metatables, coroutines, error handling, JIT-friendly loops, cached lookups, or hot-path tuning, even when the user doesn't say 'Lua'."
+description: "Use when writing or editing Lua 5.4+ or LuaJIT modules, scripts, or configuration, or making a hot path faster. Triggers on `.lua` files, `require` modules, local scoping, metatables, coroutines, `pcall` error handling, or LuaJIT loop tuning, even when the user doesn't say 'Lua'."
 ---
 
 # Lua Coding Guidelines

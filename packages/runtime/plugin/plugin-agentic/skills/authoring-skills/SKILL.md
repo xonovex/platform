@@ -1,6 +1,6 @@
 ---
 name: authoring-skills
-description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. Triggers on edits under a skills directory, creating a skill, progressive disclosure, reference files, pattern extraction, session lessons, assimilation, bullet simplification, Agent Skills spec validation, description tuning, composable ownership, runtime routing, or hard dependency tiers, even when the user doesn't say 'skill'."
+description: "Use when creating, reviewing, extracting, splitting, merging, shortening, or validating an Agent Skill or a set of skills. Triggers on `SKILL.md`, edits under a `skills/` directory, `references/` files, skill frontmatter or descriptions, a skill made from code or session lessons, Agent Skills spec validation, or overlapping and duplicate skills, even when the user doesn't say 'skill'."
 compatibility: "Git and Python 3.11+ with uv run the bundled validation and source-audit scripts; source fetch/update options perform explicit network or file writes."
 allowed-tools: "Read Bash(git:*) Bash(uv:*)"
 ---

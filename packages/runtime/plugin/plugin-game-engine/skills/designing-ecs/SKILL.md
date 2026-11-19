@@ -1,6 +1,6 @@
 ---
 name: designing-ecs
-description: "Use when designing or implementing a data-oriented Entity-Component-System: archetype/bitmask storage, contiguous per-type component arrays, filter-and-batch systems, change tracking, and syncing ECS state into stateful external systems (renderer, physics). Triggers on entities, components, archetypes, systems, world iteration, component bitmasks, mirroring transforms to physics, even when the user doesn't say 'ECS'."
+description: "Use when designing or implementing an Entity-Component-System for a game or simulation. Triggers on entities, components, archetypes, systems, component bitmasks, world queries and iteration, change tracking, mirroring transforms to physics or the renderer, even when the user doesn't say 'ECS'."
 ---
 
 # Entity-Component-System Guidelines (Data-Oriented)

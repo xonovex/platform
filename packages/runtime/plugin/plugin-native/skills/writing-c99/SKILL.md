@@ -1,6 +1,6 @@
 ---
 name: writing-c99
-description: "Use when editing or reviewing general-purpose C99: libraries, CLI tools, system code without strong opinions on memory ownership or layout. Triggers on `.c`/`.h` files and prompts about C99 idioms, designated initializers, fixed-width types, const-correctness, malloc/free patterns, inline functions, value-oriented APIs, sanitizers, or error returns, even when the user doesn't say 'C'."
+description: "Use when writing, editing, or reviewing plain C99 code such as libraries, CLI tools, and system utilities. Triggers on `.c`/`.h` files, designated initializers, fixed-width types, const-correctness, malloc/free, inline functions vs macros, string handling, error return codes, sanitizers, even when the user doesn't say 'C'."
 ---
 
 # C99 Coding Guidelines

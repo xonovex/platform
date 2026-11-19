@@ -1,6 +1,6 @@
 ---
 name: authoring-instructions
-description: "Use when authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. Triggers on edits to `AGENTS.md` and on prompts about bootstrapping fresh instructions, refreshing stale docs to match the filesystem, condensing verbose files, deduping across the repo, porting organizational patterns from another project, or folding the lessons of a session into rules, even when the user doesn't say 'instructions' or 'AGENTS.md'."
+description: "Use when writing, reviewing, updating, shortening, merging, or porting the AGENTS.md project instructions of a repository. Triggers on edits to `AGENTS.md`, bootstrapping instructions for a new repository, refreshing stale instructions to match the files, removing duplicate rules across the repository, copying rules from another project, or turning session lessons into rules, even when the user doesn't say 'instructions' or 'AGENTS.md'."
 ---
 
 # Project Instruction Guidelines

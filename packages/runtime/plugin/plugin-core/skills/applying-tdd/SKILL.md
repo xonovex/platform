@@ -1,6 +1,6 @@
 ---
 name: applying-tdd
-description: "Use when driving code test-first or coaching the red-green-refactor rhythm: writing a failing test before the production code, going green with fake-it / obvious-implementation / triangulation, then refactoring to remove duplication, working a test list one item at a time, and letting the tests grow the design. Triggers on red-green-refactor, test-first, 'write the test first', failing test before code, triangulation, fake it till you make it, test list / to-do list, classical (Detroit) vs mockist (London) TDD, and 'clean code that works', even when the user doesn't say 'TDD'."
+description: "Use when writing code test-first or coaching the red-green-refactor cycle. Triggers on TDD, red-green-refactor, test-first, 'write the test first', a failing test before the code, triangulation, fake it till you make it, a test list, classical vs mockist TDD, or Detroit vs London school, even when the user doesn't say 'TDD'."
 ---
 
 # Test-Driven Development

@@ -1,6 +1,6 @@
 ---
 name: writing-python
-description: "Use when writing or editing Python 3.12+ for APIs, data processing, scripting, or tooling. Triggers on `.py` files and prompts about async functions, type hints, dataclasses, pathlib, pytest, generators, context managers, f-strings, even when the user doesn't say 'Python'."
+description: "Use when writing or editing Python 3.12+ for APIs, data processing, scripts, or tooling. Triggers on `.py` files and prompts about async code, type hints, dataclasses, pathlib, pytest, generators, or context managers, even when the user doesn't say 'Python'."
 ---
 
 # Python Coding Guidelines

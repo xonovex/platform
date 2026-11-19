@@ -1,6 +1,6 @@
 ---
 name: writing-editorials
-description: "Use when revising articles, posts, reviews, newsletters, marketing copy, or other publication prose for voice, rhythm, register, readability, or a natural human style. Triggers on editorial rewrite, copy editing, humanizing AI-generated prose, removing AI writing tells, audience tone, CEFR readability, bilingual editorial consistency, or making prose sound natural, even when the user doesn't say 'editorial'."
+description: "Use when revising an article, post, review, newsletter, or marketing copy so it reads naturally for its audience. Triggers on copy editing, editorial rewrites, voice, tone, register, readability or CEFR level, AI-sounding text to humanize, or a consistent bilingual publication, even when the user doesn't say 'editorial'."
 ---
 
 # Editorial Writing Guidelines

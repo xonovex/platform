@@ -1,6 +1,6 @@
 ---
 name: mixing-audio
-description: "Use when building a low-level, real-time audio/sound system that does its own mixing: the OS audio callback / render thread, summing voices into the output buffer, sample-rate conversion and per-voice pitch, voice pools and stealing, and handing play/stop/parameter changes from the game thread to the audio thread. Triggers on audio underrun/dropout, clicks/pops, the audio callback can't lock or allocate, buffer size vs latency, resampling/interpolation, mixing gain/pan/clipping, fixed voice pools, even when the user doesn't say 'audio'."
+description: "Use when building a low-level real-time audio engine that mixes its own voices. Triggers on the audio callback or audio thread, underruns, dropouts, clicks and pops, buffer size vs latency, resampling, pitch, gain, pan, clipping, voice pools and voice stealing, sending play/stop commands from the game thread, even when the user doesn't say 'audio'."
 ---
 
 # Low-level Audio Guidelines (Real-Time Software Mixing)

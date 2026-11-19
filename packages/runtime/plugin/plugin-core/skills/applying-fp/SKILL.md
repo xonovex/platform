@@ -1,6 +1,6 @@
 ---
 name: applying-fp
-description: "Use when writing functional-style code or reviewing for FP cleanliness. Triggers on prompts about pure functions, immutability, function composition, module-level functions, explicit context passing, avoiding inheritance, or stateless designs, even when the user doesn't say 'FP' or 'functional'."
+description: "Use when writing functional-style code or reviewing for FP cleanliness. Triggers on pure functions, immutability, side effects, function composition, module-level functions, explicit context passing, avoiding inheritance, or stateless designs, even when the user doesn't say 'FP' or 'functional'."
 ---
 
 # General Functional Programming Guidelines

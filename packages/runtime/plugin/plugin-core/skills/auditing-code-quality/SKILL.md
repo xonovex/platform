@@ -1,6 +1,6 @@
 ---
 name: auditing-code-quality
-description: "Use when auditing existing code for quality WITHOUT changing it: a read-only pass that finds smells, grades them by severity, and routes each to its owner. Triggers on robustness or hardening, duplication, dead code, over-abstraction, complexity, magic numbers, inconsistent implementations, barrel exports, redundant comments, shared-extraction candidates, TODO/FIXME inventory, or a code-smell audit, even when the user doesn't say 'audit' or 'code quality'."
+description: "Use when auditing existing code for quality and reporting graded smells without changing anything. Triggers on code smells, robustness or hardening, duplication, dead code, over-abstraction, complexity, magic numbers, inconsistent implementations, barrel exports, redundant comments, a TODO/FIXME inventory, or 'report only, no edits', even when the user doesn't say 'audit' or 'code quality'."
 ---
 
 # Code-Quality Audit

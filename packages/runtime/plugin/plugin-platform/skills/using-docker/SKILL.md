@@ -1,6 +1,6 @@
 ---
 name: using-docker
-description: "Use when writing or editing Docker images and Compose files for production. Triggers on `Dockerfile`, `docker-compose.yml`, `.dockerignore`, and prompts about multi-stage builds, alpine/distroless base images, layer caching, non-root users, BuildKit, secrets, health checks, or image slimming, even when the user doesn't say 'Docker'."
+description: "Use when writing or editing a Dockerfile or Docker Compose file for production images. Triggers on `Dockerfile`, `docker-compose.yml`, `.dockerignore`, multi-stage builds, base images, slow builds, large images, non-root users, BuildKit secrets, or health checks, even when the user doesn't say 'Docker'."
 ---
 
 # Docker Coding Guidelines

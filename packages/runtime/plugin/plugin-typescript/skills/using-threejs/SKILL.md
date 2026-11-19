@@ -1,6 +1,6 @@
 ---
 name: using-threejs
-description: "Use when building or editing 3D scenes in vanilla Three.js for WebGL/WebGPU. Triggers on `.js`/`.ts` files with `three` or `three/*` imports, and on prompts about Scene, Renderer, Mesh, BufferGeometry, materials, lighting, GLTF loaders, raycasting, shaders, post-processing, instancing, or perf tuning, even when the user doesn't say 'Three.js'."
+description: "Use when building or editing a 3D scene in Three.js for WebGL or WebGPU, or making one render faster. Triggers on files with `three` or `three/*` imports, Scene, Renderer, Mesh, BufferGeometry, materials, lights, GLTF loaders, raycasting, shaders, post-processing, or instancing, even when the user doesn't say 'Three.js'."
 ---
 
 # Three.js Coding Guidelines

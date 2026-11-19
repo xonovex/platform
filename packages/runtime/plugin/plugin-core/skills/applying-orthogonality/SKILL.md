@@ -1,6 +1,6 @@
 ---
 name: applying-orthogonality
-description: "Use when deciding how to decompose a system into modules or packages along independent variation axes, and where each concern's boundary belongs. Triggers on shared-core plus per-variant leaves, package-by-feature vs package-by-layer, sibling naming symmetry, parallel consumers that should mirror the same concepts, cross-axis constraints, cross-cutting concerns that are not axes, false modularity, or a module tree that feels tangled, even when the user doesn't say 'orthogonal'."
+description: "Use when deciding how to split a system into modules or packages, or where the boundary of each concern belongs. Triggers on module or package layout, package-by-feature vs package-by-layer, a shared core with per-variant packages, sibling naming symmetry, cross-cutting concerns, false modularity, or a module tree that feels tangled, even when the user doesn't say 'orthogonal'."
 ---
 
 # Orthogonal Axes

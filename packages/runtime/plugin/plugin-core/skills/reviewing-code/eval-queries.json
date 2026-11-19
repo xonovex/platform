@@ -73,9 +73,15 @@
   },
   {
     "query": "find bugs and race conditions in this concurrency code",
-    "should_trigger": false,
+    "should_trigger": true,
     "split": "train",
-    "rationale": "near-miss: bug-hunting heuristics, not review-comment craft"
+    "rationale": "reviewing existing code that is not a change for defects"
+  },
+  {
+    "query": "review src/billing/proration.ts for me, it is not part of any PR, it has been on main for a year and I suspect it mishandles mid-cycle downgrades",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "review this module: existing code that is not a change, reviewed for defects"
   },
   {
     "query": "configure required reviewers and branch protection on the repository",

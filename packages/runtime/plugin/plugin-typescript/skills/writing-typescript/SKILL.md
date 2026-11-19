@@ -1,6 +1,6 @@
 ---
 name: writing-typescript
-description: "Use when editing or reviewing TypeScript in Node.js ESM projects. Triggers on `.ts` files, ESM `package.json`, and prompts about async functions, type inference, strict mode, ESM imports, env handling, template literals, even when the user doesn't say 'TypeScript'."
+description: "Use when writing, editing, or reviewing TypeScript in a Node.js ESM project. Triggers on `.ts` files, ESM `package.json`, `import` paths, strict-mode type errors, async code, or environment variables, even when the user doesn't say 'TypeScript'."
 ---
 
 # TypeScript Coding Guidelines

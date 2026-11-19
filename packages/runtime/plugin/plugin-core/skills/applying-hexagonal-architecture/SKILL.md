@@ -1,6 +1,6 @@
 ---
 name: applying-hexagonal-architecture
-description: "Use when isolating an application or domain core from its I/O and delivery mechanisms behind interfaces: hexagonal / ports-and-adapters / clean / onion architecture. Triggers on decoupling the domain from the database/UI/framework, driving (primary) vs driven (secondary) adapters, dependency inversion / the dependency rule ('depend on an interface, not the implementation'), a composition root wiring adapters to ports, swapping a real adapter for a fake in tests, or keeping business logic free of infrastructure, even when the user doesn't say 'hexagonal' and says 'ports and adapters' or 'clean architecture'."
+description: "Use when separating business logic from the database, UI, framework or other I/O behind interfaces, or structuring an app as hexagonal, ports-and-adapters, clean or onion architecture. Triggers on ports, adapters, driving vs driven adapters, dependency inversion, the dependency rule, a composition root, swapping a real adapter for a fake in tests, or business logic tangled with infrastructure, even when the user doesn't say 'hexagonal' and says 'ports and adapters' or 'clean architecture'."
 ---
 
 # Hexagonal Architecture (Ports and Adapters)

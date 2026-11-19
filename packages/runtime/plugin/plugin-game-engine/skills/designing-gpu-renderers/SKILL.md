@@ -1,6 +1,6 @@
 ---
 name: designing-gpu-renderers
-description: "Use when designing the architecture of a low-level GPU renderer on any explicit API (Vulkan/D3D12/Metal/WebGPU): render/frame graphs, shader/permutation systems, the descriptor/binding model, explicit GPU↔CPU synchronization, command recording and frames-in-flight, and GPU memory strategy. Triggers on render passes, resource barriers/transitions, transient/aliased targets, shader variants, bind groups/descriptor frequency, command buffers, double/triple buffering, even when the user doesn't say 'renderer' or name a specific API."
+description: "Use when designing the architecture of a GPU renderer on an explicit API such as Vulkan, D3D12, Metal or WebGPU. Triggers on render graphs or frame graphs, render passes, resource barriers, transient render targets, shader variants and permutations, descriptor or bind-group layout, command buffers, frames in flight, double or triple buffering, GPU memory strategy, even when the user doesn't say 'renderer' or name a specific API."
 ---
 
 # GPU Rendering Guidelines (Explicit-API Architecture)

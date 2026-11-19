@@ -1,11 +1,11 @@
 ---
 name: authoring-pull-requests
-description: "Use when authoring a pull or merge request - writing the description, sizing and splitting the change, documenting how it was tested, surfacing tradeoffs, and getting it review-ready before assigning reviewers. Triggers on opening a PR/MR, PR descriptions or templates, large or atomic PRs, what to put in a PR, draft vs ready, stacked PRs, or self-review, even when the user doesn't say 'pull request'."
+description: "Use when an author writes or prepares their own pull or merge request for review: its title and description, its size and split, how it was tested, and a self-review before reviewers are assigned. Triggers on opening a PR or MR, PR descriptions or templates, large, atomic or stacked PRs, draft vs ready for review, or 'is my PR ready', even when the user doesn't say 'pull request'."
 ---
 
 # Pull Request Authoring Guidelines
 
-How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft and returns the title and description inline during Create. Host creation, updates, and work-item links require a separate Publish operation with the git host's tooling; reviewer feedback lives in **reviewing-code**, and branch or commit work lives in **using-git**.
+How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft and returns the title and description inline during Create. Host creation, updates, and work-item links require a separate Publish operation with the git host's tooling; reviewing a change for defects and writing reviewer feedback live in **reviewing-code**, and branch or commit work lives in **using-git**.
 
 ## Essentials
 

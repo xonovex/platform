@@ -1,6 +1,6 @@
 ---
 name: applying-ddd
-description: "Use when finding and naming domain boundaries and modelling inside them: establishing a ubiquitous language, drawing bounded contexts and a context map, protecting a model with an anti-corruption layer, and applying the tactical building blocks (entity, value object, aggregate + root, domain event, repository, domain/application service). Triggers on ubiquitous language, bounded context, context map, anti-corruption layer, aggregate / aggregate root, entity vs value object, domain event, repository, strategic vs tactical design, anemic domain model, even when the user doesn't say 'DDD'."
+description: "Use when modelling a business domain in code or drawing the boundaries between parts of a system around that domain. Triggers on DDD, ubiquitous language, bounded context, context map, anti-corruption layer, aggregate or aggregate root, entity vs value object, domain event, repository, strategic vs tactical design, or an anemic domain model, even when the user doesn't say 'DDD'."
 ---
 
 # Domain-Driven Design

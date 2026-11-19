@@ -1,6 +1,6 @@
 ---
 name: applying-oop
-description: "Use when designing class hierarchies or applying OOP principles. Triggers on prompts about classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, or interfaces, even when the user doesn't say 'OOP'."
+description: "Use when designing classes or class hierarchies or applying OOP principles. Triggers on classes, inheritance, polymorphism, encapsulation, SOLID, design patterns, or interfaces, even when the user doesn't say 'OOP'."
 ---
 
 # General Object-Oriented Programming Guidelines

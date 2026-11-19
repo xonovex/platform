@@ -1,6 +1,6 @@
 ---
 name: using-kubernetes
-description: "Use when editing Kubernetes manifests in GitOps repos. Triggers on `.yaml`/`.yml` files in `clusters/`, `apps/`, or k8s manifest directories, and on prompts about Deployments, Services, ConfigMaps, Secrets (SOPS), Kustomize overlays, Flux/ArgoCD, labels, namespaces, or multi-environment configs, even when the user doesn't say 'Kubernetes'."
+description: "Use when writing or editing Kubernetes manifests in a GitOps repository. Triggers on `.yaml` files in `clusters/`, `apps/`, or manifest directories, Deployments, Services, ConfigMaps, SOPS-encrypted Secrets, Kustomize overlays, Flux, ArgoCD, or per-environment config, even when the user doesn't say 'Kubernetes'."
 ---
 
 # Kubernetes Coding Guidelines

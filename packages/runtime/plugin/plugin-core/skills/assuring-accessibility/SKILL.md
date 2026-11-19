@@ -1,6 +1,6 @@
 ---
 name: assuring-accessibility
-description: "Use when planning, assessing, governing, or operating accessibility across web, mobile, desktop, documents, content, and service journeys. Triggers on WCAG version or level selection, applicable criteria, inclusive design, keyboard or assistive-technology evaluation, accessibility evidence, release gates, conformance claims, exceptions, remediation, monitoring, or exact-revision reassessment, even when the user doesn't say 'accessibility assurance'."
+description: "Use when making a website, app, document or service accessible, or checking, gating or claiming its accessibility conformance. Triggers on accessibility, a11y, WCAG version or level, success criteria, inclusive design, keyboard or screen-reader testing, assistive technology, accessibility evidence, release gates, conformance claims, exceptions, or remediation, even when the user doesn't say 'accessibility assurance'."
 ---
 
 # Accessibility Assurance

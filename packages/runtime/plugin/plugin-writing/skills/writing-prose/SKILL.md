@@ -1,6 +1,6 @@
 ---
 name: writing-prose
-description: "Use when revising general prose for clarity, concision, factual discipline, or consistent terminology across documents and messages. Triggers on plain language, sentence clarity, active voice, ambiguous pronouns, wordiness, repeated summaries, terminology consistency, claim and evidence alignment, or requests to make writing clear and precise, even when the user doesn't say 'writing'."
+description: "Use when making existing text clearer, shorter, or more precise, such as a README, document, message, or note. Triggers on shorten, tighten, trim, wordiness, filler, plain language, active voice, ambiguous pronouns, inconsistent terms, repeated summaries, or a claim apart from its evidence, even when the user doesn't say 'writing'."
 ---
 
 # Writing Guidelines
