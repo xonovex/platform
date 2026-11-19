@@ -30,6 +30,8 @@ codex plugin add xonovex-game-engine@xonovex-marketplace
 
 Plugin dependencies: `xonovex-native`.
 
+Optional companions: `xonovex-core`.
+
 <!-- xonovex:installation:end -->
 
 ## Skills

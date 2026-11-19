@@ -78,6 +78,8 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
+Optional companions: `xonovex-core`.
+
 <!-- xonovex:installation:end -->
 
 ## Skills

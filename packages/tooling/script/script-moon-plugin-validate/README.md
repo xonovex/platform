@@ -6,7 +6,7 @@ For one plugin package directory it checks that:
 
 - the README tables under `## Skills` list exactly the skills of the plugin: each skill is a directory under `skills/` that holds `SKILL.md`, and each table row starts with a link such as `[using-git](skills/using-git/SKILL.md)`
 - every local link in the README and in `docs/**/*.md` resolves to a file, a directory, or a heading inside the package
-- for every skill plugin that `.claude-plugin/plugin.json` or `package.json` declares as a dependency, a `SKILL.md` of the plugin names one of the skills of that dependency
+- for every skill plugin that `.claude-plugin/plugin.json` or `package.json` declares as a dependency, a `SKILL.md` or a reference of the plugin names one of the skills of that dependency in bold, the form of a handoff
 - the package has no `commands` directory, because a plugin holds skills only
 - no prose file in the package contains an em dash, an ellipsis character, or a typographic quote, in literal or Unicode-escaped form
 

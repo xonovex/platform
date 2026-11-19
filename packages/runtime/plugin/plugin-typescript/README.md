@@ -26,6 +26,8 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-typescript@xonovex-marketplace
 ```
 
+Optional companions: `xonovex-core`.
+
 <!-- xonovex:installation:end -->
 
 ## Skills

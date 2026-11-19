@@ -12,6 +12,11 @@ const BOLD_MENTION_RE = new RegExp(
   "gu",
 );
 
+// The opening fence is taken whole, so the closing fence repeats it.
+const FENCED_BLOCK_RE =
+  /^ {0,3}(`{3,}(?!`)|~{3,}(?!~))[^\n]*\n[\s\S]*?^ {0,3}\1[^\n]*$/gmu;
+const CODE_SPAN_RE = /(`+)(?!`)[\s\S]+?(?<!`)\1(?!`)/gu;
+
 export const SKILL_NAME_RULE = `^${SKILL_NAME.replace("?:", "")}$`;
 
 export const isSkillName = (name: string): boolean => SKILL_NAME_RE.test(name);
@@ -24,8 +29,12 @@ export const skillNameMentions = (text: string): readonly string[] =>
 // boldSkillNameMentions returns the skill names that the Markdown sets in bold,
 // which is the notation of a handoff to a skill by name. A bold name before the
 // word operation names an operation of a skill, and an operation can have a
-// gerund name too, so it is not a handoff.
+// gerund name too, so it is not a handoff. Markdown renders no bold inside code,
+// so a name in a fenced block or a code span shows the notation, not a handoff.
 export const boldSkillNameMentions = (text: string): readonly string[] =>
-  [...text.matchAll(BOLD_MENTION_RE)].flatMap(([, name]) =>
-    name === undefined ? [] : [name],
-  );
+  [
+    ...text
+      .replaceAll(FENCED_BLOCK_RE, "")
+      .replaceAll(CODE_SPAN_RE, "")
+      .matchAll(BOLD_MENTION_RE),
+  ].flatMap(([, name]) => (name === undefined ? [] : [name]));

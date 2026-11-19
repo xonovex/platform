@@ -76,6 +76,10 @@
       "types": "./src/skill-name.ts",
       "default": "./dist/src/skill-name.js"
     },
+    "./skill-handoffs": {
+      "types": "./src/skill-handoffs.ts",
+      "default": "./dist/src/skill-handoffs.js"
+    },
     "./workspace": {
       "types": "./src/workspace.ts",
       "default": "./dist/src/workspace.js"

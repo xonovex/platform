@@ -41,6 +41,12 @@ export const installation = (plugin: Plugin, marketplace: string): string => {
       : "\n\nPlugin dependencies: " +
         plugin.dependencies.map((name) => "`" + name + "`").join(", ") +
         ".";
+  const companions =
+    plugin.companions.length === 0
+      ? ""
+      : "\n\nOptional companions: " +
+        plugin.companions.map((name) => "`" + name + "`").join(", ") +
+        ".";
   return (
     "## Install\n\nAdd the Xonovex marketplace once, then install `" +
     plugin.name +
@@ -48,6 +54,7 @@ export const installation = (plugin: Plugin, marketplace: string): string => {
     plugin.version +
     "`.\n\n" +
     sections.join("\n\n") +
-    dependencies
+    dependencies +
+    companions
   );
 };

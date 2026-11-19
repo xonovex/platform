@@ -26,6 +26,8 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-native@xonovex-marketplace
 ```
 
+Optional companions: `xonovex-core`, `xonovex-game-engine`.
+
 <!-- xonovex:installation:end -->
 
 ## Skills

@@ -9,6 +9,7 @@ describe("installation", () => {
         name: "xonovex-core",
         version: "5.3.0",
         dependencies: [],
+        companions: [],
         harnesses: ["Claude Code"],
       },
       "xonovex-marketplace",
@@ -31,13 +32,14 @@ describe("installation", () => {
     );
   });
 
-  it("renders both harness sections and the dependency sentence", () => {
+  it("renders both harness sections, the dependencies and the companions", () => {
     const text = installation(
       {
         directory: "packages/runtime/plugin/plugin-workflow",
         name: "xonovex-workflow",
         version: "5.3.0",
         dependencies: ["xonovex-core", "xonovex-agentic"],
+        companions: ["xonovex-native", "xonovex-platform"],
         harnesses: ["Claude Code", "Codex"],
       },
       "xonovex-marketplace",
@@ -67,6 +69,8 @@ describe("installation", () => {
         "```",
         "",
         "Plugin dependencies: `xonovex-core`, `xonovex-agentic`.",
+        "",
+        "Optional companions: `xonovex-native`, `xonovex-platform`.",
       ].join("\n"),
     );
   });

@@ -10,6 +10,8 @@ export interface PluginFixture {
   readonly claude: boolean;
   readonly codex: boolean;
   readonly readme?: string;
+  // skills maps a path below the plugin directory to the text of the file.
+  readonly skills?: Readonly<Record<string, string>>;
 }
 
 const json = (value: unknown): string => JSON.stringify(value);
@@ -52,6 +54,8 @@ export const repositoryFiles = (
     if (plugin.codex)
       files[ROOT + "/" + plugin.directory + "/.codex-plugin/plugin.json"] =
         manifest;
+    for (const [path, text] of Object.entries(plugin.skills ?? {}))
+      files[ROOT + "/" + plugin.directory + "/" + path] = text;
     if (plugin.readme !== undefined)
       files[ROOT + "/" + plugin.directory + "/README.md"] = plugin.readme;
   }

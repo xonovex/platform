@@ -12,11 +12,17 @@ const PACKAGE_DIR = join(PLUGINS, "plugin-test");
 
 // The fixture holds the plugin under test with one skill, and the core plugin
 // with the skills `using-git` and `applying-tdd`.
-const createPlugins = (skillBody: string): FileSystem =>
+const createPlugins = (skillBody: string, referenceBody?: string): FileSystem =>
   memoryFileSystem({
     directories: [PACKAGE_DIR],
     files: {
       [join(PACKAGE_DIR, "skills", "using-test", "SKILL.md")]: skillBody,
+      ...(referenceBody === undefined
+        ? {}
+        : {
+            [join(PACKAGE_DIR, "skills", "using-test", "references", "a.md")]:
+              referenceBody,
+          }),
       [join(PLUGINS, "plugin-core", "skills", "using-git", "SKILL.md")]:
         "# Git\n",
       [join(PLUGINS, "plugin-core", "skills", "applying-tdd", "SKILL.md")]:
@@ -72,6 +78,26 @@ describe("checkDependencyUsage", () => {
         "dependency.package-unused",
         "packages/runtime/plugin/plugin-test/package.json",
       ],
+    ]);
+  });
+
+  it("accepts a dependency when a reference hands off to one of its skills", () => {
+    const fs = createPlugins(
+      "# Test\n",
+      "# A\n\nTests follow **applying-tdd**.\n",
+    );
+
+    expect(codes(fs, {pluginDependencies: ["xonovex-core"]})).toEqual([]);
+  });
+
+  it("does not accept a plain skill name as a reason", () => {
+    const fs = createPlugins(
+      "# Test\n\nCommits belong to using-git.\n",
+      "# A\n\nSee `applying-tdd`.\n",
+    );
+
+    expect(codes(fs, {pluginDependencies: ["xonovex-core"]})).toEqual([
+      "dependency.plugin-unused",
     ]);
   });
 

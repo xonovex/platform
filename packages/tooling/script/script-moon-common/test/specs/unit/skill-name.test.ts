@@ -39,6 +39,25 @@ describe("skill names", () => {
     ).toEqual(["using-git", "writing-lua"]);
   });
 
+  it("skips a bold name inside a code span or a fenced block", () => {
+    expect(
+      boldSkillNameMentions(
+        [
+          "Write `owned by **using-hono**` for a handoff to **using-git**.",
+          "",
+          "```markdown",
+          "Owned by **applying-bdd**.",
+          "```",
+          "",
+          "~~~",
+          "**authoring-tests**",
+          "~~~",
+          "Then **reviewing-code**, and ``a `**using-zod**` span``.",
+        ].join("\n"),
+      ),
+    ).toEqual(["using-git", "reviewing-code"]);
+  });
+
   it("reads a bold name before the word operation as an operation", () => {
     expect(
       boldSkillNameMentions(
