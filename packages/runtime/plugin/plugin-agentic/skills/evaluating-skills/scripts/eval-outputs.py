@@ -29,9 +29,9 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N / RUNS=N                  runs per arm per eval (default: 1; maximum: 3)
     --concurrency N / CONCURRENCY=N    parallel claude invocations (default/maximum: 2)
     --model M / CLAUDE_MODEL=M         generation model
-                                       (default: claude-haiku-4-5-20251001)
+                                       (default: claude-haiku-5-5)
     --judge-model M / JUDGE_MODEL=M    grading model
-                                       (default: claude-sonnet-5)
+                                       (default: claude-sonnet-5-5)
     --disallowed-tools L / DISALLOWED_TOOLS=L
                                        tools blocked in BOTH arms during generation
                                        (default: Bash,Edit,Write,NotebookEdit,WebFetch);
@@ -102,8 +102,8 @@ JUDGE_SYSTEM_PROMPT = (
     "return exactly the requested JSON."
 )
 MAX_OUTPUT_MODEL_CALLS = 24
-CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
-CLAUDE_JUDGE_MODEL = "claude-sonnet-5"
+CLAUDE_GENERATION_MODEL = "claude-haiku-5-5"
+CLAUDE_JUDGE_MODEL = "claude-sonnet-5-5"
 OUTPUT_GATE_POLICIES = {
     "aggressive": {"minimum_with_skill_pass_rate": 0.75,
                    "minimum_delta_pass_rate": 0.05},

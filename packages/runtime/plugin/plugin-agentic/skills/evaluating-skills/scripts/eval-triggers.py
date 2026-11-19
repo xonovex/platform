@@ -14,7 +14,7 @@ Options (flag overrides env; env keeps the loop/CI ergonomics):
     --runs N             / RUNS=N            runs per query (default: 3)
     --threshold F        / THRESHOLD=F       trigger-rate cutoff for a pass (default: 0.5)
     --model M            / CLAUDE_MODEL=M    model for `claude --model`
-                                               (default: claude-haiku-4-5-20251001)
+                                               (default: claude-haiku-5-5)
     --plugin-dir PATH    / PLUGIN_DIR=PATH    target-only local plugin directory
     --max-budget-usd N   / MAX_BUDGET_USD=N  hard per-run spend cap (default/max: 0.05)
 
@@ -53,7 +53,7 @@ from _eval_plugin import find_plugin_directory, resolve_plugin_directories, stag
 TRIGGER_TIMEOUT = 60
 TRIGGER_OUTPUT_LIMIT = 2_000
 MAX_MODEL_RUNS = 24
-CLAUDE_GENERATION_MODEL = "claude-haiku-4-5-20251001"
+CLAUDE_GENERATION_MODEL = "claude-haiku-5-5"
 TRIGGER_SYSTEM_PROMPT = (
     "Decide only whether the available skill applies to the user request. "
     "If it applies, invoke Skill immediately. Otherwise reply with one short sentence. "

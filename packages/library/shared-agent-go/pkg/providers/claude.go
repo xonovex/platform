@@ -37,10 +37,10 @@ func geminiClaudeProvider() *types.ModelProvider {
 			"ANTHROPIC_BASE_URL":                       "http://127.0.0.1:8317",
 			"API_TIMEOUT_MS":                           "3000000",
 			"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-			"ANTHROPIC_DEFAULT_OPUS_MODEL":             "gemini-claude-opus-4-5-thinking",
-			"ANTHROPIC_DEFAULT_SONNET_MODEL":           "gemini-claude-sonnet-4-5-thinking",
+			"ANTHROPIC_DEFAULT_OPUS_MODEL":             "gemini-claude-opus-5-5-thinking",
+			"ANTHROPIC_DEFAULT_SONNET_MODEL":           "gemini-claude-sonnet-5-5-thinking",
 			"ANTHROPIC_DEFAULT_HAIKU_MODEL":            "gemini-2.5-flash-lite",
-			"CLAUDE_CODE_SUBAGENT_MODEL":               "gemini-claude-sonnet-4-5",
+			"CLAUDE_CODE_SUBAGENT_MODEL":               "gemini-claude-sonnet-5-5",
 		},
 		CliArgs: []string{},
 	}

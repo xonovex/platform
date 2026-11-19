@@ -99,7 +99,7 @@ describe("trigger configuration", () => {
       threshold: 0.5,
       budget: 0.05,
       harness: "claude",
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-5-5",
       harnessExecutable: "/bin/claude",
       queryCount: 2,
       maxBatchModelRuns: 6,

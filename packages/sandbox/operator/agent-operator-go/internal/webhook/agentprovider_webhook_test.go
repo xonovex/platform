@@ -19,7 +19,7 @@ func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
 			Environment: map[string]string{
 				"ANTHROPIC_BASE_URL": "https://api.anthropic.com",
 			},
-			CliArgs: []string{"--model", "claude-sonnet-4-6"},
+			CliArgs: []string{"--model", "claude-sonnet-5-5"},
 		},
 	}
 
@@ -197,7 +197,7 @@ func TestAgentProviderWebhook_Validate_ValidCliArgs(t *testing.T) {
 	w := &AgentProviderWebhook{}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
-			CliArgs: []string{"--model", "claude-sonnet-4-6", "--max-tokens", "4096"},
+			CliArgs: []string{"--model", "claude-sonnet-5-5", "--max-tokens", "4096"},
 		},
 	}
 

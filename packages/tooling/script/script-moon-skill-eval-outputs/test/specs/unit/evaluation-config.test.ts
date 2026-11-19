@@ -178,8 +178,8 @@ describe("evaluation configuration", () => {
     const config = successfulConfig(resolveConfig());
 
     expect(config).toMatchObject({
-      model: "claude-haiku-4-5-20251001",
-      judgeModel: "claude-sonnet-5",
+      model: "claude-haiku-5-5",
+      judgeModel: "claude-sonnet-5-5",
     });
   });
 
