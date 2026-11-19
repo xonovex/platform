@@ -16,6 +16,7 @@ tasks:
       - skill-configuring-kiro:ci-check
       - skill-configuring-opencode:ci-check
       - skill-configuring-pi:ci-check
+      - skill-evaluating-skills:ci-check
       - skill-using-herdr:ci-check
     options:
       mergeDeps: append

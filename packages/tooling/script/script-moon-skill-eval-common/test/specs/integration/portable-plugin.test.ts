@@ -35,7 +35,7 @@ describe("portable evaluation plugin loading", () => {
       write("plugin-core/skills/using-beta/SKILL.md", "# Beta");
       const scripts = resolve(
         import.meta.dirname,
-        "../../../../../../runtime/plugin/plugin-agentic/skills/authoring-skills/scripts",
+        "../../../../../../runtime/plugin/plugin-agentic/skills/evaluating-skills/scripts",
       );
 
       const result = execFileSync(

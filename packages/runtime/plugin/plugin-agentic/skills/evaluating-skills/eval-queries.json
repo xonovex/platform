@@ -1,0 +1,104 @@
+[
+  {
+    "query": "run the trigger evals for using-zod three times each and tell me which near-miss queries still fire it",
+    "rationale": "direct: trigger-rate run",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "our writing-python skill needs an evals.json: three prompts with binary assertions, then compare the pass rate with and without the skill",
+    "rationale": "direct: output evals with matched arms",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "the benchmark.json of iteration 2 shows the with-skill arm losing to the baseline on two assertions; find out why from the transcripts",
+    "rationale": "implicit: benchmark analysis",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "trim using-hono to only what the weakest model doesn't already know and prove with an ablation run that nothing essential got lost",
+    "rationale": "direct: trim by delta with ablation",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "split these 20 trigger queries into train and validation and run the description optimization loop on the train half only",
+    "rationale": "direct: train/validation optimization loop",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "the routing eval for applying-tdd hits 1 of 3 runs on two validation queries; rerun just those with codex as the harness",
+    "rationale": "context cue: rerun with another harness",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "write trigger-eval queries for our new using-docker and check the description routes them correctly",
+    "rationale": "validation positive: evaluating trigger rate",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "these output-eval assertions say things like 'the answer is good'; rewrite them so a grader can check each one with evidence",
+    "rationale": "implicit: assertion quality",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "measure whether the new hot-paths reference of writing-lua changes the answers of the weakest model at all",
+    "rationale": "implicit: ablation of one reference",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "create a new skill for our Terraform module conventions with a SKILL.md and two reference files",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the SKILL.md of using-react has grown to 600 lines; move the detail into references with load-when lines",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "run the vitest suite of the api package and fix the two failing snapshot tests",
+    "rationale": "near miss owned by using-vitest",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "load-test our HTTP server and compare the p99 latency before and after the change",
+    "rationale": "near-miss: performance benchmarking, not a skill eval",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "write an LLM-as-judge rubric that grades the answers of our support chatbot in production",
+    "rationale": "near-miss: product prompt grading, not a skill eval",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down allowed-tools",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "rewrite the description of using-zod so that it starts with Use when and names its triggers",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add a unit test that checks our CLI exits non-zero when its config file is missing",
+    "rationale": "near miss owned by authoring-tests",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

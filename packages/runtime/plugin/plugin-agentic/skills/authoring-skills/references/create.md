@@ -33,7 +33,7 @@ These are authoring shapes, not metadata classifications. Choose the shape that 
 1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type (guideline skills: see [guideline-skills.md](guideline-skills.md))
 2. **Fetch Source**: Fetch URLs from the web; read local files; mine conversation/task context
 3. **Extract Content**: Requirements, procedures, rules, gotchas, examples, edge cases, whatever the type calls for
-4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content, see [evaluating-triggers.md](evaluating-triggers.md), [evaluating-outputs.md](evaluating-outputs.md)
+4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content, with **evaluating-skills**
 5. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
 6. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items) and a routing-first description (see [writing-descriptions.md](writing-descriptions.md)); include a Gotchas section for non-obvious env-specific facts
 7. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables (see [using-scripts.md](using-scripts.md)), `assets/` for templates

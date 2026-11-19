@@ -51,6 +51,7 @@ projects:
     skill-designing-imgui: packages/runtime/plugin/plugin-game-engine/skills/designing-imgui
     skill-designing-node-graphs: packages/runtime/plugin/plugin-game-engine/skills/designing-node-graphs
     skill-distilling-plan: packages/runtime/plugin/plugin-workflow/skills/distilling-plan
+    skill-evaluating-skills: packages/runtime/plugin/plugin-agentic/skills/evaluating-skills
     skill-implementing-plan: packages/runtime/plugin/plugin-workflow/skills/implementing-plan
     skill-implementing-vulkan-renderers: packages/runtime/plugin/plugin-game-engine/skills/implementing-vulkan-renderers
     skill-managing-credentials: packages/runtime/plugin/plugin-core/skills/managing-credentials

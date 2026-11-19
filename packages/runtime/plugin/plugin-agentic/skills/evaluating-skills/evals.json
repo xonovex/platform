@@ -1,0 +1,33 @@
+{
+  "skill_name": "evaluating-skills",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write eval-queries.json entries for a skill named using-terraform: four positives and four negatives, split between train and validation.",
+      "assertions": [
+        "Each entry has the fields query, should_trigger, split and rationale",
+        "At least one negative is a near miss on infrastructure work that another skill owns, such as a Kubernetes or Docker task, not an unrelated topic",
+        "Both the train and the validation split hold at least one positive and one negative"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Here are three output-eval assertions for a Python skill: 'The code is good', 'Uses best practices', 'The function returns the records sorted by date'. Rewrite the weak ones.",
+      "assertions": [
+        "It names 'The code is good' and 'Uses best practices' as weak because a grader cannot verify them",
+        "Each rewritten assertion names one property of the output that a grader can check with evidence",
+        "It keeps 'The function returns the records sorted by date' or tightens it without a change of meaning"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I trimmed our using-hono skill from 900 to 500 words. How do I check that the trim did not remove a fact the model needs?",
+      "assertions": [
+        "It runs the evals of the skill on the weakest target model with the trimmed skill and compares the result with a run without the skill or with the untrimmed skill",
+        "It ties each kept fact to an eval whose correct answer needs that fact",
+        "It measures the repository copy of the skill, such as the local plugin directory, not an installed release"
+      ]
+    }
+  ]
+}

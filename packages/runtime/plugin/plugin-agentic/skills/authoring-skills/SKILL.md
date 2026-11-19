@@ -1,8 +1,8 @@
 ---
 name: authoring-skills
-description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. Triggers on edits under a skills directory, creating a skill, progressive disclosure, reference files, pattern extraction, assimilation, bullet simplification, Agent Skills spec validation, description tuning, trigger/output evaluation, composable ownership, runtime routing, or hard dependency tiers, even when the user doesn't say 'skill'."
-compatibility: "Git and Python 3.11+ with uv run the bundled validation, evaluation, and source-audit scripts. Live trigger/output evals additionally require a credentialed Claude or Codex CLI and network access; source fetch/update options perform explicit network or file writes."
-allowed-tools: "Read Bash(git:*) Bash(uv:*) Bash(claude:*) Bash(codex:*)"
+description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. Triggers on edits under a skills directory, creating a skill, progressive disclosure, reference files, pattern extraction, assimilation, bullet simplification, Agent Skills spec validation, description tuning, composable ownership, runtime routing, or hard dependency tiers, even when the user doesn't say 'skill'."
+compatibility: "Git and Python 3.11+ with uv run the bundled validation and source-audit scripts; source fetch/update options perform explicit network or file writes."
+allowed-tools: "Read Bash(git:*) Bash(uv:*)"
 ---
 
 # Skill Guidelines Management
@@ -32,13 +32,13 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 - **Treat skills as software**: least privilege via `allowed-tools`, audit untrusted scripts/URLs, never hardcode secrets, see [references/security.md](references/security.md)
 - **Bullet Format**: `- **Rule** - Brief 5-10 word how-to, see [references/<topic>.md](references/<topic>.md)`
 - **Style Consistency**: match existing skill patterns in structure and voice
-- **Add what the agent lacks; omit what it knows**: trim to the delta over baseline model knowledge (tier-aware) and verify against the weakest model, see [references/optimize.md](references/optimize.md); no general-knowledge filler
+- **Add what the agent lacks; omit what it knows**: trim to the delta over baseline model knowledge (tier-aware) and verify the trim against the weakest model with **evaluating-skills**; no general-knowledge filler
 - **Defaults over menus**: one default, alternatives mentioned briefly
 - **Deletion-first editing**: an editing pass cuts at least as much as it adds; if a change grows a file, say what it replaces or bump the file's recorded budget in the same change
 - **No new nouns**: reuse the vocabulary the catalog already owns; a new term of art needs a defining file and an entry in the vocabulary manifest, or it is a synonym and should be deleted
 - **Anchor to an artifact**: every instruction must pass "could an agent do this, and could you verify it did?"; an instruction naming no checkable output is advice, not a skill
 - **Procedures over declarations**: teach the approach/steps, not a one-off answer
-- **Evals before docs**: build trigger/output evals for the gap first, then write the minimum to pass them; iterate observe→revise, see [references/evaluating-triggers.md](references/evaluating-triggers.md), [references/evaluating-outputs.md](references/evaluating-outputs.md)
+- **Evals before docs**: build the trigger and output evals for the gap first with **evaluating-skills**, then write the minimum that passes them
 
 ## Skill Structure
 
@@ -59,14 +59,10 @@ Author, extract, merge, simplify, and validate Agent Skills following the Agent 
 
 ## Scripts
 
-Bundled maintenance scripts use PEP 723 and run with `uv run <script>` (`uv` creates an isolated environment on first run):
+The bundled maintenance scripts use PEP 723 and run with `uv run <script>` (`uv` creates an isolated environment on first run):
 
 - `scripts/validate.py <skill-dir>`: spec / quality / harness-neutrality audit (read-only; exits non-zero on errors)
-- `scripts/eval-triggers.py <queries.json> <skill-name>`: run trigger-eval queries against a skill (Claude Code reference implementation; requires `claude` CLI in PATH)
-- `scripts/eval-outputs.py <evals.json> <skill-name>`: run output-quality evals with-skill vs without-skill; writes per-arm pass rate / tokens / duration + `benchmark.json` (requires `claude` CLI in PATH)
 - `scripts/audit-sources.py <skill-dir>`: portable source audit: staleness, mappings, versioned drift anchors, live URLs, restricted-source classification, and content hashes; `--fetch` checks URLs and snapshots, `--pull` refreshes declared checkouts, and `--mark-reviewed` stamps the date after review (read-only by default)
-
-The repository's `moon-skill-eval-triggers` and `moon-skill-eval-outputs` commands accept `--harness claude|codex`. Claude remains the default; Codex runs with an isolated home, ignored user configuration/rules, a read-only sandbox, ephemeral sessions, and only the target skill in the activated arm.
 
 Cross-platform (macOS / Linux / Windows wherever `uv` is installed). Install `uv` with `brew install uv` or `curl -LsSf https://astral.sh/uv/install.sh | sh`.
 
@@ -78,7 +74,6 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/extract-from-codebase.md](references/extract-from-codebase.md) - Load when extracting patterns from this codebase into a skill
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one skill into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose SKILL.md to bullet format or trimming bloated reference files
-- Read [references/optimize.md](references/optimize.md) - Load when trimming a skill to its delta over baseline model knowledge (tier depth) and verifying with a weakest-model ablation that no essential fact was lost
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec
 - Read [references/composability.md](references/composability.md) - Load when deciding skill boundaries, owners, tiers, how one skill depends on another, or whether to generalize vs link a concept
 - Read [references/catalog-audit.md](references/catalog-audit.md) - Load when auditing, splitting, or de-duplicating a set of skills onto the composable split
@@ -86,8 +81,6 @@ Single index of every reference; each entry names the operation/concept and when
 - Read [references/guideline-skills.md](references/guideline-skills.md) - Load when creating a coding-guideline / style-rule skill (topic categories, do/don't patterns, reference shape)
 - Read [references/workflow-skills.md](references/workflow-skills.md) - Load when creating a workflow / operation skill: a procedure the agent or a command delegates to (Core Principles → Operations skeleton, command delegation)
 - Read [references/writing-descriptions.md](references/writing-descriptions.md) - Load when authoring or rewriting a `description` field (writing principles, before/after)
-- Read [references/evaluating-triggers.md](references/evaluating-triggers.md) - Load when verifying or iterating on trigger rate (eval queries, train/validation split, optimization loop)
-- Read [references/evaluating-outputs.md](references/evaluating-outputs.md) - Load when verifying or iterating on output quality (test cases, assertions, grading)
 - Read [references/using-scripts.md](references/using-scripts.md) - Load when the skill needs an executable component (one-off commands, self-contained scripts)
 - Read [references/instruction-patterns.md](references/instruction-patterns.md) - Load when designing the body of a workflow-heavy skill (templates, checklists, validation loops, plan-validate-execute)
 - Read [references/security.md](references/security.md) - Load when auditing an untrusted skill, restricting tool access, or reviewing scripts/URLs for exfiltration or injection

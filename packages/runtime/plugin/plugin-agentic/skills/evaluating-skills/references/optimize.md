@@ -1,6 +1,6 @@
 # optimize: Trim a Skill to Its Delta Over Baseline Model Knowledge
 
-Cut everything the target model already produces unprompted; keep only what it lacks. Never touch `description`/triggers: they route (see [writing-descriptions.md](writing-descriptions.md)). Condensing mechanics live in [simplify.md](simplify.md); this adds the knowledge-delta discipline, tier depth, and the ablation that proves nothing essential was lost.
+Cut everything the target model already produces unprompted; keep only what it lacks. Never touch `description`/triggers: they route, and **authoring-skills** owns their wording and the condensing mechanics; this adds the knowledge-delta discipline, tier depth, and the ablation that proves nothing essential was lost.
 
 The flow runs in five phases: **Baseline → Scope → Excise → Gate → Ablate.** Baseline (skill absent) and Ablate (trimmed skill present) are the two measurements that bracket the cut. Separate passes at catalog scale, or the two arms of one ablation for a single skill.
 
@@ -32,7 +32,7 @@ When unsure whether a detail is essential, keep it.
 
 ## Dedupe within the skill
 
-Merge near-duplicate reference files into one, then update every SKILL.md link and the Progressive Disclosure entry (keep one Load-when trigger) and delete the unused file. Remove SKILL.md index sections that duplicate the Progressive Disclosure list. Only dedupe within one skill: cross-skill de-duplication is a [catalog-audit.md](catalog-audit.md) operation.
+Merge near-duplicate reference files into one, then update every SKILL.md link and the Progressive Disclosure entry (keep one Load-when trigger) and delete the unused file. Remove SKILL.md index sections that duplicate the Progressive Disclosure list. Only dedupe within one skill: cross-skill de-duplication is the catalog audit of **authoring-skills**.
 
 ## Fix, don't just cut
 
@@ -40,7 +40,7 @@ If a trim surfaces a genuine defect (a rule that as written would mislead), fix 
 
 ## Gate, then Ablate
 
-1. **Gate**: `scripts/validate.py <skill-dir>` must PASS (frontmatter, refs resolve, Gotchas present, Progressive Disclosure Load-when triggers).
+1. **Gate**: the validator of **authoring-skills** (`scripts/validate.py <skill-dir>`) must PASS (frontmatter, refs resolve, Gotchas present, Progressive Disclosure Load-when triggers).
 2. **Ablate**: verify the trim kept its value with an **ablation against the weakest model you deploy**. A stronger model hides value loss:
    - Diff the removed content (`git diff <pre-trim-ref> HEAD -- <skill>`); from the `-` lines list genuine knowledge-at-risk items (non-obvious facts, exact identifiers): ignore filler.
    - For each, an eval whose correct answer needs that fact: the `evals.json` seed + `eval-outputs.py` runner in [evaluating-outputs.md](evaluating-outputs.md).

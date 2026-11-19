@@ -44,6 +44,7 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [configuring-kiro](skills/configuring-kiro/SKILL.md) | Configuring Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
 | [configuring-opencode](skills/configuring-opencode/SKILL.md) | Configuring OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
 | [configuring-pi](skills/configuring-pi/SKILL.md) | Configuring Pi extensions, packages, skills, settings, context injection, tool interception, permissions, or subagent patterns. |
+| [evaluating-skills](skills/evaluating-skills/SKILL.md) | Measuring an Agent Skill with model runs: trigger evals, output evals with and without the skill, or an ablation after a trim. |
 | [using-herdr](skills/using-herdr/SKILL.md) | Inspecting and controlling Herdr agents, terminal commands, spaces, tabs, and panes. |
 
 ## Validation

@@ -67,9 +67,9 @@
   },
   {
     "query": "write trigger-eval queries for our new using-docker and check the description routes them correctly",
-    "should_trigger": true,
+    "should_trigger": false,
     "split": "validation",
-    "rationale": "validation positive: evaluating trigger rate"
+    "rationale": "near miss owned by evaluating-skills"
   },
   {
     "query": "this guide re-explains the immutability rules that applying-fp already owns: factor them out and cross-reference it",
@@ -106,5 +106,11 @@
     "rationale": "near miss owned by authoring-commands",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "measure whether the new hot-paths reference of writing-lua changes the answers of the weakest model at all",
+    "rationale": "near miss owned by evaluating-skills",
+    "should_trigger": false,
+    "split": "train"
   }
 ]
