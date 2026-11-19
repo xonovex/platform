@@ -154,5 +154,11 @@
     "rationale": "validation near miss owned by using-git",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "the verdict on work/ledger-export-7k2m passed, write the PR body and the commit message into its deliveries folder. I'll open the PR on GitHub myself",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

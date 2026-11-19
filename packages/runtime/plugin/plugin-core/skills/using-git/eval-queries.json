@@ -166,5 +166,11 @@
     "rationale": "near miss owned by managing-versions",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "worktree for work/points-balance-endpoint-3m4q is already set up, now build the item there and save the implementation notes",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "train"
   }
 ]
