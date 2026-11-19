@@ -129,6 +129,6 @@ Configs merge sequentially: global → extends → local.
 
 - Recommend a git commit before running
 - Never modify the skill `name:` in frontmatter
-- Preserve `description:` triggering quality (imperative, ≤1024 chars, keeps trigger contexts)
+- Preserve `description:` triggering quality (imperative, ≤820 chars, keeps trigger contexts)
 - Skip skills <30 lines
 - Warn if reference files would be overwritten

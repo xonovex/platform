@@ -116,6 +116,25 @@ description: "Use when checking punctuation. Triggers on validator fixtures, eve
     );
   });
 
+  it.each([
+    [820, "description: 820 chars (within 820)"],
+    [821, "description: 821 chars (over the 820-character catalog limit)"],
+  ])("checks a %i-character description against the limit", (length, line) => {
+    const fs = memoryFileSystem({directories: [ROOT]});
+    const skill = join(ROOT, "using-limits");
+    const lead =
+      "Use when checking the description limit. Triggers on validator fixtures, even when the user doesn't say limit.";
+    fs.writeFile(
+      join(skill, "SKILL.md"),
+      `---\nname: using-limits\ndescription: "${lead.padEnd(length, "x")}"\n---\n# Guide\n`,
+    );
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    validateSkill([skill], fs);
+
+    expect(log.mock.calls.flat().join("\n")).toContain(line);
+  });
+
   it("returns an input error for invalid YAML frontmatter", () => {
     const fs = memoryFileSystem({directories: [ROOT]});
     const skill = join(ROOT, "invalid-yaml");

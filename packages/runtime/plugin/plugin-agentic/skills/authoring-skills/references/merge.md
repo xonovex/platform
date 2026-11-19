@@ -33,7 +33,7 @@ Frontmatter, section order, bullet format, voice/tone, code style, reference fil
 
 ### Spec ceilings (CRITICAL)
 
-Target `description` ≤1024 chars after merge; target body <500 lines / ~5000 tokens: push overflow to `references/` with explicit load-when triggers
+Target `description` ≤820 chars after merge; target body <500 lines / ~5000 tokens: push overflow to `references/` with explicit load-when triggers
 
 ### Extract from source
 

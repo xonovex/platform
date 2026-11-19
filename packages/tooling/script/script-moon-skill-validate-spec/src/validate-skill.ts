@@ -259,23 +259,24 @@ const checkName = (
   }
 };
 
+// The routing run on the workflow skills kept descriptions of up to this
+// length; the specification allows 1,024.
+const DESCRIPTION_LIMIT = 820;
+
 const checkDescription = (fm: Frontmatter, report: Report): void => {
   const desc = fm.description;
   if (!desc) {
     report.addFail("frontmatter: missing 'description'");
   } else if (typeof desc === "string") {
     const descLen = desc.length;
-    if (descLen > 1024) {
+    if (descLen > DESCRIPTION_LIMIT) {
       report.addFail(
-        `description: ${String(descLen)} chars (>1024 spec limit)`,
+        `description: ${String(descLen)} chars (over the ${String(DESCRIPTION_LIMIT)}-character catalog limit)`,
       );
-    } else if (descLen > 820) {
-      report.addWarn(
-        `description: ${String(descLen)} chars (>80% of 1024 limit; consider trimming)`,
-      );
-      report.addPass(`description present (${String(descLen)} chars)`);
     } else {
-      report.addPass(`description: ${String(descLen)} chars (under 1024)`);
+      report.addPass(
+        `description: ${String(descLen)} chars (within ${String(DESCRIPTION_LIMIT)})`,
+      );
     }
 
     if (/^\s*use (?:this skill )?when/i.test(desc)) {

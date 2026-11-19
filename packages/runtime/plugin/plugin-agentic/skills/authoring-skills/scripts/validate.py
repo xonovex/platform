@@ -35,6 +35,8 @@ NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 SKILL_NAME = r"[a-z0-9]+ing(?:-[a-z0-9]+)+"
 SKILL_NAME_RE = re.compile(rf"^{SKILL_NAME}$")
 RESERVED_VENDOR_ADAPTER_NAMES = frozenset({"configuring-claude-code"})
+# The routing run on the workflow skills kept descriptions of up to this length; the specification allows 1,024.
+DESCRIPTION_LIMIT = 820
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
 QUOTED_SCALAR_RE = re.compile(r"^[ \t]*[A-Za-z_][\w-]*:[ \t]*(?P<rest>.+?)[ \t]*$")
 REF_LINK_RE = re.compile(r"references/([a-zA-Z0-9_./<>{}-]+\.md)")
@@ -266,15 +268,12 @@ def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
         report.add_fail(f"frontmatter: description is {type(desc).__name__}, expected string")
     else:
         desc_len = len(desc)
-        if desc_len > 1024:
-            report.add_fail(f"description: {desc_len} chars (>1024 spec limit)")
-        elif desc_len > 820:
-            report.add_warn(
-                f"description: {desc_len} chars (>80% of 1024 limit; consider trimming)"
+        if desc_len > DESCRIPTION_LIMIT:
+            report.add_fail(
+                f"description: {desc_len} chars (over the {DESCRIPTION_LIMIT}-character catalog limit)"
             )
-            report.add_pass(f"description present ({desc_len} chars)")
         else:
-            report.add_pass(f"description: {desc_len} chars (under 1024)")
+            report.add_pass(f"description: {desc_len} chars (within {DESCRIPTION_LIMIT})")
 
         if re.match(r"^\s*use (this skill )?when", desc, re.IGNORECASE):
             report.add_pass("description: imperative phrasing ('Use when...')")
