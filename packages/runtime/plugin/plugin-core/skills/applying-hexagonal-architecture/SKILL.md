@@ -17,7 +17,7 @@ Isolate the domain core behind ports it owns, so every I/O and delivery mechanis
 ## Gotchas
 
 - The hexagon isn't six of anything. It just signals "many ports", not a top/bottom layering.
-- Ports-and-adapters is not the microkernel pattern: hexagonal isolates the domain behind a usually-fixed set of ports; an open, _registered_ plug-in set is applying-microkernel-architecture. They share the adapter mechanism, nothing more.
+- Ports-and-adapters is not the microkernel pattern: hexagonal isolates the domain behind a usually-fixed set of ports; an open, _registered_ plug-in set is **applying-microkernel-architecture**. They share the adapter mechanism, nothing more.
 - If a unit test needs a real database or network, the boundary leaked: narrow the port or invert the dependency.
 
 ## Example

@@ -1,13 +1,13 @@
 # create: Push and open the merge request
 
-Push the branch yourself, then open the MR with `glab mr create`, capturing the `iid`. glab does NOT push by default, MR creation is NOT idempotent, and the description / labels are replace-only on update. The MR description content is `authoring-pull-requests`'s craft; the pure-git push and rebase are `using-git`'s push reference: name them, don't restate them here.
+Push the branch yourself, then open the MR with `glab mr create`, capturing the `iid`. glab does NOT push by default, MR creation is NOT idempotent, and the description / labels are replace-only on update. The MR description content is **authoring-pull-requests**'s craft; the pure-git push and rebase are **using-git**'s push reference: name them, don't restate them here.
 
 ## Push first
 
-`glab mr create` opens an MR from an already-pushed source branch; it does not push on its own. Push with git (see `using-git`'s push reference), or pass `--push` to make glab push instead:
+`glab mr create` opens an MR from an already-pushed source branch; it does not push on its own. Push with git (see **using-git**'s push reference), or pass `--push` to make glab push instead:
 
 ```bash
-git push -u origin HEAD          # see using-git's push reference
+git push -u origin HEAD
 ```
 
 ## Create
@@ -17,7 +17,7 @@ glab mr create -R group/project \
   --source-branch "$(git branch --show-current)" \
   --target-branch main \
   --title "feat: x" \
-  --description "<what/why/how, see authoring-pull-requests>" \
+  --description "<what/why/how>" \
   --reviewer alice,bob --label backend --yes
 ```
 

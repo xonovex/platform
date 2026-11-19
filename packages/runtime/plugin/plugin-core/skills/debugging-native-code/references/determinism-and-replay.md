@@ -4,7 +4,7 @@ Convert an intermittent bug into a deterministic one before trying to fix it: a 
 
 ## How to Apply
 
-1. Hunt nondeterminism: uninitialized memory, unordered iteration, time/random seeds, thread scheduling. Add a "run single-threaded" flag, if the bug vanishes single-threaded it's a race (reclamation detail in writing-lock-free-code).
+1. Hunt nondeterminism: uninitialized memory, unordered iteration, time/random seeds, thread scheduling. Add a "run single-threaded" flag, if the bug vanishes single-threaded it's a race (reclamation detail in **writing-lock-free-code**).
 2. Where feasible, make the system's tick a pure function of its inputs (same inputs → same state), so a captured input sequence reproduces the bug every time.
 3. Still resists? Use a record/replay or reverse-execution tool to step _backward_ from the failure; verify the recorded run actually reproduces the bug.
 4. At scale, take the statistical view: collect crash reports (stack trace + memory dump), group by stack-trace + message, prioritize by users affected × frequency.

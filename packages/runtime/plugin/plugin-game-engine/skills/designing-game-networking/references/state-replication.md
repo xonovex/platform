@@ -14,7 +14,7 @@ A two-level opt-in keeps the wire lean without hand-written serialization per ty
 4. Default to the cheap path: with no layout info, send the whole component as one opaque binary blob, correct, easy, wasteful.
 5. Optimize by description: hand the system the struct layout and a per-field watch cadence so it sends only the members that actually changed.
 6. Send updates only to interested nodes: nodes that have the object in scope/relevancy, not to every connected node. See delta-and-snapshots.md for how the first send to a newly-interested node differs.
-7. For one-shot facts (events, variable sets) replicate the event/variable directly: send a compact identifier (e.g. an event name hash) plus the target object id; the receiver looks up the object by id and applies it, see designing-data-models for stable networked ids.
+7. For one-shot facts (events, variable sets) replicate the event/variable directly: send a compact identifier (e.g. an event name hash) plus the target object id; the receiver looks up the object by id and applies it, see **designing-data-models** for stable networked ids.
 
 ### Example
 

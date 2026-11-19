@@ -5,7 +5,7 @@ description: "Use when chasing a bug in native or low-level software: a crash, a
 
 # Debugging Guidelines
 
-Systematic, hypothesis-driven debugging of native/low-level software, plus designing each class of bug out of existence. The cheapest bug is the one made impossible; the next cheapest is the one that trips a tripwire the instant it happens. Lifetime/ownership design lives in managing-memory, race correctness in writing-lock-free-code, and speed profiling in applying-data-oriented-design; this skill is about finding bugs and preventing classes of them.
+Systematic, hypothesis-driven debugging of native/low-level software, plus designing each class of bug out of existence. The cheapest bug is the one made impossible; the next cheapest is the one that trips a tripwire the instant it happens. Lifetime/ownership design lives in **managing-memory**, race correctness in **writing-lock-free-code**, and speed profiling in **applying-data-oriented-design**; this skill is about finding bugs and preventing classes of them.
 
 ## Essentials
 

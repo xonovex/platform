@@ -42,4 +42,4 @@ These are points on a continuum, not crisp boxes (a Spy is "a Stub that records"
 
 - Whether to verify state or behaviour, and what to mock at all: [state-vs-behaviour-and-what-to-mock.md](state-vs-behaviour-and-what-to-mock.md).
 - Where a double sits in the Arrange phase: [test-structure-and-first.md](test-structure-and-first.md).
-- Classical vs mockist as a _design_ style is owned by **applying-tdd**; a coupling diagnosis by **analyzing-connascence**; framework double APIs by **using-vitest**.
+- Classical vs mockist as a _design_ style is owned by **applying-tdd**; a coupling diagnosis by **analyzing-connascence**.

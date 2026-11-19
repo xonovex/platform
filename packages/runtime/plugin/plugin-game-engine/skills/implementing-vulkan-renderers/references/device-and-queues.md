@@ -4,7 +4,7 @@ Create a `VkInstance`, select a `VkPhysicalDevice`, create a logical `VkDevice` 
 
 ## Rationale
 
-Vulkan has no implicit context: every object hangs off a `VkDevice`, which is created from a chosen `VkPhysicalDevice`, which is enumerated from the `VkInstance`. Queue families are how the hardware advertises which engines can run which work; a family with `VK_QUEUE_GRAPHICS_BIT` can do everything, but a dedicated `VK_QUEUE_TRANSFER_BIT`-only family runs DMA copies on a separate engine that overlaps graphics, and a compute-only family enables async compute that overlaps the graphics pipeline. You must request queues at device-creation time (you cannot add them later), and you must enable features (`VkPhysicalDeviceFeatures2` chain) and extensions explicitly. The architecture reason for owning all of this is in designing-gpu-renderers.
+Vulkan has no implicit context: every object hangs off a `VkDevice`, which is created from a chosen `VkPhysicalDevice`, which is enumerated from the `VkInstance`. Queue families are how the hardware advertises which engines can run which work; a family with `VK_QUEUE_GRAPHICS_BIT` can do everything, but a dedicated `VK_QUEUE_TRANSFER_BIT`-only family runs DMA copies on a separate engine that overlaps graphics, and a compute-only family enables async compute that overlaps the graphics pipeline. You must request queues at device-creation time (you cannot add them later), and you must enable features (`VkPhysicalDeviceFeatures2` chain) and extensions explicitly. The architecture reason for owning all of this is in **designing-gpu-renderers**.
 
 ## How to Apply
 

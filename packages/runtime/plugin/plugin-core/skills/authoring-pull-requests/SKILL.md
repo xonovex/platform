@@ -5,7 +5,7 @@ description: "Use when authoring a pull or merge request - writing the descripti
 
 # Pull Request Authoring Guidelines
 
-How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft and returns the title and description inline during Create. Host creation, updates, and work-item links require a separate Publish operation with the git host's tooling; reviewer feedback lives in `reviewing-code`, and branch or commit work lives in `using-git`.
+How to write a pull request that gets reviewed fast and correctly. This skill owns the author's craft and returns the title and description inline during Create. Host creation, updates, and work-item links require a separate Publish operation with the git host's tooling; reviewer feedback lives in **reviewing-code**, and branch or commit work lives in **using-git**.
 
 ## Essentials
 

@@ -4,12 +4,12 @@ The game thread never touches voice state directly; it posts immutable commands 
 
 ## Rationale
 
-Voice-state ownership stays entirely on the audio thread; commands are self-contained value messages, so no shared object is mutated from two sides and draining once per block keeps command application deterministic. The queue mechanics (indices, acquire/release ordering, full/empty handling) are owned by writing-lock-free-code.
+Voice-state ownership stays entirely on the audio thread; commands are self-contained value messages, so no shared object is mutated from two sides and draining once per block keeps command application deterministic. The queue mechanics (indices, acquire/release ordering, full/empty handling) are owned by **writing-lock-free-code**.
 
 ## How to Apply
 
 1. Define a small tagged-union command type carrying everything the audio thread needs to act without dereferencing game-side memory (voice handle, target gain matrix, pitch, source pointer into a preallocated/immutable asset).
-2. Use an SPSC ring sized for the worst-case burst of commands per block; the game thread pushes, the audio thread pops. (See writing-lock-free-code for the ring, indices, and memory ordering.)
+2. Use an SPSC ring sized for the worst-case burst of commands per block; the game thread pushes, the audio thread pops. (See **writing-lock-free-code** for the ring, indices, and memory ordering.)
 3. At the start of each render block, drain all pending commands and apply them to the voice pool, then mix. Never apply commands mid-mix.
 4. If the queue is full, drop or coalesce on the producer side (e.g. keep only the latest set-gain for a voice) rather than blocking: blocking the game thread is acceptable, blocking the audio thread never is, and an unbounded queue reintroduces allocation.
 5. For data too large to copy into a command (a decoded clip, a long buffer), pass a pointer to immutable, preallocated memory that outlives the voice; the audio thread reads it but never frees it.
@@ -31,7 +31,7 @@ typedef struct {
   };
 } audio_cmd_t;
 
-// Audio thread: drain, apply, then mix. spsc_pop is the SPSC ring from writing-lock-free-code.
+// Audio thread: drain, apply, then mix. spsc_pop pops the SPSC command ring.
 static void apply_commands(voice_pool_t *pool, spsc_ring_t *cmds) {
   audio_cmd_t c;
   while (spsc_pop(cmds, &c)) {
@@ -51,7 +51,7 @@ static void apply_commands(voice_pool_t *pool, spsc_ring_t *cmds) {
 - A full queue must not block the consumer (audio thread); decide the producer-side policy up front (drop, coalesce, or grow a preallocated bound), never `malloc` a bigger queue from either thread.
 - Applying commands mid-block makes a voice's parameters change partway through the samples, smearing the ramp; drain to a clean point, then mix.
 - A "set parameter" command should set the ramp target, not the live value: applying it as an instant change clicks (see mixing-and-buffers).
-- This is strictly one producer and one consumer; if multiple game threads can post audio commands, you need an MPSC queue, not SPSC (see writing-lock-free-code), or funnel them through one thread first.
+- This is strictly one producer and one consumer; if multiple game threads can post audio commands, you need an MPSC queue, not SPSC (see **writing-lock-free-code**), or funnel them through one thread first.
 - A stale voice handle (the slot was recycled) must be detected by generation and ignored; otherwise a late set-gain hits an unrelated new sound.
 
 ## Related

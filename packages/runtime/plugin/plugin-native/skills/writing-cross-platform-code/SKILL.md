@@ -5,7 +5,7 @@ description: "Use when making native C/C++ software portable across operating sy
 
 # Cross-platform / portability Guidelines
 
-How to make native C/C++ software portable across operating systems and targets by concentrating every OS dependency behind a thin abstraction, porting one backend at a time, and reaching new targets including the web and new input hardware. The renderer architecture itself lives in designing-gpu-renderers (and implementing-vulkan-renderers for one API); build-system mechanics live in using-cmake; the C dialect's per-platform file-naming in writing-c99-opinionated.
+How to make native C/C++ software portable across operating systems and targets by concentrating every OS dependency behind a thin abstraction, porting one backend at a time, and reaching new targets including the web and new input hardware. The renderer architecture itself lives in **designing-gpu-renderers** (and **implementing-vulkan-renderers** for one API); build-system mechanics live in **using-cmake**; the C dialect's per-platform file-naming in **writing-c99-opinionated**.
 
 ## Requirements
 

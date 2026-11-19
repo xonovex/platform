@@ -44,7 +44,7 @@ void on_cooked(pipeline_t *p, asset_id_t id, runtime_texture_t *fresh) {
 - A non-debounced watcher fires several events per save (editors write temp-then-rename), causing redundant recompiles and visible churn; coalesce events before queuing.
 - Blocking the frame loop on the recompile defeats the purpose; the cook must run on a background pool, and the swap must be a cheap atomic publish.
 - Hot-reload that bypasses the cache/dependency path can recook the world on every save; route live edits through the same closure-and-hash machinery as offline builds.
-- Reload safety also depends on the consuming code tolerating a swapped pointer between accesses: the discipline of writing such reloadable code lives in writing-c99-opinionated.
+- Reload safety also depends on the consuming code tolerating a swapped pointer between accesses: the discipline of writing such reloadable code lives in **writing-c99-opinionated**.
 
 ## Related
 

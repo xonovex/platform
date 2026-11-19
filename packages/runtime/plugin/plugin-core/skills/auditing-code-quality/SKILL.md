@@ -26,6 +26,6 @@ A read-only pass over existing code: find smells, grade them by severity, report
 ## Progressive Disclosure
 
 - Read [references/robustness.md](references/robustness.md) - Load when auditing robustness: type safety, validation, error handling, logging, complexity
-- Read [references/smell-catalog.md](references/smell-catalog.md) - Load when mapping a smell to its detector signal and owning skill (applying-oop / analyzing-connascence / here)
+- Read [references/smell-catalog.md](references/smell-catalog.md) - Load when mapping a smell to its detector signal and owning skill (**applying-oop** / **analyzing-connascence** / here)
 - Read [references/comment-inventory.md](references/comment-inventory.md) - Load when inventorying redundant, stale, narrative, commented-out, directive-like, or ambiguous comments and docstrings
 - Read [references/cleanup-inventories.md](references/cleanup-inventories.md) - Load when inventorying barrels, duplicated shared candidates, or TODO/FIXME clusters

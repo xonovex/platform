@@ -11,7 +11,7 @@ Most memory bugs are ownership bugs: leak (nobody freed), double-free (two owner
 1. For each allocation, answer two questions up front: _who frees it_ and _until when does it live_. Encode the answers in the API (owning vs borrowing parameters/returns).
 2. Prefer **single ownership**: one owner, others hold borrowed pointers/handles valid only within a known scope.
 3. **Tie lifetime to a phase** (frame, level, request, connection) and reclaim the whole phase at once via an arena/pool reset, rather than freeing objects individually.
-4. When a borrow must outlive the owner's storage moving or being freed, reference by **index/handle**, not raw pointer (handle/relocatable-storage layout lives in applying-data-oriented-design).
+4. When a borrow must outlive the owner's storage moving or being freed, reference by **index/handle**, not raw pointer (handle/relocatable-storage layout lives in **applying-data-oriented-design**).
 5. Reference-count only when ownership is genuinely shared and lifetimes can't be made scope-bound; treat it as the exception, not the default.
 
 ## Example
@@ -29,7 +29,7 @@ arena_reset(&frame_arena);   // end of frame
 ## Gotchas
 
 - A borrowed pointer cached across an allocation, reset, or free dangles: re-fetch it, or hold a handle.
-- Reference counting has its own hazards (cycles leak; the inc/dec is a cost and, when shared across threads, a race, see writing-lock-free-code); don't reach for it to paper over unclear ownership.
+- Reference counting has its own hazards (cycles leak; the inc/dec is a cost and, when shared across threads, a race, see **writing-lock-free-code**); don't reach for it to paper over unclear ownership.
 
 ## Related
 

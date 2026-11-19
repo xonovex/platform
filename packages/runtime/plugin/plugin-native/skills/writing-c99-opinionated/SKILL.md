@@ -9,7 +9,7 @@ Apply caller-owned memory, data-oriented layouts, and explicit builders to syste
 
 ## Essentials
 
-- **Overlay on writing-c99** - This skill carries only the opinionated decisions. For the shared C99 idioms: `const`-correctness, designated initializers (ZII), `inline`-over-macros, compound literals, fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **writing-c99**
+- **Overlay on **writing-c99**** - This skill carries only the opinionated decisions. For the shared C99 idioms: `const`-correctness, designated initializers (ZII), `inline`-over-macros, compound literals, fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **writing-c99**
 - **Memory management** - This style's defining choice is caller-owned storage with no hidden library allocation; apply **managing-memory**, then enforce the C99 buffer boundary in [references/safety-validations.md](references/safety-validations.md)
 - **Data-oriented design** - Layout/cache is a core choice of this style: apply **applying-data-oriented-design**
 - **Quality** - Pin strict C99, `-Werror` for correctness but relax the unused-symbol family for libraries, keep an ASan/UBSan debug build, run static analysis, see [references/build-warnings-policy.md](references/build-warnings-policy.md)

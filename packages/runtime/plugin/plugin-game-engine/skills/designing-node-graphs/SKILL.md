@@ -5,11 +5,11 @@ description: "Use when designing a visual node-based / data-flow graph for conte
 
 # Node graph Guidelines (Visual Data-Flow Authoring)
 
-Engine-agnostic architecture for a visual node-based graph that authors and non-programmers use to assemble behavior by wiring typed nodes together, then compile or evaluate into executable work. The graph itself is plain typed data (see designing-data-models); its node arrays are laid out for traversal (see applying-data-oriented-design); when it emits render/compute work, the scheduling of that work belongs to designing-gpu-renderers.
+Engine-agnostic architecture for a visual node-based graph that authors and non-programmers use to assemble behavior by wiring typed nodes together, then compile or evaluate into executable work. The graph itself is plain typed data (see **designing-data-models**); its node arrays are laid out for traversal (see **applying-data-oriented-design**); when it emits render/compute work, the scheduling of that work belongs to **designing-gpu-renderers**.
 
 ## Requirements
 
-- A reflectable typed object/data store the graph serializes into (nodes, connections, per-node settings, interface), so the editor, evaluator, and tools all read the same definition, see designing-data-models.
+- A reflectable typed object/data store the graph serializes into (nodes, connections, per-node settings, interface), so the editor, evaluator, and tools all read the same definition, see **designing-data-models**.
 - A node-type registry that plugins can extend with new node kinds and new wire data types without modifying the core.
 
 ## Essentials

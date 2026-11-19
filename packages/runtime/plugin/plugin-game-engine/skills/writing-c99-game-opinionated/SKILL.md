@@ -9,7 +9,7 @@ Build C99 game runtimes with caller-owned memory, contiguous data, and explicit 
 
 ## Requirements
 
-- **Overlay on writing-c99** - This skill carries only the game/engine opinionated decisions; for generic C99 idioms: `const`-correctness, designated initializers (ZII), fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **writing-c99**
+- **Overlay on **writing-c99**** - This skill carries only the game/engine opinionated decisions; for generic C99 idioms: `const`-correctness, designated initializers (ZII), fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **writing-c99**
 
 ## Math
 

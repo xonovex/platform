@@ -54,7 +54,7 @@ void evaluate(const compiled_graph_t *cg) {     // cg is flat + topologically so
 - Re-flattening and re-sorting on every evaluation is correct but throws away the win; cache the compiled form and invalidate only on source change.
 - Caching everything wastes memory; reserve caches for genuinely heavy nodes and let cheap nodes recompute.
 - Evaluation cost is contextual: an offline bake tolerates what a per-frame runtime graph cannot; tune cache aggressiveness to where the graph runs.
-- The evaluator publishes values but does not schedule emitted work (a draw call, a compute dispatch); the owning system does that, see designing-gpu-renderers.
+- The evaluator publishes values but does not schedule emitted work (a draw call, a compute dispatch); the owning system does that, see **designing-gpu-renderers**.
 
 ## Related
 

@@ -45,4 +45,4 @@ typedef struct { float x, y, out; char tag; } rec_t; // stride 16B, gathered
 
 ## Related
 
-[references/soa-aos-aosoa.md](./soa-aos-aosoa.md), managing-memory, [references/cache-behavior.md](./cache-behavior.md), [references/measurement-and-profiling.md](./measurement-and-profiling.md)
+[references/soa-aos-aosoa.md](./soa-aos-aosoa.md), **managing-memory**, [references/cache-behavior.md](./cache-behavior.md), [references/measurement-and-profiling.md](./measurement-and-profiling.md)

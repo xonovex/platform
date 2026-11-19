@@ -8,7 +8,7 @@ The terminal-node split matters because the graph computes values but does not d
 
 ## How to Apply
 
-1. Store the graph as a typed object with at least: a node list, a connection list, per-node data/settings, and (optionally) comments, see designing-data-models for the store itself.
+1. Store the graph as a typed object with at least: a node list, a connection list, per-node data/settings, and (optionally) comments, see **designing-data-models** for the store itself.
 2. Define each node as a typed object that declares named input pins and named output pins, each pin carrying a type identity.
 3. Represent a connection as `(from_node, from_output_pin) -> (to_node, to_input_pin)`.
 4. Let unwired inputs fall back to a stored constant (see authoring-and-introspection.md) so literals need no node.

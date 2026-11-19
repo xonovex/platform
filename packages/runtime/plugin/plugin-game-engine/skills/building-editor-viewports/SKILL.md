@@ -5,13 +5,13 @@ description: "Use when building the interactive 3D viewport that bridges a real-
 
 # Editor viewport Guidelines
 
-The interactive seam where a real-time renderer meets an editor: picking what the user clicks, highlighting what is selected, and manipulating it with transform gizmos. These features straddle two subsystems, so build a thin, render-pipeline-agnostic API the editor drives with plain data. Renderer plumbing (passes, id targets, readback primitives) belongs to designing-gpu-renderers; the generic per-object transform interface is owned by designing-ecs / designing-data-models; vector/matrix/quaternion types come from writing-c99-game-opinionated.
+The interactive seam where a real-time renderer meets an editor: picking what the user clicks, highlighting what is selected, and manipulating it with transform gizmos. These features straddle two subsystems, so build a thin, render-pipeline-agnostic API the editor drives with plain data. Renderer plumbing (passes, id targets, readback primitives) belongs to **designing-gpu-renderers**; the generic per-object transform interface is owned by **designing-ecs** / **designing-data-models**; vector/matrix/quaternion types come from **writing-c99-game-opinionated**.
 
 ## Requirements
 
-- A renderer that can run extra passes and expose a render-target read-back path (see designing-gpu-renderers).
+- A renderer that can run extra passes and expose a render-target read-back path (see **designing-gpu-renderers**).
 - A way to identify each rendered object by a stable integer/handle (entity id or equivalent) that shaders can emit.
-- Vector/matrix/quaternion math and screen↔world camera transforms (see writing-c99-game-opinionated).
+- Vector/matrix/quaternion math and screen↔world camera transforms (see **writing-c99-game-opinionated**).
 
 ## Essentials
 

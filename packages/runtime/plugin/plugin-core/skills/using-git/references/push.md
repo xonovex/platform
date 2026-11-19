@@ -1,6 +1,6 @@
 # push: Publish a Branch and Keep Its Diff Clean
 
-The local-git steps before opening a PR / MR. Driving the host (opening the PR, posting reviews) is the host skill's job (`using-github` / `using-gitlab`); this is the git half they defer to.
+The local-git steps before opening a PR / MR. Driving the host (opening the PR, posting reviews) is the host skill's job (**using-github** / **using-gitlab**); this is the git half they defer to.
 
 ```bash
 git push -u origin <branch>        # publish and set upstream in one step

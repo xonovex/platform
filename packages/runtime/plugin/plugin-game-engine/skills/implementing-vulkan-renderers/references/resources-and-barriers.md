@@ -4,7 +4,7 @@ Create `VkImage`/`VkBuffer` with the right usage flags and views (`VkImageView`/
 
 ## Rationale
 
-Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) that must match the next use: sampling needs `SHADER_READ_ONLY_OPTIMAL`, rendering needs `COLOR_ATTACHMENT_OPTIMAL`, a copy destination needs `TRANSFER_DST_OPTIMAL`, presenting needs `PRESENT_SRC_KHR`, and the only way to change it (and to make a prior write visible to a later read) is a pipeline barrier. The barrier's masks define the dependency: `src` is the producer stages/access that must complete and be made available; `dst` is the consumer stages/access that wait and to which it is made visible. The agnostic model (why scopes must be tight, the producer/consumer framing) is in designing-gpu-renderers (synchronization).
+Vulkan images have a _layout_ (an opaque, hardware-specific memory arrangement) that must match the next use: sampling needs `SHADER_READ_ONLY_OPTIMAL`, rendering needs `COLOR_ATTACHMENT_OPTIMAL`, a copy destination needs `TRANSFER_DST_OPTIMAL`, presenting needs `PRESENT_SRC_KHR`, and the only way to change it (and to make a prior write visible to a later read) is a pipeline barrier. The barrier's masks define the dependency: `src` is the producer stages/access that must complete and be made available; `dst` is the consumer stages/access that wait and to which it is made visible. The agnostic model (why scopes must be tight, the producer/consumer framing) is in **designing-gpu-renderers** (synchronization).
 
 ## Techniques
 

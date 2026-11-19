@@ -27,9 +27,9 @@ Before any write:
 - **Manage issue-board kanban**: resolve board/list type and IDs, translate card moves into minimal issue-attribute changes, use native Status only on supporting hosts, and keep vertical ranking separate. See [references/boards.md](references/boards.md).
 - **Publish durable issue/MR context**: use append-only top-level Notes with canonical ID/version/digest markers, exact retry reconciliation, successor links, and native note references. See [references/context-notes.md](references/context-notes.md).
 - **MR object & branch flags**: `glab mr create --source-branch <b> --target-branch main` (`-s` defaults to current branch, `-b` to project default); glab addresses MRs by per-project `iid`. See [references/create.md](references/create.md).
-- **glab does not push**: `git push -u origin HEAD` first (see `using-git`'s push reference), then create; or pass `--push`. Always pass `--yes` in scripts or create hangs on the confirmation prompt. See [references/create.md](references/create.md).
+- **glab does not push**: `git push -u origin HEAD` first (see **using-git**'s push reference), then create; or pass `--push`. Always pass `--yes` in scripts or create hangs on the confirmation prompt. See [references/create.md](references/create.md).
 - **Summary note**: the review's prose is a plain non-anchored note: `glab mr note <iid> -m "## Summary..."` (`POST .../notes`). See [references/review-post.md](references/review-post.md).
-- **Inline comment**: a position-anchored discussion: `glab mr note create <iid> --file path --line N -m "..."`, or raw `POST .../discussions` with a position object carrying three SHAs and conditional line keys. Realizes `reviewing-code`'s findings on GitLab. See [references/review-post.md](references/review-post.md).
+- **Inline comment**: a position-anchored discussion: `glab mr note create <iid> --file path --line N -m "..."`, or raw `POST .../discussions` with a position object carrying three SHAs and conditional line keys. Realizes **reviewing-code**'s findings on GitLab. See [references/review-post.md](references/review-post.md).
 - **Blocking**: there is no REST `REQUEST_CHANGES`; gate by withholding `/approve` against approval rules or by leaving resolvable threads unresolved with `only_allow_merge_if_all_discussions_are_resolved`. See [references/review-post.md](references/review-post.md).
 - **Resolve a thread**: `PUT .../discussions/:discussion_id?resolved=true` (REST is enough on GitLab; no GraphQL needed); match by discussion `id`, never by line. See [references/review-resolve.md](references/review-resolve.md).
 - **Deep-link**: MR notes carry no `web_url`; build `<mr_url>#note_<note_id>` from the returned note `id`. See [references/review-post.md](references/review-post.md).
@@ -56,15 +56,17 @@ Before any write:
 
 ## Example: open an MR, post a review with an inline comment, resolve the thread
 
+The push follows **using-git**, the description follows **authoring-pull-requests**, and the comment labels follow **reviewing-code**.
+
 ```bash
 # 0. confirm identity + host before any write (a stale env token acts as the wrong user)
 glab auth status
 
-# 1. push the branch (see using-git), then open the MR (--yes or it hangs in scripts)
+# 1. push the branch, then open the MR (--yes or it hangs in scripts)
 git push -u origin HEAD
 iid=$(glab mr create -R group/project \
   --source-branch "$(git branch --show-current)" --target-branch main \
-  --title "feat: x" --description "<what/why/how, see authoring-pull-requests>" \
+  --title "feat: x" --description "<what/why/how>" \
   --reviewer alice --label backend --yes \
   | grep -oE '!\d+' | tr -d '!')
 
@@ -75,7 +77,7 @@ Two issues inline; withholding approval until addressed."
 # 2b. inline comment on an added line (glab resolves the three SHAs for you)
 glab mr note create "$iid" -R group/project \
   --file src/api/users.go --line 42 \
-  -m "**issue (blocking):** unchecked error, see reviewing-code for labels"
+  -m "**issue (blocking):** unchecked error"
 
 # 2c. block by withholding approval (do NOT approve); verify gating
 glab api "projects/group%2Fproject/merge_requests/$iid" | jq -r .detailed_merge_status

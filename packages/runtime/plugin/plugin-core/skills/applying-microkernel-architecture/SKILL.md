@@ -18,7 +18,7 @@ A minimal core plus independent plug-ins, selected through a registry: extend th
 
 ## Gotchas
 
-- A microkernel is not "just a hexagon". It adds an _open, registered_ plug-in set plus extensibility machinery; ports/adapters is only the substrate (applying-hexagonal-architecture).
+- A microkernel is not "just a hexagon". It adds an _open, registered_ plug-in set plus extensibility machinery; ports/adapters is only the substrate (**applying-hexagonal-architecture**).
 - Passing the registry into business logic is the service-locator anti-pattern: hidden dependencies, runtime not-found errors, untestable; resolve at the root and inject the plug-in.
 - A churning plug-in contract forces edits across every plug-in: the open/closed violation wearing an interface; keep the contract narrow and versioned.
 - The capability gate must name no concrete plug-in: fail-closed on a self-declared guarantee, or a new plug-in can violate an invariant silently.

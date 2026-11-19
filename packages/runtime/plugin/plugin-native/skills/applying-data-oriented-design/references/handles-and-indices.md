@@ -51,4 +51,4 @@ static void store_remove(store_t *s, handle_t h) {
 
 ## Related
 
-[references/access-patterns.md](./access-patterns.md), [references/existence-based-processing.md](./existence-based-processing.md), managing-memory
+[references/access-patterns.md](./access-patterns.md), [references/existence-based-processing.md](./existence-based-processing.md), **managing-memory**

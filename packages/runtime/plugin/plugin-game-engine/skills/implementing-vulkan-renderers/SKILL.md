@@ -5,7 +5,7 @@ description: "Use when implementing a Vulkan renderer: the concrete Vulkan API f
 
 # Vulkan Rendering Guidelines
 
-The concrete Vulkan API for a low-level renderer. This skill is the Vulkan _how_; apply **designing-gpu-renderers** for the _why_ and the API-agnostic architecture (render graphs, binding model, sync model, frames-in-flight, memory strategy). For the general allocator principle behind device memory see managing-memory.
+The concrete Vulkan API for a low-level renderer. This skill is the Vulkan _how_; apply **designing-gpu-renderers** for the _why_ and the API-agnostic architecture (render graphs, binding model, sync model, frames-in-flight, memory strategy). For the general allocator principle behind device memory see **managing-memory**.
 
 ## Requirements
 
@@ -33,7 +33,7 @@ The concrete Vulkan API for a low-level renderer. This skill is the Vulkan _how_
 
 ## Gotchas
 
-- `vkAllocateMemory` is hard-capped (`maxMemoryAllocationCount`, often ~4096) and slow; sub-allocate from a few large blocks. The architecture rationale is in designing-gpu-renderers.
+- `vkAllocateMemory` is hard-capped (`maxMemoryAllocationCount`, often ~4096) and slow; sub-allocate from a few large blocks. The architecture rationale is in **designing-gpu-renderers**.
 - A `VkImageMemoryBarrier2` that omits the layout transition, or uses `oldLayout` that does not match the image's current layout, is undefined behavior: track current layout per image/subresource.
 - A `VkDescriptorSet` updated while the GPU may still read it (without `UPDATE_AFTER_BIND`) is a data race: gate on the frame `VkFence`.
 - Binding a `VkPipeline` whose dynamic state you forgot to set (e.g. `vkCmdSetViewport`) draws nothing or validation-errors; declare every dynamic state you rely on.

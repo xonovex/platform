@@ -4,7 +4,7 @@ Allocate from arena/bump and pool allocators over contiguous blocks and reclaim 
 
 ## Rationale
 
-An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction, and places objects contiguously. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior, see applying-data-oriented-design, but the allocation strategy is the concern here.)
+An arena reclaims a whole lifetime in one O(1) reset, leak-proof by construction, and places objects contiguously. Pools give O(1) allocate/free of same-size objects with stable addresses and no fragmentation. (Contiguity also helps cache behavior, see **applying-data-oriented-design**, but the allocation strategy is the concern here.)
 
 ## Techniques
 

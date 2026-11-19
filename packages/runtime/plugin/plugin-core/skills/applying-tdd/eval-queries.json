@@ -69,7 +69,7 @@
     "query": "set up Vitest config and mock this module with vi.mock for my test suite",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: framework API mechanics -> using-vitest"
+    "rationale": "near-miss: test framework API mechanics"
   },
   {
     "query": "Implement a `discountedTotal(items, rate)` function test-first, where each item has a `price`. Show the ordered sequence of failing tests and the exact code change you make to pass each one, step by step.",

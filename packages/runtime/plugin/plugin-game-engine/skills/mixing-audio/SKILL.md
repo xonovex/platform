@@ -38,7 +38,7 @@ Engine-agnostic architecture for a software audio mixer: a real-time render thre
 - Accumulating a voice's fractional read position in `float` drifts a long sound out of tune; keep the cursor in `double` or fixed-point.
 - A full command queue must never block the audio thread and must never `malloc` a bigger one; pick a producer-side drop/coalesce policy up front.
 - Sizing the queue-ahead too tight starves on ordinary scheduler jitter and high-latency USB/Bluetooth devices; too loose adds latency you can hear in interactive sounds.
-- This handoff is one producer, one consumer; multiple game threads posting audio commands need an MPSC queue or a single funnel thread (see writing-lock-free-code).
+- This handoff is one producer, one consumer; multiple game threads posting audio commands need an MPSC queue or a single funnel thread (see **writing-lock-free-code**).
 
 ## Progressive Disclosure
 

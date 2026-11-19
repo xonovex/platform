@@ -10,7 +10,7 @@ Turn the commits behind a version bump into a changelog entry, prepended newest-
 
 ## Deriving Entries From Commits
 
-- Parse each commit header as a conventional commit `type(scope)!: description`. The `using-git` skill owns the commit **format**; this is the read side.
+- Parse each commit header as a conventional commit `type(scope)!: description`. The **using-git** skill owns the commit **format**; this is the read side.
 - An include-set (e.g. `feat,fix,refactor,perf,docs`) is a fine curated filter for _which entries to list_.
 
 ## Bullet Format (Changesets-style)

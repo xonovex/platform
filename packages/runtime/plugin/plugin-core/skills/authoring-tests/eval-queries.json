@@ -69,7 +69,7 @@
     "query": "how do I use vi.fn() and vi.mock() to stub a module in Vitest?",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: framework-specific double API is owned by using-vitest"
+    "rationale": "near-miss: the double API of one test framework"
   },
   {
     "query": "audit this module for dead code and missing input validation, read-only",

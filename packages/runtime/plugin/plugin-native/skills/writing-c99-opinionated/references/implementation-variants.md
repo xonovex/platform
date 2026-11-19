@@ -15,7 +15,7 @@ float vec3_dot(const vec3_t *a, const vec3_t *b) {
   return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
-// SoA batch (cache-friendly variant; layout rationale -> applying-data-oriented-design)
+// SoA batch (cache-friendly variant)
 typedef struct { float *x, *y, *z; size_t count; } vec3_soa_t;
 void vec3_dot_soa(float *out, const vec3_soa_t *a, const vec3_soa_t *b) {
   for (size_t i = 0; i < a->count; i++)

@@ -9,7 +9,7 @@ When the game wants one more sound than the pool holds, something must lose: "le
 ## How to Apply
 
 1. Allocate `MAX_VOICES` voices once at init. A "play" returns a handle (slot index + generation counter), not a pointer, so a stale handle to a recycled slot is detectable.
-2. Store voice state struct-of-arrays for the mix loop's hot fields (read cursor, gain matrix, source pointer, flags), so the inner loop streams cache-friendly columns rather than chasing fat structs (see applying-data-oriented-design).
+2. Store voice state struct-of-arrays for the mix loop's hot fields (read cursor, gain matrix, source pointer, flags), so the inner loop streams cache-friendly columns rather than chasing fat structs (see **applying-data-oriented-design**).
 3. On play: find a free slot; if none, pick a steal victim by priority (lowest priority, then quietest, then oldest) and reuse it.
 4. On stop: set the voice's target gain matrix to zero and let it ramp down; mark the slot reclaimable only after the gain reaches zero, then bump its generation so old handles go stale.
 5. Each block, retire voices that finished their source or completed a stop-ramp; return their slots to the free set.

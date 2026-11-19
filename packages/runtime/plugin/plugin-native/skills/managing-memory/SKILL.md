@@ -24,7 +24,7 @@ General principles for allocating, owning, and freeing memory in manual-memory o
 ## Ownership
 
 - **Lifetime by scope** - Tie allocation lifetime to a clear scope/phase, see [references/ownership-and-lifetimes.md](references/ownership-and-lifetimes.md)
-- **Handles over pointers** - Reference relocatable storage by index/handle (layout detail in applying-data-oriented-design), see [references/ownership-and-lifetimes.md](references/ownership-and-lifetimes.md)
+- **Handles over pointers** - Reference relocatable storage by index/handle (layout detail in **applying-data-oriented-design**), see [references/ownership-and-lifetimes.md](references/ownership-and-lifetimes.md)
 
 ## Gotchas
 

@@ -8,7 +8,7 @@ Build tripwires so a bug announces itself at the fault site instead of corruptin
 2. Instrument allocations: pass `__FILE__`/`__LINE__` into the allocator, total bytes per subsystem, assert each counter is zero at that subsystem's shutdown.
 3. For overwrite-prone allocations, use an end-of-page allocator that places each allocation against a page boundary and unmaps the page on free: an OOB or after-free write then faults immediately at the offending instruction.
 4. Chasing stale references? Track liveness as _detection_, not ownership: non-owning references with `retain()`/`release()` counts tagged `__FILE__`/`__LINE__`, assert the count is zero at destroy. Reports the leak _at destruction time_, before any use-after-free, and names the leaking reference.
-5. Run sanitizers in CI and locally: ASan (overflow/use-after-free), UBSan (undefined behavior), TSan (data races; race guidance owned by writing-lock-free-code).
+5. Run sanitizers in CI and locally: ASan (overflow/use-after-free), UBSan (undefined behavior), TSan (data races; race guidance owned by **writing-lock-free-code**).
 6. Before adding a check, ask what it surfaces beyond the existing crash/debugger. Keep it if it fires earlier, cheaper to diagnose, or in an automated test; drop it if it only re-states a fact the `.dmp`/debugger already gives you.
 
 ## Example
@@ -32,7 +32,7 @@ void destroy_truth(truth_o *t) { assert(t->refcount == 0); }  // names the leaki
 
 - A check that only echoes the crash ("you used a freed pointer") costs runtime for no gain: instrument to fire _earlier_ or in a test.
 - Asserts must guard facts you control; asserting a hope turns into debugging the assertion.
-- Refcounting here is _detection_, not GC: keeping references alive would convert crashes into leaks and state-divergence bugs (ownership → managing-memory; concurrent refcount → writing-lock-free-code).
+- Refcounting here is _detection_, not GC: keeping references alive would convert crashes into leaks and state-divergence bugs (ownership → **managing-memory**; concurrent refcount → **writing-lock-free-code**).
 - Page-guarding allocators are heavy (≥1 page per allocation): enable for the suspect subsystem or a debug build, not globally in shipping.
 - Validation too expensive to leave on gets disabled and rots; size each tripwire so it can stay enabled where it matters.
 

@@ -63,7 +63,7 @@
     "query": "configure vi.mock and the vitest matchers for these HTTP assertions",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: framework API -> using-vitest"
+    "rationale": "near-miss: a test framework API question"
   },
   {
     "query": "audit this module for dead code and duplication without changing anything",

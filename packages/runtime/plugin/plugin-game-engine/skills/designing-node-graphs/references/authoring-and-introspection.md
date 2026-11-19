@@ -42,7 +42,7 @@ void register_node_type(registry_t *r, const node_type_t *t); // any plugin may 
 
 - An unwired input quietly using its default hides a forgotten connection; make "no wire" visually distinct from "constant on purpose".
 - A coarse uber-graph that bundles a shared texture with per-object data makes that texture unshareable; keep immutable, broadly shared assets in their own fine-grained graphs.
-- Granularity is not free-form polish. It sets the project's data layout, so changing it late forces re-authoring; decide it up front (see designing-data-models).
+- Granularity is not free-form polish. It sets the project's data layout, so changing it late forces re-authoring; decide it up front (see **designing-data-models**).
 - Discoverability degrades as the toolbox grows; without categories and compatibility hints, authors cannot find or correctly combine nodes.
 - No intermediate-value preview means a wrong result is undebuggable. You cannot tell which node along the chain produced bad data; build per-pin introspection early.
 - Hot-iteration that recompiles the whole graph on every keystroke stalls the editor; gate re-evaluation on validity-hash changes so only affected nodes rerun.

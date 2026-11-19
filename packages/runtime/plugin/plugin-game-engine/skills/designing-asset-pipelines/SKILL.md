@@ -5,7 +5,7 @@ description: "Use when designing the asset pipeline of a tool or game engine, tu
 
 # Asset pipeline Guidelines
 
-An asset pipeline turns editable authored sources into runtime-ready data and keeps the two in sync as content changes. The pipeline has two halves: a stable raw/intermediate representation that stays close to the original file, and a derived runtime representation produced by deterministic compile steps whose results are cached by content hash. How assets are modeled as typed objects with stable references is owned by designing-data-models; the memory layout of the cooked output is owned by applying-data-oriented-design; the discipline of writing reloadable C is owned by writing-c99-opinionated.
+An asset pipeline turns editable authored sources into runtime-ready data and keeps the two in sync as content changes. The pipeline has two halves: a stable raw/intermediate representation that stays close to the original file, and a derived runtime representation produced by deterministic compile steps whose results are cached by content hash. How assets are modeled as typed objects with stable references is owned by **designing-data-models**; the memory layout of the cooked output is owned by **applying-data-oriented-design**; the discipline of writing reloadable C is owned by **writing-c99-opinionated**.
 
 ## Essentials
 

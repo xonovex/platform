@@ -22,7 +22,7 @@ Create conventional commits, resolve conflicts, and manage worktrees with explic
 
 ## Branch Operations
 
-- **Push + rebase-onto-base** - Publish a branch upstream and keep its PR / MR diff just this change; the host skill (`using-github` / `using-gitlab`) drives the PR itself, see [references/push.md](references/push.md)
+- **Push + rebase-onto-base** - Publish a branch upstream and keep its PR / MR diff just this change; the host skill (**using-github** / **using-gitlab**) drives the PR itself, see [references/push.md](references/push.md)
 
 ## Conflict Resolution
 

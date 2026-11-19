@@ -40,4 +40,4 @@ long sum_array(const int *v, size_t n) {
 
 ## Related
 
-[references/handles-and-indices.md](./handles-and-indices.md), [references/cache-behavior.md](./cache-behavior.md), [references/data-as-transforms.md](./data-as-transforms.md), managing-memory
+[references/handles-and-indices.md](./handles-and-indices.md), [references/cache-behavior.md](./cache-behavior.md), [references/data-as-transforms.md](./data-as-transforms.md), **managing-memory**

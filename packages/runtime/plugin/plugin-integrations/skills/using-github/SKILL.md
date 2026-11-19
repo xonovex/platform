@@ -7,9 +7,9 @@ description: "Use when managing GitHub tickets, Projects kanban, pull-request de
 
 How to realize tickets, kanban, pull-request delivery, durable context projections, and provider-native external enforcement on GitHub. These operations do not teach ticket, review, or PR content craft; they map finished artifacts and workflow intent onto GitHub-native resources.
 
-- _What a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belongs to **`reviewing-code`**.
-- _What a good PR description says_ (sizing, how-tested, tradeoffs, self-review) belongs to **`authoring-pull-requests`**.
-- _The local-git push and rebase_ that get a clean branch onto the remote belong to **`using-git`**'s push reference.
+- _What a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belongs to **reviewing-code**.
+- _What a good PR description says_ (sizing, how-tested, tradeoffs, self-review) belongs to **authoring-pull-requests**.
+- _The local-git push and rebase_ that get a clean branch onto the remote belong to **using-git**'s push reference.
 
 This skill only takes those finished artifacts and posts them through `gh` / `gh api`.
 
@@ -35,10 +35,10 @@ When this skill fires:
 - **Manage Projects kanban**: resolve project, item, field, and option IDs; add each issue/PR once; set typed fields; distinguish Project Status from issue state; and report weak concurrency boundaries. See [references/projects.md](references/projects.md).
 - **Open a PR**: `gh pr create --base <target> --head <source> --title ... --body-file -` auto-pushes the branch if it isn't on the remote and sets reviewers/labels/assignees in one call; the raw `POST /repos/{owner}/{repo}/pulls` does NOT push. See [references/create.md](references/create.md).
 - **Publish durable issue/PR context**: use an append-only top-level issue comment, give it a marker containing canonical ID/version/digest, reconcile exact retries, and return its `html_url` for later human or agent work. See [references/context-comments.md](references/context-comments.md).
-- **Push / rebase first**: the clean branch is `using-git`'s job; this skill assumes the source branch builds on the latest target. See `using-git`'s push reference.
+- **Push / rebase first**: the clean branch is **using-git**'s job; this skill assumes the source branch builds on the latest target. See **using-git**'s push reference.
 - **Post a structured review**: `gh pr review` only carries the summary + verdict; batch the summary, every inline comment, and the verdict into one `gh api ... /pulls/{n}/reviews` object. See [references/review-post.md](references/review-post.md).
-- **Write the review content with reviewing-code**: labels, severity, and blocking decoration are `reviewing-code`'s; this skill only anchors and submits them.
-- **Write the PR body with authoring-pull-requests**: `gh pr create --body-file` takes a description authored per `authoring-pull-requests`.
+- **Write the review content with **reviewing-code****: labels, severity, and blocking decoration are **reviewing-code**'s; this skill only anchors and submits them.
+- **Write the PR body with **authoring-pull-requests****: `gh pr create --body-file` takes a description authored per **authoring-pull-requests**.
 - **Resolve a thread**: GraphQL-only `resolveReviewThread` by thread node id (`PRRT_...`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
 - **Scope the token per operation**: push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
 - **Enforce with native automation**: use SHA-pinned reusable workflows/actions, required checks and layered rulesets, protected environments, least-privilege tokens/OIDC, attestations, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).

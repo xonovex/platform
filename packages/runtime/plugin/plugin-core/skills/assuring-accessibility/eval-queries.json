@@ -97,7 +97,7 @@
   },
   {
     "query": "write a Vitest test that mocks the payment service and asserts the retry backoff timing",
-    "rationale": "near miss owned by using-vitest",
+    "rationale": "near miss: a Vitest API question",
     "should_trigger": false,
     "split": "validation"
   }

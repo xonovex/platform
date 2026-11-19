@@ -1,6 +1,6 @@
 # review-post: Publish a structured review
 
-A GitLab review has NO single object. Assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. Comment content (labels, blocking vs non-blocking) is `reviewing-code`'s craft; this file is delivery only.
+A GitLab review has NO single object. Assemble three parts and publish each immediately: a summary note, one position-anchored discussion per inline finding, and a separate approve/withhold verdict. Comment content (labels, blocking vs non-blocking) is **reviewing-code**'s craft; this file is delivery only.
 
 ## (1) Summary: a plain note
 
