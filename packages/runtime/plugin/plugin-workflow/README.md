@@ -1,12 +1,12 @@
 # Workflow Plugin
 
-Use `xonovex-workflow` to take a change from research to validated delivery as a series of standalone skills that keep everything they learn and decide in one directory of files. Record the project settings in the `Workflow` section of your project instructions (see [Record the project settings](#record-the-project-settings)), invoke `recording-handoff` once for the change, and continue with `researching-change` or `settling-questions`. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to write the skills that `distilling-change` produces.
+Use `xonovex-workflow` to take a change from research to validated delivery as a series of standalone skills that keep everything they learn and decide in one directory of files. Record the project settings in the `Workflow` section of your project instructions (see [Record the project settings](#record-the-project-settings)), invoke `recording-handoff` once for the change, and continue with `researching-change` or `settling-questions`. Use the [Core Plugin](../plugin-core/README.md) for Git operations.
 
 ## How the steps work
 
-Each step is a skill. Invoke it by name or describe the task in plain language. No step starts another: a step reads the files it needs, checks its preconditions, does its work, writes its files and stops. You, `delivering-work-package` or a script decide which step runs next.
+Each step is a skill. Invoke it by name or describe the task in plain language. No step starts another: a step reads the files it needs, checks its preconditions, does its work, writes its files and stops. You or a script decide which step runs next.
 
-Before its own work, every step runs the entry step of `recording-handoff`: it confirms the branch of each repository it writes to and names the uncommitted files, validates the files it reads, reads the generated indexes and checks that the files it needs exist. If a precondition is missing, the step reports it, names the step that normally satisfies it and stops. It never assumes that an earlier step ran, and it never runs that step itself. No step commits or stages anything, except `delivering-work-package`, which commits each validated work item locally and pushes nothing.
+Before its own work, every step runs the entry step of `recording-handoff`: it confirms the branch of each repository it writes to and names the uncommitted files, validates the files it reads, reads the generated indexes and checks that the files it needs exist. If a precondition is missing, the step reports it, names the step that normally satisfies it and stops. It never assumes that an earlier step ran, and it never runs that step itself. No step commits or stages anything: `preparing-delivery` gives the commit command when the verdict covers the tree, and you commit through `using-git`.
 
 | Step | What it does and writes |
 | --- | --- |
@@ -22,8 +22,6 @@ Before its own work, every step runs the entry step of `recording-handoff`: it c
 | `validating-work-item` | Checks one implemented work item against its criteria in a fresh read-only context and writes a verdict tied to the tree hash of the worktree. |
 | `preparing-delivery` | Writes the commit message, the pull request description and the inline comments of one work item under `deliveries/`. It applies nothing. |
 | `validating-work-package` | Checks the success criteria of the plan and the integration of the work package in a fresh read-only context, and writes the close-out. |
-| `delivering-work-package` | Runs each ready work item through `implementing-work-item`, `validating-work-item` and `preparing-delivery` in dependency order, each in its own agent, and commits the item locally with `using-git` when the verdict covers the tree. It pushes nothing. |
-| `distilling-change` | Turns a finished change into reusable skills from its directory, after `validating-work-package`. |
 
 A push, a pull request and an inline comment go through `using-git`, `using-github` or `using-gitlab` when you ask for them. No step reaches a tracker or a host on its own.
 
@@ -31,7 +29,7 @@ A push, a pull request and an inline comment go through `using-git`, `using-gith
 
 Planning runs once for a change. Execution then repeats for each work item in dependency order, and the work package is validated after the last item.
 
-![Planning from intent to work items, then implement, validate and deliver each work item, then validate the work package and distill the change](diagrams/change-flow.svg)
+![Planning from intent to work items, then implement, validate and deliver each work item, then validate the work package](diagrams/change-flow.svg)
 
 [Open the PNG](diagrams/change-flow.png) or [edit its Graphviz source](diagrams/change-flow.dot).
 
@@ -42,9 +40,8 @@ The order is a loop, not a line. Each step lists what must exist before it runs:
 3. `critiquing-plan` needs `plan.md`. `illustrating-plan` needs `plan.md` and at least one decision.
 4. `revising-plan` needs `plan.md` and something waiting: `FIXME` notes, critique findings or research corrections. Settle new questions and revise again until nothing is open.
 5. `defining-work-items` needs `plan.md` and the draft work outline. Rows that wait on an open decision stay at their outline.
-6. For each work item: `implementing-work-item` needs a work file whose criteria say how each is verified, `readiness: ready`, finished `depends_on` items and a repository in the settings. `validating-work-item` needs the worktree to hold a change. `preparing-delivery` needs the implementation notes and the `delivery` setting. `delivering-work-package` runs the three steps for each ready item.
+6. For each work item: `implementing-work-item` needs a work file whose criteria say how each is verified, `readiness: ready`, finished `depends_on` items and a repository in the settings. `validating-work-item` needs the worktree to hold a change. `preparing-delivery` needs the implementation notes and the `delivery` setting.
 7. `validating-work-package` needs `plan.md` with success criteria and the work items. A missing verdict does not stop it, but the criteria that the verdict would cover cannot be marked met.
-8. `distilling-change` needs `close-out.md`.
 
 Return to an earlier step whenever a later one shows a gap. Every step can run again, because each reads its inputs from files.
 
@@ -129,7 +126,7 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
-Optional companions: `xonovex-agentic`, `xonovex-core`, `xonovex-integrations`, `xonovex-native`.
+Optional companions: `xonovex-core`, `xonovex-integrations`, `xonovex-native`.
 
 <!-- xonovex:installation:end -->
 
@@ -141,8 +138,6 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | --- | --- |
 | [critiquing-plan](skills/critiquing-plan/SKILL.md) | A written plan needs an independent adversarial review before anyone approves it: stress-testing its assumptions, tracing how delivery could fail, finding inputs and sequences it misses, or finding the smallest change that would strengthen a weak section. |
 | [defining-work-items](skills/defining-work-items/SKILL.md) | The draft work outline of a change must become complete work item definitions: each ready row gets observable criteria with their verification, a repository, real dependencies, the decisions that apply and the skills to consult, and a work package groups the items when the plan calls for one. |
-| [delivering-work-package](skills/delivering-work-package/SKILL.md) | The ready work items of one work package are to be carried from implementation to a local commit, one item at a time in dependency order: each item is implemented, validated independently and given its delivery text, each step in its own agent, and the supervisor reads every verdict and commits the item locally only when the verdict covers the tree. |
-| [distilling-change](skills/distilling-change/SKILL.md) | A change is finished and its work should become reusable skills: an umbrella map skill and granular skills that replay the change on a clean base branch. |
 | [illustrating-plan](skills/illustrating-plan/SKILL.md) | The diagrams of a change are to be drawn or redrawn: a lead diagram of what is settled, one diagram for each set of options whose choice changes who calls whom, and an optional system model, saved as PlantUML sources with rendered SVG images, or PNG on request, in the bundle's diagrams directory. |
 | [implementing-work-item](skills/implementing-work-item/SKILL.md) | One defined, ready work item is to be built: it picks up the work file, checks that it can start, splits the work into tasks by concern, delegates each task to a worker with a bounded and sequenced fan-out (or works through them in order when the harness cannot start one), verifies the result itself, runs the checks the criteria name and saves implementation notes with the decisions that shaped the code. |
 | [preparing-delivery](skills/preparing-delivery/SKILL.md) | The implementation of one work item is done and the words that deliver it must be written: the commit message, the pull request description and the inline comments where a decision shaped non-obvious code. |

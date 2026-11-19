@@ -19,7 +19,7 @@ digraph change_flow {
   }
 
   subgraph cluster_execution {
-    graph [label="Execution, for each work item in dependency order\ndelivering-work-package runs the three steps", style=rounded, role=panel, margin=16];
+    graph [label="Execution, for each work item in dependency order", style=rounded, role=panel, margin=16];
 
     implement [label="Implement\nimplementing-work-item"];
     validate_item [label="Validate the work item\nvalidating-work-item"];
@@ -29,7 +29,6 @@ digraph change_flow {
   }
 
   validate_package [label="Validate the work package\nvalidating-work-package", role=strong];
-  distill [label="Distill (optional)\ndistilling-change", role=positive];
   entry [label="Every step starts with the entry step of recording-handoff\nand records its result in the change directory", role=caption];
 
   intent -> research -> decide -> plan;
@@ -41,6 +40,5 @@ digraph change_flow {
   implement -> validate_item -> deliver;
   deliver:n -> implement:ne [style=dashed, constraint=false, label="next work item", role=retry];
   deliver -> validate_package [label="after the last work item"];
-  validate_package -> distill;
-  distill -> entry [style=invis];
+  validate_package -> entry [style=invis];
 }

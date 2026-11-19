@@ -75,7 +75,6 @@ The defaults name skills of the xonovex catalog. A phase that is not listed has 
 | `validating-work-item` | `reviewing-code`, `authoring-tests` |
 | `preparing-delivery` | `authoring-pull-requests`, `using-git`, `managing-versions` |
 | `validating-work-package` | `reviewing-code` |
-| `distilling-change` | `authoring-skills` |
 
 ## Missing settings
 

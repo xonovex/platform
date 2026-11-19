@@ -10,8 +10,6 @@ tasks:
       - graph-build
       - skill-critiquing-plan:ci-check
       - skill-defining-work-items:ci-check
-      - skill-delivering-work-package:ci-check
-      - skill-distilling-change:ci-check
       - skill-illustrating-plan:ci-check
       - skill-implementing-work-item:ci-check
       - skill-preparing-delivery:ci-check

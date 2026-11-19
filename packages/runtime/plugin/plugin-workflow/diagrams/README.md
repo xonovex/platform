@@ -8,7 +8,7 @@ Follow a change from intent through planning, the execution of each work item an
 
 ## Read the flow
 
-Read the planning panel from left to right, then the execution panel, which repeats for each work item. Dark gray arrows show the normal flow, and the dashed blue arrow returns to the next work item. A box names the step and the skill that owns it; a `Core:` prefix names a skill of the Core Plugin. The dark box marks the validation of the work package, and the green box the optional distillation.
+Read the planning panel from left to right, then the execution panel, which repeats for each work item. Dark gray arrows show the normal flow, and the dashed blue arrow returns to the next work item. A box names the step and the skill that owns it; a `Core:` prefix names a skill of the Core Plugin. The dark box marks the validation of the work package.
 
 The palette, typography, shapes, and export rules follow the Xonovex design system in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`), as mirrored in `packages/asset/asset-brand/diagrams/style.gvpr`.
 

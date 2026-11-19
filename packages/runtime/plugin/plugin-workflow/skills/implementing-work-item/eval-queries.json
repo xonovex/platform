@@ -100,11 +100,5 @@
     "rationale": "near miss owned by preparing-delivery",
     "should_trigger": false,
     "split": "validation"
-  },
-  {
-    "query": "work through all the ready items of the change while I'm out, one commit each on top of the last, nothing pushed",
-    "rationale": "near miss owned by delivering-work-package",
-    "should_trigger": false,
-    "split": "validation"
   }
 ]

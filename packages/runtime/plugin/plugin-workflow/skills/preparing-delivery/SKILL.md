@@ -36,7 +36,6 @@ Purpose: turn a finished work item into the text a reviewer and the history need
 - Committing: **using-git**. Pushing, opening the pull request or merge request, or commenting on the host: **using-github** or **using-gitlab**, when the user asks.
 - Judging whether the work meets its criteria: **validating-work-item** writes the verdict this skill reads.
 - Writing the code or the notes that feed this skill: **implementing-work-item**.
-- Running every ready work item through implementation, validation and delivery: **delivering-work-package**.
 - A change with no work item file: write the message with **using-git** and the description with **authoring-pull-requests**.
 
 ## Gotchas

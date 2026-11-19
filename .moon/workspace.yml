@@ -40,7 +40,6 @@ projects:
     skill-critiquing-plan: packages/runtime/plugin/plugin-workflow/skills/critiquing-plan
     skill-debugging-native-code: packages/runtime/plugin/plugin-native/skills/debugging-native-code
     skill-defining-work-items: packages/runtime/plugin/plugin-workflow/skills/defining-work-items
-    skill-delivering-work-package: packages/runtime/plugin/plugin-workflow/skills/delivering-work-package
     skill-designing-asset-pipelines: packages/runtime/plugin/plugin-game-engine/skills/designing-asset-pipelines
     skill-designing-data-models: packages/runtime/plugin/plugin-game-engine/skills/designing-data-models
     skill-designing-ecs: packages/runtime/plugin/plugin-game-engine/skills/designing-ecs
@@ -48,7 +47,6 @@ projects:
     skill-designing-gpu-renderers: packages/runtime/plugin/plugin-game-engine/skills/designing-gpu-renderers
     skill-designing-imgui: packages/runtime/plugin/plugin-game-engine/skills/designing-imgui
     skill-designing-node-graphs: packages/runtime/plugin/plugin-game-engine/skills/designing-node-graphs
-    skill-distilling-change: packages/runtime/plugin/plugin-workflow/skills/distilling-change
     skill-evaluating-skills: packages/runtime/plugin/plugin-agentic/skills/evaluating-skills
     skill-illustrating-plan: packages/runtime/plugin/plugin-workflow/skills/illustrating-plan
     skill-implementing-vulkan-renderers: packages/runtime/plugin/plugin-game-engine/skills/implementing-vulkan-renderers

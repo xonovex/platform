@@ -118,11 +118,5 @@
     "rationale": "one session lesson: where reusable skill guidance lives",
     "should_trigger": true,
     "split": "train"
-  },
-  {
-    "query": "Distill last year's finished upgrade plan into a replay playbook of granular skills so next year is a controlled process instead of archaeology.",
-    "rationale": "near miss owned by distilling-change",
-    "should_trigger": false,
-    "split": "validation"
   }
 ]
