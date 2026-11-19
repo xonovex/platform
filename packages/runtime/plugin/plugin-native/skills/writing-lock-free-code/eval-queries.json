@@ -93,7 +93,7 @@
     "query": "tune this LuaJIT hot loop with stable table shapes and preallocated arrays",
     "should_trigger": false,
     "split": "train",
-    "rationale": "near-miss: language-specific perf, use writing-lua-opinionated"
+    "rationale": "near-miss: language-specific perf, use writing-lua"
   },
   {
     "query": "align my vec4 struct to 16 bytes so the SIMD loads don't fault",

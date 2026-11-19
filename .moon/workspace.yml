@@ -40,7 +40,7 @@ projects:
     skill-configuring-opencode: packages/runtime/plugin/plugin-agentic/skills/configuring-opencode
     skill-configuring-pi: packages/runtime/plugin/plugin-agentic/skills/configuring-pi
     skill-critiquing-plan: packages/runtime/plugin/plugin-workflow/skills/critiquing-plan
-    skill-debugging-native-code: packages/runtime/plugin/plugin-core/skills/debugging-native-code
+    skill-debugging-native-code: packages/runtime/plugin/plugin-native/skills/debugging-native-code
     skill-defining-subplans: packages/runtime/plugin/plugin-workflow/skills/defining-subplans
     skill-delegating-plan: packages/runtime/plugin/plugin-workflow/skills/delegating-plan
     skill-designing-asset-pipelines: packages/runtime/plugin/plugin-game-engine/skills/designing-asset-pipelines
@@ -87,7 +87,6 @@ projects:
     skill-writing-editorials: packages/runtime/plugin/plugin-writing/skills/writing-editorials
     skill-writing-lock-free-code: packages/runtime/plugin/plugin-native/skills/writing-lock-free-code
     skill-writing-lua: packages/runtime/plugin/plugin-languages/skills/writing-lua
-    skill-writing-lua-opinionated: packages/runtime/plugin/plugin-languages/skills/writing-lua-opinionated
     skill-writing-news: packages/runtime/plugin/plugin-writing/skills/writing-news
     skill-writing-plan: packages/runtime/plugin/plugin-workflow/skills/writing-plan
     skill-writing-prose: packages/runtime/plugin/plugin-writing/skills/writing-prose

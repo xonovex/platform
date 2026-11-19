@@ -38,7 +38,7 @@
 - **References:** references/auth.md, references/context-comments.md,
   references/create.md, references/first-time-setup.md, references/issues.md,
   references/projects.md, references/provider-conformance.md,
-  references/review-post.md
+  references/review-post.md, references/worked-example.md
 
 ## GitHub REST API
 
@@ -63,7 +63,7 @@
   behavior in auth.md.
 - **References:** references/auth.md, references/context-comments.md,
   references/create.md, references/issues.md, references/provider-conformance.md,
-  references/review-post.md
+  references/review-post.md, references/worked-example.md
 
 ## GitHub GraphQL API
 
@@ -80,7 +80,7 @@
   `addPullRequestReviewThreadReply` mutations and the `pullRequest.reviewThreads`
   connection in review-resolve.md.
 - **References:** references/projects.md, references/provider-conformance.md,
-  references/review-resolve.md
+  references/review-resolve.md, references/worked-example.md
 
 ## GitHub Issues and Projects product guidance
 

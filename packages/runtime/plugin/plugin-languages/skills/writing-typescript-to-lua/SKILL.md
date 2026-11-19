@@ -5,7 +5,7 @@ description: "Use when editing TypeScript that compiles to Lua via TSTL 1.24+ (g
 
 # TypeScript-to-Lua Coding Guidelines
 
-The output is Lua. For Lua runtime semantics and idioms: module pattern, coroutines, metatables, error handling, string building. Apply **writing-lua**; for hot-path tuning of the generated code apply **writing-lua-opinionated**. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
+The output is Lua. For Lua runtime semantics and idioms: module pattern, coroutines, metatables, error handling, string building. Apply **writing-lua**, which also covers hot-path tuning of the generated code. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ The output is Lua. For Lua runtime semantics and idioms: module pattern, corouti
 
 - **Code organization** - Favor namespaces/functions over classes for clean Lua output; Lua module idioms in **writing-lua**, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md)
 - **TSTL features** - Use LuaMultiReturn, decorators when beneficial, see [references/multi-return-functions.md](references/multi-return-functions.md), [references/tstl-decorators.md](references/tstl-decorators.md)
-- **Performance** - Keep tables stable, cache lookups, design for Lua GC and coroutines; the JIT "why" is in **writing-lua-opinionated**, see [references/performance-tips.md](references/performance-tips.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
+- **Performance** - Keep tables stable, cache lookups, design for Lua GC and coroutines; the JIT "why" is in **writing-lua**, see [references/performance-tips.md](references/performance-tips.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
 - **Optimization** - Avoid heavy TypeScript features, see [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md)
 
 ## Gotchas

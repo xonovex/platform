@@ -5,6 +5,7 @@ tasks:
   ci-check:
     deps:
       - skill-applying-data-oriented-design:ci-check
+      - skill-debugging-native-code:ci-check
       - skill-managing-memory:ci-check
       - skill-using-cmake:ci-check
       - skill-writing-c99-opinionated:ci-check

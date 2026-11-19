@@ -52,7 +52,7 @@ Install the grouped plugins your tasks need. Each plugin owns related skills and
 | [`xonovex-game-engine`](packages/runtime/plugin/plugin-game-engine/README.md) | Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking. |
 | [`xonovex-integrations`](packages/runtime/plugin/plugin-integrations/README.md) | Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration. |
 | [`xonovex-languages`](packages/runtime/plugin/plugin-languages/README.md) | Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua. |
-| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write C99 and build portable native systems with explicit memory, concurrency, and data layouts. |
+| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts. |
 | [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md) | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
 | [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md) | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests. |
 | [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Research, plan, implement, validate, and close out work, then integrate lessons from the session. |

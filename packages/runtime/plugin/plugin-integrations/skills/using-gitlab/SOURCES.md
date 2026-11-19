@@ -12,7 +12,7 @@
   references/context-notes.md, references/create.md,
   references/first-time-setup.md, references/issues.md,
   references/provider-conformance.md, references/review-post.md,
-  references/review-resolve.md
+  references/review-resolve.md, references/worked-example.md
 
 ## GitLab REST & GraphQL API
 
@@ -28,7 +28,7 @@
 - **References:** references/boards.md, references/context-notes.md,
   references/create.md, references/issues.md,
   references/provider-conformance.md, references/review-post.md,
-  references/review-resolve.md
+  references/review-resolve.md, references/worked-example.md
 
 ## GitLab issues, work items, Status, and boards
 

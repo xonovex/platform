@@ -63,48 +63,19 @@ When this skill fires:
 - GitHub Enterprise Server uses **GH_ENTERPRISE_TOKEN** / GITHUB_ENTERPRISE_TOKEN, not GH_TOKEN: mixing them is the classic "works on github.com, 401 on GHES".
 - Insufficient permission on a **private** repo returns 404 (not 403): GitHub hides existence; read the `X-Accepted-GitHub-Permissions` header (`gh api -i <endpoint>`) for the exact required permission.
 
-## Example: open a PR, post a blocking inline review, resolve a thread
-
-```bash
-# 0. confirm the host is GitHub and you can read
-gh repo view --json nameWithOwner,url -q '.url'   # github.com/... or your GHES host
-gh auth status && gh api user -q '.login'
-
-# 1. open the PR (gh pushes feat/x if it isn't on the remote); idempotency guard
-gh pr create --base main --head feat/x \
-  --title "feat: guard null user" --body-file pr-body.md \
-  --reviewer org/team-slug --assignee @me --label enhancement \
-  || gh pr view feat/x --json url -q .url
-
-# 2. post ONE review object: summary + inline comment + verdict (gh pr review can't do inline)
-HEAD=$(gh pr view 123 --json headRefOid -q .headRefOid)
-gh api --method POST repos/{owner}/{repo}/pulls/123/reviews \
-  -f commit_id="$HEAD" -f event=REQUEST_CHANGES \
-  -f body=$'## Summary\nOne blocking issue, see inline.' \
-  -f 'comments[][path]=src/app.ts' \
-  -F 'comments[][line]=42' \
-  -f 'comments[][side]=RIGHT' \
-  -f 'comments[][body]=**issue (blocking):** guard against a null `user` here.'
-
-# 3. list threads, then resolve by node id (never by line): GraphQL only
-gh api graphql -f query='query($o:String!,$r:String!,$n:Int!){repository(owner:$o,name:$r){pullRequest(number:$n){reviewThreads(first:100){nodes{id isResolved path comments(first:1){nodes{databaseId body}}}}}}}' \
-  -F o=OWNER -F r=REPO -F n=123
-gh api graphql -f query='mutation($t:ID!){resolveReviewThread(input:{threadId:$t}){thread{id isResolved}}}' \
-  -f t=PRRT_kwDOxxxxx
-```
-
 ## Progressive Disclosure
 
-Each reference is a trigger: read only the one matching the user's intent; do not preload everything.
+Read only the reference that matches the task.
 
-- Read [references/first-time-setup.md](references/first-time-setup.md). Load when setting up a fresh machine/account: installing `gh`, running `gh auth login`, picking HTTPS vs SSH, making gh the git credential helper, cloning, and verifying with a read call (GHES included).
-- Read [references/auth.md](references/auth.md): Load when auth fails, choosing classic vs fine-grained PAT, scoping a token per operation (push / open-PR / review / resolve), the GH_TOKEN vs GH_ENTERPRISE_TOKEN split, keyring storage, or wiring tokens into CI / GitHub Actions.
-- Read [references/issues.md](references/issues.md): Load when creating, finding, updating, relating, closing, reopening, or commenting on GitHub issues as workflow tickets.
-- Read [references/projects.md](references/projects.md): Load when adding tickets or pull requests to GitHub Projects, setting Status or typed fields, archiving/removing items, or reconciling project automation.
-- Read [references/create.md](references/create.md). Load when opening a PR: `gh pr create` flags, draft, reviewers/labels, issue-linking and auto-close semantics, the additive-body / replace-on-edit trap, idempotency guard, and the raw `POST /pulls` REST equivalent.
-- Read [references/context-comments.md](references/context-comments.md): Load when publishing or reconciling versioned decision, rationale, tradeoff, assumption, or constraint context as a top-level issue or pull-request comment.
-- Read [references/review-post.md](references/review-post.md). Load when publishing a review: the single `.../reviews` object, the exact path/line/side inline anchor model, the REQUEST_CHANGES blocking mechanism, and deep-linking from `html_url`.
-- Read [references/review-resolve.md](references/review-resolve.md). Load when resolving/replying on threads: listing `reviewThreads`, matching a finding to a thread by id (never line), the GraphQL `resolveReviewThread` mutation, in-thread replies, and the conversation-resolution merge gate.
-- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md): Load when configuring or onboarding reusable workflows/actions, required checks, rulesets, protected environments, token/OIDC permissions, attestations, evidence, rollback, or governance-only GitHub adoption.
-- Read [references/onboarding.md](references/onboarding.md): Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift on repository/organization governance.
-- Read [provider conformance](references/provider-conformance.md): Load when composing GitHub tickets, Projects, pull requests, reviews, context, and evidence into a provider-neutral workflow handoff or testing adapter behavior.
+- Read [references/first-time-setup.md](references/first-time-setup.md): Load when setting up `gh` on a new machine or account.
+- Read [references/auth.md](references/auth.md): Load when auth fails or a token needs a type, a scope or a home.
+- Read [references/issues.md](references/issues.md): Load when working with issues as tickets.
+- Read [references/projects.md](references/projects.md): Load when working with Projects items, Status or fields.
+- Read [references/create.md](references/create.md): Load when opening a pull request.
+- Read [references/context-comments.md](references/context-comments.md): Load when publishing durable decision or rationale context as a comment.
+- Read [references/review-post.md](references/review-post.md): Load when publishing a review with inline comments.
+- Read [references/review-resolve.md](references/review-resolve.md): Load when replying to or resolving review threads.
+- Read [references/worked-example.md](references/worked-example.md): Load when one end-to-end run helps: open a pull request, post a blocking inline review, resolve a thread.
+- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md): Load when configuring workflows, required checks, rulesets, environments or attestations.
+- Read [references/onboarding.md](references/onboarding.md): Load when setting up, verifying, rolling back or checking drift of repository or organization governance.
+- Read [references/provider-conformance.md](references/provider-conformance.md): Load when composing GitHub objects into a provider-neutral handoff or testing an adapter.

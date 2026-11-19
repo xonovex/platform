@@ -1,6 +1,6 @@
 # Native Plugin
 
-Write C99 and build portable native systems with explicit memory, concurrency, and data layouts.
+Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts.
 
 <!-- xonovex:installation:start -->
 
@@ -37,6 +37,7 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | Skill | Use when |
 | --- | --- |
 | [applying-data-oriented-design](skills/applying-data-oriented-design/SKILL.md) | Designing or refactoring performance-critical data layouts for cache efficiency, in any language. |
+| [debugging-native-code](skills/debugging-native-code/SKILL.md) | Chasing a bug in native or low-level software: a crash, access violation, use-after-free, leak, intermittent/heisenbug, or 'works on my machine' failure, and when deciding how to prevent a whole class of bugs by design. |
 | [managing-memory](skills/managing-memory/SKILL.md) | Deciding how memory is allocated, owned, and freed in manual-memory or buffer-passing code, in any language. |
 | [using-cmake](skills/using-cmake/SKILL.md) | Editing CMake build files for C/C++ projects on CMake 3.20+. |
 | [writing-c99-opinionated](skills/writing-c99-opinionated/SKILL.md) | Editing systems or embedded C99 code in projects that follow the opinionated caller-owns-memory, data-oriented style. A focused overlay that covers only house-style decisions, not generic C99 idioms. |

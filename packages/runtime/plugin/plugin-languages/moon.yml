@@ -4,7 +4,6 @@ tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - skill-writing-lua-opinionated:ci-check
       - skill-writing-lua:ci-check
       - skill-writing-python:ci-check
       - skill-writing-shell-scripts:ci-check

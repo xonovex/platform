@@ -32,7 +32,7 @@
     {
       "name": "xonovex-native",
       "source": "./packages/runtime/plugin/plugin-native",
-      "description": "Write C99 and build portable native systems with explicit memory, concurrency, and data layouts."
+      "description": "Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts."
     },
     {
       "name": "xonovex-platform",

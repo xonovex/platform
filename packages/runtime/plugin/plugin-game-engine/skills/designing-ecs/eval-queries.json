@@ -69,7 +69,7 @@
     "query": "tune this LuaJIT table layout so the hot path stays JIT-friendly and avoids rehashing",
     "should_trigger": false,
     "split": "train",
-    "rationale": "validation negative: LuaJIT table tuning -> writing-lua-opinionated"
+    "rationale": "validation negative: LuaJIT table tuning -> writing-lua"
   },
   {
     "query": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",

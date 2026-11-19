@@ -54,54 +54,19 @@ Before any write:
 - **Several review subcommands are EXPERIMENTAL** (`glab mr note list` / `resolve` / `reopen`) and may change or be removed, for stable scripted inline review and resolution drive the Discussions API via `glab api` instead.
 - **Identity & host traps.** Env tokens (`GITLAB_TOKEN` / `GITLAB_ACCESS_TOKEN` / `OAUTH_TOKEN`) override stored config; self-managed needs `--hostname` / `GITLAB_HOST` or glab silently hits gitlab.com; `git_protocol` and `api_protocol` are separate per-host settings; the token sits in plaintext `~/.config/glab-cli/config.yml` unless `--use-keyring`. Run `glab auth status` before every write.
 
-## Example: open an MR, post a review with an inline comment, resolve the thread
-
-The push follows **using-git**, the description follows **authoring-pull-requests**, and the comment labels follow **reviewing-code**.
-
-```bash
-# 0. confirm identity + host before any write (a stale env token acts as the wrong user)
-glab auth status
-
-# 1. push the branch, then open the MR (--yes or it hangs in scripts)
-git push -u origin HEAD
-iid=$(glab mr create -R group/project \
-  --source-branch "$(git branch --show-current)" --target-branch main \
-  --title "feat: x" --description "<what/why/how>" \
-  --reviewer alice --label backend --yes \
-  | grep -oE '!\d+' | tr -d '!')
-
-# 2a. summary note (plain, non-anchored)
-glab mr note "$iid" -R group/project -m "## Review summary
-Two issues inline; withholding approval until addressed."
-
-# 2b. inline comment on an added line (glab resolves the three SHAs for you)
-glab mr note create "$iid" -R group/project \
-  --file src/api/users.go --line 42 \
-  -m "**issue (blocking):** unchecked error"
-
-# 2c. block by withholding approval (do NOT approve); verify gating
-glab api "projects/group%2Fproject/merge_requests/$iid" | jq -r .detailed_merge_status
-
-# 3. later: list threads, match by id, resolve, then approve to clear the gate
-glab api "projects/group%2Fproject/merge_requests/$iid/discussions" \
-  | jq -r '.[] | select(.notes[0].position.new_path=="src/api/users.go") | .id'
-glab api --method PUT \
-  "projects/group%2Fproject/merge_requests/$iid/discussions/<discussion_id>?resolved=true"
-glab mr approve "$iid" -R group/project
-```
-
 ## Progressive Disclosure
 
-Each reference is a trigger: read it only when the user's intent matches; do not preload everything.
+Read only the reference that matches the task.
 
-- Read [references/first-time-setup.md](references/first-time-setup.md). Load when setting up a fresh machine or account: installing glab, `glab auth login` (web / device / stdin), choosing `git_protocol` vs `api_protocol`, cloning, and verifying with a read call.
-- Read [references/auth.md](references/auth.md): Load when auth fails, choosing a token type (PAT / project access token / fine-grained / CI_JOB_TOKEN), scoping it to the exact operation (`read_api` vs `api`), targeting a self-managed host, storing it (keyring / CI), or rotating a leak.
-- Read [references/issues.md](references/issues.md): Load when creating, finding, updating, relating, closing, reopening, or commenting on GitLab issues/work items as workflow tickets.
-- Read [references/boards.md](references/boards.md): Load when reading or configuring issue boards, moving tickets between list types, changing native Status or label-based stages, or changing vertical rank.
-- Read [references/context-notes.md](references/context-notes.md): Load when publishing or reconciling versioned decision, rationale, tradeoff, assumption, or constraint context as a top-level issue or merge-request Note.
-- Read [references/create.md](references/create.md). Load when opening or updating an MR: push, `glab mr create` flags, draft, reviewers / labels, issue-link / close semantics, the one-open-MR-per-branch 409, additive-body rules, and the raw REST equivalent.
-- Read [references/review-post.md](references/review-post.md). Load when publishing a review: the summary note, the exact inline position model (three SHAs + conditional line keys), verifying `DiffNote`, the blocking mechanism, and the `#note_<id>` deep-link.
-- Read [references/review-resolve.md](references/review-resolve.md): Load when listing threads, matching a finding to a discussion by id, resolving via the REST PUT, replying in-thread, and the merge-gating effect.
-- Read [references/onboarding.md](references/onboarding.md): Load when setting up, diagnosing, dry-running, verifying, rolling back, uninstalling, or checking drift for selected GitLab adapters and controls.
-- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md): Load when configuring or onboarding CI/CD components, typed inputs, pipeline execution policies, compliance frameworks, protected environments, policy projects, evidence, rollback, or governance-only GitLab adoption.
-- Read [provider conformance](references/provider-conformance.md): Load when composing GitLab tickets, boards, merge requests, reviews, context, and evidence into a provider-neutral handoff or testing adapter behavior.
+- Read [references/first-time-setup.md](references/first-time-setup.md): Load when setting up glab on a new machine or account.
+- Read [references/auth.md](references/auth.md): Load when auth fails, a token needs a type or a scope, or a self-managed host is the target.
+- Read [references/issues.md](references/issues.md): Load when working with issues or work items as tickets.
+- Read [references/boards.md](references/boards.md): Load when reading or changing issue boards, stages or rank.
+- Read [references/context-notes.md](references/context-notes.md): Load when publishing durable decision or rationale context as a note.
+- Read [references/create.md](references/create.md): Load when opening or updating a merge request.
+- Read [references/review-post.md](references/review-post.md): Load when publishing a review with inline comments.
+- Read [references/review-resolve.md](references/review-resolve.md): Load when replying to or resolving discussions.
+- Read [references/worked-example.md](references/worked-example.md): Load when one end-to-end run helps: open a merge request, post a review with an inline comment, resolve the thread.
+- Read [references/onboarding.md](references/onboarding.md): Load when setting up, verifying, rolling back or checking drift of GitLab adapters and controls.
+- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md): Load when configuring CI/CD components, pipeline policies, compliance frameworks or protected environments.
+- Read [references/provider-conformance.md](references/provider-conformance.md): Load when composing GitLab objects into a provider-neutral handoff or testing an adapter.

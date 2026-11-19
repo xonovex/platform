@@ -36,7 +36,6 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [writing-lua-opinionated](skills/writing-lua-opinionated/SKILL.md) | Tuning performance-critical Lua hot paths: the tunings especially benefit LuaJIT, and the principles apply to vanilla Lua 5.4 too. A focused overlay that covers only hot-path performance, not Lua fundamentals. |
 | [writing-lua](skills/writing-lua/SKILL.md) | Editing general-purpose Lua 5.4+: modules, scripts, configuration. |
 | [writing-python](skills/writing-python/SKILL.md) | Writing or editing Python 3.12+ for APIs, data processing, scripting, or tooling. |
 | [writing-shell-scripts](skills/writing-shell-scripts/SKILL.md) | Writing or editing POSIX shell or Bash automation. |

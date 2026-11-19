@@ -19,7 +19,6 @@ tasks:
       - skill-auditing-code-quality:ci-check
       - skill-authoring-pull-requests:ci-check
       - skill-authoring-tests:ci-check
-      - skill-debugging-native-code:ci-check
       - skill-managing-credentials:ci-check
       - skill-managing-versions:ci-check
       - skill-reviewing-code:ci-check
