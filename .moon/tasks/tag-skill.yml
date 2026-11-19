@@ -70,10 +70,17 @@ tasks:
       - /budgets.json
     options:
       cache: false
+  # The limits are longer than the defaults of the tool (180 and 90 days). A
+  # review of 2026-05-13, or of 2026-07-22 for a source with a version, stays
+  # valid through 2027-02-28 and is stale on 2027-03-01.
   skill-audit-sources:
     command:
       - node
       - $workspaceRoot/packages/tooling/script/script-moon-skill-audit-sources/bin.js
+      - --max-age
+      - "291"
+      - --version-max-age
+      - "221"
     deps:
       - target: ~:build
         optional: true
