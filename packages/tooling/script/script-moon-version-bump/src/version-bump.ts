@@ -171,10 +171,7 @@ export const main = (
   let newVersion: string;
   const changes: FileChange[] = [];
 
-  if (gitVersion !== undefined && gitVersion !== oldVersion) {
-    logInfo(`${pkg.name}: already bumped (${oldVersion}), skipping.`);
-    newVersion = oldVersion;
-  } else {
+  if (gitVersion === undefined || gitVersion === oldVersion) {
     newVersion = exact ?? bumpVersion(oldVersion, bumpType, preid);
     if (dryRun) {
       logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
@@ -185,6 +182,9 @@ export const main = (
       });
       logInfo(`[planned] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
     }
+  } else {
+    logInfo(`${pkg.name}: already bumped (${oldVersion}), skipping.`);
+    newVersion = oldVersion;
   }
 
   const dependentChanges = noDependents

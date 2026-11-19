@@ -90,8 +90,11 @@ export const taskInheritanceFailures = (
       new Set([fileName]),
     );
     for (const [task, definition] of Object.entries(file.tasks ?? {})) {
-      if (definition.deps === undefined) continue;
-      if (definition.options?.mergeDeps === "replace") continue;
+      if (
+        definition.deps === undefined ||
+        definition.options?.mergeDeps === "replace"
+      )
+        continue;
       const inherited = parentDeps.get(task);
       if (inherited === undefined) continue;
       const declared = new Set(depTargets(definition.deps));

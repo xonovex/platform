@@ -254,9 +254,9 @@ type Semver = readonly [number, number, number];
 
 const parseSemver = (text: string): Semver | undefined => {
   const m = /(\d+)\.(\d+)\.(\d+)/.exec(text);
-  return m?.[1] !== undefined && m[2] !== undefined && m[3] !== undefined
-    ? [Number(m[1]), Number(m[2]), Number(m[3])]
-    : undefined;
+  return m?.[1] === undefined || m[2] === undefined || m[3] === undefined
+    ? undefined
+    : [Number(m[1]), Number(m[2]), Number(m[3])];
 };
 
 const cmpSemver = (a: Semver, b: Semver): number =>

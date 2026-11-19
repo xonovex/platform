@@ -233,8 +233,8 @@ export const main = async (
       : splitScenarios.slice(offset, offset + limit);
   if (scenarios.length === 0) throw new Error("no routing scenarios selected");
 
-  const {batchSize, budget, runs, threshold} = optionsResult.data;
-  const batches = boundedBatches(scenarios, batchSize ?? 8);
+  const {batchSize = 8, budget, runs, threshold} = optionsResult.data;
+  const batches = boundedBatches(scenarios, batchSize);
   const maxBatchRuns = Math.max(
     ...batches.map((batch) => triggerModelRunCount(batch.length, runs)),
   );

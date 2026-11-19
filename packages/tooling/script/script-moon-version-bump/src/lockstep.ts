@@ -170,9 +170,12 @@ const selectBaseVersion = (members: readonly ResolvedMember[]): string => {
 // worktree has not already bumped it away from its committed version.
 const dependentVersionOf = (entry: WorkspacePackage): string | undefined => {
   const currentVersion = entry.pkg.version;
-  if (currentVersion === undefined) return undefined;
-  if (entry.pkg.private === true) return undefined;
-  if (entry.headVersion !== currentVersion) return undefined;
+  if (
+    currentVersion === undefined ||
+    entry.pkg.private === true ||
+    entry.headVersion !== currentVersion
+  )
+    return undefined;
   return bumpVersion(currentVersion, "patch");
 };
 
@@ -192,9 +195,13 @@ const resolveVersions = (
     settled = true;
     for (const entry of packages) {
       const name = entry.pkg.name;
-      if (name === undefined) continue;
-      if (memberPaths.has(entry.path) || resolved.has(name)) continue;
-      if (rewriteReferences(entry.pkg, resolved).changed === 0) continue;
+      if (
+        name === undefined ||
+        memberPaths.has(entry.path) ||
+        resolved.has(name) ||
+        rewriteReferences(entry.pkg, resolved).changed === 0
+      )
+        continue;
       const newVersion = dependentVersionOf(entry);
       if (newVersion === undefined) continue;
       resolved.set(name, newVersion);

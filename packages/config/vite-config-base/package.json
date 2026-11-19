@@ -31,7 +31,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@tailwindcss/vite": "4.3.3",
+    "@tailwindcss/vite": "4.3.5",
     "@xonovex/eslint-config-base": "0.2.0",
     "@xonovex/ts-config-build": "0.2.0"
   },

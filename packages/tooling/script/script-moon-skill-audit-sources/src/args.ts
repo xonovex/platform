@@ -27,9 +27,9 @@ const optionalValue = (
 ): {readonly value: string; readonly nextIndex: number} => {
   if (inline !== undefined) return {value: inline, nextIndex: index};
   const next = argv[index + 1];
-  return next !== undefined && !isOptionToken(next)
-    ? {value: next, nextIndex: index + 1}
-    : {value: fallback, nextIndex: index};
+  return next === undefined || isOptionToken(next)
+    ? {value: fallback, nextIndex: index}
+    : {value: next, nextIndex: index + 1};
 };
 
 const valueOption = (

@@ -77,10 +77,10 @@ export const hasherIgnoreFailures = ({
   );
 
   for (const ignoredPath of ignoredPaths) {
-    if (exemptPrefixes.some((prefix) => ignoredPath.startsWith(prefix))) {
-      continue;
-    }
-    if (probePaths(ignoredPath).every((probe) => matchesAny(probe, compiled))) {
+    if (
+      exemptPrefixes.some((prefix) => ignoredPath.startsWith(prefix)) ||
+      probePaths(ignoredPath).every((probe) => matchesAny(probe, compiled))
+    ) {
       continue;
     }
     failures.push(
@@ -205,8 +205,7 @@ export const declaredLiteralInputs = (
     const projectDirectory = file.path.slice(0, file.path.lastIndexOf("/"));
     for (const task of Object.values(result.data.tasks ?? {})) {
       for (const entry of task.inputs ?? []) {
-        if (!isLiteral(entry)) continue;
-        if (entry.startsWith("$")) continue;
+        if (!isLiteral(entry) || entry.startsWith("$")) continue;
         const path = entry.startsWith("/")
           ? entry.slice(1)
           : `${projectDirectory}/${entry}`;

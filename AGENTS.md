@@ -22,7 +22,7 @@ Work within the package boundaries below, run the required checks, and follow th
 - **Tasks**: `npx moon run <project>:<task>` or `npx moon run #<tag>:<task>`
 - **Query**: `moon query projects --tags "<pattern>"`
 - **Moon**: a `moon.yml` tag `<name>` inherits `.moon/tasks/tag-<name>.yml`; `extends` refines one (`tag-typescript-script.yml`, `tag-typescript-config.yml` -> `tag-typescript.yml`). A redefined task replaces the parent's `deps`, so restate every inherited dep or set `mergeDeps: replace`
-- **Dependencies**: internal `@xonovex/*` exact, a config package pins its plugins exactly, everything else caret. An exact pin elsewhere records its reason: `typescript` and `vite` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task
+- **Dependencies**: internal `@xonovex/*` exact, a config package pins its plugins exactly, everything else caret. An exact pin elsewhere records its reason: `typescript` in `.ncurc.cjs`, `@moonrepo/cli` because it resolves every task. `npm run deps:update` moves every range and obeys the holds in `.ncurc.cjs`
 - **Git**: no feature branches or pushes unless asked
 - **Commits**: conventional. Rebuild a restructured series on a temporary branch, confirm `git diff <old tip> <new tip>` is empty before moving the branch, and verify each commit with `npx moon run :ci-check --force` so the series stays bisectable
 - **Release**: reviewed `version packages` PR only; merging to `main` runs `.github/workflows/release.yml` (`:ci-publish` -> release/tag). Never bypass branch protection

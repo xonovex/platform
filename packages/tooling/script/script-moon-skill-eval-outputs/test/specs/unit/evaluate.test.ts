@@ -169,6 +169,19 @@ describe("the output evaluator", () => {
     });
   });
 
+  it("reports each skipped evaluation on stderr and evaluates the rest", async () => {
+    const {exitCode} = await runEvaluator(
+      "skipped",
+      [{...evaluation("blank"), prompt: ""}, evaluation("question")],
+      (fs) => dependencies(fs),
+    );
+
+    expect(exitCode).toBe(0);
+    expect(process.stderr.write).toHaveBeenCalledWith(
+      expect.stringContaining("Skipping eval #1"),
+    );
+  });
+
   it("fails a valid positive delta below the tier's absolute quality floor", async () => {
     const {exitCode, fs, workspace} = await runEvaluator(
       "low-quality",

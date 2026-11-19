@@ -5,8 +5,8 @@ export const bumpVersion = (
   type: BumpType,
   preid?: string,
 ): string => {
-  const [corePart, ...prereleaseParts] = version.split("-");
-  const parts = (corePart ?? "").split(".").map(Number);
+  const [corePart = "", ...prereleaseParts] = version.split("-");
+  const parts = corePart.split(".").map(Number);
   const major = parts[0] ?? 0;
   const minor = parts[1] ?? 0;
   const patch = parts[2] ?? 0;
@@ -18,7 +18,7 @@ export const bumpVersion = (
       const preNum = Number(prereleaseStr.slice(expectedPrefix.length));
       return `${String(major)}.${String(minor)}.${String(patch)}-${preid}.${String(preNum + 1)}`;
     }
-    const bumped = bumpVersion(corePart ?? "", type);
+    const bumped = bumpVersion(corePart, type);
     return `${bumped}-${preid}.0`;
   }
 
@@ -45,9 +45,9 @@ interface ParsedVersion {
 }
 
 const parseVersion = (version: string): ParsedVersion => {
-  const [corePart, ...prereleaseParts] = version.split("-");
+  const [corePart = "", ...prereleaseParts] = version.split("-");
   return {
-    core: (corePart ?? "").split(".").map(Number),
+    core: corePart.split(".").map(Number),
     prerelease: prereleaseParts.join("-").split(".").filter(Boolean),
   };
 };

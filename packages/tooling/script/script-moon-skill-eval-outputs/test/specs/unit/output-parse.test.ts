@@ -283,4 +283,15 @@ describe("parseJudgeVerdict", () => {
       ),
     ).toEqual({assertion_results: [{passed: true}]});
   });
+
+  it("drops the Codex verdict when a later line is not JSON", () => {
+    const message = lines({
+      type: "item.completed",
+      item: {
+        type: "agent_message",
+        text: '{"assertion_results":[{"passed":true}]}',
+      },
+    });
+    expect(parseJudgeVerdict("codex", `${message}\nnot json`)).toBeNull();
+  });
 });

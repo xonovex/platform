@@ -119,8 +119,10 @@ const proseFiles = (
       files.push(...proseFiles(root, absolute, fs));
       continue;
     }
-    if (!fs.isFile(absolute)) continue;
-    if (!PROSE_FILE_EXTENSIONS.includes(extname(name).toLowerCase())) {
+    if (
+      !fs.isFile(absolute) ||
+      !PROSE_FILE_EXTENSIONS.includes(extname(name).toLowerCase())
+    ) {
       continue;
     }
     files.push(relative(root, absolute));

@@ -152,13 +152,7 @@ export const aggregateArm = (
   runs: number,
 ): ArmBlock => {
   const armRecords = records.filter((record) => record.arm === arm);
-  const byEvaluation = new Map<string | number, JobRecord[]>();
-  for (const record of armRecords) {
-    const group = byEvaluation.get(record.id) ?? [];
-    group.push(record);
-    byEvaluation.set(record.id, group);
-  }
-  const groups = [...byEvaluation.values()];
+  const groups = [...Map.groupBy(armRecords, (record) => record.id).values()];
   const block: ArmBlock = {
     pass_rate: meanBlock(
       groups.map((group) => fmean(group.map((record) => record.pass_rate))),

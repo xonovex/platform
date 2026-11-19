@@ -239,8 +239,11 @@ export const unresolvedOperationRationales = (
     );
     for (const {rationale} of queries) {
       for (const [, operation] of rationale.matchAll(OPERATION_MENTION)) {
-        if (operation === undefined || references.has(operation)) continue;
-        if (topics.every((topic) => !operation.startsWith(`${topic}-`)))
+        if (
+          operation === undefined ||
+          references.has(operation) ||
+          topics.every((topic) => !operation.startsWith(`${topic}-`))
+        )
           continue;
         findings.push({
           operation,

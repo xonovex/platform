@@ -19,8 +19,13 @@ export interface LinkReport {
 // (http/https/mailto), a placeholder or elided illustrative form, or a pure
 // #anchor.
 export const relativeLinkTarget = (raw: string): string | null => {
-  if (EXTERNAL_LINK_RE.test(raw)) return null;
-  if (raw.includes("<") || raw.includes("{") || raw.includes("…")) return null;
+  if (
+    EXTERNAL_LINK_RE.test(raw) ||
+    raw.includes("<") ||
+    raw.includes("{") ||
+    raw.includes("…")
+  )
+    return null;
   const target = raw.split("#", 1)[0] ?? "";
   return target === "" ? null : target;
 };
