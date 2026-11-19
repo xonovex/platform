@@ -26,8 +26,6 @@ sbom.spdx.json
 dive-report.json
 image.env
 
-# gitlab-ci-local validation tool cache
-.gitlab-ci-local/
 
 # Project-Specific Files
 *.local.md

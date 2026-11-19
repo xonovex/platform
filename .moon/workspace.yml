@@ -89,7 +89,6 @@ projects:
     skill-writing: packages/runtime/plugin/plugin-writing/skills/writing-guide
     skill-zod: packages/runtime/plugin/plugin-typescript/skills/zod-guide
     github-actions: .github
-    gitlab-ci: .gitlab
     repository-shell: .hooks
     workspace-config: .
 vcs:
@@ -144,7 +143,6 @@ hasher:
     - ".moon/docker/**"
     - ".moon/toolchain/**"
     - ".artifacts/**"
-    - ".gitlab-ci-local/**"
     - ".skill-eval-results/**"
     - "**/*.tsbuildinfo"
     - "**/coverage.out"
