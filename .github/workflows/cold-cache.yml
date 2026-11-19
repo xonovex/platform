@@ -19,6 +19,6 @@ jobs:
       contents: read
       pull-requests: write
       actions: write
-    uses: ./.github/workflows/ci.yml
+    uses: $/.github/workflows/ci.yml
     with:
       cache-workspace: false

@@ -27,7 +27,7 @@ import (
 
 // DefaultWorkspaceInitImage is pinned to the multi-architecture OCI index for
 // alpine/git 2.54.0. Operators may configure another digest-pinned image.
-const DefaultWorkspaceInitImage = "docker.io/alpine/git:2.54.0@sha256:697cb1c85aefc5724febaec2202a974e0d66f6abb6be91a9a86d0c8757af692a"
+const DefaultWorkspaceInitImage = "docker.io/alpine/git:2.54.1@sha256:2306e2b05ee0ef99f5d25b0779f645b24ae9f91ba187107503592fcdfe78da3a"
 
 // AgentWorkspaceReconciler reconciles an AgentWorkspace object
 type AgentWorkspaceReconciler struct {

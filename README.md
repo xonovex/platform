@@ -2,7 +2,7 @@
 
 Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills and commands.
 
-![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.26%2B-00ADD8)
+![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.27%2B-00ADD8)
 
 ## Choose an entry point
 
