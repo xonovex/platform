@@ -13,7 +13,7 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Run Claude Code or OpenCode locally | [Agent CLI](packages/tooling/cli/agent-cli-go/README.md) |
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
 | Install skills | [Plugin catalog](#agent-plugins) |
-| Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
+| Take a change from research to delivery | [Workflow guide and diagram](packages/runtime/plugin/plugin-workflow/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
 The CLI and operator support Claude Code and OpenCode, model-provider routing, Git and Jujutsu workspaces, and Nix provisioning. The CLI offers bubblewrap and Docker isolation. The operator uses cluster-provided gVisor, Kata, and Confidential Containers runtime classes. Each component documents its requirements and guarantees.
@@ -55,7 +55,7 @@ Install the grouped plugins your tasks need. Each plugin owns related skills and
 | [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts. |
 | [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md) | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
 | [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md) | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests. |
-| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Research, plan, implement, validate, and close out work, then integrate lessons from the session. |
+| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Take a change from research to validated delivery in one directory of files that every step reads and writes. |
 | [`xonovex-writing`](packages/runtime/plugin/plugin-writing/README.md) | Revise prose and write technical documents, articles, news, and travel guides. |
 
 #### Claude Code

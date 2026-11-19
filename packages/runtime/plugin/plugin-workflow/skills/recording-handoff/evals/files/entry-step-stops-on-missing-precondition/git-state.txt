@@ -1,0 +1,5 @@
+$ git branch --show-current
+feature/fare-capping
+$ git status --short | head -20
+?? plans/fare-capping/decisions/pricing-scope-4hq2.md
+?? notes.txt

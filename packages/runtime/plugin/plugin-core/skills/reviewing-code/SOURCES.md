@@ -29,5 +29,5 @@
 ## Refresh Workflow
 
 1. Re-check the Conventional Comments GitLab repository for any change to the label set or decorations
-2. Fold recurring review-craft lessons (from `reflecting-on-sessions` retrospectives) into the references
+2. Fold recurring review-craft lessons (from session lessons, through `authoring-skills`) into the references
 3. Bump **Last reviewed** above

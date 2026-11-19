@@ -1,0 +1,16 @@
+@startuml
+title A signed-in customer saves and opens a search
+
+participant "Customer [settled]" as C #C8E6C9
+participant "Shop page [settled]" as S #C8E6C9
+participant "Accounts service [settled]" as A #C8E6C9
+
+C -> S : Saves the search with a name
+S -> A : Sends the name and the normalised query
+A --> S : Stores it, or answers 401 or 409
+C -> S : Opens a saved search from the account menu
+S -> A : Asks for the saved searches of the customer
+S -> S : Runs the stored query again
+
+note over A #C8E6C9 : At most 20 saved searches for each customer
+@enduml

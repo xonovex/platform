@@ -1,0 +1,116 @@
+{
+  "$id": "workflow/common",
+  "$defs": {
+    "actor": {
+      "type": "string",
+      "pattern": "^(human|process):[A-Za-z0-9][A-Za-z0-9._-]*$|^[A-Za-z][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._+-]*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "datetime-offset"
+    },
+    "event": {
+      "type": "object",
+      "required": ["by", "at"],
+      "properties": {
+        "by": {"$ref": "#/$defs/actor"},
+        "at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "generated": {
+      "$ref": "#/$defs/event"
+    },
+    "verified": {
+      "oneOf": [
+        {"$ref": "#/$defs/event"},
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/event"}
+        }
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "stable", "deprecated"]
+    },
+    "kebabName": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "skillNames": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/kebabName"}
+    },
+    "source": {
+      "type": "object",
+      "required": ["resource"],
+      "properties": {
+        "resource": {"type": "string", "minLength": 1},
+        "id": {"$ref": "#/$defs/kebabName"},
+        "title": {"type": "string", "minLength": 1},
+        "author": {"$ref": "#/$defs/actor"},
+        "last_modified": {"$ref": "#/$defs/timestamp"},
+        "usage_count": {"type": "integer"}
+      }
+    },
+    "conceptId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$"
+    },
+    "conceptIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "allOf": [{"$ref": "#/$defs/conceptId"}, {"x-concept": ""}]
+      }
+    },
+    "decisionId": {
+      "allOf": [{"$ref": "#/$defs/conceptId"}, {"x-concept": "decisions/"}]
+    },
+    "decisionIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/decisionId"}
+    },
+    "workId": {
+      "allOf": [{"$ref": "#/$defs/conceptId"}, {"x-concept": "work/"}]
+    },
+    "workIds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/workId"}
+    },
+    "header": {
+      "type": "object",
+      "required": ["type", "schema", "title", "description", "generated"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^Workflow [A-Z][A-Za-z-]*( [A-Za-z-]+)*$"
+        },
+        "schema": {
+          "type": "string",
+          "pattern": "^workflow/[a-z0-9]+(-[a-z0-9]+)*/[0-9]+$"
+        },
+        "title": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1},
+        "generated": {"$ref": "#/$defs/generated"},
+        "verified": {"$ref": "#/$defs/verified"},
+        "status": {"$ref": "#/$defs/status"},
+        "stale_after": {"$ref": "#/$defs/timestamp"},
+        "sources": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/source"}
+        },
+        "tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "resource": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: authoring-instructions
-description: "Use when authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. Triggers on edits to `AGENTS.md` and on prompts about bootstrapping fresh instructions, refreshing stale docs to match the filesystem, condensing verbose files, deduping across the repo, or porting organizational patterns from another project, even when the user doesn't say 'instructions' or 'AGENTS.md'."
+description: "Use when authoring, reviewing, initializing, syncing, simplifying, consolidating, or assimilating AGENTS.md project-instruction files. Triggers on edits to `AGENTS.md` and on prompts about bootstrapping fresh instructions, refreshing stale docs to match the filesystem, condensing verbose files, deduping across the repo, porting organizational patterns from another project, or folding the lessons of a session into rules, even when the user doesn't say 'instructions' or 'AGENTS.md'."
 ---
 
 # Project Instruction Guidelines
@@ -21,6 +21,7 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - **Signal Over Volume**: keep only non-obvious content; anything inferable from `package.json` + source belongs in the code, not the doc
 - **Deletion-first editing**: a simplify or consolidate pass cuts at least as much as it adds, and reuses existing vocabulary rather than coining new terms; **authoring-skills** owns this rule
 - **Living documentation**: update alongside project changes (sync operation)
+- **Lessons of a session**: a project lesson becomes a rule of the nearest AGENTS.md, and reusable guidance goes to its owning skill through **authoring-skills**
 
 ## Gotchas
 
@@ -39,3 +40,4 @@ Author, refresh, simplify, consolidate, and port AGENTS.md project-instruction f
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose AGENTS.md
 - Read [references/consolidate.md](references/consolidate.md) - Load when cleaning up scattered AGENTS.md across a repo
 - Read [references/merge.md](references/merge.md) - Load when porting organizational patterns from another project's AGENTS.md
+- Read [references/from-a-session.md](references/from-a-session.md) - Load when capturing the lessons of a session, folding them into AGENTS.md, or promoting a lesson to a managed or organization-wide target

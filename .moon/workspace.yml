@@ -22,7 +22,6 @@ projects:
     skill-applying-oop: packages/runtime/plugin/plugin-core/skills/applying-oop
     skill-applying-orthogonality: packages/runtime/plugin/plugin-core/skills/applying-orthogonality
     skill-applying-tdd: packages/runtime/plugin/plugin-core/skills/applying-tdd
-    skill-approving-plan: packages/runtime/plugin/plugin-workflow/skills/approving-plan
     skill-assuring-accessibility: packages/runtime/plugin/plugin-core/skills/assuring-accessibility
     skill-auditing-code-quality: packages/runtime/plugin/plugin-core/skills/auditing-code-quality
     skill-authoring-commands: packages/runtime/plugin/plugin-agentic/skills/authoring-commands
@@ -32,17 +31,13 @@ projects:
     skill-authoring-skills: packages/runtime/plugin/plugin-agentic/skills/authoring-skills
     skill-authoring-tests: packages/runtime/plugin/plugin-core/skills/authoring-tests
     skill-building-editor-viewports: packages/runtime/plugin/plugin-game-engine/skills/building-editor-viewports
-    skill-closing-plan: packages/runtime/plugin/plugin-workflow/skills/closing-plan
     skill-configuring-claude-code: packages/runtime/plugin/plugin-agentic/skills/configuring-claude-code
     skill-configuring-codex: packages/runtime/plugin/plugin-agentic/skills/configuring-codex
     skill-configuring-copilot: packages/runtime/plugin/plugin-agentic/skills/configuring-copilot
     skill-configuring-kiro: packages/runtime/plugin/plugin-agentic/skills/configuring-kiro
     skill-configuring-opencode: packages/runtime/plugin/plugin-agentic/skills/configuring-opencode
     skill-configuring-pi: packages/runtime/plugin/plugin-agentic/skills/configuring-pi
-    skill-critiquing-plan: packages/runtime/plugin/plugin-workflow/skills/critiquing-plan
     skill-debugging-native-code: packages/runtime/plugin/plugin-native/skills/debugging-native-code
-    skill-defining-subplans: packages/runtime/plugin/plugin-workflow/skills/defining-subplans
-    skill-delegating-plan: packages/runtime/plugin/plugin-workflow/skills/delegating-plan
     skill-designing-asset-pipelines: packages/runtime/plugin/plugin-game-engine/skills/designing-asset-pipelines
     skill-designing-data-models: packages/runtime/plugin/plugin-game-engine/skills/designing-data-models
     skill-designing-ecs: packages/runtime/plugin/plugin-game-engine/skills/designing-ecs
@@ -50,20 +45,16 @@ projects:
     skill-designing-gpu-renderers: packages/runtime/plugin/plugin-game-engine/skills/designing-gpu-renderers
     skill-designing-imgui: packages/runtime/plugin/plugin-game-engine/skills/designing-imgui
     skill-designing-node-graphs: packages/runtime/plugin/plugin-game-engine/skills/designing-node-graphs
-    skill-distilling-plan: packages/runtime/plugin/plugin-workflow/skills/distilling-plan
+    skill-distilling-change: packages/runtime/plugin/plugin-workflow/skills/distilling-change
     skill-evaluating-skills: packages/runtime/plugin/plugin-agentic/skills/evaluating-skills
-    skill-implementing-plan: packages/runtime/plugin/plugin-workflow/skills/implementing-plan
     skill-implementing-vulkan-renderers: packages/runtime/plugin/plugin-game-engine/skills/implementing-vulkan-renderers
     skill-managing-credentials: packages/runtime/plugin/plugin-core/skills/managing-credentials
     skill-managing-memory: packages/runtime/plugin/plugin-native/skills/managing-memory
     skill-managing-versions: packages/runtime/plugin/plugin-core/skills/managing-versions
     skill-mixing-audio: packages/runtime/plugin/plugin-game-engine/skills/mixing-audio
     skill-publishing-npm-packages: packages/runtime/plugin/plugin-typescript/skills/publishing-npm-packages
-    skill-reflecting-on-sessions: packages/runtime/plugin/plugin-workflow/skills/reflecting-on-sessions
-    skill-researching-changes: packages/runtime/plugin/plugin-workflow/skills/researching-changes
+    skill-recording-handoff: packages/runtime/plugin/plugin-workflow/skills/recording-handoff
     skill-reviewing-code: packages/runtime/plugin/plugin-core/skills/reviewing-code
-    skill-revising-plan: packages/runtime/plugin/plugin-workflow/skills/revising-plan
-    skill-settling-questions: packages/runtime/plugin/plugin-workflow/skills/settling-questions
     skill-using-astro: packages/runtime/plugin/plugin-typescript/skills/using-astro
     skill-using-cmake: packages/runtime/plugin/plugin-native/skills/using-cmake
     skill-using-docker: packages/runtime/plugin/plugin-platform/skills/using-docker
@@ -80,7 +71,6 @@ projects:
     skill-using-threejs: packages/runtime/plugin/plugin-typescript/skills/using-threejs
     skill-using-vitest: packages/runtime/plugin/plugin-typescript/skills/using-vitest
     skill-using-zod: packages/runtime/plugin/plugin-typescript/skills/using-zod
-    skill-validating-plan: packages/runtime/plugin/plugin-workflow/skills/validating-plan
     skill-writing-c99: packages/runtime/plugin/plugin-native/skills/writing-c99
     skill-writing-c99-game-opinionated: packages/runtime/plugin/plugin-game-engine/skills/writing-c99-game-opinionated
     skill-writing-c99-opinionated: packages/runtime/plugin/plugin-native/skills/writing-c99-opinionated
@@ -89,7 +79,6 @@ projects:
     skill-writing-lock-free-code: packages/runtime/plugin/plugin-native/skills/writing-lock-free-code
     skill-writing-lua: packages/runtime/plugin/plugin-languages/skills/writing-lua
     skill-writing-news: packages/runtime/plugin/plugin-writing/skills/writing-news
-    skill-writing-plan: packages/runtime/plugin/plugin-workflow/skills/writing-plan
     skill-writing-prose: packages/runtime/plugin/plugin-writing/skills/writing-prose
     skill-writing-python: packages/runtime/plugin/plugin-languages/skills/writing-python
     skill-writing-shell-scripts: packages/runtime/plugin/plugin-languages/skills/writing-shell-scripts

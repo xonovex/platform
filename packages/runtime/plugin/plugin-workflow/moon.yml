@@ -8,19 +8,12 @@ tasks:
       - format-check
       - diagram-role-check
       - graph-build
-      - skill-approving-plan:ci-check
-      - skill-closing-plan:ci-check
-      - skill-critiquing-plan:ci-check
-      - skill-defining-subplans:ci-check
-      - skill-delegating-plan:ci-check
-      - skill-distilling-plan:ci-check
-      - skill-implementing-plan:ci-check
-      - skill-reflecting-on-sessions:ci-check
-      - skill-researching-changes:ci-check
-      - skill-revising-plan:ci-check
-      - skill-settling-questions:ci-check
-      - skill-validating-plan:ci-check
-      - skill-writing-plan:ci-check
+      - skill-distilling-change:ci-check
+      - skill-recording-handoff:ci-check
+      - example-validate
+      - example-index-check
+      - example-log-check
+      - validator-test
     options:
       mergeDeps: append
   graph-build:
@@ -43,3 +36,53 @@ tasks:
       - "diagrams/*.png"
     options:
       cache: false
+  example-validate:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        validate,
+        examples/saved-searches,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  example-index-check:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        index,
+        examples/saved-searches,
+        --check,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  example-log-check:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        log,
+        examples/saved-searches,
+        --check,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  validator-test:
+    command: [python3, -m, unittest, discover, -s, test/specs/unit]
+    inputs:
+      - "test/specs/unit/**/*.py"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"

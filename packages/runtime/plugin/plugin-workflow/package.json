@@ -3,7 +3,7 @@
   "version": "5.3.0",
   "private": true,
   "type": "module",
-  "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
+  "description": "Take a change from research to validated delivery in one directory of files that every step reads and writes.",
   "keywords": [
     "xonovex",
     "plugin",

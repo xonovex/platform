@@ -142,5 +142,53 @@
     "should_trigger": false,
     "split": "train",
     "rationale": "human documentation, not agent instructions"
+  },
+  {
+    "query": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Fold the lessons from this session into our project's AGENTS.md instructions. Explain how the reflect tooling does this by default before you run it.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "When I extract insights from a session, I usually just tag every one with applies_to: [\"general\"] to keep it simple. Is that a good idea for how these get integrated later?",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "A policy denial and an incident both suggest a new organization-wide blocking rule. Extract the lesson and promote it automatically to every agent configuration.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Extract the mistakes, successful tactics, and unresolved risks from this completed debugging session without retelling the transcript.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Integrate one reusable lesson into AGENTS.md in present tense, remove the superseded rule, and keep invocation-specific details out.",
+    "rationale": "session lessons folded into AGENTS.md",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Set up the Workflow section in our project instructions: where the plans live, the two repositories, how work is delivered, and which skills each phase should load.",
+    "rationale": "near miss owned by recording-handoff",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

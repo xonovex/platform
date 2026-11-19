@@ -1,0 +1,104 @@
+[
+  {
+    "query": "Start the next step for the change in plans/fare-capping. Before anything else, tell me which branch each repository is on and which files are uncommitted, and check that the plan directory is valid.",
+    "rationale": "the entry step at the start of a workflow step",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "We just agreed to address pricing requests by customer id. Record that as a decision in plans/fare-capping with the right file name and header, and add the log entry for this run.",
+    "rationale": "a new decision file and a log entry in a plan directory",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Create the work item file for the rate-limit change in plans/loyalty-points. It must wait on the open identifier decision and have two acceptance criteria with a way to check each.",
+    "rationale": "a work item with readiness and waits_on",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "I added a decision to plans/fare-capping and the decisions index and the log look out of date. Regenerate them and tell me whether the whole bundle validates.",
+    "rationale": "generated indexes, the log and the validator",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "What should the file be called for the new decision about token expiry in the change directory? Do I number it, and what goes on the end of the name?",
+    "rationale": "naming files and ids without naming the skill",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Set up the Workflow section in our project instructions: where the plans live, the two repositories, how work is delivered, and which skills each phase should load.",
+    "rationale": "project settings",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "The decision on data retention in plans/fare-capping was wrong. Open the file and change it to 30 days.",
+    "rationale": "a request to edit an append-only decision; the skill routes it to a superseding decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "Start a new change called loyalty-points: create its directory under plans, make the first log entry, and make sure the bundle validates before we write anything else.",
+    "rationale": "starting a new change",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Write an ADR in docs/adr that explains why we chose Postgres over DynamoDB for the orders service, with the options we rejected.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Commit my staged changes with a conventional commit message and push the branch.",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Create a Story in our Azure DevOps board titled 'Add retry to the payment webhook', set its area path and link it to the epic.",
+    "rationale": "near miss: a tracker item belongs to the integration of the tracker, not to the plan directory",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write a README for the shop-api repository with install, usage and contribution sections.",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "This checkout story is too big. Split it into smaller user stories that pass INVEST and write acceptance criteria for each.",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "Write the pull request description for my branch that adds retry to the webhook handler, including how it was tested.",
+    "rationale": "near miss owned by authoring-pull-requests",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Fix the frontmatter of the SKILL.md for my new skill: the description should start with 'Use when' and the name must match the directory.",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Add a section to our AGENTS.md that lists the build, test and lint commands and the folders a new engineer should read first.",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "Start a new change called saved-searches inside the agentic family under plans, next to its roadmap, and check that the new bundle validates.",
+    "rationale": "starting a change in a family directory",
+    "should_trigger": true,
+    "split": "validation"
+  }
+]

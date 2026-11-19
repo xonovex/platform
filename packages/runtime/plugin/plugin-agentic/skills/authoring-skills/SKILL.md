@@ -1,6 +1,6 @@
 ---
 name: authoring-skills
-description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. Triggers on edits under a skills directory, creating a skill, progressive disclosure, reference files, pattern extraction, assimilation, bullet simplification, Agent Skills spec validation, description tuning, composable ownership, runtime routing, or hard dependency tiers, even when the user doesn't say 'skill'."
+description: "Use when authoring, reviewing, extracting, merging, simplifying, decomposing, or validating Agent Skills (SKILL.md plus references / scripts / assets), or when auditing, splitting, de-duplicating, or tiering a set of skills. Triggers on edits under a skills directory, creating a skill, progressive disclosure, reference files, pattern extraction, session lessons, assimilation, bullet simplification, Agent Skills spec validation, description tuning, composable ownership, runtime routing, or hard dependency tiers, even when the user doesn't say 'skill'."
 compatibility: "Git and Python 3.11+ with uv run the bundled validation and source-audit scripts; source fetch/update options perform explicit network or file writes."
 allowed-tools: "Read Bash(git:*) Bash(uv:*)"
 ---
@@ -72,6 +72,7 @@ Single index of every reference; each entry names the operation/concept and when
 
 - Read [references/create.md](references/create.md) - Load when creating a new skill from a document, URL, or task description
 - Read [references/extract-from-codebase.md](references/extract-from-codebase.md) - Load when extracting patterns from this codebase into a skill
+- Read [references/from-a-session.md](references/from-a-session.md) - Load when folding the reusable lessons of a session into the skill that owns their domain
 - Read [references/merge.md](references/merge.md) - Load when porting elements from one skill into another
 - Read [references/simplify.md](references/simplify.md) - Load when condensing a verbose SKILL.md to bullet format or trimming bloated reference files
 - Read [references/validate.md](references/validate.md) - Load when auditing a SKILL.md against the spec

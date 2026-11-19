@@ -94,5 +94,11 @@
     "rationale": "near miss owned by using-gitlab",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "Inventory and group the TODO and FIXME comments under packages/tooling/cli so we can decide what belongs in a cleanup plan.",
+    "rationale": "near miss owned by auditing-code-quality",
+    "should_trigger": false,
+    "split": "validation"
   }
 ]

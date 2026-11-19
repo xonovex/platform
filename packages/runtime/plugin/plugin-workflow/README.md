@@ -1,58 +1,109 @@
 # Workflow Plugin
 
-Use `xonovex-workflow` to take a task from research to validated delivery and closeout. Each step has its own skill, and the harness loads the skill that matches the request. Choose `implementing-plan` for one implementation target or `delegating-plan` for supervised roadmap execution. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to maintain instructions and skills.
+Use `xonovex-workflow` to take a change from research to validated delivery as a series of standalone skills that keep everything they learn and decide in one directory of files. Record the project settings in the `Workflow` section of your project instructions (see [Record the project settings](#record-the-project-settings)), invoke `recording-handoff` once for the change, and continue with `researching` or `settling-questions`. Use the [Core Plugin](../plugin-core/README.md) for Git operations and the [Agentic Plugin](../plugin-agentic/README.md) to write the skills that `distilling-change` produces.
 
-![Research and decide, plan and review, implement and validate, review quality and deliver, then close out](diagrams/workflow-lifecycle.svg)
+## How the steps work
 
-## Follow the workflow
+Each step is a skill. Invoke it by name or describe the task in plain language. No step starts another: a step reads the files it needs, checks its preconditions, does its work, writes its files and stops. You, `delivering-work-package` or a script decide which step runs next.
 
-Work through the phases below and return to implementation when checks or review find a gap. Continuous learning can run during any phase. A diagram label names the skill that owns the step, and a `Core:` prefix names a skill of the Core Plugin.
+Before its own work, every step runs the entry step of `recording-handoff`: it confirms the branch of each repository it writes to and names the uncommitted files, validates the files it reads, reads the generated indexes and checks that the files it needs exist. If a precondition is missing, the step reports it, names the step that normally satisfies it and stops. It never assumes that an earlier step ran, and it never runs that step itself. No step commits or stages anything, except `delivering-work-package`, which commits each validated work item locally and pushes nothing.
 
-| Phase | Action and result |
+| Step | What it does and writes |
 | --- | --- |
-| Research and decisions | Use `researching-changes` to investigate the task and `settling-questions` to resolve questions. Continue only when the work has a clear purpose and direction. |
-| Planning and review | Use `writing-plan`, independently critique the plan with `critiquing-plan`, and apply feedback with `revising-plan`. Record the decision with `approving-plan`. Use `defining-subplans` when the work needs smaller targets. |
-| Implementation and validation | Use `implementing-plan` for one target or `delegating-plan` for a supervised roadmap. Load the applicable skills, implement the target, and check success criteria with `validating-plan`. Fix failures and refresh evidence with the progress update of `implementing-plan` before selecting more work. |
-| Quality and delivery | Use the Core Plugin's `auditing-code-quality` for an audit. Fix bounded findings or return to research for broader changes. Integrate isolated work when applicable, validate the combined result, and commit within the granted authority. |
-| Closeout and follow-up | Use `closing-plan` to return status, evidence, remaining work, and follow-up seeds for completed, paused, or handed-over work. Use `distilling-plan` when a completed implementation should become a replayable skill suite. |
+| `recording-handoff` | Owns the layout, the schemas, the entry step, the settings and the validator. Writes the generated files and the first log entry of a change. |
+| `researching` | Researches the change with read-only explorers and writes one research file with the open questions. Holds the research of a system migration as a reference. |
+| `settling-questions` | Settles open questions with you one at a time and writes each answer as a decision file. |
+| `writing-plan` | Writes `plan.md` from the research and the decisions, and outlines draft work files. |
+| `critiquing-plan` | Reviews the plan in a fresh read-only context and writes one critique file of graded findings. |
+| `illustrating-plan` | Draws and renders the diagrams of a change into `diagrams/`, as SVG by default. |
+| `revising-plan` | Folds `FIXME` notes, critique findings and research corrections into the plan and the work files, and records each changed decision as a new decision file. |
+| `defining-work-items` | Proposes the cut and, after your approval, completes the work package and the work items. |
+| `implementing-work-item` | Builds one ready work item in its own worktree and writes implementation notes. |
+| `validating-work-item` | Checks one implemented work item against its criteria in a fresh read-only context and writes a verdict tied to the tree hash of the worktree. |
+| `preparing-delivery` | Writes the commit message, the pull request description and the inline comments of one work item under `deliveries/`. It applies nothing. |
+| `validating-work-package` | Checks the success criteria of the plan and the integration of the work package in a fresh read-only context, and writes the close-out. |
+| `delivering-work-package` | Runs each ready work item through `implementing-work-item`, `validating-work-item` and `preparing-delivery` in dependency order, each in its own agent, and commits the item locally with `using-git` when the verdict covers the tree. It pushes nothing. |
+| `distilling-change` | Turns a finished change into reusable skills from its directory, after `validating-work-package`. |
 
-A plan approval records a review decision. Status metadata does not grant authority to implement, create branches, merge, push, or publish. Use the authority already granted by the user and the project rules.
+A push, a pull request and an inline comment go through `using-git`, `using-github` or `using-gitlab` when you ask for them. No step reaches a tracker or a host on its own.
 
-### Open the complete diagram
+## Typical order
 
-Read the main phases from top to bottom. The diagram includes acceptance and rejection, revision loops, execution choices, failed checks, worktree delivery or abandonment, pull-request review, closeout, and continuous learning.
+Planning runs once for a change. Execution then repeats for each work item in dependency order, and the work package is validated after the last item.
 
-[Open the scalable diagram](diagrams/workflow-diagram.svg), [open the PNG](diagrams/workflow-diagram.png), or [edit its Graphviz source](diagrams/workflow-diagram.dot).
+![Planning from intent to work items, then implement, validate and deliver each work item, then validate the work package and distill the change](diagrams/change-flow.svg)
 
-![Complete workflow with review outcomes, retries, delivery choices, and learning alongside implementation](diagrams/workflow-diagram.svg)
+[Open the PNG](diagrams/change-flow.png) or [edit its Graphviz source](diagrams/change-flow.dot).
 
-## Choose an execution mode
+The order is a loop, not a line. Each step lists what must exist before it runs:
 
-Use `implementing-plan` for one selected plan or subplan. Request the apply effect for implementation; the skill defaults to inspect. Reconstruct the target context and load its applicable skills before editing. Stop after the selected target rather than continuing into another child plan.
+1. `researching` and `settling-questions` need only the change directory. `settling-questions` discovers questions when none are known.
+2. `writing-plan` needs at least one research file or decision and no plan yet.
+3. `critiquing-plan` needs `plan.md`. `illustrating-plan` needs `plan.md` and at least one decision.
+4. `revising-plan` needs `plan.md` and something waiting: `FIXME` notes, critique findings or research corrections. Settle new questions and revise again until nothing is open.
+5. `defining-work-items` needs `plan.md` and the draft work outline. Rows that wait on an open decision stay at their outline.
+6. For each work item: `implementing-work-item` needs a work file whose criteria say how each is verified, `readiness: ready`, finished `depends_on` items and a repository in the settings. `validating-work-item` needs the worktree to hold a change. `preparing-delivery` needs the implementation notes and the `delivery` setting. `delivering-work-package` runs the three steps for each ready item.
+7. `validating-work-package` needs `plan.md` with success criteria and the work items. A missing verdict does not stop it, but the criteria that the verdict would cover cannot be marked met.
+8. `distilling-change` needs `close-out.md`.
 
-Use `delegating-plan` for supervised roadmap execution. The supervisor briefs implementation agents, independently verifies their results, and records progress. Sequential ordering is the default. Parallel groups need disjoint file sets and completed dependencies.
+Return to an earlier step whenever a later one shows a gap. Every step can run again, because each reads its inputs from files.
 
-![Choose one target or a supervised roadmap, validate criteria, fix failures, and record progress before advancing](diagrams/development-cycle.svg)
+## Where the files live
 
-Validate explicit success criteria, not just test exit codes. The progress update of `implementing-plan` returns refreshed progress and evidence. Persist the result separately when requested so another session can reconstruct the remaining work.
+Each change is one directory, `plans/<change>/`, that is also an Open Knowledge Format v0.2 bundle. The directory is the source of truth. Related changes of one initiative can share a family directory, `plans/<family>/<change>/`, whose `roadmap.md` orders them and is not a bundle.
 
-## Deliver isolated work
+[`examples/saved-searches/`](examples/saved-searches/) holds a finished bundle of an invented change, and the check of this plugin validates it.
 
-Use the worktree operations of the Core Plugin's [`using-git`](../plugin-core/skills/using-git/SKILL.md) skill when isolation is needed and branch creation is within the granted authority.
+```text
+plans/<change>/
+  index.md                     generated
+  log.md                       generated from log/
+  plan.md
+  research/<slug>-<suffix>.md
+  decisions/<slug>-<suffix>.md
+  critiques/<slug>-<suffix>.md
+  diagrams/                    sources and images
+  work/<slug>-<suffix>.md
+  implementation/<work-id>/notes.md
+  verdicts/<work-id>.md
+  deliveries/<work-id>/        commit-message.md, pull-request.md, comments/<suffix>.md
+  log/<date>-<skill>-<suffix>.md
+  close-out.md
+```
 
-| Operation | Result |
-| --- | --- |
-| Create a worktree | Create an isolated worktree before implementation. |
-| Merge a worktree | Integrate into the source worktree. Validate the combined result before declaring completion. |
-| Abandon a worktree | Record why work stops and retain useful lessons. Worktree removal is a separate option. |
-| Clean up worktrees | Remove eligible stale or merged worktrees when cleanup is requested. |
-| Commit | Commit validated work. Push only when publication is requested. |
+- `plan.md` holds the objective, scope and success criteria. Only `writing-plan` and `revising-plan` change it, outside the generated block of links to the decisions and the work.
+- `research/`, `critiques/` and `log/` only grow: a change is a new file.
+- A decision is never edited. A new decision supersedes it, and the old file gets `status: deprecated` and `superseded_by`.
+- `work/` holds the work package and the work items. `defining-work-items` and `revising-plan` edit them in place, and Git keeps the history.
+- `implementation/`, `verdicts/` and `deliveries/` hold what the steps of each work item produce. `close-out.md` is the record of `validating-work-package`.
+- `index.md` in each directory except `diagrams/`, and `log.md`, are generated. Never edit them by hand.
 
-## Carry lessons into future work
+A file name is `<slug>-<suffix>`, with a random four-character suffix. Files are never moved or renamed, so links stay valid. Only the skill that owns a kind of document creates it. The [layout reference](skills/recording-handoff/references/layout.md) lists the type, owner and schema of each document.
 
-Use `reflecting-on-sessions` to carry session lessons forward: it applies project-specific lessons to the relevant `AGENTS.md` files and reusable procedures to their owning skills. Both operations extract and apply directly, and each has a preview. Extract the lessons to files first only when a separate extraction is useful, then integrate the stored reflections.
+Check a bundle or a family with the validator, `uv run skills/recording-handoff/scripts/plan-bundle.py validate <directory>`. It checks Open Knowledge Format conformance, the schemas and the cross-file rules, and exits non-zero on an error. The `index` and `log` commands, each with `--check` or `--write`, check or regenerate the generated files.
 
-Reflection captures session lessons. `distilling-plan` reconstructs a completed implementation as a replayable skill suite. Use the Agentic Plugin's `authoring-instructions` and `authoring-skills` when the resulting guidance needs shortening.
+## Record the project settings
+
+Add a `Workflow` section to your project instructions. The [settings reference](skills/recording-handoff/references/settings.md) holds a complete example and the default skills of each phase.
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `plans` | `plans/` | The directory that holds the bundles, directly or one level down in a family directory. |
+| `repositories` | none | Explicit when more than one repository is involved. A map from a name to `{ resource, host }`. |
+| `delivery` | none | Explicit. `mode` is `branch`, `trunk` or `pull-request`. |
+| `skills` | none | A map from a phase name to the installed skills to load in that phase. The phase name is the name of the workflow step. |
+
+A missing `repositories` map blocks any step that writes to a repository once more than one is involved. A missing `delivery` blocks a step that applies something outward, such as pushing a branch or opening a pull request. The step names the missing setting and stops, and it never guesses a value from a remote. Steps that only read and write plan files carry on.
+
+A step loads knowledge skills from four sources, most specific first: the `skills_to_consult` list of the plan or the work item, a custom workflow skill of your project, the project's `skills` map, and the defaults of the settings reference. The sources add up, and the more specific one wins on conflict. A skill named in a `skills_to_consult` list that is not installed blocks the step; any other missing skill is reported and skipped.
+
+## Validate a change
+
+Run the checks of this plugin from the repository root. They validate the example bundle, check its generated files and run the unit tests of the validator:
+
+```bash
+npx moon run plugin-workflow:ci-check
+```
 
 <!-- xonovex:installation:start -->
 
@@ -78,7 +129,7 @@ codex plugin marketplace add xonovex/platform
 codex plugin add xonovex-workflow@xonovex-marketplace
 ```
 
-Optional companions: `xonovex-core`.
+Optional companions: `xonovex-agentic`, `xonovex-integrations`.
 
 <!-- xonovex:installation:end -->
 
@@ -88,26 +139,5 @@ Choose the skill that owns the task. The harness loads its instructions when the
 
 | Skill | Use when |
 | --- | --- |
-| [approving-plan](skills/approving-plan/SKILL.md) | Recording the user's approval or rejection of a reviewed plan. |
-| [closing-plan](skills/closing-plan/SKILL.md) | Closing out a completed, paused, or handed-over plan with a follow-up record. |
-| [critiquing-plan](skills/critiquing-plan/SKILL.md) | A written plan needs an independent adversarial review before anyone approves or implements it. |
-| [defining-subplans](skills/defining-subplans/SKILL.md) | Expanding a parent plan into focused child plans with their execution order. |
-| [delegating-plan](skills/delegating-plan/SKILL.md) | Supervising the execution of a roadmap, a plan, or a list of subplans by handing each item to an implementation agent and verifying its result. |
-| [distilling-plan](skills/distilling-plan/SKILL.md) | Turning a completed plan's implementation (its branch, plan record, and execution logs) into a replayable suite of skills. |
-| [implementing-plan](skills/implementing-plan/SKILL.md) | Implementing, resuming, or previewing work from an existing plan or subplan, one target at a time, and when refreshing the plan's progress from implementation evidence. |
-| [reflecting-on-sessions](skills/reflecting-on-sessions/SKILL.md) | Reflecting on a session or distilling lessons into reusable form. |
-| [researching-changes](skills/researching-changes/SKILL.md) | Researching a codebase and external sources to ground a future implementation plan, without writing the plan or changing code. |
-| [revising-plan](skills/revising-plan/SKILL.md) | Applying explicit feedback, annotations, or critique findings to an existing plan as a traceable new revision. |
-| [settling-questions](skills/settling-questions/SKILL.md) | Open decisions for a plan need an answer from the user, one at a time, each with a recommendation. |
-| [validating-plan](skills/validating-plan/SKILL.md) | Checking a plan's success criteria and Definition of Done against implementation evidence without changing the plan. |
-| [writing-plan](skills/writing-plan/SKILL.md) | Writing one high-level implementation plan from requirements, research, or settled decisions, before any detailed subplan exists. |
-
-## Validation
-
-Run the plugin gate from the repository root. It checks the plugin documents, formatting, owned skills, and diagram rendering.
-
-```bash
-npx moon run plugin-workflow:ci-check --force
-```
-
-Edit diagram sources under [`diagrams/`](diagrams/README.md) using the Xonovex design system in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`), then run `nix develop --no-update-lock-file --command npx moon run plugin-workflow:graph-build --force` to refresh SVG and PNG outputs with the supplied fonts.
+| [distilling-change](skills/distilling-change/SKILL.md) | A change is finished and its work should become reusable skills: an umbrella map skill and granular skills that replay the change on a clean base branch. |
+| [recording-handoff](skills/recording-handoff/SKILL.md) | A workflow step reads or writes the directory of a change: the entry step, plan, decision, work item and log files, names, frontmatter, generated indexes, validation, a new change, or the project's `Workflow` settings. |

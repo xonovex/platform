@@ -1,0 +1,31 @@
+{
+  "skill_name": "distilling-change",
+  "tier": "moderate",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Plan the reconstruction phase for distilling the completed work described below into a replayable skill suite. Return the source inventory and the fan-out you would launch, with the report structure you would require from each agent. Work only from the text; do not read files or launch anything.\n\nAvailable: a 25-commit branch feature/payments-v2 with a known merge base; the change directory plans/payments-v2/ with plan.md, decisions/, work/, implementation notes, verdicts and close-out.md; 30MB of agent session logs from the run; a developer guide the work rewrote.",
+      "assertions": [
+        "The plan reads the change directory first and personally, before any delegation, and partitions the commits into tiers with one reconstruction agent per tier plus a log miner",
+        "Each agent's required report covers what was built with paths and snippets, why, order dependencies, temporary versus final, failure modes with mechanisms, and exact validation commands",
+        "Log handling samples rather than reads wholesale, and the log miner hunts for what the written record omits such as reverts and abandoned attempts"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Distill the finished upgrade branch into skills. The session logs are 2 GB of JSONL.",
+      "assertions": [
+        "The sources are scoped cheap first, and the logs are sampled after their format is established instead of being read wholesale",
+        "The change directory is read fully before any reconstruction is delegated"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Check the distilled suite before we archive the branch.",
+      "assertions": [
+        "The verification is mechanical: frontmatter names match directories, commit ids and branch names appear only in provenance files, cross-references resolve, and validation commands run",
+        "One violation is planted to prove that each sweep can fail before its green result is trusted"
+      ]
+    }
+  ]
+}

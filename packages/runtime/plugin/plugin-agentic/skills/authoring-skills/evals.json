@@ -53,6 +53,14 @@
         "Treats the required ambiguity as blocking until the caller selects or further distinguishes the need.",
         "Does not select the remote-only skill because soft runtime selection is limited to installed skills."
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "This session surfaced one useful lesson about how we type JSON responses in our tests. Should I spin up a new guideline skill to capture it? Tell me where this lesson should actually live.",
+      "assertions": [
+        "Advises against a new guideline skill for a single lesson and recommends a rule in AGENTS.md, or a merge into an existing skill that owns the domain",
+        "States that a new skill is warranted only once a category has roughly 3 to 7 worth-keeping lessons and no existing skill owns it"
+      ]
     }
   ]
 }

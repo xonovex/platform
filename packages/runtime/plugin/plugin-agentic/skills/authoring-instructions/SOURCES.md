@@ -25,3 +25,10 @@
 - **Provenance:** Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream
 - **References:** references/merge.md, references/simplify.md
 - **Last reviewed:** 2026-05-13
+
+## Xonovex reflection workflow
+
+- **Provenance:** Repository-original session-reflection and governed-promotion conventions
+- **Last reviewed:** 2026-11-19
+- **References:** references/from-a-session.md
+- **Aspects extracted:** The stored lesson format, the `applied` lifecycle, the promotion thresholds and the routing of a lesson to one owner are Xonovex contracts.

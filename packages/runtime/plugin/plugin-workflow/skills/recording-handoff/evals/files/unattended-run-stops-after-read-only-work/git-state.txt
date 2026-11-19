@@ -1,0 +1,4 @@
+$ git branch --show-current
+feature/fare-capping
+$ git status --short | head -20
+ M plans/fare-capping/plan.md

@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "required": ["type", "schema", "state"],
+  "properties": {
+    "type": {"const": "Workflow Decision"},
+    "schema": {"const": "workflow/decision/1"},
+    "state": {"enum": ["settled", "open", "paused", "partly-settled"]},
+    "owner": {"type": "string", "minLength": 1},
+    "depends_on": {"$ref": "common.schema.json#/$defs/decisionIds"},
+    "blocks": {"$ref": "common.schema.json#/$defs/decisionIds"},
+    "supersedes": {"$ref": "common.schema.json#/$defs/decisionIds"},
+    "superseded_by": {"$ref": "common.schema.json#/$defs/decisionId"}
+  },
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/header"},
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "status": {"enum": ["draft", "stable"]}
+          }
+        },
+        {
+          "required": ["status", "superseded_by"],
+          "properties": {
+            "status": {"const": "deprecated"}
+          }
+        }
+      ]
+    }
+  ]
+}

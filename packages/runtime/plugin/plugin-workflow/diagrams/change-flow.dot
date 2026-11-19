@@ -1,0 +1,46 @@
+digraph change_flow {
+  graph [rankdir=TB, pad=0.25, nodesep=0.4, ranksep=0.5, splines=polyline, fontsize=20];
+  node [shape=box, style="rounded,filled", fontsize=16, margin="0.2,0.12"];
+  edge [fontsize=14, penwidth=1.5, arrowsize=0.7];
+
+  subgraph cluster_planning {
+    graph [label="Planning, once for each change", style=rounded, role=panel, margin=16];
+
+    intent [label="Intent\nYou describe the change", role=actor];
+    research [label="Research\nresearching"];
+    decide [label="Decide\nsettling-questions"];
+    plan [label="Plan\nwriting-plan\nillustrating-plan draws the diagrams"];
+    critique [label="Critique (optional)\ncritiquing-plan", role=note];
+    revise [label="Revise\nrevising-plan"];
+    define [label="Define the work\ndefining-work-items"];
+
+    { rank=same; intent; research; decide; plan; }
+    { rank=same; define; revise; critique; }
+  }
+
+  subgraph cluster_execution {
+    graph [label="Execution, for each work item in dependency order\ndelivering-work-package runs the three steps", style=rounded, role=panel, margin=16];
+
+    implement [label="Implement\nimplementing-work-item"];
+    validate_item [label="Validate the work item\nvalidating-work-item"];
+    deliver [label="Deliver\npreparing-delivery writes the words\nCore: using-git commits"];
+
+    { rank=same; implement; validate_item; deliver; }
+  }
+
+  validate_package [label="Validate the work package\nvalidating-work-package", role=strong];
+  distill [label="Distill (optional)\ndistilling-change", role=positive];
+  entry [label="Every step starts with the entry step of recording-handoff\nand records its result in the change directory", role=caption];
+
+  intent -> research -> decide -> plan;
+  plan -> critique;
+  revise -> critique [dir=back];
+  plan -> revise [style=dashed, label="skip the critique"];
+  define -> revise [dir=back];
+  define -> implement;
+  implement -> validate_item -> deliver;
+  deliver:n -> implement:ne [style=dashed, constraint=false, label="next work item", role=retry];
+  deliver -> validate_package [label="after the last work item"];
+  validate_package -> distill;
+  distill -> entry [style=invis];
+}

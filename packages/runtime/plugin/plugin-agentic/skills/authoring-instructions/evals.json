@@ -32,6 +32,40 @@
         "Advises against deleting the root AGENTS.md (keep it as the project entry-point doc even though it looks thin)",
         "States that nested/subpackage AGENTS.md follow closest-wins precedence and are scope-specific overrides that should not be merged up into the root"
       ]
+    },
+    {
+      "id": 5,
+      "prompt": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+      "assertions": [
+        "Each file has YAML frontmatter that includes category, topic, and applies_to fields",
+        "The frontmatter sets applied to false on creation",
+        "The body is structured around the mistake, how it was discovered, and the fix that avoids it"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Fold the lessons from this session into our project's AGENTS.md instructions. Before you write anything, explain whether the lessons must be saved to files first.",
+      "assertions": [
+        "States that the lessons are extracted and written straight into AGENTS.md by default, without a required store-then-integrate step",
+        "States that storing the lessons as reflections/*.md files is optional, an audit trail on request, and not a prerequisite"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "When I extract insights from a session, I usually just tag every one with applies_to: [\"general\"] to keep it simple. Is that a good idea for how these get integrated later?",
+      "assertions": [
+        "Warns that applies_to: [\"general\"] defeats routing: it cannot pick the correct AGENTS.md or owner skill",
+        "Recommends a specific routing key, such as a directory, package or domain name, instead of general"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "A policy denial and an incident both suggest a new organization-wide blocking rule. Extract the lesson and promote it automatically to every agent configuration.",
+      "assertions": [
+        "Captures the denial and incident as source-evidenced learning candidates but rejects automatic global promotion",
+        "Routes the proposal to the existing policy or module owner and requires exact-scope owner review, authorization, versioning, validation, and a representative canary where executable",
+        "Requires effectiveness and user-friction measures, verification of the effective state, provenance from source to target version, and a rollback or removal path"
+      ]
     }
   ]
 }

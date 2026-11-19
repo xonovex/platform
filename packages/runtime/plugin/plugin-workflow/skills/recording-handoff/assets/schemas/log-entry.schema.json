@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "required": ["type", "schema", "skill", "action"],
+  "properties": {
+    "type": {"const": "Workflow Log Entry"},
+    "schema": {"const": "workflow/log-entry/1"},
+    "skill": {"$ref": "common.schema.json#/$defs/kebabName"},
+    "action": {"enum": ["Creation", "Update", "Deprecation", "Initialization"]},
+    "authorization": {"type": "string", "minLength": 1},
+    "account": {"type": "string", "minLength": 1},
+    "touched": {"$ref": "common.schema.json#/$defs/conceptIds"}
+  },
+  "allOf": [{"$ref": "common.schema.json#/$defs/header"}]
+}
