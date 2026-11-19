@@ -7,6 +7,7 @@ package jj
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -41,8 +42,14 @@ func TestSetup_ReusesExistingWorkspace(t *testing.T) {
 func TestSetup_CreatesWorkspace(t *testing.T) {
 	logPath := filepath.Join(t.TempDir(), "jj.log")
 	t.Setenv("JJ_TEST_LOG", logPath)
+	// installFakeJJ leaves only the fake on PATH, and mkdir has no fixed path on
+	// every host, so the fake calls the mkdir that PATH held before.
+	mkdir, err := exec.LookPath("mkdir")
+	if err != nil {
+		t.Fatalf("find mkdir: %v", err)
+	}
 	installFakeJJ(t, `printf '%s\n' "$*" > "$JJ_TEST_LOG"
-/bin/mkdir -p "$3"`)
+"`+mkdir+`" -p "$3"`)
 	repoDir := t.TempDir()
 	target := "workspace"
 
