@@ -1,6 +1,7 @@
-// Package workspace checks the Moon workspace of a repository: task
-// inheritance across tag files, coverage floors, dependency source file groups,
-// the hasher ignore patterns and the targets of package bins.
+// Package workspace checks the Moon workspace of a repository: that tag task
+// files and project files exist, task inheritance across tag files, coverage
+// floors, dependency source file groups, the hasher ignore patterns and the
+// targets of package bins.
 package workspace
 
 import (
@@ -32,7 +33,7 @@ func defaults() Options {
 	return Options{TasksDir: ".moon/tasks", Workspace: ".moon/workspace.yml"}
 }
 
-var allRules = []string{"task-inheritance", "coverage-floors", "dependency-sources", "hasher", "bin-targets"}
+var allRules = []string{"task-files", "task-inheritance", "coverage-floors", "dependency-sources", "hasher", "bin-targets"}
 
 // Check is the workspace check.
 type Check struct{}
@@ -42,7 +43,7 @@ func (Check) Name() string { return Name }
 
 // Summary describes the check.
 func (Check) Summary() string {
-	return "Moon task inheritance, coverage floors, dependency sources, hasher ignores and bin targets"
+	return "Moon task files, task inheritance, coverage floors, dependency sources, hasher ignores and bin targets"
 }
 
 // DefaultPaths returns the package tree root.
@@ -56,6 +57,8 @@ type project struct {
 	text        string
 	packageName string
 	configTexts []string
+	// moon is true when the directory holds a moon.yml.
+	moon bool
 }
 
 type run struct {
@@ -88,6 +91,7 @@ func (Check) Run(ctx check.Context) ([]findings.Finding, error) {
 		rules = allRules
 	}
 	steps := map[string]func() error{
+		"task-files":         r.taskFiles,
 		"task-inheritance":   r.taskInheritance,
 		"coverage-floors":    r.coverageFloors,
 		"dependency-sources": r.dependencySources,
@@ -161,11 +165,11 @@ func (r *run) loadProjects(root string) error {
 
 func (r *run) addProject(dir string) error {
 	file := path.Join(dir, "moon.yml")
-	text, _, err := r.ctx.Tree.Optional(file)
+	text, hasMoon, err := r.ctx.Tree.Optional(file)
 	if err != nil {
 		return err
 	}
-	p := project{id: path.Base(dir), dir: dir, file: file, text: text}
+	p := project{id: path.Base(dir), dir: dir, file: file, text: text, moon: hasMoon}
 	if raw, found, err := r.ctx.Tree.Optional(path.Join(dir, "package.json")); err != nil {
 		return err
 	} else if found {

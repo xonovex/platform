@@ -27,10 +27,6 @@ export interface GitRepository {
     since: string | undefined,
     path: string,
   ) => readonly CommitRecord[];
-  /** The committed files of the working tree. */
-  readonly trackedFiles: () => readonly string[];
-  /** The paths git ignores, a fully ignored directory collapsed to one entry. */
-  readonly ignoredPaths: () => readonly string[];
 }
 
 /** The log format parseCommitLog reads: a NUL, then hash|author, then the message. */

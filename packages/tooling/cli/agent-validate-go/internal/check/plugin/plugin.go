@@ -274,9 +274,16 @@ func (r *run) checkPackage(p *pkg) error {
 	if len(p.skills) == 0 {
 		r.report.Fail("plugin.no-skills", p.dir, 1, "%s contains no skills", p.dir)
 	}
-	for label, m := range map[string]*manifest{"Claude": p.claude, "Codex": p.codex} {
-		if !sameStrings(skillPaths(m), []string{r.options.SkillsPath}) {
-			r.report.Fail("plugin.skills-path", m.file, 1, "%s manifest in %s must point directly to %s", label, p.dir, r.options.SkillsPath)
+	for _, entry := range []struct {
+		label string
+		m     *manifest
+	}{{"Claude", p.claude}, {"Codex", p.codex}} {
+		if _, isString := entry.m.Skills.(string); !isString {
+			r.report.Fail("plugin.skills-form", entry.m.file, 1, "%s manifest in %s must name the skill directory as one string, not a list", entry.label, p.dir)
+			continue
+		}
+		if !sameStrings(skillPaths(entry.m), []string{r.options.SkillsPath}) {
+			r.report.Fail("plugin.skills-path", entry.m.file, 1, "%s manifest in %s must point directly to %s", entry.label, p.dir, r.options.SkillsPath)
 		}
 	}
 	if err := r.checkReadme(p); err != nil {

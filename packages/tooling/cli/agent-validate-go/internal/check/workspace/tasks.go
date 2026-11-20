@@ -77,6 +77,34 @@ func inherited(name string, files map[string]tagFile, visiting map[string]bool) 
 	return deps
 }
 
+// A workspace with no tag task files or no project files has nothing for the
+// other rules to read, so it fails here rather than passing them vacuously.
+func (r *run) taskFiles() error {
+	entries, err := r.ctx.Tree.List(r.options.TasksDir)
+	if err != nil {
+		return err
+	}
+	tagFiles := 0
+	for _, e := range entries {
+		if !e.IsDir && strings.HasSuffix(e.Name, ".yml") {
+			tagFiles++
+		}
+	}
+	if tagFiles == 0 {
+		r.report.Fail("workspace.tag-files-missing", r.options.TasksDir, 1, "%s must define tag task files", r.options.TasksDir)
+	}
+	projects := 0
+	for _, p := range r.projects {
+		if p.moon {
+			projects++
+		}
+	}
+	if projects == 0 {
+		r.report.Fail("workspace.project-files-missing", strings.Join(r.ctx.Paths, ","), 1, "packages must define project task files")
+	}
+	return nil
+}
+
 // A tag file that redefines an inherited task with fewer deps than its parent
 // declares drops part of the gate: Moon replaces the parent's deps across
 // extends, and mergeDeps does not change that.

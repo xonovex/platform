@@ -41,8 +41,17 @@ func TestIdentity(t *testing.T) {
 	if _, err := c.Run(ctx); err == nil || !strings.Contains(err.Error(), "known rules") {
 		t.Fatalf("err = %v", err)
 	}
-	if got := run(t, nil, nil); len(got) != 0 {
-		t.Fatalf("an empty workspace is clean: %v", got)
+	got := run(t, nil, nil)
+	if !checktest.Has(got, "workspace.tag-files-missing") || !checktest.Has(got, "workspace.project-files-missing") {
+		t.Fatalf("an empty workspace has nothing to check: %v", got)
+	}
+	complete := map[string]string{".moon/tasks/all.yml": "tasks: {}\n", "packages/a/moon.yml": "tags: [go]\n"}
+	if got := run(t, complete, nil); len(got) != 0 {
+		t.Fatalf("a workspace with tag files and project files is clean: %v", got)
+	}
+	noTags := map[string]string{"packages/a/moon.yml": "tags: [go]\n"}
+	if got := run(t, noTags, nil, rules("task-files")); !checktest.Has(got, "workspace.tag-files-missing") || checktest.Has(got, "workspace.project-files-missing") {
+		t.Fatalf("codes = %v", checktest.Codes(got))
 	}
 }
 

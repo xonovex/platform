@@ -92,6 +92,23 @@ type manifest struct {
 	Description  string        `json:"description"`
 	Skills       any           `json:"skills"`
 	Dependencies dependencyMap `json:"dependencies"`
+	// The other three maps of package.json also install a plugin package, so
+	// each must name the release version.
+	DevDependencies      dependencyMap `json:"devDependencies"`
+	PeerDependencies     dependencyMap `json:"peerDependencies"`
+	OptionalDependencies dependencyMap `json:"optionalDependencies"`
+}
+
+// installed merges the four dependency maps of package.json. A name in a later
+// map replaces the same name in an earlier one, as npm resolves it.
+func (m manifest) installed() map[string]string {
+	merged := map[string]string{}
+	for _, deps := range []dependencyMap{m.Dependencies, m.DevDependencies, m.PeerDependencies, m.OptionalDependencies} {
+		for name, version := range deps {
+			merged[name] = version
+		}
+	}
+	return merged
 }
 
 // dependencyMap reads the dependencies of package.json, which name a version
@@ -280,13 +297,14 @@ func (r *run) checkPackage(p pluginPackage, release string, claudeEntries, codex
 			r.report.Fail("marketplace.description", c.file, 1, "%s package and %s descriptions match", pkg.Name, c.label)
 		}
 	}
-	names := make([]string, 0, len(pkg.Dependencies))
-	for name := range pkg.Dependencies {
+	installed := pkg.installed()
+	names := make([]string, 0, len(installed))
+	for name := range installed {
 		names = append(names, name)
 	}
 	sort.Strings(names)
 	for _, name := range names {
-		if strings.HasPrefix(name, r.options.PackagePrefix) && pkg.Dependencies[name] != release {
+		if strings.HasPrefix(name, r.options.PackagePrefix) && installed[name] != release {
 			r.report.Fail("marketplace.dependency-version", path.Join(p.dir, "package.json"), 1, "%s dependency %s matches %s", pkg.Name, name, release)
 		}
 	}

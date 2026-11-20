@@ -7,7 +7,7 @@ import {
 } from "../git.js";
 import {resolveExecutable} from "./executable-node.js";
 
-// A listing of every ignored path in a large checkout exceeds the default buffer.
+// The log of a long history exceeds the default buffer.
 const MAX_OUTPUT_BYTES = 64 * 1024 * 1024;
 
 /** Reads the repository at rootDir by running git there. */
@@ -44,17 +44,6 @@ export const nodeGitRepository = (rootDir: string): GitRepository => {
           since === undefined ? "HEAD" : `${since}..HEAD`,
           "--",
           path,
-        ]),
-      ),
-    trackedFiles: () => parseGitLines(git(["ls-files"])),
-    ignoredPaths: () =>
-      parseGitLines(
-        git([
-          "ls-files",
-          "--others",
-          "--ignored",
-          "--exclude-standard",
-          "--directory",
         ]),
       ),
   };

@@ -201,16 +201,27 @@ func checkClaims(ctx check.Context, report *check.Reporter, options Options) err
 	return nil
 }
 
-// stepBody returns the text of the workflow step that starts at the pattern, up
-// to the next step.
+// stepBody returns the text of the workflow step that starts at the pattern. It
+// ends at the next step or, for the last step of a job, where the indentation
+// falls below the step's own, so a condition in a later job never counts.
 func stepBody(text string, start *regexp.Regexp) (string, bool) {
 	loc := start.FindStringIndex(text)
 	if loc == nil {
 		return "", false
 	}
+	header := text[loc[0]:loc[1]]
+	dash := strings.Index(header, "- name:")
+	indent := dash - strings.LastIndex(header[:dash], "\n") - 1
 	rest := text[loc[1]:]
 	if end := stepEnd.FindStringIndex(rest); end != nil {
 		rest = rest[:end[0]]
+	}
+	lines := strings.Split(rest, "\n")
+	for i, line := range lines {
+		trimmed := strings.TrimLeft(line, " ")
+		if trimmed != "" && len(line)-len(trimmed) < indent {
+			return strings.Join(lines[:i], "\n"), true
+		}
 	}
 	return rest, true
 }

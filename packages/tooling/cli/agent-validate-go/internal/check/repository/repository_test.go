@@ -140,6 +140,7 @@ func TestReleaseWorkflow(t *testing.T) {
 		"publish":   {"steps:\n      - name: Publish\n        run: x\n      - uses: y\n", "repository.workflow-publish"},
 		"no step":   {"steps:\n      - uses: y\n", "repository.workflow-publish"},
 		"dry run":   {"steps:\n      - name: Publish (dry run)\n        run: x\n      - uses: y\n", "repository.workflow-dry-run"},
+		"later job": {"jobs:\n  a:\n    steps:\n      - name: Publish\n        run: x\n  b:\n    steps:\n      - name: y\n        if: github.event_name == 'pull_request'\n        run: z\n", "repository.workflow-publish"},
 		"last step": {"steps:\n      - name: Publish\n        if: github.event_name == 'pull_request'\n", ""},
 	}
 	for name, tc := range cases {

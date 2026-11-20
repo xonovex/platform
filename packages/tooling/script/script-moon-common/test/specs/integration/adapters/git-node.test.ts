@@ -71,15 +71,4 @@ describe("nodeGitRepository", () => {
       repository.commitsSince(undefined, "pkg").map((record) => record.hash),
     ).toEqual([third, first]);
   });
-
-  it("lists the tracked files and the ignored paths", () => {
-    writeFileSync(join(root, ".gitignore"), "build/\n");
-    mkdirSync(join(root, "build"));
-    writeFileSync(join(root, "build", "out.js"), "");
-    commit("a.txt", "one", "feat: first");
-    const repository = nodeGitRepository(root);
-
-    expect(repository.trackedFiles()).toEqual([".gitignore", "a.txt"]);
-    expect(repository.ignoredPaths()).toEqual(["build/"]);
-  });
 });

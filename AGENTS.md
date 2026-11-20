@@ -40,7 +40,7 @@ Work within the package boundaries below, run the required checks, and follow th
 - **Imports**: direct from source; no re-exports, deprecated APIs, compatibility wrappers, or shims
 - **Deprecation**: remove unused or deprecated code immediately; no `@deprecated` markers
 - **Comments**: only the non-obvious _why_, never what the code or config already shows. Present behavior, naming the declaration, function, or module; never a plan, agent, doc path, porting history, `INTERIM`, or `TODO`
-- **Validation**: typecheck, lint, build, test must pass; fix warnings at source. Keep a project's `dependencySources` file group in sync with its dependencies; `script-moon-release-validate` enforces it. Verify a signature change with `--force`
+- **Validation**: typecheck, lint, build, test must pass; fix warnings at source. Keep a project's `dependencySources` file group in sync with its dependencies; the `workspace` check of `agent-validate` enforces it. Verify a signature change with `--force`
 - **Testing**: specs live in `test/specs/<tier>/`: `unit` runs in `ci-check`, `acceptance` and `integration` opt in by tag. Unit tests use in-memory inputs and test doubles, with no filesystem, network, subprocess, or other external side effects
 
 ### Writing

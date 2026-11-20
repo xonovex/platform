@@ -89,6 +89,7 @@ func TestManifestProblems(t *testing.T) {
 		"deps differ":   {map[string]string{"root/plugin-git/.codex-plugin/plugin.json": manifest("xonovex-git", "xonovex-x")}, "plugin.dependencies-differ"},
 		"skills differ": {map[string]string{"root/plugin-git/.codex-plugin/plugin.json": `{"name":"xonovex-git","skills":["./skills/","./more/"]}`}, "plugin.skills-differ"},
 		"skills path":   {map[string]string{"root/plugin-git/.codex-plugin/plugin.json": `{"name":"xonovex-git","skills":"./other/"}`, "root/plugin-git/.claude-plugin/plugin.json": `{"name":"xonovex-git","skills":"./other/"}`}, "plugin.skills-path"},
+		"skills list":   {map[string]string{"root/plugin-git/.codex-plugin/plugin.json": `{"name":"xonovex-git","skills":["./skills/"]}`, "root/plugin-git/.claude-plugin/plugin.json": `{"name":"xonovex-git","skills":["./skills/"]}`}, "plugin.skills-form"},
 		"commands":      {map[string]string{"root/plugin-git/commands/x.md": "x"}, "plugin.commands-present"},
 		"no codex":      {map[string]string{"root/plugin-git/.codex-plugin/plugin.json": "\x00"}, "plugin.manifest-missing"},
 		"no claude":     {map[string]string{"root/plugin-git/.claude-plugin/plugin.json": "\x00"}, "plugin.manifest-missing"},

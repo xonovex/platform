@@ -48,9 +48,6 @@
       "path": "./packages/tooling/script/script-moon-plugin-sync-installation"
     },
     {
-      "path": "./packages/tooling/script/script-moon-release-validate"
-    },
-    {
       "path": "./packages/tooling/script/script-moon-version-bump"
     },
     {

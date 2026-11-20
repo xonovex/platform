@@ -96,6 +96,9 @@ func TestPackageRules(t *testing.T) {
 		"description missing": {map[string]string{dir + "/package.json": `{"name":"p","version":"1.2.3"}`}, "marketplace.description-missing"},
 		"description claude":  {map[string]string{dir + "/.claude-plugin/plugin.json": plugin("xonovex-git", "1.2.3", "x")}, "marketplace.description"},
 		"dependency version":  {map[string]string{dir + "/package.json": `{"name":"p","version":"1.2.3","description":"d","dependencies":{"@xonovex/plugin-base":"1.0.0"}}`}, "marketplace.dependency-version"},
+		"dev dependency":      {map[string]string{dir + "/package.json": `{"name":"p","version":"1.2.3","description":"d","devDependencies":{"@xonovex/plugin-base":"1.0.0"}}`}, "marketplace.dependency-version"},
+		"peer dependency":     {map[string]string{dir + "/package.json": `{"name":"p","version":"1.2.3","description":"d","peerDependencies":{"@xonovex/plugin-base":"1.0.0"}}`}, "marketplace.dependency-version"},
+		"optional dependency": {map[string]string{dir + "/package.json": `{"name":"p","version":"1.2.3","description":"d","optionalDependencies":{"@xonovex/plugin-base":"1.0.0"}}`}, "marketplace.dependency-version"},
 		"missing package":     {map[string]string{dir + "/package.json": "\x00"}, "marketplace.package-missing"},
 		"broken manifest":     {map[string]string{dir + "/plugin.json": "{"}, "marketplace.package-invalid"},
 	}
