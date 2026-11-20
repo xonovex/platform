@@ -8,13 +8,16 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {nodeEvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/adapters/evaluator-ports-node";
+import type {EvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {afterEach, beforeEach, describe, expect, it} from "vitest";
 import {main} from "../../../src/evaluate.js";
 
 // These drive the evaluator against a harness binary on PATH. Scoring, evidence,
 // and the failure paths are covered without a process in test/specs/unit; what is
-// left here is the composition root, which resolves the harness, probes that it
-// runs, and spawns it for each query.
+// left here is the node adapters, which locate the harness on PATH, probe that it
+// starts, and spawn it for each query.
 const QUERIES = JSON.stringify([
   {
     query: "positive",
@@ -31,8 +34,8 @@ const QUERIES = JSON.stringify([
 ]);
 
 describe("the trigger evaluator against a real harness", () => {
-  const originalPath = process.env.PATH;
   let directory: string;
+  let ports: EvaluatorPorts;
 
   beforeEach(() => {
     directory = mkdtempSync(join(tmpdir(), "skill-trigger-main-"));
@@ -53,14 +56,17 @@ if (query === "positive") {
 `,
     );
     chmodSync(executable, 0o755);
-    process.env.PATH = `${directory}:${originalPath ?? ""}`;
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+    ports = {
+      ...nodeEvaluatorPorts,
+      environment: {
+        ...process.env,
+        PATH: `${directory}:${process.env.PATH ?? ""}`,
+      },
+      output: memoryOutput(),
+    };
   });
 
   afterEach(() => {
-    process.env.PATH = originalPath;
-    vi.restoreAllMocks();
     rmSync(directory, {recursive: true, force: true});
   });
 
@@ -80,16 +86,20 @@ if (query === "positive") {
     );
     writeFileSync(queriesFile, QUERIES);
 
-    const exitCode = await main([
-      "--runs",
-      "1",
-      "--workspace",
-      workspace,
-      "--plugin-dir",
-      pluginDirectory,
-      queriesFile,
-      "test-skill",
-    ]);
+    const exitCode = await main(
+      [
+        "--runs",
+        "1",
+        "--workspace",
+        workspace,
+        "--plugin-dir",
+        pluginDirectory,
+        queriesFile,
+        "test-skill",
+      ],
+      directory,
+      ports,
+    );
 
     expect(exitCode).toBe(0);
     expect(
@@ -121,16 +131,20 @@ console.log(JSON.stringify({type: "item.completed", item: {type: "agent_message"
     chmodSync(executable, 0o755);
     writeFileSync(queriesFile, QUERIES);
 
-    const exitCode = await main([
-      "--harness",
-      "codex",
-      "--runs",
-      "1",
-      "--workspace",
-      workspace,
-      queriesFile,
-      "test-skill",
-    ]);
+    const exitCode = await main(
+      [
+        "--harness",
+        "codex",
+        "--runs",
+        "1",
+        "--workspace",
+        workspace,
+        queriesFile,
+        "test-skill",
+      ],
+      directory,
+      ports,
+    );
 
     expect(exitCode).toBe(0);
     expect(

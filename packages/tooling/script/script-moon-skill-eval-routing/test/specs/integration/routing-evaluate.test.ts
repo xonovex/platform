@@ -8,7 +8,10 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {nodeEvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/adapters/evaluator-ports-node";
+import type {EvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {afterEach, beforeEach, describe, expect, it} from "vitest";
 import {main} from "../../../src/routing-evaluate.js";
 
 // These drive the evaluator against a harness binary on PATH. Scenario selection,
@@ -45,10 +48,9 @@ const addSkill = (root: string, name: string, shouldTrigger: boolean): void => {
 };
 
 describe("catalog routing evaluator against a real harness", () => {
-  const originalPath = process.env.PATH;
-  const originalHarness = process.env.SKILL_EVAL_HARNESS;
   let directory: string;
   let catalog: string;
+  let ports: EvaluatorPorts;
 
   beforeEach(() => {
     directory = mkdtempSync(join(tmpdir(), "routing-evaluate-"));
@@ -56,16 +58,20 @@ describe("catalog routing evaluator against a real harness", () => {
     mkdirSync(catalog);
     addSkill(catalog, "alpha", true);
     addSkill(catalog, "beta", false);
-    process.env.PATH = `${directory}:${originalPath ?? ""}`;
-    delete process.env.SKILL_EVAL_HARNESS;
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+    ports = {
+      ...nodeEvaluatorPorts,
+      // The harness comes from each case's flag and the stub on this PATH, never
+      // from the host.
+      environment: {
+        ...process.env,
+        PATH: `${directory}:${process.env.PATH ?? ""}`,
+        SKILL_EVAL_HARNESS: undefined,
+      },
+      output: memoryOutput(),
+    };
   });
 
   afterEach(() => {
-    process.env.PATH = originalPath;
-    process.env.SKILL_EVAL_HARNESS = originalHarness;
-    vi.restoreAllMocks();
     rmSync(directory, {recursive: true, force: true});
   });
 
@@ -85,15 +91,19 @@ console.log(JSON.stringify({message:{content:[{type:"tool_use",name:"Skill",inpu
     );
     const workspace = join(directory, "claude-evidence");
 
-    const exitCode = await main([
-      catalog,
-      "--harness",
-      "claude",
-      "--workspace",
-      workspace,
-      "--split",
-      "validation",
-    ]);
+    const exitCode = await main(
+      [
+        catalog,
+        "--harness",
+        "claude",
+        "--workspace",
+        workspace,
+        "--split",
+        "validation",
+      ],
+      directory,
+      ports,
+    );
 
     expect(exitCode).toBe(0);
     expect(
@@ -122,13 +132,17 @@ console.log(JSON.stringify({type:"item.completed",item:{type:"agent_message",tex
     );
     const workspace = join(directory, "codex-evidence");
 
-    const exitCode = await main([
-      catalog,
-      "--harness=codex",
-      "--workspace",
-      workspace,
-      "--model=gpt-test",
-    ]);
+    const exitCode = await main(
+      [
+        catalog,
+        "--harness=codex",
+        "--workspace",
+        workspace,
+        "--model=gpt-test",
+      ],
+      directory,
+      ports,
+    );
 
     expect(exitCode).toBe(0);
     expect(

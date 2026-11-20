@@ -1,13 +1,19 @@
 import {dirname, join, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/claude-plugin";
 import type {ParsedArgs} from "@xonovex/script-moon-common/cli-args";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {resolveSkillDirectory} from "@xonovex/script-moon-common/skill-directory";
-import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
+import {planBatches} from "@xonovex/script-moon-skill-eval-common/batch-plan";
 import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
+import type {Environment} from "@xonovex/script-moon-skill-eval-common/environment";
+import {
+  declaredSkillName,
+  harnessInput,
+  locateHarness,
+  parseHarness,
+  resolveHarnessModel,
+  shortSkillName,
+} from "@xonovex/script-moon-skill-eval-common/harness-config";
 import {
   buildGenerationClaudeArgs,
   evalEntries,
@@ -48,11 +54,12 @@ type EvaluationLoadResult =
       readonly warnings: readonly string[];
     };
 
-export interface EvaluationConfigOptions {
-  readonly environment?: Readonly<Record<string, string | undefined>>;
-  readonly locateExecutable?: (command: string) => string | undefined;
-  readonly workingDirectory?: string;
-  readonly fs?: FileSystem;
+/** Where the configuration reads its defaults, files and harness from. */
+export interface EvaluationConfigContext {
+  readonly environment: Environment;
+  readonly workingDirectory: string;
+  readonly platform: NodeJS.Platform;
+  readonly fs: FileSystem;
 }
 
 export interface EvaluationConfig {
@@ -159,28 +166,6 @@ export const cliDefinition = {
   },
 } as const;
 
-const defaultLocateExecutable = (command: string): string | undefined => {
-  try {
-    return resolveExecutable(command);
-  } catch {
-    return undefined;
-  }
-};
-
-const skillNameFromSkillMd = (
-  path: string,
-  fs: FileSystem,
-): string | undefined => {
-  if (!fs.isFile(path)) return undefined;
-  const content = fs.readText(path);
-  const frontmatterMatch = /^---\s*\n([\s\S]*?)\n---/.exec(content);
-  const block = frontmatterMatch?.[1] ?? content;
-  const nameMatch = /^name:\s*(.+?)\s*$/m.exec(block);
-  const name = nameMatch?.[1];
-  if (!name) return undefined;
-  return name.replaceAll(/^["']|["']$/g, "").trim() || undefined;
-};
-
 const loadEvaluations = (
   evaluationsFile: string,
   evaluationsArgument: string,
@@ -273,12 +258,9 @@ export const buildEvaluationPrompt = (
 
 export const resolveEvaluationConfig = (
   args: ParsedArgs,
-  options: EvaluationConfigOptions = {},
+  context: EvaluationConfigContext,
 ): EvaluationConfigResult => {
-  const environment = options.environment ?? process.env;
-  const locateExecutable = options.locateExecutable ?? defaultLocateExecutable;
-  const workingDirectory = options.workingDirectory ?? resolve(".");
-  const fs = options.fs ?? nodeFileSystem;
+  const {environment, workingDirectory, fs} = context;
   const {values, positionals} = args;
   const skillDirectory = resolveSkillDirectory(workingDirectory, fs);
   const evaluationsArgument =
@@ -288,17 +270,22 @@ export const resolveEvaluationConfig = (
   if (!fs.isFile(evaluationsFile)) {
     return failure(`evals file not found: ${evaluationsArgument}`);
   }
-  const harnessInput =
-    (values.harness as string | undefined) ??
-    environment.SKILL_EVAL_HARNESS ??
-    "claude";
-  if (harnessInput !== "claude" && harnessInput !== "codex") {
+  const requestedHarness = harnessInput(
+    values.harness as string | undefined,
+    environment,
+  );
+  const harness = parseHarness(requestedHarness);
+  if (harness === undefined) {
     return failure(
-      `invalid harness '${harnessInput}'; expected claude or codex`,
+      `invalid harness '${requestedHarness}'; expected claude or codex`,
     );
   }
-  const harness = harnessInput;
-  const harnessExecutable = locateExecutable(harness);
+  const harnessExecutable = locateHarness(
+    harness,
+    environment,
+    context.platform,
+    fs,
+  );
   if (harnessExecutable === undefined) {
     return failure(`'${harness}' CLI not found in PATH`);
   }
@@ -308,7 +295,7 @@ export const resolveEvaluationConfig = (
   const skillName =
     skillArgument && skillArgument.length > 0
       ? skillArgument
-      : skillNameFromSkillMd(skillMd, fs);
+      : declaredSkillName(skillDirectory, fs);
   if (!skillName) {
     return failure(
       `no skill_name given and no 'name' frontmatter in ${skillMd}`,
@@ -317,8 +304,8 @@ export const resolveEvaluationConfig = (
 
   const loaded = loadEvaluations(evaluationsFile, evaluationsArgument, fs);
   if (!loaded.success) return loaded;
-  const requestedShortName = skillName.split(":").pop() ?? skillName;
-  if (requestedShortName !== loaded.data.skillName) {
+  const shortName = shortSkillName(skillName);
+  if (shortName !== loaded.data.skillName) {
     return failure(
       `skill name mismatch: requested '${skillName}' but evals declare '${loaded.data.skillName}'`,
       loaded.warnings,
@@ -373,16 +360,10 @@ export const resolveEvaluationConfig = (
   }
 
   const {runs, concurrency, timeout, batchSize, maxTurns} = optionsResult.data;
-  const evaluationBatches = boundedBatches(
-    loaded.data.evaluations,
-    batchSize ?? Math.max(loaded.data.evaluations.length, 1),
-  );
-  const maxBatchModelCalls = Math.max(
-    0,
-    ...evaluationBatches.map((batch) =>
-      outputModelCallCount(batch.length, runs),
-    ),
-  );
+  const {batches: evaluationBatches, maxBatchRuns: maxBatchModelCalls} =
+    planBatches(loaded.data.evaluations, batchSize, (count) =>
+      outputModelCallCount(count, runs),
+    );
   if (maxBatchModelCalls > MAX_OUTPUT_MODEL_CALLS) {
     return failure(
       `output eval batch would launch ${String(maxBatchModelCalls)} model calls; ` +
@@ -391,7 +372,6 @@ export const resolveEvaluationConfig = (
     );
   }
 
-  const shortName = skillName.split(":").pop() ?? skillName;
   const workspaceArgument =
     (values.workspace as string | undefined) ?? environment.WORKSPACE ?? "";
   const workspace = workspaceArgument
@@ -400,23 +380,18 @@ export const resolveEvaluationConfig = (
   const iteration =
     optionsResult.data.iteration ?? nextIteration(workspace, fs);
   const iterationDirectory = join(workspace, iteration);
-  const defaultModels = skillEvalModelDefaults(harness);
-  const environmentModel =
-    harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
-  const modelInput =
-    (values.model as string | undefined) ??
-    environmentModel ??
-    defaultModels.generation;
-  const model =
-    modelInput.trim().length > 0 ? modelInput : defaultModels.generation;
-  const judgeModelInput =
-    (values["judge-model"] as string | undefined) ??
-    (harness === "codex"
-      ? environment.CODEX_JUDGE_MODEL
-      : environment.JUDGE_MODEL) ??
-    defaultModels.judge;
-  const judgeModel =
-    judgeModelInput.trim().length > 0 ? judgeModelInput : defaultModels.judge;
+  const model = resolveHarnessModel(
+    harness,
+    "generation",
+    values.model as string | undefined,
+    environment,
+  );
+  const judgeModel = resolveHarnessModel(
+    harness,
+    "judge",
+    values["judge-model"] as string | undefined,
+    environment,
+  );
   const disallowedTools =
     (values["disallowed-tools"] as string | undefined) ??
     environment.DISALLOWED_TOOLS ??

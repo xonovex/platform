@@ -1,14 +1,19 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {
+  memoryOutput,
+  type MemoryOutput,
+} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
   memoryProcessRunner,
   type ScriptedProcess,
 } from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
 import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {EvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
 import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {main, type TriggerDependencies} from "../../../src/evaluate.js";
+import {beforeEach, describe, expect, it} from "vitest";
+import {main} from "../../../src/evaluate.js";
 
 const QUERIES = [
   {
@@ -65,52 +70,93 @@ const triggeredOn = (invocation: ProcessInvocation): ScriptedProcess => {
 const DIRECTORY = "/skill";
 
 // The skill a run resolves from, holding the SKILL.md that names the skill and
-// the queries the evaluator scores.
+// the queries the evaluator scores, beside the harness binaries the run locates on
+// its PATH. Those binaries are never spawned: the process runner answers for them.
 const skillTree = (extra: Readonly<Record<string, string>> = {}): FileSystem =>
   memoryFileSystem({
     files: {
       [join(DIRECTORY, "SKILL.md")]:
         "---\nname: test-skill\ndescription: Use for tests.\n---\n",
       [join(DIRECTORY, "eval-queries.json")]: JSON.stringify(QUERIES),
+      "/usr/bin/claude": "",
+      "/usr/bin/codex": "",
       ...extra,
     },
+    executables: ["/usr/bin/claude", "/usr/bin/codex"],
   });
 
-const dependencies = (
+const ports = (
   fs: FileSystem,
   answer: (invocation: ProcessInvocation) => ScriptedProcess = triggeredOn,
-): TriggerDependencies => ({
+  output: MemoryOutput = memoryOutput(),
+): EvaluatorPorts => ({
   fs,
   scratch: memoryScratch(fs),
   runProcess: memoryProcessRunner(answer).run,
-  environment: {},
-  // The harness binary is never spawned here, so the probe reports it as present
-  // and the resolver hands back a path that is only ever passed through.
-  configOptions: {
-    executableRuns: () => true,
-    resolveExecutablePath: (command) => `/usr/bin/${command}`,
-    workingDirectory: DIRECTORY,
-  },
+  environment: {PATH: "/usr/bin"},
+  output,
+  platform: "linux",
 });
 
 describe("main", () => {
+  it("prints the usage to stdout for help", async () => {
+    const output = memoryOutput();
+
+    await expect(
+      main(["--help"], DIRECTORY, ports(skillTree(), triggeredOn, output)),
+    ).resolves.toBe(0);
+    expect(output.stdoutLines()[0]).toMatch(/^Usage: moon-skill-eval-triggers/);
+  });
+
   it("fails cleanly when the query file is missing", async () => {
+    const output = memoryOutput();
+
     await expect(
       main(
         ["missing-queries.json", "testing"],
-        dependencies(memoryFileSystem({directories: [DIRECTORY]})),
+        DIRECTORY,
+        ports(
+          memoryFileSystem({directories: [DIRECTORY]}),
+          triggeredOn,
+          output,
+        ),
       ),
     ).resolves.toBe(2);
+    expect(output.stderrLines()).toEqual([
+      "Error: queries file not found: /skill/missing-queries.json",
+    ]);
   });
 
-  it("reports invalid positional arguments as a usage error", async () => {
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+  it("reports an unknown flag and an extra positional argument as usage errors", async () => {
+    for (const argv of [["--unknown"], ["a", "b", "all", "extra"]]) {
+      const output = memoryOutput();
+
+      await expect(
+        main(argv, DIRECTORY, ports(skillTree(), triggeredOn, output)),
+      ).resolves.toBe(2);
+      expect(output.stderrLines()[0]).toMatch(
+        /\nmoon-skill-eval-triggers: error: unrecognized arguments: (--unknown|extra)$/,
+      );
+    }
+  });
+
+  it("rejects a harness CLI that does not start", async () => {
+    const output = memoryOutput();
 
     await expect(
-      main(["a", "b", "all", "extra"], dependencies(skillTree())),
-    ).rejects.toThrow('process.exit unexpectedly called with "2"');
-
-    vi.restoreAllMocks();
+      main(
+        ["--harness", "codex", QUERIES_FILE, "test-skill"],
+        DIRECTORY,
+        ports(
+          skillTree(),
+          () => ({spawnError: "spawn EACCES", code: null}),
+          output,
+        ),
+      ),
+    ).resolves.toBe(2);
+    expect(output.stderrLines()).toEqual([
+      "Error: 'codex' CLI not found in PATH",
+    ]);
   });
 });
 
@@ -131,15 +177,11 @@ const evaluatorTree = (): FileSystem =>
 
 describe("the trigger evaluator", () => {
   let fs: FileSystem;
+  let output: MemoryOutput;
 
   beforeEach(() => {
     fs = evaluatorTree();
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
+    output = memoryOutput();
   });
 
   it("runs both trigger decisions and writes evidence", async () => {
@@ -156,10 +198,18 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs),
+      DIRECTORY,
+      ports(fs, triggeredOn, output),
     );
 
     expect(exitCode).toBe(0);
+    expect(
+      output.stdoutLines().map((line): unknown => JSON.parse(line)),
+    ).toMatchObject([
+      {query: "positive", pass: true},
+      {query: "negative", pass: true},
+    ]);
+    expect(output.stderrLines().at(-1)).toBe("passed: 2 / 2   failed: 0");
     expect(
       JSON.parse(fs.readText(join(workspace, "summary.json"))),
     ).toMatchObject({
@@ -188,7 +238,8 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs),
+      DIRECTORY,
+      ports(fs),
     );
 
     expect(exitCode).toBe(0);
@@ -218,7 +269,8 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs, () => ({stdout: claudeStream(false)})),
+      DIRECTORY,
+      ports(fs, () => ({stdout: claudeStream(false)})),
     );
 
     expect(exitCode).toBe(1);
@@ -241,9 +293,19 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs, () => ({code: 3})),
+      DIRECTORY,
+      ports(fs, () => ({code: 3}), output),
     );
 
     expect(exitCode).toBe(2);
+    expect(output.stderrLines()).toEqual(
+      expect.arrayContaining([
+        "retrying after transient failure (2/3): claude exited 3",
+        'Error: trigger infrastructure failure for query "positive": claude exited 3',
+      ]),
+    );
+    expect(
+      JSON.parse(fs.readText(join(workspace, "invalid-run.json"))),
+    ).toEqual({query: "positive", error: "claude exited 3"});
   });
 });

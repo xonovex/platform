@@ -19,10 +19,10 @@ fileGroups:
 tasks:
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "90"
-      TS_COVERAGE_MIN_FUNCTIONS: "92"
-      TS_COVERAGE_MIN_BRANCHES: "80"
-      TS_COVERAGE_MIN_STATEMENTS: "90"
+      TS_COVERAGE_MIN_LINES: "97"
+      TS_COVERAGE_MIN_FUNCTIONS: "94"
+      TS_COVERAGE_MIN_BRANCHES: "96"
+      TS_COVERAGE_MIN_STATEMENTS: "98"
   ci-routing:
     script: >-
       npx moon-skill-eval-routing packages/runtime/plugin

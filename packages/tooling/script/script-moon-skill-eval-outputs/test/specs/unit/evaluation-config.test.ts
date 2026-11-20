@@ -55,6 +55,10 @@ const normalizedEvaluation = (files: readonly string[]): NormalizedEval => ({
 
 const DIRECTORY = "/guide";
 
+// The harness binaries a run locates on its PATH; no case spawns them.
+const HARNESS_FILES = {"/usr/bin/claude": "", "/usr/bin/codex": ""};
+const HARNESS_EXECUTABLES = Object.keys(HARNESS_FILES);
+
 // The skill a run resolves from: a SKILL.md naming the skill, plus the file the
 // evaluations are read out of. A case that needs one of them absent builds the
 // tree without it rather than deleting it.
@@ -70,7 +74,9 @@ const skillTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
       [join(DIRECTORY, "evals.json")]: JSON.stringify(
         evalFile([validEvaluation()]),
       ),
+      ...HARNESS_FILES,
     },
+    executables: HARNESS_EXECUTABLES,
   });
 
 describe("evaluation configuration", () => {
@@ -87,8 +93,8 @@ describe("evaluation configuration", () => {
     environment: Readonly<Record<string, string | undefined>> = {},
   ) =>
     resolveEvaluationConfig(parsedArguments(argv), {
-      environment,
-      locateExecutable: (command) => `/usr/bin/${command}`,
+      environment: {PATH: "/usr/bin", ...environment},
+      platform: "linux",
       workingDirectory: directory,
       fs,
     });
@@ -213,7 +219,9 @@ describe("evaluation configuration", () => {
         [join(directory, "evals.json")]: JSON.stringify(
           evalFile([validEvaluation()]),
         ),
+        ...HARNESS_FILES,
       },
+      executables: HARNESS_EXECUTABLES,
     });
 
     const config = successfulConfig(resolveConfig(["--plugin-dir", "../.."]));
@@ -265,14 +273,7 @@ describe("evaluation configuration", () => {
       success: false,
       error: "evals file not found: missing.json",
     });
-    expect(
-      resolveEvaluationConfig(parsedArguments([]), {
-        environment: {},
-        locateExecutable: () => void 0,
-        workingDirectory: directory,
-        fs,
-      }),
-    ).toMatchObject({
+    expect(resolveConfig([], {PATH: "/opt/bin"})).toMatchObject({
       success: false,
       error: "'claude' CLI not found in PATH",
     });

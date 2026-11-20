@@ -7,13 +7,15 @@ import {
 } from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {main} from "../../../src/evaluate.js";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {nodeEvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/adapters/evaluator-ports-node";
+import {afterEach, beforeEach, describe, expect, it} from "vitest";
+import {main, type OutputEvaluatorPorts} from "../../../src/evaluate.js";
 import type {NormalizedEval} from "../../../src/validation.js";
 
 // These drive the evaluator end to end against a harness binary on PATH. The
 // scoring and persistence rules are covered without a process in test/specs/unit;
-// what is left here is the composition root: resolving the harness executable,
+// what is left here is the node adapters: locating the harness executable,
 // spawning it, and turning a whole sweep into benchmark evidence on disk.
 const evaluation = (prompt: string): NormalizedEval => ({
   id: 1,
@@ -24,8 +26,8 @@ const evaluation = (prompt: string): NormalizedEval => ({
 });
 
 describe("the output evaluator", () => {
-  const originalPath = process.env.PATH;
   let temporaryDirectory: string;
+  let ports: OutputEvaluatorPorts;
 
   beforeEach(() => {
     temporaryDirectory = mkdtempSync(join(tmpdir(), "skill-eval-output-"));
@@ -51,14 +53,19 @@ if (args.includes("--json-schema")) {
 `,
     );
     chmodSync(executable, 0o755);
-    process.env.PATH = `${temporaryDirectory}:${originalPath ?? ""}`;
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
+    ports = {
+      ...nodeEvaluatorPorts,
+      environment: {
+        ...process.env,
+        PATH: `${temporaryDirectory}:${process.env.PATH ?? ""}`,
+        SKILL_EVAL_HARNESS: undefined,
+      },
+      output: memoryOutput(),
+      now: () => Date.now(),
+    };
   });
 
   afterEach(() => {
-    process.env.PATH = originalPath;
-    vi.restoreAllMocks();
     rmSync(temporaryDirectory, {recursive: true, force: true});
   });
 
@@ -77,13 +84,11 @@ if (args.includes("--json-schema")) {
       }),
     );
 
-    const exitCode = await main([
-      "--workspace",
-      workspace,
-      evaluationsFile,
-      "test-skill",
-      "iteration-1",
-    ]);
+    const exitCode = await main(
+      ["--workspace", workspace, evaluationsFile, "test-skill", "iteration-1"],
+      temporaryDirectory,
+      ports,
+    );
 
     return {
       exitCode,
@@ -124,13 +129,11 @@ if (args.includes("--json-schema")) {
       }),
     );
 
-    const exitCode = await main([
-      "--workspace",
-      workspace,
-      evaluationsFile,
-      "test-skill",
-      "iteration-1",
-    ]);
+    const exitCode = await main(
+      ["--workspace", workspace, evaluationsFile, "test-skill", "iteration-1"],
+      temporaryDirectory,
+      ports,
+    );
 
     expect(exitCode).toBe(2);
     expect(

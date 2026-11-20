@@ -1,6 +1,8 @@
 import {join} from "node:path";
 import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
+import {writeJsonEvidence} from "@xonovex/script-moon-skill-eval-common/evidence";
 import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import type {Reporter} from "@xonovex/script-moon-skill-eval-common/report";
 import {runHarness} from "./output-harness.js";
 import {
   GENERATION_OUTPUT_LIMIT,
@@ -49,6 +51,7 @@ export interface RunContext extends HarnessPorts {
   readonly buildPrompt: (evaluation: NormalizedEval) => string;
   // When the clock is read, so a recorded run reports a fixed duration.
   readonly now: () => number;
+  readonly report: Reporter;
 }
 
 const generationFailure = (
@@ -252,32 +255,22 @@ export const runJob = async (
     join(armDirectory, "outputs", "response.md"),
     generation.text,
   );
-  context.fs.writeFile(
-    join(armDirectory, "timing.json"),
-    JSON.stringify(
-      {
-        total_tokens: generation.totalTokens,
-        duration_ms: generation.durationMs,
-        skill_triggered: generation.skillTriggered,
-        error: generation.error,
-      },
-      null,
-      2,
-    ),
-  );
-  context.fs.writeFile(
-    join(armDirectory, "grading.json"),
-    JSON.stringify(graded, null, 2),
-  );
+  writeJsonEvidence(context.fs, join(armDirectory, "timing.json"), {
+    total_tokens: generation.totalTokens,
+    duration_ms: generation.durationMs,
+    skill_triggered: generation.skillTriggered,
+    error: generation.error,
+  });
+  writeJsonEvidence(context.fs, join(armDirectory, "grading.json"), graded);
 
   const runTag = context.runs === 1 ? "" : `/run-${String(runIndex + 1)}`;
   const skillTag =
     arm === "with_skill" && generation.skillTriggered ? " (skill fired)" : "";
   const errorTag = generation.error ? ` [${generation.error}]` : "";
-  process.stderr.write(
+  context.report.info(
     `  [${String(evaluation.id)}/${arm}${runTag}] ` +
       `pass_rate=${String(graded.summary.pass_rate)} tokens=${String(generation.totalTokens)}` +
-      `${skillTag}${errorTag}\n`,
+      `${skillTag}${errorTag}`,
   );
 
   return {

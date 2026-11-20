@@ -1,11 +1,15 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {
+  memoryOutput,
+  type MemoryOutput,
+} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {memoryProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
 import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
 import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {main, type EvaluatorDependencies} from "../../../src/evaluate.js";
+import {describe, expect, it} from "vitest";
+import {main, type OutputEvaluatorPorts} from "../../../src/evaluate.js";
 import type {NormalizedEval} from "../../../src/validation.js";
 
 const evaluation = (prompt: string): NormalizedEval => ({
@@ -68,20 +72,23 @@ const armGeneration = (request: ProcessInvocation): string =>
   generationOutput(usedSkill(request) ? "the answer" : "wrong");
 
 // A tree the evaluator reads its inputs from and writes its evidence into, so a
-// whole sweep can be scored and asserted on without a disk.
+// whole sweep can be scored and asserted on without a disk. The output keeps every
+// line the run reports.
+type RecordedPorts = OutputEvaluatorPorts & {readonly output: MemoryOutput};
+
 const dependencies = (
   fs: FileSystem,
   assertionCount = 1,
   failGeneration = false,
-): EvaluatorDependencies => ({
+): RecordedPorts => ({
   fs,
   scratch: memoryScratch(fs),
-  environment: {},
-  workingDirectory: ROOT,
+  // The harness is located in this tree and answered by the process runner, so
+  // the verdict does not depend on what the host has installed.
+  environment: {PATH: "/usr/bin"},
+  platform: "linux",
+  output: memoryOutput(),
   now: () => 0,
-  // The harness is answered from this tree, so its location must not be read
-  // from the host's PATH.
-  locateExecutable: (command) => `/usr/bin/${command}`,
   runProcess: memoryProcessRunner((request) => {
     if (failGeneration && !isJudgeRequest(request)) {
       return {code: 3, stderr: "generation failed"};
@@ -105,8 +112,13 @@ const readWorkspaceJson = (
 const runEvaluator = async (
   name: string,
   evaluations: readonly NormalizedEval[],
-  makeDependencies: (fs: FileSystem) => EvaluatorDependencies,
-): Promise<{exitCode: number; workspace: string; fs: FileSystem}> => {
+  makeDependencies: (fs: FileSystem) => RecordedPorts,
+): Promise<{
+  exitCode: number;
+  workspace: string;
+  fs: FileSystem;
+  output: MemoryOutput;
+}> => {
   const evaluationsFile = join(ROOT, `${name}.json`);
   const workspace = join(ROOT, name);
   // resolveEvaluationConfig locates the skill by its SKILL.md, so the tree has
@@ -120,37 +132,50 @@ const runEvaluator = async (
       }),
       [join(ROOT, "SKILL.md")]:
         "---\nname: test-skill\ndescription: Use for tests.\n---\n",
+      "/usr/bin/claude": "",
     },
+    executables: ["/usr/bin/claude"],
   });
 
+  const ports = makeDependencies(fs);
   return {
     fs,
     workspace,
+    output: ports.output,
     exitCode: await main(
       ["--workspace", workspace, evaluationsFile, "test-skill", "iteration-1"],
-      makeDependencies(fs),
+      ROOT,
+      ports,
     ),
   };
 };
 
 describe("the output evaluator", () => {
-  beforeEach(() => {
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
   it("runs the complete evaluator and writes benchmark evidence", async () => {
-    const {exitCode, fs, workspace} = await runEvaluator(
+    const {exitCode, fs, workspace, output} = await runEvaluator(
       "evals",
       [evaluation("question")],
       (fs) => dependencies(fs),
     );
 
     expect(exitCode).toBe(0);
+    expect(
+      output.stdoutLines().map((line): unknown => JSON.parse(line)),
+    ).toEqual([
+      {
+        id: 1,
+        prompt: "question",
+        with_skill: {pass_rate: 1, tokens: 5, skill_triggered: true},
+        without_skill: {pass_rate: 0, tokens: 5},
+        delta_pass_rate: 1,
+        delta_tokens: 0,
+      },
+    ]);
+    expect(output.stderrLines().at(-1)).toMatch(
+      new RegExp(
+        `\nbenchmark: ${join(workspace, "iteration-1", "benchmark.json")}$`,
+      ),
+    );
     expect(readWorkspaceJson(fs, workspace, "benchmark.json")).toMatchObject({
       skill: "test-skill",
       tier: "moderate",
@@ -165,16 +190,14 @@ describe("the output evaluator", () => {
   });
 
   it("reports each skipped evaluation on stderr and evaluates the rest", async () => {
-    const {exitCode} = await runEvaluator(
+    const {exitCode, output} = await runEvaluator(
       "skipped",
       [{...evaluation("blank"), prompt: ""}, evaluation("question")],
       (fs) => dependencies(fs),
     );
 
     expect(exitCode).toBe(0);
-    expect(process.stderr.write).toHaveBeenCalledWith(
-      expect.stringContaining("Skipping eval #1"),
-    );
+    expect(output.stderrLines()[0]).toMatch(/^Skipping eval #1: /);
   });
 
   it("fails a valid positive delta below the tier's absolute quality floor", async () => {
@@ -226,13 +249,21 @@ describe("the output evaluator", () => {
   });
 
   it("invalidates the whole run when a generation fails as infrastructure", async () => {
-    const {exitCode, fs, workspace} = await runEvaluator(
+    const {exitCode, fs, workspace, output} = await runEvaluator(
       "failing",
       [evaluation("question")],
       (fs) => dependencies(fs, 1, true),
     );
 
     expect(exitCode).toBe(2);
+    expect(output.stderrLines()).toEqual(
+      expect.arrayContaining([
+        "retrying after transient failure (2/3): claude exited 3: generation failed",
+        // Both arms run at once, so each reports its own failure.
+        "invalid benchmark evidence: 2 infrastructure failure(s)",
+        `diagnostic: ${join(workspace, "iteration-1", "invalid-run.json")}`,
+      ]),
+    );
     expect(readWorkspaceJson(fs, workspace, "invalid-run.json")).toMatchObject({
       skill: "test-skill",
       iteration: "iteration-1",

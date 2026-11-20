@@ -1,4 +1,6 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {reporter} from "@xonovex/script-moon-skill-eval-common/report";
 import {describe, expect, it} from "vitest";
 import {
   runTriggerEvaluation,
@@ -18,6 +20,7 @@ const optionsWith = (
   // No workspace, so nothing is written; the port is supplied because the
   // options require it.
   fs: memoryFileSystem(),
+  report: reporter(memoryOutput()),
   check,
 });
 

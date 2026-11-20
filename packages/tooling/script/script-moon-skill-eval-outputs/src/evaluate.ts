@@ -1,8 +1,20 @@
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {nodeProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-node";
-import {nodeScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-node";
-import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {
+  clearEvidence,
+  writeJsonEvidence,
+} from "@xonovex/script-moon-skill-eval-common/evidence";
+import type {EvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {
+  EVAL_EXIT,
+  reporter,
+  verdictExit,
+  type Reporter,
+} from "@xonovex/script-moon-skill-eval-common/report";
+import {
+  runWithTransientRetry,
+  TRANSIENT_RUN_ATTEMPTS,
+  transientRetryNotice,
+} from "@xonovex/script-moon-skill-eval-common/retry";
 import {
   buildEvaluationPrompt,
   cliDefinition,
@@ -15,10 +27,8 @@ import {
   evaluateOutputGate,
   findEvaluationInfrastructureFailures,
   MAX_OUTPUT_MODEL_CALLS,
-  OUTPUT_RUN_ATTEMPTS,
   outputModelCallCount,
   runFailFastPool,
-  runWithTransientRetry,
   type EvaluationArm,
   type NormalizedEval,
 } from "./validation.js";
@@ -45,12 +55,6 @@ const evaluationJobs = (
   );
 };
 
-export const writeRetryNotice = (attempt: number, error: string): void => {
-  process.stderr.write(
-    `retrying after transient failure (${String(attempt)}/${String(OUTPUT_RUN_ATTEMPTS)}): ${error}\n`,
-  );
-};
-
 const runEvaluationBatches = async (
   batches: readonly (readonly NormalizedEval[])[],
   concurrency: number,
@@ -61,18 +65,21 @@ const runEvaluationBatches = async (
 ): Promise<readonly JobRecord[] | undefined> => {
   const records: JobRecord[] = [];
   for (const [batchIndex, batch] of batches.entries()) {
-    process.stderr.write(
+    context.report.info(
       `batch ${String(batchIndex + 1)}/${String(batches.length)}: ` +
-        `${String(batch.length)} evals\n`,
+        `${String(batch.length)} evals`,
     );
     const batchRecords = await runFailFastPool(
       evaluationJobs(batch, context.runs),
       concurrency,
+      // A with-skill run whose skill never activated carries no error, so it is
+      // not retried: that is a finding, not a flake.
       (job) =>
         runWithTransientRetry(
           () => runJob(job.evaluation, job.arm, job.runIndex, context),
-          OUTPUT_RUN_ATTEMPTS,
-          writeRetryNotice,
+          (attempt, error) => {
+            context.report.info(transientRetryNotice(attempt, error));
+          },
         ),
       (record) => findEvaluationInfrastructureFailures([record]).length > 0,
     );
@@ -80,24 +87,17 @@ const runEvaluationBatches = async (
 
     const failures = findEvaluationInfrastructureFailures(batchRecords);
     if (failures.length > 0) {
-      context.fs.writeFile(
-        invalidRunPath,
-        JSON.stringify(
-          {
-            skill: skillName,
-            iteration,
-            status: "invalid",
-            batch: batchIndex + 1,
-            failures,
-          },
-          null,
-          2,
-        ),
+      writeJsonEvidence(context.fs, invalidRunPath, {
+        skill: skillName,
+        iteration,
+        status: "invalid",
+        batch: batchIndex + 1,
+        failures,
+      });
+      context.report.info(
+        `invalid benchmark evidence: ${String(failures.length)} infrastructure failure(s)`,
       );
-      process.stderr.write(
-        `invalid benchmark evidence: ${String(failures.length)} infrastructure failure(s)\n` +
-          `diagnostic: ${invalidRunPath}\n`,
-      );
+      context.report.info(`diagnostic: ${invalidRunPath}`);
       return undefined;
     }
   }
@@ -109,9 +109,10 @@ const averageRecordValue = (
   select: (record: JobRecord) => number,
 ): number => (records.length > 0 ? fmean(records.map(select)) : 0);
 
-const writeEvaluationLines = (
+const reportEvaluationLines = (
   evaluations: readonly NormalizedEval[],
   records: readonly JobRecord[],
+  report: Reporter,
 ): void => {
   for (const evaluation of evaluations) {
     const withSkill = records.filter(
@@ -133,79 +134,62 @@ const writeEvaluationLines = (
       withoutSkill,
       (record) => record.tokens,
     );
-    process.stdout.write(
-      `${JSON.stringify({
-        id: evaluation.id,
-        prompt: evaluation.prompt,
-        with_skill: {
-          pass_rate: round(withPassRate, 3),
-          tokens: round(withTokens),
-          skill_triggered: withSkill.some((record) => record.skill_triggered),
-        },
-        without_skill: {
-          pass_rate: round(withoutPassRate, 3),
-          tokens: round(withoutTokens),
-        },
-        delta_pass_rate: round(withPassRate - withoutPassRate, 3),
-        delta_tokens: round(withTokens - withoutTokens),
-      })}\n`,
-    );
+    report.result({
+      id: evaluation.id,
+      prompt: evaluation.prompt,
+      with_skill: {
+        pass_rate: round(withPassRate, 3),
+        tokens: round(withTokens),
+        skill_triggered: withSkill.some((record) => record.skill_triggered),
+      },
+      without_skill: {
+        pass_rate: round(withoutPassRate, 3),
+        tokens: round(withoutTokens),
+      },
+      delta_pass_rate: round(withPassRate - withoutPassRate, 3),
+      delta_tokens: round(withTokens - withoutTokens),
+    });
   }
 };
 
-/**
- * The effects the evaluator reaches the outside world through. A run supplies the
- * real ones; a test supplies recorded harness output and a fixed clock, so the
- * whole sweep can be scored without a process.
- */
-export interface EvaluatorDependencies extends HarnessPorts {
+/** The ports of an output evaluation: an evaluator's ports and the clock. */
+export interface OutputEvaluatorPorts extends EvaluatorPorts {
+  // When the clock is read, so a recorded run reports a fixed duration.
   readonly now: () => number;
-  // Where relative paths and the skill are resolved from. A run uses the process
-  // directory; a test names a directory in its own tree.
-  readonly workingDirectory?: string;
-  // Where the harness CLI is. A run looks it up on PATH; a test answers from its
-  // own tree, so the verdict does not depend on what the host has installed.
-  readonly locateExecutable?: (command: string) => string | undefined;
 }
-
-export const defaultDependencies: EvaluatorDependencies = {
-  fs: nodeFileSystem,
-  scratch: nodeScratch,
-  runProcess: nodeProcessRunner,
-  environment: process.env,
-  now: () => Date.now(),
-};
 
 export const main = async (
   argv: readonly string[],
-  dependencies: EvaluatorDependencies = defaultDependencies,
+  workingDirectory: string,
+  ports: OutputEvaluatorPorts,
 ): Promise<number> => {
+  const report = reporter(ports.output);
   const args = parseCliArgs(cliDefinition, argv);
   if (args.kind === "help") {
-    console.log(args.text);
-    return 0;
+    ports.output.stdout(args.text);
+    return EVAL_EXIT.passed;
   }
   const configResult = resolveEvaluationConfig(args, {
-    fs: dependencies.fs,
-    workingDirectory: dependencies.workingDirectory,
-    locateExecutable: dependencies.locateExecutable,
-    environment: dependencies.environment,
+    environment: ports.environment,
+    workingDirectory,
+    platform: ports.platform,
+    fs: ports.fs,
   });
   for (const warning of configResult.warnings) {
-    process.stderr.write(`${warning}\n`);
+    report.info(warning);
   }
   if (!configResult.success) {
-    process.stderr.write(`Error: ${configResult.error}\n`);
-    return 2;
+    report.error(configResult.error);
+    return EVAL_EXIT.invalid;
   }
   const config = configResult.data;
 
-  dependencies.fs.makeDirectory(config.iterationDirectory);
-  dependencies.scratch.remove(config.benchmarkPath);
-  dependencies.scratch.remove(config.invalidRunPath);
+  ports.fs.makeDirectory(config.iterationDirectory);
+  clearEvidence(ports.scratch, [config.benchmarkPath, config.invalidRunPath]);
 
   const ctx: RunContext = {
-    ...dependencies,
+    ...ports,
+    report,
     executable: config.harnessExecutable,
     withArgs: config.withArgs,
     withoutArgs: config.withoutArgs,
@@ -229,7 +213,7 @@ export const main = async (
         `judge=$${String(config.judgeBudget)}/1 turn  `
       : `generation-timeout=${String(config.timeout)}s  ` +
         `output-limit=${String(GENERATION_OUTPUT_LIMIT)} chars  `;
-  process.stderr.write(
+  report.info(
     `skill: ${config.skillName}  evals: ${String(config.evaluations.length)}  ` +
       `runs/arm: ${String(config.runs)}  concurrency: ${String(config.concurrency)}  ` +
       `workspace: ${config.iterationDirectory}\n` +
@@ -239,7 +223,7 @@ export const main = async (
       `model_calls=${String(outputModelCallCount(config.evaluations.length, config.runs))}  ` +
       `batches=${String(config.evaluationBatches.length)}  ` +
       `max_batch_calls=${String(config.maxBatchModelCalls)}/${String(MAX_OUTPUT_MODEL_CALLS)}  ` +
-      `retries=${String(OUTPUT_RUN_ATTEMPTS - 1)}\n---\n`,
+      `retries=${String(TRANSIENT_RUN_ATTEMPTS - 1)}\n---`,
   );
 
   const records = await runEvaluationBatches(
@@ -251,9 +235,9 @@ export const main = async (
     config.iteration,
   );
   if (records === undefined) {
-    return 2;
+    return EVAL_EXIT.invalid;
   }
-  writeEvaluationLines(config.evaluations, records);
+  reportEvaluationLines(config.evaluations, records, report);
 
   const withBlock = aggregateArm(records, "with_skill", config.runs);
   const withoutBlock = aggregateArm(records, "without_skill", config.runs);
@@ -288,13 +272,10 @@ export const main = async (
       withBlock.skill_trigger_rate?.mean ?? 0,
     ),
   };
-  dependencies.fs.writeFile(
-    config.benchmarkPath,
-    JSON.stringify(benchmark, null, 2),
-  );
+  writeJsonEvidence(ports.fs, config.benchmarkPath, benchmark);
 
   const delta = benchmark.run_summary.delta;
-  process.stderr.write(
+  report.info(
     `---\nwith_skill pass_rate: ${String(withBlock.pass_rate.mean)}  ` +
       `(skill fired: ${String(withBlock.skill_trigger_rate?.mean)})  ` +
       `tokens: ${String(withBlock.tokens.mean)}\n` +
@@ -302,7 +283,7 @@ export const main = async (
       `tokens: ${String(withoutBlock.tokens.mean)}\n` +
       `delta pass_rate: ${String(delta.pass_rate)}  tokens: ${String(delta.tokens)}\n` +
       `quality gate (${config.tier}): ${benchmark.quality_gate.passed ? "PASS" : "FAIL"}\n` +
-      `benchmark: ${config.benchmarkPath}\n`,
+      `benchmark: ${config.benchmarkPath}`,
   );
-  return benchmark.quality_gate.passed ? 0 : 1;
+  return verdictExit(benchmark.quality_gate.passed);
 };

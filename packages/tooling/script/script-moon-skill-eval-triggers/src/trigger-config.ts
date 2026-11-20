@@ -1,18 +1,22 @@
-import {spawnSync} from "node:child_process";
 import {join, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/claude-plugin";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {
   findPluginDirectory,
   resolveSkillDirectory,
 } from "@xonovex/script-moon-common/skill-directory";
-import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
+import {planBatches} from "@xonovex/script-moon-skill-eval-common/batch-plan";
 import {buildTriggerClaudeArgs} from "@xonovex/script-moon-skill-eval-common/claude/args";
 import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
+import type {Environment} from "@xonovex/script-moon-skill-eval-common/environment";
+import {
+  declaredSkillName,
+  harnessInput,
+  locateHarness,
+  parseHarness,
+  resolveHarnessModel,
+  shortSkillName,
+} from "@xonovex/script-moon-skill-eval-common/harness-config";
 import {catalogQueryOwners} from "@xonovex/script-moon-skill-eval-common/routing-catalog";
 import {
   MAX_TRIGGER_MODEL_RUNS,
@@ -23,7 +27,7 @@ import {
   triggerModelRunCount,
   type Query,
 } from "@xonovex/script-moon-skill-eval-common/validation";
-import {parseCli} from "./cli.js";
+import type {ParsedCli} from "./cli.js";
 
 type TriggerConfigResult =
   | {readonly success: true; readonly data: TriggerConfig}
@@ -33,12 +37,12 @@ type TriggerConfigResult =
       readonly kind: "runtime" | "usage";
     };
 
-export interface TriggerConfigOptions {
-  readonly environment?: Readonly<Record<string, string | undefined>>;
-  readonly executableRuns?: (executable: string) => boolean;
-  readonly resolveExecutablePath?: (command: string) => string | undefined;
-  readonly workingDirectory?: string;
-  readonly fs?: FileSystem;
+/** Where the configuration reads its defaults, files and harness from. */
+export interface TriggerConfigContext {
+  readonly environment: Environment;
+  readonly workingDirectory: string;
+  readonly platform: NodeJS.Platform;
+  readonly fs: FileSystem;
 }
 
 export interface TriggerConfig {
@@ -59,19 +63,6 @@ export interface TriggerConfig {
   readonly threshold: number;
   readonly workspace: string | undefined;
 }
-
-const defaultResolveExecutablePath = (command: string): string | undefined => {
-  try {
-    return resolveExecutable(command);
-  } catch {
-    return undefined;
-  }
-};
-
-const defaultExecutableRuns = (executable: string): boolean => {
-  const probe = spawnSync(executable, ["--version"], {stdio: "ignore"});
-  return probe.error === undefined;
-};
 
 const failure = (
   kind: "runtime" | "usage",
@@ -127,10 +118,9 @@ const partitionOwnedQueries = (
 };
 
 export const resolveTriggerConfig = (
-  argv: readonly string[],
-  options: TriggerConfigOptions = {},
+  cli: ParsedCli,
+  context: TriggerConfigContext,
 ): TriggerConfigResult => {
-  const cli = parseCli(argv);
   if (cli.positionals.length > 3) {
     return failure(
       "usage",
@@ -138,17 +128,12 @@ export const resolveTriggerConfig = (
     );
   }
 
-  const environment = options.environment ?? process.env;
-  const workingDirectory = options.workingDirectory ?? resolve(".");
-  const fs = options.fs ?? nodeFileSystem;
+  const {environment, workingDirectory, fs} = context;
   const skillDirectory = resolveSkillDirectory(workingDirectory, fs);
   const queriesArgument =
     cli.positionals[0] ?? join(skillDirectory, "eval-queries.json");
   const queriesFile = resolve(workingDirectory, queriesArgument);
-  const skillMd = join(skillDirectory, "SKILL.md");
-  const skillName =
-    cli.positionals[1] ??
-    (fs.isFile(skillMd) ? parseFrontmatterName(skillMd, fs) : undefined);
+  const skillName = cli.positionals[1] ?? declaredSkillName(skillDirectory, fs);
   if (skillName === undefined) {
     return failure(
       "usage",
@@ -181,23 +166,21 @@ export const resolveTriggerConfig = (
   if (!fs.isFile(queriesFile)) {
     return failure("runtime", `queries file not found: ${queriesFile}`);
   }
-  const resolveExecutablePath =
-    options.resolveExecutablePath ?? defaultResolveExecutablePath;
-  const harnessInput =
-    cli.harness ?? environment.SKILL_EVAL_HARNESS ?? "claude";
-  if (harnessInput !== "claude" && harnessInput !== "codex") {
+  const requestedHarness = harnessInput(cli.harness, environment);
+  const harness = parseHarness(requestedHarness);
+  if (harness === undefined) {
     return failure(
       "usage",
-      `argument harness: invalid choice: '${harnessInput}' (choose from 'claude', 'codex')`,
+      `argument harness: invalid choice: '${requestedHarness}' (choose from 'claude', 'codex')`,
     );
   }
-  const harness = harnessInput;
-  const harnessExecutable = resolveExecutablePath(harness);
+  const harnessExecutable = locateHarness(
+    harness,
+    environment,
+    context.platform,
+    fs,
+  );
   if (harnessExecutable === undefined) {
-    return failure("runtime", `'${harness}' CLI not found in PATH`);
-  }
-  const executableRuns = options.executableRuns ?? defaultExecutableRuns;
-  if (!executableRuns(harnessExecutable)) {
     return failure("runtime", `'${harness}' CLI not found in PATH`);
   }
 
@@ -250,10 +233,10 @@ export const resolveTriggerConfig = (
     return failure("runtime", selectionResult.error);
   }
 
-  const shortNameForCatalog = skillName.split(":").pop() ?? skillName;
+  const shortName = shortSkillName(skillName);
   const deferredResult = partitionOwnedQueries(
     selectionResult.data,
-    shortNameForCatalog,
+    shortName,
     cli.catalogRoot ?? environment.CATALOG_ROOT,
     workingDirectory,
     fs,
@@ -263,13 +246,10 @@ export const resolveTriggerConfig = (
   }
   const {kept, deferred} = deferredResult;
 
-  const queryBatches = boundedBatches(
+  const {batches: queryBatches, maxBatchRuns: maxBatchModelRuns} = planBatches(
     kept,
-    batchSize ?? Math.max(kept.length, 1),
-  );
-  const maxBatchModelRuns = Math.max(
-    0,
-    ...queryBatches.map((batch) => triggerModelRunCount(batch.length, runs)),
+    batchSize,
+    (count) => triggerModelRunCount(count, runs),
   );
   if (maxBatchModelRuns > MAX_TRIGGER_MODEL_RUNS) {
     return failure(
@@ -279,12 +259,12 @@ export const resolveTriggerConfig = (
     );
   }
 
-  const defaultModel = skillEvalModelDefaults(harness).generation;
-  const environmentModel =
-    harness === "claude" ? environment.CLAUDE_MODEL : environment.CODEX_MODEL;
-  const modelInput = cli.model ?? environmentModel ?? defaultModel;
-  const model = modelInput.trim().length > 0 ? modelInput : defaultModel;
-  const shortName = skillName.split(":").pop() ?? skillName;
+  const model = resolveHarnessModel(
+    harness,
+    "generation",
+    cli.model,
+    environment,
+  );
 
   return {
     success: true,

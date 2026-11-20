@@ -12,7 +12,6 @@ import {
   parseJudgeResults,
   parseOutputOptions,
   runFailFastPool,
-  runWithTransientRetry,
   validateUniqueEvaluationIds,
 } from "../../../src/validation.js";
 
@@ -129,55 +128,6 @@ describe("fail-fast scheduling", () => {
 
     expect(results).toEqual([1, 2]);
     expect(started).toEqual([1, 2]);
-  });
-});
-
-describe("transient failure retry", () => {
-  it("returns the first healthy result without retrying", async () => {
-    const attempts: number[] = [];
-    const result = await runWithTransientRetry(
-      () => Promise.resolve({error: null, value: "ok"}),
-      3,
-      (attempt) => {
-        attempts.push(attempt);
-      },
-    );
-
-    expect(result).toEqual({error: null, value: "ok"});
-    expect(attempts).toEqual([]);
-  });
-
-  it("retries a transient failure and keeps the recovered result", async () => {
-    const outcomes = [
-      {error: "claude exited 1: error_max_turns"},
-      {error: null},
-    ];
-    const retried: string[] = [];
-    const result = await runWithTransientRetry(
-      () => Promise.resolve(outcomes.shift() ?? {error: "exhausted"}),
-      3,
-      (_attempt, error) => {
-        retried.push(error);
-      },
-    );
-
-    expect(result).toEqual({error: null});
-    expect(retried).toEqual(["claude exited 1: error_max_turns"]);
-  });
-
-  it("surfaces the last failure once every attempt is spent", async () => {
-    let runs = 0;
-    const result = await runWithTransientRetry(
-      () => {
-        runs += 1;
-        return Promise.resolve({error: `timeout ${String(runs)}`});
-      },
-      3,
-      () => {},
-    );
-
-    expect(runs).toBe(3);
-    expect(result).toEqual({error: "timeout 3"});
   });
 });
 

@@ -1,5 +1,11 @@
 import {join} from "node:path";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {writeJsonEvidence} from "@xonovex/script-moon-skill-eval-common/evidence";
+import type {Reporter} from "@xonovex/script-moon-skill-eval-common/report";
+import {
+  runWithTransientRetry,
+  transientRetryNotice,
+} from "@xonovex/script-moon-skill-eval-common/retry";
 import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger";
 import {type Query} from "@xonovex/script-moon-skill-eval-common/validation";
 
@@ -35,12 +41,8 @@ export interface TriggerEvaluationOptions {
   readonly workspace: string | undefined;
   readonly check: TriggerCheck;
   readonly fs: FileSystem;
+  readonly report: Reporter;
 }
-
-// A harness error is transient (a dropped stream, a timeout, a killed process), so
-// retry the run before discarding the whole batch's evidence. A run that fails every
-// attempt still invalidates: partial evidence must never be reported as a pass.
-export const TRIGGER_RUN_ATTEMPTS = 3;
 
 const runOnce = async (
   query: string,
@@ -49,22 +51,15 @@ const runOnce = async (
   | {readonly triggered: boolean; readonly selected: string}
   | {readonly error: string}
 > => {
-  let lastError = "unknown failure";
-  for (let attempt = 1; attempt <= TRIGGER_RUN_ATTEMPTS; attempt += 1) {
-    const outcome = await options.check(query);
-    if (outcome.error === null)
-      return {
-        triggered: outcome.triggered,
-        selected: outcome.selected ?? "unrecorded",
-      };
-    lastError = outcome.error;
-    if (attempt < TRIGGER_RUN_ATTEMPTS) {
-      process.stderr.write(
-        `retrying after transient failure (${String(attempt)}/${String(TRIGGER_RUN_ATTEMPTS)}): ${outcome.error}\n`,
-      );
-    }
-  }
-  return {error: lastError};
+  const outcome = await runWithTransientRetry(
+    () => options.check(query),
+    (attempt, error) => {
+      options.report.info(transientRetryNotice(attempt, error));
+    },
+  );
+  return outcome.error === null
+    ? {triggered: outcome.triggered, selected: outcome.selected ?? "unrecorded"}
+    : {error: outcome.error};
 };
 
 const evaluateQuery = async (
@@ -77,13 +72,14 @@ const evaluateQuery = async (
     const outcome = await runOnce(entry.query, options);
     if ("error" in outcome) {
       if (options.workspace !== undefined) {
-        options.fs.writeFile(
+        writeJsonEvidence(
+          options.fs,
           join(options.workspace, "invalid-run.json"),
-          `${JSON.stringify({query: entry.query, error: outcome.error}, null, 2)}\n`,
+          {query: entry.query, error: outcome.error},
         );
       }
-      process.stderr.write(
-        `Error: trigger infrastructure failure for query ${JSON.stringify(entry.query)}: ${outcome.error}\n`,
+      options.report.error(
+        `trigger infrastructure failure for query ${JSON.stringify(entry.query)}: ${outcome.error}`,
       );
       return undefined;
     }
@@ -111,9 +107,9 @@ export const runTriggerEvaluation = async (
 ): Promise<TriggerEvaluationResult> => {
   const results: ResultRecord[] = [];
   for (const [batchIndex, batch] of options.queryBatches.entries()) {
-    process.stderr.write(
+    options.report.info(
       `batch ${String(batchIndex + 1)}/${String(options.queryBatches.length)}: ` +
-        `${String(batch.length)} queries\n`,
+        `${String(batch.length)} queries`,
     );
     for (const entry of batch) {
       const result = await evaluateQuery(entry, options);
@@ -121,7 +117,7 @@ export const runTriggerEvaluation = async (
         return {success: false, results, passed: 0, failed: 0, total: 0};
       }
       results.push(result);
-      process.stdout.write(`${JSON.stringify(result)}\n`);
+      options.report.result(result);
     }
   }
 

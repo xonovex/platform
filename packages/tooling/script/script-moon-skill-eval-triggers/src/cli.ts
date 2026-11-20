@@ -47,40 +47,28 @@ const OPTION_FLAGS = new Set([
   "--max-budget-usd",
 ]);
 
-export const usageError = (message: string): never => {
-  process.stderr.write(`${USAGE}\n${PROGRAM}: error: ${message}\n`);
-  process.exit(2);
-};
+// Help and usage errors are results rather than side effects, so the entry point
+// owns the output stream and the exit code.
+export type CliParse =
+  | {readonly kind: "parsed"; readonly cli: ParsedCli}
+  | {readonly kind: "help"; readonly text: string}
+  | {readonly kind: "usage"; readonly error: string};
 
-export const parseCli = (argv: readonly string[]): ParsedCli => {
+/** The usage text and the error line a usage error prints to stderr. */
+export const usageErrorText = (message: string): string =>
+  `${USAGE}\n${PROGRAM}: error: ${message}`;
+
+const usage = (error: string): CliParse => ({kind: "usage", error});
+
+export const parseCli = (argv: readonly string[]): CliParse => {
   const positionals: string[] = [];
   const options: Record<string, string> = {};
 
-  const takeValue = (
-    flag: string,
-    inline: string | undefined,
-    index: number,
-  ): {value: string; next: number} => {
-    if (inline !== undefined) {
-      return {value: inline, next: index};
-    }
-    const value = argv[index + 1];
-    if (value === undefined) {
-      return usageError(`argument ${flag}: expected one argument`);
-    }
-    return {value, next: index + 1};
-  };
-
   let index = 0;
   while (index < argv.length) {
-    const arg = argv[index];
-    if (arg === undefined) {
-      index += 1;
-      continue;
-    }
+    const arg = argv[index] ?? "";
     if (arg === "--help" || arg === "-h") {
-      process.stdout.write(`${USAGE}\n`);
-      process.exit(0);
+      return {kind: "help", text: USAGE};
     }
 
     const equals = arg.indexOf("=");
@@ -90,29 +78,35 @@ export const parseCli = (argv: readonly string[]): ParsedCli => {
       equals !== -1 && arg.startsWith("--") ? arg.slice(equals + 1) : undefined;
 
     if (OPTION_FLAGS.has(flag)) {
-      const {value, next} = takeValue(flag, inline, index);
+      const value = inline ?? argv[index + 1];
+      if (value === undefined) {
+        return usage(`argument ${flag}: expected one argument`);
+      }
       options[flag] = value;
-      index = next + 1;
+      index += inline === undefined ? 2 : 1;
       continue;
     }
     if (arg !== "-" && arg.startsWith("-")) {
-      usageError(`unrecognized arguments: ${arg}`);
+      return usage(`unrecognized arguments: ${arg}`);
     }
     positionals.push(arg);
     index += 1;
   }
 
   return {
-    positionals,
-    runs: options["--runs"],
-    threshold: options["--threshold"],
-    harness: options["--harness"],
-    model: options["--model"],
-    split: options["--split"],
-    batchSize: options["--batch-size"],
-    workspace: options["--workspace"],
-    pluginDir: options["--plugin-dir"],
-    catalogRoot: options["--catalog-root"],
-    maxBudget: options["--max-budget-usd"],
+    kind: "parsed",
+    cli: {
+      positionals,
+      runs: options["--runs"],
+      threshold: options["--threshold"],
+      harness: options["--harness"],
+      model: options["--model"],
+      split: options["--split"],
+      batchSize: options["--batch-size"],
+      workspace: options["--workspace"],
+      pluginDir: options["--plugin-dir"],
+      catalogRoot: options["--catalog-root"],
+      maxBudget: options["--max-budget-usd"],
+    },
   };
 };

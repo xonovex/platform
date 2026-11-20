@@ -1,21 +1,32 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {
+  memoryOutput,
+  type MemoryOutput,
+} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
   memoryProcessRunner,
   type ScriptedProcess,
 } from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
 import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {Environment} from "@xonovex/script-moon-skill-eval-common/environment";
+import type {EvaluatorPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
 import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {main, type RoutingDependencies} from "../../../src/routing-evaluate.js";
+import {beforeEach, describe, expect, it} from "vitest";
+import {main} from "../../../src/routing-evaluate.js";
 
 const CATALOG = "/catalog";
 
 // A catalog of two competing skills: alpha owns the shared query, beta carries it
-// as a negative, which is the smallest pairing a routing scenario needs.
+// as a negative, which is the smallest pairing a routing scenario needs. The tree
+// also holds the harness binaries a run locates on its PATH; the process runner
+// answers for them, so they are never spawned.
 const catalogTree = (): FileSystem => {
-  const files: Record<string, string> = {};
+  const files: Record<string, string> = {
+    "/usr/bin/claude": "",
+    "/usr/bin/codex": "",
+  };
   for (const [name, shouldTrigger] of [
     ["alpha", true],
     ["beta", false],
@@ -37,7 +48,10 @@ const catalogTree = (): FileSystem => {
       },
     ]);
   }
-  return memoryFileSystem({files});
+  return memoryFileSystem({
+    files,
+    executables: ["/usr/bin/claude", "/usr/bin/codex"],
+  });
 };
 
 const line = (event: unknown): string => JSON.stringify(event);
@@ -85,41 +99,49 @@ const answering =
 
 // Evidence is written into the same tree the catalog is read from, so a case
 // asserts on what a run produced without a disk.
-const dependencies = (
+const ports = (
   fs: FileSystem,
   stdout: Readonly<Record<Harness, string>> = SELECTED,
-): RoutingDependencies => ({
+  output: MemoryOutput = memoryOutput(),
+  environment: Environment = {},
+): EvaluatorPorts => ({
   fs,
   scratch: memoryScratch(fs),
   runProcess: memoryProcessRunner(answering(stdout)).run,
-  environment: {},
-  // The harness binary is never spawned here, so resolution only has to hand
-  // back a path the evaluator passes through.
-  resolveExecutable: (command) => `/usr/bin/${command}`,
+  environment: {PATH: "/usr/bin", ...environment},
+  output,
+  platform: "linux",
 });
 
 describe("catalog routing evaluator", () => {
-  const originalHarness = process.env.SKILL_EVAL_HARNESS;
   const catalog = CATALOG;
   let fs: FileSystem;
 
   const readWorkspace = (workspace: string, file: string): string =>
     fs.readText(join(workspace, file));
 
+  // The error line a run that cannot start reports, with its exit code.
+  const startFailure = async (
+    argv: readonly string[],
+    environment: Environment = {},
+  ): Promise<{exitCode: number; stderr: readonly string[]}> => {
+    const output = memoryOutput();
+    const exitCode = await main(
+      argv,
+      "/",
+      ports(fs, SELECTED, output, environment),
+    );
+    return {exitCode, stderr: output.stderrLines()};
+  };
+
   beforeEach(() => {
     fs = catalogTree();
-    delete process.env.SKILL_EVAL_HARNESS;
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    vi.spyOn(process.stdout, "write").mockImplementation(() => true);
-  });
-
-  afterEach(() => {
-    process.env.SKILL_EVAL_HARNESS = originalHarness;
-    vi.restoreAllMocks();
   });
 
   it("loads competing Claude plugins and writes passing evidence", async () => {
     const workspace = join("/evidence", "claude-evidence");
+
+    const output = memoryOutput();
 
     const exitCode = await main(
       [
@@ -131,10 +153,26 @@ describe("catalog routing evaluator", () => {
         "--split",
         "validation",
       ],
-      dependencies(fs),
+      "/",
+      ports(fs, SELECTED, output),
     );
 
     expect(exitCode).toBe(0);
+    expect(output.stderrLines()).toEqual(["batch 1/1: 1 routing scenarios"]);
+    expect(
+      output.stdoutLines().map((record): unknown => JSON.parse(record)),
+    ).toEqual([
+      {
+        query: "shared request",
+        split: "validation",
+        expected_skill: "using-alpha",
+        candidate_skills: ["using-alpha", "using-beta"],
+        owner_selections: 1,
+        runs: 1,
+        selection_rate: 1,
+        pass: true,
+      },
+    ]);
     expect(JSON.parse(readWorkspace(workspace, "summary.json"))).toMatchObject({
       harness: "claude",
       model: "claude-haiku-5-5",
@@ -161,7 +199,8 @@ describe("catalog routing evaluator", () => {
         "--limit=1",
         "--model=gpt-test",
       ],
-      dependencies(fs),
+      "/",
+      ports(fs),
     );
 
     expect(exitCode).toBe(0);
@@ -177,7 +216,8 @@ describe("catalog routing evaluator", () => {
 
     const exitCode = await main(
       [catalog, "--workspace", workspace, "--owners", "using-alpha"],
-      dependencies(fs),
+      "/",
+      ports(fs),
     );
 
     expect(exitCode).toBe(0);
@@ -186,15 +226,19 @@ describe("catalog routing evaluator", () => {
       selected_scenarios: 1,
     });
     await expect(
-      main([catalog, "--owners", "using-beta"], dependencies(fs)),
-    ).rejects.toThrow("no routing scenarios selected");
+      startFailure([catalog, "--owners", "using-beta"]),
+    ).resolves.toEqual({
+      exitCode: 2,
+      stderr: ["Error: no routing scenarios selected"],
+    });
   });
 
   it("returns one when a healthy run selects no owner", async () => {
     await expect(
       main(
         [catalog, "--workspace", join("/evidence", "failed-evidence")],
-        dependencies(fs, NOT_SELECTED),
+        "/",
+        ports(fs, NOT_SELECTED),
       ),
     ).resolves.toBe(1);
   });
@@ -203,32 +247,113 @@ describe("catalog routing evaluator", () => {
     const workspace = join("/evidence", "invalid-evidence");
 
     await expect(
-      main([catalog, "--workspace", workspace], dependencies(fs, UNAVAILABLE)),
+      main([catalog, "--workspace", workspace], "/", ports(fs, UNAVAILABLE)),
     ).resolves.toBe(2);
     expect(readWorkspace(workspace, "invalid-run.json")).toContain(
       "target skill unavailable",
     );
   });
 
+  it("prints the help to stdout", async () => {
+    const output = memoryOutput();
+
+    await expect(
+      main(["--help"], "/", ports(fs, SELECTED, output)),
+    ).resolves.toBe(0);
+    expect(output.stdoutLines()[0]).toMatch(/^Usage: moon-skill-eval-routing/);
+  });
+
+  it("reads the harness and its model from the environment", async () => {
+    const workspace = join("/evidence", "environment-evidence");
+
+    const exitCode = await main(
+      [catalog, "--workspace", workspace],
+      "/",
+      ports(fs, SELECTED, memoryOutput(), {
+        SKILL_EVAL_HARNESS: "codex",
+        CODEX_MODEL: "gpt-env",
+      }),
+    );
+
+    expect(exitCode).toBe(0);
+    expect(JSON.parse(readWorkspace(workspace, "summary.json"))).toMatchObject({
+      harness: "codex",
+      model: "gpt-env",
+    });
+  });
+
+  it("resolves the catalog and the workspace from the working directory", async () => {
+    const exitCode = await main(["catalog"], "/", ports(fs));
+
+    expect(exitCode).toBe(0);
+    expect(fs.isFile("/.skill-eval-results/routing/claude/summary.json")).toBe(
+      true,
+    );
+  });
+
   it("rejects invalid selection and evaluator options", async () => {
-    const deps = dependencies(fs);
-    await expect(main([catalog, "--harness", "other"], deps)).rejects.toThrow(
-      "invalid harness",
-    );
-    await expect(main([catalog, "--split", "other"], deps)).rejects.toThrow(
-      "invalid split",
-    );
-    await expect(main([catalog, "--runs", "4"], deps)).rejects.toThrow(
-      "invalid evaluator options",
-    );
-    await expect(main([catalog, "--offset=-1"], deps)).rejects.toThrow(
-      "offset must be",
-    );
-    await expect(main([catalog, "--split", "train"], deps)).rejects.toThrow(
-      "no routing scenarios selected",
-    );
-    await expect(main([catalog, "extra"], deps)).rejects.toThrow(
-      "unrecognized arguments",
-    );
+    for (const [argv, error] of [
+      [
+        ["--harness", "other"],
+        "invalid harness 'other'; expected claude or codex",
+      ],
+      [["--split", "other"], "invalid split"],
+      [["--runs", "4"], "invalid evaluator options"],
+      [["--offset=-1"], "offset must be a non-negative integer"],
+      [["--limit=x"], "limit must be a non-negative integer"],
+      [["--split", "train"], "no routing scenarios selected"],
+      [["extra"], "unrecognized arguments: extra"],
+    ] as const) {
+      const {exitCode, stderr} = await startFailure([catalog, ...argv]);
+
+      expect(exitCode).toBe(2);
+      expect(stderr[0]).toContain(`Error: ${error}`);
+    }
+  });
+
+  it("rejects a batch that would launch more model runs than the cap", async () => {
+    // Nine shared queries at three runs each exceed the cap in one batch.
+    for (const [name, shouldTrigger] of [
+      ["alpha", true],
+      ["beta", false],
+    ] as const) {
+      fs.writeFile(
+        join(
+          CATALOG,
+          `plugin-${name}`,
+          "skills",
+          `using-${name}`,
+          "eval-queries.json",
+        ),
+        JSON.stringify(
+          Array.from({length: 9}, (_, index) => ({
+            query: `shared request ${String(index)}`,
+            should_trigger: shouldTrigger,
+            split: "validation",
+          })),
+        ),
+      );
+    }
+
+    await expect(
+      startFailure([catalog, "--runs", "3", "--batch-size", "9"]),
+    ).resolves.toEqual({
+      exitCode: 2,
+      stderr: [
+        "Error: routing eval batch would launch 27 model runs; maximum is 24",
+      ],
+    });
+  });
+
+  it("rejects an unreadable catalog and a harness missing from PATH", async () => {
+    await expect(startFailure(["/missing"])).resolves.toMatchObject({
+      exitCode: 2,
+    });
+    await expect(
+      startFailure([catalog, "--harness", "codex"], {PATH: "/opt/bin"}),
+    ).resolves.toEqual({
+      exitCode: 2,
+      stderr: ["Error: 'codex' CLI not found in PATH"],
+    });
   });
 });

@@ -1,5 +1,11 @@
 import {isAbsolute} from "node:path";
 import {buildIsolatedClaudeArgs} from "@xonovex/script-moon-skill-eval-common/claude/args";
+import {
+  FiniteNumberTextSchema,
+  parseWithSchema,
+  PositiveIntegerTextSchema,
+  type ValidationResult,
+} from "@xonovex/script-moon-skill-eval-common/option-schemas";
 import {z} from "zod";
 
 const SafePathSegmentSchema = z
@@ -43,23 +49,12 @@ const JudgeVerdictSchema = z.object({
   assertion_results: z.array(JudgeResultSchema),
 });
 
-const PositiveIntegerTextSchema = z
-  .string()
-  .regex(/^\d+$/, "must be a positive integer")
-  .transform(Number)
-  .pipe(z.int().positive());
-
 const RunsTextSchema = PositiveIntegerTextSchema.pipe(z.number().max(3));
 const ConcurrencyTextSchema = PositiveIntegerTextSchema.pipe(z.number().max(2));
 
-const PositiveNumberTextSchema = z
-  .string()
-  .refine(
-    (value) => value.trim().length > 0 && Number.isFinite(Number(value)),
-    "must be a finite number",
-  )
-  .transform(Number)
-  .pipe(z.number().positive());
+const PositiveNumberTextSchema = FiniteNumberTextSchema.pipe(
+  z.number().positive(),
+);
 
 const GenerationBudgetTextSchema = PositiveNumberTextSchema.pipe(
   z.number().max(0.1),
@@ -87,12 +82,7 @@ const OutputOptionsSchema = z.object({
   budget: GenerationBudgetTextSchema.default(0.1),
   judgeBudget: JudgeBudgetTextSchema.default(0.1),
   maxTurns: MaxTurnsTextSchema.default(GENERATION_MAX_TURNS),
-  batchSize: z
-    .string()
-    .regex(/^\d+$/, "must be a positive integer")
-    .transform(Number)
-    .pipe(z.int().positive())
-    .optional(),
+  batchSize: PositiveIntegerTextSchema.optional(),
   iteration: z
     .string()
     .regex(/^iteration-[1-9]\d*$/, "must match iteration-N")
@@ -160,10 +150,6 @@ interface EvaluationInfrastructureFailure {
   readonly reason: string;
 }
 
-type ValidationResult<T> =
-  | {readonly success: true; readonly data: T}
-  | {readonly success: false; readonly error: string};
-
 export const MAX_OUTPUT_MODEL_CALLS = 24;
 
 const OUTPUT_GATE_POLICIES: Readonly<Record<OutputTier, OutputGatePolicy>> = {
@@ -183,14 +169,6 @@ const OUTPUT_GATE_POLICIES: Readonly<Record<OutputTier, OutputGatePolicy>> = {
 
 export const outputModelCallCount = (evalCount: number, runs: number): number =>
   evalCount * runs * 4;
-
-const errorText = (error: z.ZodError): string =>
-  error.issues
-    .map((issue) => {
-      const path = issue.path.length > 0 ? `${issue.path.join(".")}: ` : "";
-      return `${path}${issue.message}`;
-    })
-    .join("; ");
 
 export const buildGenerationPrompt = (
   prompt: string,
@@ -305,32 +283,6 @@ export const findEvaluationInfrastructureFailures = (
     return [];
   });
 
-// A harness error is usually transient (a dropped stream, an output-limit trip, an
-// exhausted turn cap), so retry the job before discarding the whole batch's
-// evidence. A with-skill run whose target skill never activated carries no error
-// and is not retried: that is a finding, not a flake. A job that fails every
-// attempt still invalidates: partial evidence must never be reported as a pass.
-export const OUTPUT_RUN_ATTEMPTS = 3;
-
-export const runWithTransientRetry = async <
-  R extends {readonly error: string | null},
->(
-  run: () => Promise<R>,
-  attempts: number,
-  onRetry: (attempt: number, error: string) => void,
-): Promise<R> => {
-  let result = await run();
-  for (
-    let attempt = 1;
-    attempt < attempts && result.error !== null;
-    attempt += 1
-  ) {
-    onRetry(attempt, result.error);
-    result = await run();
-  }
-  return result;
-};
-
 export const runFailFastPool = async <T, R>(
   items: readonly T[],
   limit: number,
@@ -361,8 +313,8 @@ export const runFailFastPool = async <T, R>(
 export const evalEntries = (
   input: unknown,
 ): ValidationResult<ParsedEvalFile> => {
-  const result = EvalFileSchema.safeParse(input);
-  if (!result.success) return {success: false, error: errorText(result.error)};
+  const result = parseWithSchema(EvalFileSchema, input);
+  if (!result.success) return result;
   return {
     success: true,
     data: {
@@ -397,8 +349,8 @@ export const normalizeEval = (
   input: unknown,
   fallbackId: number,
 ): ValidationResult<NormalizedEval> => {
-  const result = EvalInputSchema.safeParse(input);
-  if (!result.success) return {success: false, error: errorText(result.error)};
+  const result = parseWithSchema(EvalInputSchema, input);
+  if (!result.success) return result;
   let assertions: readonly string[] = result.data.assertions;
   if (assertions.length === 0 && result.data.expected_output.length > 0) {
     assertions = [result.data.expected_output];
@@ -441,12 +393,8 @@ export const parseJudgeResults = (
 
 export const parseOutputOptions = (
   input: z.input<typeof OutputOptionsSchema>,
-): ValidationResult<z.output<typeof OutputOptionsSchema>> => {
-  const result = OutputOptionsSchema.safeParse(input);
-  return result.success
-    ? {success: true, data: result.data}
-    : {success: false, error: errorText(result.error)};
-};
+): ValidationResult<z.output<typeof OutputOptionsSchema>> =>
+  parseWithSchema(OutputOptionsSchema, input);
 
 export type {
   EvaluationArm,

@@ -1,5 +1,9 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {
+  memoryOutput,
+  type MemoryOutput,
+} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
   memoryProcessRunner,
@@ -11,7 +15,8 @@ import {
   type MemoryScratch,
 } from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
 import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {reporter} from "@xonovex/script-moon-skill-eval-common/report";
+import {beforeEach, describe, expect, it} from "vitest";
 import {CODEX_SKILL_SIGNAL} from "../../../src/output-parse.js";
 import {runJob, type RunContext} from "../../../src/output-process.js";
 import type {NormalizedEval} from "../../../src/validation.js";
@@ -75,6 +80,7 @@ describe("runJob", () => {
   let tree: FileSystem;
   let scratch: MemoryScratch;
   let runner: MemoryProcessRunner;
+  let output: MemoryOutput;
 
   // Answers every harness invocation from a script and records what it was asked
   // to run, which is what lets these cases score a job without a harness process.
@@ -90,12 +96,8 @@ describe("runJob", () => {
       files: {[join(SKILL_DIRECTORY, "SKILL.md")]: "# Guide\n"},
     });
     scratch = memoryScratch(tree);
+    output = memoryOutput();
     answer(() => ({}));
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   const context = (overrides: Partial<RunContext> = {}): RunContext => ({
@@ -118,6 +120,7 @@ describe("runJob", () => {
     runs: 1,
     buildPrompt: (value) => value.prompt,
     now: () => 0,
+    report: reporter(output),
     ...overrides,
   });
 
@@ -154,6 +157,9 @@ describe("runJob", () => {
     expect(readArm("with_skill", join("outputs", "response.md"))).toBe(
       "the answer",
     );
+    expect(output.stderrLines()).toEqual([
+      "  [1/with_skill] pass_rate=1 tokens=5 (skill fired)",
+    ]);
     expect(JSON.parse(readArm("with_skill", "timing.json"))).toMatchObject({
       total_tokens: 5,
       skill_triggered: true,

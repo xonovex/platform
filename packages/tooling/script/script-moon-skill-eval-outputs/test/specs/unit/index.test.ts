@@ -1,5 +1,9 @@
-import {describe, expect, it, vi} from "vitest";
-import {main, writeRetryNotice} from "../../../src/evaluate.js";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {memoryProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
+import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import {describe, expect, it} from "vitest";
+import {main, type OutputEvaluatorPorts} from "../../../src/evaluate.js";
 import {
   aggregateArm,
   claudeFailureDetail,
@@ -100,32 +104,40 @@ describe("output evaluation helpers", () => {
   });
 });
 
+// An empty tree with no harness: these cases end before a harness would run.
+const ports = (): OutputEvaluatorPorts & {
+  output: ReturnType<typeof memoryOutput>;
+} => {
+  const fs = memoryFileSystem({directories: ["/work"]});
+  return {
+    fs,
+    scratch: memoryScratch(fs),
+    runProcess: memoryProcessRunner(() => ({})).run,
+    environment: {},
+    output: memoryOutput(),
+    platform: "linux",
+    now: () => 0,
+  };
+};
+
 describe("main", () => {
   it("prints the help text and runs nothing on --help", async () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    await expect(main(["--help"])).resolves.toBe(0);
-    expect(log).toHaveBeenCalledWith(
-      expect.stringContaining("moon-skill-eval-outputs"),
+    const dependencies = ports();
+
+    await expect(main(["--help"], "/work", dependencies)).resolves.toBe(0);
+    expect(dependencies.output.stdoutLines()[0]).toContain(
+      "moon-skill-eval-outputs",
     );
-    log.mockRestore();
   });
 
   it("fails cleanly when the evaluation file is missing", async () => {
-    await expect(main(["missing-evals.json"])).resolves.toBe(2);
-  });
-});
+    const dependencies = ports();
 
-describe("writeRetryNotice", () => {
-  it("names the attempt, the attempt cap, and the failure", () => {
-    const write = vi
-      .spyOn(process.stderr, "write")
-      .mockImplementation(() => true);
-
-    writeRetryNotice(2, "claude exited 1: error_max_turns");
-
-    expect(write).toHaveBeenCalledWith(
-      "retrying after transient failure (2/3): claude exited 1: error_max_turns\n",
-    );
-    write.mockRestore();
+    await expect(
+      main(["missing-evals.json"], "/work", dependencies),
+    ).resolves.toBe(2);
+    expect(dependencies.output.stderrLines()).toEqual([
+      "Error: evals file not found: missing-evals.json",
+    ]);
   });
 });

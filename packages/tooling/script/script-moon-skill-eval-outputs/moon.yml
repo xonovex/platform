@@ -21,7 +21,7 @@ tasks:
   # floors that keep each logic module near full coverage.
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "85"
-      TS_COVERAGE_MIN_FUNCTIONS: "87"
-      TS_COVERAGE_MIN_BRANCHES: "82"
-      TS_COVERAGE_MIN_STATEMENTS: "85"
+      TS_COVERAGE_MIN_LINES: "99"
+      TS_COVERAGE_MIN_FUNCTIONS: "97"
+      TS_COVERAGE_MIN_BRANCHES: "94"
+      TS_COVERAGE_MIN_STATEMENTS: "98"

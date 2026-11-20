@@ -10,21 +10,17 @@ export default defineConfig({
           functions: 100,
           lines: 100,
         },
-        // The two functions below the floor here are the defaults behind the
-        // executableRuns and resolveExecutablePath ports: one spawns the harness
-        // to probe it, the other resolves it on PATH. The unit tier injects both,
-        // and test/specs/integration drives the real ones.
         "src/trigger-config.ts": {
-          statements: 93,
-          branches: 90,
-          functions: 75,
-          lines: 93,
+          statements: 98,
+          branches: 95,
+          functions: 100,
+          lines: 98,
         },
         "src/trigger-evaluation.ts": {
-          statements: 90,
-          branches: 85,
+          statements: 100,
+          branches: 100,
           functions: 100,
-          lines: 90,
+          lines: 100,
         },
       },
     },

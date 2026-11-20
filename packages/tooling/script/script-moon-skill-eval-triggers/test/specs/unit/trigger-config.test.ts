@@ -2,6 +2,7 @@ import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {beforeEach, describe, expect, it} from "vitest";
+import {parseCli} from "../../../src/cli.js";
 import {
   resolveTriggerConfig,
   type TriggerConfig,
@@ -56,6 +57,8 @@ const skillTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
         query("train"),
         query("validation", "validation"),
       ]),
+      "/bin/claude": "",
+      "/bin/codex": "",
       [join(DIRECTORY, "plugin", ".claude-plugin", "plugin.json")]:
         JSON.stringify({
           name: "test-plugin",
@@ -64,7 +67,15 @@ const skillTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
           skills: ["./skills/test-skill"],
         }),
     },
+    executables: ["/bin/claude", "/bin/codex"],
   });
+
+// The command line a case gives, parsed the way the entry parses it.
+const parsedCli = (argv: readonly string[]) => {
+  const parsed = parseCli(argv);
+  if (parsed.kind !== "parsed") throw new Error(`unparsed: ${parsed.kind}`);
+  return parsed.cli;
+};
 
 describe("trigger configuration", () => {
   const directory = DIRECTORY;
@@ -80,11 +91,11 @@ describe("trigger configuration", () => {
       Record<string, string | undefined>
     > = defaultEnvironment,
   ) =>
-    resolveTriggerConfig(argv, {
+    resolveTriggerConfig(parsedCli(argv), {
       fs,
-      environment,
-      executableRuns: () => true,
-      resolveExecutablePath: () => "/bin/claude",
+      // Every case locates its harness on this PATH unless it names its own.
+      environment: {PATH: "/bin", ...environment},
+      platform: "linux",
       workingDirectory: directory,
     });
 
@@ -147,7 +158,7 @@ describe("trigger configuration", () => {
 
     expect(config).toMatchObject({
       harness: "codex",
-      harnessExecutable: "/bin/claude",
+      harnessExecutable: "/bin/codex",
       model: "gpt-test",
     });
     expect(config.harnessArgs).toEqual(
@@ -208,28 +219,10 @@ describe("trigger configuration", () => {
     ).toContain("queries file not found");
     expect(
       failureMessage(
-        resolveTriggerConfig([], {
-          fs,
-          environment: {PLUGIN_DIR: "plugin"},
-          executableRuns: () => true,
-          resolveExecutablePath: () => void 0,
-          workingDirectory: directory,
-        }),
+        resolveConfig([], {PLUGIN_DIR: "plugin", PATH: "/usr/bin"}),
         "runtime",
       ),
-    ).toContain("CLI not found");
-    expect(
-      failureMessage(
-        resolveTriggerConfig([], {
-          fs,
-          environment: {PLUGIN_DIR: "plugin"},
-          executableRuns: () => false,
-          resolveExecutablePath: () => "/bin/claude",
-          workingDirectory: directory,
-        }),
-        "runtime",
-      ),
-    ).toContain("CLI not found");
+    ).toBe("'claude' CLI not found in PATH");
     expect(
       failureMessage(resolveConfig([], {PLUGIN_DIR: "missing"}), "runtime"),
     ).toContain("target plugin directory is invalid");
