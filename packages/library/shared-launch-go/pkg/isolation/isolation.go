@@ -31,6 +31,10 @@ type RunConfig struct {
 	// Process is the agent process to confine. Its Dir is the work directory,
 	// which the isolation binds read-write and starts the process in.
 	Process Process
+	// Interactive attaches the process to the terminal of the caller. A run
+	// without it gets no terminal and no standard input, so a caller that reads
+	// the output of the process can start it without one.
+	Interactive bool
 
 	// Network is the egress mode; the isolator emits its own network flags via its
 	// network.go bridge.

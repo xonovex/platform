@@ -54,6 +54,7 @@ func TestCommandNamesTheSandboxAndPassesEnvironmentByName(t *testing.T) {
 	run.Secrets = map[string]string{"API_KEY": "s3cret"}
 	run.Process.Env = []string{"MODE=fast"}
 	run.ProviderEnv = map[string]string{"ROUTE_AUTH": "route-token"}
+	run.Interactive = true
 	command, err := NewIsolator(newHost(), testLog).Command(run, provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
@@ -245,5 +246,15 @@ func TestCapabilitiesFailClosed(t *testing.T) {
 	bare.Env["PATH"] = "/usr/bin"
 	if ok, _ := NewIsolator(bare, testLog).Available(); ok {
 		t.Error("sbx is missing")
+	}
+}
+
+func TestCommandAttachesNoTerminalToARunWithoutOne(t *testing.T) {
+	command, err := NewIsolator(newHost(), testLog).Command(cfg(), provision.Contribution{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if line := strings.Join(command, " "); line != "sbx exec -w /home/dev/work agent-cli-1 claude review" {
+		t.Errorf("command = %q, want no -i and no -t", line)
 	}
 }

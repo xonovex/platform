@@ -159,7 +159,10 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		}
 	}
 
-	args := []string{"run", "--rm", "-it"}
+	args := []string{"run", "--rm"}
+	if cfg.Interactive {
+		args = append(args, "-it")
+	}
 
 	// Kernel-isolating runtime (e.g. runsc/gVisor); empty means default runc.
 	if cfg.Runtime != "" {

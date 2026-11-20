@@ -425,3 +425,14 @@ func TestDocker_CommandEndsWithTheImageAndTheProcess(t *testing.T) {
 		t.Errorf("command tail = %v, want the image and the argument vector of the process", tail)
 	}
 }
+
+func TestDocker_AttachesATerminalOnlyToAnInteractiveRun(t *testing.T) {
+	c := dockerCfg(network.NetworkHost)
+	if args := dockerCommand(t, newHost(), c, provision.Contribution{}); argHas(args, "-it") || !slices.Equal(args[:3], []string{"docker", "run", "--rm"}) {
+		t.Errorf("a run without a terminal = %v, want docker run --rm with no -it", args[:4])
+	}
+	c.Interactive = true
+	if args := dockerCommand(t, newHost(), c, provision.Contribution{}); !slices.Equal(args[:4], []string{"docker", "run", "--rm", "-it"}) {
+		t.Errorf("an interactive run = %v, want docker run --rm -it", args[:4])
+	}
+}

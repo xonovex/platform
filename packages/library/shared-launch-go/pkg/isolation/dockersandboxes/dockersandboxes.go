@@ -211,7 +211,11 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	create := append([]string{"create", "--no-progress", "--name", name, string(cfg.Agent.Type)}, mounts...)
 	create = append(create, readOnly...)
 
-	exec := []string{"exec", "-i", "-t", "-w", workDir}
+	exec := []string{"exec"}
+	if cfg.Interactive {
+		exec = append(exec, "-i", "-t")
+	}
+	exec = append(exec, "-w", workDir)
 	names := make([]string, 0, len(values))
 	for variable := range values {
 		names = append(names, variable)

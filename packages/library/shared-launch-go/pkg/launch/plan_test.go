@@ -212,6 +212,7 @@ func TestPlanSpecFillsThePortableSpec(t *testing.T) {
 		Image:       "registry.example/agent:1",
 		Policy:      policy.SandboxPolicy{RequireEgressRestricted: true},
 		AgentArgs:   []string{"go"},
+		Interactive: true,
 	}
 
 	spec := mustPlan(t, request)
@@ -241,6 +242,9 @@ func TestPlanSpecFillsThePortableSpec(t *testing.T) {
 	if spec.Run.ProviderEnv != nil || spec.Run.Secrets != nil {
 		t.Errorf("the plan resolved run-time values: %v %v", spec.Run.ProviderEnv, spec.Run.Secrets)
 	}
+	if !spec.Run.Interactive {
+		t.Error("an interactive request plans an interactive run")
+	}
 }
 
 func TestPlanSpecStartsTheAgentWithoutPromptsOnlyInsideABoundary(t *testing.T) {
@@ -248,6 +252,9 @@ func TestPlanSpecStartsTheAgentWithoutPromptsOnlyInsideABoundary(t *testing.T) {
 
 	if !slices.Equal(host.Run.Process.Argv, []string{"claude", "go"}) || host.Run.Egress.Transport != "" {
 		t.Errorf("host run = %v %+v, want the plain argv and no route", host.Run.Process.Argv, host.Run.Egress)
+	}
+	if host.Run.Interactive {
+		t.Error("a request that asks for no terminal plans a run without one")
 	}
 }
 

@@ -87,7 +87,10 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry[iso
 	if err != nil {
 		return Plan{}, err
 	}
-	spec, choice, err := launchcore.PlanSpec(options.Request, agent, provider, sourceDir, cwd, home, registry, enforce)
+	// agent-cli attaches every agent it starts to the terminal of the user.
+	request := options.Request
+	request.Interactive = true
+	spec, choice, err := launchcore.PlanSpec(request, agent, provider, sourceDir, cwd, home, registry, enforce)
 	if err != nil {
 		return Plan{}, err
 	}

@@ -70,6 +70,8 @@ type Request struct {
 	// AgentArgs are the arguments of the user, which end the argument vector of
 	// the agent process.
 	AgentArgs []string
+	// Interactive attaches the agent to the terminal of the caller.
+	Interactive bool
 }
 
 // ResolveAgent resolves the agent from the harness catalog of the request and
@@ -167,6 +169,7 @@ func PlanSpec[I isoshared.Confinement](request Request, agent *types.AgentConfig
 				Env:  envutil.EnvMapToSlice(customEnv),
 				Dir:  sourceDir,
 			},
+			Interactive:     request.Interactive,
 			Network:         selected.network,
 			Egress:          plannedRoute(selected.network, confinement.EgressTransport(), allow),
 			HostPassthrough: request.IsolationBwrapPassthrough,
