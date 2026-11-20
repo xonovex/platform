@@ -6,9 +6,13 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
@@ -21,6 +25,13 @@ type Host interface {
 	Getwd() (string, error)
 }
 
+// EgressOpener starts the enforcement of a managed network run: the allowlist
+// proxy for a transport that needs one. It returns the route the isolator
+// applies, and a stop function that ends the enforcement.
+type EgressOpener interface {
+	Open(transport netshared.Transport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error)
+}
+
 // Dependencies are the ports and plugin sets one run executes through.
 type Dependencies struct {
 	Host Host
@@ -28,6 +39,12 @@ type Dependencies struct {
 	// Out receives the command line of a dry run.
 	Out       io.Writer
 	Sandboxes *sandbox.Registry
+	// Egress starts managed network enforcement; it may be nil for a build that
+	// offers no managed egress, and a managed run then fails.
+	Egress EgressOpener
+	// Credentials maps a credential scheme to its store; it may be nil for a build
+	// without credential stores, and a run that binds a credential then fails.
+	Credentials *credshared.Registry
 	// Overlays builds the artifact overlay; it may be nil for a build without one.
 	Overlays   Overlays
 	Workspaces map[wsp.VCSType]wsshared.VCS
@@ -89,6 +106,18 @@ func Execute(deps Dependencies, options Options) error {
 	}()
 
 	run := applyOverlay(plan.Run, overlayResult)
+	run.Secrets, err = credentialValues(deps.Credentials, plan)
+	if err != nil {
+		return err
+	}
+	if plan.Run.Network == netshared.ModeManaged {
+		route, stop, err := openEgress(deps.Egress, plan)
+		if err != nil {
+			return err
+		}
+		defer stop()
+		run.Egress = route
+	}
 	if vcs != nil && !plan.DryRun {
 		dir, err := vcs.Setup(plan.Checkout.Config, plan.SourceDir, plan.Verbose)
 		if err != nil {
@@ -148,6 +177,43 @@ func Execute(deps Dependencies, options Options) error {
 	return nil
 }
 
+// credentialValues resolves the credential bindings of the run. A dry run
+// resolves nothing, so it prompts no keychain and holds no secret: it carries the
+// redacted placeholder of each credential, which is enough to build the command.
+func credentialValues(registry *credshared.Registry, plan Plan) (map[string]string, error) {
+	if len(plan.Credentials) == 0 {
+		return nil, nil
+	}
+	if plan.DryRun {
+		placeholders := make(map[string]string, len(plan.Credentials))
+		for _, binding := range plan.Credentials {
+			placeholders[binding.Name] = credshared.Redacted
+		}
+		return placeholders, nil
+	}
+	if registry == nil {
+		return nil, fmt.Errorf("this build has no credential stores")
+	}
+	secrets, err := credshared.Resolve(registry, plan.Credentials)
+	if err != nil {
+		return nil, err
+	}
+	return credshared.Reveal(secrets), nil
+}
+
+// openEgress starts the enforcement of a managed run for the transport the
+// isolator declared.
+func openEgress(opener EgressOpener, plan Plan) (isoshared.EgressRoute, func(), error) {
+	if opener == nil {
+		return isoshared.EgressRoute{}, nil, fmt.Errorf("this build has no managed egress")
+	}
+	route, stop, err := opener.Open(plan.Run.Egress.Transport, plan.Allow)
+	if err != nil {
+		return isoshared.EgressRoute{}, nil, fmt.Errorf("start managed egress: %w", err)
+	}
+	return route, stop, nil
+}
+
 // selectTerminal returns the installed executor of the requested terminal, or
 // nil when the run uses no terminal wrapper.
 func selectTerminal(terminals map[termshared.TerminalType]termshared.TerminalExecutor, cfg *termshared.TerminalConfig) (termshared.TerminalExecutor, error) {
@@ -205,6 +271,7 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 		log.Info("  Arguments: (none)")
 	}
 	logOverlay(log, overlay)
+	logNetwork(log, plan)
 	if len(command) == 0 {
 		return nil
 	}
@@ -212,4 +279,22 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 		return fmt.Errorf("write dry run: %w", err)
 	}
 	return nil
+}
+
+// logNetwork reports the network mode, the allowed hosts and the credential
+// bindings of a dry run. A binding shows where the credential lives and never what
+// it holds.
+func logNetwork(log logging.Logger, plan Plan) {
+	log.Info("  Network: " + string(plan.Run.Network))
+	if plan.Run.Network == netshared.ModeManaged {
+		var hosts []string
+		for _, rule := range plan.Allow.Rules() {
+			hosts = append(hosts, rule.String())
+		}
+		log.Info("  Allowed hosts: " + strings.Join(hosts, ", "))
+		log.Info("  Egress transport: " + string(plan.Run.Egress.Transport))
+	}
+	for _, binding := range plan.Credentials {
+		log.Info("  Credential: " + binding.Name + " from " + binding.Scheme + ":" + binding.Locator + " (" + credshared.Redacted + ")")
+	}
 }

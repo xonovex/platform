@@ -9,6 +9,7 @@ import (
 	"path"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -52,8 +53,18 @@ type Fake struct {
 	Outcomes map[string]Outcome
 	Calls    []Call
 
+	// Dial and DialPublicFunc answer DialContext and DialPublic; ListenErr, when
+	// set, fails Listen; ExecutablePath answers Executable.
+	Dial           DialFunc
+	DialPublicFunc DialFunc
+	ListenErr      error
+	ExecutablePath string
+
 	files     map[string]entry
 	tempCount int
+
+	netMu     sync.Mutex
+	listeners map[string]*MemListener
 }
 
 // New returns a Fake with an empty root directory, uid and gid 1000, 4 CPUs,

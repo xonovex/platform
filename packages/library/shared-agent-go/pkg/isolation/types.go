@@ -19,6 +19,15 @@ const (
 	// attack-surface reduction; a sandboxed runtime (runsc/gVisor) is a kernel
 	// boundary (each isolator declares its own KernelIsolated capability).
 	IsolationDocker IsolationMethod = "docker"
+	// IsolationSeatbelt confines the agent with a macOS Seatbelt sandbox profile.
+	// Attack-surface reduction, not a kernel trust boundary.
+	IsolationSeatbelt IsolationMethod = "seatbelt"
+	// IsolationDockerSandboxes runs the agent in a Docker Sandboxes sandbox, a
+	// virtual machine with its own agent image.
+	IsolationDockerSandboxes IsolationMethod = "docker-sandboxes"
+	// IsolationOpenShell runs the agent in an OpenShell sandbox on a gateway,
+	// under a policy document the CLI hands the gateway.
+	IsolationOpenShell IsolationMethod = "openshell"
 )
 
 // DefaultContainerImage is the default container image for running agents.

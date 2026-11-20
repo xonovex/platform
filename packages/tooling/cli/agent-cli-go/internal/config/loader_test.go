@@ -130,3 +130,19 @@ func TestParseKeyValueConfigLoadsSupportedKeys(t *testing.T) {
 		t.Errorf("parseKeyValueConfig() = %#v, want provider and homeDir", config)
 	}
 }
+
+func TestParseReadsAllowedHostsAndCredentials(t *testing.T) {
+	data := "allowHosts:\n  - api.example.com\n  - '*.cdn.example.com:8443'\ncredentials:\n  - API_KEY=keychain:svc/acct\n"
+	got, err := Parse([]byte(data), ".yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got.AllowHosts) != 2 || got.AllowHosts[1] != "*.cdn.example.com:8443" || len(got.Credentials) != 1 || got.Credentials[0] != "API_KEY=keychain:svc/acct" {
+		t.Errorf("config = %+v", got)
+	}
+	toml := "allowHosts = [\"api.example.com\"]\ncredentials = [\"API_KEY=env:SOURCE\"]\n"
+	got, err = Parse([]byte(toml), ".toml")
+	if err != nil || len(got.AllowHosts) != 1 || len(got.Credentials) != 1 {
+		t.Errorf("toml config = %+v, %v", got, err)
+	}
+}

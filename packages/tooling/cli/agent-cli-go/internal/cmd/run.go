@@ -10,6 +10,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // newRunCommand binds the run flags into launch.Options and executes them
@@ -49,9 +50,11 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	// Bare axis selectors.
 	flags.StringVarP(&options.Agent, "agent", "a", options.Agent, "Agent to run ("+strings.Join(agentNames(), ", ")+")")
 	flags.StringVarP(&options.Provider, "provider", "p", "", "Model provider")
-	flags.StringVar(&options.Isolation, "isolation", options.Isolation, "Isolation axis (none, bwrap, docker)")
+	flags.StringVar(&options.Isolation, "isolation", options.Isolation, "Isolation axis (none, bwrap, docker, seatbelt, docker-sandboxes, openshell)")
 	flags.StringVar(&options.Provision, "provision", options.Provision, "Provision axis (none, nix, command)")
-	flags.StringVar(&options.Network, "network", options.Network, "Network egress axis (host, none)")
+	flags.StringVar(&options.Network, "network", options.Network, "Network egress axis (host, none, managed)")
+	flags.StringSliceVar(&options.AllowHosts, "allow-host", nil, "Host a managed network run may reach: host, host:port or *.domain (repeatable; denies all others)")
+	flags.StringSliceVar(&options.Credentials, "credential", nil, "Inject a credential as an environment variable: NAME=scheme:locator, scheme one of env, file, keychain, secret-service, pass (repeatable)")
 
 	// Per-type knobs under the --<axis>-<type>-<option> grammar.
 	flags.StringVar(&options.IsolationDockerRuntime, "isolation-docker-runtime", "", "Kernel-isolating container runtime, e.g. runsc (docker only)")
@@ -61,7 +64,7 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	flags.StringVar(&options.NixRev, "nix-rev", "", "Pinned nixpkgs rev for --nix-source packages")
 	flags.StringSliceVar(&options.NixPackages, "nix-packages", nil, "Additional packages for --nix-source packages; selected agent is automatic (repeatable)")
 	flags.StringVar(&options.NixShell, "nix-shell", options.NixShell, "devShell name for --nix-source flake")
-	flags.StringVar(&options.Image, "image", "", "Container image (for docker isolation)")
+	flags.StringVar(&options.Image, "image", "", "Container image (for docker and openshell isolation)")
 
 	// Workspace / terminal / misc.
 	flags.StringVarP(&options.WorkDir, "work-dir", "w", "", "Working directory")
@@ -100,7 +103,47 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 		return providers.GetProviderNames(types.AgentType(options.Agent)), cobra.ShellCompDirectiveNoFileComp
 	})
 
+	_ = cmd.RegisterFlagCompletionFunc("isolation", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return isolationNames(deps), cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = cmd.RegisterFlagCompletionFunc("network", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return []string{string(netshared.ModeHost), string(netshared.ModeNone), string(netshared.ModeManaged)}, cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = cmd.RegisterFlagCompletionFunc("credential", func(_ *cobra.Command, _ []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return credentialCandidates(deps, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
 	return cmd
+}
+
+// isolationNames lists the isolations the build registers.
+func isolationNames(deps launch.Dependencies) []string {
+	if deps.Sandboxes == nil {
+		return nil
+	}
+	var names []string
+	for _, method := range deps.Sandboxes.IsolationMethods() {
+		names = append(names, string(method))
+	}
+	return names
+}
+
+// credentialCandidates completes NAME=scheme: once the user typed the variable
+// name and the equals sign, and offers nothing before it, because the variable
+// name is the user's own.
+func credentialCandidates(deps launch.Dependencies, toComplete string) []string {
+	if deps.Credentials == nil {
+		return nil
+	}
+	name, _, hasEquals := strings.Cut(toComplete, "=")
+	if !hasEquals {
+		return nil
+	}
+	var candidates []string
+	for _, scheme := range deps.Credentials.Schemes() {
+		candidates = append(candidates, name+"="+scheme+":")
+	}
+	return candidates
 }
 
 // agentNames lists the registered agent types in sorted order.

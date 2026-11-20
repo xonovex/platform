@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
@@ -19,6 +20,7 @@ import (
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
@@ -69,6 +71,11 @@ type Options struct {
 	BindPaths   []string
 	RoBindPaths []string
 	CustomEnv   []string
+	// AllowHosts are the hosts a managed network run may reach.
+	AllowHosts []string
+	// Credentials bind environment variables to credential store entries, as
+	// NAME=scheme:locator.
+	Credentials []string
 
 	Terminal        string
 	TerminalSession string
@@ -104,6 +111,10 @@ type Plan struct {
 	Checkout  *Checkout
 	// Overlay is the artifact overlay of the run, nil when the run has none.
 	Overlay *OverlayRequest
+	// Allow is the egress allowlist of a managed network run, empty for any other.
+	Allow egress.Allowlist
+	// Credentials are the credential bindings the executor resolves at run time.
+	Credentials []credshared.Binding
 	// Run launches in SourceDir; the executor moves it into a created checkout.
 	Run      isoshared.RunConfig
 	Terminal *termshared.TerminalConfig
@@ -152,6 +163,15 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		return Plan{}, fmt.Errorf("invalid custom environment: %w", err)
 	}
 
+	allow, err := planAllowlist(selection, options, file)
+	if err != nil {
+		return Plan{}, err
+	}
+	bindings, err := credshared.ParseBindings(append(append([]string{}, file.Credentials...), options.Credentials...))
+	if err != nil {
+		return Plan{}, err
+	}
+
 	homeDir := home
 	if file.HomeDir != "" {
 		homeDir = file.HomeDir
@@ -168,11 +188,14 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		SourceDir:     sourceDir,
 		Checkout:      checkout,
 		Overlay:       overlayRequest,
+		Allow:         allow,
+		Credentials:   bindings,
 		Run: isoshared.RunConfig{
 			HomeDir:         absolute(cwd, homeDir),
 			WorkDir:         sourceDir,
 			RepoDir:         sourceDir,
 			Network:         selection.network,
+			Egress:          plannedRoute(selection, allow),
 			HostPassthrough: options.IsolationBwrapPassthrough,
 			Image:           options.Image,
 			Runtime:         options.IsolationDockerRuntime,
@@ -187,6 +210,33 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		DryRun:   options.DryRun,
 		Verbose:  options.Verbose,
 	}, nil
+}
+
+// planAllowlist parses the allowed hosts. A managed run needs at least one, and
+// no other network mode takes any, because the hosts would then restrict nothing.
+func planAllowlist(selected selection, options Options, file config.FileConfig) (egress.Allowlist, error) {
+	texts := append(append([]string{}, file.AllowHosts...), options.AllowHosts...)
+	if selected.network != netshared.ModeManaged {
+		if len(texts) > 0 {
+			return egress.Allowlist{}, fmt.Errorf("allowed hosts need --network managed, not %s", selected.network)
+		}
+		return egress.Allowlist{}, nil
+	}
+	allow, err := egress.NewAllowlist(texts)
+	if err != nil {
+		return egress.Allowlist{}, fmt.Errorf("--network managed: %w; pass --allow-host", err)
+	}
+	return allow, nil
+}
+
+// plannedRoute is the route a managed run starts from: the transport the
+// isolator declared and the allowlist. The executor fills in the socket or the
+// proxy address when it starts the proxy.
+func plannedRoute(selected selection, allow egress.Allowlist) isoshared.EgressRoute {
+	if selected.network != netshared.ModeManaged {
+		return isoshared.EgressRoute{}
+	}
+	return isoshared.EgressRoute{Transport: selected.isolator.EgressTransport(), Allow: allow}
 }
 
 // DisplayDir is the directory a dry run reports: the checkout it would create,

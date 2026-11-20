@@ -20,6 +20,12 @@ type FileConfig struct {
 	BindPaths   []string `yaml:"bindPaths" toml:"bindPaths"`
 	RoBindPaths []string `yaml:"roBindPaths" toml:"roBindPaths"`
 	CustomEnv   []string `yaml:"customEnv" toml:"customEnv"`
+	// AllowHosts are the hosts of a managed network run, as "host", "host:port" or
+	// "*.domain[:port]".
+	AllowHosts []string `yaml:"allowHosts" toml:"allowHosts"`
+	// Credentials bind an environment variable to a credential store entry, as
+	// "NAME=scheme:locator". The file holds where a credential is, never its value.
+	Credentials []string `yaml:"credentials" toml:"credentials"`
 }
 
 // Files is the port the loader reads the configuration through.

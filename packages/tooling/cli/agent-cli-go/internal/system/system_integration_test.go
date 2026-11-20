@@ -4,8 +4,11 @@ package system
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"io"
 	"io/fs"
+	"net"
 	"os"
 	"path/filepath"
 	"slices"
@@ -185,5 +188,74 @@ func TestFileOperationsWorkOnTheRealDisk(t *testing.T) {
 	}
 	if err := s.RemoveAll(moved); err != nil {
 		t.Errorf("RemoveAll(missing) error = %v", err)
+	}
+}
+
+func TestIsPublicAddress(t *testing.T) {
+	cases := map[string]bool{
+		"8.8.8.8": true, "2606:4700:4700::1111": true,
+		"127.0.0.1": false, "::1": false, "10.0.0.1": false, "192.168.1.1": false, "172.16.0.1": false,
+		"169.254.169.254": false, "224.0.0.1": false, "0.0.0.0": false, "fe80::1": false, "fc00::1": false,
+	}
+	for text, want := range cases {
+		if got := IsPublicAddress(net.ParseIP(text)); got != want {
+			t.Errorf("IsPublicAddress(%s) = %v, want %v", text, got, want)
+		}
+	}
+}
+
+func TestListenAndDialConnectOnLoopback(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	listener, err := s.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	go func() {
+		conn, err := listener.Accept()
+		if err == nil {
+			_, _ = conn.Write([]byte("hello"))
+			_ = conn.Close()
+		}
+	}()
+	conn, err := s.DialContext(context.Background(), "tcp", listener.Addr().String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	data, _ := io.ReadAll(conn)
+	if string(data) != "hello" {
+		t.Errorf("read %q", data)
+	}
+}
+
+func TestDialPublicRefusesALoopbackService(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	listener, err := s.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	for _, address := range []string{listener.Addr().String(), "localhost:" + portOf(t, listener)} {
+		if _, err := s.DialPublic(context.Background(), "tcp", address); !errors.Is(err, ErrNonPublicAddress) {
+			t.Errorf("DialPublic(%s) = %v, want ErrNonPublicAddress", address, err)
+		}
+	}
+}
+
+func portOf(t *testing.T, listener net.Listener) string {
+	t.Helper()
+	_, port, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	return port
+}
+
+func TestExecutableReturnsTheTestBinary(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	path, err := s.Executable()
+	if err != nil || !filepath.IsAbs(path) {
+		t.Errorf("Executable() = %q, %v", path, err)
 	}
 }

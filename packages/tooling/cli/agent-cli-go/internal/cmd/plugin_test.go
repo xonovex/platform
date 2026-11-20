@@ -203,7 +203,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 			if host.relative {
 				args = append(append([]string{}, args...), "--store", "s")
 			}
-			root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard})
+			root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard}, &recordingBridge{})
 			root.SetArgs(args)
 			root.SetOut(io.Discard)
 			root.SetErr(io.Discard)
@@ -214,7 +214,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 	}
 	// A relative store needs no home directory.
 	host := brokenHost{Fake: systemtest.New(), home: true}
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard})
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard}, &recordingBridge{})
 	root.SetArgs([]string{"plugin", "list", "--store", "s"})
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)
@@ -240,7 +240,7 @@ func TestAFailedWriteToTheOutputIsAnError(t *testing.T) {
 		{"plugin", "list"}, {"plugin", "remove", "hello"},
 		{"marketplace", "add", "/market"}, {"marketplace", "list"}, {"marketplace", "list", "main"}, {"marketplace", "remove", "main"},
 	} {
-		root := NewRootCommand(r.deps, r.ports)
+		root := NewRootCommand(r.deps, r.ports, r.bridge)
 		root.SetArgs(args)
 		root.SetOut(io.Discard)
 		root.SetErr(io.Discard)
@@ -258,7 +258,7 @@ func TestThePreviewNamesTheRevisionOfARepository(t *testing.T) {
 
 func TestTheAllowFlagCompletesTheCapabilities(t *testing.T) {
 	r := pluginRoot()
-	root := NewRootCommand(r.deps, r.ports)
+	root := NewRootCommand(r.deps, r.ports, r.bridge)
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)

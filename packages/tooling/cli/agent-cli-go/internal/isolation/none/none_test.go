@@ -39,7 +39,7 @@ func cfg(net netshared.Mode) isoshared.RunConfig {
 }
 
 func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
-	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeProxy} {
+	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeManaged} {
 		host := newHost()
 		i := NewIsolator(host, testLog)
 		c := provision.Contribution{}
@@ -244,5 +244,11 @@ func TestNone_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
 				t.Errorf("command = %v, want %v (no sandbox arguments on the host)", cmd, test.want)
 			}
 		})
+	}
+}
+
+func TestNone_DeclaresNoEgressTransport(t *testing.T) {
+	if got := NewIsolator(newHost(), testLog).EgressTransport(); got != netshared.TransportNone {
+		t.Errorf("EgressTransport() = %q, want none: host execution has no boundary to route traffic through", got)
 	}
 }

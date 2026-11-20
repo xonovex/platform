@@ -1,7 +1,6 @@
 package bwrap
 
 import (
-	"errors"
 	"slices"
 	"strings"
 	"testing"
@@ -174,8 +173,31 @@ func TestBwrap_NetworkExplicit(t *testing.T) {
 	if !argHas(args, "--share-net") || argHas(args, "--unshare-net") {
 		t.Error("network host must --share-net and not --unshare-net")
 	}
-	if _, err := NewIsolator(host, testLog).Command(claudeCfg(netshared.ModeProxy, false), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
-		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
+}
+
+func TestBwrap_ManagedEgressHasNoNetworkAndABridge(t *testing.T) {
+	host := newHost().AddDir("/run/egress").AddExecutable("/opt/agent-cli")
+	cfg := claudeCfg(netshared.ModeManaged, false)
+	cfg.Egress = isoshared.EgressRoute{Transport: netshared.TransportUnixSocket, Socket: "/run/egress/proxy.sock", Bridge: "/opt/agent-cli"}
+	args := bwrapCommand(t, host, cfg, provision.Contribution{})
+	if !argHas(args, "--unshare-net") || argHas(args, "--share-net") {
+		t.Error("managed must --unshare-net: the only route out is the proxy socket")
+	}
+	line := strings.Join(args, " ")
+	for _, want := range []string{"--bind /run/egress /run/egress", "--ro-bind /opt/agent-cli /opt/agent-cli", "/opt/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 --"} {
+		if !strings.Contains(line, want) {
+			t.Errorf("args lack %q:\n%s", want, line)
+		}
+	}
+}
+
+func TestBwrap_ManagedEgressNeedsItsRoute(t *testing.T) {
+	cfg := claudeCfg(netshared.ModeManaged, false)
+	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("managed without a route must fail")
+	}
+	if NewIsolator(newHost(), testLog).EgressTransport() != netshared.TransportUnixSocket {
+		t.Error("bwrap declares the unix-socket transport")
 	}
 }
 

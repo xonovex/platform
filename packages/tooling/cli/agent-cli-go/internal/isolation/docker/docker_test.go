@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"errors"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -149,8 +148,39 @@ func TestDocker_NetworkExplicit(t *testing.T) {
 	if args := dockerCommand(t, host, dockerCfg(netshared.ModeHost), provision.Contribution{}); !argHasPair(args, "--network", "host") {
 		t.Error("network host must emit --network host")
 	}
-	if _, err := NewIsolator(host, testLog).Command(dockerCfg(netshared.ModeProxy), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
-		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
+}
+
+func managedRoute() isoshared.EgressRoute {
+	return isoshared.EgressRoute{Transport: netshared.TransportUnixSocket, Socket: "/run/egress/proxy.sock", Bridge: "/opt/agent-cli"}
+}
+
+func TestDocker_ManagedEgressHasNoNetworkAndABridge(t *testing.T) {
+	host := newHost().AddDir("/run/egress").AddExecutable("/opt/agent-cli")
+	cfg := dockerCfg(netshared.ModeManaged)
+	cfg.Egress = managedRoute()
+	args := dockerCommand(t, host, cfg, provision.Contribution{})
+	if !argHasPair(args, "--network", "none") {
+		t.Error("managed must give the container no network of its own")
+	}
+	line := strings.Join(args, " ")
+	for _, want := range []string{"/run/egress:/run/egress", "/opt/agent-cli:/opt/agent-cli:ro", "/opt/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 --"} {
+		if !strings.Contains(line, want) {
+			t.Errorf("args lack %q:\n%s", want, line)
+		}
+	}
+}
+
+func TestDocker_ManagedEgressNeedsItsRoute(t *testing.T) {
+	cfg := dockerCfg(netshared.ModeManaged)
+	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("managed without a route must fail")
+	}
+	cfg.Egress = managedRoute()
+	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
+		t.Error("managed with a socket directory that does not exist must fail")
+	}
+	if NewIsolator(newHost(), testLog).EgressTransport() != netshared.TransportUnixSocket {
+		t.Error("docker declares the unix-socket transport")
 	}
 }
 

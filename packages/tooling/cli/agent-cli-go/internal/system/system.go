@@ -7,15 +7,18 @@ package system
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 )
 
 // System launches child processes on the given standard streams.
@@ -50,6 +53,55 @@ func (System) Getgid() int { return os.Getgid() }
 
 // NumCPU returns the number of logical CPUs of this host.
 func (System) NumCPU() int { return runtime.NumCPU() }
+
+// Executable returns the absolute path of the executable that started this
+// process, with symlinks resolved.
+func (System) Executable() (string, error) {
+	path, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	return filepath.EvalSymlinks(path)
+}
+
+// Listen announces on the local network address.
+func (System) Listen(network, address string) (net.Listener, error) {
+	return net.Listen(network, address)
+}
+
+// DialContext connects to address on the named network.
+func (System) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	var dialer net.Dialer
+	return dialer.DialContext(ctx, network, address)
+}
+
+// ErrNonPublicAddress reports a connection to an address that is not a public
+// unicast address.
+var ErrNonPublicAddress = errors.New("connection to a non-public address refused")
+
+// DialPublic connects to address and refuses every resolved address that is
+// loopback, private, link-local, multicast or unspecified, so an allowed host
+// name cannot reach a service of this machine or its network.
+func (System) DialPublic(ctx context.Context, network, address string) (net.Conn, error) {
+	dialer := net.Dialer{Control: func(_, resolved string, _ syscall.RawConn) error {
+		host, _, err := net.SplitHostPort(resolved)
+		if err != nil {
+			return err
+		}
+		ip := net.ParseIP(host)
+		if ip == nil || !IsPublicAddress(ip) {
+			return fmt.Errorf("%w: %s", ErrNonPublicAddress, host)
+		}
+		return nil
+	}}
+	return dialer.DialContext(ctx, network, address)
+}
+
+// IsPublicAddress reports whether ip is a public unicast address.
+func IsPublicAddress(ip net.IP) bool {
+	return !ip.IsLoopback() && !ip.IsPrivate() && !ip.IsLinkLocalUnicast() && !ip.IsLinkLocalMulticast() &&
+		!ip.IsMulticast() && !ip.IsUnspecified() && !ip.IsInterfaceLocalMulticast()
+}
 
 // Stat returns the file information of path, following symlinks.
 func (System) Stat(path string) (fs.FileInfo, error) { return os.Stat(path) }

@@ -18,6 +18,7 @@ tasks:
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./pkg/agentcmd=95 \
         ./pkg/agents=100 \
+        ./pkg/egress=100 \
         ./pkg/artifact=100 \
         ./pkg/isolation=100 \
         ./pkg/network=100 \

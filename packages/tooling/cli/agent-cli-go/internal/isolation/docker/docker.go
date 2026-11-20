@@ -14,6 +14,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // containerHome is the synthetic, writable HOME inside the container. The host
@@ -88,6 +89,10 @@ func (i *Isolator) KernelIsolated(runtime string) bool {
 
 // ConfinesNetwork reports true: docker applies --network none.
 func (i *Isolator) ConfinesNetwork() bool { return true }
+
+// EgressTransport declares the unix socket: a managed run has --network none,
+// and reaches the allowlist proxy through a bound socket.
+func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportUnixSocket }
 
 // CheckAgent rejects the default image, which does not contain an agent; a
 // caller-supplied image is trusted to contain it.
@@ -169,11 +174,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	)
 
 	// Network — applied EXPLICITLY via the network bridge.
-	netArgs, err := networkArgs(cfg.Network)
-	if err != nil {
-		return nil, err
-	}
-	args = append(args, netArgs...)
+	args = append(args, networkArgs(cfg.Network)...)
 
 	// Run as the current user so written files are owned by the caller.
 	args = append(args, "-u", fmt.Sprintf("%d:%d", i.host.Getuid(), i.host.Getgid()))
@@ -220,6 +221,18 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		args = append(args, "-v", fmt.Sprintf("%s:%s:ro", resolved, resolved))
 	}
 
+	// Managed egress: bind the proxy socket directory and the bridge executable;
+	// the command runs under the bridge below.
+	var route isoshared.EgressRoute
+	if cfg.Network == netshared.ModeManaged {
+		route, err = isoshared.ResolveBridge(i.host, cfg.Egress)
+		if err != nil {
+			return nil, err
+		}
+		socketDir, bridge := isoshared.BridgeMounts(route)
+		args = append(args, "-v", fmt.Sprintf("%s:%s", socketDir, socketDir), "-v", fmt.Sprintf("%s:%s:ro", bridge, bridge))
+	}
+
 	// Environment.
 	containerEnv, err := i.containerEnv(cfg, c)
 	if err != nil {
@@ -242,7 +255,11 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	if err != nil {
 		return nil, err
 	}
-	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
+	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
+	if cfg.Network == netshared.ModeManaged {
+		command = isoshared.WrapWithBridge(route, command)
+	}
+	args = append(args, command...)
 
 	return args, nil
 }
@@ -288,7 +305,7 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	customEnv, err := isoshared.RunEnv(cfg)
 	if err != nil {
 		return nil, err
 	}

@@ -10,8 +10,9 @@ import (
 var version = "dev"
 
 // NewRootCommand builds the agent-cli command tree; every run executes through
-// deps, and the plugin and marketplace commands through ports.
-func NewRootCommand(deps launch.Dependencies, ports PluginPorts) *cobra.Command {
+// deps, the plugin and marketplace commands through ports, and the hidden
+// egress-bridge command through bridge.
+func NewRootCommand(deps launch.Dependencies, ports PluginPorts, bridge EgressBridge) *cobra.Command {
 	root := &cobra.Command{
 		Use:   "agent-cli",
 		Short: "Unified CLI for running AI coding agents",
@@ -20,6 +21,6 @@ with multiple model providers and sandbox options.`,
 		Version: version,
 	}
 	root.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
-	root.AddCommand(newRunCommand(deps), newPluginCommand(ports), newMarketplaceCommand(ports), newCompletionCommand())
+	root.AddCommand(newRunCommand(deps), newPluginCommand(ports), newMarketplaceCommand(ports), newCompletionCommand(), newEgressBridgeCommand(bridge))
 	return root
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
@@ -27,11 +28,13 @@ func main() {
 	log := logging.FromEnvironment(host.Getenv, os.Stdout, os.Stderr)
 	origins := originplugins.DefaultRegistry(host)
 	deps := launch.Dependencies{
-		Host:      host,
-		Log:       log,
-		Out:       os.Stdout,
-		Sandboxes: plugins.DefaultRegistry(host, log),
-		Overlays:  overlay.Builder{Host: host, Origins: origins},
+		Host:        host,
+		Log:         log,
+		Out:         os.Stdout,
+		Sandboxes:   plugins.DefaultRegistry(host, log),
+		Egress:      managed.Service{Host: host, Log: log},
+		Credentials: plugins.DefaultCredentials(host),
+		Overlays:    overlay.Builder{Host: host, Origins: origins},
 		Workspaces: map[wsp.VCSType]wsshared.VCS{
 			wsp.VCSGit:     git.New(host, log),
 			wsp.VCSJujutsu: jj.New(host, log),
@@ -42,7 +45,7 @@ func main() {
 	}
 
 	ports := cmd.PluginPorts{Host: host, Origins: origins, Out: os.Stdout}
-	err := cmd.NewRootCommand(deps, ports).Execute()
+	err := cmd.NewRootCommand(deps, ports, managed.Bridge{Host: host}).Execute()
 	var exit launch.ExitError
 	switch {
 	case errors.As(err, &exit):

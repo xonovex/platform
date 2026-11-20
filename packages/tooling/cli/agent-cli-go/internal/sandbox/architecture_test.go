@@ -24,6 +24,8 @@ package sandbox
 //   - TestNoHarnessIsNamedOutsideTheAgentRegistry — facts, not names: no
 //     production file of this module names a concrete agent type; the planner and
 //     the isolators compare the facts a harness declares.
+//   - TestCredentialValuesStayInsideSecret — a credential reaches code only
+//     through the Secret type that redacts itself.
 //   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
 //     name no concrete plugin, no OS adapter, no origin leaf, no overlay adapter,
 //     and (for launch) no cobra and no plugin store.
@@ -48,7 +50,7 @@ import (
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
 
 // axisNames are the orthogonal axes, each a directory of a shared core and leaves.
-var axisNames = []string{"isolation", "provision", "network", "workspace", "terminal"}
+var axisNames = []string{"isolation", "provision", "network", "workspace", "terminal", "credential"}
 
 // internalRoot returns the absolute path of the internal/ directory.
 func internalRoot(t *testing.T) string {
@@ -165,8 +167,9 @@ func TestSelectionLayerNamesNoVariant(t *testing.T) {
 	banned := map[string]bool{
 		"IsolationNone": true, "IsolationBwrap": true, "IsolationDocker": true,
 		"ProvisionNone": true, "ProvisionNix": true, "ProvisionCommand": true,
-		"NetworkHost": true, "NetworkNone": true, "NetworkProxy": true,
-		"ModeHost": true, "ModeNone": true, "ModeProxy": true,
+		"NetworkHost": true, "NetworkNone": true,
+		"ModeHost": true, "ModeNone": true, "ModeManaged": true, "NetworkManaged": true,
+		"IsolationSeatbelt": true, "IsolationDockerSandboxes": true, "IsolationOpenShell": true,
 	}
 	// The selection / policy gate (registry.go: Select + Capabilities + EnforcePolicy)
 	// must name no concrete variant; it gates on the Capabilities booleans only.
@@ -194,6 +197,15 @@ func TestConcreteConstructorsOnlyInPlugins(t *testing.T) {
 		modPath + "/internal/provision/none":    "New",
 		modPath + "/internal/provision/command": "New",
 		modPath + "/internal/provision/nix":     "New",
+
+		modPath + "/internal/isolation/seatbelt":        "NewIsolator",
+		modPath + "/internal/isolation/dockersandboxes": "NewIsolator",
+		modPath + "/internal/isolation/openshell":       "NewIsolator",
+		modPath + "/internal/credential/env":            "New",
+		modPath + "/internal/credential/file":           "New",
+		modPath + "/internal/credential/keychain":       "New",
+		modPath + "/internal/credential/secretservice":  "New",
+		modPath + "/internal/credential/pass":           "New",
 	}
 	pluginsFile := filepath.Join(root, "sandbox", "plugins", "plugins.go")
 
@@ -324,6 +336,15 @@ func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 		modPath + "/internal/isolation/none",
 		modPath + "/internal/isolation/bwrap",
 		modPath + "/internal/isolation/docker",
+		modPath + "/internal/isolation/seatbelt",
+		modPath + "/internal/isolation/dockersandboxes",
+		modPath + "/internal/isolation/openshell",
+		modPath + "/internal/network/managed",
+		modPath + "/internal/credential/env",
+		modPath + "/internal/credential/file",
+		modPath + "/internal/credential/keychain",
+		modPath + "/internal/credential/secretservice",
+		modPath + "/internal/credential/pass",
 		modPath + "/internal/provision/none",
 		modPath + "/internal/provision/command",
 		modPath + "/internal/provision/nix",
@@ -373,6 +394,32 @@ func TestNoHarnessIsNamedOutsideTheAgentRegistry(t *testing.T) {
 				pkg, ok := sel.X.(*ast.Ident)
 				if ok && pkg.Name == "types" && strings.HasPrefix(sel.Sel.Name, "Agent") && !agentTypeSurface[sel.Sel.Name] {
 					t.Errorf("%s names the concrete agent %s; compare the declared facts instead", file, sel.Sel.Name)
+				}
+				return true
+			})
+		}
+	}
+}
+
+// TestCredentialValuesStayInsideSecret locks the redaction boundary: the only
+// function that returns a credential as a plain string is Secret.Reveal and the
+// Reveal helper beside it, and no store leaf calls either, so a store can neither
+// print nor keep a plain value.
+func TestCredentialValuesStayInsideSecret(t *testing.T) {
+	root := internalRoot(t)
+	for leaf, dir := range leafDirs(t, filepath.Join(root, "credential")) {
+		if leaf == "shared" {
+			continue
+		}
+		for _, file := range productionFiles(t, dir) {
+			fset := token.NewFileSet()
+			f, err := parser.ParseFile(fset, file, nil, 0)
+			if err != nil {
+				t.Fatalf("parse %s: %v", file, err)
+			}
+			ast.Inspect(f, func(n ast.Node) bool {
+				if sel, ok := n.(*ast.SelectorExpr); ok && sel.Sel.Name == "Reveal" {
+					t.Errorf("%s calls Reveal; a store must hand the Secret on unrevealed", file)
 				}
 				return true
 			})

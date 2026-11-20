@@ -13,6 +13,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // Isolator confines the agent with bubblewrap namespaces and applies a
@@ -60,6 +61,10 @@ func (i *Isolator) KernelIsolated(_ string) bool { return false }
 
 // ConfinesNetwork reports true: bwrap unshares the network namespace.
 func (i *Isolator) ConfinesNetwork() bool { return true }
+
+// EgressTransport declares the unix socket: a managed run has no network
+// namespace interface, and reaches the allowlist proxy through a bound socket.
+func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportUnixSocket }
 
 // CheckAgent requires host passthrough, because deny-default bwrap exposes no
 // host tool, and then the agent executable on the PATH it passes through.
@@ -152,11 +157,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	}
 
 	// Network is applied explicitly through the network bridge.
-	netArgs, err := networkArgs(cfg.Network)
-	if err != nil {
-		return nil, err
-	}
-	args = append(args, netArgs...)
+	args = append(args, networkArgs(cfg.Network)...)
 
 	// Sandbox-local HOME: a tmpfs at the home path (no host-$HOME bind), with only
 	// the curated config paths bound back read-only.
@@ -214,12 +215,24 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, "--chdir", workDir)
 
 	// Agent command, wrapped with the provisioner's init commands.
-	args = append(args, "--")
 	agentCmd, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
 	if err != nil {
 		return nil, err
 	}
-	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
+	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
+	// Managed egress: bind the proxy socket directory and the bridge executable,
+	// and run the command under the bridge.
+	if cfg.Network == netshared.ModeManaged {
+		route, err := isoshared.ResolveBridge(i.host, cfg.Egress)
+		if err != nil {
+			return nil, err
+		}
+		socketDir, bridge := isoshared.BridgeMounts(route)
+		args = append(args, "--bind", socketDir, socketDir, "--ro-bind", bridge, bridge)
+		command = isoshared.WrapWithBridge(route, command)
+	}
+	args = append(args, "--")
+	args = append(args, command...)
 
 	return args, nil
 }
@@ -268,7 +281,7 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	customEnv, err := isoshared.RunEnv(cfg)
 	if err != nil {
 		return nil, err
 	}

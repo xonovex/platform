@@ -1,0 +1,167 @@
+// Package seatbelt is the isolation=seatbelt leaf: the agent runs on the host
+// under a macOS Seatbelt profile that denies file writes outside the workspace,
+// hides the home directory, and confines the network.
+package seatbelt
+
+import (
+	"fmt"
+	"path/filepath"
+
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+)
+
+// program is the macOS command that runs a process under a profile.
+const program = "sandbox-exec"
+
+// Isolator confines the agent with a Seatbelt profile. The agent keeps the host
+// tools and the host kernel, so the isolator hides neither: it limits what the
+// agent can write, what it can read in the home directory, and where it can
+// connect. A profile has no way to name the interfaces of a network namespace, so
+// a managed run reaches an allowlist proxy on the host loopback, and the profile
+// allows that one port.
+type Isolator struct {
+	host isoshared.Host
+	log  logging.Logger
+}
+
+// NewIsolator creates a seatbelt isolator over host, writing through log.
+func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+	return &Isolator{host: host, log: log}
+}
+
+// Available reports whether sandbox-exec is installed, which only macOS does.
+func (i *Isolator) Available() (bool, error) {
+	_, err := i.host.LookPath(program)
+	return err == nil, nil
+}
+
+// HidesHost reports false: the agent runs the host tools.
+func (i *Isolator) HidesHost(bool, string) bool { return false }
+
+// PinnedProvision mirrors the selected provisioner's immutability because the
+// agent runs from the host, with no image input.
+func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
+}
+
+// KernelIsolated reports false: a profile restricts a process of the host kernel.
+func (i *Isolator) KernelIsolated(string) bool { return false }
+
+// ConfinesNetwork reports true: the profile denies network operations.
+func (i *Isolator) ConfinesNetwork() bool { return true }
+
+// EgressTransport declares loopback: the profile allows only the loopback port of
+// the allowlist proxy.
+func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportLoopback }
+
+// CheckAgent requires the agent executable on the PATH of the host.
+func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
+	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {
+		return fmt.Errorf("agent executable %q is not available on host PATH: %w", cfg.Agent.Binary, err)
+	}
+	return nil
+}
+
+// Run executes the agent under the profile.
+func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
+	cmd, env, err := i.command(cfg, c)
+	if err != nil {
+		return 1, err
+	}
+	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.WorkDir, "Seatbelt sandbox")
+}
+
+// Command returns the sandbox-exec command (for display and terminal wrappers).
+func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	cmd, _, err := i.command(cfg, c)
+	return cmd, err
+}
+
+// TerminalCommand returns the command plus the environment used to launch it.
+func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
+	return i.command(cfg, c)
+}
+
+func (i *Isolator) command(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
+	spec, err := i.spec(cfg, c)
+	if err != nil {
+		return nil, nil, err
+	}
+	profile, err := renderProfile(spec)
+	if err != nil {
+		return nil, nil, err
+	}
+	agent, env, err := isoshared.HostExecution(i.host, cfg, c, true)
+	if err != nil {
+		return nil, nil, err
+	}
+	return append([]string{program, "-p", profile}, agent...), env, nil
+}
+
+// spec resolves every path the run names to its canonical form.
+func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (profileSpec, error) {
+	home, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
+	if err != nil {
+		return profileSpec{}, err
+	}
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
+	if err != nil {
+		return profileSpec{}, err
+	}
+	spec := profileSpec{Home: home, Network: cfg.Network, Writable: []string{workDir}, Readable: []string{workDir}}
+	if cfg.Network == netshared.ModeManaged {
+		if cfg.Egress.Transport != netshared.TransportLoopback {
+			return profileSpec{}, fmt.Errorf("managed egress under seatbelt needs the loopback transport, not %q", cfg.Egress.Transport)
+		}
+		if err := cfg.Egress.Validate(); err != nil {
+			return profileSpec{}, err
+		}
+		spec.ProxyAddress = cfg.Egress.Proxy
+	}
+	if cfg.RepoDir != "" {
+		repo, err := isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
+		if err != nil {
+			return profileSpec{}, err
+		}
+		spec.Readable = append(spec.Readable, repo)
+	}
+	// The agent keeps its login and its sessions in its configuration, so it reads
+	// and writes those places; the rest of the home directory stays hidden.
+	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
+		source, exists, err := isoshared.ResolveContainedOptionalPath(i.host, home, configPath, "user config path")
+		if err != nil {
+			return profileSpec{}, err
+		}
+		if exists {
+			spec.Writable = append(spec.Writable, source)
+			spec.Readable = append(spec.Readable, source)
+		}
+	}
+	for _, path := range c.RoBindPaths {
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "provisioned read-only bind")
+		if err != nil {
+			return profileSpec{}, err
+		}
+		spec.Readable = append(spec.Readable, resolved)
+	}
+	for _, path := range cfg.BindPaths {
+		resolved, err := isoshared.ResolveExistingPath(i.host, filepath.Clean(path), "read-write bind")
+		if err != nil {
+			return profileSpec{}, err
+		}
+		spec.Writable = append(spec.Writable, resolved)
+		spec.Readable = append(spec.Readable, resolved)
+	}
+	for _, path := range cfg.RoBindPaths {
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
+		if err != nil {
+			return profileSpec{}, err
+		}
+		spec.Readable = append(spec.Readable, resolved)
+	}
+	return spec, nil
+}

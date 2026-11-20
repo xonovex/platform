@@ -22,6 +22,9 @@ type fakeIsolator struct {
 	// sharesNetwork makes the double unable to confine the network; the zero
 	// value confines it.
 	sharesNetwork bool
+	// noTransport makes the double declare no egress transport; the zero value
+	// declares the unix socket.
+	noTransport bool
 }
 
 func (f fakeIsolator) Available() (bool, error)                                     { return f.available, nil }
@@ -37,7 +40,13 @@ func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPi
 }
 func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
 func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
-func (f fakeIsolator) ConfinesNetwork() bool           { return !f.sharesNetwork }
+func (f fakeIsolator) EgressTransport() netshared.Transport {
+	if f.noTransport {
+		return netshared.TransportNone
+	}
+	return netshared.TransportUnixSocket
+}
+func (f fakeIsolator) ConfinesNetwork() bool { return !f.sharesNetwork }
 func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error {
 	return nil
 }
@@ -137,6 +146,23 @@ func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
 	req.Network = netshared.ModeHost
 	if _, _, err := Select(reg, req, policy.SandboxPolicy{}); err != nil {
 		t.Fatalf("Select(network host, shared network) error = %v, want nil", err)
+	}
+}
+
+func TestSelect_ManagedEgressNeedsATransport(t *testing.T) {
+	req := bwrapNixReq()
+	req.Network = netshared.ModeManaged
+	noTransport := testRegistry(fakeIsolator{available: true, noTransport: true}, fakeProvisioner{})
+	if _, _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, netshared.ErrManagedEgressUnenforceable) {
+		t.Errorf("an isolator without a transport must refuse managed whatever the policy: %v", err)
+	}
+	withTransport := testRegistry(fakeIsolator{available: true}, fakeProvisioner{})
+	if _, _, err := Select(withTransport, req, policy.SandboxPolicy{RequireEgressRestricted: true}); err != nil {
+		t.Errorf("managed over a transport must satisfy RequireEgressRestricted: %v", err)
+	}
+	sharing := testRegistry(fakeIsolator{available: true, sharesNetwork: true}, fakeProvisioner{})
+	if _, _, err := Select(sharing, req, policy.SandboxPolicy{}); err == nil {
+		t.Error("an isolator that cannot confine the network must refuse managed")
 	}
 }
 

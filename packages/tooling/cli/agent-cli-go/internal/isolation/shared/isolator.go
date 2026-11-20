@@ -24,6 +24,9 @@ type RunConfig struct {
 	// Network is the egress mode; the isolator emits its own network flags via its
 	// network.go bridge.
 	Network netshared.Mode
+	// Egress is the route of a managed run: the allowlist and, for a transport
+	// that runs a proxy, where to reach it. It is the zero value for any other mode.
+	Egress EgressRoute
 
 	// HostPassthrough is the bwrap knob: expose host tool dirs as a fallback.
 	HostPassthrough bool
@@ -35,6 +38,9 @@ type RunConfig struct {
 	BindPaths   []string
 	RoBindPaths []string
 	CustomEnv   []string
+	// Secrets are credential values resolved for this run. They reach the agent as
+	// environment variables only, never as an argument, a file or a log line.
+	Secrets map[string]string
 
 	Agent     *types.AgentConfig
 	Provider  *types.ModelProvider
@@ -70,6 +76,11 @@ type Isolator interface {
 	// ConfinesNetwork reports whether this isolator can apply a network mode
 	// other than host.
 	ConfinesNetwork() bool
+	// EgressTransport declares how this isolator forces a managed run through the
+	// allowlist, or TransportNone when it has no such route. Select refuses a
+	// managed run on an isolator that declares none, and a managed run satisfies
+	// the egress guarantee only through a declared transport.
+	EgressTransport() netshared.Transport
 	// CheckAgent reports an error when the base of this isolator, the host or
 	// the image, cannot supply the agent executable for cfg. It applies only
 	// when the provisioner supplies no tools.

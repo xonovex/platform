@@ -4,14 +4,8 @@ package none
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
-	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
@@ -49,6 +43,10 @@ func (i *Isolator) KernelIsolated(string) bool { return false }
 
 // ConfinesNetwork reports false: with no namespace, egress stays unrestricted.
 func (i *Isolator) ConfinesNetwork() bool { return false }
+
+// EgressTransport declares none: host execution has no boundary to route traffic
+// through an allowlist.
+func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportNone }
 
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
@@ -90,36 +88,5 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if _, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory"); err != nil {
 		return nil, nil, err
 	}
-	if _, err := agents.GetAgent(cfg.Agent.Type); err != nil {
-		return nil, nil, err
-	}
-	var providerCliArgs []string
-	if cfg.Provider != nil {
-		providerCliArgs = providers.GetProviderCliArgs(cfg.Provider)
-	}
-	agentEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
-	if err != nil {
-		return nil, nil, err
-	}
-	agentArgs := agents.BuildArgs(cfg.Agent, cfg.AgentArgs, types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs})
-
-	cmd := append([]string{cfg.Agent.Binary}, agentArgs...)
-	cmd = isoshared.WrapWithInitCommands(cmd, c.InitCommands)
-
-	customEnv, err := envutil.ParseCustomEnv(cfg.CustomEnv)
-	if err != nil {
-		return nil, nil, err
-	}
-	env := envutil.MergeEnvMaps(envutil.ParseEnv(i.host.Environ()), agentEnv, customEnv, c.Env)
-	// Prepend the contribution's tool dirs; host execution always exposes the
-	// host PATH (it cannot hide host tools), so HostPassthrough is implied.
-	if len(c.PathEntries) > 0 {
-		path := strings.Join(c.PathEntries, ":")
-		if host := i.host.Getenv("PATH"); host != "" {
-			path += ":" + host
-		}
-		env["PATH"] = path
-	}
-
-	return cmd, envutil.EnvMapToSlice(env), nil
+	return isoshared.HostExecution(i.host, cfg, c, false)
 }

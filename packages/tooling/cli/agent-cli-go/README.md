@@ -29,6 +29,9 @@ agent-cli run --isolation docker --provision nix --nix-source packages --nix-rev
 agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
 agent-cli run --isolation bwrap --provision nix --nix-source flake --nix-shell default
 
+# Reach only the hosts you name, and inject a credential from a store
+agent-cli run --isolation bwrap --network managed --allow-host api.anthropic.com --allow-host '*.example.com:8443' --credential ANTHROPIC_API_KEY=keychain:anthropic/work
+
 # Run with worktree
 agent-cli run --worktree-branch feature/my-feature
 
@@ -46,9 +49,12 @@ Use `run` to start an AI coding agent. Select the sandbox with the three indepen
 Options:
   -a, --agent <type>           Agent: claude, codex, copilot, kiro, opencode, pi (default: claude)
   -p, --provider <name>        Model provider for the agent
-  --isolation <method>         Isolation: none, bwrap, docker (default: none)
+  --isolation <method>         Isolation: none, bwrap, docker, seatbelt, docker-sandboxes, openshell (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
-  --network <method>           Network egress: host, none (default: host)
+  --network <method>           Network egress: host, none, managed (default: host)
+  --allow-host <host>          Host a managed run may reach: host, host:port or *.domain (repeatable; all others are denied)
+  --credential <binding>       Inject NAME=scheme:locator as an environment variable (repeatable)
+  --image <image>              Container image for docker and openshell
   --isolation-bwrap-passthrough
                                Expose host tools to bwrap (forfeits host-tools-unreachable)
   --init-command <cmd>         Init command for --provision command (repeatable)
@@ -70,6 +76,47 @@ Options:
   --store <dir>                Plugin store (default: $XDG_DATA_HOME/agent-cli/plugins)
   -n, --dry-run                Show configuration without executing
 ```
+
+### Isolations
+
+Each isolation declares what it can guarantee, and `--require-*` stops a run that needs more.
+
+| Isolation | Confines | Network `none` | Network `managed` | Notes |
+| --- | --- | --- | --- | --- |
+| `none` | nothing | no | no | Runs on the host. |
+| `bwrap` | Linux namespaces | yes | unix socket | Attack-surface reduction, not a kernel boundary. |
+| `docker` | container | yes | unix socket | `--isolation-docker-runtime runsc` adds a kernel boundary. |
+| `seatbelt` | macOS `sandbox-exec` profile | yes | loopback port | macOS only. Denies file writes outside the workspace and hides the home directory. |
+| `docker-sandboxes` | `sbx` sandbox | no | no | Runs the agent in its own sandbox image. Fails closed for `none` and `managed`, because `sbx` has deny rules only. |
+| `openshell` | OpenShell gateway sandbox | yes | policy | Needs `--image`. Uploads the work directory, downloads it after the run, and refuses credentials and binds. |
+
+### Managed network egress
+
+`--network managed` lets the agent reach only the hosts of `--allow-host` (or `allowHosts` in the configuration file) and denies every other host. The allowlist denies by default, and an empty one is an error. Rules are `host`, `host:port` and `*.domain[:port]`. A rule without a port allows 443.
+
+The run starts the allowlist proxy and stops it when the run ends. How traffic reaches the proxy depends on the isolation:
+
+- `bwrap` and `docker` give the sandbox no network. The sandbox runs this same binary as `agent-cli egress-bridge`, which listens on `127.0.0.1:3128` inside the sandbox and relays to a unix socket of the proxy. A direct socket has no interface to use.
+- `seatbelt` allows outbound connections only to the loopback port of the proxy.
+- `openshell` hands the gateway a policy that lists the allowed endpoints.
+
+The proxy refuses a host name that resolves to a loopback, private or link-local address, so an allowed name cannot reach a service of this machine. A rule that names an address allows that address.
+
+`--require-egress-restricted` passes for `managed` only on an isolation that forces the traffic through the allowlist. An isolation without a transport (`none`, `docker-sandboxes`) fails closed for `managed` whatever the policy.
+
+### Credentials
+
+`--credential NAME=scheme:locator` (or `credentials` in the configuration file) reads a credential when the run starts and passes it to the agent as the environment variable `NAME`. A value is never written to an argument, an overlay or a log, and a dry run shows only where it lives. A missing, unavailable or unreadable credential stops the run before the agent starts.
+
+| Scheme | Locator | Reads from |
+| --- | --- | --- |
+| `env` | variable name | An environment variable of the CLI. |
+| `file` | absolute path | A regular file that only its owner can read. |
+| `keychain` | `service` or `service/account` | The macOS keychain, through `security`. |
+| `secret-service` | `service` or `service/account` | A Linux secret service, through `secret-tool`. |
+| `pass` | entry name | The first line of a `pass` entry. |
+
+A terminal wrapper (`--terminal tmux`) installs the environment through a private launch script that deletes itself, so a credential reaches the terminal session through that script.
 
 ### Agents
 
@@ -142,7 +189,7 @@ agent-cli marketplace remove <name>
 
 ### completion
 
-Use `completion` to generate a completion script for the current shell.
+Use `completion` to generate a completion script for the current shell. It completes agents, providers, isolations, network modes and `--credential` schemes.
 
 ```bash
 # Bash
@@ -168,6 +215,11 @@ roBindPaths:
   - /home/user/reference
 customEnv:
   - FEATURE_FLAG=true
+allowHosts:
+  - api.anthropic.com
+  - '*.example.com:8443'
+credentials:
+  - ANTHROPIC_API_KEY=keychain:anthropic/work
 ```
 
 Load the file with `--config`.

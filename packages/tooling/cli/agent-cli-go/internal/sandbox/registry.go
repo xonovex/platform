@@ -103,7 +103,8 @@ type Request struct {
 // policy fail-closed. Registry membership is the validity check; the resolved
 // plugins declare their own capabilities, so the policy engine never names a
 // concrete isolator or provisioner. A network mode that needs confinement
-// fails for an isolator that cannot confine the network, whatever the policy.
+// fails for an isolator that cannot confine the network, and a managed run fails
+// for an isolator that declares no egress transport, whatever the policy.
 func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Isolator, provshared.Provisioner, error) {
 	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {
@@ -116,10 +117,14 @@ func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Iso
 	if netshared.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
 		return nil, nil, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
 	}
+	transport := iso.EgressTransport()
+	if err := netshared.CheckManaged(req.Network, transport); err != nil {
+		return nil, nil, fmt.Errorf("isolation=%s: %w", req.Isolation, err)
+	}
 	caps := policy.Capabilities{
 		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
 		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
-		EgressRestricted:     netshared.EgressIsRestricted(req.Network),
+		EgressRestricted:     netshared.EgressRestricted(req.Network, transport),
 		KernelIsolated:       iso.KernelIsolated(req.Runtime),
 	}
 	if err := policy.EnforcePolicy(caps, pol); err != nil {

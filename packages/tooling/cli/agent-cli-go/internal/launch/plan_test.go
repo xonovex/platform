@@ -212,13 +212,71 @@ func TestNewPlanSelectsThePinnedPairOnlyWithoutAnExplicitAxis(t *testing.T) {
 	}
 }
 
-func TestNewPlanFailsClosedOnTheProxyNetwork(t *testing.T) {
+func TestNewPlanRejectsTheRetiredProxyNetwork(t *testing.T) {
 	options := baseOptions()
 	options.Isolation = "bwrap"
 	options.Network = "proxy"
 
-	if _, err := plan(t, options, config.FileConfig{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
-		t.Fatalf("NewPlan() error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
+	var invalid *netshared.InvalidModeError
+	if _, err := plan(t, options, config.FileConfig{}); !errors.As(err, &invalid) {
+		t.Fatalf("NewPlan() error = %v, want an invalid network mode", err)
+	}
+}
+
+func TestNewPlanBuildsTheManagedRoute(t *testing.T) {
+	options := baseOptions()
+	options.Isolation = "bwrap"
+	options.Network = "managed"
+	options.AllowHosts = []string{"api.example.com"}
+	p := mustPlan(t, options, config.FileConfig{AllowHosts: []string{"*.cdn.example.com:8443"}})
+	if p.Run.Network != netshared.ModeManaged || p.Run.Egress.Transport != netshared.TransportUnixSocket {
+		t.Errorf("network, transport = %q, %q", p.Run.Network, p.Run.Egress.Transport)
+	}
+	if len(p.Allow.Rules()) != 2 || !p.Allow.Allows("api.example.com", 443) || !p.Allow.Allows("x.cdn.example.com", 8443) {
+		t.Errorf("allowlist = %v", p.Allow.Rules())
+	}
+}
+
+func TestNewPlanManagedNetworkFailsClosed(t *testing.T) {
+	options := baseOptions()
+	options.Isolation = "bwrap"
+	options.Network = "managed"
+	if _, err := plan(t, options, config.FileConfig{}); err == nil || !strings.Contains(err.Error(), "--allow-host") {
+		t.Errorf("managed without hosts error = %v, want a hint for --allow-host", err)
+	}
+	options.AllowHosts = []string{"https://api.example.com/path"}
+	if _, err := plan(t, options, config.FileConfig{}); err == nil {
+		t.Error("an allowed host with a scheme must fail")
+	}
+	options.AllowHosts = []string{"api.example.com"}
+	options.Isolation = "none"
+	if _, err := plan(t, options, config.FileConfig{}); err == nil || !strings.Contains(err.Error(), "cannot restrict network egress") {
+		t.Errorf("managed on an isolation without a transport error = %v", err)
+	}
+}
+
+func TestNewPlanRefusesAllowedHostsWithoutAManagedNetwork(t *testing.T) {
+	options := baseOptions()
+	options.AllowHosts = []string{"api.example.com"}
+	if _, err := plan(t, options, config.FileConfig{}); err == nil || !strings.Contains(err.Error(), "--network managed") {
+		t.Errorf("error = %v, want a --network managed hint", err)
+	}
+}
+
+func TestNewPlanParsesCredentialBindings(t *testing.T) {
+	options := baseOptions()
+	options.Credentials = []string{"API_KEY=env:SOURCE_KEY"}
+	p := mustPlan(t, options, config.FileConfig{Credentials: []string{"TOKEN=pass:work/token"}})
+	if len(p.Credentials) != 2 || p.Credentials[0].Name != "TOKEN" || p.Credentials[1].Scheme != "env" {
+		t.Errorf("credentials = %+v", p.Credentials)
+	}
+	options.Credentials = []string{"TOKEN=env:X"}
+	if _, err := plan(t, options, config.FileConfig{Credentials: []string{"TOKEN=pass:y"}}); err == nil {
+		t.Error("a variable bound by both the file and the flag must fail")
+	}
+	options.Credentials = []string{"not-a-binding"}
+	if _, err := plan(t, options, config.FileConfig{}); err == nil {
+		t.Error("an invalid binding must fail")
 	}
 }
 
