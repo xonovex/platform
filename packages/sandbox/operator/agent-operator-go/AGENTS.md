@@ -10,7 +10,7 @@ Accept execution through AgentRun resources and enforce namespace policy across 
 - Create a default-deny egress `NetworkPolicy` per run: `none` is DNS-only and `host` allows all. Reject `proxy` until a Cilium `toFQDNs`, Squid, or equivalent backend can enforce FQDN-aware policy without direct-socket bypass.
 - Unit: `go test ./...` (builders, resolvers, webhooks); integration: `go test -tags=integration ./test/integration/` (requires `KUBEBUILDER_ASSETS`); E2E: `go test -tags=e2e ./test/e2e/` (requires Docker, kind, kubectl)
 - E2E gVisor: `go test -tags=e2e_gvisor ./test/e2e-gvisor/` (downloads runsc, creates kind cluster)
-- E2E Kata: `go test -tags=e2e_kata ./test/e2e-kata/` (downloads Kata, requires `/dev/kvm`; VM isolation test skips in unprivileged kind — use a real cluster or `USE_EXISTING_CLUSTER=true`)
+- E2E Kata: `go test -tags=e2e_kata ./test/e2e-kata/` (downloads Kata, requires `/dev/kvm` and `/dev/vhost-vsock`; boots a real VM in the kind node, after it remounts the node's `/dev/shm` at 4G)
 - E2E CoCo: `go test -tags=e2e_coco ./test/e2e-coco/` (creates kind cluster with simulated kata-cc/kata-tdx RuntimeClasses; validates runtimeClassName propagation, harness defaults, full-cycle pipeline, workspace jobs)
 - `controller-gen` is broken with Go 1.25+: it generates `_.yaml` and omits subtype `DeepCopyInto` methods. Maintain CRDs and `zz_generated.deepcopy.go` manually until controller-tools supports Go 1.25+.
 - Image build: `docker build -f packages/sandbox/operator/agent-operator-go/Dockerfile -t ghcr.io/xonovex/agent-operator-go:latest .` or `npx moon run agent-operator-go:docker-build`; multi-arch publish: `npx moon run agent-operator-go-docker:docker-publish`
