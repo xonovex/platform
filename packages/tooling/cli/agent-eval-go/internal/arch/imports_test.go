@@ -97,9 +97,12 @@ var libraries = map[string][]string{
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
 		"shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
 	},
-	"internal/baseline":              {"shared-contract-go/pkg/fs"},
-	"internal/catalog":               {"shared-contract-go/pkg/fs"},
-	"internal/cmd":                   {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema"},
+	"internal/baseline": {"shared-contract-go/pkg/fs"},
+	"internal/catalog":  {"shared-contract-go/pkg/fs"},
+	"internal/cmd": {
+		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
+		"shared-contract-go/pkg/report",
+	},
 	"internal/cost":                  {"shared-contract-go/pkg/fs"},
 	"internal/document":              {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema", "shared-contract-go/pkg/schemas"},
 	"internal/execute":               {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process", "shared-core-go/pkg/scratch"},
@@ -110,6 +113,7 @@ var libraries = map[string][]string{
 	"internal/model":                 {"shared-contract-go/pkg/condition"},
 	"internal/protocol":              {"shared-contract-go/pkg/fs"},
 	"internal/protocol/protocoltest": {"shared-contract-go/pkg/fs/memfs", "shared-contract-go/pkg/wiring"},
+	"internal/report":                {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/report"},
 	"internal/store":                 {"shared-contract-go/pkg/fs"},
 }
 

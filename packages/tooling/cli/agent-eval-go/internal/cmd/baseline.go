@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/baseline"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 )
@@ -81,7 +82,7 @@ func newBaselineCommand(deps Dependencies) *cobra.Command {
 				return err
 			}
 			if cmp.Regressed() {
-				return ExitError{Code: 1}
+				return ExitError{Code: findings.ExitFindings}
 			}
 			return nil
 		},

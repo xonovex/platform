@@ -132,6 +132,9 @@ const (
 	// ExitUsage means the command could not run: a bad flag, an unreadable
 	// input or another infrastructure fault. A run that ends so has no verdict.
 	ExitUsage = 2
+	// ExitIncomplete means the run stopped at a limit, such as a spend budget,
+	// with work left. What it finished holds, and a later run resumes the rest.
+	ExitIncomplete = 3
 )
 
 // Policy sets the lowest level that makes a run fail.

@@ -7,6 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/budget"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cost"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
@@ -65,7 +67,7 @@ func (o *options) bind(c *cobra.Command) {
 	f.Float64Var(&o.threshold, "threshold", 0, "share of runs that must load the skill for a query to count as triggered")
 	f.Float64Var(&o.maxCostUSD, "max-cost-usd", 0, fmt.Sprintf("spend the invocation may reach in US dollars (default %.2f)", budget.DefaultMaxCostUSD))
 	f.StringVar(&o.resultsDir, "results-dir", DefaultResultsDir, "directory for run checkpoints")
-	f.StringVar(&o.format, "format", string(report.Text), "output format: text or json")
+	f.StringVar(&o.format, "format", string(contractreport.Text), "output format: "+contractreport.Names(report.Formats()...))
 	f.BoolVar(&o.resume, "resume", false, "continue the incomplete run with the same inputs")
 	f.BoolVar(&o.dryRun, "dry-run", false, "plan the work and run no model")
 	f.StringArrayVar(&o.pluginDirs, "plugin-dir", nil, "plugin package directory, or a directory of plugins (repeatable)")
@@ -98,9 +100,9 @@ func newProtocolCommands(deps Dependencies) []*cobra.Command {
 }
 
 func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *options, args []string) error {
-	format := report.Format(o.format)
-	if format != report.Text && format != report.JSON {
-		return fmt.Errorf("format must be text or json, got %q", o.format)
+	format, err := contractreport.Parse(o.format, report.Formats()...)
+	if err != nil {
+		return err
 	}
 	project, projectDir, err := deps.loadProject(o.project)
 	if err != nil {
@@ -154,7 +156,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 			return err
 		}
 	}
-	if code := report.ExitCode(rep); code != report.ExitPass {
+	if code := report.ExitCode(rep); code != findings.ExitClean {
 		return ExitError{Code: code}
 	}
 	return nil

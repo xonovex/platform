@@ -7,43 +7,33 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/run"
 )
 
-// Exit codes.
-const (
-	ExitPass       = 0
-	ExitFail       = 1
-	ExitInvalid    = 2
-	ExitIncomplete = 3
-)
-
-// Format selects the output form.
-type Format string
-
-// The formats.
-const (
-	Text Format = "text"
-	JSON Format = "json"
-)
+// Formats lists the output formats that Render writes.
+func Formats() []contractreport.Format {
+	return []contractreport.Format{contractreport.Text, contractreport.JSON}
+}
 
 // ExitCode maps a report to the process exit code. A dry run plans work and
 // passes.
 func ExitCode(r run.Report) int {
 	if r.Dry {
-		return ExitPass
+		return findings.ExitClean
 	}
 	switch r.Results.Status {
 	case model.Invalid:
-		return ExitInvalid
+		return findings.ExitUsage
 	case model.Incomplete:
-		return ExitIncomplete
+		return findings.ExitIncomplete
 	}
 	if r.Verdict.Pass {
-		return ExitPass
+		return findings.ExitClean
 	}
-	return ExitFail
+	return findings.ExitFindings
 }
 
 // Document is the JSON form of a report.
@@ -59,8 +49,8 @@ type Document struct {
 }
 
 // Render writes the report in the format.
-func Render(r run.Report, format Format) ([]byte, error) {
-	if format == JSON {
+func Render(r run.Report, format contractreport.Format) ([]byte, error) {
+	if format == contractreport.JSON {
 		doc := Document{
 			Results: r.Results, Verdict: r.Verdict.Lines, Planned: r.Planned, Pending: r.Pending,
 			ModelRuns: r.ModelRuns, Resumed: r.Resumed, Dry: r.Dry,

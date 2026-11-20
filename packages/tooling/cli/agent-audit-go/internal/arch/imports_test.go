@@ -77,7 +77,8 @@ var libraries = map[string][]string{
 	"internal/catalogs": {"shared-contract-go/pkg/discovery", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
 	"internal/cmd": {
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
-		"shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources", "shared-core-go/pkg/process",
+		"shared-contract-go/pkg/report", "shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources",
+		"shared-core-go/pkg/process",
 	},
 	"internal/compare": {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sources"},
 	"internal/compare/gitbase": {
@@ -87,7 +88,7 @@ var libraries = map[string][]string{
 	"internal/gitfs":                {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process"},
 	"internal/legacy":               {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources"},
 	"internal/observe":              {"shared-contract-go/pkg/sources"},
-	"internal/render":               {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sarif"},
+	"internal/render":               {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/report", "shared-contract-go/pkg/sarif"},
 	"internal/rules":                {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sources"},
 	"internal/stamp":                {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
 	"internal/transport/filesystem": {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},

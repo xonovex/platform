@@ -33,6 +33,7 @@ var allowed = map[string][]string{
 	"pkg/fs/osfs":           {"pkg/fs"},
 	"pkg/jsonschema":        {},
 	"pkg/jsonschema/tekuri": {"pkg/jsonschema"},
+	"pkg/report":            {},
 	"pkg/sarif":             {"pkg/findings"},
 	"pkg/schemas":           {},
 	"pkg/sources":           {"pkg/findings", "pkg/fs", "pkg/jsonschema", "pkg/schemas"},

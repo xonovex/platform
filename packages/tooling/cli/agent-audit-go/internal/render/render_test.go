@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/audit"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/render"
 )
@@ -22,15 +23,9 @@ func outcome() render.Outcome {
 	}
 }
 
-func TestParse(t *testing.T) {
-	for _, format := range render.Formats() {
-		got, err := render.Parse(string(format))
-		if err != nil || got != format {
-			t.Errorf("Parse(%s) = %s, %v", format, got, err)
-		}
-	}
-	if _, err := render.Parse("xml"); err == nil {
-		t.Error("an unknown format must be an error")
+func TestFormatsAreTextJSONAndSARIF(t *testing.T) {
+	if got := report.Names(render.Formats()...); got != "text, json or sarif" {
+		t.Fatalf("Formats = %q", got)
 	}
 }
 
@@ -43,7 +38,7 @@ func TestFindingsOrder(t *testing.T) {
 
 func TestTextHidesPassesAndSummarises(t *testing.T) {
 	var out bytes.Buffer
-	if err := render.Write(&out, render.Text, outcome(), "agent-audit", "1"); err != nil {
+	if err := render.Write(&out, report.Text, outcome(), "agent-audit", "1"); err != nil {
 		t.Fatal(err)
 	}
 	text := out.String()
@@ -61,7 +56,7 @@ func TestTextShowsTheFault(t *testing.T) {
 	var out bytes.Buffer
 	o := outcome()
 	o.Err = errors.New("disk gone")
-	if err := render.Write(&out, render.Text, o, "t", "1"); err != nil || !strings.Contains(out.String(), "error: disk gone") {
+	if err := render.Write(&out, report.Text, o, "t", "1"); err != nil || !strings.Contains(out.String(), "error: disk gone") {
 		t.Fatalf("out = %q, err = %v", out.String(), err)
 	}
 }
@@ -70,7 +65,7 @@ func TestJSON(t *testing.T) {
 	var out bytes.Buffer
 	o := outcome()
 	o.Err = errors.New("late")
-	if err := render.Write(&out, render.JSON, o, "t", "1"); err != nil {
+	if err := render.Write(&out, report.JSON, o, "t", "1"); err != nil {
 		t.Fatal(err)
 	}
 	var doc struct {
@@ -89,7 +84,7 @@ func TestJSON(t *testing.T) {
 
 func TestJSONOfNothingIsAnEmptyList(t *testing.T) {
 	var out bytes.Buffer
-	if err := render.Write(&out, render.JSON, render.Outcome{}, "t", "1"); err != nil || !strings.Contains(out.String(), `"catalogs": []`) {
+	if err := render.Write(&out, report.JSON, render.Outcome{}, "t", "1"); err != nil || !strings.Contains(out.String(), `"catalogs": []`) {
 		t.Fatalf("out = %q, err = %v", out.String(), err)
 	}
 }
@@ -98,7 +93,7 @@ func TestSARIF(t *testing.T) {
 	var out bytes.Buffer
 	o := outcome()
 	o.Err = errors.New("late")
-	if err := render.Write(&out, render.SARIF, o, "agent-audit", "9.9"); err != nil {
+	if err := render.Write(&out, report.SARIF, o, "agent-audit", "9.9"); err != nil {
 		t.Fatal(err)
 	}
 	for _, want := range []string{`"version": "2.1.0"`, `"name": "agent-audit"`, `audit.metadata-changed`, `audit.fault`} {
@@ -128,7 +123,7 @@ func TestWriteReportsAFailingWriter(t *testing.T) {
 	o := outcome()
 	o.Err = errors.New("x")
 	for after := 0; after < 4; after++ {
-		if err := render.Write(&failingWriter{after: after}, render.Text, o, "t", "1"); err == nil {
+		if err := render.Write(&failingWriter{after: after}, report.Text, o, "t", "1"); err == nil {
 			t.Errorf("text after %d writes: want an error", after)
 		}
 	}

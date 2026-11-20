@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 
@@ -25,7 +26,7 @@ func main() {
 	validator, err := wiring.NewValidator()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(2)
+		os.Exit(findings.ExitUsage)
 	}
 	deps := cmd.Dependencies{
 		Open:      open,

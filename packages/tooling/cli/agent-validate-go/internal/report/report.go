@@ -7,25 +7,13 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sarif"
 )
 
-// Format is an output format.
-type Format string
-
-// The formats.
-const (
-	Text  Format = "text"
-	SARIF Format = "sarif"
-)
-
-// ParseFormat reads a format name.
-func ParseFormat(name string) (Format, error) {
-	switch Format(name) {
-	case Text, SARIF:
-		return Format(name), nil
-	}
-	return "", fmt.Errorf("unknown format %q; use text or sarif", name)
+// Formats lists the output formats that Write renders.
+func Formats() []contractreport.Format {
+	return []contractreport.Format{contractreport.Text, contractreport.SARIF}
 }
 
 // Meta names the tool that produced the run.
@@ -37,8 +25,8 @@ type Meta struct {
 
 // Write renders the findings. A text report lists each finding that is not a
 // pass, then one summary line per check that ran.
-func Write(w io.Writer, format Format, meta Meta, ran []string, all []findings.Finding) error {
-	if format == SARIF {
+func Write(w io.Writer, format contractreport.Format, meta Meta, ran []string, all []findings.Finding) error {
+	if format == contractreport.SARIF {
 		return sarif.Write(w, sarif.Run{ToolName: meta.Tool, ToolVersion: meta.Version, InformationURI: meta.URI, Findings: all})
 	}
 	var b strings.Builder
@@ -62,8 +50,8 @@ func Write(w io.Writer, format Format, meta Meta, ran []string, all []findings.F
 // WriteFailure renders a run that did not finish. A SARIF log marks the run as
 // failed, so a consumer reads no verdict from it; a text report leaves the
 // message to the error stream.
-func WriteFailure(w io.Writer, format Format, meta Meta, cause error) error {
-	if format != SARIF {
+func WriteFailure(w io.Writer, format contractreport.Format, meta Meta, cause error) error {
+	if format != contractreport.SARIF {
 		return nil
 	}
 	return sarif.Write(w, sarif.Run{

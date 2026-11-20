@@ -140,7 +140,7 @@ func TestUsageAndInfrastructureFaults(t *testing.T) {
 		args []string
 		want string
 	}{
-		"format":        {&harness{}, []string{"--format", "xml"}, "unknown format"},
+		"format":        {&harness{}, []string{"--format", "xml"}, "unknown output format"},
 		"flag":          {&harness{}, []string{"--nope"}, "unknown flag"},
 		"open":          {&harness{openErr: boom}, nil, "boom"},
 		"unknown check": {&harness{checks: []check.Check{stub{name: "alpha"}}}, []string{"beta"}, "unknown check"},

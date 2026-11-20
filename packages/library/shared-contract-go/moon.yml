@@ -29,6 +29,7 @@ tasks:
         ./pkg/fs/osfs=exempt \
         ./pkg/jsonschema=exempt \
         ./pkg/jsonschema/tekuri=94 \
+        ./pkg/report=100 \
         ./pkg/sarif=100 \
         ./pkg/schemas=95 \
         ./pkg/sources=100 \

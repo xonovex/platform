@@ -8,32 +8,13 @@ import (
 	"io"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sarif"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/audit"
 )
 
-// Format names an output format.
-type Format string
-
-// Output formats.
-const (
-	Text  Format = "text"
-	JSON  Format = "json"
-	SARIF Format = "sarif"
-)
-
-// Formats lists the output formats.
-func Formats() []Format { return []Format{Text, JSON, SARIF} }
-
-// Parse returns the format a name stands for.
-func Parse(name string) (Format, error) {
-	for _, format := range Formats() {
-		if string(format) == name {
-			return format, nil
-		}
-	}
-	return "", fmt.Errorf("unknown output format %q: use text, json or sarif", name)
-}
+// Formats lists the output formats that Write writes.
+func Formats() []report.Format { return []report.Format{report.Text, report.JSON, report.SARIF} }
 
 // Outcome is everything an audit run produced, ready to be written.
 type Outcome struct {
@@ -56,11 +37,11 @@ func (o Outcome) Findings() []findings.Finding {
 
 // Write writes the outcome in the format. The tool name and version go into the
 // SARIF run.
-func Write(w io.Writer, format Format, outcome Outcome, tool, version string) error {
+func Write(w io.Writer, format report.Format, outcome Outcome, tool, version string) error {
 	switch format {
-	case JSON:
+	case report.JSON:
 		return writeJSON(w, outcome)
-	case SARIF:
+	case report.SARIF:
 		return writeSARIF(w, outcome, tool, version)
 	default:
 		return writeText(w, outcome)

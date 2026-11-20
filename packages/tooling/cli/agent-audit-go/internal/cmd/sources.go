@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/audit"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/catalogs"
@@ -69,7 +70,7 @@ Exit status: 0 when nothing reaches the failing level, 1 when a finding does,
 	f.StringVar(&flags.match, "match", "", "limit --mark-reviewed to the sources whose title contains this text")
 	f.StringVar(&flags.base, "base", "", "compare each catalog with the catalog at this git ref")
 	f.StringVar(&flags.coverDir, "cover-dir", defaultCoverDir, "directory whose Markdown files each need a source, empty to turn the check off")
-	f.StringVar(&flags.format, "format", string(render.Text), "output format: text, json or sarif")
+	f.StringVar(&flags.format, "format", string(report.Text), "output format: "+report.Names(render.Formats()...))
 	f.BoolVar(&flags.json, "json", false, "write JSON, the same as --format json")
 	f.BoolVar(&flags.strict, "strict", false, "fail on a warning as well")
 	return command
@@ -98,11 +99,11 @@ func runSources(ctx context.Context, deps Dependencies, flags sourcesFlags, root
 	return nil
 }
 
-func outputFormat(flags sourcesFlags) (render.Format, error) {
+func outputFormat(flags sourcesFlags) (report.Format, error) {
 	if flags.json {
-		return render.JSON, nil
+		return report.JSON, nil
 	}
-	return render.Parse(flags.format)
+	return report.Parse(flags.format, render.Formats()...)
 }
 
 // collect audits every catalog below the roots. A fault stops the run and goes

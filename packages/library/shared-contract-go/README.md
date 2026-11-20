@@ -9,6 +9,7 @@ Import the package that owns the concern.
 | Package | Description |
 | --- | --- |
 | `pkg/findings` | Finding model with the levels pass, warn, drift and fail, summaries and exit codes |
+| `pkg/report` | Output formats text, JSON and SARIF, and the parser of a format flag |
 | `pkg/sarif` | SARIF 2.1.0 writer with execution notifications |
 | `pkg/fs` | File-system port |
 | `pkg/fs/memfs` | In-memory file system for unit tests |

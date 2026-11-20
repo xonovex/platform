@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/protocol"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/report"
@@ -27,11 +29,11 @@ func TestExitCodes(t *testing.T) {
 		r    run.Report
 		want int
 	}{
-		"pass":       {rep(model.Complete, true), report.ExitPass},
-		"fail":       {rep(model.Complete, false), report.ExitFail},
-		"invalid":    {rep(model.Invalid, false), report.ExitInvalid},
-		"incomplete": {rep(model.Incomplete, false), report.ExitIncomplete},
-		"dry":        {run.Report{Dry: true}, report.ExitPass},
+		"pass":       {rep(model.Complete, true), findings.ExitClean},
+		"fail":       {rep(model.Complete, false), findings.ExitFindings},
+		"invalid":    {rep(model.Invalid, false), findings.ExitUsage},
+		"incomplete": {rep(model.Incomplete, false), findings.ExitIncomplete},
+		"dry":        {run.Report{Dry: true}, findings.ExitClean},
 	} {
 		if got := report.ExitCode(tc.r); got != tc.want {
 			t.Errorf("%s: %d", name, got)
@@ -40,7 +42,7 @@ func TestExitCodes(t *testing.T) {
 }
 
 func text(t *testing.T, r run.Report) string {
-	out, err := report.Render(r, report.Text)
+	out, err := report.Render(r, contractreport.Text)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,16 +71,22 @@ func TestTextForEachStatus(t *testing.T) {
 }
 
 func TestJSON(t *testing.T) {
-	out, err := report.Render(rep(model.Complete, true), report.JSON)
+	out, err := report.Render(rep(model.Complete, true), contractreport.JSON)
 	if err != nil || !strings.Contains(string(out), `"pass": true`) || !strings.Contains(string(out), `"modelRuns": 6`) {
 		t.Fatalf("%v %s", err, out)
 	}
-	partial, _ := report.Render(rep(model.Incomplete, false), report.JSON)
+	partial, _ := report.Render(rep(model.Incomplete, false), contractreport.JSON)
 	if strings.Contains(string(partial), `"pass"`) {
 		t.Fatal("an incomplete run has no pass member")
 	}
-	dry, _ := report.Render(run.Report{Dry: true}, report.JSON)
+	dry, _ := report.Render(run.Report{Dry: true}, contractreport.JSON)
 	if strings.Contains(string(dry), `"pass"`) || !strings.Contains(string(dry), `"dry": true`) {
 		t.Fatalf("%s", dry)
+	}
+}
+
+func TestFormatsAreTextAndJSON(t *testing.T) {
+	if got := contractreport.Names(report.Formats()...); got != "text or json" {
+		t.Fatalf("Formats = %q", got)
 	}
 }

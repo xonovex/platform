@@ -14,6 +14,7 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
+	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/project"
@@ -104,7 +105,7 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return ExitError{Code: findings.ExitUsage, Err: err} })
 	root.PersistentFlags().StringVar(&f.root, "root", ".", "repository root to validate")
 	root.Flags().StringVar(&f.project, "project", project.File, "project file, relative to the root")
-	root.Flags().StringVar(&f.format, "format", string(report.Text), "output format: text or sarif")
+	root.Flags().StringVar(&f.format, "format", string(contractreport.Text), "output format: "+contractreport.Names(report.Formats()...))
 	root.Flags().BoolVar(&f.strict, "strict", false, "fail on warnings too")
 	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the project file, repeatable")
 	root.AddCommand(listCommand(d))
@@ -115,7 +116,7 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 func usage(err error) error { return ExitError{Code: findings.ExitUsage, Err: err} }
 
 func run(cmd *cobra.Command, d Dependencies, f flags, names []string) error {
-	format, err := report.ParseFormat(f.format)
+	format, err := contractreport.Parse(f.format, report.Formats()...)
 	if err != nil {
 		return usage(err)
 	}
