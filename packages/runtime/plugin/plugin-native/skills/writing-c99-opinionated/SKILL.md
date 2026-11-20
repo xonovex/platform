@@ -1,6 +1,6 @@
 ---
 name: writing-c99-opinionated
-description: "Use when writing or editing systems or embedded C99 libraries with no hidden allocation, caller-provided buffers, and handle indices. Triggers on `.c`/`.h` files named `*_type.h`, `*_impl.h`, `*_soa.h` or `*_simde.h`, scalar/AoS/SoA/SIMD variants with parity tests, alignment macros, headers that include no headers, opaque handles, function-pointer plugin registries, hot-reloadable modules, and a C API for Lua, C#, Python or Rust FFI bindings, even when the user doesn't say 'opinionated'."
+description: "Use when writing or editing systems or embedded C99 libraries with no hidden allocation, caller-provided buffers, and handle indices. Triggers on file naming that looks inconsistent, `.c`/`.h` files named `*_type.h`, `*_impl.h`, `*_soa.h` or `*_simde.h`, scalar/AoS/SoA/SIMD variants with parity tests, alignment macros, headers that include no headers, opaque handles, function-pointer plugin registries, hot-reloadable modules, and a C API for Lua, C#, Python or Rust FFI bindings, even when the user doesn't say 'opinionated'."
 ---
 
 # C99 Opinionated Guidelines (Systems/Game/Embedded)
