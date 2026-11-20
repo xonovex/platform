@@ -1,3 +1,4 @@
+import {resolve} from "node:path";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {Output} from "@xonovex/script-moon-common/output";
 import {catalogDocuments, scanCatalog} from "./catalog-scan.js";
@@ -35,11 +36,13 @@ export const main = (
     return 0;
   }
 
-  // The root stays as given. A relative root leaves the source paths relative
-  // while link targets resolve to absolute paths, so every relative link counts
-  // as crossing a package boundary; the composition-check task passes "." and
-  // so checks every relative link of the catalog.
-  const repoRoot = argv.find((arg) => !arg.startsWith("-")) ?? cwd;
+  // Resolve the root against the working directory: source paths and link
+  // targets must both be absolute, or every relative link reads as one that
+  // crosses a package boundary.
+  const repoRoot = resolve(
+    cwd,
+    argv.find((arg) => !arg.startsWith("-")) ?? ".",
+  );
   const snapshot = scanCatalog(repoRoot, fs);
   const documents = catalogDocuments(snapshot);
   const report = renderLinkReport([

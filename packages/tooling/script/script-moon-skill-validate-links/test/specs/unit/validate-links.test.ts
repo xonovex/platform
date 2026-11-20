@@ -61,4 +61,20 @@ describe("moon-skill-validate-links", () => {
       ],
     });
   });
+
+  it("resolves a relative root against the working directory", () => {
+    const fs = makeRepo({
+      ...plugin(
+        "x",
+        [],
+        "# X\nSee [r](../../../../../../README.md) and [l](./local.md).\n",
+      ),
+      "README.md": "# Root\n",
+      "packages/runtime/plugin/plugin-x/skills/using-x/local.md": "# Local\n",
+    });
+
+    expect(run(["."], fs).lines[0]).toBe(
+      "[PASS] cross-package links: 1/1 link(s) resolve",
+    );
+  });
 });
