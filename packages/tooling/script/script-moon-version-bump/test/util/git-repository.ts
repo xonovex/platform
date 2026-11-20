@@ -2,8 +2,16 @@ import {execFileSync} from "node:child_process";
 import {mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
+import {processExecutableResolver} from "@xonovex/script-moon-common/adapters/executable-node";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {afterEach} from "vitest";
+
+/** Resolves a command on the PATH of the test process, as the entry point does. */
+export const resolveExecutable = processExecutableResolver(nodeFileSystem);
+
+/** Opens a repository through the git adapter the entry point composes. */
+export const openGitRepository = nodeGitRepository(resolveExecutable);
 
 const gitExecutable = resolveExecutable("git");
 

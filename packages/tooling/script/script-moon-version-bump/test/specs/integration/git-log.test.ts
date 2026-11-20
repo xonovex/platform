@@ -1,6 +1,5 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
-import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {describe, expect, it} from "vitest";
 import {
   findChangelogRange,
@@ -8,7 +7,11 @@ import {
   isIncludedType,
   parseConventionalCommit,
 } from "../../../src/git-log.js";
-import {commitAll, gitRepositories} from "../../util/git-repository.js";
+import {
+  commitAll,
+  gitRepositories,
+  openGitRepository,
+} from "../../util/git-repository.js";
 
 const repository = gitRepositories();
 
@@ -86,7 +89,7 @@ describe("git history", () => {
       findChangelogRange(
         "packages/example",
         "2.0.0",
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toEqual({
       since: previousVersionCommit,
@@ -104,7 +107,7 @@ describe("git history", () => {
       findChangelogRange(
         "packages/example",
         "1.0.0",
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toEqual({
       since: `${introduction}~1`,
@@ -113,7 +116,7 @@ describe("git history", () => {
       findChangelogRange(
         "packages/missing",
         "1.0.0",
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toBeUndefined();
   });
@@ -127,7 +130,7 @@ describe("git history", () => {
       findChangelogRange(
         "packages/example",
         "1.0.0",
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toEqual({
       since: undefined,
@@ -136,7 +139,7 @@ describe("git history", () => {
       getCommitsSince(
         "packages/example",
         undefined,
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toMatchObject([{hash: introduction, author: "Test Author"}]);
   });
@@ -156,7 +159,7 @@ describe("git history", () => {
       getCommitsSince(
         "packages/example",
         initial,
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       ),
     ).toEqual([
       {
@@ -178,7 +181,7 @@ describe("git history", () => {
       getCommitsSince(
         "packages/example",
         initial,
-        nodeGitRepository(directory),
+        openGitRepository(directory),
       )[0],
     ).toMatchObject({
       messages: ["Plain message"],

@@ -1,7 +1,6 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {detectDepUpdates} from "../../../src/dep-updates.js";
@@ -9,6 +8,7 @@ import {getGitVersion} from "../../../src/git.js";
 import {
   commitAll,
   gitRepositories,
+  openGitRepository,
   temporaryDirectories,
 } from "../../util/git-repository.js";
 
@@ -47,13 +47,13 @@ describe("Git package history", () => {
       }),
     );
 
-    expect(getGitVersion(root, pkgPath, nodeGitRepository(root))).toBe("1.0.0");
+    expect(getGitVersion(root, pkgPath, openGitRepository(root))).toBe("1.0.0");
     expect(
       detectDepUpdates(
         root,
         pkgPath,
         readPkg(pkgPath, nodeFileSystem),
-        nodeGitRepository(root),
+        openGitRepository(root),
       ),
     ).toEqual([{name: "@xonovex/shared", version: "workspace:2.0.0"}]);
   });
@@ -69,14 +69,14 @@ describe("Git package history", () => {
     );
 
     expect(
-      getGitVersion(root, newPackagePath, nodeGitRepository(root)),
+      getGitVersion(root, newPackagePath, openGitRepository(root)),
     ).toBeUndefined();
     expect(
       detectDepUpdates(
         root,
         newPackagePath,
         readPkg(newPackagePath, nodeFileSystem),
-        nodeGitRepository(root),
+        openGitRepository(root),
       ),
     ).toEqual([]);
 
@@ -85,7 +85,7 @@ describe("Git package history", () => {
       getGitVersion(
         nonRepository,
         newPackagePath,
-        nodeGitRepository(nonRepository),
+        openGitRepository(nonRepository),
       ),
     ).toThrow();
   });

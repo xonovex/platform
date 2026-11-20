@@ -19,6 +19,9 @@ const executableExtensions = (
         .filter(Boolean)
     : [""];
 
+/** Returns the absolute path of a bare command name, or throws when none exists. */
+export type ExecutableResolver = (name: string) => string;
+
 export const findExecutable = (
   name: string,
   environment: ExecutableEnvironment,

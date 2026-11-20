@@ -3,11 +3,14 @@ import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {dirname, join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
-import {resolveExecutable} from "../../../../src/adapters/executable-node.js";
+import {processExecutableResolver} from "../../../../src/adapters/executable-node.js";
+import {nodeFileSystem} from "../../../../src/adapters/file-system-node.js";
 import {nodeGitRepository} from "../../../../src/adapters/git-node.js";
 
 // nodeGitRepository is the adapter onto a real git, so these cases run it against
 // a fresh repository whose history each case controls.
+const resolveExecutable = processExecutableResolver(nodeFileSystem);
+
 describe("nodeGitRepository", () => {
   let root: string;
 
@@ -39,7 +42,7 @@ describe("nodeGitRepository", () => {
 
   it("resolves a ref and fails for one that names no commit", () => {
     const first = commit("a.txt", "one", "feat: first");
-    const repository = nodeGitRepository(root);
+    const repository = nodeGitRepository(resolveExecutable)(root);
 
     expect(repository.resolveCommit("HEAD")).toBe(first);
     expect(() => repository.resolveCommit("not-a-ref")).toThrow();
@@ -48,7 +51,7 @@ describe("nodeGitRepository", () => {
   it("reads a file at a commit and reports one the commit lacks", () => {
     const first = commit("pkg/a.txt", "one", "feat: first");
     commit("pkg/a.txt", "two", "fix: second");
-    const repository = nodeGitRepository(root);
+    const repository = nodeGitRepository(resolveExecutable)(root);
 
     expect(repository.readFile(first, "pkg/a.txt")).toBe("one");
     expect(repository.readFile("HEAD", "pkg/a.txt")).toBe("two");
@@ -59,7 +62,7 @@ describe("nodeGitRepository", () => {
     const first = commit("pkg/a.txt", "one", "feat: first");
     commit("other.txt", "x", "chore: other");
     const third = commit("pkg/a.txt", "two", "fix: second\n\nBody.");
-    const repository = nodeGitRepository(root);
+    const repository = nodeGitRepository(resolveExecutable)(root);
 
     expect(repository.pathHistory("pkg/a.txt")).toEqual([third, first]);
     expect(repository.hasParent(first)).toBe(false);
@@ -74,7 +77,7 @@ describe("nodeGitRepository", () => {
 
   it("lists every tag and none in a repository without tags", () => {
     commit("a.txt", "one", "feat: first");
-    const repository = nodeGitRepository(root);
+    const repository = nodeGitRepository(resolveExecutable)(root);
 
     expect(repository.tags()).toEqual([]);
 
@@ -82,5 +85,20 @@ describe("nodeGitRepository", () => {
     git("tag", "tool-v0.2.0");
 
     expect(repository.tags()).toEqual(["tool-v0.1.0", "tool-v0.2.0"]);
+  });
+
+  it("runs the git that the injected resolver names", () => {
+    const first = commit("a.txt", "one", "feat: first");
+    const requested: string[] = [];
+    const repository = nodeGitRepository((name) => {
+      requested.push(name);
+      return resolveExecutable(name);
+    })(root);
+
+    expect(repository.resolveCommit("HEAD")).toBe(first);
+    expect(requested).toEqual(["git"]);
+    expect(() =>
+      nodeGitRepository(() => join(root, "no-such-git"))(root).tags(),
+    ).toThrow();
   });
 });

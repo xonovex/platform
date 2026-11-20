@@ -1,7 +1,6 @@
 import {mkdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
 import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
@@ -14,14 +13,16 @@ import {
 import {
   commitAll,
   gitRepositories,
+  openGitRepository,
+  resolveExecutable,
   temporaryDirectories,
 } from "../../util/git-repository.js";
 
 // The same adapters the entry point composes, so each case runs main over a real
 // repository and disk.
 const nodeDependencies: VersionBumpDependencies = {
-  openRepository: nodeGitRepository,
-  listProjects: queryMoonProjects,
+  openRepository: openGitRepository,
+  listProjects: queryMoonProjects(resolveExecutable),
   fs: nodeFileSystem,
   output: memoryOutput(),
   applyChanges: applyFileChangesOnDisk,

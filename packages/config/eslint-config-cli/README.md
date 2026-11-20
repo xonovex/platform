@@ -20,6 +20,18 @@ import {cliConfig} from "@xonovex/eslint-config-cli";
 export default cliConfig;
 ```
 
+### Ports and adapters
+
+Add `portsAndAdaptersConfig` in a package whose composition root is `src/index.ts` and whose adapters live in `src/adapters/`. A core module then imports no I/O built-in (only `node:path` and `parseArgs` from `node:util`), reads no `process` or `fetch`, and imports no adapter, and an adapter imports no other adapter.
+
+```javascript
+import cliConfig from "@xonovex/eslint-config-cli";
+import portsAndAdaptersConfig from "@xonovex/eslint-config-cli/ports-and-adapters";
+import {defineConfig} from "eslint/config";
+
+export default defineConfig(cliConfig, portsAndAdaptersConfig);
+```
+
 ## Features
 
 The configuration extends `@xonovex/eslint-config-base` with these command-line settings:

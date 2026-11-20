@@ -1,14 +1,18 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {describe, expect, it} from "vitest";
 import {
   planDependentUpdates,
   type DependentUpdateOptions,
 } from "../../../src/dependents-command.js";
-import {commitAll, git, gitRepositories} from "../../util/git-repository.js";
+import {
+  commitAll,
+  git,
+  gitRepositories,
+  openGitRepository,
+} from "../../util/git-repository.js";
 
 const repository = gitRepositories();
 
@@ -66,7 +70,7 @@ const dependentOptions = (
 ): DependentUpdateOptions => ({
   rootDir: root,
   packagePaths,
-  git: nodeGitRepository(root),
+  git: openGitRepository(root),
   fs: nodeFileSystem,
   output: memoryOutput(),
   packageName: "@xonovex/core",

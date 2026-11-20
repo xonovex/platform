@@ -2,7 +2,7 @@ import {execFileSync} from "node:child_process";
 import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
+import {processExecutableResolver} from "@xonovex/script-moon-common/adapters/executable-node";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
@@ -11,6 +11,8 @@ import {main} from "../../../src/version-detect.js";
 
 // Drives main through the real git and disk adapters against a fresh repository.
 // The project list stands in for moon, which needs a configured workspace.
+const resolveExecutable = processExecutableResolver(nodeFileSystem);
+
 describe("version detect", () => {
   let root: string;
 
@@ -47,7 +49,7 @@ describe("version detect", () => {
     const output = memoryOutput();
 
     const code = main(["--ref", "HEAD"], join(root, "packages"), {
-      openRepository: nodeGitRepository,
+      openRepository: nodeGitRepository(resolveExecutable),
       listProjects: () => [{id: "example", source: "packages/example"}],
       fs: nodeFileSystem,
       output,
@@ -60,7 +62,7 @@ describe("version detect", () => {
   it("fails for a ref that names no commit", () => {
     expect(() =>
       main(["--ref", "not-a-ref"], root, {
-        openRepository: nodeGitRepository,
+        openRepository: nodeGitRepository(resolveExecutable),
         listProjects: () => [],
         fs: nodeFileSystem,
         output: memoryOutput(),

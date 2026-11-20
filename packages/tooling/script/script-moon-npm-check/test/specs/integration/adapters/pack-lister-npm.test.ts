@@ -1,8 +1,14 @@
 import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {processExecutableResolver} from "@xonovex/script-moon-common/adapters/executable-node";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {afterEach, describe, expect, it} from "vitest";
 import {npmPackLister} from "../../../../src/adapters/pack-lister-npm.js";
+
+const listPackedFiles = npmPackLister(
+  processExecutableResolver(nodeFileSystem),
+);
 
 describe("npmPackLister", () => {
   const roots: string[] = [];
@@ -31,7 +37,7 @@ describe("npmPackLister", () => {
     writeFileSync(join(root, "dist", "index.js"), "export {};\n");
     writeFileSync(join(root, "unpacked.js"), "export {};\n");
 
-    expect([...npmPackLister(root)].toSorted()).toEqual([
+    expect([...listPackedFiles(root)].toSorted()).toEqual([
       "dist/index.js",
       "package.json",
     ]);
@@ -40,6 +46,6 @@ describe("npmPackLister", () => {
   it("fails with the npm error for a manifest npm cannot parse", () => {
     const root = packageRoot("{");
 
-    expect(() => npmPackLister(root)).toThrow("npm pack failed");
+    expect(() => listPackedFiles(root)).toThrow("npm pack failed");
   });
 });

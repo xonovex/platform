@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": ".",
+    "types": ["node"],
     "paths": {
       "@xonovex/eslint-config-base": ["../eslint-config-base/src/index.ts"],
       "@xonovex/eslint-config-base/*": ["../eslint-config-base/src/*"]

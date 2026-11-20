@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {processExecutableResolver} from "@xonovex/script-moon-common/adapters/executable-node";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {processOutput} from "@xonovex/script-moon-common/adapters/output-node";
 import {errorLine} from "@xonovex/script-moon-common/logging";
@@ -8,7 +9,7 @@ import {main} from "./npm-check.js";
 try {
   process.exitCode = main(process.argv.slice(2), process.cwd(), {
     fs: nodeFileSystem,
-    listPackedFiles: npmPackLister,
+    listPackedFiles: npmPackLister(processExecutableResolver(nodeFileSystem)),
     output: processOutput,
   });
 } catch (error: unknown) {
