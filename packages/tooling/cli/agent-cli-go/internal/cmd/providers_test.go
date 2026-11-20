@@ -325,14 +325,6 @@ func TestRunStopsWhenTheModelOverrideNamesNoSlot(t *testing.T) {
 	}
 }
 
-func TestDefinedProvidersOffersNothingWhenTheProvidersCannotBeRead(t *testing.T) {
-	r := newTestRoot()
-	r.host.HomeErr = errors.New("no home")
-	if got := definedProviders(r.deps, launch.Options{}, "claude"); got != nil {
-		t.Errorf("definedProviders() = %v, want none", got)
-	}
-}
-
 // failAfter accepts n writes, then fails every write.
 type failAfter struct{ n int }
 

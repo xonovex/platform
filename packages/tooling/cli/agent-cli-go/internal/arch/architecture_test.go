@@ -24,6 +24,11 @@
 //   - TestApplicationCoreNamesNoAdapter: the launch core and the cobra adapter
 //     name no concrete plugin, no OS adapter, no origin leaf and no overlay
 //     adapter.
+//   - TestCommandLayerUsesOnlyItsEntryPoints: the cobra adapter reaches the
+//     application through the launch and plugin entry points, and names of
+//     any other package only what it prints or parses.
+//   - TestCommandLayerReachesNoPort: the cobra adapter selects no port of the
+//     dependencies it hands to the core; it prints to their Out only.
 //
 // The origin axis (internal/origin) has its own fitness tests beside it, and
 // shared-launch-go holds the tests of its isolation, provision, egress and
@@ -419,5 +424,173 @@ func TestNoHarnessIsNamedOutsideTheAgentRegistry(t *testing.T) {
 				return true
 			})
 		}
+	}
+}
+
+// commandModule is the import path prefix of the packages of this module.
+const commandModule = modPath + "/internal/"
+
+// commandImports lists, for each non-standard package internal/cmd may import,
+// the identifiers it may name of it; nil allows every identifier. The cobra
+// layer is a driving adapter: a rule that decides (a default, a selection, a
+// path, an approval) belongs to the application core, which the adapter reaches
+// through launch and plugin. Any other package is allowed only for what the
+// adapter prints or parses, so naming a deciding identifier of it, such as
+// trust.Decide or a runconfig function, fails here.
+var commandImports = map[string]map[string]bool{
+	"github.com/spf13/cobra": nil,
+	commandModule + "launch": nil,
+	commandModule + "plugin": nil,
+	// The name of the approval flag is shared by every command that approves.
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust": {"ApproveFlag": true},
+	// The sources of `config show --sources` are rendered by the library.
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/explain": {"Render": true},
+	// The runs commands print a record and its JSON form.
+	launchLibrary + "/pkg/record": {"Record": true, "Marshal": true},
+	// The schema command prints the contract documents verbatim, by name.
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas": nil,
+}
+
+// isStandard reports whether path names a package of the standard library,
+// whose first element has no dot.
+func isStandard(path string) bool {
+	return !strings.Contains(topSegment(path), ".")
+}
+
+func TestCommandLayerUsesOnlyItsEntryPoints(t *testing.T) {
+	dir := filepath.Join(internalRoot(t), "cmd")
+	fset := token.NewFileSet()
+	for _, file := range productionFiles(t, dir) {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		names := map[string]string{}
+		for _, im := range f.Imports {
+			path, _ := strconv.Unquote(im.Path.Value)
+			if isStandard(path) {
+				continue
+			}
+			if _, ok := commandImports[path]; !ok {
+				t.Errorf("%s imports %s; reach the application through launch or plugin", file, path)
+				continue
+			}
+			name := filepath.Base(path)
+			if im.Name != nil {
+				name = im.Name.Name
+			}
+			names[name] = path
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			sel, ok := n.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			pkg, ok := sel.X.(*ast.Ident)
+			if !ok {
+				return true
+			}
+			path, imported := names[pkg.Name]
+			if allowed := commandImports[path]; imported && allowed != nil && !allowed[sel.Sel.Name] {
+				t.Errorf("%s names %s.%s; that rule belongs to the application core", file, pkg.Name, sel.Sel.Name)
+			}
+			return true
+		})
+	}
+}
+
+// commandDependencies are the types that carry the ports the cobra adapter
+// hands to the core, by package name and type name.
+var commandDependencies = map[string]string{"launch": "Dependencies", "plugin": "Manager"}
+
+// dependencyNames returns the names that f declares, as a parameter, a result,
+// a struct field or a variable, with a type of commandDependencies.
+func dependencyNames(f *ast.File) map[string]bool {
+	names := map[string]bool{}
+	isDependencies := func(expr ast.Expr) bool {
+		sel, ok := expr.(*ast.SelectorExpr)
+		if !ok {
+			return false
+		}
+		pkg, ok := sel.X.(*ast.Ident)
+		return ok && commandDependencies[pkg.Name] == sel.Sel.Name
+	}
+	ast.Inspect(f, func(n ast.Node) bool {
+		switch node := n.(type) {
+		case *ast.Field:
+			if isDependencies(node.Type) {
+				for _, name := range node.Names {
+					names[name.Name] = true
+				}
+			}
+		case *ast.ValueSpec:
+			if isDependencies(node.Type) {
+				for _, name := range node.Names {
+					names[name.Name] = true
+				}
+			}
+		}
+		return true
+	})
+	return names
+}
+
+// portFields returns the fields of every type of commandDependencies except
+// Out, read from the source of its package.
+func portFields(t *testing.T) map[string]bool {
+	t.Helper()
+	fields := map[string]bool{}
+	fset := token.NewFileSet()
+	for pkg, typeName := range commandDependencies {
+		found := false
+		for _, file := range productionFiles(t, filepath.Join(internalRoot(t), pkg)) {
+			f, err := parser.ParseFile(fset, file, nil, 0)
+			if err != nil {
+				t.Fatalf("parse %s: %v", file, err)
+			}
+			ast.Inspect(f, func(n ast.Node) bool {
+				spec, ok := n.(*ast.TypeSpec)
+				if !ok || spec.Name.Name != typeName {
+					return true
+				}
+				found = true
+				for _, field := range spec.Type.(*ast.StructType).Fields.List {
+					for _, name := range field.Names {
+						fields[name.Name] = name.Name != "Out"
+					}
+				}
+				return false
+			})
+		}
+		if !found {
+			t.Errorf("package %s declares no type %s", pkg, typeName)
+		}
+	}
+	return fields
+}
+
+// TestCommandLayerReachesNoPort lets a command call the methods of the values
+// that carry the ports and print to their Out, and select no other field. A
+// command that selects a port, such as the host, a registry or a store, reads
+// the machine or a plugin set itself and so decides what the core decides.
+func TestCommandLayerReachesNoPort(t *testing.T) {
+	ports := portFields(t)
+	fset := token.NewFileSet()
+	for _, file := range productionFiles(t, filepath.Join(internalRoot(t), "cmd")) {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		carriers := dependencyNames(f)
+		ast.Inspect(f, func(n ast.Node) bool {
+			sel, ok := n.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			if x, ok := sel.X.(*ast.Ident); ok && carriers[x.Name] && ports[sel.Sel.Name] {
+				t.Errorf("%s selects %s.%s; pass the dependencies to the core", file, x.Name, sel.Sel.Name)
+			}
+			return true
+		})
 	}
 }

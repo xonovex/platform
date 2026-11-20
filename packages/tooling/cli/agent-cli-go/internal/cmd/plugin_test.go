@@ -204,7 +204,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 			if host.relative {
 				args = append(append([]string{}, args...), "--store", "s")
 			}
-			root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard}, RecordPorts{}, &recordingBridge{})
+			root := NewRootCommand(newTestRoot().deps, plugin.Manager{Host: host, Out: io.Discard}, RecordPorts{}, &recordingBridge{})
 			root.SetArgs(args)
 			root.SetOut(io.Discard)
 			root.SetErr(io.Discard)
@@ -215,7 +215,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 	}
 	// A relative store needs no home directory.
 	host := brokenHost{Fake: oshosttest.New(), home: true}
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard}, RecordPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{Host: host, Out: io.Discard}, RecordPorts{}, &recordingBridge{})
 	root.SetArgs([]string{"plugin", "list", "--store", "s"})
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)

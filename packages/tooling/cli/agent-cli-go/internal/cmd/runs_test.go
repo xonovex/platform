@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 )
 
 type fakeRecords struct {
@@ -42,10 +44,10 @@ func sampleRecords() []record.Record {
 	}
 }
 
-func runs(t *testing.T, records RecordReader, args ...string) (string, error) {
+func runs(t *testing.T, records launch.RecordReader, args ...string) (string, error) {
 	t.Helper()
 	var out bytes.Buffer
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{Records: records, Out: &out}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{}, RecordPorts{Records: records, Out: &out}, &recordingBridge{})
 	root.SetArgs(append([]string{"runs"}, args...))
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)
@@ -151,7 +153,7 @@ func TestRunsReportsAFailureToWrite(t *testing.T) {
 
 func TestCompletionOffersTheRunIDs(t *testing.T) {
 	var out bytes.Buffer
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{Records: fakeRecords{records: sampleRecords()}, Out: io.Discard}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{}, RecordPorts{Records: fakeRecords{records: sampleRecords()}, Out: io.Discard}, &recordingBridge{})
 	root.SetOut(&out)
 	root.SetErr(io.Discard)
 	root.SetArgs([]string{"__complete", "runs", "show", ""})

@@ -8,7 +8,6 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/explain"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // newConfigCommand builds `agent-cli config`.
@@ -37,20 +36,15 @@ func newConfigShowCommand(deps launch.Dependencies) *cobra.Command {
 		Short: "Print the merged run and providers sections",
 		Args:  cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			loaded, err := launch.LoadConfig(deps, options)
+			view, err := launch.ShowConfig(deps, options)
 			if err != nil {
 				return err
 			}
-			merged := loaded.Resolved.Merged()
 			if sources {
-				return explain.Render(deps.Out, merged)
-			}
-			sections := map[string]json.RawMessage{}
-			for _, section := range runconfig.Sections() {
-				sections[section.Name] = merged.Section(section.Name)
+				return explain.Render(deps.Out, view.Merged)
 			}
 			// The merged sections are valid JSON, which always encodes.
-			data, _ := json.Marshal(sections)
+			data, _ := json.Marshal(view.Sections)
 			var out bytes.Buffer
 			_ = json.Indent(&out, data, "", "  ")
 			out.WriteByte('\n')

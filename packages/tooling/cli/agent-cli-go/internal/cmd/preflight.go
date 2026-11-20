@@ -29,7 +29,7 @@ func (e UsageError) Unwrap() error { return e.Err }
 // describe, as `run` would, and reports whether the run could start, without
 // starting it.
 func newPreflightCommand(deps launch.Dependencies) *cobra.Command {
-	options := defaultOptions()
+	options := launch.DefaultOptions()
 	var asJSON bool
 	cmd := &cobra.Command{
 		Use:   "preflight",
@@ -46,7 +46,7 @@ Exit code 0 means the run could start, 1 means it could not, 2 means the command
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			run := options
 			run.Verbose, _ = cmd.Flags().GetBool("verbose")
-			run.Explicit = chosenKeys(cmd)
+			run.Explicit = launch.ExplicitKeys(cmd.Flags().Changed)
 			report := launch.Preflight(deps, run)
 			if err := writeReport(deps.Out, report, asJSON); err != nil {
 				return err

@@ -9,21 +9,13 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 )
-
-// latest is the id that names the newest run.
-const latest = "latest"
-
-// RecordReader is the port the runs commands read run records through.
-type RecordReader interface {
-	List() ([]record.Record, error)
-	Read(id string) (record.Record, error)
-}
 
 // RecordPorts are the ports of the runs command.
 type RecordPorts struct {
 	// Records is nil for a build or a machine that keeps no run records.
-	Records RecordReader
+	Records launch.RecordReader
 	// Out receives the result of each command.
 	Out io.Writer
 }
@@ -40,10 +32,7 @@ func newRunsCommand(ports RecordPorts) *cobra.Command {
 		Short: "List the run records, newest first",
 		Args:  cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			if ports.Records == nil {
-				return errors.New("this build keeps no run records")
-			}
-			records, err := ports.Records.List()
+			records, err := launch.ListRuns(ports.Records)
 			if err != nil {
 				return err
 			}
@@ -51,26 +40,17 @@ func newRunsCommand(ports RecordPorts) *cobra.Command {
 		},
 	}
 	show := &cobra.Command{
-		Use:   "show <id|latest>",
+		Use:   "show <id|" + launch.LatestRun + ">",
 		Short: "Show one run record",
 		Args:  cobra.ExactArgs(1),
 		ValidArgsFunction: func(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
-			if len(args) > 0 || ports.Records == nil {
+			if len(args) > 0 {
 				return nil, cobra.ShellCompDirectiveNoFileComp
 			}
-			ids := []string{latest}
-			if records, err := ports.Records.List(); err == nil {
-				for _, r := range records {
-					ids = append(ids, r.ID)
-				}
-			}
-			return ids, cobra.ShellCompDirectiveNoFileComp
+			return launch.RunIDs(ports.Records), cobra.ShellCompDirectiveNoFileComp
 		},
 		RunE: func(_ *cobra.Command, args []string) error {
-			if ports.Records == nil {
-				return errors.New("this build keeps no run records")
-			}
-			found, err := readRun(ports.Records, args[0])
+			found, err := launch.ReadRun(ports.Records, args[0])
 			if err != nil {
 				return err
 			}
@@ -81,21 +61,6 @@ func newRunsCommand(ports RecordPorts) *cobra.Command {
 	show.Flags().BoolVar(&asJSON, "json", false, "Print the record as JSON")
 	runs.AddCommand(list, show)
 	return runs
-}
-
-// readRun reads the record the id names, or the newest one for "latest".
-func readRun(records RecordReader, id string) (record.Record, error) {
-	if id != latest {
-		return records.Read(id)
-	}
-	all, err := records.List()
-	if err != nil {
-		return record.Record{}, err
-	}
-	if len(all) == 0 {
-		return record.Record{}, errors.New("no run is recorded yet")
-	}
-	return all[0], nil
 }
 
 func writeRunList(out io.Writer, records []record.Record, asJSON bool) error {

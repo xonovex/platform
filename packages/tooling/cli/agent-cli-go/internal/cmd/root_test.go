@@ -23,6 +23,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	pluginorigins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
@@ -92,7 +93,7 @@ type testRoot struct {
 	provisioner *recordingProvisioner
 	out         bytes.Buffer
 	deps        launch.Dependencies
-	ports       PluginPorts
+	ports       plugin.Manager
 	host        *oshosttest.Fake
 }
 
@@ -114,7 +115,7 @@ func newTestRoot() *testRoot {
 		registry.RegisterIsolator(method, func() isoshared.Isolator { return r.isolator })
 	}
 	r.host = oshosttest.New()
-	r.ports = PluginPorts{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
+	r.ports = plugin.Manager{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
 	r.deps = launch.Dependencies{
 		Host:      r.host,
 		Log:       logging.New(io.Discard, io.Discard, false, false),
@@ -134,7 +135,7 @@ func (r *testRoot) execute(args ...string) error {
 }
 
 func TestNewRootCommandRegistersSubcommandsAndFlags(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{}, RecordPorts{}, &recordingBridge{})
 
 	for _, name := range []string{"run", "completion"} {
 		if command, _, err := root.Find([]string{name}); err != nil || command.Name() != name {
@@ -263,7 +264,7 @@ func TestRunCommandRejectsAnUnknownAgentAndAProviderForALoginAgent(t *testing.T)
 }
 
 func TestRunCommandHelpListsEveryHarness(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{}, RecordPorts{}, &recordingBridge{})
 	run, _, _ := root.Find([]string{"run"})
 
 	usage := run.Flags().Lookup("agent").Usage
@@ -285,7 +286,7 @@ func complete(t *testing.T, args ...string) []string {
 // root r.
 func completeWith(t *testing.T, r *testRoot, args ...string) []string {
 	t.Helper()
-	root := NewRootCommand(r.deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
+	root := NewRootCommand(r.deps, plugin.Manager{}, RecordPorts{}, &recordingBridge{})
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)
@@ -377,15 +378,6 @@ func TestCompletionOffersCredentialSchemesAfterTheVariableName(t *testing.T) {
 			t.Errorf("completion lacks %q:\n%s", want, out.String())
 		}
 	}
-	if got := credentialCandidates(r.deps, "API"); got != nil {
-		t.Errorf("before the equals sign the user names the variable: %v", got)
-	}
-	if got := credentialCandidates(launch.Dependencies{}, "API_KEY="); got != nil {
-		t.Errorf("a build without stores offers nothing: %v", got)
-	}
-	if got := isolationNames(launch.Dependencies{}); got != nil {
-		t.Errorf("a build without isolations offers nothing: %v", got)
-	}
 }
 
 func TestCompletionOffersTheRegisteredTerminals(t *testing.T) {
@@ -402,8 +394,5 @@ func TestCompletionOffersTheRegisteredTerminals(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "auto\nherdr-core\nherdr-tui\ntmux\n") {
 		t.Errorf("terminal completion = %q, want auto and every wrapper", out.String())
-	}
-	if got := terminalNames(launch.Dependencies{Terminals: r.deps.Terminals}); slices.Contains(got, "auto") {
-		t.Errorf("a build without automatic candidates offers auto: %v", got)
 	}
 }

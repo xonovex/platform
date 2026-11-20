@@ -18,6 +18,7 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdrcore"
@@ -59,7 +60,7 @@ func main() {
 		os.Exit(1)
 	}
 	deps.Validator = validator
-	var records cmd.RecordReader
+	var records launch.RecordReader
 	if store, err := runStore(host); err != nil {
 		log.Warning("Run records are off: " + err.Error())
 	} else {
@@ -67,8 +68,8 @@ func main() {
 		records = store
 	}
 
-	ports := cmd.PluginPorts{Host: host, Origins: origins, Out: os.Stdout}
-	err = cmd.NewRootCommand(deps, ports, cmd.RecordPorts{Records: records, Out: os.Stdout}, managed.Bridge{Host: host}).Execute()
+	plugins := plugin.Manager{Host: host, Origins: origins, Out: os.Stdout}
+	err = cmd.NewRootCommand(deps, plugins, cmd.RecordPorts{Records: records, Out: os.Stdout}, managed.Bridge{Host: host}).Execute()
 	var exit launch.ExitError
 	var usage cmd.UsageError
 	switch {

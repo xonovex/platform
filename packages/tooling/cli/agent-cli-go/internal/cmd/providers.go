@@ -3,15 +3,12 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"maps"
-	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // newProvidersCommand builds `agent-cli providers`.
@@ -114,7 +111,6 @@ func newProvidersShowCommand(deps launch.Dependencies) *cobra.Command {
 // describeProvider is what a person reviews of one provider: where it is
 // defined, the hosts its route reaches and its model slots.
 func describeProvider(row launch.ProviderRow) []string {
-	preset := row.Document.Preset
 	lines := []string{
 		"Name: " + row.Name,
 		"Agent: " + string(row.Agent),
@@ -124,11 +120,7 @@ func describeProvider(row launch.ProviderRow) []string {
 	if row.Extends != "" {
 		lines = append(lines, "Extends: "+row.Extends)
 	}
-	slots := make([]string, 0, len(preset.Models))
-	for _, name := range slices.Sorted(maps.Keys(preset.Models)) {
-		slots = append(slots, name+"="+preset.Models[name].ID)
-	}
-	lines = append(lines, "Route hosts: "+orNone(preset.Hosts()), "Model slots: "+orNone(slots))
+	lines = append(lines, "Route hosts: "+orNone(row.RouteHosts()), "Model slots: "+orNone(row.ModelSlots()))
 	if row.Approval != "" {
 		lines = append(lines, "Approval: "+row.Approval)
 	}
@@ -155,18 +147,15 @@ the file, then repeat the command with --approve-config-digest <digest>. Any
 change to a file changes its digest and asks again.`,
 		Args: cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			listing, err := launch.ListProviders(deps, options)
+			approved, err := launch.ApproveProjectFiles(deps, options)
 			if err != nil {
 				return err
 			}
-			if len(listing.Pending) == 0 {
+			if len(approved) == 0 {
 				_, err := fmt.Fprintln(deps.Out, "The project supplies no file that needs approval.")
 				return err
 			}
-			if err := runconfig.Gate(deps.ConfigEnv(), listing.Pending, options.ApproveDigest); err != nil {
-				return err
-			}
-			for _, p := range listing.Pending {
+			for _, p := range approved {
 				if _, err := fmt.Fprintf(deps.Out, "Approved %s (%s)\n", p.Subject.Digest, p.Subject.Path); err != nil {
 					return err
 				}
@@ -190,21 +179,13 @@ next run that reads a file whose approval is gone asks again.`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) == 1 {
-				held, err := runconfig.Ledger(deps.Host).Revoke(args[0])
-				if err != nil {
+				if err := launch.RevokeDigest(deps, args[0]); err != nil {
 					return err
 				}
-				if !held {
-					return fmt.Errorf("the approval ledger holds no approval of %s", args[0])
-				}
-				_, err = fmt.Fprintf(deps.Out, "Revoked %s\n", args[0])
+				_, err := fmt.Fprintf(deps.Out, "Revoked %s\n", args[0])
 				return err
 			}
-			loaded, err := launch.ReadConfig(deps, options)
-			if err != nil {
-				return err
-			}
-			revoked, err := runconfig.Revoke(deps.ConfigEnv(), loaded.Pending)
+			revoked, err := launch.RevokeProjectFiles(deps, options)
 			if err != nil {
 				return err
 			}
@@ -234,20 +215,4 @@ func bindProviderLocation(command *cobra.Command, options *launch.Options) {
 // bindApproval binds the flag that approves project content by its digest.
 func bindApproval(command *cobra.Command, options *launch.Options) {
 	command.Flags().StringVar(&options.ApproveDigest, trust.ApproveFlag, "", "Approve the project file with this digest (sha256:...) without a question")
-}
-
-// definedProviders names the providers defined for an agent type, for
-// completion. A failure to read them offers none.
-func definedProviders(deps launch.Dependencies, options launch.Options, agent string) []string {
-	listing, err := launch.ListProviders(deps, options)
-	if err != nil {
-		return nil
-	}
-	var names []string
-	for _, row := range listing.Rows {
-		if string(row.Agent) == agent {
-			names = append(names, row.Name)
-		}
-	}
-	return names
 }

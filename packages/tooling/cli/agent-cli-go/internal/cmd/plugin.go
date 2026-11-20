@@ -3,60 +3,16 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"path"
 	"strings"
 
 	"github.com/spf13/cobra"
 
-	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
-	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
-// PluginHost is the machine the plugin and marketplace commands consult.
-type PluginHost interface {
-	plugin.Files
-	// Host reaches the approval ledger and the terminal of the trust gate.
-	runconfig.Host
-}
-
-// PluginPorts are the ports of the plugin and marketplace commands.
-type PluginPorts struct {
-	Host    PluginHost
-	Origins origin.Registry
-	// Out receives the result of each command.
-	Out io.Writer
-}
-
-// service builds the plugin service of the store the user named, or of the
-// default store.
-func (p PluginPorts) service(store string) (plugin.Service, error) {
-	cwd, err := p.Host.Getwd()
-	if err != nil {
-		return plugin.Service{}, fmt.Errorf("resolve current working directory: %w", err)
-	}
-	dir := store
-	switch {
-	case dir == "":
-		home, err := p.Host.UserHomeDir()
-		if err != nil {
-			return plugin.Service{}, fmt.Errorf("resolve user home directory: %w", err)
-		}
-		dir = plugin.DefaultDir(p.Host.Getenv, home)
-	case !path.IsAbs(dir):
-		dir = path.Join(cwd, dir)
-	}
-	dirStore, err := plugin.NewStore(p.Host, path.Clean(dir))
-	if err != nil {
-		return plugin.Service{}, err
-	}
-	return plugin.Service{Store: dirStore, Files: p.Host, Origins: p.Origins}, nil
-}
-
 // newPluginCommand builds `agent-cli plugin`.
-func newPluginCommand(ports PluginPorts) *cobra.Command {
+func newPluginCommand(plugins plugin.Manager) *cobra.Command {
 	var store string
 	command := &cobra.Command{
 		Use:   "plugin",
@@ -69,14 +25,14 @@ server or settings file the plugin carries.`,
 	}
 	command.PersistentFlags().StringVar(&store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agentic/plugins)")
 	command.AddCommand(
-		newPluginInstallCommand(ports, &store),
-		newPluginListCommand(ports, &store),
-		newPluginRemoveCommand(ports, &store),
+		newPluginInstallCommand(plugins, &store),
+		newPluginListCommand(plugins, &store),
+		newPluginRemoveCommand(plugins, &store),
 	)
 	return command
 }
 
-func newPluginInstallCommand(ports PluginPorts, store *string) *cobra.Command {
+func newPluginInstallCommand(plugins plugin.Manager, store *string) *cobra.Command {
 	var approveDigest string
 	var allow []string
 	command := &cobra.Command{
@@ -91,55 +47,31 @@ The approval ledger keeps an approved digest, so the same content installs again
 without a question. A grant for a hook, MCP server, language server or settings file is never given by
 the answer: pass --allow for each.`,
 		Args: cobra.ExactArgs(1),
-		RunE: func(command *cobra.Command, args []string) error {
-			capabilities := make([]libplugin.Capability, 0, len(allow))
-			for _, name := range allow {
-				capability, err := libplugin.ParseCapability(name)
-				if err != nil {
-					return err
-				}
-				capabilities = append(capabilities, capability)
-			}
-			service, err := ports.service(*store)
+		RunE: func(_ *cobra.Command, args []string) error {
+			request := plugin.InstallRequest{Store: *store, Source: args[0], Allow: allow, ApproveDigest: approveDigest}
+			record, err := plugins.Install(request, func(fetched plugin.Fetched) { printPreview(plugins.Out, fetched) })
 			if err != nil {
 				return err
 			}
-			fetched, err := service.Fetch(args[0])
-			if err != nil {
-				return err
-			}
-			printPreview(ports.Out, fetched)
-			subject := trust.Subject{
-				Digest: fetched.Digest,
-				Path:   fetched.Source,
-				Notice: fmt.Sprintf("The plugin %s from %s is installed only after you approve its digest", fetched.Manifest.Name, fetched.Source),
-			}
-			if err := trust.Decide(subject, approveDigest, runconfig.Ledger(ports.Host), ports.Host, ports.Out); err != nil {
-				return err
-			}
-			record, err := service.Commit(fetched, capabilities)
-			if err != nil {
-				return err
-			}
-			_, err = fmt.Fprintf(ports.Out, "Installed %s %s (%s)\n", record.Name, record.Version, record.Digest)
+			_, err = fmt.Fprintf(plugins.Out, "Installed %s %s (%s)\n", record.Name, record.Version, record.Digest)
 			return err
 		},
 	}
 	command.Flags().StringVar(&approveDigest, trust.ApproveFlag, "", "Digest of the reviewed plugin files (sha256:...); approves without a question")
-	command.Flags().StringSliceVar(&allow, "allow", nil, "Grant a capability the plugin carries: "+strings.Join(capabilityNames(), ", ")+" (repeatable)")
+	command.Flags().StringSliceVar(&allow, "allow", nil, "Grant a capability the plugin carries: "+strings.Join(plugin.CapabilityNames(), ", ")+" (repeatable)")
 	_ = command.RegisterFlagCompletionFunc("allow", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
-		return capabilityNames(), cobra.ShellCompDirectiveNoFileComp
+		return plugin.CapabilityNames(), cobra.ShellCompDirectiveNoFileComp
 	})
 	return command
 }
 
-func newPluginListCommand(ports PluginPorts, store *string) *cobra.Command {
+func newPluginListCommand(plugins plugin.Manager, store *string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List the installed plugins",
 		Args:  cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			service, err := ports.service(*store)
+			service, err := plugins.Open(*store)
 			if err != nil {
 				return err
 			}
@@ -148,7 +80,7 @@ func newPluginListCommand(ports PluginPorts, store *string) *cobra.Command {
 				return err
 			}
 			if len(records) == 0 {
-				_, err = fmt.Fprintln(ports.Out, "No plugins installed.")
+				_, err = fmt.Fprintln(plugins.Out, "No plugins installed.")
 				return err
 			}
 			for _, record := range records {
@@ -156,7 +88,7 @@ func newPluginListCommand(ports PluginPorts, store *string) *cobra.Command {
 				if record.Marketplace != "" {
 					line += " (marketplace " + record.Marketplace + ")"
 				}
-				if _, err := fmt.Fprintln(ports.Out, line); err != nil {
+				if _, err := fmt.Fprintln(plugins.Out, line); err != nil {
 					return err
 				}
 			}
@@ -165,27 +97,27 @@ func newPluginListCommand(ports PluginPorts, store *string) *cobra.Command {
 	}
 }
 
-func newPluginRemoveCommand(ports PluginPorts, store *string) *cobra.Command {
+func newPluginRemoveCommand(plugins plugin.Manager, store *string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "remove <name>",
 		Short: "Remove an installed plugin",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
-			service, err := ports.service(*store)
+			service, err := plugins.Open(*store)
 			if err != nil {
 				return err
 			}
 			if err := service.Remove(args[0]); err != nil {
 				return err
 			}
-			_, err = fmt.Fprintf(ports.Out, "Removed %s\n", args[0])
+			_, err = fmt.Fprintf(plugins.Out, "Removed %s\n", args[0])
 			return err
 		},
 	}
 }
 
 // newMarketplaceCommand builds `agent-cli marketplace`.
-func newMarketplaceCommand(ports PluginPorts) *cobra.Command {
+func newMarketplaceCommand(plugins plugin.Manager) *cobra.Command {
 	var store string
 	command := &cobra.Command{
 		Use:   "marketplace",
@@ -201,7 +133,7 @@ plugin as name@marketplace.`,
 			Short: "Register the marketplace at a directory or repository URL",
 			Args:  cobra.ExactArgs(1),
 			RunE: func(_ *cobra.Command, args []string) error {
-				service, err := ports.service(store)
+				service, err := plugins.Open(store)
 				if err != nil {
 					return err
 				}
@@ -209,7 +141,7 @@ plugin as name@marketplace.`,
 				if err != nil {
 					return err
 				}
-				_, err = fmt.Fprintf(ports.Out, "Registered marketplace %s (%s) with %d plugins\n", source.Name, source.Source, len(listing.Entries))
+				_, err = fmt.Fprintf(plugins.Out, "Registered marketplace %s (%s) with %d plugins\n", source.Name, source.Source, len(listing.Entries))
 				return err
 			},
 		},
@@ -218,23 +150,23 @@ plugin as name@marketplace.`,
 			Short: "List the registered marketplaces, or the plugins of one",
 			Args:  cobra.MaximumNArgs(1),
 			RunE: func(_ *cobra.Command, args []string) error {
-				service, err := ports.service(store)
+				service, err := plugins.Open(store)
 				if err != nil {
 					return err
 				}
 				if len(args) == 1 {
-					return printListing(ports.Out, service, args[0])
+					return printListing(plugins.Out, service, args[0])
 				}
 				sources, err := service.Marketplaces()
 				if err != nil {
 					return err
 				}
 				if len(sources) == 0 {
-					_, err = fmt.Fprintln(ports.Out, "No marketplaces registered.")
+					_, err = fmt.Fprintln(plugins.Out, "No marketplaces registered.")
 					return err
 				}
 				for _, source := range sources {
-					if _, err := fmt.Fprintf(ports.Out, "%s %s\n", source.Name, source.Source); err != nil {
+					if _, err := fmt.Fprintf(plugins.Out, "%s %s\n", source.Name, source.Source); err != nil {
 						return err
 					}
 				}
@@ -246,14 +178,14 @@ plugin as name@marketplace.`,
 			Short: "Unregister a marketplace",
 			Args:  cobra.ExactArgs(1),
 			RunE: func(_ *cobra.Command, args []string) error {
-				service, err := ports.service(store)
+				service, err := plugins.Open(store)
 				if err != nil {
 					return err
 				}
 				if err := service.RemoveMarketplace(args[0]); err != nil {
 					return err
 				}
-				_, err = fmt.Fprintf(ports.Out, "Removed marketplace %s\n", args[0])
+				_, err = fmt.Fprintf(plugins.Out, "Removed marketplace %s\n", args[0])
 				return err
 			},
 		},
@@ -304,12 +236,4 @@ func printPreview(out io.Writer, fetched plugin.Fetched) {
 	}
 	// A failed write to the output stream does not change what is installed.
 	_, _ = fmt.Fprintln(out, strings.Join(lines, "\n"))
-}
-
-func capabilityNames() []string {
-	var names []string
-	for _, capability := range libplugin.Capabilities() {
-		names = append(names, string(capability))
-	}
-	return names
 }

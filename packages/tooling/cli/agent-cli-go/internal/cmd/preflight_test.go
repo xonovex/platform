@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 )
 
 func preflight(t *testing.T, r *testRoot, args ...string) (string, error) {
@@ -113,7 +114,7 @@ func TestPreflightDoesNotRunTheAgent(t *testing.T) {
 }
 
 func TestPreflightSharesTheRunFlags(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, plugin.Manager{}, RecordPorts{}, &recordingBridge{})
 	command, _, _ := root.Find([]string{"preflight"})
 	for _, flag := range []string{"agent", "isolation", "network", "credential", "plugin", "terminal", "require-kernel-isolation", "json"} {
 		if command.Flags().Lookup(flag) == nil {

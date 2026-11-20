@@ -48,3 +48,38 @@ type Options struct {
 	DryRun  bool
 	Verbose bool
 }
+
+// DefaultOptions are the options a run holds before any flag or layer changes
+// them.
+func DefaultOptions() Options {
+	return Options{
+		Request: launchcore.Request{
+			Agent:     "claude",
+			Isolation: "none",
+			Provision: "none",
+			Network:   "host",
+			NixSource: "packages",
+			NixShell:  "default",
+		},
+		VCS: "git",
+	}
+}
+
+// ExplicitKeys returns the configuration keys whose flags the user set, as
+// changed reports each flag by its name. Only these keys need the mark: a flag
+// that keeps its default yields to the file layers, and every other flag has no
+// default that could shadow a file.
+func ExplicitKeys(changed func(flag string) bool) runconfig.Keys {
+	chosen := runconfig.Keys{}
+	for flag, key := range map[string]runconfig.Key{
+		"agent":     runconfig.KeyAgent,
+		"isolation": runconfig.KeyIsolation,
+		"provision": runconfig.KeyProvision,
+		"network":   runconfig.KeyNetwork,
+	} {
+		if changed(flag) {
+			chosen[key] = struct{}{}
+		}
+	}
+	return chosen
+}
