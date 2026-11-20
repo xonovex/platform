@@ -13,6 +13,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
@@ -22,7 +24,6 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	pluginorigins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
 // recordingIsolator records the RunConfig the command line produced; it runs
@@ -93,6 +94,15 @@ type testRoot struct {
 	host        *oshosttest.Fake
 }
 
+// testValidator checks the files against the schemas of the contract.
+var testValidator = func() jsonschema.Validator {
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		panic(err)
+	}
+	return validator
+}()
+
 func newTestRoot() *testRoot {
 	r := &testRoot{bridge: &recordingBridge{}, isolator: &recordingIsolator{}, provisioner: &recordingProvisioner{}}
 	registry := sandbox.NewRegistry[isoshared.Isolator]().
@@ -102,14 +112,13 @@ func newTestRoot() *testRoot {
 		registry.RegisterIsolator(method, func() isoshared.Isolator { return r.isolator })
 	}
 	r.host = oshosttest.New()
-	approvals, _ := trust.NewStore(r.host, trust.DefaultFile(r.host.Getenv, r.host.Home))
 	r.ports = PluginPorts{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
 	r.deps = launch.Dependencies{
 		Host:      r.host,
 		Log:       logging.New(io.Discard, io.Discard, false, false),
 		Out:       &r.out,
 		Sandboxes: registry,
-		Approvals: approvals,
+		Validator: testValidator,
 	}
 	return r
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/egress/managed"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost"
@@ -20,7 +21,6 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/tmux"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/git"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/jj"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
@@ -47,11 +47,12 @@ func main() {
 			termshared.TerminalHerdr: herdr.NewExecutor(host, log),
 		},
 	}
-	if approvals, err := approvalStore(host); err != nil {
-		log.Warning("Project provider files stay unapproved: " + err.Error())
-	} else {
-		deps.Approvals = approvals
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		log.Error("The embedded schemas do not compile: " + err.Error())
+		os.Exit(1)
 	}
+	deps.Validator = validator
 	var records cmd.RecordReader
 	if store, err := runStore(host); err != nil {
 		log.Warning("Run records are off: " + err.Error())
@@ -61,7 +62,7 @@ func main() {
 	}
 
 	ports := cmd.PluginPorts{Host: host, Origins: origins, Out: os.Stdout}
-	err := cmd.NewRootCommand(deps, ports, cmd.RecordPorts{Records: records, Out: os.Stdout}, managed.Bridge{Host: host}).Execute()
+	err = cmd.NewRootCommand(deps, ports, cmd.RecordPorts{Records: records, Out: os.Stdout}, managed.Bridge{Host: host}).Execute()
 	var exit launch.ExitError
 	var usage cmd.UsageError
 	switch {
@@ -83,13 +84,4 @@ func runStore(host oshost.System) (record.Store, error) {
 		return record.Store{}, err
 	}
 	return record.NewStore(host, record.DefaultDir(host.Getenv, home, "agent-cli"))
-}
-
-// approvalStore opens the approval ledger of the user.
-func approvalStore(host oshost.System) (trust.Store, error) {
-	home, err := host.UserHomeDir()
-	if err != nil {
-		return trust.Store{}, err
-	}
-	return trust.NewStore(host, trust.DefaultFile(host.Getenv, home))
 }

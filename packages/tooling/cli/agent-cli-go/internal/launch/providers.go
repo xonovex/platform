@@ -1,67 +1,96 @@
 package launch
 
 import (
-	"fmt"
-
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/spec"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // ProviderRow is one defined provider with the approval state of its file.
 type ProviderRow struct {
 	providers.Entry
+	// Document is the provider document that defines the provider.
+	Document providers.Document
 	// Approval is empty for a file the user or an administrator supplies. For a
 	// project file it is "approved" or "not approved".
 	Approval string
 }
 
-// ProviderListing is every defined provider and the directories read for them.
+// ProviderListing is every defined provider, the shard directories, and the
+// project content behind the trust gate.
 type ProviderListing struct {
-	Rows []ProviderRow
-	Dirs []config.ProviderDir
-	// Material is the provider content the project supplies.
-	Material providers.Material
+	Rows    []ProviderRow
+	Dirs    []runconfig.ProviderDir
+	Pending []runconfig.Pending
 }
 
-// ProjectMaterial returns the provider content the project of the options
-// supplies: its provider files and its model overrides.
-func ProjectMaterial(deps Dependencies, options Options) (providers.Material, error) {
-	listing, err := ListProviders(deps, options)
-	return listing.Material, err
+// ReadConfig reads the configuration of the options without the trust gate,
+// for a command that reports on the project content or approves it.
+func ReadConfig(deps Dependencies, options Options) (runconfig.Loaded, error) {
+	return readConfig(deps, options, runconfig.Read)
 }
 
-// ListProviders reads the provider files of every layer and the project model
-// overrides, and marks each project provider with the approval state of the
-// project material.
+// LoadConfig reads the configuration of the options as a run does: the
+// project content passes the trust gate first.
+func LoadConfig(deps Dependencies, options Options) (runconfig.Loaded, error) {
+	return readConfig(deps, options, runconfig.Load)
+}
+
+func readConfig(deps Dependencies, options Options, read func(runconfig.Env, runconfig.Request) (runconfig.Loaded, error)) (runconfig.Loaded, error) {
+	return read(deps.ConfigEnv(), configRequest(options))
+}
+
+// ListProviders reads the providers of every layer and marks each project
+// provider with the approval state of the file that defines it.
 func ListProviders(deps Dependencies, options Options) (ProviderListing, error) {
-	cwd, err := deps.Host.Getwd()
+	loaded, err := ReadConfig(deps, options)
 	if err != nil {
-		return ProviderListing{}, fmt.Errorf("resolve current working directory: %w", err)
+		return ProviderListing{}, err
 	}
-	projectDir := absolute(cwd, options.WorkDir)
-	inputs, err := config.LoadLayers(deps.Host, options.Config, projectDir)
-	if err != nil {
-		return ProviderListing{}, fmt.Errorf("failed to load config: %w", err)
+	approved := map[string]bool{}
+	for _, p := range loaded.Pending {
+		yes, err := runconfig.Approved(deps.ConfigEnv(), p)
+		if err != nil {
+			return ProviderListing{}, err
+		}
+		for _, origin := range p.Origins {
+			approved[origin] = yes
+		}
 	}
-	set, err := config.LoadProviders(deps.Host, options.Config, projectDir)
-	if err != nil {
-		return ProviderListing{}, fmt.Errorf("failed to load providers: %w", err)
-	}
-	material := providers.Material{Documents: set.Project, Models: config.ProjectModels(inputs)}
-	approved, err := approvedDigest(deps.Approvals, material.Digest())
-	if err != nil {
-		return ProviderListing{}, fmt.Errorf("read the approvals: %w", err)
-	}
-	listing := ProviderListing{Dirs: set.Dirs, Material: material}
-	for _, entry := range providers.NewCatalog(set.Documents...).List() {
-		row := ProviderRow{Entry: entry}
-		if entry.Layer == string(config.LayerProject) {
+	listing := ProviderListing{Dirs: loaded.ProviderDirs, Pending: loaded.Pending}
+	for _, entry := range providers.NewCatalog(loaded.Providers...).List() {
+		row := ProviderRow{Entry: entry, Document: definition(loaded.Providers, entry)}
+		if entry.Layer == string(spec.Project) {
 			row.Approval = "not approved"
-			if approved {
+			if approved[entry.Origin] {
 				row.Approval = "approved"
 			}
 		}
 		listing.Rows = append(listing.Rows, row)
 	}
 	return listing, nil
+}
+
+// definition returns the document of the entry: the last one of its agent and
+// name, as the catalog keeps it.
+func definition(documents []providers.Document, entry providers.Entry) providers.Document {
+	var found providers.Document
+	for _, document := range documents {
+		if document.Preset.Name == entry.Name && document.Preset.Agent == entry.Agent {
+			found = document
+		}
+	}
+	return found
+}
+
+// Named returns the rows of the providers with the name, one for each agent
+// that defines it.
+func (l ProviderListing) Named(name string) []ProviderRow {
+	var rows []ProviderRow
+	for _, row := range l.Rows {
+		if row.Name == name {
+			rows = append(rows, row)
+		}
+	}
+	return rows
 }

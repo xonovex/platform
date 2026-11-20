@@ -9,15 +9,15 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // newRunCommand binds the run flags into launch.Options and executes them
 // through deps.
-func newRunCommand(deps launch.Dependencies, ports PluginPorts) *cobra.Command {
+func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	options := defaultOptions()
-	var approveDigest string
 	cmd := &cobra.Command{
 		Use:   "run [agent-args...]",
 		Short: "Run an AI coding agent",
@@ -27,7 +27,7 @@ func newRunCommand(deps launch.Dependencies, ports PluginPorts) *cobra.Command {
 			run.Verbose, _ = cmd.Flags().GetBool("verbose")
 			run.Explicit = chosenKeys(cmd)
 			run.AgentArgs = args
-			err := executeWithApproval(deps, ports, run, approveDigest)
+			err := launch.Execute(deps, run)
 			// The agent reported its own failure; the CLI passes on only the code.
 			var exit launch.ExitError
 			if errors.As(err, &exit) {
@@ -39,7 +39,6 @@ func newRunCommand(deps launch.Dependencies, ports PluginPorts) *cobra.Command {
 	}
 
 	bindRunFlags(cmd, &options, deps)
-	cmd.Flags().StringVar(&approveDigest, "approve-project-digest", "", "Digest of the reviewed provider files and model overrides of the project (sha256:...); approves without a question")
 	cmd.Flags().BoolVarP(&options.DryRun, "dry-run", "n", false, "Show configuration without executing")
 	return cmd
 }
@@ -60,13 +59,13 @@ func defaultOptions() launch.Options {
 
 // chosenKeys are the configuration keys whose flags the user set. A flag that
 // keeps its default must yield to the file layers.
-func chosenKeys(cmd *cobra.Command) config.Keys {
-	chosen := config.Keys{}
-	for flag, key := range map[string]config.Key{
-		"agent":     config.KeyAgent,
-		"isolation": config.KeyIsolation,
-		"provision": config.KeyProvision,
-		"network":   config.KeyNetwork,
+func chosenKeys(cmd *cobra.Command) runconfig.Keys {
+	chosen := runconfig.Keys{}
+	for flag, key := range map[string]runconfig.Key{
+		"agent":     runconfig.KeyAgent,
+		"isolation": runconfig.KeyIsolation,
+		"provision": runconfig.KeyProvision,
+		"network":   runconfig.KeyNetwork,
 	} {
 		if cmd.Flags().Changed(flag) {
 			chosen[key] = struct{}{}
@@ -101,10 +100,11 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 
 	// Workspace / terminal / misc.
 	flags.StringVarP(&options.WorkDir, "work-dir", "w", "", "Working directory")
+	flags.StringVar(&options.Project, "project", "", "Project agentic.json (default: the nearest agentic.json from the work directory up to the repository root)")
+	flags.StringVar(&options.ApproveDigest, trust.ApproveFlag, "", "Approve the project file with this digest (sha256:...) without a question")
 	flags.StringVar(&options.WorktreeBranch, "worktree-branch", "", "Create worktree with branch name")
 	flags.StringVar(&options.WorktreeSourceBranch, "worktree-source-branch", "", "Source branch for worktree")
 	flags.StringVar(&options.WorktreeDir, "worktree-dir", "", "Worktree directory path")
-	flags.StringVarP(&options.Config, "config", "c", "", "Configuration file")
 	flags.StringSliceVar(&options.BindPaths, "bind", nil, "Read-write bind mount")
 	flags.StringSliceVar(&options.RoBindPaths, "ro-bind", nil, "Read-only bind mount")
 	flags.StringSliceVar(&options.Plugins, "plugin", nil, "Installed plugin to overlay on the run (repeatable; see agent-cli plugin)")

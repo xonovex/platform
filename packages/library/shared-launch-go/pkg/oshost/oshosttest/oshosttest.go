@@ -60,10 +60,9 @@ type Fake struct {
 	DialPublicFunc DialFunc
 	ListenErr      error
 	ExecutablePath string
-	// Clock is the instant Now returns, and ManagedDir the directory
-	// ManagedConfigDir returns.
-	Clock      time.Time
-	ManagedDir string
+	// Clock is the instant Now returns, and OS the name GOOS returns.
+	Clock time.Time
+	OS    string
 
 	// Terminal is the answer of IsTerminal. Input holds the lines ReadLine
 	// returns in order, then io.EOF; InputErr, when set, replaces that EOF.
@@ -78,8 +77,8 @@ type Fake struct {
 	listeners map[string]*MemListener
 }
 
-// New returns a Fake with an empty root directory, uid and gid 1000, 4 CPUs,
-// home /home/user and working directory /work.
+// New returns a Linux Fake with an empty root directory, uid and gid 1000, 4
+// CPUs, home /home/user and working directory /work.
 func New() *Fake {
 	return &Fake{
 		Env:        map[string]string{},
@@ -89,7 +88,7 @@ func New() *Fake {
 		GID:        1000,
 		CPUs:       4,
 		Clock:      time.Date(2026, time.November, 20, 12, 0, 0, 0, time.UTC),
-		ManagedDir: "/etc/agent-cli",
+		OS:         "linux",
 		Outcomes:   map[string]Outcome{},
 		files:      map[string]entry{"/": {dir: true, mode: fs.ModeDir | 0o755}},
 	}
@@ -200,8 +199,8 @@ func (f *Fake) Getgid() int { return f.GID }
 // Now returns Clock.
 func (f *Fake) Now() time.Time { return f.Clock }
 
-// ManagedConfigDir returns ManagedDir.
-func (f *Fake) ManagedConfigDir() string { return f.ManagedDir }
+// GOOS returns OS.
+func (f *Fake) GOOS() string { return f.OS }
 
 // NumCPU returns CPUs.
 func (f *Fake) NumCPU() int { return f.CPUs }

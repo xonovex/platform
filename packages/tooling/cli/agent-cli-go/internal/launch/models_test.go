@@ -5,31 +5,19 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 const (
-	projectProviders = "/work/repo/.agent-cli/providers"
-	managedProviders = "/etc/agent-cli/providers"
+	projectProviders = "/work/repo/providers.d"
+	managedProviders = "/etc/agentic/providers.d"
 )
 
-// fakeApprovals approves the digests it holds.
-type fakeApprovals struct {
-	digests map[string]bool
-	err     error
-}
-
-func (f fakeApprovals) Approved(kind, digest string) (bool, error) {
-	return f.digests[kind+" "+digest] && f.err == nil, f.err
-}
-
-func approving(digests ...string) fakeApprovals {
-	approved := map[string]bool{}
-	for _, digest := range digests {
-		approved[ApprovalKind+" "+digest] = true
-	}
-	return fakeApprovals{digests: approved}
+// withProject gives the Fake host a project agentic.json that sets no gated
+// section, so the provider shards beside it are the only project content.
+func withProject(f *executeFixture) *executeFixture {
+	f.host.AddFile(projectFile, `{"version":1}`, 0o644)
+	return f
 }
 
 func dryRunOptions() Options {
@@ -40,9 +28,8 @@ func dryRunOptions() Options {
 
 func TestModelOverridesApplyInLayerOrderAndNameTheirSource(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile(userConfig, "provider: alpha\nmodels: [main=user-id]\n", 0o600)
+	f.host.AddFile(userFile, runFile(`{"provider":"alpha","models":["main=user-id"]}`), 0o600)
 	options := dryRunOptions()
-	options.Config = userConfig
 	options.Models = []string{"main=flag-id"}
 
 	if err := Execute(f.deps(), options); err != nil {
@@ -51,7 +38,7 @@ func TestModelOverridesApplyInLayerOrderAndNameTheirSource(t *testing.T) {
 
 	log := f.log.String()
 	for _, want := range []string{
-		"models: main=user-id (user " + userConfig + ")",
+		"models: main=user-id (user " + userFile + ")",
 		"models: main=flag-id (flags command line)",
 		"Model main: flag-id (flags command line)",
 	} {
@@ -66,7 +53,7 @@ func TestModelOverridesApplyInLayerOrderAndNameTheirSource(t *testing.T) {
 
 func TestAManagedModelOverrideBeatsTheLayersBelowAndRefusesAContradiction(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/etc/agent-cli/managed.yaml", "models: [main=managed-id]\n", 0o644)
+	f.host.AddFile(managedFile, runFile(`{"models":["main=managed-id"]}`), 0o644)
 	options := dryRunOptions()
 	options.Provider = "alpha"
 
@@ -133,7 +120,7 @@ func TestAProviderThatIsNotDefinedNamesTheDirectoryToAddItTo(t *testing.T) {
 }
 
 func TestAProjectProviderFileTakesEffectOnlyAfterTheDigestIsApproved(t *testing.T) {
-	f := newExecuteFixture()
+	f := withProject(newExecuteFixture())
 	file := providerFile("proj", "claude", "Project route")
 	f.host.AddFile(projectProviders+"/proj.json", file, 0o644)
 	options := dryRunOptions()
@@ -141,43 +128,39 @@ func TestAProjectProviderFileTakesEffectOnlyAfterTheDigestIsApproved(t *testing.
 
 	err := Execute(f.deps(), options)
 
-	var needed *ApprovalRequiredError
-	if !errors.As(err, &needed) {
-		t.Fatalf("Execute() error = %v, want ApprovalRequiredError", err)
-	}
-	digest := needed.Material.Digest()
-	if !strings.Contains(err.Error(), "--approve-digest "+digest) {
-		t.Errorf("error = %q, want it to name the digest", err)
+	if err == nil || !strings.Contains(err.Error(), "--approve-config-digest "+digestOf(file)) {
+		t.Fatalf("Execute() error = %v, want the digest to approve", err)
 	}
 	if f.sandbox.isolator.commandRun.Provider != nil {
 		t.Error("the run reached the isolator without approval")
 	}
 
-	deps := f.deps()
-	deps.Approvals = approving(digest)
-	if err := Execute(deps, options); err != nil {
+	options.ApproveDigest = digestOf(file)
+	if err := Execute(f.deps(), options); err != nil {
 		t.Fatalf("Execute() with the approval error = %v", err)
+	}
+	options.ApproveDigest = ""
+	if err := Execute(f.deps(), options); err != nil {
+		t.Fatalf("Execute() after the approval error = %v, want the ledger to hold it", err)
 	}
 
 	f.host.AddFile(projectProviders+"/proj.json", file+"\n", 0o644)
-	if err := Execute(deps, options); !errors.As(err, &needed) {
-		t.Errorf("Execute() after the file changed error = %v, want ApprovalRequiredError", err)
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "not approved") {
+		t.Errorf("Execute() after the file changed error = %v, want a new approval", err)
 	}
 }
 
 func TestProjectModelOverridesNeedApprovalEvenForAUserProvider(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/work/repo/.agent-cli.yaml", "provider: alpha\nmodels: [main=project-id]\n", 0o644)
+	data := runFile(`{"provider":"alpha","models":["main=project-id"]}`)
+	f.host.AddFile(projectFile, data, 0o644)
 
-	err := Execute(f.deps(), dryRunOptions())
-
-	var needed *ApprovalRequiredError
-	if !errors.As(err, &needed) || len(needed.Material.Models) != 1 {
-		t.Fatalf("Execute() error = %v, want ApprovalRequiredError for the model override", err)
+	if err := Execute(f.deps(), dryRunOptions()); err == nil || !strings.Contains(err.Error(), "sets the run configuration") {
+		t.Fatalf("Execute() error = %v, want the project file to wait for its approval", err)
 	}
-	deps := f.deps()
-	deps.Approvals = approving(needed.Material.Digest())
-	if err := Execute(deps, dryRunOptions()); err != nil {
+	options := dryRunOptions()
+	options.ApproveDigest = digestOf(data)
+	if err := Execute(f.deps(), options); err != nil {
 		t.Fatalf("Execute() with the approval error = %v", err)
 	}
 	if got := f.sandbox.isolator.commandRun.Provider.Slots[0]; got.ID != "project-id" || !strings.HasPrefix(got.Source, "project ") {
@@ -185,53 +168,77 @@ func TestProjectModelOverridesNeedApprovalEvenForAUserProvider(t *testing.T) {
 	}
 }
 
-func TestAProjectFileThatRefinesAUserProviderNeedsApproval(t *testing.T) {
-	f := newExecuteFixture()
-	f.host.AddFile(projectProviders+"/child.json", `{"name":"child","agent":"claude","extends":"alpha","models":{"main":{"id":"child-id"}}}`, 0o644)
+func TestTheTrustGateAsksAtATerminal(t *testing.T) {
+	f := withProject(newExecuteFixture())
+	file := `{"name":"child","agent":"claude","extends":"alpha","models":{"main":{"id":"child-id"}}}`
+	f.host.AddFile(projectProviders+"/child.json", file, 0o644)
+	f.host.Terminal = true
+	f.host.Input = []string{"no", "yes"}
 	options := dryRunOptions()
 	options.Provider = "child"
 
-	var needed *ApprovalRequiredError
-	if err := Execute(f.deps(), options); !errors.As(err, &needed) {
-		t.Fatalf("Execute() error = %v, want ApprovalRequiredError", err)
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "was declined") {
+		t.Fatalf("Execute() error = %v, want the refusal", err)
+	}
+	if err := Execute(f.deps(), options); err != nil {
+		t.Fatalf("Execute() after yes error = %v", err)
+	}
+	for _, want := range []string{file, "Digest: " + digestOf(file), "Approve this digest? [y/N]"} {
+		if !strings.Contains(f.out.String(), want) {
+			t.Errorf("the gate output lacks %q:\n%s", want, f.out.String())
+		}
+	}
+}
+
+func TestAFlagThatNamesNoProjectFileStopsTheRun(t *testing.T) {
+	f := withProject(newExecuteFixture())
+	f.host.AddFile(projectProviders+"/proj.json", providerFile("proj", "claude", "P"), 0o644)
+	options := dryRunOptions()
+	options.ApproveDigest = digestOf("other")
+
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "is the digest of no project file") {
+		t.Errorf("Execute() error = %v, want the stale digest refused", err)
 	}
 }
 
 func TestAProjectFileNeverChangesAManagedProvider(t *testing.T) {
-	f := newExecuteFixture()
+	f := withProject(newExecuteFixture())
+	f.host.AddFile(managedFile, `{"version":1}`, 0o644)
 	f.host.AddFile(managedProviders+"/alpha.json", `{"name":"alpha","agent":"claude","models":{"main":{"id":"managed-id"}},"environment":{"ROUTE_MODEL":"{model:main}"}}`, 0o644)
-	f.host.AddFile(projectProviders+"/alpha.json", `{"name":"alpha","agent":"claude","models":{"main":{"id":"project-id"}},"environment":{"ROUTE_MODEL":"{model:main}"}}`, 0o644)
+	project := `{"name":"alpha","agent":"claude","models":{"main":{"id":"project-id"}},"environment":{"ROUTE_MODEL":"{model:main}"}}`
+	f.host.AddFile(projectProviders+"/alpha.json", project, 0o644)
 	options := dryRunOptions()
 	options.Provider = "alpha"
+	options.ApproveDigest = digestOf(project)
 
 	if err := Execute(f.deps(), options); err != nil {
-		t.Fatalf("Execute() error = %v, want the managed provider to run without approval", err)
+		t.Fatalf("Execute() error = %v", err)
 	}
 	if got := f.sandbox.isolator.commandRun.Provider.Environment["ROUTE_MODEL"]; got != "managed-id" {
 		t.Errorf("ROUTE_MODEL = %q, want the managed value", got)
 	}
 }
 
-func TestApprovalsThatCannotBeReadStopTheRun(t *testing.T) {
-	f := newExecuteFixture()
+func TestALedgerThatCannotBeReadStopsTheRun(t *testing.T) {
+	f := withProject(newExecuteFixture())
 	f.host.AddFile(projectProviders+"/proj.json", providerFile("proj", "claude", "P"), 0o644)
-	deps := f.deps()
-	deps.Approvals = fakeApprovals{err: errors.New("corrupt")}
+	f.host.AddFile("/home/user/.local/state/agentic/trust.json", "{", 0o600)
 	options := dryRunOptions()
 	options.Provider = "proj"
 
-	if err := Execute(deps, options); err == nil || !strings.Contains(err.Error(), "read the approvals: corrupt") {
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "approval ledger") {
 		t.Errorf("Execute() error = %v", err)
 	}
-	if _, err := ListProviders(deps, options); err == nil || !strings.Contains(err.Error(), "read the approvals") {
+	if _, err := ListProviders(f.deps(), options); err == nil || !strings.Contains(err.Error(), "approval ledger") {
 		t.Errorf("ListProviders() error = %v", err)
 	}
 }
 
 func TestListProvidersShowsTheLayerAndTheApprovalOfProjectFiles(t *testing.T) {
-	f := newExecuteFixture()
-	f.host.AddFile(projectProviders+"/proj.json", providerFile("proj", "claude", "P"), 0o644)
-	f.host.AddFile(managedProviders+"/zeta.json", `{"name":"zeta","agent":"codex","portable":true}`, 0o644)
+	f := withProject(newExecuteFixture())
+	project := providerFile("proj", "claude", "P")
+	f.host.AddFile(projectProviders+"/proj.json", project, 0o644)
+	f.host.AddFile(managedFile, `{"version":1,"providers":{"zeta":{"agent":"codex","portable":true}}}`, 0o644)
 
 	listing, err := ListProviders(f.deps(), Options{})
 
@@ -246,19 +253,20 @@ func TestListProvidersShowsTheLayerAndTheApprovalOfProjectFiles(t *testing.T) {
 	if strings.Join(lines, "|") != strings.Join(want, "|") {
 		t.Errorf("rows = %q, want %q", lines, want)
 	}
-	if len(listing.Dirs) != 3 || listing.Material.Empty() {
-		t.Errorf("Dirs = %v, Material = %+v", listing.Dirs, listing.Material)
+	if len(listing.Dirs) != 3 || len(listing.Pending) != 1 || listing.Rows[3].Origin != managedFile {
+		t.Errorf("Dirs = %v, Pending = %+v, rows = %+v", listing.Dirs, listing.Pending, listing.Rows)
+	}
+	if rows := listing.Named("proj"); len(rows) != 1 || string(rows[0].Document.Raw) != project {
+		t.Errorf("Named(proj) = %+v, want the project document", rows)
 	}
 
-	deps := f.deps()
-	deps.Approvals = approving(listing.Material.Digest())
-	approved, err := ListProviders(deps, Options{})
+	options := Options{ApproveDigest: digestOf(project)}
+	if _, err := LoadConfig(f.deps(), options); err != nil {
+		t.Fatalf("LoadConfig() error = %v", err)
+	}
+	approved, err := ListProviders(f.deps(), Options{})
 	if err != nil || approved.Rows[2].Approval != "approved" {
 		t.Errorf("ListProviders() = %+v, %v, want the project file approved", approved.Rows, err)
-	}
-	material, err := ProjectMaterial(deps, Options{})
-	if err != nil || material.Digest() != listing.Material.Digest() {
-		t.Errorf("ProjectMaterial() = %v, %v", material.Digest(), err)
 	}
 }
 
@@ -273,16 +281,6 @@ func TestListProvidersFailsOnABrokenFileAndAnUnreadableHome(t *testing.T) {
 	g.host.HomeErr = errors.New("no home")
 	if _, err := ListProviders(g.deps(), Options{}); err == nil || !strings.Contains(err.Error(), "no home") {
 		t.Errorf("ListProviders() error = %v, want the home failure", err)
-	}
-}
-
-func TestNeedsApprovalIsFalseWithoutAProviderOrMaterial(t *testing.T) {
-	material := providers.Material{Models: []string{"main=x"}}
-	if needsApproval(Options{}, material) {
-		t.Error("a run without a provider needs no approval")
-	}
-	if needsApproval(Options{Provider: "alpha", Agent: "claude"}, providers.Material{}) {
-		t.Error("a run without project material needs no approval")
 	}
 }
 

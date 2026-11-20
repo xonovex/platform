@@ -6,7 +6,7 @@ import (
 
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // defaultSource is the source of an axis no layer set.
@@ -88,9 +88,9 @@ func readyReport(report Report) bool {
 	return true
 }
 
-func axisChoices(plan Plan, resolved config.Resolved) []AxisChoice {
+func axisChoices(plan Plan, resolved runconfig.Resolved) []AxisChoice {
 	layers := resolved.Layers()
-	source := func(key config.Key) string {
+	source := func(key runconfig.Key) string {
 		if names := layers[key]; len(names) > 0 {
 			parts := make([]string, len(names))
 			for i, name := range names {
@@ -101,13 +101,13 @@ func axisChoices(plan Plan, resolved config.Resolved) []AxisChoice {
 		return defaultSource
 	}
 	axes := []AxisChoice{
-		{"agent", plan.Agent.Binary, source(config.KeyAgent)},
-		{"isolation", string(plan.IsolationName), source(config.KeyIsolation)},
-		{"provision", string(plan.ProvisionName), source(config.KeyProvision)},
-		{"network", string(plan.Run.Network), source(config.KeyNetwork)},
+		{"agent", plan.Agent.Binary, source(runconfig.KeyAgent)},
+		{"isolation", string(plan.IsolationName), source(runconfig.KeyIsolation)},
+		{"provision", string(plan.ProvisionName), source(runconfig.KeyProvision)},
+		{"network", string(plan.Run.Network), source(runconfig.KeyNetwork)},
 	}
 	if plan.Provider != nil {
-		axes = append(axes, AxisChoice{"provider", plan.Provider.Name, source(config.KeyProvider)})
+		axes = append(axes, AxisChoice{"provider", plan.Provider.Name, source(runconfig.KeyProvider)})
 		for _, slot := range plan.Provider.Slots {
 			value := slot.ID
 			if slot.Effort != "" {

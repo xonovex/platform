@@ -13,11 +13,13 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
@@ -39,9 +41,19 @@ const (
 	goldenBridge   = "/opt/agent-cli/agent-cli"
 	goldenProxy    = "127.0.0.1:41000"
 	goldenOverlay  = "/tmp/overlay"
-	goldenUser     = "/home/user/.config/sandboxed-claude/providers"
+	goldenUser     = "/home/user/.config/agentic/providers.d"
 	goldenCheckout = "/work/checkout"
 )
+
+// goldenValidator checks the configuration files against the schemas of the
+// contract.
+var goldenValidator = func() jsonschema.Validator {
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		panic(err)
+	}
+	return validator
+}()
 
 // goldenHost is a oshosttest.Fake whose every process succeeds, so a run of a
 // real isolator reaches the launch of the agent and the test records it.
@@ -195,13 +207,14 @@ func goldenCase(isolation string, variant goldenVariant, mode goldenMode) string
 		Overlays:    goldenOverlays{},
 		Workspaces:  map[wsp.VCSType]wsshared.VCS{wsp.VCSGit: goldenVCS{}},
 		Terminals:   map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: goldenTerminal{&terminalCalls}},
+		Validator:   goldenValidator,
 	}
 	options := launch.Options{
 		Agent:                     "claude",
 		Isolation:                 isolation,
 		Provision:                 "none",
 		Network:                   "host",
-		Explicit:                  config.KeysOf(config.KeyAgent, config.KeyIsolation, config.KeyProvision, config.KeyNetwork),
+		Explicit:                  runconfig.KeysOf(runconfig.KeyAgent, runconfig.KeyIsolation, runconfig.KeyProvision, runconfig.KeyNetwork),
 		IsolationBwrapPassthrough: isolation == "bwrap",
 		Image:                     goldenImage,
 		NixSource:                 "packages",

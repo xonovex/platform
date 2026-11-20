@@ -5,134 +5,138 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
-
-// flagsOrigin is the origin of the command line in the provenance.
-const flagsOrigin = "command line"
 
 // flagInput is the command line of this run as the top configuration layer. A
 // scalar counts only when the user chose it, because a flag that holds its default
 // must not shadow the value of a file.
-func flagInput(options Options) config.Input {
-	entries := config.Entries{}
-	for key, value := range map[config.Key]string{
-		config.KeyAgent:     options.Agent,
-		config.KeyIsolation: options.Isolation,
-		config.KeyProvision: options.Provision,
-		config.KeyNetwork:   options.Network,
+func flagInput(options Options) []merge.Flag {
+	var flags []merge.Flag
+	for _, text := range []struct {
+		key   runconfig.Key
+		value string
+	}{
+		{runconfig.KeyAgent, options.Agent},
+		{runconfig.KeyIsolation, options.Isolation},
+		{runconfig.KeyProvision, options.Provision},
+		{runconfig.KeyNetwork, options.Network},
 	} {
-		if options.Explicit.Has(key) && value != "" {
-			entries[key] = config.Value{Text: value}
+		if options.Explicit.Has(text.key) && text.value != "" {
+			flags = append(flags, runconfig.Text(text.key, text.value))
 		}
 	}
 	if options.Provider != "" {
-		entries[config.KeyProvider] = config.Value{Text: options.Provider}
+		flags = append(flags, runconfig.Text(runconfig.KeyProvider, options.Provider))
 	}
-	for key, items := range map[config.Key][]string{
-		config.KeyModels:      options.Models,
-		config.KeyBindPaths:   options.BindPaths,
-		config.KeyRoBindPaths: options.RoBindPaths,
-		config.KeyCustomEnv:   options.CustomEnv,
-		config.KeyAllowHosts:  options.AllowHosts,
-		config.KeyCredentials: options.Credentials,
+	for _, list := range []struct {
+		key   runconfig.Key
+		items []string
+	}{
+		{runconfig.KeyModels, options.Models},
+		{runconfig.KeyBindPaths, options.BindPaths},
+		{runconfig.KeyRoBindPaths, options.RoBindPaths},
+		{runconfig.KeyCustomEnv, options.CustomEnv},
+		{runconfig.KeyAllowHosts, options.AllowHosts},
+		{runconfig.KeyCredentials, options.Credentials},
 	} {
-		if len(items) > 0 {
-			entries[key] = config.Value{Items: items}
+		if len(list.items) > 0 {
+			flags = append(flags, runconfig.List(list.key, list.items))
 		}
 	}
-	for key, on := range map[config.Key]bool{
-		config.KeyRequirePinnedProvision:      options.Policy.RequirePinnedProvision,
-		config.KeyRequireHostToolsUnreachable: options.Policy.RequireHostToolsUnreachable,
-		config.KeyRequireEgressRestricted:     options.Policy.RequireEgressRestricted,
-		config.KeyRequireKernelIsolation:      options.Policy.RequireKernelIsolation,
+	for _, demand := range []struct {
+		key runconfig.Key
+		on  bool
+	}{
+		{runconfig.KeyRequirePinnedProvision, options.Policy.RequirePinnedProvision},
+		{runconfig.KeyRequireHostToolsUnreachable, options.Policy.RequireHostToolsUnreachable},
+		{runconfig.KeyRequireEgressRestricted, options.Policy.RequireEgressRestricted},
+		{runconfig.KeyRequireKernelIsolation, options.Policy.RequireKernelIsolation},
 	} {
-		if on {
-			entries[key] = config.Value{On: true}
+		if demand.on {
+			flags = append(flags, runconfig.Demand(demand.key))
 		}
 	}
-	return config.Input{Layer: config.LayerFlags, Origin: flagsOrigin, Entries: entries}
+	return flags
 }
 
 // applyResolved folds the merged configuration into the options of the run. It
 // replaces each list with the merged one, which already holds the entries of the
 // command line, and records whether a layer chose an isolation or provision
 // axis, so the pinned default yields to it.
-func applyResolved(options Options, resolved config.Resolved) Options {
-	for key, target := range map[config.Key]*string{
-		config.KeyAgent:     &options.Agent,
-		config.KeyProvider:  &options.Provider,
-		config.KeyIsolation: &options.Isolation,
-		config.KeyProvision: &options.Provision,
-		config.KeyNetwork:   &options.Network,
-		config.KeyHomeDir:   &options.HomeDir,
+func applyResolved(options Options, resolved runconfig.Resolved) Options {
+	for key, target := range map[runconfig.Key]*string{
+		runconfig.KeyAgent:     &options.Agent,
+		runconfig.KeyProvider:  &options.Provider,
+		runconfig.KeyIsolation: &options.Isolation,
+		runconfig.KeyProvision: &options.Provision,
+		runconfig.KeyNetwork:   &options.Network,
+		runconfig.KeyHomeDir:   &options.HomeDir,
 	} {
 		if resolved.Has(key) {
 			*target = resolved.Text(key)
 		}
 	}
-	for _, key := range []config.Key{config.KeyIsolation, config.KeyProvision} {
+	for _, key := range []runconfig.Key{runconfig.KeyIsolation, runconfig.KeyProvision} {
 		if options.Explicit.Has(key) || resolved.Has(key) {
 			options.ExplicitAxes = true
 		}
 	}
-	options.Models = resolved.Items(config.KeyModels)
-	options.BindPaths = resolved.Items(config.KeyBindPaths)
-	options.RoBindPaths = resolved.Items(config.KeyRoBindPaths)
-	options.CustomEnv = resolved.Items(config.KeyCustomEnv)
-	options.AllowHosts = resolved.Items(config.KeyAllowHosts)
-	options.Credentials = resolved.Items(config.KeyCredentials)
-	options.Policy.RequirePinnedProvision = resolved.On(config.KeyRequirePinnedProvision)
-	options.Policy.RequireHostToolsUnreachable = resolved.On(config.KeyRequireHostToolsUnreachable)
-	options.Policy.RequireEgressRestricted = resolved.On(config.KeyRequireEgressRestricted)
-	options.Policy.RequireKernelIsolation = resolved.On(config.KeyRequireKernelIsolation)
+	options.Models = resolved.Items(runconfig.KeyModels)
+	options.BindPaths = resolved.Items(runconfig.KeyBindPaths)
+	options.RoBindPaths = resolved.Items(runconfig.KeyRoBindPaths)
+	options.CustomEnv = resolved.Items(runconfig.KeyCustomEnv)
+	options.AllowHosts = resolved.Items(runconfig.KeyAllowHosts)
+	options.Credentials = resolved.Items(runconfig.KeyCredentials)
+	options.Policy.RequirePinnedProvision = resolved.On(runconfig.KeyRequirePinnedProvision)
+	options.Policy.RequireHostToolsUnreachable = resolved.On(runconfig.KeyRequireHostToolsUnreachable)
+	options.Policy.RequireEgressRestricted = resolved.On(runconfig.KeyRequireEgressRestricted)
+	options.Policy.RequireKernelIsolation = resolved.On(runconfig.KeyRequireKernelIsolation)
 	return options
 }
 
 // resolution is a run whose options carry every configuration layer and whose plan
 // is built from them.
 type resolution struct {
-	config  config.Resolved
+	config  runconfig.Resolved
 	plan    Plan
 	planErr error
 }
 
-// resolve loads the configuration layers, merges them with the command line and
-// builds the plan. A configuration error is returned; a plan error is returned
-// as well unless advisory is set, which builds the plan without demanding the
-// guarantees of the policy.
+// ConfigEnv is the environment the configuration of a run is read through.
+// The trust gate asks its question on Out.
+func (d Dependencies) ConfigEnv() runconfig.Env {
+	return runconfig.Env{Host: d.Host, Validator: d.Validator, Out: d.Out}
+}
+
+// configRequest locates the configuration of the options.
+func configRequest(options Options) runconfig.Request {
+	return runconfig.Request{
+		Start: options.WorkDir, Project: options.Project,
+		ApproveDigest: options.ApproveDigest, Flags: flagInput(options),
+	}
+}
+
+// resolve loads the configuration layers, lets the project content through the
+// trust gate, merges the layers with the command line and builds the plan. A
+// configuration error is returned; a plan error is returned as well unless
+// advisory is set, which builds the plan without demanding the guarantees of
+// the policy.
 func resolve(deps Dependencies, options Options, advisory bool) (resolution, error) {
 	cwd, err := deps.Host.Getwd()
 	if err != nil {
 		return resolution{}, fmt.Errorf("resolve current working directory: %w", err)
 	}
-	inputs, err := config.LoadLayers(deps.Host, options.Config, absolute(cwd, options.WorkDir))
-	if err != nil {
-		return resolution{}, fmt.Errorf("failed to load config: %w", err)
-	}
-	merged, err := config.Merge(append(inputs, flagInput(options)))
+	loaded, err := runconfig.Load(deps.ConfigEnv(), configRequest(options))
 	if err != nil {
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
 	}
-	effective := applyResolved(options, merged)
-	set, err := config.LoadProviders(deps.Host, options.Config, absolute(cwd, options.WorkDir))
-	if err != nil {
-		return resolution{}, fmt.Errorf("failed to load providers: %w", err)
-	}
-	effective.Catalog = providers.NewCatalog(set.Documents...)
-	effective.UserProviderDir = userProviderDir(set.Dirs)
-	if effective.ModelOverrides, err = parseModelOverrides(merged.Sourced(config.KeyModels)); err != nil {
+	effective := applyResolved(options, loaded.Resolved)
+	effective.Catalog = providers.NewCatalog(loaded.Providers...)
+	effective.UserProviderDir = loaded.UserProviderDir()
+	if effective.ModelOverrides, err = parseModelOverrides(loaded.Resolved.Sourced(runconfig.KeyModels)); err != nil {
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
-	}
-	material := providers.Material{Documents: set.Project, Models: config.ProjectModels(inputs)}
-	if needsApproval(effective, material) {
-		approved, err := approvedDigest(deps.Approvals, material.Digest())
-		if err != nil {
-			return resolution{}, fmt.Errorf("read the approvals: %w", err)
-		}
-		if !approved {
-			return resolution{}, &ApprovalRequiredError{Material: material}
-		}
 	}
 	home := effective.HomeDir
 	if home == "" {
@@ -145,26 +149,5 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 		build = advisoryPlan
 	}
 	plan, err := build(effective, cwd, home, deps.Sandboxes)
-	return resolution{config: merged, plan: plan, planErr: err}, nil
-}
-
-// userProviderDir is the provider directory of the user layer, or empty when
-// no user layer has one.
-func userProviderDir(dirs []config.ProviderDir) string {
-	path := ""
-	for _, dir := range dirs {
-		if dir.Layer == config.LayerUser {
-			path = dir.Path
-		}
-	}
-	return path
-}
-
-// approvedDigest asks the approvals whether the digest is approved; a build
-// without approvals approves nothing.
-func approvedDigest(approvals Approvals, digest string) (bool, error) {
-	if approvals == nil {
-		return false, nil
-	}
-	return approvals.Approved(ApprovalKind, digest)
+	return resolution{config: loaded.Resolved, plan: plan, planErr: err}, nil
 }

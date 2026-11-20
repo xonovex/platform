@@ -32,7 +32,7 @@ log: [INFO]   Protocol: messages
 log: [INFO]   Model access: provider (environment)
 log: [INFO]   Version probe: claude --version
 log: [INFO]   Provider: route
-log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Model main: model-main (/home/user/.config/agentic/providers.d/route.json)
 log: [INFO]   Work directory: /work/repo
 log: [INFO]   Arguments: [review --depth 2]
 log: [INFO]   Network: host
@@ -277,7 +277,7 @@ log: [INFO]   Protocol: messages
 log: [INFO]   Model access: provider (environment)
 log: [INFO]   Version probe: claude --version
 log: [INFO]   Provider: route
-log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Model main: model-main (/home/user/.config/agentic/providers.d/route.json)
 log: [INFO]   Work directory: /work/repo
 log: [INFO]   Arguments: [review --depth 2]
 log: [INFO]   Network: host
@@ -558,7 +558,7 @@ log: [INFO]   Protocol: messages
 log: [INFO]   Model access: provider (environment)
 log: [INFO]   Version probe: claude --version
 log: [INFO]   Provider: route
-log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Model main: model-main (/home/user/.config/agentic/providers.d/route.json)
 log: [INFO]   Work directory: /work/repo
 log: [INFO]   Arguments: [review --depth 2]
 log: [INFO]   Network: host
@@ -891,7 +891,7 @@ log: [INFO]   Protocol: messages
 log: [INFO]   Model access: provider (environment)
 log: [INFO]   Version probe: claude --version
 log: [INFO]   Provider: route
-log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Model main: model-main (/home/user/.config/agentic/providers.d/route.json)
 log: [INFO]   Work directory: /work/repo
 log: [INFO]   Arguments: [review --depth 2]
 log: [INFO]   Network: host
@@ -1362,7 +1362,7 @@ log: [INFO]   Protocol: messages
 log: [INFO]   Model access: provider (environment)
 log: [INFO]   Version probe: claude --version
 log: [INFO]   Provider: route
-log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Model main: model-main (/home/user/.config/agentic/providers.d/route.json)
 log: [INFO]   Work directory: /work/repo
 log: [INFO]   Arguments: [review --depth 2]
 log: [INFO]   Network: host

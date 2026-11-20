@@ -12,32 +12,26 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
 // Host is the port the executor consumes to locate the run and to time it: the
-// working directory, the home directory, the configuration files, the
-// environment the provider route reads its credential from, and the clock.
+// working directory, the home directory, the configuration files and the
+// terminal of the trust gate, the environment the provider route reads its
+// credential from, and the clock.
 type Host interface {
-	config.Files
+	runconfig.Host
 	// ReadDir returns the entries of a directory, sorted by name.
 	ReadDir(path string) ([]fs.DirEntry, error)
-	Getwd() (string, error)
-	Getenv(key string) string
 	Now() time.Time
-}
-
-// Approvals answers whether the user approved a digest of content a repository
-// supplies.
-type Approvals interface {
-	Approved(kind, digest string) (bool, error)
 }
 
 // Recorder stores the record of a finished run and returns its id.
@@ -69,9 +63,8 @@ type Dependencies struct {
 	Overlays Overlays
 	// Records stores the run record; it may be nil for a build that keeps none.
 	Records Recorder
-	// Approvals holds the digests the user approved; it may be nil for a build
-	// that approves nothing, and project provider content then never takes effect.
-	Approvals  Approvals
+	// Validator checks each agentic.json against the schemas of the contract.
+	Validator  jsonschema.Validator
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
 }

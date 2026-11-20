@@ -21,6 +21,6 @@ with multiple model providers and sandbox options.`,
 		Version: version,
 	}
 	root.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
-	root.AddCommand(newRunCommand(deps, ports), newPreflightCommand(deps), newProvidersCommand(deps, ports), newRunsCommand(records), newSchemaCommand(deps.Out), newPluginCommand(ports), newMarketplaceCommand(ports), newCompletionCommand(), newEgressBridgeCommand(bridge))
+	root.AddCommand(newRunCommand(deps), newPreflightCommand(deps), newProvidersCommand(deps), newConfigCommand(deps), newRunsCommand(records), newSchemaCommand(deps.Out), newPluginCommand(ports), newMarketplaceCommand(ports), newCompletionCommand(), newEgressBridgeCommand(bridge))
 	return root
 }

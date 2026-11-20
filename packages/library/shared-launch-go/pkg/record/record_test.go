@@ -32,7 +32,7 @@ func exited(code int) Record {
 		Overlay:     Overlay{Plugins: []Digest{{Name: "plugin-core", Digest: "sha256:" + strings.Repeat("a", 64)}}},
 		Credentials: []string{"TOKEN"},
 		WorkDir:     "/work/repo",
-		Config:      Config{Sources: []Source{{Layer: "user", Path: "/home/user/.config/sandboxed-claude/config"}, {Layer: "flags"}}, Decided: map[string][]string{"isolation": {"flags"}}},
+		Config:      Config{Sources: []Source{{Layer: "user", Path: "/home/user/.config/agentic/agentic.json"}, {Layer: "flags"}}, Decided: map[string][]string{"isolation": {"flags"}}},
 	}
 }
 

@@ -3,6 +3,10 @@ package launch
 import (
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
@@ -14,6 +18,30 @@ import (
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
+
+// The agentic.json files of the layers on the Fake host, whose home is
+// /home/user and whose working directory is /work/repo.
+const (
+	userDir     = "/home/user/.config/agentic"
+	userFile    = userDir + "/agentic.json"
+	managedFile = "/etc/agentic/agentic.json"
+	projectFile = "/work/repo/agentic.json"
+)
+
+// runFile is an agentic.json file with the run section.
+func runFile(section string) string { return `{"version":1,"run":` + section + `}` }
+
+// digestOf is the digest the trust gate approves for a file.
+func digestOf(data string) string { return layer.Digest([]byte(data)) }
+
+// testValidator checks the files against the schemas of the contract.
+var testValidator = func() jsonschema.Validator {
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		panic(err)
+	}
+	return validator
+}()
 
 // fakeIsolator records the calls of the executor and answers with its fields.
 // It confines the network, is kernel-isolated only under runsc, and is pinned

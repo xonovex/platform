@@ -5,8 +5,6 @@ import (
 	"slices"
 	"strings"
 	"testing"
-
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
 type fakeOverlays struct {
@@ -34,7 +32,7 @@ func overlayOptions() Options {
 }
 
 func TestNewPlanResolvesTheOverlayRequest(t *testing.T) {
-	p := mustPlan(t, overlayOptions(), config.FileConfig{})
+	p := mustPlan(t, overlayOptions(), "")
 	if p.Overlay == nil {
 		t.Fatal("no overlay request")
 	}
@@ -42,13 +40,13 @@ func TestNewPlanResolvesTheOverlayRequest(t *testing.T) {
 		t.Errorf("overlay = %+v", p.Overlay)
 	}
 
-	if p := mustPlan(t, baseOptions(), config.FileConfig{}); p.Overlay != nil {
+	if p := mustPlan(t, baseOptions(), ""); p.Overlay != nil {
 		t.Errorf("a run without plugins has the overlay %+v", p.Overlay)
 	}
 	options := overlayOptions()
 	options.Store = ""
 	options.DryRun = true
-	if p := mustPlan(t, options, config.FileConfig{}); p.Overlay.Store != "" || !p.Overlay.DryRun {
+	if p := mustPlan(t, options, ""); p.Overlay.Store != "" || !p.Overlay.DryRun {
 		t.Errorf("overlay = %+v", p.Overlay)
 	}
 }
@@ -62,7 +60,7 @@ func TestNewPlanRejectsAnInvalidOverlay(t *testing.T) {
 	for name, mutate := range cases {
 		options := overlayOptions()
 		mutate(&options)
-		if _, err := plan(t, options, config.FileConfig{}); err == nil {
+		if _, err := plan(t, options, ""); err == nil {
 			t.Errorf("%s: NewPlan() error = nil", name)
 		}
 	}

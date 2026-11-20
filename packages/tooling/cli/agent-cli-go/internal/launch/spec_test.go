@@ -11,20 +11,20 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 func TestNewPlanStartsTheAgentWithoutPromptsOnlyInsideABoundary(t *testing.T) {
 	options := baseOptions()
 	options.AgentArgs = []string{"go"}
 
-	host := mustPlan(t, options, config.FileConfig{})
+	host := mustPlan(t, options, "")
 	if !slices.Equal(host.Run.Process.Argv, []string{"claude", "go"}) {
 		t.Errorf("unbounded argv = %v, want claude go", host.Run.Process.Argv)
 	}
 
 	options.Isolation = "bwrap"
-	bounded := mustPlan(t, options, config.FileConfig{})
+	bounded := mustPlan(t, options, "")
 	if !slices.Equal(bounded.Run.Process.Argv, []string{"claude", "--permission-mode", "bypassPermissions", "go"}) {
 		t.Errorf("bounded argv = %v, want the sandbox arguments", bounded.Run.Process.Argv)
 	}
@@ -36,7 +36,7 @@ func TestNewPlanCarriesTheProviderArgumentsInTheProcess(t *testing.T) {
 	options.Provider = "gamma"
 	options.AgentArgs = []string{"go"}
 
-	p := mustPlan(t, options, config.FileConfig{})
+	p := mustPlan(t, options, "")
 
 	if !slices.Equal(p.Run.Process.Argv, []string{"codex", "--model", "model-main", "go"}) {
 		t.Errorf("argv = %v, want the provider route before the user arguments", p.Run.Process.Argv)
@@ -50,7 +50,7 @@ func TestNewPlanFillsThePortableSpec(t *testing.T) {
 	options.Credentials = []string{"API_KEY=env:SOURCE"}
 	options.Policy = policy.SandboxPolicy{RequireEgressRestricted: true}
 
-	p := mustPlan(t, options, config.FileConfig{})
+	p := mustPlan(t, options, "")
 
 	if p.IsolationName != isolation.IsolationBwrap || p.ProvisionName != provision.ProvisionNone || p.Run.Network != network.NetworkManaged {
 		t.Errorf("axes = %s %s %s", p.IsolationName, p.ProvisionName, p.Run.Network)
@@ -86,38 +86,24 @@ func TestNewPlanYieldsThePinnedPairToAnExplicitAxis(t *testing.T) {
 }
 
 func TestApplyResolvedMarksAnAxisTheCommandLineOrALayerChose(t *testing.T) {
-	merge := func(options Options, file config.FileConfig) Options {
-		return fold(t, options, file)
+	merge := func(options Options, section string) Options {
+		return fold(t, options, section)
 	}
-	if merge(baseOptions(), config.FileConfig{}).ExplicitAxes {
+	if merge(baseOptions(), "").ExplicitAxes {
 		t.Error("ExplicitAxes = true without a chosen axis")
 	}
-	if !merge(baseOptions(), config.FileConfig{Provision: "nix"}).ExplicitAxes {
+	if !merge(baseOptions(), `{"provision":"nix"}`).ExplicitAxes {
 		t.Error("ExplicitAxes = false for a provision the user layer chose")
 	}
 	flagged := baseOptions()
-	flagged.Explicit = config.KeysOf(config.KeyIsolation)
-	if !merge(flagged, config.FileConfig{}).ExplicitAxes {
+	flagged.Explicit = runconfig.KeysOf(runconfig.KeyIsolation)
+	if !merge(flagged, "").ExplicitAxes {
 		t.Error("ExplicitAxes = false for an isolation the command line chose")
 	}
 	network := baseOptions()
-	network.Explicit = config.KeysOf(config.KeyNetwork)
-	if merge(network, config.FileConfig{}).ExplicitAxes {
+	network.Explicit = runconfig.KeysOf(runconfig.KeyNetwork)
+	if merge(network, "").ExplicitAxes {
 		t.Error("ExplicitAxes = true for a network choice")
-	}
-}
-
-func TestUserProviderDirNamesTheLastUserLayer(t *testing.T) {
-	dirs := []config.ProviderDir{
-		{Layer: config.LayerManaged, Path: "/etc/providers"},
-		{Layer: config.LayerUser, Path: "/home/user/providers"},
-		{Layer: config.LayerProject, Path: "/work/repo/providers"},
-	}
-	if got := userProviderDir(dirs); got != "/home/user/providers" {
-		t.Errorf("userProviderDir() = %q, want the user directory", got)
-	}
-	if got := userProviderDir(dirs[:1]); got != "" {
-		t.Errorf("userProviderDir(managed only) = %q, want empty", got)
 	}
 }
 
@@ -168,7 +154,7 @@ func TestNewPlanRejectsARouteTheAgentDoesNotRead(t *testing.T) {
 	options.Provider = "argued"
 	options.Catalog = providers.NewCatalog(providers.Document{Preset: preset, Layer: "user", Origin: "/test/argued.json", Raw: []byte(raw)})
 
-	if _, err := plan(t, options, config.FileConfig{}); err == nil || !strings.Contains(err.Error(), "sets arguments that agent claude does not take") {
+	if _, err := plan(t, options, ""); err == nil || !strings.Contains(err.Error(), "sets arguments that agent claude does not take") {
 		t.Fatalf("NewPlan() error = %v, want the unread route", err)
 	}
 }

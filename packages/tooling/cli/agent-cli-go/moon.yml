@@ -8,6 +8,7 @@ tags:
   - cli
 dependsOn:
   - shared-agent-go
+  - shared-config-go
   - shared-contract-go
   - shared-core-go
   - shared-launch-go
@@ -77,7 +78,6 @@ tasks:
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
         ./internal/cmd=97 \
-        ./internal/config=100 \
         ./internal/launch=99 \
         ./internal/origin=exempt \
         ./internal/origin/directory=100 \
@@ -86,6 +86,7 @@ tasks:
         ./internal/origin/shared=100 \
         ./internal/overlay=100 \
         ./internal/plugin=100 \
+        ./internal/runconfig=100 \
         ./internal/trust=100 \
         ./internal/sandbox/plugins=100 \
         ./internal/schematest=92 \

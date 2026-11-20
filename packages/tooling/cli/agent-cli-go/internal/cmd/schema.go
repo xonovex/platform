@@ -10,8 +10,6 @@ import (
 	"github.com/spf13/cobra"
 
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
-
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
 // schemaSource returns one JSON Schema.
@@ -19,13 +17,12 @@ type schemaSource func() ([]byte, error)
 
 // schemas are the JSON Schemas the CLI prints, by name.
 var schemas = map[string]schemaSource{
-	"config":     infallible(config.Schema),
-	"provider":   contractSchema(contract.Provider),
-	"run-record": contractSchema(contract.RunRecord),
-}
-
-func infallible(build func() []byte) schemaSource {
-	return func() ([]byte, error) { return build(), nil }
+	"agentic":           contractSchema(contract.Agentic),
+	"agentic-run":       contractSchema(contract.AgenticRun),
+	"agentic-providers": contractSchema(contract.AgenticProviders),
+	"provider":          contractSchema(contract.Provider),
+	"harness-override":  contractSchema(contract.HarnessOverride),
+	"run-record":        contractSchema(contract.RunRecord),
 }
 
 // contractSchema returns the schema of shared-contract-go with the id, which
@@ -56,8 +53,8 @@ func writeJSON(out io.Writer, value any) error {
 }
 
 // newSchemaCommand builds `agent-cli schema`: it prints a JSON Schema, so an
-// editor or a pipeline can validate a configuration file or a run record without
-// reading the source.
+// editor or a pipeline can validate an agentic.json file, a provider or harness
+// override file, or a run record without reading the source.
 func newSchemaCommand(out io.Writer) *cobra.Command {
 	return schemaCommand(out, schemas)
 }
@@ -65,7 +62,7 @@ func newSchemaCommand(out io.Writer) *cobra.Command {
 func schemaCommand(out io.Writer, sources map[string]schemaSource) *cobra.Command {
 	return &cobra.Command{
 		Use:       "schema [" + strings.Join(schemaNames(), "|") + "]",
-		Short:     "Print a JSON Schema of the configuration file, a provider file or the run record",
+		Short:     "Print a JSON Schema of agentic.json, a provider or harness override file, or the run record",
 		Args:      cobra.MaximumNArgs(1),
 		ValidArgs: schemaNames(),
 		RunE: func(_ *cobra.Command, args []string) error {

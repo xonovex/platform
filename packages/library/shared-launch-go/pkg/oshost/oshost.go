@@ -95,19 +95,9 @@ func (System) UserHomeDir() (string, error) { return os.UserHomeDir() }
 // Now returns the current time.
 func (System) Now() time.Time { return time.Now() }
 
-// ManagedConfigDir returns the directory of the system-wide configuration that
-// an administrator manages: /etc/agent-cli, or the machine-wide application data
-// directory of macOS and Windows.
-func (System) ManagedConfigDir() string {
-	switch runtime.GOOS {
-	case "darwin":
-		return "/Library/Application Support/agent-cli"
-	case "windows":
-		return filepath.Join(os.Getenv("ProgramData"), "agent-cli")
-	default:
-		return "/etc/agent-cli"
-	}
-}
+// GOOS names the operating system, as runtime.GOOS does, so a caller chooses
+// the directories of the platform without reading the machine itself.
+func (System) GOOS() string { return runtime.GOOS }
 
 // Getuid returns the user id of this process.
 func (System) Getuid() int { return os.Getuid() }

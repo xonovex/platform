@@ -11,13 +11,12 @@ import (
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
-// userProviders is the providers directory beside the default user configuration.
-const userProviders = "/home/user/.config/sandboxed-claude/providers"
+// userProviders is the provider shard directory beside the user agentic.json.
+const userProviders = userDir + "/providers.d"
 
 // executeFixture wires Execute to doubles: the bwrap and docker methods resolve
 // to one isolator, a git checkout creates /work/created, and tmux is installed.
@@ -53,6 +52,7 @@ func (f *executeFixture) deps() Dependencies {
 		Out:        &f.out,
 		Sandboxes:  f.sandbox.registry,
 		Records:    f.records,
+		Validator:  testValidator,
 		Workspaces: map[wsp.VCSType]wsshared.VCS{wsp.VCSGit: f.vcs},
 		Terminals:  map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: f.terminal},
 	}
@@ -369,11 +369,11 @@ func TestExecuteStopsOnAnInvalidPlan(t *testing.T) {
 
 func TestExecuteLoadsTheConfigurationFile(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/etc/providers/beta.json", providerFile("beta", "claude", "Display beta"), 0o644)
-	f.host.AddFile("/etc/agent.yaml", "homeDir: /srv/home\nprovider: beta\n", 0o600)
+	f.host.Env["XDG_CONFIG_HOME"] = "/xdg"
+	f.host.AddFile("/xdg/agentic/providers.d/beta.json", providerFile("beta", "claude", "Display beta"), 0o644)
+	f.host.AddFile("/xdg/agentic/agentic.json", runFile(`{"homeDir":"/srv/home","provider":"beta"}`), 0o600)
 	f.host.HomeErr = errors.New("no home")
 	options := bwrapOptions()
-	options.Config = "/etc/agent.yaml"
 
 	if err := Execute(f.deps(), options); err != nil {
 		t.Fatalf("Execute() error = %v", err)
@@ -390,14 +390,13 @@ func TestExecuteReportsHostFailures(t *testing.T) {
 		modify func(*executeFixture, *Options)
 		phrase string
 	}{
-		{"config", func(_ *executeFixture, o *Options) { o.Config = "/missing.yaml" }, "failed to load config"},
-		{"invalid default config", func(f *executeFixture, _ *Options) {
-			f.host.AddFile(config.DefaultPath("/home/user"), "providre=glm\n", 0o600)
-		}, "failed to load config"},
-		{"home", func(f *executeFixture, o *Options) {
-			f.host.AddFile("/etc/agent.yaml", "{}\n", 0o600)
+		{"config", func(_ *executeFixture, o *Options) { o.Project = "/missing.json" }, "resolve configuration"},
+		{"invalid user config", func(f *executeFixture, _ *Options) {
+			f.host.AddFile(userFile, runFile(`{"providre":"glm"}`), 0o600)
+		}, "resolve configuration"},
+		{"home", func(f *executeFixture, _ *Options) {
+			f.host.Env["XDG_CONFIG_HOME"] = "/xdg"
 			f.host.HomeErr = errors.New("no home")
-			o.Config = "/etc/agent.yaml"
 		}, "resolve user home directory: no home"},
 	}
 	for _, test := range tests {

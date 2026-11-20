@@ -262,26 +262,14 @@ func TestExecutableReturnsTheTestBinary(t *testing.T) {
 	}
 }
 
-func TestNowAndTheManagedConfigDirectory(t *testing.T) {
+func TestNowAndTheOperatingSystem(t *testing.T) {
 	s, _, _ := newTestSystem("")
 
 	if drift := time.Since(s.Now()); drift < -time.Minute || drift > time.Minute {
 		t.Errorf("Now() is %v away from the clock", drift)
 	}
-	dir := s.ManagedConfigDir()
-	switch runtime.GOOS {
-	case "darwin":
-		if dir != "/Library/Application Support/agent-cli" {
-			t.Errorf("ManagedConfigDir() = %q", dir)
-		}
-	case "windows":
-		if filepath.Base(dir) != "agent-cli" {
-			t.Errorf("ManagedConfigDir() = %q", dir)
-		}
-	default:
-		if dir != "/etc/agent-cli" {
-			t.Errorf("ManagedConfigDir() = %q", dir)
-		}
+	if got := s.GOOS(); got != runtime.GOOS {
+		t.Errorf("GOOS() = %q, want %q", got, runtime.GOOS)
 	}
 }
 

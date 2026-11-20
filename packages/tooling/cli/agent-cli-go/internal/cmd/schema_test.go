@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
-
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
 func TestSchemaPrintsEachSchemaAsJSON(t *testing.T) {
-	for name, id := range map[string]string{"config": config.SchemaID, "provider": contract.Provider, "run-record": contract.RunRecord} {
+	for name, id := range map[string]string{
+		"agentic": contract.Agentic, "agentic-run": contract.AgenticRun, "agentic-providers": contract.AgenticProviders,
+		"provider": contract.Provider, "harness-override": contract.HarnessOverride, "run-record": contract.RunRecord,
+	} {
 		r := newTestRoot()
 
 		if err := r.execute("schema", name); err != nil {
@@ -35,7 +36,7 @@ func TestSchemaListsTheNamesWithoutAnArgument(t *testing.T) {
 	if err := r.execute("schema"); err != nil {
 		t.Fatalf("schema error = %v", err)
 	}
-	if r.out.String() != "config\nprovider\nrun-record\n" {
+	if r.out.String() != "agentic\nagentic-providers\nagentic-run\nharness-override\nprovider\nrun-record\n" {
 		t.Errorf("schema = %q, want the names", r.out.String())
 	}
 }
@@ -46,13 +47,13 @@ func TestSchemaRejectsAnUnknownNameAsUsage(t *testing.T) {
 	err := r.execute("schema", "nosuch")
 
 	var usage UsageError
-	if !errors.As(err, &usage) || !strings.Contains(err.Error(), "config, provider, run-record") {
+	if !errors.As(err, &usage) || !strings.Contains(err.Error(), "agentic, agentic-providers, agentic-run, harness-override, provider, run-record") {
 		t.Errorf("schema nosuch error = %v, want a usage error that lists the schemas", err)
 	}
 }
 
 func TestSchemaReportsAFailureToWrite(t *testing.T) {
-	for _, args := range [][]string{{}, {"config"}} {
+	for _, args := range [][]string{{}, {"provider"}} {
 		command := newSchemaCommand(brokenWriter{})
 		command.SetArgs(args)
 		if err := command.Execute(); err == nil {

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 func findCheck(report Report, prefix string) (Check, bool) {
@@ -30,7 +30,7 @@ func findGuarantee(report Report, name string) GuaranteeStatus {
 func TestPreflightReportsAReadyRunWithoutRunningIt(t *testing.T) {
 	f := newExecuteFixture()
 	options := bwrapOptions()
-	options.Explicit = config.KeysOf(config.KeyIsolation)
+	options.Explicit = runconfig.KeysOf(runconfig.KeyIsolation)
 
 	report := Preflight(f.deps(), options)
 
@@ -204,23 +204,22 @@ func TestPreflightReportsAPlanThatDoesNotResolve(t *testing.T) {
 
 func TestPreflightReportsAConfigurationThatDoesNotLoad(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/etc/agent-cli/managed.yaml", "network: none\n", 0o644)
+	f.host.AddFile(managedFile, runFile(`{"network":"none"}`), 0o644)
 	options := bwrapOptions()
 	options.Network = "host"
-	options.Explicit = config.KeysOf(config.KeyNetwork)
+	options.Explicit = runconfig.KeysOf(runconfig.KeyNetwork)
 
 	report := Preflight(f.deps(), options)
 
-	if report.Ready || !strings.Contains(report.Problem, "managed value cannot be changed") {
+	if report.Ready || !strings.Contains(report.Problem, "but the managed file") {
 		t.Errorf("report = %+v, want the managed contradiction", report)
 	}
 }
 
 func TestPreflightReportsTheLayerThatDecidedAnAxis(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile(userConfig, "isolation: bwrap\n", 0o600)
+	f.host.AddFile(userFile, runFile(`{"isolation":"bwrap"}`), 0o600)
 	options := baseOptions()
-	options.Config = userConfig
 
 	report := Preflight(f.deps(), options)
 

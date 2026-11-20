@@ -3,7 +3,7 @@ package launch
 import (
 	launchcore "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // Options are the inputs of one run as the user gave them: the Request the
@@ -19,7 +19,7 @@ type Options struct {
 
 	// Explicit holds the keys the command line chose, as opposed to the defaults
 	// of the flags.
-	Explicit config.Keys
+	Explicit runconfig.Keys
 
 	WorkDir              string
 	WorktreeBranch       string
@@ -34,8 +34,11 @@ type Options struct {
 	OverlayDirs []string
 	Store       string
 
-	// Config is the file of the user layer; empty selects the default file.
-	Config string
+	// Project names the project agentic.json instead of the search from the
+	// work directory, and ApproveDigest is the digest of project content the
+	// user approved on the command line.
+	Project       string
+	ApproveDigest string
 
 	Terminal        string
 	TerminalSession string

@@ -7,7 +7,7 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // writeRecord stores the record of a finished run. A store that fails costs the
@@ -91,7 +91,7 @@ func overlayRecord(sources []OverlaySource) record.Overlay {
 	return overlay
 }
 
-func configRecord(resolved config.Resolved) record.Config {
+func configRecord(resolved runconfig.Resolved) record.Config {
 	var out record.Config
 	for _, source := range resolved.Sources() {
 		out.Sources = append(out.Sources, record.Source{Layer: string(source.Layer), Path: source.Origin})

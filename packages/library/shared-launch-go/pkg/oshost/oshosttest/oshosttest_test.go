@@ -23,13 +23,13 @@ func TestNewDescribesAUser(t *testing.T) {
 	}
 }
 
-func TestNewHasAClockAndAManagedConfigDirectory(t *testing.T) {
+func TestNewHasAClockAndAnOperatingSystem(t *testing.T) {
 	f := New()
 	if got := f.Now(); got.IsZero() || !got.Equal(f.Clock) {
 		t.Errorf("Now() = %v, want the fixed Clock", got)
 	}
-	if got := f.ManagedConfigDir(); got != "/etc/agent-cli" {
-		t.Errorf("ManagedConfigDir() = %q, want /etc/agent-cli", got)
+	if got := f.GOOS(); got != "linux" {
+		t.Errorf("GOOS() = %q, want linux", got)
 	}
 }
 

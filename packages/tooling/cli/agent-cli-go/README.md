@@ -50,8 +50,11 @@ agent-cli runs show latest --json
 agent-cli providers list
 agent-cli run -p <name> --model sonnet=<model-id>
 
+# Show the merged configuration and where each value came from
+agent-cli config show --sources
+
 # Print a JSON Schema
-agent-cli schema config
+agent-cli schema agentic
 agent-cli schema provider
 ```
 
@@ -66,7 +69,8 @@ Options:
   -a, --agent <type>           Agent: claude, codex, copilot, kiro, opencode, pi (default: claude)
   -p, --provider <name>        Model provider, the name of a provider file
       --model <slot>=<id>      Override a model slot of the provider (repeatable)
-      --approve-project-digest <digest>  Approve the project provider files and model overrides
+      --project <file>         Project agentic.json (default: the nearest agentic.json from the work directory up to the repository root)
+      --approve-config-digest <digest>  Approve the project file with this digest
   --isolation <method>         Isolation: none, bwrap, docker, seatbelt, docker-sandboxes, openshell (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
   --network <method>           Network egress: host, none, managed (default: host)
@@ -88,7 +92,6 @@ Options:
   -w, --work-dir <dir>         Working directory
   --worktree-branch <branch>   Create worktree with branch
   -t, --terminal <wrapper>     Terminal wrapper: tmux, herdr
-  -c, --config <file>          Load configuration from file
   --plugin <name>              Overlay an installed plugin on the run (repeatable)
   --overlay-dir <dir>          Overlay a directory of skills, agents, commands and AGENTS.md (repeatable)
   --store <dir>                Plugin store (default: $XDG_DATA_HOME/agent-cli/plugins)
@@ -158,15 +161,15 @@ Each agent declares its facts, and the planner and the isolators compare those f
 
 ### Providers
 
-A provider is a JSON file that names the agent it serves, the credential and the route the agent uses, and the models of that route as named slots. `agent-cli` ships no provider and no model id, so a new model never needs a new release: you change a file. `-p <name>` selects the file `<name>.json`, and a name that no file defines fails with `provider <name> is not defined; add <name>.json to <directory>`.
+A provider is a JSON document that names the agent it serves, the credential and the route the agent uses, and the models of that route as named slots. `agent-cli` ships no provider and no model id, so a new model never needs a new release: you change a file. Define a provider as an entry of the `providers` section of an `agentic.json` file, keyed by its name, or as the file `providers.d/<name>.json` beside an `agentic.json`. `-p <name>` selects the provider, and a name that no layer defines fails with `provider <name> is not defined; add <name>.json to <directory>`.
 
-| Layer | Directory | Role |
+| Layer | Where | Role |
 | --- | --- | --- |
-| managed | `providers` in the managed configuration directory | An administrator defines providers that no other layer replaces. |
-| user | `providers` beside the user configuration file, `~/.config/sandboxed-claude/providers` by default | Your providers. |
-| project | `.agent-cli/providers` in the work directory | The providers of a repository. They take effect only after you approve their digest. |
+| managed | the `providers` section of the managed `agentic.json` and `providers.d` beside it, see [Configuration](#configuration) | An administrator defines providers that no other layer replaces. |
+| user | the `providers` section of `$XDG_CONFIG_HOME/agentic/agentic.json` and `$XDG_CONFIG_HOME/agentic/providers.d` | Your providers. |
+| project | the `providers` section of the project `agentic.json` and `providers.d` beside it | The providers of a repository. They take effect only after you approve the digest of the file. |
 
-A later layer replaces an earlier file of the same name, managed last, so a project file never changes a managed provider.
+A later layer replaces an earlier provider of the same name, managed last, so a project file never changes a managed provider. One layer may not define a name both in its `providers` section and in `providers.d`.
 
 | Member | Meaning |
 | --- | --- |
@@ -179,9 +182,9 @@ A later layer replaces an earlier file of the same name, managed last, so a proj
 
 A route must use what its agent reads: `claude` reads `environment`, and `codex` reads `args` and `environment`.
 
-Override a slot for one run with `--model <slot>=<id>`, or for every run with the `models` list of a configuration file. A later layer wins per slot (user, project, command line, managed), and a command line value that contradicts a managed one is an error. `--dry-run` and `preflight` show the id of each slot and the file or layer that decided it. `agent-cli providers list` shows each defined provider and its layer, and `agent-cli schema provider` prints the schema of a provider file for an editor.
+Override a slot for one run with `--model <slot>=<id>`, or for every run with the `models` list of the `run` section of an `agentic.json` file. A later layer wins per slot (user, project, command line, managed), and a command line value that contradicts a managed one is an error. `--dry-run` and `preflight` show the id of each slot and the file or layer that decided it. `agent-cli providers list` shows each defined provider and its layer, and `agent-cli schema provider` prints the schema of a provider file for an editor.
 
-A project file or a project `models` override takes effect only after you approve its digest. `agent-cli providers approve` shows each project file with the hosts its route reaches and its model slots, and records the digest after you answer yes on a terminal or pass `--approve-digest <digest>`. A run that needs the approval asks the same question on a terminal. Without a terminal it stops and names the digest, and `--approve-project-digest <digest>` approves it. Any change to a file or an override asks again. A project file can select a provider by name without approval, because naming a provider changes no route.
+Project content takes effect only after you approve the digest of its file: the project `agentic.json` when it sets the `run` or the `providers` section, and each file in the project `providers.d`. `agent-cli providers approve` shows each such file and records its digest after you answer yes to `Approve this digest? [y/N]` on a terminal, or when you pass `--approve-config-digest <digest>`. A run, `preflight` and `config show` ask the same question on a terminal. Without a terminal they stop and name the digest, and `--approve-config-digest <digest>` approves it. The approval ledger is `$XDG_STATE_HOME/agentic/trust.json`, and any change to a file asks again.
 
 The three files below are examples, not shipped code. Replace each `<model-id>` with an id your service accepts.
 
@@ -300,11 +303,15 @@ A store that cannot be written costs the run its record and never its result: th
 
 ### providers
 
-Use `providers list` to show every defined provider with its agent, the layer and the file it came from, and, for a project file, whether its digest is approved. Use `providers approve` to review and approve the provider files and model overrides of the project, see [Providers](#providers). Both take `--config` and `--work-dir`.
+Use `providers list` to show every defined provider with its agent, the layer and the file it came from, and, for a project file, whether its digest is approved. Use `providers show <name>` to show one provider: its file, the hosts its route reaches, its model slots and its approval. Use `providers approve` to review and approve the project files, see [Providers](#providers), and `providers revoke [digest]` to remove the approval of the project files, or of one digest, from the ledger. Each takes `--project` and `--work-dir`.
+
+### config
+
+Use `config show` to print the merged `run` and `providers` sections as JSON, and `config show --sources` to print each value with the layer and the file that set it. It reads the layers as a run does, so project content passes the trust gate first. It takes `--project`, `--work-dir` and `--approve-config-digest`.
 
 ### schema
 
-Use `schema` to print a JSON Schema (draft 2020-12): `agent-cli schema config` for the configuration file, `agent-cli schema provider` for a provider file and `agent-cli schema run-record` for a run record. `agent-cli schema` lists the names.
+Use `schema` to print a JSON Schema (draft 2020-12): `agentic` for an `agentic.json` file, `agentic-run` and `agentic-providers` for its `run` and `providers` sections, `provider` for a provider file, `harness-override` for a harness file and `run-record` for a run record. `agent-cli schema` lists the names.
 
 ### plugin
 
@@ -352,47 +359,40 @@ agent-cli completion fish | source
 
 ## Configuration
 
-Create a YAML, JSON, or TOML file when run defaults must be reusable. The CLI merges up to four layers, and `--dry-run` and `preflight` show which layer decided each value.
+Put reusable run defaults in the `run` section of an `agentic.json` file. The CLI merges three files and the command line, and `--dry-run`, `preflight` and `config show --sources` show which layer decided each value.
 
 | Layer | Where | Role |
 | --- | --- | --- |
-| managed | `managed.yaml`, `managed.yml` or `managed.toml` in `/etc/agent-cli` (`/Library/Application Support/agent-cli` on macOS, `%ProgramData%\agent-cli` on Windows) | An administrator sets a value that no other layer can change. The CLI refuses a file that group or others can write. |
-| user | `~/.config/sandboxed-claude/config` or the file of `--config` | The defaults of the user. |
-| project | `.agent-cli.yaml`, `.agent-cli.yml` or `.agent-cli.toml` in the work directory | The defaults of a repository. It can set only keys that cannot widen access: `agent`, `provider`, the four `require*` keys and `models`. A project `models` list and the provider files of the project take effect only after you approve their digest, see [Providers](#providers). |
+| managed | `/etc/agentic/agentic.json` (`/Library/Application Support/agentic` on macOS, `%ProgramData%\agentic` on Windows) | An administrator sets a value that no other layer can change. |
+| user | `$XDG_CONFIG_HOME/agentic/agentic.json` (default `~/.config/agentic/agentic.json`) | The defaults of the user. |
+| project | the nearest `agentic.json` from the work directory up to the repository root, or the file of `--project` | The defaults of a repository. It can set only keys that cannot widen access: `agent`, `provider`, the four `require*` keys and `models`. Its `run` and `providers` sections take effect only after you approve its digest, see [Providers](#providers). |
 | flags | the command line | The choice of one run. |
 
-Each key has one merge rule, listed by `agent-cli schema config`:
+Each key has one merge rule, listed by `agent-cli schema agentic-run`:
 
 - `replace` (`agent`, `provider`, `isolation`, `provision`, `network`, `homeDir`): the managed value wins, then the flag, then the project, then the user. A flag that contradicts a managed value is an error.
 - `append` (`models`, `bindPaths`, `roBindPaths`, `customEnv`, `allowHosts`, `credentials`): the items of every layer join, user first and managed last, without duplicates.
 - `require` (`requirePinnedProvision`, `requireHostToolsUnreachable`, `requireEgressRestricted`, `requireKernelIsolation`): a guarantee that any layer demands stays demanded.
 
-```yaml
-agent: claude
-provider: zai
-models:
-  - sonnet=<model-id>
-isolation: bwrap
-network: managed
-homeDir: /home/user
-bindPaths:
-  - /home/user/projects
-roBindPaths:
-  - /home/user/reference
-customEnv:
-  - FEATURE_FLAG=true
-allowHosts:
-  - api.anthropic.com
-  - '*.example.com:8443'
-credentials:
-  - ANTHROPIC_API_KEY=keychain:anthropic/work
-requireEgressRestricted: true
-```
-
-Load a user file with `--config`.
-
-```bash
-agent-cli run -c config.yaml
+```json
+{
+  "$schema": "https://schemas.xonovex.com/agent/agentic.schema.json",
+  "version": 1,
+  "run": {
+    "agent": "claude",
+    "provider": "zai",
+    "models": ["sonnet=<model-id>"],
+    "isolation": "bwrap",
+    "network": "managed",
+    "homeDir": "/home/user",
+    "bindPaths": ["/home/user/projects"],
+    "roBindPaths": ["/home/user/reference"],
+    "customEnv": ["FEATURE_FLAG=true"],
+    "allowHosts": ["api.anthropic.com", "*.example.com:8443"],
+    "credentials": ["ANTHROPIC_API_KEY=keychain:anthropic/work"],
+    "requireEgressRestricted": true
+  }
+}
 ```
 
 ## Testing

@@ -2,50 +2,43 @@ package launch
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
-
-const userConfig = "/home/user/.config/sandboxed-claude/config.yaml"
 
 func TestFlagInputHoldsOnlyWhatTheUserChose(t *testing.T) {
 	options := baseOptions()
-	options.Explicit = config.KeysOf(config.KeyIsolation)
+	options.Explicit = runconfig.KeysOf(runconfig.KeyIsolation)
 	options.Isolation = "bwrap"
 	options.Provider = "beta"
 	options.BindPaths = []string{"/data"}
 	options.Policy.RequireEgressRestricted = true
 
-	input := flagInput(options)
+	got := map[string]string{}
+	for _, flag := range flagInput(options) {
+		if flag.Section != "run" {
+			t.Errorf("flag %+v is outside the run section", flag)
+		}
+		got[flag.Pointer] = string(flag.Value)
+	}
 
-	if input.Layer != config.LayerFlags {
-		t.Errorf("Layer = %q, want flags", input.Layer)
-	}
-	if _, ok := input.Entries[config.KeyNetwork]; ok {
-		t.Error("the default network is in the command line layer, so it would shadow a file")
-	}
-	if input.Entries[config.KeyIsolation].Text != "bwrap" || input.Entries[config.KeyProvider].Text != "beta" {
-		t.Errorf("Entries = %+v, want the chosen isolation and the provider", input.Entries)
-	}
-	if got := input.Entries[config.KeyBindPaths].Items; len(got) != 1 || got[0] != "/data" {
-		t.Errorf("bindPaths = %v", got)
-	}
-	if !input.Entries[config.KeyRequireEgressRestricted].On {
-		t.Error("requireEgressRestricted is missing")
+	want := map[string]string{"/isolation": `"bwrap"`, "/provider": `"beta"`, "/bindPaths": `["/data"]`, "/requireEgressRestricted": "true"}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("flags = %v, want %v; the default network would shadow a file", got, want)
 	}
 }
 
 func TestExecuteReadsTheUserLayerAndTheCommandLineWins(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile(userConfig, "isolation: bwrap\nnetwork: none\nprovider: beta\n", 0o600)
+	f.host.AddFile(userFile, runFile(`{"isolation":"bwrap","network":"none","provider":"beta"}`), 0o600)
 	options := baseOptions()
-	options.Config = userConfig
 	options.Network = "host"
-	options.Explicit = config.KeysOf(config.KeyNetwork)
+	options.Explicit = runconfig.KeysOf(runconfig.KeyNetwork)
 	options.DryRun = true
 
 	if err := Execute(f.deps(), options); err != nil {
@@ -57,7 +50,7 @@ func TestExecuteReadsTheUserLayerAndTheCommandLineWins(t *testing.T) {
 		t.Errorf("network = %q, want the command line to win", run.Network)
 	}
 	log := f.log.String()
-	for _, want := range []string{"Configuration:", "isolation: bwrap (user " + userConfig + ")", "network: host (flags"} {
+	for _, want := range []string{"Configuration:", "isolation: bwrap (user " + userFile + ")", "network: host (flags command line)"} {
 		if !strings.Contains(log, want) {
 			t.Errorf("dry run lacks %q:\n%s", want, log)
 		}
@@ -66,42 +59,47 @@ func TestExecuteReadsTheUserLayerAndTheCommandLineWins(t *testing.T) {
 
 func TestExecuteAppliesTheManagedLayerAndRefusesAContradiction(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/etc/agent-cli/managed.yaml", "requireEgressRestricted: true\nnetwork: none\n", 0o644)
+	f.host.AddFile(managedFile, runFile(`{"requireEgressRestricted":true,"network":"none"}`), 0o644)
 	options := bwrapOptions()
 	options.Network = "host"
-	options.Explicit = config.KeysOf(config.KeyNetwork)
+	options.Explicit = runconfig.KeysOf(runconfig.KeyNetwork)
 
 	err := Execute(f.deps(), options)
 
-	if err == nil || !strings.Contains(err.Error(), "the managed value cannot be changed") {
+	if err == nil || !strings.Contains(err.Error(), "but the managed file "+managedFile+" sets it to") {
 		t.Fatalf("Execute() error = %v, want the managed contradiction", err)
 	}
 	if f.sandbox.isolator.ran {
 		t.Error("the run started under a contradicted managed value")
 	}
 
-	options.Network, options.Explicit = "none", config.KeysOf(config.KeyNetwork)
+	options.Network, options.Explicit = "none", runconfig.KeysOf(runconfig.KeyNetwork)
 	if err := Execute(f.deps(), options); err != nil {
 		t.Errorf("Execute() with the managed value error = %v", err)
 	}
 }
 
-func TestExecuteReadsTheProjectLayerFromTheWorkDirectory(t *testing.T) {
+func TestExecuteReadsTheProjectLayerFromTheWorkDirectoryAfterTheApproval(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/work/repo/.agent-cli.yaml", "provider: alpha\n", 0o644)
+	data := runFile(`{"provider":"alpha"}`)
+	f.host.AddFile(projectFile, data, 0o644)
 	options := bwrapOptions()
 	options.DryRun = true
 
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "--approve-config-digest "+digestOf(data)) {
+		t.Fatalf("Execute() error = %v, want the project file to wait for its approval", err)
+	}
+	options.ApproveDigest = digestOf(data)
 	if err := Execute(f.deps(), options); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	if !strings.Contains(f.log.String(), "provider: alpha (project /work/repo/.agent-cli.yaml)") {
+	if !strings.Contains(f.log.String(), "provider: alpha (project "+projectFile+")") {
 		t.Errorf("dry run lacks the project provenance:\n%s", f.log.String())
 	}
 
 	f = newExecuteFixture()
-	f.host.AddFile("/work/repo/.agent-cli.yaml", "bindPaths: [/etc]\n", 0o644)
-	if err := Execute(f.deps(), bwrapOptions()); err == nil || !strings.Contains(err.Error(), "project") {
+	f.host.AddFile(projectFile, runFile(`{"bindPaths":["/etc"]}`), 0o644)
+	if err := Execute(f.deps(), bwrapOptions()); err == nil || !strings.Contains(err.Error(), "the project file sets run.bindPaths") {
 		t.Errorf("Execute() error = %v, want the project layer refused for bindPaths", err)
 	}
 }
@@ -109,9 +107,9 @@ func TestExecuteReadsTheProjectLayerFromTheWorkDirectory(t *testing.T) {
 func TestExecuteReportsAConfigurationFailure(t *testing.T) {
 	f := newExecuteFixture()
 	options := bwrapOptions()
-	options.Config = "/missing.yaml"
+	options.Project = "/missing.json"
 
-	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "failed to load config") {
+	if err := Execute(f.deps(), options); err == nil || !strings.Contains(err.Error(), "resolve configuration: project configuration /missing.json") {
 		t.Errorf("Execute() error = %v, want a load failure", err)
 	}
 }

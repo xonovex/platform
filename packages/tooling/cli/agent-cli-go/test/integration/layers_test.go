@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/schematest"
@@ -139,11 +140,16 @@ func TestPreflightJSONReportsTheGuaranteeThatFails(t *testing.T) {
 
 const routeProvider = `{"name":"route","agent":"claude","models":{"main":{"id":"model-main"}},"environment":{"ROUTE_MODEL":"{model:main}"}}`
 
+// userProviders is the provider shard directory of the user, whose
+// XDG_CONFIG_HOME is the home directory.
+func (m machine) userProviders() string { return filepath.Join(m.home, "agentic", "providers.d") }
+
 func TestTheProjectLayerShowsInTheDryRun(t *testing.T) {
 	m := newMachine(t, "0")
-	writeFile(t, filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json"), routeProvider, 0o644)
-	writeFile(t, filepath.Join(m.work, ".agent-cli.yaml"), "provider: route\n", 0o644)
-	cmd, stdout, stderr := m.command("run", "--dry-run")
+	writeFile(t, filepath.Join(m.userProviders(), "route.json"), routeProvider, 0o644)
+	project := `{"version":1,"run":{"provider":"route"}}`
+	writeFile(t, filepath.Join(m.work, "agentic.json"), project, 0o644)
+	cmd, stdout, stderr := m.command("run", "--dry-run", "--approve-config-digest", layer.Digest([]byte(project)))
 
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("dry run: %v\n%s", err, stderr)
@@ -161,39 +167,40 @@ func TestAProviderThatNoFileDefinesFailsAndNamesTheDirectory(t *testing.T) {
 	if got := exitCode(cmd.Run()); got != 1 {
 		t.Fatalf("exit code = %d, want 1", got)
 	}
-	if want := "provider ghost is not defined; add ghost.json to " + filepath.Join(m.home, ".config", "sandboxed-claude", "providers"); !strings.Contains(stderr.String(), want) {
+	if want := "provider ghost is not defined; add ghost.json to " + m.userProviders(); !strings.Contains(stderr.String(), want) {
 		t.Errorf("stderr = %s, want %q", stderr, want)
 	}
 }
 
 func TestProvidersListShowsTheLayerOfEachProvider(t *testing.T) {
 	m := newMachine(t, "0")
-	writeFile(t, filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json"), routeProvider, 0o644)
+	writeFile(t, filepath.Join(m.userProviders(), "route.json"), routeProvider, 0o644)
 	cmd, stdout, stderr := m.command("providers", "list")
 
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("providers list: %v\n%s", err, stderr)
 	}
-	if !strings.HasPrefix(stdout.String(), "route claude user "+filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json")) {
+	if !strings.HasPrefix(stdout.String(), "route claude user "+filepath.Join(m.userProviders(), "route.json")) {
 		t.Errorf("providers list = %q", stdout)
 	}
 }
 
 func TestAProjectProviderNeedsTheApprovalOfItsDigest(t *testing.T) {
 	m := newMachine(t, "0")
-	writeFile(t, filepath.Join(m.work, ".agent-cli", "providers", "route.json"), routeProvider, 0o644)
+	writeFile(t, filepath.Join(m.work, "agentic.json"), `{"version":1}`, 0o644)
+	writeFile(t, filepath.Join(m.work, "providers.d", "route.json"), routeProvider, 0o644)
 	cmd, _, stderr := m.command("run", "--dry-run", "--provider", "route")
 
 	if got := exitCode(cmd.Run()); got != 1 {
 		t.Fatalf("exit code = %d, want 1 without an approval and without a terminal", got)
 	}
-	_, digest, found := strings.Cut(stderr.String(), "--approve-project-digest ")
+	_, digest, found := strings.Cut(stderr.String(), "--approve-config-digest ")
 	if !found || len(digest) < 71 {
 		t.Fatalf("stderr = %s, want the digest to approve", stderr)
 	}
 	digest = digest[:71]
 
-	approved, _, stderr2 := m.command("run", "--dry-run", "--provider", "route", "--approve-project-digest", digest)
+	approved, _, stderr2 := m.command("run", "--dry-run", "--provider", "route", "--approve-config-digest", digest)
 	if err := approved.Run(); err != nil {
 		t.Fatalf("approved run: %v\n%s", err, stderr2)
 	}
@@ -202,7 +209,7 @@ func TestAProjectProviderNeedsTheApprovalOfItsDigest(t *testing.T) {
 		t.Fatalf("a run after the approval: %v\n%s", err, stderr3)
 	}
 
-	writeFile(t, filepath.Join(m.work, ".agent-cli", "providers", "route.json"), routeProvider+"\n", 0o644)
+	writeFile(t, filepath.Join(m.work, "providers.d", "route.json"), routeProvider+"\n", 0o644)
 	changed, _, _ := m.command("run", "--dry-run", "--provider", "route")
 	if got := exitCode(changed.Run()); got != 1 {
 		t.Errorf("exit code after the file changed = %d, want 1", got)
@@ -211,7 +218,7 @@ func TestAProjectProviderNeedsTheApprovalOfItsDigest(t *testing.T) {
 
 func TestSchemaCommandsPrintValidJSON(t *testing.T) {
 	m := newMachine(t, "0")
-	for _, name := range []string{"config", "provider", "run-record"} {
+	for _, name := range []string{"agentic", "agentic-run", "agentic-providers", "provider", "harness-override", "run-record"} {
 		cmd, stdout, stderr := m.command("schema", name)
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("schema %s: %v\n%s", name, err, stderr)
