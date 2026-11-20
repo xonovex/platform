@@ -107,7 +107,7 @@ type resolution struct {
 // ConfigEnv is the environment the configuration of a run is read through.
 // The trust gate asks its question on Out.
 func (d Dependencies) ConfigEnv() runconfig.Env {
-	return runconfig.Env{Host: d.Host, Validator: d.Validator, Out: d.Out}
+	return runconfig.Env{Host: d.Host, Validator: d.Validator, Legacy: d.Legacy, Out: d.Out}
 }
 
 // configRequest locates the configuration of the options.
@@ -128,7 +128,7 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 	if err != nil {
 		return resolution{}, fmt.Errorf("resolve current working directory: %w", err)
 	}
-	loaded, err := runconfig.Load(deps.ConfigEnv(), configRequest(options))
+	loaded, err := LoadConfig(deps, options)
 	if err != nil {
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
 	}

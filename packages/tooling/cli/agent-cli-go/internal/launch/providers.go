@@ -36,8 +36,16 @@ func LoadConfig(deps Dependencies, options Options) (runconfig.Loaded, error) {
 	return readConfig(deps, options, runconfig.Load)
 }
 
+// readConfig reads the configuration and warns of each legacy file it read.
 func readConfig(deps Dependencies, options Options, read func(runconfig.Env, runconfig.Request) (runconfig.Loaded, error)) (runconfig.Loaded, error) {
-	return read(deps.ConfigEnv(), configRequest(options))
+	loaded, err := read(deps.ConfigEnv(), configRequest(options))
+	if err != nil {
+		return runconfig.Loaded{}, err
+	}
+	for _, notice := range loaded.Notices() {
+		deps.Log.Warning(notice)
+	}
+	return loaded, nil
 }
 
 // ListProviders reads the providers of every layer and marks each project
@@ -47,23 +55,25 @@ func ListProviders(deps Dependencies, options Options) (ProviderListing, error) 
 	if err != nil {
 		return ProviderListing{}, err
 	}
-	approved := map[string]bool{}
+	// A project document that no pending content covers was approved before
+	// this command, such as a legacy file that the previous ledger approves.
+	waiting := map[string]bool{}
 	for _, p := range loaded.Pending {
 		yes, err := runconfig.Approved(deps.ConfigEnv(), p)
 		if err != nil {
 			return ProviderListing{}, err
 		}
 		for _, origin := range p.Origins {
-			approved[origin] = yes
+			waiting[origin] = !yes
 		}
 	}
 	listing := ProviderListing{Dirs: loaded.ProviderDirs, Pending: loaded.Pending}
 	for _, entry := range providers.NewCatalog(loaded.Providers...).List() {
 		row := ProviderRow{Entry: entry, Document: definition(loaded.Providers, entry)}
 		if entry.Layer == string(spec.Project) {
-			row.Approval = "not approved"
-			if approved[entry.Origin] {
-				row.Approval = "approved"
+			row.Approval = "approved"
+			if waiting[entry.Origin] {
+				row.Approval = "not approved"
 			}
 		}
 		listing.Rows = append(listing.Rows, row)

@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"slices"
 	"sort"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
@@ -39,6 +40,9 @@ const (
 type Env struct {
 	Host      Host
 	Validator jsonschema.Validator
+	// Legacy reads the configuration files of the previous release; nil reads
+	// none.
+	Legacy Legacy
 	// Out receives the review and the question of the trust gate.
 	Out io.Writer
 }
@@ -84,6 +88,7 @@ type Loaded struct {
 	Harnesses agents.Catalog
 	// Pending is the project content behind the trust gate.
 	Pending []Pending
+	legacy  []LegacyFile
 }
 
 // UserProviderDir is the provider shard directory of the user layer, empty
@@ -119,24 +124,32 @@ func Read(env Env, request Request) (Loaded, error) {
 	if err != nil {
 		return Loaded{}, err
 	}
-	documents, err := resolve.Load(files, places, env.Validator, resolve.Request{Sections: Sections(), Start: request.Start, Project: request.Project})
+	start, err := absolute(env.Host, request.Start)
 	if err != nil {
 		return Loaded{}, err
 	}
-	resolved, err := Merge(documents, request.Flags)
+	documents, err := resolve.Load(files, places, env.Validator, resolve.Request{Sections: Sections(), Start: start, Project: request.Project})
+	if err != nil {
+		return Loaded{}, err
+	}
+	legacy, err := readLegacy(env, start, documents)
+	if err != nil {
+		return Loaded{}, err
+	}
+	resolved, err := Merge(append(slices.Clone(documents), legacy.Documents...), request.Flags)
 	if err != nil {
 		return Loaded{}, err
 	}
 	shardEnv := shard.Env{Files: files, Places: places, Lister: files}
 	shards, err := shard.Find(shardEnv, shard.Request{
-		Dir: ProvidersDir, Kind: ProviderKind, Start: request.Start, Project: request.Project,
+		Dir: ProvidersDir, Kind: ProviderKind, Start: start, Project: request.Project,
 	})
 	if err != nil {
 		return Loaded{}, err
 	}
 	base := agents.Embedded()
 	harnessShards, err := shard.Find(shardEnv, shard.Request{
-		Dir: agents.OverrideDir, Names: harnessNames(base), Kind: agents.OverrideKind, Start: request.Start, Project: request.Project,
+		Dir: agents.OverrideDir, Names: harnessNames(base), Kind: agents.OverrideKind, Start: start, Project: request.Project,
 	})
 	if err != nil {
 		return Loaded{}, err
@@ -149,21 +162,34 @@ func Read(env Env, request Request) (Loaded, error) {
 	if err != nil {
 		return Loaded{}, err
 	}
-	loaded := Loaded{Resolved: resolved, ProviderDirs: dirs, Harnesses: harnesses}
+	loaded := Loaded{Resolved: resolved, ProviderDirs: dirs, Harnesses: harnesses, legacy: legacy.Files}
 	for _, document := range documents {
 		if document.Layer == spec.Project {
 			loaded.ProviderDirs = append(loaded.ProviderDirs, ProviderDir{Layer: spec.Project, Path: filepath.Join(filepath.Dir(document.Path), ProvidersDir)})
 		}
 	}
 	for _, l := range []spec.Layer{spec.User, spec.Project, spec.Managed} {
-		documentsOf, err := layerProviders(l, documents, shards)
+		documentsOf, err := layerProviders(l, documents, shards, legacy.Providers)
 		if err != nil {
 			return Loaded{}, err
 		}
 		loaded.Providers = append(loaded.Providers, documentsOf...)
 	}
-	loaded.Pending = pending(documents, shards, harnessShards)
+	loaded.Pending = append(pending(documents, shards, harnessShards), legacy.Pending...)
 	return loaded, nil
+}
+
+// absolute resolves the start directory against the working directory once,
+// so every reader of the project looks in the same directory.
+func absolute(host Host, start string) (string, error) {
+	if filepath.IsAbs(start) {
+		return start, nil
+	}
+	wd, err := host.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("find the working directory: %w", err)
+	}
+	return filepath.Join(wd, start), nil
 }
 
 // harnessNames lists the harnesses an override file may name: a file named
@@ -191,9 +217,10 @@ func providerDirs(places Places) ([]ProviderDir, error) {
 }
 
 // layerProviders returns the provider documents of one layer: the entries of
-// its providers section, then its shards. A name that both define is an
-// error, because neither may silently replace the other.
-func layerProviders(l spec.Layer, documents []layer.Document, shards []shard.Shard) ([]providers.Document, error) {
+// its providers section, then its shards, then its legacy provider files. A
+// name that two of them define is an error, because neither may silently
+// replace the other.
+func layerProviders(l spec.Layer, documents []layer.Document, shards []shard.Shard, legacy []providers.Document) ([]providers.Document, error) {
 	var out []providers.Document
 	defined := map[string]string{}
 	for _, document := range documents {
@@ -223,7 +250,17 @@ func layerProviders(l spec.Layer, documents []layer.Document, shards []shard.Sha
 		if origin, taken := defined[preset.Name]; taken {
 			return nil, fmt.Errorf("the provider %s is defined in %s and in %s; keep one", preset.Name, origin, s.Path)
 		}
+		defined[preset.Name] = s.Path
 		out = append(out, providers.Document{Preset: preset, Layer: string(l), Origin: s.Path, Raw: s.Data})
+	}
+	for _, document := range legacy {
+		if document.Layer != string(l) {
+			continue
+		}
+		if origin, taken := defined[document.Preset.Name]; taken {
+			return nil, fmt.Errorf("the provider %s is defined in %s and in %s; keep one", document.Preset.Name, origin, document.Origin)
+		}
+		out = append(out, document)
 	}
 	return out, nil
 }

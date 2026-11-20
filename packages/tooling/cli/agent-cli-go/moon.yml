@@ -79,6 +79,7 @@ tasks:
         ./cmd/agent-cli=exempt \
         ./internal/cmd=97 \
         ./internal/launch=99 \
+        ./internal/legacy=100 \
         ./internal/origin=exempt \
         ./internal/origin/directory=100 \
         ./internal/origin/git=100 \

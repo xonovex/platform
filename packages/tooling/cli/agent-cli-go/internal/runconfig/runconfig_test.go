@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
@@ -371,3 +372,123 @@ func TestPlacesFollowThePlatform(t *testing.T) {
 		t.Errorf("StateDir() = %q, %v", dir, err)
 	}
 }
+
+// legacyDouble is a Legacy port that returns fixed content and records the
+// project directory it was asked for.
+type legacyDouble struct {
+	content LegacyContent
+	err     error
+	dir     *string
+}
+
+func (l legacyDouble) Read(_ Env, projectDir string) (LegacyContent, error) {
+	if l.dir != nil {
+		*l.dir = projectDir
+	}
+	return l.content, l.err
+}
+
+func (legacyDouble) Migrate(Env, Migration) ([]Migrated, error) { return nil, nil }
+
+func legacyPreset(t *testing.T, name, l, origin string) providers.Document {
+	t.Helper()
+	raw := `{"name":"` + name + `","agent":"claude"}`
+	preset, err := providers.ParsePreset([]byte(raw))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return providers.Document{Preset: preset, Layer: l, Origin: origin, Raw: []byte(raw)}
+}
+
+func TestReadMergesTheLegacyContentOfEveryLayer(t *testing.T) {
+	host := oshosttest.New()
+	host.AddFile(managedFile, `{"version":1,"run":{"network":"none"}}`, 0o644)
+	legacyUser := "/home/user/.config/sandboxed-claude/config"
+	legacyProject := "/work/sub/.agent-cli/providers"
+	pendingLegacy := Pending{Subject: trust.Subject{Digest: "sha256:01", Path: "/work/sub (legacy)"}, Origins: []string{legacyProject + "/proj.json (legacy)"}}
+	var dir string
+	e, _ := env(host)
+	e.Legacy = legacyDouble{dir: &dir, content: LegacyContent{
+		Documents: []layer.Document{document(t, spec.User, legacyUser+LegacySuffix, `{"version":1,"run":{"provider":"mine"}}`)},
+		Providers: []providers.Document{
+			legacyPreset(t, "mine", "user", "/home/user/.config/sandboxed-claude/providers/mine.json (legacy)"),
+			legacyPreset(t, "proj", "project", legacyProject+"/proj.json (legacy)"),
+		},
+		Files:   []LegacyFile{{Layer: spec.User, Path: legacyUser}, {Layer: spec.Project, Path: legacyProject}},
+		Pending: []Pending{pendingLegacy},
+	}}
+
+	loaded, err := Read(e, Request{Start: "sub"})
+
+	if err != nil {
+		t.Fatalf("Read() error = %v", err)
+	}
+	if dir != "/work/sub" {
+		t.Errorf("legacy project directory = %q, want the start resolved against the working directory", dir)
+	}
+	if loaded.Resolved.Text(KeyProvider) != "mine" || !reflect.DeepEqual(loaded.Resolved.Sources()[0], Source{Layer: spec.User, Origin: legacyUser + LegacySuffix}) {
+		t.Errorf("sources = %v, want the legacy user file", loaded.Resolved.Sources())
+	}
+	var names []string
+	for _, provider := range loaded.Providers {
+		names = append(names, provider.Preset.Name+" "+provider.Layer)
+	}
+	if !reflect.DeepEqual(names, []string{"mine user", "proj project"}) {
+		t.Errorf("providers = %q", names)
+	}
+	if !reflect.DeepEqual(loaded.Pending, []Pending{pendingLegacy}) {
+		t.Errorf("Pending = %+v", loaded.Pending)
+	}
+	notices := loaded.Notices()
+	if len(notices) != 2 || !strings.Contains(notices[0], legacyUser+" is a legacy user configuration file") || !strings.Contains(notices[0], "agent-cli config migrate") {
+		t.Errorf("Notices() = %q", notices)
+	}
+}
+
+func TestReadRefusesALegacyFileBesideAnAgenticFileOfItsLayer(t *testing.T) {
+	host := oshosttest.New()
+	host.AddFile(userFile, `{"version":1}`, 0o600)
+	e, _ := env(host)
+	legacyUser := "/home/user/.config/sandboxed-claude/config"
+	e.Legacy = legacyDouble{content: LegacyContent{Files: []LegacyFile{{Layer: spec.User, Path: legacyUser}}}}
+
+	_, err := Read(e, Request{Start: "/work"})
+
+	if err == nil || !strings.Contains(err.Error(), "the user layer has "+userFile+" and the legacy "+legacyUser) {
+		t.Errorf("Read() error = %v, want both files named", err)
+	}
+}
+
+func TestReadFailsClosedOnLegacyFaults(t *testing.T) {
+	for name, tc := range map[string]struct {
+		host   Host
+		legacy Legacy
+		want   string
+	}{
+		"legacy read": {oshosttest.New(), legacyDouble{err: errors.New("legacy broken")}, "legacy broken"},
+		"provider defined twice": {
+			oshosttest.New().AddFile(userProviders+"/mine.json", `{"name":"mine","agent":"claude"}`, 0o644),
+			legacyDouble{content: LegacyContent{Providers: []providers.Document{legacyPreset(t, "mine", "user", "/old/mine.json (legacy)")}}},
+			"is defined in " + userProviders + "/mine.json and in /old/mine.json (legacy)",
+		},
+		"no working directory": {wdFails{oshosttest.New()}, nil, "find the working directory"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			e := Env{Host: tc.host, Validator: schemas, Legacy: tc.legacy, Out: &bytes.Buffer{}}
+			if _, err := Read(e, Request{}); err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Errorf("Read() error = %v, want %q", err, tc.want)
+			}
+		})
+	}
+}
+
+func TestPlacesNameTheWorkingDirectory(t *testing.T) {
+	if wd, err := (Places{Host: oshosttest.New()}).Getwd(); err != nil || wd != "/work" {
+		t.Errorf("Getwd() = %q, %v", wd, err)
+	}
+}
+
+// wdFails is a host without a working directory.
+type wdFails struct{ *oshosttest.Fake }
+
+func (wdFails) Getwd() (string, error) { return "", errors.New("no working directory") }
