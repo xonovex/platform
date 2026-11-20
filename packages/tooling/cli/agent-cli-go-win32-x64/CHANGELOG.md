@@ -1,5 +1,13 @@
 # @xonovex/agent-cli-go-win32-x64
 
+## 0.3.0
+
+### Minor Changes
+
+- [`f75b993`](https://github.com/xonovex/platform/commit/f75b993f6e6a6e4d27eb3a79c5337e83cccab214) [@Deorder](https://github.com/Deorder)! - define providers and models in user data with a digest approval gate for project files
+- [`f8fe7d3`](https://github.com/xonovex/platform/commit/f8fe7d3dbd70ba2e899fc425e036b8c408307a03) [@Deorder](https://github.com/Deorder)! - package the validate, audit and eval CLIs as npm launchers with platform and release packages
+- [`891a19f`](https://github.com/xonovex/platform/commit/891a19f05bbcc348716d573a86fe7d3b07f554c7) [@Deorder](https://github.com/Deorder)! - organize packages and group agent plugins
+
 ## 0.2.0
 
 ### Minor Changes

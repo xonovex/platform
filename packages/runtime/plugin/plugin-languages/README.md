@@ -6,7 +6,7 @@ Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua.
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-languages` in the selected harness. The bundle version is `6.0.0`.
+Add the Xonovex marketplace once, then install `xonovex-languages` in the selected harness. The bundle version is `7.0.0`.
 
 ### Claude Code
 

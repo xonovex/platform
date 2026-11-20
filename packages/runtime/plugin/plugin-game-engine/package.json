@@ -1,9 +1,9 @@
 {
   "name": "@xonovex/plugin-game-engine",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "dependencies": {
-    "@xonovex/plugin-native": "6.0.0"
+    "@xonovex/plugin-native": "7.0.0"
   },
   "type": "module",
   "description": "Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking.",

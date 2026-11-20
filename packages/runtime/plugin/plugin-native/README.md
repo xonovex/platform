@@ -6,7 +6,7 @@ Write, build, and debug portable native C99 systems with explicit memory, concur
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-native` in the selected harness. The bundle version is `6.0.0`.
+Add the Xonovex marketplace once, then install `xonovex-native` in the selected harness. The bundle version is `7.0.0`.
 
 ### Claude Code
 

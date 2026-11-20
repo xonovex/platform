@@ -1,6 +1,6 @@
 {
   "name": "@xonovex/plugin-workflow",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "type": "module",
   "description": "Take a change from research to validated delivery in one directory of files that every step reads and writes.",

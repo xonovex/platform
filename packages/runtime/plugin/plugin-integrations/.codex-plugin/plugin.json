@@ -1,6 +1,6 @@
 {
   "name": "xonovex-integrations",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.",
   "author": {
     "name": "Xonovex"

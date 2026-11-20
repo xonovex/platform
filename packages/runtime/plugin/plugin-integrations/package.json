@@ -1,9 +1,9 @@
 {
   "name": "@xonovex/plugin-integrations",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "dependencies": {
-    "@xonovex/plugin-core": "6.0.0"
+    "@xonovex/plugin-core": "7.0.0"
   },
   "type": "module",
   "description": "Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration.",

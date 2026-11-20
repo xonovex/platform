@@ -2,6 +2,24 @@
 
 Release notes for the plugin catalog line: the `packages/runtime/plugin/*` plugins versioned in lockstep with `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The agent CLI keeps its own notes in `packages/tooling/cli/*/CHANGELOG.md`.
 
+## 7.0.0 - 2026-11-20
+
+10 grouped plugins with 88 skills. Previous catalog version: 6.0.0.
+
+### Breaking changes
+
+- `using-herdr` in `xonovex-agentic` is renamed to `using-herdr-tui`. It covers the Herdr terminal multiplexer and its `herdr` command. Replace each reference to `using-herdr` with `using-herdr-tui`.
+
+### Added
+
+- `using-herdr-core` in `xonovex-agentic` runs, messages, reads and waits on programs and agents in herdr-core terminals through the `hc` command, and arranges the Herdr desktop app.
+- `configuring-harness-integrations` in `xonovex-agentic` owns the integration lifecycle that every harness shares: the capability matrix, preview, apply, verify, disable and rollback. Each `configuring-*` skill of one harness keeps its own events, settings and trust rules, and a request about one harness goes to the skill of that harness.
+
+### Changed
+
+- Each skill lists its sources in `sources.json`, which replaces `SOURCES.md`, and its evaluations in `eval-trigger.json` and `eval-output.json`, which replace `evals.json` and `eval-queries.json`.
+- `evaluating-skills` names no model. `--model`, `--judge-model`, a profile model or a harness environment variable choose the models of `agent-eval output`, and the harness default applies when none is set.
+
 ## 6.0.0 - 2026-11-20
 
 10 grouped plugins with 86 skills. Previous catalog version: 5.3.0.

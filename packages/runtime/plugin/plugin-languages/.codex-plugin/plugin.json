@@ -1,6 +1,6 @@
 {
   "name": "xonovex-languages",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "description": "Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua.",
   "author": {
     "name": "Xonovex"

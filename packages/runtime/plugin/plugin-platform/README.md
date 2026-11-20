@@ -6,7 +6,7 @@ Configure Moon tasks and build and operate Docker images, Kubernetes workloads, 
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-platform` in the selected harness. The bundle version is `6.0.0`.
+Add the Xonovex marketplace once, then install `xonovex-platform` in the selected harness. The bundle version is `7.0.0`.
 
 ### Claude Code
 

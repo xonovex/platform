@@ -2,14 +2,14 @@
   "name": "@xonovex/agent-cli-go-github",
   "version": "0.0.0",
   "private": true,
-  "description": "GitHub release orchestration for agent-cli-go",
   "optionalDependencies": {
-    "@xonovex/agent-cli-go-darwin-arm64": "0.2.0",
-    "@xonovex/agent-cli-go-darwin-x64": "0.2.0",
-    "@xonovex/agent-cli-go-linux-arm64": "0.2.0",
-    "@xonovex/agent-cli-go-linux-x64": "0.2.0",
-    "@xonovex/agent-cli-go-win32-x64": "0.2.0"
+    "@xonovex/agent-cli-go-darwin-arm64": "0.3.0",
+    "@xonovex/agent-cli-go-darwin-x64": "0.3.0",
+    "@xonovex/agent-cli-go-linux-arm64": "0.3.0",
+    "@xonovex/agent-cli-go-linux-x64": "0.3.0",
+    "@xonovex/agent-cli-go-win32-x64": "0.3.0"
   },
+  "description": "GitHub release orchestration for agent-cli-go",
   "keywords": [
     "xonovex",
     "agent",
