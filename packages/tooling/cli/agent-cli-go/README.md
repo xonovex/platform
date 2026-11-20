@@ -37,7 +37,9 @@ agent-cli run --worktree-branch feature/my-feature
 
 # Run with terminal wrapper
 agent-cli run -t tmux
-agent-cli run -t herdr --terminal-detach
+agent-cli run -t herdr-tui --terminal-detach
+agent-cli run -t herdr-core
+agent-cli run -t auto
 
 # Check that a run could start, without starting it
 agent-cli preflight --isolation bwrap --require-kernel-isolation
@@ -94,7 +96,7 @@ Options:
   --require-kernel-isolation   Require a kernel-isolating runtime such as runsc
   -w, --work-dir <dir>         Working directory
   --worktree-branch <branch>   Create worktree with branch
-  -t, --terminal <wrapper>     Terminal wrapper: tmux, herdr
+  -t, --terminal <wrapper>     Terminal wrapper: tmux, herdr-tui, herdr-core, auto
   --plugin <name>              Overlay an installed plugin on the run (repeatable)
   --overlay-dir <dir>          Overlay a directory of skills, agents, commands and AGENTS.md (repeatable)
   --store <dir>                Plugin store (default: $XDG_DATA_HOME/agentic/plugins)
@@ -142,7 +144,7 @@ The proxy refuses a host name that resolves to a loopback, private or link-local
 | `secret-service` | `service` or `service/account` | A Linux secret service, through `secret-tool`. |
 | `pass` | entry name | The first line of a `pass` entry. |
 
-A terminal wrapper (`--terminal tmux` or `--terminal herdr`) installs the environment through a private launch script that deletes itself, so a credential reaches the terminal session through that script.
+A terminal wrapper (`--terminal tmux`, `--terminal herdr-tui` or `--terminal herdr-core`) installs the environment through a private launch script that deletes itself, so a credential reaches the terminal session through that script.
 
 ### Agents
 
@@ -284,7 +286,14 @@ A Codex route through the same proxy, `codex-proxy.json`:
 | Terminal | Runs the agent in | Notes |
 | --- | --- | --- |
 | `tmux` | a tmux session and window | `--terminal-session` and `--terminal-window` name them. The run attaches unless `--terminal-detach` is set. |
-| `herdr` | a pane beside the current herdr pane | Needs the CLI to run in a herdr pane (`HERDR_ENV=1`). It never attaches to a herdr session the CLI does not run in. `--terminal-detach` keeps the focus where it is. The command returns when herdr has accepted the command, not when the agent ends, so the run record shows exit code 0. |
+| `herdr-tui` | a pane beside the current pane of the herdr terminal user interface | Needs the CLI to run in a herdr-tui pane (`HERDR_ENV=1`). It never attaches to a herdr session the CLI does not run in. `--terminal-detach` keeps the focus where it is. |
+| `herdr-core` | a new terminal of the herdr-core runtime, a child of the terminal the CLI runs in | Needs the CLI to run in a herdr-core terminal (`HC_TERMINAL_ID` set) and the `hc` command. It talks to the runtime through `hc` only. Each terminal carries the label `agent-cli.run=<run id>`, so `hc ls --label agent-cli.run=<run id>` finds it. An interrupt of the CLI ends the program and removes its terminal. With `--terminal-detach` the terminal outlives the CLI and removes itself when the program exits. |
+| `auto` | the wrapper whose session the CLI runs in | Chooses `herdr-core` when `HC_TERMINAL_ID` is set and `herdr-tui` when `HERDR_ENV=1`. It fails when neither is set, and when both are set it asks you to name the wrapper. It never chooses tmux. |
+
+The exit code of a terminal run differs by wrapper:
+
+- `herdr-tui` returns when herdr has accepted the command, not when the agent ends, so the CLI exits 0 and the run record shows exit code 0.
+- `herdr-core` waits for the program and returns its exit code, which the run record keeps. A program that a signal ended reports 128 plus the signal, and a run you interrupt reports 130. With `--terminal-detach` it returns when the terminal has started, with exit code 0.
 
 ### preflight
 

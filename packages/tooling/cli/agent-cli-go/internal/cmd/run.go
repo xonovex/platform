@@ -12,6 +12,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
+	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
 // newRunCommand binds the run flags into launch.Options and executes them
@@ -111,10 +112,10 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 	flags.StringSliceVar(&options.OverlayDirs, "overlay-dir", nil, "Directory of skills, agents, commands and AGENTS.md to overlay on the run (repeatable)")
 	flags.StringVar(&options.Store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agentic/plugins)")
 	flags.StringSliceVar(&options.CustomEnv, "env", nil, "Environment variables (KEY=VALUE)")
-	flags.StringVarP(&options.Terminal, "terminal", "t", "", "Terminal wrapper (tmux, herdr)")
+	flags.StringVarP(&options.Terminal, "terminal", "t", "", "Terminal wrapper (tmux, herdr-tui, herdr-core, or auto for the session agent-cli runs in)")
 	flags.StringVar(&options.TerminalSession, "terminal-session", "", "Custom tmux session name (tmux only)")
 	flags.StringVar(&options.TerminalWindow, "terminal-window", "", "Custom tmux window name (tmux only)")
-	flags.BoolVar(&options.TerminalDetach, "terminal-detach", false, "Run in background (detach from terminal; herdr keeps the focus where it is)")
+	flags.BoolVar(&options.TerminalDetach, "terminal-detach", false, "Run in background (detach from terminal; herdr-tui keeps the focus where it is, herdr-core returns once the agent started)")
 	flags.StringVar(&options.VCS, "vcs", options.VCS, "VCS type for worktree (git, jj)")
 
 	// Independent policy guarantees.
@@ -163,9 +164,12 @@ func isolationNames(deps launch.Dependencies) []string {
 
 // terminalNames lists the terminal wrappers the build registers.
 func terminalNames(deps launch.Dependencies) []string {
-	names := make([]string, 0, len(deps.Terminals))
+	names := make([]string, 0, len(deps.Terminals)+1)
 	for name := range deps.Terminals {
 		names = append(names, string(name))
+	}
+	if len(deps.AutoTerminals) > 0 {
+		names = append(names, string(termshared.TerminalAuto))
 	}
 	sort.Strings(names)
 	return names

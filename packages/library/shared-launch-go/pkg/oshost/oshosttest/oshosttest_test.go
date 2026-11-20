@@ -1,12 +1,14 @@
 package oshosttest
 
 import (
+	"context"
 	"errors"
 	"io"
 	"io/fs"
 	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestNewDescribesAUser(t *testing.T) {
@@ -334,5 +336,57 @@ func TestTerminalAndInput(t *testing.T) {
 	f.InputErr = failure
 	if _, err := f.ReadLine(); !errors.Is(err, failure) {
 		t.Errorf("ReadLine() error = %v, want %v", err, failure)
+	}
+}
+
+func TestOutputReturnsBothStreamsAndTheExitCode(t *testing.T) {
+	f := New()
+	f.Outcomes["hc wait t7"] = Outcome{Stdout: " {} \n", Stderr: " gone \n", ExitCode: 3}
+
+	stdout, stderr, code, err := f.Output(context.Background(), "hc", []string{"wait", "t7"}, "")
+
+	if err != nil || stdout != "{}" || stderr != "gone" || code != 3 {
+		t.Errorf("Output() = (%q, %q, %d, %v)", stdout, stderr, code, err)
+	}
+	if f.Calls[0].Kind != "output" {
+		t.Errorf("call kind = %q", f.Calls[0].Kind)
+	}
+	if _, _, code, err := f.Output(context.Background(), "missing", nil, ""); err == nil || code != 1 {
+		t.Errorf("Output(missing) = (%d, %v), want a start failure", code, err)
+	}
+}
+
+func TestOutputDeliversTheInterruptOfItsCommand(t *testing.T) {
+	f := New()
+	f.Outcomes["hc run"] = Outcome{Stdout: "started"}
+	f.Outcomes["hc wait"] = Outcome{Stdout: "partial"}
+	f.InterruptOn = "hc wait"
+	ctx, stop := f.NotifyInterrupt(context.Background())
+	defer stop()
+
+	if _, _, _, err := f.Output(ctx, "hc", []string{"run"}, ""); err != nil {
+		t.Fatalf("Output(before the interrupt) error = %v", err)
+	}
+	stdout, _, code, err := f.Output(ctx, "hc", []string{"wait"}, "")
+	if !errors.Is(err, context.Canceled) || code != 1 || stdout != "partial" {
+		t.Errorf("Output(interrupted) = (%q, %d, %v), want the interrupt", stdout, code, err)
+	}
+	if ctx.Err() == nil {
+		t.Error("the interrupt context did not end")
+	}
+}
+
+func TestSleepRecordsThePauseAndHonoursTheContext(t *testing.T) {
+	f := New()
+	if err := f.Sleep(context.Background(), time.Second); err != nil {
+		t.Errorf("Sleep() error = %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err := f.Sleep(ctx, 2*time.Second); !errors.Is(err, context.Canceled) {
+		t.Errorf("Sleep(ended) error = %v", err)
+	}
+	if !slices.Equal(f.Sleeps, []time.Duration{time.Second, 2 * time.Second}) {
+		t.Errorf("Sleeps = %v", f.Sleeps)
 	}
 }

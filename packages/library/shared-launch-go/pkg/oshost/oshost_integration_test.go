@@ -14,6 +14,7 @@ import (
 	"runtime"
 	"slices"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 )
@@ -80,6 +81,63 @@ func TestCaptureTrimsTheOutputAndReportsTheStandardError(t *testing.T) {
 	_, err = s.Capture("/bin/sh", []string{"-c", "printf ' reason \\n' >&2; exit 2"}, "")
 	if err == nil || !strings.HasPrefix(err.Error(), "/bin/sh -c ") || !strings.HasSuffix(err.Error(), ": reason") {
 		t.Errorf("Capture(failure) error = %v, want the command line and the standard error", err)
+	}
+}
+
+func TestOutputKeepsTheStreamsOfAFailingCommand(t *testing.T) {
+	s, stdout, _ := newTestSystem("")
+
+	out, errOut, code, err := s.Output(context.Background(), "/bin/sh", []string{"-c", "printf ' value \\n'; printf ' reason \\n' >&2; exit 3"}, "")
+	if err != nil || out != "value" || errOut != "reason" || code != 3 || stdout.Len() != 0 {
+		t.Errorf("Output() = (%q, %q, %d, %v)", out, errOut, code, err)
+	}
+	if _, _, code, err := s.Output(context.Background(), "/bin/sh", []string{"-c", "exit 0"}, ""); err != nil || code != 0 {
+		t.Errorf("Output(success) = (%d, %v)", code, err)
+	}
+	if _, _, code, err := s.Output(context.Background(), filepath.Join(t.TempDir(), "missing"), nil, ""); err == nil || code != 1 {
+		t.Errorf("Output(missing) = (%d, %v), want a start failure", code, err)
+	}
+}
+
+func TestOutputEndsTheCommandWithItsContext(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+
+	_, _, code, err := s.Output(ctx, "/bin/sh", []string{"-c", "sleep 30"}, "")
+	if !errors.Is(err, context.DeadlineExceeded) || code != 1 {
+		t.Errorf("Output(ended) = (%d, %v), want the context error", code, err)
+	}
+}
+
+func TestNotifyInterruptEndsOnASignal(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	ctx, stop := s.NotifyInterrupt(context.Background())
+	defer stop()
+
+	process, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := process.Signal(syscall.SIGHUP); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-ctx.Done():
+	case <-time.After(5 * time.Second):
+		t.Error("the context did not end on a hangup")
+	}
+}
+
+func TestSleepPausesOrEndsWithItsContext(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	if err := s.Sleep(context.Background(), time.Millisecond); err != nil {
+		t.Errorf("Sleep() error = %v", err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	if err := s.Sleep(ctx, time.Hour); !errors.Is(err, context.Canceled) {
+		t.Errorf("Sleep(ended) error = %v", err)
 	}
 }
 

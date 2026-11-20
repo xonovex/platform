@@ -229,16 +229,41 @@ func TestSchemaCommandsPrintValidJSON(t *testing.T) {
 	}
 }
 
-func TestHerdrRefusesToRunOutsideAHerdrPane(t *testing.T) {
+func TestHerdrTUIRefusesToRunOutsideAHerdrTUIPane(t *testing.T) {
 	if _, err := exec.LookPath("herdr"); err != nil {
 		t.Skip("herdr is not installed")
 	}
-	cmd, _, stderr := newMachine(t, "0").command("run", "--terminal", "herdr")
+	cmd, _, stderr := newMachine(t, "0").command("run", "--terminal", "herdr-tui")
 
 	if err := cmd.Run(); err == nil {
-		t.Fatal("run --terminal herdr succeeded outside a herdr pane")
+		t.Fatal("run --terminal herdr-tui succeeded outside a herdr-tui pane")
 	}
-	if !strings.Contains(stderr.String(), "does not run inside a herdr pane") {
+	if !strings.Contains(stderr.String(), "does not run inside a herdr-tui pane") {
 		t.Errorf("stderr = %q, want the outside refusal", stderr.String())
+	}
+}
+
+func TestHerdrCoreRefusesToRunOutsideAHerdrCoreTerminal(t *testing.T) {
+	if _, err := exec.LookPath("hc"); err != nil {
+		t.Skip("hc is not installed")
+	}
+	cmd, _, stderr := newMachine(t, "0").command("run", "--terminal", "herdr-core")
+
+	if err := cmd.Run(); err == nil {
+		t.Fatal("run --terminal herdr-core succeeded outside a herdr-core terminal")
+	}
+	if !strings.Contains(stderr.String(), "does not run inside a herdr-core terminal") {
+		t.Errorf("stderr = %q, want the outside refusal", stderr.String())
+	}
+}
+
+func TestAutoTerminalRefusesOutsideEverySession(t *testing.T) {
+	cmd, _, stderr := newMachine(t, "0").command("run", "--terminal", "auto")
+
+	if err := cmd.Run(); err == nil {
+		t.Fatal("run --terminal auto succeeded outside every session")
+	}
+	if !strings.Contains(stderr.String(), "runs inside no terminal session") {
+		t.Errorf("stderr = %q, want the refusal", stderr.String())
 	}
 }

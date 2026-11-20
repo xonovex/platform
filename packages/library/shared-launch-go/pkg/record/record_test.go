@@ -179,6 +179,26 @@ func TestStoreWritesPrivateRecordsWithDistinctIDs(t *testing.T) {
 	}
 }
 
+func TestStoreKeepsTheIDARunCarriesWhileItIsFree(t *testing.T) {
+	store, _ := newStore(t)
+	id, err := store.NextID(exited(0).StartedAt)
+	if err != nil || id != "20261120T123005Z" {
+		t.Fatalf("NextID() = (%q, %v)", id, err)
+	}
+	carried := exited(0)
+	carried.ID = "20261120T123005Z-7"
+	if got, err := store.Write(carried); err != nil || got != "20261120T123005Z-7" {
+		t.Errorf("Write(carried id) = (%q, %v), want the carried id", got, err)
+	}
+	if got, err := store.Write(carried); err != nil || got != "20261120T123005Z" {
+		t.Errorf("Write(taken id) = (%q, %v), want the first free id", got, err)
+	}
+	carried.ID = "../escape"
+	if got, err := store.Write(carried); err != nil || got != "20261120T123005Z-2" {
+		t.Errorf("Write(invalid id) = (%q, %v), want a free id", got, err)
+	}
+}
+
 func TestStoreListsNewestFirst(t *testing.T) {
 	store, _ := newStore(t)
 	older := exited(0)
@@ -287,6 +307,12 @@ func TestStoreReportsDiskFailures(t *testing.T) {
 		if _, err := store.Write(exited(0)); err == nil {
 			t.Errorf("%s: Write() error = nil, want the failure reported", name)
 		}
+	}
+	carried := exited(0)
+	carried.ID = "20261120T123005Z"
+	broken, _ := NewStore(brokenFiles{memFiles: newMemFiles(), statErr: errors.New("denied")}, "/state/runs")
+	if _, err := broken.Write(carried); err == nil || !strings.Contains(err.Error(), "denied") {
+		t.Errorf("Write(carried id) error = %v, want the failure reported", err)
 	}
 	store, _ := NewStore(brokenFiles{memFiles: newMemFiles(), readDirErr: errors.New("denied")}, "/state/runs")
 	if _, err := store.List(); err == nil || !strings.Contains(err.Error(), "denied") {

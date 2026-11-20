@@ -1,4 +1,4 @@
-package herdr
+package herdrtui
 
 import (
 	"errors"

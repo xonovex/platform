@@ -21,7 +21,8 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdrcore"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdrtui"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/tmux"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/git"
@@ -47,9 +48,12 @@ func main() {
 			wsp.VCSJujutsu: jj.New(host, log),
 		},
 		Terminals: map[termshared.TerminalType]termshared.TerminalExecutor{
-			termshared.TerminalTmux:  tmux.NewExecutor(host, log),
-			termshared.TerminalHerdr: herdr.NewExecutor(host, log),
+			tmux.Name:      tmux.NewExecutor(host, log),
+			herdrtui.Name:  herdrtui.NewExecutor(host, log),
+			herdrcore.Name: herdrcore.NewExecutor(host, log),
 		},
+		// tmux is left out: it attaches to a session the CLI need not run in.
+		AutoTerminals: []termshared.TerminalType{herdrcore.Name, herdrtui.Name},
 	}
 	validator, err := wiring.NewValidator()
 	if err != nil {

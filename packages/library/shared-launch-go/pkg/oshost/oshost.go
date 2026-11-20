@@ -1,8 +1,8 @@
 // Package oshost is the driven adapter over the operating system: the file
-// system, the process environment, child processes, the network and the user
-// identity. The axis cores and leaves declare the subset they consume as their
-// own port, and System satisfies each of them; no other package of the library
-// calls os, os/exec, syscall or runtime.
+// system, the process environment, child processes, signals, the network, the
+// clock and the user identity. The axis cores and leaves declare the subset they
+// consume as their own port, and System satisfies each of them; no other package
+// of the library calls os, os/exec, os/signal, syscall or runtime.
 package oshost
 
 import (
@@ -15,6 +15,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -239,6 +240,51 @@ func (s System) Stream(name string, args []string, dir string) error {
 	cmd.Stdout = s.stdout
 	cmd.Stderr = s.stderr
 	return cmd.Run()
+}
+
+// Output runs name in dir until it exits or ctx ends, and returns its trimmed
+// standard output, its trimmed standard error and its exit code. A process that
+// starts and exits non-zero is a result, not an error, so a caller can read what
+// a failing command printed; the error reports a process that did not run or
+// that ctx ended.
+func (System) Output(ctx context.Context, name string, args []string, dir string) (stdout, stderr string, code int, err error) {
+	cmd := exec.CommandContext(ctx, name, args...)
+	cmd.Dir = dir
+	var out, errOut bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &errOut
+	runErr := cmd.Run()
+	stdout, stderr = strings.TrimSpace(out.String()), strings.TrimSpace(errOut.String())
+	if ctx.Err() != nil {
+		return stdout, stderr, 1, ctx.Err()
+	}
+	var exitErr *exec.ExitError
+	if errors.As(runErr, &exitErr) {
+		return stdout, stderr, exitErr.ExitCode(), nil
+	}
+	if runErr != nil {
+		return stdout, stderr, 1, runErr
+	}
+	return stdout, stderr, 0, nil
+}
+
+// NotifyInterrupt returns a context that ends when the process receives an
+// interrupt, a termination or a hangup signal, and the function that stops the
+// notification and restores the default handling of those signals.
+func (System) NotifyInterrupt(parent context.Context) (context.Context, context.CancelFunc) {
+	return signal.NotifyContext(parent, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
+}
+
+// Sleep pauses for d, or until ctx ends, which it reports as its error.
+func (System) Sleep(ctx context.Context, d time.Duration) error {
+	timer := time.NewTimer(d)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 // Capture runs name in dir and returns its trimmed standard output. A failure

@@ -206,7 +206,7 @@ func goldenCase(isolation string, variant goldenVariant, mode goldenMode) string
 		Credentials: plugins.DefaultCredentials(host),
 		Overlays:    goldenOverlays{},
 		Workspaces:  map[wsp.VCSType]wsshared.VCS{wsp.VCSGit: goldenVCS{}},
-		Terminals:   map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: goldenTerminal{&terminalCalls}},
+		Terminals:   map[termshared.TerminalType]termshared.TerminalExecutor{"tmux": goldenTerminal{&terminalCalls}},
 		Validator:   goldenValidator,
 	}
 	options := launch.Options{

@@ -26,9 +26,9 @@ No core package reads the disk, the environment, the clock or the network, and n
 | `pkg/provision/{none,command,nix}` | One provisioning each, behind `provision.Provisioner` |
 | `pkg/credential/{env,file,keychain,pass,secretservice}` | One credential store each, behind `credential.Store` |
 | `pkg/egress/managed` | The allowlist proxy of a managed run and the bridge that relays the loopback port of a sandbox to it |
-| `pkg/oshost` | The adapter over the operating system: files, environment, processes, network, clock and user identity |
+| `pkg/oshost` | The adapter over the operating system: files, environment, processes, signals, network, clock and user identity |
 | `pkg/oshost/oshosttest` | `Fake`, the in-memory double of `oshost` for unit tests |
 
-Each leaf reaches the machine through a port that `oshost.System` satisfies, so its unit tests run against `oshosttest.Fake`. Only `pkg/oshost` imports `os`, `os/exec`, `syscall` or `runtime`, and the integration tier (`npx moon run shared-launch-go:ci-integration`) covers it.
+Each leaf reaches the machine through a port that `oshost.System` satisfies, so its unit tests run against `oshosttest.Fake`. Only `pkg/oshost` imports `os`, `os/exec`, `os/signal`, `syscall` or `runtime`, and the integration tier (`npx moon run shared-launch-go:ci-integration`) covers it.
 
 `internal/arch` enforces the split: the dependency direction inside the module, a core that uses only the standard library and the shared libraries and names no network, no leaf that imports another leaf, lazy factories, a credential value that stays inside `Secret`, and an agent command line that stays out of the isolation port and its leaves.

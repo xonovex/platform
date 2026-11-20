@@ -2,6 +2,7 @@ package launch
 
 import (
 	"strings"
+	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
@@ -139,6 +140,7 @@ func (f *fakeVCS) Available() bool { return true }
 
 type fakeTerminal struct {
 	missing  bool
+	inside   bool
 	code     int
 	err      error
 	config   *termshared.TerminalConfig
@@ -149,7 +151,7 @@ type fakeTerminal struct {
 }
 
 func (f *fakeTerminal) IsAvailable() bool { return !f.missing }
-func (f *fakeTerminal) IsInside() bool    { return false }
+func (f *fakeTerminal) IsInside() bool    { return f.inside }
 
 func (f *fakeTerminal) Execute(config *termshared.TerminalConfig, command, env []string, workDir string) (int, error) {
 	f.executed = true
@@ -185,6 +187,14 @@ func newTestSandbox() testSandbox {
 type fakeRecorder struct {
 	records []record.Record
 	err     error
+	nextErr error
+}
+
+func (f *fakeRecorder) NextID(time.Time) (string, error) {
+	if f.nextErr != nil {
+		return "", f.nextErr
+	}
+	return "20261120T120000Z", nil
 }
 
 func (f *fakeRecorder) Write(r record.Record) (string, error) {

@@ -4,6 +4,7 @@
 package oshosttest
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -17,13 +18,14 @@ import (
 // Outcome is the recorded result of one command line.
 type Outcome struct {
 	Stdout   string
+	Stderr   string
 	ExitCode int
 	Err      error
 }
 
 // Call is one process the code under test started.
 type Call struct {
-	Kind string // "run", "stream" or "capture"
+	Kind string // "run", "stream", "capture" or "output"
 	Name string
 	Args []string
 	Env  []string
@@ -64,6 +66,12 @@ type Fake struct {
 	Clock time.Time
 	OS    string
 
+	// InterruptOn is the command line whose Output call delivers an interrupt:
+	// the context of NotifyInterrupt ends while that command runs. Sleeps holds
+	// each pause Sleep was asked for.
+	InterruptOn string
+	Sleeps      []time.Duration
+
 	// Terminal is the answer of IsTerminal. Input holds the lines ReadLine
 	// returns in order, then io.EOF; InputErr, when set, replaces that EOF.
 	Terminal bool
@@ -72,6 +80,7 @@ type Fake struct {
 
 	files     map[string]entry
 	tempCount int
+	interrupt context.CancelFunc
 
 	netMu     sync.Mutex
 	listeners map[string]*MemListener
@@ -399,6 +408,39 @@ func (f *Fake) Capture(name string, args []string, dir string) (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(outcome.Stdout), nil
+}
+
+// Output records the call and returns the outputs and the exit code of its
+// outcome. A call while ctx has ended, or the call InterruptOn names, returns
+// the error of ctx, as a process that the context ended does.
+func (f *Fake) Output(ctx context.Context, name string, args []string, dir string) (string, string, int, error) {
+	outcome, err := f.record(Call{Kind: "output", Name: name, Args: args, Dir: dir})
+	if f.interrupt != nil && f.InterruptOn != "" && CommandLine(name, args...) == f.InterruptOn {
+		f.interrupt()
+	}
+	stdout, stderr := strings.TrimSpace(outcome.Stdout), strings.TrimSpace(outcome.Stderr)
+	if ctx.Err() != nil {
+		return stdout, stderr, 1, ctx.Err()
+	}
+	if err != nil {
+		return "", "", 1, err
+	}
+	return stdout, stderr, outcome.ExitCode, nil
+}
+
+// NotifyInterrupt returns a context that ends when the command InterruptOn
+// names runs, and its cancel function.
+func (f *Fake) NotifyInterrupt(parent context.Context) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(parent)
+	f.interrupt = cancel
+	return ctx, cancel
+}
+
+// Sleep records the pause and returns at once, with the error of ctx when it
+// has ended.
+func (f *Fake) Sleep(ctx context.Context, d time.Duration) error {
+	f.Sleeps = append(f.Sleeps, d)
+	return ctx.Err()
 }
 
 func (f *Fake) record(call Call) (Outcome, error) {

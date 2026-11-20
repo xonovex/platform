@@ -34,8 +34,11 @@ type Host interface {
 	Now() time.Time
 }
 
-// Recorder stores the record of a finished run and returns its id.
+// Recorder stores the record of a finished run and returns its id. NextID names
+// the id a run that starts at an instant expects, so the run carries it while it
+// runs.
 type Recorder interface {
+	NextID(at time.Time) (string, error)
 	Write(record.Record) (string, error)
 }
 
@@ -70,6 +73,9 @@ type Dependencies struct {
 	Legacy     runconfig.Legacy
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
+	// AutoTerminals lists, among Terminals, the wrappers that --terminal auto
+	// chooses from by the session the CLI runs in.
+	AutoTerminals []termshared.TerminalType
 }
 
 // ExitError reports that the agent ran and exited with a non-zero code, which
@@ -91,12 +97,60 @@ func Execute(deps Dependencies, options Options) error {
 	if res.planErr != nil {
 		return res.planErr
 	}
+	if res.plan.Terminal, err = resolveAutoTerminal(deps, res.plan.Terminal); err != nil {
+		return err
+	}
 	started := deps.Host.Now()
+	runID := ""
+	if !res.plan.DryRun {
+		runID = nextRunID(deps, started)
+	}
+	if res.plan.Terminal != nil {
+		terminal := *res.plan.Terminal
+		terminal.RunID = runID
+		res.plan.Terminal = &terminal
+	}
 	result, err := carryOut(deps, res)
 	if !res.plan.DryRun {
-		writeRecord(deps, res, started, result, err)
+		writeRecord(deps, res, runID, started, result, err)
 	}
 	return err
+}
+
+// nextRunID returns the id the record of a run that starts at started expects,
+// or none when the CLI keeps no records or cannot name one.
+func nextRunID(deps Dependencies, started time.Time) string {
+	if deps.Records == nil {
+		return ""
+	}
+	id, err := deps.Records.NextID(started)
+	if err != nil {
+		deps.Log.Warning("The run has no record id while it runs: " + err.Error())
+		return ""
+	}
+	return id
+}
+
+// resolveAutoTerminal replaces the automatic terminal selection with the one
+// wrapper among AutoTerminals whose session the CLI runs in. Any other
+// configuration passes unchanged.
+func resolveAutoTerminal(deps Dependencies, cfg *termshared.TerminalConfig) (*termshared.TerminalConfig, error) {
+	if cfg == nil || cfg.Type != termshared.TerminalAuto {
+		return cfg, nil
+	}
+	var inside []termshared.TerminalType
+	for _, name := range deps.AutoTerminals {
+		if executor, ok := deps.Terminals[name]; ok && executor.IsInside() {
+			inside = append(inside, name)
+		}
+	}
+	name, err := termshared.SelectAuto(inside)
+	if err != nil {
+		return nil, err
+	}
+	resolved := *cfg
+	resolved.Type = name
+	return &resolved, nil
 }
 
 // outcome is what a run did: whether the agent, or its terminal wrapper, ran to an

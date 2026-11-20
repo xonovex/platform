@@ -10,6 +10,9 @@ import (
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
+// Name is the wrapper name of the leaf.
+const Name termshared.TerminalType = "tmux"
+
 // gitInfo holds git repository information
 type gitInfo struct {
 	parentDir   string

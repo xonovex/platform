@@ -53,7 +53,8 @@ tasks:
         ./internal/runconfig=100
         ./internal/sandbox/plugins=100
         ./internal/schematest=92
-        ./internal/terminal/herdr=100
+        ./internal/terminal/herdrcore=100
+        ./internal/terminal/herdrtui=100
         ./internal/terminal/shared=100
         ./internal/terminal/tmux=100
         ./internal/workspace/git=98

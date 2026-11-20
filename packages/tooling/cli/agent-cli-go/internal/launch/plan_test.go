@@ -536,7 +536,7 @@ func TestNewPlanConfiguresTheTerminal(t *testing.T) {
 
 	p := mustPlan(t, options, "")
 
-	want := termshared.TerminalConfig{Type: termshared.TerminalTmux, SessionName: "session", WindowName: "window", Detach: true}
+	want := termshared.TerminalConfig{Type: "tmux", SessionName: "session", WindowName: "window", Detach: true}
 	if p.Terminal == nil || *p.Terminal != want {
 		t.Errorf("Terminal = %+v, want %+v", p.Terminal, want)
 	}

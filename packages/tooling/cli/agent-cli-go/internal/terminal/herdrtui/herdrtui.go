@@ -1,9 +1,10 @@
-// Package herdr is the terminal leaf that runs the agent in a pane of herdr, the
-// session the CLI itself runs in. It splits the current pane and types a command
-// into the new pane that runs a private launch script, so no environment value
-// appears in a herdr command line or in the process list. It never attaches to a
-// herdr session the CLI does not run in.
-package herdr
+// Package herdrtui is the terminal leaf that runs the agent in a pane of the
+// herdr terminal user interface, the session the CLI itself runs in. It splits
+// the current pane and types a command into the new pane that runs a private
+// launch script, so no environment value appears in a herdr command line or in
+// the process list. It never attaches to a herdr session the CLI does not run
+// in.
+package herdrtui
 
 import (
 	"encoding/json"
@@ -17,15 +18,18 @@ import (
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
+// Name is the wrapper name of the leaf.
+const Name termshared.TerminalType = "herdr-tui"
+
 // insideVariable is set to 1 in every process that runs in a herdr pane.
 const insideVariable = "HERDR_ENV"
 
 // ErrOutside marks a run that does not run in a herdr pane, so there is no pane
 // to split and no session the CLI may use.
-var ErrOutside = errors.New("agent-cli does not run inside a herdr pane; start it from a herdr pane or use another terminal")
+var ErrOutside = errors.New("agent-cli does not run inside a herdr-tui pane; start it from a pane of the herdr terminal user interface or use another terminal")
 
-// Host is the port the herdr executor consumes: the herdr command it runs, the
-// environment it reads, and the launch script it writes.
+// Host is the port the herdr-tui executor consumes: the herdr command it runs,
+// the environment it reads, and the launch script it writes.
 type Host interface {
 	LookPath(file string) (string, error)
 	Getenv(key string) string
@@ -36,7 +40,7 @@ type Host interface {
 	Remove(path string) error
 }
 
-// Executor implements the herdr terminal wrapper.
+// Executor implements the herdr-tui terminal wrapper.
 type Executor struct {
 	host Host
 	log  logging.Logger
@@ -44,7 +48,7 @@ type Executor struct {
 
 var _ termshared.TerminalExecutor = (*Executor)(nil)
 
-// NewExecutor creates a herdr executor over host, writing through log.
+// NewExecutor creates a herdr-tui executor over host, writing through log.
 func NewExecutor(host Host, log logging.Logger) *Executor {
 	return &Executor{host: host, log: log}
 }
@@ -81,7 +85,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 		_, _ = e.herdr("pane", "close", pane)
 		return 1, err
 	}
-	e.log.Info("Started the agent in herdr pane " + pane)
+	e.log.Info("Started the agent in herdr-tui pane " + pane)
 	return 0, nil
 }
 

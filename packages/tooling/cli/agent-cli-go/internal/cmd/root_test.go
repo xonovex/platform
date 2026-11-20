@@ -390,7 +390,8 @@ func TestCompletionOffersCredentialSchemesAfterTheVariableName(t *testing.T) {
 
 func TestCompletionOffersTheRegisteredTerminals(t *testing.T) {
 	r := newTestRoot()
-	r.deps.Terminals = map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: nil, termshared.TerminalHerdr: nil}
+	r.deps.Terminals = map[termshared.TerminalType]termshared.TerminalExecutor{"tmux": nil, "herdr-core": nil, "herdr-tui": nil}
+	r.deps.AutoTerminals = []termshared.TerminalType{"herdr-core", "herdr-tui"}
 	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	var out bytes.Buffer
 	root.SetOut(&out)
@@ -399,7 +400,10 @@ func TestCompletionOffersTheRegisteredTerminals(t *testing.T) {
 	if err := root.Execute(); err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "herdr\ntmux\n") {
-		t.Errorf("terminal completion = %q, want herdr and tmux", out.String())
+	if !strings.Contains(out.String(), "auto\nherdr-core\nherdr-tui\ntmux\n") {
+		t.Errorf("terminal completion = %q, want auto and every wrapper", out.String())
+	}
+	if got := terminalNames(launch.Dependencies{Terminals: r.deps.Terminals}); slices.Contains(got, "auto") {
+		t.Errorf("a build without automatic candidates offers auto: %v", got)
 	}
 }

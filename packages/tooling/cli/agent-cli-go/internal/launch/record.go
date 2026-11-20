@@ -12,20 +12,21 @@ import (
 
 // writeRecord stores the record of a finished run. A store that fails costs the
 // run its record and never its result, so the failure is a warning.
-func writeRecord(deps Dependencies, res resolution, started time.Time, result outcome, runErr error) {
+func writeRecord(deps Dependencies, res resolution, runID string, started time.Time, result outcome, runErr error) {
 	if deps.Records == nil {
 		return
 	}
-	if _, err := deps.Records.Write(buildRecord(res, started, deps.Host.Now(), result, runErr)); err != nil {
+	if _, err := deps.Records.Write(buildRecord(res, runID, started, deps.Host.Now(), result, runErr)); err != nil {
 		deps.Log.Warning("Could not write the run record: " + err.Error())
 	}
 }
 
 // buildRecord is the record of a run. It names the credentials and never holds a
 // value, and it keeps the layers that decided each key, not the keys' values.
-func buildRecord(res resolution, started, ended time.Time, result outcome, runErr error) record.Record {
+func buildRecord(res resolution, runID string, started, ended time.Time, result outcome, runErr error) record.Record {
 	plan := res.plan
 	r := record.Record{
+		ID:        runID,
 		StartedAt: started,
 		EndedAt:   ended,
 		Status:    record.StatusExited,

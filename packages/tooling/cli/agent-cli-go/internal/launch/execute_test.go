@@ -15,6 +15,9 @@ import (
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
+// tmuxName is the wrapper name the fixture registers its terminal double under.
+const tmuxName termshared.TerminalType = "tmux"
+
 // userProviders is the provider shard directory beside the user agentic.json.
 const userProviders = userDir + "/providers.d"
 
@@ -54,7 +57,7 @@ func (f *executeFixture) deps() Dependencies {
 		Records:    f.records,
 		Validator:  testValidator,
 		Workspaces: map[wsp.VCSType]wsshared.VCS{wsp.VCSGit: f.vcs},
-		Terminals:  map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: f.terminal},
+		Terminals:  map[termshared.TerminalType]termshared.TerminalExecutor{tmuxName: f.terminal},
 	}
 }
 
@@ -455,5 +458,76 @@ func TestExecuteDryRunReportsTheDeclaredFacts(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestExecuteCarriesTheRunIDIntoTheTerminalAndTheRecord(t *testing.T) {
+	f := newExecuteFixture()
+	options := bwrapOptions()
+	options.Terminal = "tmux"
+
+	if err := Execute(f.deps(), options); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if f.terminal.config.RunID != "20261120T120000Z" || f.records.records[0].ID != "20261120T120000Z" {
+		t.Errorf("terminal run id = %q, record id = %q, want the expected id in both", f.terminal.config.RunID, f.records.records[0].ID)
+	}
+}
+
+func TestExecuteRunsWithoutARunIDWhenNoneCanBeNamed(t *testing.T) {
+	f := newExecuteFixture()
+	f.records.nextErr = errors.New("denied")
+	options := bwrapOptions()
+	options.Terminal = "tmux"
+
+	if err := Execute(f.deps(), options); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if f.terminal.config.RunID != "" || !strings.Contains(f.log.String(), "no record id while it runs: denied") {
+		t.Errorf("run id = %q, log = %q, want no id and a warning", f.terminal.config.RunID, f.log.String())
+	}
+	deps := f.deps()
+	deps.Records = nil
+	if err := Execute(deps, options); err != nil || f.terminal.config.RunID != "" {
+		t.Errorf("Execute() without a recorder = %v with run id %q", err, f.terminal.config.RunID)
+	}
+}
+
+// autoFixture registers tmux and two wrappers that --terminal auto chooses from.
+func autoFixture(core, tui *fakeTerminal) (*executeFixture, Dependencies, Options) {
+	f := newExecuteFixture()
+	deps := f.deps()
+	deps.Terminals["core"] = core
+	deps.Terminals["tui"] = tui
+	deps.AutoTerminals = []termshared.TerminalType{"core", "tui", "unregistered"}
+	options := bwrapOptions()
+	options.Terminal = "auto"
+	return f, deps, options
+}
+
+func TestExecuteRunsAutoInTheSessionTheCLIRunsIn(t *testing.T) {
+	core := &fakeTerminal{inside: true}
+	f, deps, options := autoFixture(core, &fakeTerminal{})
+	f.terminal.inside = true
+
+	if err := Execute(deps, options); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if !core.executed || f.terminal.executed || core.config.Type != "core" {
+		t.Errorf("core ran = %v with %+v, tmux ran = %v; want only core", core.executed, core.config, f.terminal.executed)
+	}
+	if f.records.records[0].Axes.Terminal != "core" {
+		t.Errorf("record terminal = %q, want the chosen wrapper", f.records.records[0].Axes.Terminal)
+	}
+}
+
+func TestExecuteRefusesAutoOutsideOrInsideTwoSessions(t *testing.T) {
+	_, deps, options := autoFixture(&fakeTerminal{}, &fakeTerminal{})
+	if err := Execute(deps, options); !errors.Is(err, termshared.ErrNotInside) {
+		t.Errorf("Execute(outside) error = %v, want the refusal", err)
+	}
+	_, deps, options = autoFixture(&fakeTerminal{inside: true}, &fakeTerminal{inside: true})
+	if err := Execute(deps, options); err == nil || !strings.Contains(err.Error(), "core and tui") {
+		t.Errorf("Execute(inside both) error = %v, want a request to name one", err)
 	}
 }

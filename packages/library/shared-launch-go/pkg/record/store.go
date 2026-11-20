@@ -49,13 +49,19 @@ func NewStore(files Files, dir string) (Store, error) {
 // Dir returns the directory of the store.
 func (s Store) Dir() string { return s.dir }
 
-// Write assigns the record an id from its start time, writes it as a private file
-// and returns the id. Two runs that start in one second get distinct ids.
+// NextID returns the id a run that starts at the instant gets when no other run
+// takes it first, so the run can name itself while it runs.
+func (s Store) NextID(at time.Time) (string, error) { return s.freeID(at) }
+
+// Write writes the record as a private file and returns its id. A record keeps
+// the id it carries while no other record uses it, and otherwise gets the first
+// free id of its start time, so two runs that start in one second get distinct
+// ids.
 func (s Store) Write(r Record) (string, error) {
 	if err := s.files.MkdirAll(s.dir, 0o700); err != nil {
 		return "", fmt.Errorf("create the run record directory: %w", err)
 	}
-	id, err := s.freeID(r.StartedAt)
+	id, err := s.claim(r)
 	if err != nil {
 		return "", err
 	}
@@ -70,6 +76,18 @@ func (s Store) Write(r Record) (string, error) {
 	return id, nil
 }
 
+// claim returns the id the record carries when it is valid and free, and
+// otherwise the first free id of its start time.
+func (s Store) claim(r Record) (string, error) {
+	if ValidID(r.ID) {
+		free, err := s.free(r.ID)
+		if err != nil || free {
+			return r.ID, err
+		}
+	}
+	return s.freeID(r.StartedAt)
+}
+
 // freeID returns the first id for the instant that no record uses.
 func (s Store) freeID(at time.Time) (string, error) {
 	base := at.UTC().Format("20060102T150405Z")
@@ -78,13 +96,23 @@ func (s Store) freeID(at time.Time) (string, error) {
 		if suffix > 1 {
 			id = fmt.Sprintf("%s-%d", base, suffix)
 		}
-		if _, err := s.files.Stat(s.file(id)); errors.Is(err, fs.ErrNotExist) {
-			return id, nil
-		} else if err != nil {
-			return "", fmt.Errorf("check the run record %s: %w", id, err)
+		if free, err := s.free(id); err != nil || free {
+			return id, err
 		}
 	}
 	return "", fmt.Errorf("no free run record id for %s", base)
+}
+
+// free reports whether no record uses id.
+func (s Store) free(id string) (bool, error) {
+	_, err := s.files.Stat(s.file(id))
+	if errors.Is(err, fs.ErrNotExist) {
+		return true, nil
+	}
+	if err != nil {
+		return false, fmt.Errorf("check the run record %s: %w", id, err)
+	}
+	return false, nil
 }
 
 func (s Store) file(id string) string { return path.Join(s.dir, id+extension) }
