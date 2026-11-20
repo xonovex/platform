@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
@@ -23,6 +24,7 @@ const testRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 func baseOptions() Options {
 	return Options{
 		Agent:     "claude",
+		Harnesses: agents.Embedded(),
 		Isolation: "none",
 		Provision: "none",
 		Network:   "host",
@@ -525,7 +527,7 @@ func TestNewPlanRejectsAnUnregisteredAxis(t *testing.T) {
 }
 
 func TestNewPlanDefaultsEmptyAxes(t *testing.T) {
-	p := mustPlan(t, Options{Agent: "claude", VCS: "git"}, "")
+	p := mustPlan(t, Options{Agent: "claude", Harnesses: agents.Embedded(), VCS: "git"}, "")
 
 	if p.IsolationName != isolation.IsolationNone || p.Run.Network != network.NetworkHost {
 		t.Errorf("defaults = %s %s, want none and host", p.IsolationName, p.Run.Network)

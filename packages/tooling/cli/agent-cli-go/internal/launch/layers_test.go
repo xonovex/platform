@@ -232,3 +232,20 @@ func TestExecuteRecordsTheOverlaySourcesWithTheirDigests(t *testing.T) {
 		t.Errorf("overlay = %+v, want one plugin and one directory with digests", overlay)
 	}
 }
+
+func TestExecuteStartsTheBinaryOfAHarnessOverride(t *testing.T) {
+	f := newExecuteFixture()
+	f.host.AddFile(userDir+"/harnesses.d/claude.json", `{"binary":"claude-next"}`, 0o644)
+
+	if err := Execute(f.deps(), dryRunOptions()); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if got := f.sandbox.isolator.commandRun.Process.Argv; len(got) == 0 || got[0] != "claude-next" {
+		t.Errorf("agent argv = %q, want the binary of the override", got)
+	}
+
+	f.host.AddFile(userDir+"/harnesses.d/claude.json", `{"binary":7}`, 0o644)
+	if err := Execute(f.deps(), dryRunOptions()); err == nil || !strings.Contains(err.Error(), "harness override") {
+		t.Errorf("Execute() error = %v, want the broken override named", err)
+	}
+}

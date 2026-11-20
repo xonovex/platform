@@ -27,8 +27,11 @@ const defaultFlakeShell = "default"
 // Request is a run as its caller asks for it, with every configuration layer
 // already applied. An empty axis selects its default.
 type Request struct {
-	Agent    string
-	Provider string
+	Agent string
+	// Harnesses holds the facts of every harness the run may start, with the
+	// override files of every layer applied.
+	Harnesses agents.Catalog
+	Provider  string
 	// Catalog holds the provider files of every layer, and ModelOverrides the
 	// model slot overrides in the order they apply.
 	Catalog        providers.Catalog
@@ -69,13 +72,14 @@ type Request struct {
 	AgentArgs []string
 }
 
-// ResolveAgent resolves the agent and its provider route, and fails on a route
-// the agent does not read. A provider that no catalog document defines fails
-// with an error that wraps providers.ErrNotDefined.
+// ResolveAgent resolves the agent from the harness catalog of the request and
+// its provider route, and fails on a route the agent does not read. A provider
+// that no catalog document defines fails with an error that wraps
+// providers.ErrNotDefined.
 func ResolveAgent(request Request) (*types.AgentConfig, *types.ModelProvider, error) {
-	agent, err := agents.GetAgent(types.AgentType(request.Agent))
+	agent, err := request.Harnesses.Get(types.AgentType(request.Agent))
 	if err != nil {
-		return nil, nil, fmt.Errorf("%w; available agents: %v", err, agents.GetAgentTypes())
+		return nil, nil, fmt.Errorf("%w; available agents: %v", err, request.Harnesses.Types())
 	}
 	provider, err := resolveProvider(request, agent)
 	if err != nil {

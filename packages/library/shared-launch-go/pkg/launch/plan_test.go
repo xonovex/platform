@@ -14,6 +14,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
@@ -83,8 +84,10 @@ func catalog(t *testing.T, raws ...string) providers.Catalog {
 	return providers.NewCatalog(documents...)
 }
 
+// plan resolves the request against the shipped harness facts and plans it.
 func plan(t *testing.T, request Request) (Spec, error) {
 	t.Helper()
+	request.Harnesses = agents.Embedded()
 	agent, provider, err := ResolveAgent(request)
 	if err != nil {
 		t.Fatalf("ResolveAgent() error = %v", err)
@@ -103,15 +106,35 @@ func mustPlan(t *testing.T, request Request) Spec {
 }
 
 func TestResolveAgentResolvesTheAgentAndItsProvider(t *testing.T) {
-	request := Request{Agent: "codex", Provider: "coder", Catalog: catalog(t, `{"name":"coder","agent":"codex","models":{"main":{"id":"model-code"}},"args":["--model","{model:main}"]}`)}
+	request := Request{Agent: "codex", Harnesses: agents.Embedded(), Provider: "coder", Catalog: catalog(t, `{"name":"coder","agent":"codex","models":{"main":{"id":"model-code"}},"args":["--model","{model:main}"]}`)}
 
 	agent, provider, err := ResolveAgent(request)
 
 	if err != nil || agent.Type != types.AgentCodex || provider == nil || provider.Name != "coder" {
 		t.Fatalf("ResolveAgent() = %v, %v, %v; want codex with the coder route", agent, provider, err)
 	}
-	if agent, provider, err := ResolveAgent(Request{Agent: "claude"}); err != nil || agent.Type != types.AgentClaude || provider != nil {
+	if agent, provider, err := ResolveAgent(Request{Agent: "claude", Harnesses: agents.Embedded()}); err != nil || agent.Type != types.AgentClaude || provider != nil {
 		t.Errorf("ResolveAgent(no provider) = %v, %v, %v; want claude alone", agent, provider, err)
+	}
+}
+
+func TestResolveAgentReadsTheHarnessCatalogOfTheRequest(t *testing.T) {
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		t.Fatal(err)
+	}
+	harnesses, err := agents.Embedded().Apply(validator, agents.Override{Name: types.AgentClaude, Origin: "claude.json", Data: []byte(`{"binary":"claude-next"}`)})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	agent, _, err := ResolveAgent(Request{Agent: "claude", Harnesses: harnesses})
+
+	if err != nil || agent.Binary != "claude-next" {
+		t.Errorf("ResolveAgent() = %+v, %v, want the overridden binary", agent, err)
+	}
+	if _, _, err := ResolveAgent(Request{Agent: "claude"}); err == nil || !strings.Contains(err.Error(), "available agents: []") {
+		t.Errorf("ResolveAgent() without harnesses error = %v, want none available", err)
 	}
 }
 
@@ -128,11 +151,12 @@ func TestResolveAgentRefusesWhatTheAgentCannotTake(t *testing.T) {
 		"route the agent ignores": {Request{Agent: "claude", Provider: "argued", Catalog: argued}, "does not take"},
 	}
 	for name, test := range cases {
+		test.request.Harnesses = agents.Embedded()
 		if _, _, err := ResolveAgent(test.request); err == nil || !strings.Contains(err.Error(), test.want) {
 			t.Errorf("%s: ResolveAgent() error = %v, want %q", name, err, test.want)
 		}
 	}
-	if _, _, err := ResolveAgent(Request{Agent: "claude", Provider: "ghost"}); !errors.Is(err, providers.ErrNotDefined) {
+	if _, _, err := ResolveAgent(Request{Agent: "claude", Harnesses: agents.Embedded(), Provider: "ghost"}); !errors.Is(err, providers.ErrNotDefined) {
 		t.Errorf("ResolveAgent(undefined) error = %v, want %v", err, providers.ErrNotDefined)
 	}
 }

@@ -158,6 +158,7 @@ Each agent declares its facts, and the planner and the isolators compare those f
 - A provider that sets a route the agent does not read, such as environment for OpenCode, fails before the run, because the agent would drop it silently.
 - `agent-cli` ships no provider and no model id. You define each provider in a file, see [Providers](#providers). `pi` takes its Azure OpenAI variables through `--env`.
 - `--dry-run` prints the protocol, the model access and the version probe of the agent. `--agent` and `--provider` complete in the shell, and `--provider` offers only the providers you defined.
+- A harness override file `harnesses.d/<agent>.json` beside the managed, the user or the project `agentic.json` changes the facts of one agent, such as its binary. It names only the members it changes, and `agent-cli schema harness-override` prints its schema. The overrides apply user first, then project, then managed, so the managed one wins. A project override takes effect only after you approve its digest, see [Providers](#providers).
 
 ### Providers
 
@@ -184,7 +185,7 @@ A route must use what its agent reads: `claude` reads `environment`, and `codex`
 
 Override a slot for one run with `--model <slot>=<id>`, or for every run with the `models` list of the `run` section of an `agentic.json` file. A later layer wins per slot (user, project, command line, managed), and a command line value that contradicts a managed one is an error. `--dry-run` and `preflight` show the id of each slot and the file or layer that decided it. `agent-cli providers list` shows each defined provider and its layer, and `agent-cli schema provider` prints the schema of a provider file for an editor.
 
-Project content takes effect only after you approve the digest of its file: the project `agentic.json` when it sets the `run` or the `providers` section, and each file in the project `providers.d`. `agent-cli providers approve` shows each such file and records its digest after you answer yes to `Approve this digest? [y/N]` on a terminal, or when you pass `--approve-config-digest <digest>`. A run, `preflight` and `config show` ask the same question on a terminal. Without a terminal they stop and name the digest, and `--approve-config-digest <digest>` approves it. The approval ledger is `$XDG_STATE_HOME/agentic/trust.json`, and any change to a file asks again.
+Project content takes effect only after you approve the digest of its file: the project `agentic.json` when it sets the `run` or the `providers` section, each file in the project `providers.d` and each harness override in the project `harnesses.d`. `agent-cli providers approve` shows each such file and records its digest after you answer yes to `Approve this digest? [y/N]` on a terminal, or when you pass `--approve-config-digest <digest>`. A run, `preflight` and `config show` ask the same question on a terminal. Without a terminal they stop and name the digest, and `--approve-config-digest <digest>` approves it. The approval ledger is `$XDG_STATE_HOME/agentic/trust.json`, and any change to a file asks again.
 
 The three files below are examples, not shipped code. Replace each `<model-id>` with an id your service accepts.
 

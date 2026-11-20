@@ -135,7 +135,7 @@ func TestProvidersApproveWithoutProjectContentSaysSo(t *testing.T) {
 	if err := r.execute("providers", "approve"); err != nil {
 		t.Fatalf("providers approve error = %v", err)
 	}
-	if !strings.Contains(r.out.String(), "supplies no run or providers configuration") {
+	if !strings.Contains(r.out.String(), "supplies no file that needs approval") {
 		t.Errorf("output = %q", r.out.String())
 	}
 }

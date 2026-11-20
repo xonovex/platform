@@ -146,10 +146,10 @@ func newProvidersApproveCommand(deps launch.Dependencies) *cobra.Command {
 	options := launch.Options{}
 	command := &cobra.Command{
 		Use:   "approve",
-		Short: "Approve the project agentic.json and the provider files of the project",
+		Short: "Approve the project agentic.json, provider files and harness overrides",
 		Long: `Show each project file that a run reads only after approval: the project
-agentic.json when it sets the run or providers section, and each provider file
-in providers.d beside it. On a terminal the command shows each file that is not
+agentic.json when it sets the run or providers section, each provider file in
+providers.d and each harness override in harnesses.d beside it. On a terminal the command shows each file that is not
 approved and asks you to approve its digest. Without a terminal it stops; review
 the file, then repeat the command with --approve-config-digest <digest>. Any
 change to a file changes its digest and asks again.`,
@@ -160,7 +160,7 @@ change to a file changes its digest and asks again.`,
 				return err
 			}
 			if len(listing.Pending) == 0 {
-				_, err := fmt.Fprintln(deps.Out, "The project supplies no run or providers configuration.")
+				_, err := fmt.Fprintln(deps.Out, "The project supplies no file that needs approval.")
 				return err
 			}
 			if err := runconfig.Gate(deps.ConfigEnv(), listing.Pending, options.ApproveDigest); err != nil {

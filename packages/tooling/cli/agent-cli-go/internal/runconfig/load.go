@@ -1,6 +1,6 @@
 // Package runconfig reads the configuration of a run: the run and providers
-// sections of each agentic.json layer, and the provider shards in providers.d
-// beside each file. The rule of each key and the layers that may set it are
+// sections of each agentic.json layer, the provider shards in providers.d and
+// the harness overrides in harnesses.d beside each file. The rule of each key and the layers that may set it are
 // data in the run section of shared-config-go. Content a project supplies
 // takes effect only after the user approves its digest through the one trust
 // gate of shared-config-go.
@@ -14,7 +14,9 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/resolve"
@@ -58,7 +60,7 @@ type Request struct {
 // its digest.
 type Pending struct {
 	Subject trust.Subject
-	// Origins are the paths of the provider documents the content defines.
+	// Origins are the paths of the documents the content defines.
 	Origins []string
 }
 
@@ -77,6 +79,9 @@ type Loaded struct {
 	Providers []providers.Document
 	// ProviderDirs are the provider shard directories, managed first.
 	ProviderDirs []ProviderDir
+	// Harnesses are the facts of every harness with the overrides of every
+	// layer applied: user, then project, then managed.
+	Harnesses agents.Catalog
 	// Pending is the project content behind the trust gate.
 	Pending []Pending
 }
@@ -122,13 +127,29 @@ func Read(env Env, request Request) (Loaded, error) {
 	if err != nil {
 		return Loaded{}, err
 	}
-	shards, err := shard.Find(shard.Env{Files: files, Places: places, Lister: files}, shard.Request{
+	shardEnv := shard.Env{Files: files, Places: places, Lister: files}
+	shards, err := shard.Find(shardEnv, shard.Request{
 		Dir: ProvidersDir, Kind: ProviderKind, Start: request.Start, Project: request.Project,
 	})
 	if err != nil {
 		return Loaded{}, err
 	}
-	loaded := Loaded{Resolved: resolved, ProviderDirs: dirs}
+	base := agents.Embedded()
+	harnessShards, err := shard.Find(shardEnv, shard.Request{
+		Dir: agents.OverrideDir, Names: harnessNames(base), Kind: agents.OverrideKind, Start: request.Start, Project: request.Project,
+	})
+	if err != nil {
+		return Loaded{}, err
+	}
+	overrides := make([]agents.Override, len(harnessShards))
+	for i, s := range harnessShards {
+		overrides[i] = agents.Override{Name: types.AgentType(s.Name), Origin: s.Path, Data: s.Data}
+	}
+	harnesses, err := base.Apply(env.Validator, overrides...)
+	if err != nil {
+		return Loaded{}, err
+	}
+	loaded := Loaded{Resolved: resolved, ProviderDirs: dirs, Harnesses: harnesses}
 	for _, document := range documents {
 		if document.Layer == spec.Project {
 			loaded.ProviderDirs = append(loaded.ProviderDirs, ProviderDir{Layer: spec.Project, Path: filepath.Join(filepath.Dir(document.Path), ProvidersDir)})
@@ -141,8 +162,18 @@ func Read(env Env, request Request) (Loaded, error) {
 		}
 		loaded.Providers = append(loaded.Providers, documentsOf...)
 	}
-	loaded.Pending = pending(documents, shards)
+	loaded.Pending = pending(documents, shards, harnessShards)
 	return loaded, nil
+}
+
+// harnessNames lists the harnesses an override file may name: a file named
+// after no harness is not an override.
+func harnessNames(catalog agents.Catalog) []string {
+	var names []string
+	for _, agentType := range catalog.Types() {
+		names = append(names, string(agentType))
+	}
+	return names
 }
 
 // providerDirs lists the provider shard directories of the managed and the
@@ -234,8 +265,8 @@ func inlineProviders(document layer.Document) ([]providers.Document, error) {
 
 // pending lists the project content behind the trust gate: the project
 // agentic.json when it sets a run or providers section, then each project
-// provider shard.
-func pending(documents []layer.Document, shards []shard.Shard) []Pending {
+// provider shard, then each project harness override.
+func pending(documents []layer.Document, providerShards, harnessShards []shard.Shard) []Pending {
 	var out []Pending
 	for _, document := range documents {
 		if document.Layer != spec.Project {
@@ -245,10 +276,16 @@ func pending(documents []layer.Document, shards []shard.Shard) []Pending {
 			out = append(out, Pending{Subject: trust.FileSubject(document, sections), Origins: []string{document.Path}})
 		}
 	}
+	out = append(out, projectShards(providerShards, ProviderKind)...)
+	return append(out, projectShards(harnessShards, agents.OverrideKind)...)
+}
+
+func projectShards(shards []shard.Shard, kind string) []Pending {
+	var out []Pending
 	for _, s := range shards {
 		if s.Layer == spec.Project {
 			document := layer.Document{Layer: s.Layer, Path: s.Path, Data: s.Data, Digest: s.Digest}
-			out = append(out, Pending{Subject: trust.FileSubject(document, []string{ProviderKind}), Origins: []string{s.Path}})
+			out = append(out, Pending{Subject: trust.FileSubject(document, []string{kind}), Origins: []string{s.Path}})
 		}
 	}
 	return out

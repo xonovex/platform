@@ -134,6 +134,7 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 	}
 	effective := applyResolved(options, loaded.Resolved)
 	effective.Catalog = providers.NewCatalog(loaded.Providers...)
+	effective.Harnesses = loaded.Harnesses
 	effective.UserProviderDir = loaded.UserProviderDir()
 	if effective.ModelOverrides, err = parseModelOverrides(loaded.Resolved.Sourced(runconfig.KeyModels)); err != nil {
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)

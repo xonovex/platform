@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/spec"
@@ -190,6 +191,31 @@ func TestReadFindsTheProvidersOfEveryLayer(t *testing.T) {
 	}
 }
 
+func TestReadAppliesTheHarnessOverridesOfEveryLayer(t *testing.T) {
+	host := oshosttest.New()
+	host.AddFile("/home/user/.config/agentic/harnesses.d/claude.json", `{"binary":"claude-user"}`, 0o644)
+	host.AddFile("/home/user/.config/agentic/harnesses.d/notes.json", `{"binary":"ignored"}`, 0o644)
+	host.AddFile("/etc/agentic/harnesses.d/codex.json", `{"binary":"codex-managed"}`, 0o644)
+	host.AddFile(projectFile, `{"version":1}`, 0o644)
+	project := `{"binary":"claude-project"}`
+	host.AddFile("/work/harnesses.d/claude.json", project, 0o644)
+	e, _ := env(host)
+
+	loaded, err := Read(e, Request{})
+
+	if err != nil {
+		t.Fatalf("Read() error = %v", err)
+	}
+	claude, _ := loaded.Harnesses.Get(types.AgentClaude)
+	codex, _ := loaded.Harnesses.Get(types.AgentCodex)
+	if claude.Binary != "claude-project" || codex.Binary != "codex-managed" {
+		t.Errorf("binaries = %q, %q; want the project and the managed override", claude.Binary, codex.Binary)
+	}
+	if len(loaded.Pending) != 1 || loaded.Pending[0].Subject.Digest != layer.Digest([]byte(project)) || !strings.Contains(loaded.Pending[0].Subject.Notice, "harness") {
+		t.Errorf("Pending = %+v, want the project override", loaded.Pending)
+	}
+}
+
 func TestAProjectFileThatSetsNoGatedSectionWaitsForNothing(t *testing.T) {
 	host := oshosttest.New()
 	host.AddFile(projectFile, `{"version":1}`, 0o644)
@@ -207,17 +233,19 @@ func TestReadFailsClosed(t *testing.T) {
 		homeless  bool
 		want      string
 	}{
-		"no home":          {homeless: true, want: "find the user configuration directory"},
-		"invalid file":     {files: map[string]string{userFile: `{"version":1,"run":{"agnet":"x"}}`}, want: userFile},
-		"widening project": {files: map[string]string{projectFile: `{"version":1,"run":{"bindPaths":["/"]}}`}, want: "only the managed and user files may set"},
-		"shard directory":  {files: map[string]string{userProviders: "a file"}, want: userProviders},
-		"broken shard":     {files: map[string]string{userProviders + "/a.json": "{"}, want: "provider file " + userProviders + "/a.json"},
-		"misnamed shard":   {files: map[string]string{userProviders + "/a.json": `{"name":"b","agent":"claude"}`}, want: "name the file b.json"},
-		"defined twice":    {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"agent":"claude"}}}`, userProviders + "/a.json": `{"name":"a","agent":"claude"}`}, want: "is defined in " + userFile + " and in " + userProviders + "/a.json"},
-		"renamed inline":   {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"name":"b","agent":"claude"}}}`}, want: `the provider a names itself "b"`},
-		"broken inline":    {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"agent":"Claude"}}}`}, validator: anything{}, want: "the provider a:"},
-		"not a map":        {files: map[string]string{userFile: `{"version":1,"providers":{"a":1}}`}, validator: anything{}, want: userFile + ": the providers section"},
-		"missing project":  {want: "project configuration /missing.json"},
+		"no home":           {homeless: true, want: "find the user configuration directory"},
+		"invalid file":      {files: map[string]string{userFile: `{"version":1,"run":{"agnet":"x"}}`}, want: userFile},
+		"widening project":  {files: map[string]string{projectFile: `{"version":1,"run":{"bindPaths":["/"]}}`}, want: "only the managed and user files may set"},
+		"shard directory":   {files: map[string]string{userProviders: "a file"}, want: userProviders},
+		"broken shard":      {files: map[string]string{userProviders + "/a.json": "{"}, want: "provider file " + userProviders + "/a.json"},
+		"misnamed shard":    {files: map[string]string{userProviders + "/a.json": `{"name":"b","agent":"claude"}`}, want: "name the file b.json"},
+		"defined twice":     {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"agent":"claude"}}}`, userProviders + "/a.json": `{"name":"a","agent":"claude"}`}, want: "is defined in " + userFile + " and in " + userProviders + "/a.json"},
+		"renamed inline":    {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"name":"b","agent":"claude"}}}`}, want: `the provider a names itself "b"`},
+		"broken inline":     {files: map[string]string{userFile: `{"version":1,"providers":{"a":{"agent":"Claude"}}}`}, validator: anything{}, want: "the provider a:"},
+		"not a map":         {files: map[string]string{userFile: `{"version":1,"providers":{"a":1}}`}, validator: anything{}, want: userFile + ": the providers section"},
+		"missing project":   {want: "project configuration /missing.json"},
+		"harness directory": {files: map[string]string{"/home/user/.config/agentic/harnesses.d": "a file"}, want: "harnesses.d"},
+		"broken override":   {files: map[string]string{"/etc/agentic/harnesses.d/claude.json": `{"binary":1}`}, want: "harness override /etc/agentic/harnesses.d/claude.json"},
 	}
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
