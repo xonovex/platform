@@ -288,7 +288,7 @@ A Codex route through the same proxy, `codex-proxy.json`:
 | `tmux` | a tmux session and window | `--terminal-session` and `--terminal-window` name them. The run attaches unless `--terminal-detach` is set. |
 | `herdr-tui` | a pane beside the current pane of the herdr terminal user interface | Needs the CLI to run in a herdr-tui pane (`HERDR_ENV=1`). It never attaches to a herdr session the CLI does not run in. `--terminal-detach` keeps the focus where it is. |
 | `herdr-core` | a new terminal of the herdr-core runtime, a child of the terminal the CLI runs in | Needs the CLI to run in a herdr-core terminal (`HC_TERMINAL_ID` set) and the `hc` command. It talks to the runtime through `hc` only. Each terminal carries the label `agent-cli.run=<run id>`, so `hc ls --label agent-cli.run=<run id>` finds it. An interrupt of the CLI ends the program and removes its terminal. With `--terminal-detach` the terminal outlives the CLI and removes itself when the program exits. |
-| `auto` | the wrapper whose session the CLI runs in | Chooses `herdr-core` when `HC_TERMINAL_ID` is set and `herdr-tui` when `HERDR_ENV=1`. It fails when neither is set, and when both are set it asks you to name the wrapper. It never chooses tmux. |
+| `auto` | the wrapper whose session the CLI runs in | Chooses `herdr-core` when `HC_TERMINAL_ID` is set and `herdr-tui` when `HERDR_ENV=1`. It fails when neither is set, and when both are set it chooses `herdr-core`, because every program in a `herdr-core` terminal inherits `HC_TERMINAL_ID`, a `herdr-tui` session included. It never chooses tmux. |
 
 The exit code of a terminal run differs by wrapper:
 

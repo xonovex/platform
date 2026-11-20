@@ -521,13 +521,20 @@ func TestExecuteRunsAutoInTheSessionTheCLIRunsIn(t *testing.T) {
 	}
 }
 
-func TestExecuteRefusesAutoOutsideOrInsideTwoSessions(t *testing.T) {
+func TestExecuteRefusesAutoOutsideEverySession(t *testing.T) {
 	_, deps, options := autoFixture(&fakeTerminal{}, &fakeTerminal{})
 	if err := Execute(deps, options); !errors.Is(err, termshared.ErrNotInside) {
 		t.Errorf("Execute(outside) error = %v, want the refusal", err)
 	}
-	_, deps, options = autoFixture(&fakeTerminal{inside: true}, &fakeTerminal{inside: true})
-	if err := Execute(deps, options); err == nil || !strings.Contains(err.Error(), "core and tui") {
-		t.Errorf("Execute(inside both) error = %v, want a request to name one", err)
+}
+
+func TestExecuteRunsAutoInTheFirstWrapperInsideTwoSessions(t *testing.T) {
+	core, tui := &fakeTerminal{inside: true}, &fakeTerminal{inside: true}
+	_, deps, options := autoFixture(core, tui)
+	if err := Execute(deps, options); err != nil {
+		t.Fatalf("Execute() error = %v", err)
+	}
+	if !core.executed || tui.executed {
+		t.Errorf("core ran = %v, tui ran = %v; want only core, the first in priority order", core.executed, tui.executed)
 	}
 }
