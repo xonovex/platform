@@ -6,7 +6,7 @@ Configure coding-agent harnesses and author their skills, commands, and project 
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-agentic` in the selected harness. The bundle version is `5.3.0`.
+Add the Xonovex marketplace once, then install `xonovex-agentic` in the selected harness. The bundle version is `6.0.0`.
 
 ### Claude Code
 

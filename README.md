@@ -80,10 +80,6 @@ codex plugin add xonovex-workflow@xonovex-marketplace
 codex plugin add xonovex-typescript@xonovex-marketplace
 ```
 
-#### Upgrade from individual plugins
-
-The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The plugins ship no slash commands: the skill that owned the procedure of a former command now takes the request directly. The `xonovex-workflow` plugin holds the planning and reflection skills. The Git skill with its worktree operations belongs to `xonovex-core`, the authoring skills belong to `xonovex-agentic`, and the content skills belong to `xonovex-writing`.
-
 ## Development
 
 ### Documentation website

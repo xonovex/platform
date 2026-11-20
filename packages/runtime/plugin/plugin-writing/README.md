@@ -6,7 +6,7 @@ Revise prose and write technical documents, articles, news, and travel guides.
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-writing` in the selected harness. The bundle version is `5.3.0`.
+Add the Xonovex marketplace once, then install `xonovex-writing` in the selected harness. The bundle version is `6.0.0`.
 
 ### Claude Code
 

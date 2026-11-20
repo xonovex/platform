@@ -6,7 +6,7 @@ Apply software design, testing, review, version control, credentials, and access
 
 ## Install
 
-Add the Xonovex marketplace once, then install `xonovex-core` in the selected harness. The bundle version is `5.3.0`.
+Add the Xonovex marketplace once, then install `xonovex-core` in the selected harness. The bundle version is `6.0.0`.
 
 ### Claude Code
 
