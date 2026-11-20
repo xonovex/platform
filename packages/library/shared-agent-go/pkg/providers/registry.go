@@ -248,28 +248,6 @@ func build(p Preset, sources map[string]string) (*types.ModelProvider, error) {
 	return provider, nil
 }
 
-// BuildProviderEnv builds environment variables from provider config, reading
-// the credential through getenv.
-func BuildProviderEnv(provider *types.ModelProvider, getenv Getenv) (map[string]string, error) {
-	env := maps.Clone(provider.Environment)
-	if env == nil {
-		env = make(map[string]string)
-	}
-
-	if provider.CredentialSourceEnv != "" || provider.CredentialTargetEnv != "" {
-		if provider.CredentialSourceEnv == "" || provider.CredentialTargetEnv == "" {
-			return nil, fmt.Errorf("provider %q must define both credential source and target environment variables", provider.Name)
-		}
-		authToken := getenv(provider.CredentialSourceEnv)
-		if authToken == "" {
-			return nil, fmt.Errorf("missing authentication token: %s environment variable is not set", provider.CredentialSourceEnv)
-		}
-		env[provider.CredentialTargetEnv] = authToken
-	}
-
-	return env, nil
-}
-
 // GetProviderCliArgs gets CLI arguments for a provider
 func GetProviderCliArgs(provider *types.ModelProvider) []string {
 	return slices.Clone(provider.CliArgs)

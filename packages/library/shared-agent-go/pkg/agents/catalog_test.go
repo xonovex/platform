@@ -127,6 +127,25 @@ func TestHeadlessArgs(t *testing.T) {
 	}
 }
 
+func TestPromptArgs(t *testing.T) {
+	agent := &types.AgentConfig{Type: "h", Headless: types.Headless{Args: []string{"-p"}, HermeticArgs: []string{"--clean"}}}
+	got, err := PromptArgs(agent, "fix the tests")
+	if want := []string{"-p", "fix the tests"}; err != nil || !reflect.DeepEqual(got, want) {
+		t.Fatalf("PromptArgs() = %v, %v, want %v", got, err, want)
+	}
+	got[0] = "changed"
+	if agent.Headless.Args[0] != "-p" {
+		t.Error("PromptArgs() shares the arguments of the facts")
+	}
+	if _, err := PromptArgs(agent, "--help"); err == nil || !strings.Contains(err.Error(), "dash") {
+		t.Errorf("PromptArgs(--help) error = %v, want a dash refused", err)
+	}
+	interactive := &types.AgentConfig{Type: "i"}
+	if _, err := PromptArgs(interactive, "fix"); err == nil || !strings.Contains(err.Error(), "harness i declares no non-interactive run") {
+		t.Errorf("PromptArgs(interactive) error = %v", err)
+	}
+}
+
 func TestOption(t *testing.T) {
 	agent := &types.AgentConfig{Type: "h", Headless: types.Headless{Options: map[string][]string{
 		"effort": {"-c", `effort="{value}"`}, "readOnly": {"--sandbox", "read-only"},

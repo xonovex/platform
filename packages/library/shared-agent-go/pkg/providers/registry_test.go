@@ -268,30 +268,6 @@ func TestListOrdersTheSameAgentByNameBothWays(t *testing.T) {
 	}
 }
 
-func TestBuildProviderEnvReadsTheCredentialThroughGetenv(t *testing.T) {
-	provider := &types.ModelProvider{
-		Name: "p", Environment: map[string]string{"A": "1"}, CredentialSourceEnv: "HOST_KEY", CredentialTargetEnv: "AGENT_KEY",
-	}
-	env, err := BuildProviderEnv(provider, func(key string) string { return map[string]string{"HOST_KEY": "secret"}[key] })
-	if err != nil || env["AGENT_KEY"] != "secret" || env["A"] != "1" {
-		t.Fatalf("BuildProviderEnv() = %v, %v", env, err)
-	}
-	if _, set := provider.Environment["AGENT_KEY"]; set {
-		t.Error("BuildProviderEnv() wrote the credential into the provider")
-	}
-	if _, err := BuildProviderEnv(provider, func(string) string { return "" }); err == nil || !strings.Contains(err.Error(), "HOST_KEY") {
-		t.Errorf("a missing credential error = %v", err)
-	}
-	half := &types.ModelProvider{Name: "half", CredentialSourceEnv: "HOST_KEY"}
-	if _, err := BuildProviderEnv(half, func(string) string { return "x" }); err == nil || !strings.Contains(err.Error(), "both") {
-		t.Errorf("a half credential error = %v", err)
-	}
-	bare, err := BuildProviderEnv(&types.ModelProvider{Name: "bare"}, func(string) string { return "" })
-	if err != nil || bare == nil || len(bare) != 0 {
-		t.Errorf("BuildProviderEnv(bare) = %v, %v, want an empty map", bare, err)
-	}
-}
-
 func TestGetProviderCliArgsReturnsACopy(t *testing.T) {
 	provider := &types.ModelProvider{CliArgs: []string{"a", "b"}}
 	args := GetProviderCliArgs(provider)

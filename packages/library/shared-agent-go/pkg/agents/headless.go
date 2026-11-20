@@ -21,6 +21,20 @@ func HeadlessArgs(agent *types.AgentConfig, format string) ([]string, error) {
 	return append(args, agent.Headless.HermeticArgs...), nil
 }
 
+// PromptArgs returns the arguments of a run that takes one prompt and exits:
+// the non-interactive arguments, then the prompt. The prompt is the last
+// positional argument, so one that starts with a dash would be read as an
+// option and fails here.
+func PromptArgs(agent *types.AgentConfig, prompt string) ([]string, error) {
+	if len(agent.Headless.Args) == 0 {
+		return nil, fmt.Errorf("harness %s declares no non-interactive run, so it cannot take a prompt", agent.Type)
+	}
+	if strings.HasPrefix(prompt, "-") {
+		return nil, fmt.Errorf("prompt starts with a dash, which harness %s would read as an option", agent.Type)
+	}
+	return append(slices.Clone(agent.Headless.Args), prompt), nil
+}
+
 // Option returns the arguments of a named option with value in place of the
 // placeholder.
 func Option(agent *types.AgentConfig, name, value string) ([]string, error) {

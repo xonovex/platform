@@ -170,7 +170,7 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 			return result, err
 		}
 	}
-	if run.ProviderEnv, err = agentcmd.BuildProviderEnv(plan.Agent, plan.Provider, deps.Host.Getenv); err != nil {
+	if run.ProviderEnv, err = agentcmd.PlanProviderEnv(plan.Agent, plan.Provider).Resolve(deps.Host.Getenv); err != nil {
 		return result, fmt.Errorf("prepare sandbox command: %w", err)
 	}
 	command, err := plan.Isolator.Command(run, contribution)

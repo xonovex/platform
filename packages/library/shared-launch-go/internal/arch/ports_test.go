@@ -164,8 +164,8 @@ func TestSpecReachesNoForbiddenPackage(t *testing.T) {
 func TestIsolationBuildsNoAgentCommand(t *testing.T) {
 	builders := map[string][]string{
 		agentLibrary + "agents":    {"BuildArgs", "BuildEnv"},
-		agentLibrary + "providers": {"GetProviderCliArgs", "BuildProviderEnv"},
-		agentLibrary + "agentcmd":  {"BuildProviderEnv"},
+		agentLibrary + "providers": {"GetProviderCliArgs"},
+		agentLibrary + "agentcmd":  {"PlanProviderEnv"},
 	}
 	for _, f := range nonTest(moduleFiles(t)) {
 		if f.dir != "pkg/isolation" && f.dir != "pkg/hostlaunch" && !strings.HasPrefix(f.dir, "pkg/isolation/") {
