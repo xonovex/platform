@@ -38,11 +38,7 @@ type Reader interface {
 // providers directory.
 func ResolveProvider(ctx context.Context, reader Reader, presets providers.Catalog, run *agentv1alpha1.AgentRun, defaultProvider string) (Route, error) {
 	if run.Spec.Provider != nil {
-		spec := run.Spec.Provider
-		route, err := buildRoute(presets, providerFields{
-			name: spec.PresetRef, presetRef: spec.PresetRef, agentType: spec.AgentType,
-			authSecret: spec.AuthSecretRef, authTokenEnv: spec.AuthTokenEnv, environment: spec.Environment, cliArgs: spec.CliArgs,
-		})
+		route, err := InlineRoute(presets, run.Spec.Provider)
 		if err != nil {
 			return Route{}, err
 		}
@@ -75,6 +71,19 @@ func ResolveProvider(ctx context.Context, reader Reader, presets providers.Catal
 		return Route{}, fmt.Errorf("failed to resolve auth token: %w", err)
 	}
 	return route, nil
+}
+
+// InlineRoute builds the route of an inline provider without reading its
+// Secret; nil spec is no provider. Admission snapshots every referenced
+// provider inline, so it plans an admitted run with this route.
+func InlineRoute(presets providers.Catalog, spec *agentv1alpha1.ProviderSpec) (Route, error) {
+	if spec == nil {
+		return Route{}, nil
+	}
+	return buildRoute(presets, providerFields{
+		name: spec.PresetRef, presetRef: spec.PresetRef, agentType: spec.AgentType,
+		authSecret: spec.AuthSecretRef, authTokenEnv: spec.AuthTokenEnv, environment: spec.Environment, cliArgs: spec.CliArgs,
+	})
 }
 
 // providerFields are the fields an inline provider and an AgentProvider share.

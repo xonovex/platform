@@ -626,3 +626,14 @@ func TestEnvironment_RendersACredentialTargetOnlyFromASecret(t *testing.T) {
 		t.Errorf("Environment() = %v, want none: no Secret holds the credential", env)
 	}
 }
+
+func TestInlineRoute_IsNoRouteForNoProviderAndReadsNoSecret(t *testing.T) {
+	if route, err := InlineRoute(testutil.NewPresets(), nil); err != nil || route.Provider != nil {
+		t.Errorf("InlineRoute(nil) = %+v, %v, want no route", route, err)
+	}
+	spec := &agentv1alpha1.ProviderSpec{AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "absent", Key: "token"}, AuthTokenEnv: "TOKEN"}
+	route, err := InlineRoute(testutil.NewPresets(), spec)
+	if err != nil || route.Provider.CredentialTargetEnv != "TOKEN" || route.AuthSecret.Name != "absent" {
+		t.Errorf("InlineRoute() = %+v, %v, want the credential target of an unread Secret", route, err)
+	}
+}

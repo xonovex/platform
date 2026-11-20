@@ -38,7 +38,7 @@ tasks:
         ./internal/provision/shared=exempt \
         ./internal/resolver=100 \
         ./internal/validator=100 \
-        ./internal/webhook=87 \
+        ./internal/webhook=88 \
         ./internal/wiring=100 \
         ./internal/workspace/git=100 \
         ./internal/workspace/jj=100 \

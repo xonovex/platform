@@ -57,12 +57,7 @@ func sandboxedAgentRunWebhook(namespaces ...string) *AgentRunWebhook {
 	if len(namespaces) > 0 {
 		namespace = namespaces[0]
 	}
-	policy := &agentv1alpha1.AgentPolicy{
-		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-runtime-policy", Namespace: namespace},
-		Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
-			AllowedRuntimeClassNames: []string{"kata"},
-		}},
-	}
+	policy := sandboxPolicyFor(namespace)
 	return runWebhookWith(policy)
 }
 
@@ -787,5 +782,61 @@ func TestAgentRunWebhook_Validate_InlineHarnessOnly(t *testing.T) {
 	_, err := w.ValidateCreate(context.Background(), run)
 	if err != nil {
 		t.Errorf("ValidateCreate() error = %v", err)
+	}
+}
+
+// Admission plans the run with the shared planner, so a run the planner
+// refuses is refused before it is stored.
+func TestAgentRunWebhook_Validate_RefusesARunThePlannerRefuses(t *testing.T) {
+	tests := map[string]func(*agentv1alpha1.AgentRun){
+		"prompt to a harness with no non-interactive run": func(run *agentv1alpha1.AgentRun) {
+			run.Spec.Harness = &agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeOpencode}
+			run.Spec.Prompt = "fix it"
+		},
+		"prompt read as an option": func(run *agentv1alpha1.AgentRun) {
+			run.Spec.Prompt = "--help"
+		},
+		"provider arguments the harness does not take": func(run *agentv1alpha1.AgentRun) {
+			run.Spec.Provider = &agentv1alpha1.ProviderSpec{CliArgs: []string{"--model", "m"}}
+		},
+	}
+	for name, mutate := range tests {
+		t.Run(name, func(t *testing.T) {
+			run := baseRun()
+			mutate(run)
+
+			_, err := sandboxedAgentRunWebhook(run.Namespace).ValidateCreate(context.Background(), run)
+			if err == nil || !strings.HasPrefix(err.Error(), "agent execution plan: ") {
+				t.Fatalf("ValidateCreate() error = %v, want an execution plan error", err)
+			}
+		})
+	}
+}
+
+func TestAgentRunWebhook_Validate_AdmitsAPromptedRunOfEveryNonInteractiveHarness(t *testing.T) {
+	for _, agent := range []agentv1alpha1.AgentType{agentv1alpha1.AgentTypeClaude, "codex"} {
+		run := baseRun()
+		run.Spec.Harness = &agentv1alpha1.AgentSpec{Type: agent}
+		run.Spec.Prompt = "fix it"
+
+		store := testutil.NewMemoryStore(sandboxPolicyFor(run.Namespace))
+		w := NewAgentRunWebhook(store, store, everyHarness{}, testPlanner{}, testutil.NewPresets())
+		if _, err := w.ValidateCreate(context.Background(), run); err != nil {
+			t.Errorf("ValidateCreate(%s) error = %v", agent, err)
+		}
+	}
+}
+
+// everyHarness is a catalog that registers every harness.
+type everyHarness struct{ testCatalog }
+
+func (everyHarness) HasHarness(agentv1alpha1.AgentType) bool { return true }
+
+func sandboxPolicyFor(namespace string) *agentv1alpha1.AgentPolicy {
+	return &agentv1alpha1.AgentPolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: "sandbox-runtime-policy", Namespace: namespace},
+		Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
+			AllowedRuntimeClassNames: []string{"kata"},
+		}},
 	}
 }

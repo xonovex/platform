@@ -7,6 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/launch"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/resolver"
 )
 
@@ -27,6 +28,13 @@ type Catalog interface {
 	HasHarness(agent agentv1alpha1.AgentType) bool
 	HasWorkspace(wsType agentv1alpha1.WorkspaceType) bool
 	HasToolchain(tcType agentv1alpha1.ToolchainType) bool
+}
+
+// Planner supplies the sandbox of a namespace and the harness facts the shared
+// planner plans an admitted run with.
+type Planner interface {
+	launch.Sandboxes
+	launch.Harnesses
 }
 
 // namespacePolicy reads the AgentPolicy of a namespace through source.

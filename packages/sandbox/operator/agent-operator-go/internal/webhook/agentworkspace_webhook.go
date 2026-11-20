@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -142,7 +143,7 @@ func (w *AgentWorkspaceWebhook) validate(ctx context.Context, ws *agentv1alpha1.
 	if runtimeClassName == nil || strings.TrimSpace(*runtimeClassName) == "" {
 		return nil, fmt.Errorf("workspace initialization requires an explicit sandboxed runtimeClassName or policy default")
 	}
-	if !runtimeClassApproved(*runtimeClassName, policy) {
+	if !slices.Contains(approvedRuntimeClasses(policy), *runtimeClassName) {
 		return nil, fmt.Errorf("runtimeClassName %q is not allowed by the namespace AgentPolicy", *runtimeClassName)
 	}
 	if ref := ws.Spec.Repository.CredentialsSecretRef; ref != nil {

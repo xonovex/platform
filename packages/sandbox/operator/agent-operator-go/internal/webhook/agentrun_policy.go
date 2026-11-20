@@ -2,12 +2,17 @@ package webhook
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	agentpolicy "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
+	sharedlaunch "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/launch"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provider"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/validator"
 )
 
@@ -64,45 +69,102 @@ func requireAllowedSecret(name, key string, policy *agentv1alpha1.AgentPolicy) e
 	return fmt.Errorf("secret %q is not allowed by the namespace AgentPolicy", name)
 }
 
-func validateExecutionBoundary(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
-	if policy == nil {
-		return fmt.Errorf("namespace requires exactly one AgentPolicy before agent execution")
+// planRun plans the effective run of an admitted AgentRun with the sandbox of
+// its namespace, whose AgentPolicy approves the sandboxed runtime classes.
+func (w *AgentRunWebhook) planRun(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) (sharedlaunch.Spec, error) {
+	route, err := provider.InlineRoute(w.presets, run.Spec.Provider)
+	if err != nil {
+		return sharedlaunch.Spec{}, fmt.Errorf("agent execution plan: %w", err)
 	}
-	if run.Spec.Image == "" {
-		return fmt.Errorf("agent execution requires an explicit agent-capable image or harness/toolchain image default")
+	agentType := agentv1alpha1.AgentTypeClaude
+	if run.Spec.Harness != nil && run.Spec.Harness.Type != "" {
+		agentType = run.Spec.Harness.Type
 	}
-	if err := validator.ValidatePinnedImageReference(run.Spec.Image); err != nil {
-		return fmt.Errorf("agent execution image: %w", err)
+	spec, err := launch.Plan(w.planner.Sandbox(approvedRuntimeClasses(policy)), w.planner, run, launch.Execution{
+		AgentType: agentType,
+		Image:     run.Spec.Image,
+		Provider:  route.Provider,
+	})
+	if err != nil {
+		return sharedlaunch.Spec{}, fmt.Errorf("agent execution plan: %w", err)
 	}
-	if run.Spec.RuntimeClassName == nil || strings.TrimSpace(*run.Spec.RuntimeClassName) == "" {
-		return fmt.Errorf("agent execution requires an explicit sandboxed runtimeClassName or harness/policy default")
+	return spec, nil
+}
+
+// approvedRuntimeClasses are the runtime classes the AgentPolicy approves as
+// sandboxed: the enforced one and the allowed ones.
+func approvedRuntimeClasses(policy *agentv1alpha1.AgentPolicy) []string {
+	enforced := policy.Spec.Enforced
+	var approved []string
+	if enforced.RuntimeClassName != nil {
+		approved = append(approved, *enforced.RuntimeClassName)
 	}
-	if !runtimeClassApproved(*run.Spec.RuntimeClassName, policy) {
+	return append(approved, enforced.AllowedRuntimeClassNames...)
+}
+
+// sandboxPolicy is what admission demands of every run: a pinned image, host
+// tools out of reach and a sandboxed runtime class, and restricted egress when
+// the AgentPolicy requires it.
+func sandboxPolicy(policy *agentv1alpha1.AgentPolicy) agentpolicy.SandboxPolicy {
+	return agentpolicy.SandboxPolicy{
+		RequirePinnedProvision:      true,
+		RequireHostToolsUnreachable: true,
+		RequireKernelIsolation:      true,
+		RequireEgressRestricted:     policy.Spec.Enforced.RequireEgressRestricted,
+	}
+}
+
+// guaranteeMessages state an unmet guarantee in the terms of the AgentRun, so
+// the admission error names the field to change. A guarantee with no entry
+// reports the error of the shared policy.
+var guaranteeMessages = map[agentpolicy.Guarantee]func(run *agentv1alpha1.AgentRun) error{
+	agentpolicy.GuaranteePinnedProvision: func(run *agentv1alpha1.AgentRun) error {
+		return fmt.Errorf("agent execution image: %w", validator.ValidatePinnedImageReference(run.Spec.Image))
+	},
+	agentpolicy.GuaranteeKernelIsolation: func(run *agentv1alpha1.AgentRun) error {
+		if run.Spec.RuntimeClassName == nil || strings.TrimSpace(*run.Spec.RuntimeClassName) == "" {
+			return fmt.Errorf("agent execution requires an explicit sandboxed runtimeClassName or harness/policy default")
+		}
 		return fmt.Errorf("runtimeClassName %q is not allowed by the namespace AgentPolicy", *run.Spec.RuntimeClassName)
-	}
-	if err := validateSecurityContextOverrides(run); err != nil {
-		return err
+	},
+	agentpolicy.GuaranteeEgressRestricted: func(run *agentv1alpha1.AgentRun) error {
+		switch {
+		case run.Spec.Network == agentv1alpha1.NetworkModeHost:
+			return fmt.Errorf("policy requires restricted egress; network=host is unrestricted")
+		case run.Spec.NetworkPolicy != nil && run.Spec.NetworkPolicy.Disabled:
+			return fmt.Errorf("policy requires restricted egress; NetworkPolicy cannot be disabled")
+		default:
+			return fmt.Errorf("policy requires restricted egress; custom egress rules cannot be proven restricted")
+		}
+	},
+}
+
+// unmetGuarantee returns the error of the first guarantee of guarantees that
+// outcomes report unmet, nil when each is met.
+func unmetGuarantee(run *agentv1alpha1.AgentRun, outcomes []agentpolicy.Outcome, guarantees ...agentpolicy.Guarantee) error {
+	for _, outcome := range outcomes {
+		if outcome.Met() || !slices.Contains(guarantees, outcome.Guarantee) {
+			continue
+		}
+		if message, ok := guaranteeMessages[outcome.Guarantee]; ok {
+			return message(run)
+		}
+		return outcome.Err
 	}
 	return nil
 }
 
-func runtimeClassApproved(runtimeClassName string, policy *agentv1alpha1.AgentPolicy) bool {
-	if policy == nil {
-		return false
+// validateExecutionBoundary checks the boundary every run needs whatever its
+// AgentPolicy enforces: an image, the guarantees of the plan, and the security
+// context.
+func validateExecutionBoundary(run *agentv1alpha1.AgentRun, outcomes []agentpolicy.Outcome) error {
+	if err := unmetGuarantee(run, outcomes, agentpolicy.GuaranteePinnedProvision, agentpolicy.GuaranteeHostToolsUnreachable, agentpolicy.GuaranteeKernelIsolation); err != nil {
+		return err
 	}
-	enforced := policy.Spec.Enforced
-	if enforced.RuntimeClassName != nil && *enforced.RuntimeClassName == runtimeClassName {
-		return true
-	}
-	for _, allowed := range enforced.AllowedRuntimeClassNames {
-		if allowed == runtimeClassName {
-			return true
-		}
-	}
-	return false
+	return validateSecurityContextOverrides(run)
 }
 
-func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy, outcomes []agentpolicy.Outcome) error {
 	e := policy.Spec.Enforced
 
 	// Enforce runtimeClassName
@@ -142,21 +204,8 @@ func enforcePolicy(run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolic
 		}
 	}
 
-	if e.RequireEgressRestricted {
-		switch run.Spec.Network {
-		case agentv1alpha1.NetworkModeHost:
-			return fmt.Errorf("policy requires restricted egress; network=host is unrestricted")
-		case agentv1alpha1.NetworkModeProxy:
-			return fmt.Errorf("policy requires restricted egress; network=proxy has no enforceable backend")
-		}
-		if run.Spec.NetworkPolicy != nil {
-			if run.Spec.NetworkPolicy.Disabled {
-				return fmt.Errorf("policy requires restricted egress; NetworkPolicy cannot be disabled")
-			}
-			if len(run.Spec.NetworkPolicy.Egress) > 0 {
-				return fmt.Errorf("policy requires restricted egress; custom egress rules cannot be proven restricted")
-			}
-		}
+	if err := unmetGuarantee(run, outcomes, agentpolicy.GuaranteeEgressRestricted); err != nil {
+		return err
 	}
 
 	// Enforce max timeout

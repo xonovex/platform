@@ -78,7 +78,7 @@ func TestSampleAgentRunPassesAdmissionWithSamplePolicyAndProvider(t *testing.T) 
 		Data:       map[string][]byte{"api-key": []byte("test-token")},
 	}
 	store := testutil.NewMemoryStore(policy, provider, secret)
-	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.New(agents.Embedded()), providers.Catalog{})
+	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.New(agents.Embedded()), plugins.New(agents.Embedded()), providers.Catalog{})
 
 	warnings, err := admissionWebhook.ValidateCreate(context.Background(), run)
 

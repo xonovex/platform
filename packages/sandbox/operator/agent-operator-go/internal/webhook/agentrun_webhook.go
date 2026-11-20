@@ -9,6 +9,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
+	agentpolicy "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentvalidation "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/validation"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
@@ -19,12 +20,13 @@ type AgentRunWebhook struct {
 	policies   PolicySource
 	references ReferenceReader
 	catalog    Catalog
+	planner    Planner
 	presets    providers.Catalog
 }
 
 // NewAgentRunWebhook returns the AgentRun webhook over its ports.
-func NewAgentRunWebhook(policies PolicySource, references ReferenceReader, catalog Catalog, presets providers.Catalog) *AgentRunWebhook {
-	return &AgentRunWebhook{policies: policies, references: references, catalog: catalog, presets: presets}
+func NewAgentRunWebhook(policies PolicySource, references ReferenceReader, catalog Catalog, planner Planner, presets providers.Catalog) *AgentRunWebhook {
+	return &AgentRunWebhook{policies: policies, references: references, catalog: catalog, planner: planner, presets: presets}
 }
 
 var _ admission.Defaulter[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
@@ -170,19 +172,28 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 	if err := validateTimeout(effectiveRun.Spec.Timeout); err != nil {
 		return nil, err
 	}
-	if err := validateExecutionBoundary(effectiveRun, policy); err != nil {
+	if policy == nil {
+		return nil, fmt.Errorf("namespace requires exactly one AgentPolicy before agent execution")
+	}
+	if effectiveRun.Spec.Image == "" {
+		return nil, fmt.Errorf("agent execution requires an explicit agent-capable image or harness/toolchain image default")
+	}
+	spec, err := w.planRun(effectiveRun, policy)
+	if err != nil {
 		return nil, err
 	}
-	if policy != nil {
-		if err := validatePolicyDurations(policy); err != nil {
-			return nil, err
-		}
-		if err := validateRunSecretAccess(effectiveRun, policy); err != nil {
-			return nil, err
-		}
-		if err := enforcePolicy(effectiveRun, policy); err != nil {
-			return nil, err
-		}
+	outcomes := agentpolicy.Evaluate(spec.Capabilities, sandboxPolicy(policy))
+	if err := validateExecutionBoundary(effectiveRun, outcomes); err != nil {
+		return nil, err
+	}
+	if err := validatePolicyDurations(policy); err != nil {
+		return nil, err
+	}
+	if err := validateRunSecretAccess(effectiveRun, policy); err != nil {
+		return nil, err
+	}
+	if err := enforcePolicy(effectiveRun, policy, outcomes); err != nil {
+		return nil, err
 	}
 
 	return warnings, nil

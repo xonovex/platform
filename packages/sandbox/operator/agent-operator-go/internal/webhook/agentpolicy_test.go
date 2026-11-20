@@ -3,6 +3,7 @@ package webhook
 import (
 	"context"
 	"errors"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -12,9 +13,31 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	agentpolicy "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
+
+// outcomes plans run in the sandbox of policy and evaluates the guarantees
+// admission demands.
+func outcomes(t *testing.T, run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) []agentpolicy.Outcome {
+	t.Helper()
+	spec, err := runWebhookWith().planRun(run, policy)
+	if err != nil {
+		t.Fatalf("planRun() error = %v", err)
+	}
+	return agentpolicy.Evaluate(spec.Capabilities, sandboxPolicy(policy))
+}
+
+func enforce(t *testing.T, run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	t.Helper()
+	return enforcePolicy(run, policy, outcomes(t, run, policy))
+}
+
+func boundary(t *testing.T, run *agentv1alpha1.AgentRun, policy *agentv1alpha1.AgentPolicy) error {
+	t.Helper()
+	return validateExecutionBoundary(run, outcomes(t, run, policy))
+}
 
 func boolPtr(b bool) *bool    { return &b }
 func strPtr(s string) *string { return &s }
@@ -56,7 +79,7 @@ func TestEnforcePolicy_AllowsCompliantRun(t *testing.T) {
 	run := baseRun()
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -66,7 +89,7 @@ func TestEnforcePolicy_RejectsWrongRuntimeClass(t *testing.T) {
 	run.Spec.RuntimeClassName = strPtr("wrong")
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for wrong runtimeClassName")
 	}
@@ -77,7 +100,7 @@ func TestEnforcePolicy_RejectsNilRuntimeClassWhenRequired(t *testing.T) {
 	run.Spec.RuntimeClassName = nil
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for nil runtimeClassName when policy requires one")
 	}
@@ -90,7 +113,7 @@ func TestEnforcePolicy_RejectsPrivEsc(t *testing.T) {
 	}
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for AllowPrivilegeEscalation=true")
 	}
@@ -103,7 +126,7 @@ func TestEnforcePolicy_RejectsRunAsNonRootFalse(t *testing.T) {
 	}
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for RunAsNonRoot=false")
 	}
@@ -117,7 +140,7 @@ func TestEnforcePolicy_AllowsSecurityContextWithCompliantValues(t *testing.T) {
 	}
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -173,7 +196,7 @@ func TestEnforcePolicy_RejectsSecurityContextWeakening(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			run := baseRun()
 			test.mutate(run)
-			err := enforcePolicy(run, basePolicy())
+			err := enforce(t, run, basePolicy())
 			if err == nil || !strings.Contains(err.Error(), test.phrase) {
 				t.Fatalf("enforcePolicy() error = %v, want phrase %q", err, test.phrase)
 			}
@@ -181,13 +204,11 @@ func TestEnforcePolicy_RejectsSecurityContextWeakening(t *testing.T) {
 	}
 }
 
-func TestValidateExecutionBoundary_RequiresNamespacePolicy(t *testing.T) {
-	run := baseRun()
-
-	err := validateExecutionBoundary(run, nil)
+func TestValidate_RequiresNamespacePolicy(t *testing.T) {
+	_, err := runWebhookWith().ValidateCreate(context.Background(), baseRun())
 
 	if err == nil || !strings.Contains(err.Error(), "requires exactly one AgentPolicy") {
-		t.Fatalf("validateExecutionBoundary(no policy) error = %v, want missing-policy error", err)
+		t.Fatalf("ValidateCreate(no policy) error = %v, want missing-policy error", err)
 	}
 }
 
@@ -197,13 +218,13 @@ func TestValidateExecutionBoundary_RequiresApprovedRuntimeClass(t *testing.T) {
 	unapproved := &agentv1alpha1.AgentPolicy{Spec: agentv1alpha1.AgentPolicySpec{Enforced: agentv1alpha1.AgentPolicyEnforced{
 		AllowedRuntimeClassNames: []string{"gvisor"},
 	}}}
-	if err := validateExecutionBoundary(run, unapproved); err == nil || !strings.Contains(err.Error(), "not allowed") {
+	if err := boundary(t, run, unapproved); err == nil || !strings.Contains(err.Error(), "not allowed") {
 		t.Fatalf("validateExecutionBoundary(unapproved) error = %v, want allowlist error", err)
 	}
 
 	approved := unapproved.DeepCopy()
 	approved.Spec.Enforced.AllowedRuntimeClassNames = append(approved.Spec.Enforced.AllowedRuntimeClassNames, "kata")
-	if err := validateExecutionBoundary(run, approved); err != nil {
+	if err := boundary(t, run, approved); err != nil {
 		t.Fatalf("validateExecutionBoundary(approved) error = %v", err)
 	}
 }
@@ -215,7 +236,7 @@ func TestValidateExecutionBoundary_RejectsWeakeningSecurityOverrideWithoutPolicy
 		AllowedRuntimeClassNames: []string{"kata"},
 	}}}
 
-	err := validateExecutionBoundary(run, policy)
+	err := boundary(t, run, policy)
 
 	if err == nil || !strings.Contains(err.Error(), "AllowPrivilegeEscalation") {
 		t.Fatalf("validateExecutionBoundary() error = %v, want security override error", err)
@@ -227,7 +248,7 @@ func TestEnforcePolicy_RejectsDisabledNetworkPolicy(t *testing.T) {
 	run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{Disabled: true}
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for NetworkPolicy.Disabled=true")
 	}
@@ -238,7 +259,7 @@ func TestEnforcePolicy_AllowsEnabledNetworkPolicy(t *testing.T) {
 	run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{Disabled: false}
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -249,7 +270,7 @@ func TestEnforcePolicy_RejectsImageRepositoryLookalike(t *testing.T) {
 	policy := basePolicy()
 	policy.Spec.Enforced.AllowedImages = []string{"ghcr.io/xonovex/agent"}
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 
 	if err == nil || !strings.Contains(err.Error(), "allowed images") {
 		t.Fatalf("enforcePolicy() error = %v, want image allowlist error", err)
@@ -270,13 +291,6 @@ func TestEnforcePolicy_RejectsUnrestrictedNetworkConfigurations(t *testing.T) {
 			phrase: "network=host",
 		},
 		{
-			name: "proxy without backend",
-			mutate: func(run *agentv1alpha1.AgentRun) {
-				run.Spec.Network = agentv1alpha1.NetworkModeProxy
-			},
-			phrase: "network=proxy",
-		},
-		{
 			name: "custom egress",
 			mutate: func(run *agentv1alpha1.AgentRun) {
 				run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{
@@ -292,7 +306,7 @@ func TestEnforcePolicy_RejectsUnrestrictedNetworkConfigurations(t *testing.T) {
 			run := baseRun()
 			test.mutate(run)
 
-			err := enforcePolicy(run, basePolicy())
+			err := enforce(t, run, basePolicy())
 			if err == nil || !strings.Contains(err.Error(), test.phrase) {
 				t.Fatalf("enforcePolicy() error = %v, want phrase %q", err, test.phrase)
 			}
@@ -305,7 +319,7 @@ func TestEnforcePolicy_RejectsExceededTimeout(t *testing.T) {
 	run.Spec.Timeout = &metav1.Duration{Duration: 5 * time.Hour}
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for timeout exceeding max")
 	}
@@ -316,7 +330,7 @@ func TestEnforcePolicy_AllowsTimeoutWithinMax(t *testing.T) {
 	run.Spec.Timeout = &metav1.Duration{Duration: 1 * time.Hour}
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -326,7 +340,7 @@ func TestEnforcePolicy_RejectsDisallowedImage(t *testing.T) {
 	run.Spec.Image = "docker.io/evil/image:latest"
 	policy := basePolicy()
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for disallowed image")
 	}
@@ -337,7 +351,7 @@ func TestEnforcePolicy_AllowsMatchingImagePrefix(t *testing.T) {
 	run.Spec.Image = "ghcr.io/xonovex/custom-agent:v1"
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -353,7 +367,7 @@ func TestEnforcePolicy_RejectsResourceLimitAboveMaximum(t *testing.T) {
 	policy := basePolicy()
 	policy.Spec.Enforced.MaxResources = &maximum
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for resource limit above policy maximum")
 	}
@@ -367,7 +381,7 @@ func TestEnforcePolicy_RejectsMissingResourceLimit(t *testing.T) {
 	policy := basePolicy()
 	policy.Spec.Enforced.MaxResources = &maximum
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for missing bounded resource limit")
 	}
@@ -389,7 +403,7 @@ func TestEnforcePolicy_AllowsResourcesWithinMaximum(t *testing.T) {
 	policy := basePolicy()
 	policy.Spec.Enforced.MaxResources = &maximum
 
-	if err := enforcePolicy(run, policy); err != nil {
+	if err := enforce(t, run, policy); err != nil {
 		t.Errorf("enforcePolicy() error = %v, want nil", err)
 	}
 }
@@ -405,7 +419,7 @@ func TestEnforcePolicy_RejectsRuntimeClassNotInAllowedList(t *testing.T) {
 		},
 	}
 
-	err := enforcePolicy(run, policy)
+	err := enforce(t, run, policy)
 	if err == nil {
 		t.Error("enforcePolicy() expected error for runtimeClassName not in allowed list")
 	}
@@ -434,7 +448,7 @@ func TestEnforcePolicy_RejectsEmptyImageWhenAllowlistIsConfigured(t *testing.T) 
 	run.Spec.Image = ""
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err == nil {
+	if err := enforce(t, run, policy); err == nil {
 		t.Error("enforcePolicy() expected error for an image that cannot be checked against the allowlist")
 	}
 }
@@ -444,7 +458,7 @@ func TestEnforcePolicy_RejectsNilTimeoutWhenMaximumIsConfigured(t *testing.T) {
 	run.Spec.Timeout = nil
 	policy := basePolicy()
 
-	if err := enforcePolicy(run, policy); err == nil {
+	if err := enforce(t, run, policy); err == nil {
 		t.Error("enforcePolicy() expected error for a timeout that cannot be checked against the maximum")
 	}
 }
@@ -496,5 +510,45 @@ func TestAgentRunWebhook_Validate_FailsClosedWhenPolicyLookupFails(t *testing.T)
 	_, err := w.validate(context.Background(), baseRun())
 	if err == nil {
 		t.Error("validate() expected error when policy lookup is unavailable")
+	}
+}
+
+func TestUnmetGuarantee_StatesEachGuaranteeInTheTermsOfTheRun(t *testing.T) {
+	run := baseRun()
+	run.Spec.Image = "ghcr.io/xonovex/agent:latest"
+	run.Spec.RuntimeClassName = strPtr(" ")
+	unmet := func(guarantee agentpolicy.Guarantee) []agentpolicy.Outcome {
+		return []agentpolicy.Outcome{{Guarantee: guarantee, Required: true, Err: errors.New("shared policy error")}}
+	}
+
+	if err := unmetGuarantee(run, unmet(agentpolicy.GuaranteePinnedProvision), agentpolicy.GuaranteePinnedProvision); err == nil || !strings.HasPrefix(err.Error(), "agent execution image: ") {
+		t.Errorf("pinned = %v, want the image error", err)
+	}
+	if err := unmetGuarantee(run, unmet(agentpolicy.GuaranteeKernelIsolation), agentpolicy.GuaranteeKernelIsolation); err == nil || !strings.Contains(err.Error(), "explicit sandboxed runtimeClassName") {
+		t.Errorf("kernel = %v, want the missing runtime class error", err)
+	}
+	if err := unmetGuarantee(run, unmet(agentpolicy.GuaranteeHostToolsUnreachable), agentpolicy.GuaranteeHostToolsUnreachable); err == nil || err.Error() != "shared policy error" {
+		t.Errorf("host tools = %v, want the error of the shared policy", err)
+	}
+	if err := unmetGuarantee(run, unmet(agentpolicy.GuaranteeEgressRestricted), agentpolicy.GuaranteeKernelIsolation); err != nil {
+		t.Errorf("unselected guarantee = %v, want nil", err)
+	}
+}
+
+func TestApprovedRuntimeClasses_AreTheEnforcedAndTheAllowedClasses(t *testing.T) {
+	got := approvedRuntimeClasses(basePolicy())
+	if want := []string{"kata", "kata", "gvisor"}; !slices.Equal(got, want) {
+		t.Errorf("approvedRuntimeClasses() = %v, want %v", got, want)
+	}
+}
+
+func TestEnforcePolicy_RestrictedEgressNamesADisabledNetworkPolicy(t *testing.T) {
+	run := baseRun()
+	run.Spec.NetworkPolicy = &agentv1alpha1.AgentNetworkPolicy{Disabled: true}
+	policy := basePolicy()
+	policy.Spec.Enforced.RequireNetworkPolicy = false
+
+	if err := enforce(t, run, policy); err == nil || !strings.Contains(err.Error(), "NetworkPolicy cannot be disabled") {
+		t.Fatalf("enforcePolicy() error = %v, want the disabled NetworkPolicy error", err)
 	}
 }

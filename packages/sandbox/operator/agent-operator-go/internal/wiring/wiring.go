@@ -104,7 +104,7 @@ func SetupWebhooks(mgr ctrl.Manager, presets providers.Catalog) error {
 		name  string
 		setup func(ctrl.Manager) error
 	}{
-		{name: "AgentRun", setup: webhook.NewAgentRunWebhook(store, store, registry, presets).SetupWebhookWithManager},
+		{name: "AgentRun", setup: webhook.NewAgentRunWebhook(store, store, registry, registry, presets).SetupWebhookWithManager},
 		{name: "AgentHarness", setup: webhook.NewAgentHarnessWebhook(registry).SetupWebhookWithManager},
 		{name: "AgentProvider", setup: (&webhook.AgentProviderWebhook{Presets: presets}).SetupWebhookWithManager},
 		{name: "AgentToolchain", setup: webhook.NewAgentToolchainWebhook(registry).SetupWebhookWithManager},
