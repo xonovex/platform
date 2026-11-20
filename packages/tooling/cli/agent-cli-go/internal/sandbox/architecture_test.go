@@ -16,6 +16,13 @@ package sandbox
 //     constructors are referenced only from plugins.go.
 //   - TestRegistryFactoriesAreLazy — microkernel lazy binding: the registry stores
 //     func()-typed factories, not eager instances.
+//   - TestOnlySystemAdapterTouchesTheOperatingSystem — hexagonal edge: only
+//     internal/system imports os, os/exec, runtime or syscall; every other
+//     package reaches the machine through a port it declares.
+//   - TestInternalPackagesDoNotPrint — explicit output: no package writes to the
+//     process streams through fmt.Print*; output goes through a logger or writer.
+//   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
+//     name no concrete plugin, no OS adapter, and (for launch) no cobra.
 //
 // The checks use only the standard library (go/parser, go/ast) — no new dependency.
 
@@ -33,6 +40,9 @@ import (
 )
 
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
+
+// axisNames are the orthogonal axes, each a directory of a shared core and leaves.
+var axisNames = []string{"isolation", "provision", "network", "workspace", "terminal"}
 
 // internalRoot returns the absolute path of the internal/ directory.
 func internalRoot(t *testing.T) string {
@@ -96,7 +106,7 @@ func topSegment(s string) string {
 func TestLeavesDoNotImportCompositionRoot(t *testing.T) {
 	root := internalRoot(t)
 	sandboxPath := modPath + "/internal/sandbox"
-	for _, axis := range []string{"isolation", "provision", "network"} {
+	for _, axis := range axisNames {
 		for _, dir := range leafDirs(t, filepath.Join(root, axis)) {
 			for _, imp := range dirImports(t, dir) {
 				if imp == sandboxPath || (strings.HasPrefix(imp, sandboxPath+"/") && imp != sandboxPath+"/plugins") {
@@ -109,7 +119,7 @@ func TestLeavesDoNotImportCompositionRoot(t *testing.T) {
 
 func TestLeavesDoNotImportSiblings(t *testing.T) {
 	root := internalRoot(t)
-	for _, axis := range []string{"isolation", "provision", "network", "workspace"} {
+	for _, axis := range axisNames {
 		base := modPath + "/internal/" + axis + "/"
 		for leaf, dir := range leafDirs(t, filepath.Join(root, axis)) {
 			for _, imp := range dirImports(t, dir) {
@@ -128,14 +138,13 @@ func TestLeavesDoNotImportSiblings(t *testing.T) {
 
 func TestSharedCoresImportNoLeaf(t *testing.T) {
 	root := internalRoot(t)
-	axes := []string{"isolation", "provision", "network", "workspace"}
-	for _, axis := range []string{"isolation", "provision", "network"} {
+	for _, axis := range axisNames {
 		dir := filepath.Join(root, axis, "shared")
 		if _, err := os.Stat(dir); err != nil {
 			continue
 		}
 		for _, imp := range dirImports(t, dir) {
-			for _, other := range axes {
+			for _, other := range axisNames {
 				base := modPath + "/internal/" + other + "/"
 				if leaf, ok := strings.CutPrefix(imp, base); ok && topSegment(leaf) != "shared" {
 					t.Errorf("shared core %s imports leaf %s", dir, imp)
@@ -182,21 +191,8 @@ func TestConcreteConstructorsOnlyInPlugins(t *testing.T) {
 	}
 	pluginsFile := filepath.Join(root, "sandbox", "plugins", "plugins.go")
 
-	var files []string
-	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !d.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
-			files = append(files, path)
-		}
-		return nil
-	}); err != nil {
-		t.Fatalf("walk: %v", err)
-	}
-
 	fset := token.NewFileSet()
-	for _, file := range files {
+	for _, file := range productionFiles(t, root) {
 		f, err := parser.ParseFile(fset, file, nil, 0)
 		if err != nil {
 			t.Fatalf("parse %s: %v", file, err)
@@ -249,5 +245,97 @@ func TestRegistryFactoriesAreLazy(t *testing.T) {
 	}
 	if reflect.TypeOf(ProvisionerFactory(nil)).Kind() != reflect.Func {
 		t.Error("ProvisionerFactory must be a func()-typed factory (lazy binding)")
+	}
+}
+
+// productionFiles returns every non-test Go file under root.
+func productionFiles(t *testing.T, root string) []string {
+	var files []string
+	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
+			files = append(files, path)
+		}
+		return nil
+	}); err != nil {
+		t.Fatalf("walk: %v", err)
+	}
+	return files
+}
+
+func TestOnlySystemAdapterTouchesTheOperatingSystem(t *testing.T) {
+	root := internalRoot(t)
+	systemDir := filepath.Join(root, "system") + string(filepath.Separator)
+	banned := map[string]bool{"os": true, "os/exec": true, "runtime": true, "syscall": true}
+	fset := token.NewFileSet()
+	for _, file := range productionFiles(t, root) {
+		if strings.HasPrefix(file, systemDir) {
+			continue
+		}
+		f, err := parser.ParseFile(fset, file, nil, parser.ImportsOnly)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		for _, im := range f.Imports {
+			if path, _ := strconv.Unquote(im.Path.Value); banned[path] {
+				t.Errorf("%s imports %s; reach the machine through a port", file, path)
+			}
+		}
+	}
+}
+
+func TestInternalPackagesDoNotPrint(t *testing.T) {
+	root := internalRoot(t)
+	fset := token.NewFileSet()
+	for _, file := range productionFiles(t, root) {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch node := n.(type) {
+			case *ast.SelectorExpr:
+				if x, ok := node.X.(*ast.Ident); ok && x.Name == "fmt" && strings.HasPrefix(node.Sel.Name, "Print") {
+					t.Errorf("%s calls fmt.%s", file, node.Sel.Name)
+				}
+			case *ast.CallExpr:
+				if id, ok := node.Fun.(*ast.Ident); ok && (id.Name == "print" || id.Name == "println") {
+					t.Errorf("%s calls %s", file, id.Name)
+				}
+			}
+			return true
+		})
+	}
+}
+
+func TestApplicationCoreNamesNoAdapter(t *testing.T) {
+	root := internalRoot(t)
+	adapters := []string{
+		modPath + "/internal/system",
+		modPath + "/internal/sandbox/plugins",
+		modPath + "/internal/isolation/none",
+		modPath + "/internal/isolation/bwrap",
+		modPath + "/internal/isolation/docker",
+		modPath + "/internal/provision/none",
+		modPath + "/internal/provision/command",
+		modPath + "/internal/provision/nix",
+		modPath + "/internal/workspace/git",
+		modPath + "/internal/workspace/jj",
+		modPath + "/internal/terminal/tmux",
+	}
+	for pkg, extra := range map[string][]string{
+		"launch": {"github.com/spf13/cobra", modPath + "/internal/cmd"},
+		"cmd":    nil,
+	} {
+		banned := append(append([]string{}, adapters...), extra...)
+		for _, imp := range dirImports(t, filepath.Join(root, pkg)) {
+			for _, b := range banned {
+				if imp == b || strings.HasPrefix(imp, b+"/") {
+					t.Errorf("internal/%s imports adapter %s", pkg, imp)
+				}
+			}
+		}
 	}
 }
