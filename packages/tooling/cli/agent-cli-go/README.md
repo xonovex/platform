@@ -213,7 +213,7 @@ agent-cli plugin remove <name>
 
 `<source>` is a directory, a repository URL (`https://`, `ssh://`, `file://` or `user@host:path`, with an optional `#branch-or-tag`), or `name@marketplace`.
 
-- An install fails closed. The first call prints the name, the source, the revision, the file count and the digest of the plugin, and stops. Review the files, then repeat the call with `--approve-digest <digest>`. A digest of other content fails.
+- An install fails closed. It prints the name, the source, the revision, the file count and the digest of the plugin. On a terminal it then asks `Approve this digest? [y/N]` and installs only on `y` or `yes`: an empty answer, any other answer, the end of the input or an interrupt installs nothing and exits 1. Without a terminal it stops after the preview. Review the files, then repeat the call with `--approve-digest <digest>`, which never asks. A digest of other content fails. The answer never grants a capability: pass `--allow` for each.
 - A plugin that carries hooks, MCP servers, language servers or settings needs one `--allow hooks|mcp|lsp|settings` for each. The grant goes into the lock file, and a run fails when the stored plugin carries a capability that the lock does not grant.
 - A plugin lists its dependencies in the manifest. Install a dependency first. `plugin remove` fails while another plugin needs the plugin.
 - The store holds `lock.json` (name, version, source, revision, digest, grants, dependencies), `marketplaces.json` and `content/<digest>/`. Every run checks the stored files against the digest in the lock. A symlink, a file over 8 MiB, a source over 4096 files or 64 MiB, and an `http://` URL are refused.

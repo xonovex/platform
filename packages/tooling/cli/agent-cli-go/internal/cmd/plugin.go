@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"path"
@@ -19,6 +20,11 @@ type PluginHost interface {
 	Getenv(key string) string
 	Getwd() (string, error)
 	UserHomeDir() (string, error)
+	// IsTerminal reports whether a person can answer a question on the input
+	// and the output.
+	IsTerminal() bool
+	// ReadLine reads one line of the input without its line ending.
+	ReadLine() (string, error)
 }
 
 // PluginPorts are the ports of the plugin and marketplace commands.
@@ -83,8 +89,11 @@ func newPluginInstallCommand(ports PluginPorts, store *string) *cobra.Command {
 		Short: "Install a plugin after you approve its digest",
 		Long: `Install the plugin at <source>: a directory, a repository URL with an optional
 #branch-or-tag, or name@marketplace for a plugin of a registered marketplace.
-The first run prints the plugin and its digest and stops. Review the files, then
-repeat the command with --approve-digest <digest>.`,
+The command prints the plugin and its digest. On a terminal it then asks you to
+approve that digest and installs only on y or yes. Without a terminal it stops;
+review the files, then repeat the command with --approve-digest <digest>. A
+grant for a hook, MCP server, language server or settings file is never given by
+the answer: pass --allow for each.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			capabilities := make([]libplugin.Capability, 0, len(allow))
@@ -104,6 +113,16 @@ repeat the command with --approve-digest <digest>.`,
 				return err
 			}
 			printPreview(ports.Out, fetched)
+			if approved == "" && ports.Host.IsTerminal() {
+				yes, err := askApproval(ports)
+				if err != nil {
+					return err
+				}
+				if !yes {
+					return errDeclined
+				}
+				approved = fetched.Digest
+			}
 			record, err := service.Commit(fetched, approved, capabilities)
 			if err != nil {
 				return err
@@ -112,7 +131,7 @@ repeat the command with --approve-digest <digest>.`,
 			return err
 		},
 	}
-	command.Flags().StringVar(&approved, "approve-digest", "", "Digest of the reviewed plugin files (sha256:...)")
+	command.Flags().StringVar(&approved, "approve-digest", "", "Digest of the reviewed plugin files (sha256:...); approves without a question")
 	command.Flags().StringSliceVar(&allow, "allow", nil, "Grant a capability the plugin carries: "+strings.Join(capabilityNames(), ", ")+" (repeatable)")
 	_ = command.RegisterFlagCompletionFunc("allow", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 		return capabilityNames(), cobra.ShellCompDirectiveNoFileComp
@@ -263,6 +282,32 @@ func printListing(out io.Writer, service plugin.Service, name string) error {
 		}
 	}
 	return nil
+}
+
+// errDeclined reports an answer other than yes to the approval question.
+var errDeclined = errors.New("install declined: the digest was not approved and nothing was installed")
+
+// askApproval asks the user to approve the digest just shown. Only y and yes
+// approve; an empty answer, any other answer or the end of the input decline.
+func askApproval(ports PluginPorts) (bool, error) {
+	if _, err := fmt.Fprint(ports.Out, "Approve this digest? [y/N] "); err != nil {
+		return false, err
+	}
+	answer, err := ports.Host.ReadLine()
+	if err != nil {
+		// The question stays unanswered on a closed input, so nothing is approved.
+		_, _ = fmt.Fprintln(ports.Out)
+		if errors.Is(err, io.EOF) {
+			return false, nil
+		}
+		return false, fmt.Errorf("read the answer: %w", err)
+	}
+	switch strings.ToLower(strings.TrimSpace(answer)) {
+	case "y", "yes":
+		return true, nil
+	default:
+		return false, nil
+	}
 }
 
 // printPreview shows what the user is asked to approve.

@@ -186,6 +186,17 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
+  # The launcher resolves these exact versions at install time, so they
+  # reach the registry first.
+  npm-publish:
+    deps:
+      - agent-audit-go-darwin-arm64:npm-publish
+      - agent-audit-go-darwin-x64:npm-publish
+      - agent-audit-go-linux-arm64:npm-publish
+      - agent-audit-go-linux-x64:npm-publish
+      - agent-audit-go-win32-x64:npm-publish
+    options:
+      mergeDeps: append
   ci-publish:
     script: echo 'ci-publish complete'
     deps:

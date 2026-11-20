@@ -142,3 +142,22 @@ func TestPluginFromAGitRepositoryAndAMarketplace(t *testing.T) {
 		t.Errorf("a marketplace in use was removed: %s", output)
 	}
 }
+
+func TestPluginInstallDoesNotTreatPipedInputAsApproval(t *testing.T) {
+	env := newPluginEnvironment(t)
+	plugin := makePlugin(t)
+
+	cmd := exec.Command(testBinary(t), "plugin", "install", plugin, "--store", env.store)
+	cmd.Env = append(os.Environ(), "HOME="+env.home, "XDG_CONFIG_HOME="+env.home, "XDG_DATA_HOME="+filepath.Join(env.home, "data"))
+	cmd.Stdin = strings.NewReader("yes\n")
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Fatalf("a piped yes installed a plugin: %s", output)
+	}
+	if strings.Contains(string(output), "Approve this digest?") || !strings.Contains(string(output), "--approve-digest ") {
+		t.Errorf("output = %q, want the preview and the --approve-digest instructions only", output)
+	}
+	if _, err := os.Stat(filepath.Join(env.store, "lock.json")); err == nil {
+		t.Error("a piped yes changed the store")
+	}
+}

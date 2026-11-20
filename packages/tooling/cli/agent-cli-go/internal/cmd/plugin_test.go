@@ -267,3 +267,127 @@ func TestTheAllowFlagCompletesTheCapabilities(t *testing.T) {
 		t.Errorf("completion = %q, %v", out.String(), err)
 	}
 }
+
+func terminalRoot(answers ...string) *testRoot {
+	r := pluginRoot()
+	r.host.Terminal = true
+	r.host.Input = answers
+	return r
+}
+
+func TestPluginInstallAsksOnATerminalAndInstallsOnYes(t *testing.T) {
+	for _, answer := range []string{"y", "yes", "Y", " YES \r"} {
+		r := terminalRoot(answer)
+		if err := r.execute("plugin", "install", "/src/hello"); err != nil {
+			t.Fatalf("answer %q: %v", answer, err)
+		}
+		out := r.out.String()
+		if !strings.Contains(out, "Digest: sha256:") || !strings.Contains(out, "Approve this digest? [y/N] ") || !strings.Contains(out, "Installed hello 1.0.0") {
+			t.Errorf("answer %q: output = %q", answer, out)
+		}
+		if !r.host.Exists(defaultStore + "/lock.json") {
+			t.Errorf("answer %q: the plugin was not installed", answer)
+		}
+		if len(r.host.Input) != 0 {
+			t.Errorf("answer %q: input left = %q", answer, r.host.Input)
+		}
+	}
+}
+
+func TestPluginInstallDeclinesOtherAnswers(t *testing.T) {
+	for _, answer := range []string{"", "n", "no", "yess", "ok", "y es"} {
+		r := terminalRoot(answer)
+		err := r.execute("plugin", "install", "/src/hello")
+		if !errors.Is(err, errDeclined) {
+			t.Errorf("answer %q: error = %v, want errDeclined", answer, err)
+		}
+		if r.host.Exists(defaultStore + "/lock.json") {
+			t.Errorf("answer %q: a declined install changed the store", answer)
+		}
+	}
+}
+
+func TestPluginInstallDeclinesAtTheEndOfTheInput(t *testing.T) {
+	r := terminalRoot()
+	if err := r.execute("plugin", "install", "/src/hello"); !errors.Is(err, errDeclined) {
+		t.Errorf("error = %v, want errDeclined", err)
+	}
+	if r.host.Exists(defaultStore + "/lock.json") {
+		t.Error("an unanswered install changed the store")
+	}
+	if !strings.HasSuffix(r.out.String(), "Approve this digest? [y/N] \n") {
+		t.Errorf("output = %q, want the question closed with a line ending", r.out.String())
+	}
+}
+
+func TestPluginInstallStopsWhenTheAnswerCannotBeRead(t *testing.T) {
+	r := terminalRoot()
+	r.host.InputErr = errors.New("interrupted")
+	err := r.execute("plugin", "install", "/src/hello")
+	if err == nil || errors.Is(err, errDeclined) || !strings.Contains(err.Error(), "interrupted") {
+		t.Errorf("error = %v, want the read failure", err)
+	}
+	if r.host.Exists(defaultStore + "/lock.json") {
+		t.Error("an unreadable answer changed the store")
+	}
+}
+
+func TestPluginInstallWithoutATerminalOnlyPreviews(t *testing.T) {
+	r := pluginRoot()
+	r.host.Input = []string{"yes"}
+	err := r.execute("plugin", "install", "/src/hello")
+	if err == nil || !strings.Contains(err.Error(), "--approve-digest ") {
+		t.Fatalf("error = %v, want instructions naming --approve-digest", err)
+	}
+	if strings.Contains(r.out.String(), "Approve this digest?") {
+		t.Errorf("output = %q, a question was asked without a terminal", r.out.String())
+	}
+	if len(r.host.Input) != 1 {
+		t.Error("the input was read without a terminal")
+	}
+	if r.host.Exists(defaultStore + "/lock.json") {
+		t.Error("the preview installed the plugin")
+	}
+}
+
+func TestPluginInstallWithADigestNeverAsks(t *testing.T) {
+	r := terminalRoot("n")
+	digest := func() string {
+		probe := pluginRoot()
+		return probe.digest(t, "/src/hello")
+	}()
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest); err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(r.out.String(), "Approve this digest?") || len(r.host.Input) != 1 {
+		t.Errorf("output = %q, input left = %q, want no question", r.out.String(), r.host.Input)
+	}
+
+	mismatch := terminalRoot("yes")
+	if err := mismatch.execute("plugin", "install", "/src/hello", "--approve-digest", "sha256:"+strings.Repeat("0", 64)); err == nil {
+		t.Error("a mismatching digest installed")
+	}
+	if strings.Contains(mismatch.out.String(), "Approve this digest?") || len(mismatch.host.Input) != 1 || mismatch.host.Exists(defaultStore+"/lock.json") {
+		t.Errorf("a mismatching digest asked or installed: output = %q", mismatch.out.String())
+	}
+}
+
+func TestPluginInstallKeepsTheCapabilityGrantSeparateFromTheAnswer(t *testing.T) {
+	r := terminalRoot("yes")
+	r.host.AddFile("/src/hooked/plugin.json", `{"name":"hooked","version":"1.0.0"}`, 0o644).AddFile("/src/hooked/hooks/hooks.json", "{}", 0o644)
+	if err := r.execute("plugin", "install", "/src/hooked"); err == nil {
+		t.Fatal("a yes granted a capability")
+	}
+	if r.host.Exists(defaultStore + "/lock.json") {
+		t.Error("a plugin with hooks was installed without --allow hooks")
+	}
+	if !strings.Contains(r.out.String(), "Carries: hooks (each needs --allow)") {
+		t.Errorf("preview = %q", r.out.String())
+	}
+
+	granted := terminalRoot("yes")
+	granted.host.AddFile("/src/hooked/plugin.json", `{"name":"hooked","version":"1.0.0"}`, 0o644).AddFile("/src/hooked/hooks/hooks.json", "{}", 0o644)
+	if err := granted.execute("plugin", "install", "/src/hooked", "--allow", "hooks"); err != nil {
+		t.Errorf("an answered and granted install failed: %v", err)
+	}
+}

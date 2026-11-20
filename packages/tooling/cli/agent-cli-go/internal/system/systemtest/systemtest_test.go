@@ -2,6 +2,7 @@ package systemtest
 
 import (
 	"errors"
+	"io"
 	"io/fs"
 	"slices"
 	"strings"
@@ -308,5 +309,30 @@ func TestMkdirTempRenameAndRemoveAll(t *testing.T) {
 	}
 	if err := f.RemoveAll("/dest"); err != nil {
 		t.Errorf("RemoveAll(missing) error = %v", err)
+	}
+}
+
+func TestTerminalAndInput(t *testing.T) {
+	f := New()
+	if f.IsTerminal() {
+		t.Error("a new Fake is a terminal")
+	}
+	f.Terminal = true
+	f.Input = []string{"y", "n"}
+	if !f.IsTerminal() {
+		t.Error("IsTerminal() = false after Terminal is set")
+	}
+	for _, want := range []string{"y", "n"} {
+		if got, err := f.ReadLine(); err != nil || got != want {
+			t.Fatalf("ReadLine() = (%q, %v), want %q", got, err, want)
+		}
+	}
+	if _, err := f.ReadLine(); !errors.Is(err, io.EOF) {
+		t.Errorf("ReadLine() error = %v, want io.EOF", err)
+	}
+	failure := errors.New("interrupted")
+	f.InputErr = failure
+	if _, err := f.ReadLine(); !errors.Is(err, failure) {
+		t.Errorf("ReadLine() error = %v, want %v", err, failure)
 	}
 }

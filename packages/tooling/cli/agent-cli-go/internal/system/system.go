@@ -34,6 +34,52 @@ func New(stdin io.Reader, stdout, stderr io.Writer) System {
 	return System{stdin: stdin, stdout: stdout, stderr: stderr}
 }
 
+// IsTerminal reports whether both the input and the output of System are a
+// terminal, so a person is there to answer a question.
+func (s System) IsTerminal() bool { return isTerminal(s.stdin) && isTerminal(s.stdout) }
+
+// ReadLine reads one line from the input of System without its line ending. It
+// reads a byte at a time, so it consumes nothing beyond the line. Input that
+// ends before a line ending returns what it read, or io.EOF if it read nothing.
+func (s System) ReadLine() (string, error) {
+	if s.stdin == nil {
+		return "", io.EOF
+	}
+	var line []byte
+	buf := make([]byte, 1)
+	for {
+		n, err := s.stdin.Read(buf)
+		if n == 1 {
+			if buf[0] == '\n' {
+				return strings.TrimSuffix(string(line), "\r"), nil
+			}
+			line = append(line, buf[0])
+		}
+		if err != nil {
+			if errors.Is(err, io.EOF) && len(line) > 0 {
+				return string(line), nil
+			}
+			return "", err
+		}
+	}
+}
+
+// isTerminal reports whether stream is a character device other than the null
+// device, so a terminal and not a redirection. A character device that is not a
+// terminal makes ReadLine return no answer, and the caller declines.
+func isTerminal(stream any) bool {
+	file, ok := stream.(*os.File)
+	if !ok {
+		return false
+	}
+	info, err := file.Stat()
+	if err != nil || info.Mode()&os.ModeCharDevice == 0 {
+		return false
+	}
+	null, err := os.Stat(os.DevNull)
+	return err != nil || !os.SameFile(info, null)
+}
+
 // Getenv returns the value of an environment variable of this process.
 func (System) Getenv(key string) string { return os.Getenv(key) }
 

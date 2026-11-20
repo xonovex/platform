@@ -284,3 +284,44 @@ func TestNowAndTheManagedConfigDirectory(t *testing.T) {
 		}
 	}
 }
+
+func TestReadLineReadsOneLineAtATime(t *testing.T) {
+	s, _, _ := newTestSystem("yes\r\nno\nlast")
+	for _, want := range []string{"yes", "no", "last"} {
+		got, err := s.ReadLine()
+		if err != nil || got != want {
+			t.Fatalf("ReadLine() = (%q, %v), want %q", got, err, want)
+		}
+	}
+	if got, err := s.ReadLine(); !errors.Is(err, io.EOF) || got != "" {
+		t.Errorf("ReadLine() after the input = (%q, %v), want io.EOF", got, err)
+	}
+}
+
+func TestReadLineWithoutInputIsEndOfInput(t *testing.T) {
+	if _, err := New(nil, io.Discard, io.Discard).ReadLine(); !errors.Is(err, io.EOF) {
+		t.Errorf("ReadLine() error = %v, want io.EOF", err)
+	}
+}
+
+func TestIsTerminalRefusesPipesFilesAndTheNullDevice(t *testing.T) {
+	if New(strings.NewReader(""), io.Discard, io.Discard).IsTerminal() {
+		t.Error("a string input is a terminal")
+	}
+	null, err := os.Open(os.DevNull)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = null.Close() }()
+	if New(null, null, null).IsTerminal() {
+		t.Error("the null device is a terminal")
+	}
+	file, err := os.Open(os.Args[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = file.Close() }()
+	if New(file, file, file).IsTerminal() {
+		t.Error("a regular file is a terminal")
+	}
+}

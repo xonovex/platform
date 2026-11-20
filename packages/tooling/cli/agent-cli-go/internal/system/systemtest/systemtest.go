@@ -5,6 +5,7 @@ package systemtest
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"path"
 	"sort"
@@ -63,6 +64,12 @@ type Fake struct {
 	// ManagedConfigDir returns.
 	Clock      time.Time
 	ManagedDir string
+
+	// Terminal is the answer of IsTerminal. Input holds the lines ReadLine
+	// returns in order, then io.EOF; InputErr, when set, replaces that EOF.
+	Terminal bool
+	Input    []string
+	InputErr error
 
 	files     map[string]entry
 	tempCount int
@@ -145,6 +152,23 @@ func (f *Fake) Exists(p string) bool {
 
 // Getenv returns the value of key in Env.
 func (f *Fake) Getenv(key string) string { return f.Env[key] }
+
+// IsTerminal reports the Terminal field.
+func (f *Fake) IsTerminal() bool { return f.Terminal }
+
+// ReadLine returns the next line of Input. When Input is used up it returns
+// InputErr, or io.EOF when that is nil.
+func (f *Fake) ReadLine() (string, error) {
+	if len(f.Input) == 0 {
+		if f.InputErr != nil {
+			return "", f.InputErr
+		}
+		return "", io.EOF
+	}
+	line := f.Input[0]
+	f.Input = f.Input[1:]
+	return line, nil
+}
 
 // Environ returns Env as sorted KEY=VALUE entries.
 func (f *Fake) Environ() []string {
