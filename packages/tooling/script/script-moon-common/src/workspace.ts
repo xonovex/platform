@@ -9,8 +9,6 @@ export const findWorkspaceRoot = (
 ): string => {
   let dir = start;
   while (dir !== dirname(dir)) {
-    // existsSync accepted either kind, and a workspace marks its root with a
-    // .moon directory, so both are still treated as the marker.
     const marker = join(dir, ".moon");
     if (fs.isDirectory(marker) || fs.isFile(marker)) return dir;
     if (root !== undefined && dir === root) break;

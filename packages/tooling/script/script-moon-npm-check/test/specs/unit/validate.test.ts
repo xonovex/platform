@@ -153,4 +153,53 @@ describe("validatePackedPackage", () => {
 
     expect(files).toEqual(["package.json", "dist/index.js"]);
   });
+
+  it("matches wildcard, conditional, string bin, and entry point targets", () => {
+    const pkg = {
+      ...validPkg,
+      exports: {
+        "./skills/*": "./dist/skills/*.js",
+        "./features/*": ["./dist/features/*.js"],
+        "./external": "external-package",
+      },
+      bin: "./dist/cli.js",
+      main: "./dist/main.js",
+      types: "./dist/types.d.ts",
+    };
+
+    const errors = validatePackedPackage(
+      pkg,
+      ["dist/skills/a.js", "dist/cli.js", "dist/main.js", "package.json"],
+      () => "",
+    );
+
+    expect(errors).toEqual([
+      'Packed package is missing export target: "./dist/features/*.js"',
+      'Packed package is missing manifest target: "./dist/types.d.ts"',
+    ]);
+  });
+
+  it("ignores a bin that is neither a path nor a map", () => {
+    expect(
+      validatePackedPackage(
+        {...validPkg, bin: 1} as unknown as Parameters<
+          typeof validatePackedPackage
+        >[0],
+        ["package.json"],
+        () => "",
+      ),
+    ).toEqual([]);
+  });
+
+  it("rejects npm pack output it cannot use", () => {
+    expect(() => parsePackagedFilePaths("{")).toThrow(
+      "npm pack returned malformed JSON",
+    );
+    expect(() => parsePackagedFilePaths("{}")).toThrow(
+      "npm pack did not report packaged files",
+    );
+    expect(() => parsePackagedFilePaths('[{"files": [{}]}]')).toThrow(
+      "npm pack reported an invalid file entry",
+    );
+  });
 });

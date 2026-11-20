@@ -1,10 +1,11 @@
-import {spawnSync} from "node:child_process";
 import {posix} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {isRecord} from "@xonovex/script-moon-common/records";
 
 type ReadPackedFile = (path: string) => string;
+
+/** Lists the files a publish of the package at packageRoot would pack. */
+export type PackLister = (packageRoot: string) => readonly string[];
 
 const normalizedPath = (path: string): string =>
   path.replaceAll("\\", "/").replace(/^\.\//, "");
@@ -84,24 +85,6 @@ export const parsePackagedFilePaths = (output: string): readonly string[] => {
     }
     return normalizedPath(file.path);
   });
-};
-
-export const packagedFilePaths = (packageRoot: string): readonly string[] => {
-  const result = spawnSync(
-    resolveExecutable("npm"),
-    ["pack", "--dry-run", "--json"],
-    {
-      cwd: packageRoot,
-      encoding: "utf8",
-      maxBuffer: 10_485_760,
-    },
-  );
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    const detail = result.stderr.trim() || `exit ${String(result.status)}`;
-    throw new Error(`npm pack failed: ${detail}`);
-  }
-  return parsePackagedFilePaths(result.stdout);
 };
 
 export const validatePackedPackage = (
