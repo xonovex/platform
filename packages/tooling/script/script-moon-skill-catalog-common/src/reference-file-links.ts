@@ -1,15 +1,14 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {fail, pass, type Finding} from "./finding.js";
 
 export const MD_LINK_RE = /\[[^\]]*\]\(([^)\s]+)\)/g;
 const EXTERNAL_LINK_RE = /^(?:https?|mailto):/i;
 
-// Minimal sink the check reports through; the CLI's Report satisfies it.
-export interface LinkReport {
-  addFail(message: string): void;
-  addPass(message: string): void;
-  addWarn?(message: string): void;
+/** One Markdown file directly under a skill's references directory. */
+export interface ReferenceDocument {
+  /** The file name inside the references directory. */
+  readonly name: string;
+  readonly text: string;
 }
 
 // The file a markdown link points at, with any in-page fragment stripped, or
@@ -28,45 +27,32 @@ export const relativeLinkTarget = (raw: string): string | null => {
   return target === "" ? null : target;
 };
 
-// checkReferenceFileLinks resolves links relative to their containing document.
+// checkReferenceFileLinks resolves links relative to their containing document,
+// which sits directly in referencesDirectory.
 export const checkReferenceFileLinks = (
-  skillDir: string,
-  report: LinkReport,
-  fs: FileSystem = nodeFileSystem,
-): void => {
-  const refsDir = join(skillDir, "references");
-  if (!fs.isDirectory(refsDir)) {
-    return;
-  }
-  const mdFiles = fs
-    .readDirectory(refsDir)
-    .filter((entry) => entry.endsWith(".md"))
-    .filter((entry) => fs.isFile(join(refsDir, entry)))
-    .toSorted();
-
-  let resolved = 0;
-  let broken = 0;
-  for (const entry of mdFiles) {
-    const text = fs.readText(join(refsDir, entry));
-    for (const m of text.matchAll(MD_LINK_RE)) {
-      const raw = m[1];
-      if (raw === undefined) continue;
-      const target = relativeLinkTarget(raw);
-      if (target === null) continue;
-      if (fs.isFile(join(refsDir, target))) {
-        resolved += 1;
-      } else {
-        report.addFail(
-          `reference links: broken link in references/${entry} → ${raw}`,
-        );
-        broken += 1;
-      }
-    }
-  }
-
-  if (broken === 0 && resolved > 0) {
-    report.addPass(
-      `reference links: ${String(resolved)}/${String(resolved)} link(s) resolve`,
+  referencesDirectory: string,
+  documents: readonly ReferenceDocument[],
+  isFile: (path: string) => boolean,
+): readonly Finding[] => {
+  const links = documents.flatMap(({name, text}) =>
+    [...text.matchAll(MD_LINK_RE)].flatMap((match) => {
+      const raw = match[1];
+      const target = raw === undefined ? null : relativeLinkTarget(raw);
+      if (raw === undefined || target === null) return [];
+      return [{raw, name, resolves: isFile(join(referencesDirectory, target))}];
+    }),
+  );
+  const failures = links
+    .filter(({resolves}) => !resolves)
+    .map(({name, raw}) =>
+      fail(`reference links: broken link in references/${name} → ${raw}`),
     );
-  }
+  const resolved = links.length - failures.length;
+  return failures.length === 0 && resolved > 0
+    ? [
+        pass(
+          `reference links: ${String(resolved)}/${String(resolved)} link(s) resolve`,
+        ),
+      ]
+    : failures;
 };

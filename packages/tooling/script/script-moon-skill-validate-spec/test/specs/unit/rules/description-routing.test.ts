@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {descriptionRoutingErrors} from "../../../src/description-routing.js";
+import {descriptionRoutingErrors} from "../../../../src/rules/description-routing.js";
 
 describe("descriptionRoutingErrors", () => {
   it("accepts positive routing and non-routing uses of skip", () => {

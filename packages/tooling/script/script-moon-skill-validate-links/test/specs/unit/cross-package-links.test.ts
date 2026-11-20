@@ -1,13 +1,13 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {type LinkReport} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
 import {describe, expect, it} from "vitest";
 import {
   checkCrossPackageLinks,
   checkMarkdownFilesForCrossPackageLinks,
   checkNamedSkillHandoffs,
   checkSkillDependencies,
+  type LinkReport,
 } from "../../../src/cross-package-links.js";
 
 const REPO = "/repo";

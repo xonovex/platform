@@ -1,148 +1,75 @@
-import {join} from "node:path";
-import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
-import {main as validateSkill} from "../../../src/validate-skill.js";
 
-const ROOT = "/repo";
+const {mainMock, stderrMock} = vi.hoisted(() => ({
+  mainMock: vi.fn<(...args: readonly unknown[]) => number>(),
+  stderrMock: vi.fn(),
+}));
 
-describe("skill validator entrypoints", () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
+vi.mock("../../../src/validate-skill.js", () => ({main: mainMock}));
+vi.mock("@xonovex/script-moon-common/adapters/output-node", () => ({
+  processOutput: {stdout: vi.fn(), stderr: stderrMock},
+}));
+
+const originalExitCode = process.exitCode;
+const originalLintMode = process.env.XONOVEX_LINT_MODE;
+
+// The entry point runs on import, so each case resets the module registry and
+// restores the exit code and the environment it reads.
+const runEntryPoint = async (): Promise<void> => {
+  await import("../../../src/index.js");
+};
+
+afterEach(() => {
+  process.exitCode = originalExitCode;
+  if (originalLintMode === undefined) delete process.env.XONOVEX_LINT_MODE;
+  else process.env.XONOVEX_LINT_MODE = originalLintMode;
+  vi.resetModules();
+  vi.clearAllMocks();
+});
+
+describe("skill validator entry point", () => {
+  it("validates from the working directory and reports the exit code", async () => {
+    process.env.XONOVEX_LINT_MODE = "enforce";
+    mainMock.mockReturnValue(1);
+
+    await runEntryPoint();
+
+    expect(mainMock.mock.calls[0]?.slice(0, 2)).toEqual([
+      process.argv.slice(2),
+      process.cwd(),
+    ]);
+    expect(mainMock.mock.calls[0]?.[2]).toMatchObject({driftMode: "enforce"});
+    expect(process.exitCode).toBe(1);
   });
 
-  it("renders validator help without reading a skill", () => {
-    expect(validateSkill(["--help"])).toBe(0);
+  it("reads an unset lint mode as warn", async () => {
+    delete process.env.XONOVEX_LINT_MODE;
+    mainMock.mockReturnValue(0);
+
+    await runEntryPoint();
+
+    expect(mainMock.mock.calls[0]?.[2]).toMatchObject({driftMode: "warn"});
   });
 
-  it("rejects unknown validator options", () => {
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-    expect(validateSkill(["--unknown"])).toBe(2);
+  it("reports a thrown error and exits non-zero", async () => {
+    mainMock.mockImplementation(() => {
+      throw new Error("broken");
+    });
+
+    await runEntryPoint();
+
+    expect(stderrMock).toHaveBeenCalledWith("Error: broken");
+    expect(process.exitCode).toBe(1);
   });
 
-  it("reports malformed frontmatter and missing catalog files", () => {
-    const fs = memoryFileSystem({directories: [ROOT]});
-    const skill = join(ROOT, "invalid-skill");
-    fs.makeDirectory(join(skill, "references", "nested"));
-    fs.writeFile(
-      join(skill, "references", "nested", "sources.md"),
-      "# Details\n\n## External References\n\n- https://example.com/nested-source\n",
-    );
-    fs.writeFile(
-      join(skill, "SKILL.md"),
-      `---
-name: Invalid Skill
-description: Use when checking a deliberately invalid skill. Triggers on validator test fixtures, even when the user doesn't say validation.
-unknown-field: true
----
-# Guide
+  it("stringifies a thrown value that is not an error", async () => {
+    const thrown: unknown = "broken";
+    mainMock.mockImplementation(() => {
+      throw thrown;
+    });
 
-Use references/missing_file.md with @references/legacy.md.
+    await runEntryPoint();
 
-## External References
-
-- https://example.com/misplaced-source
-`,
-    );
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    const result = validateSkill([skill], fs);
-
-    expect(result).toBe(1);
-    const output = log.mock.calls.flat().join("\n");
-    expect(output).toContain("frontmatter: name 'Invalid Skill'");
-    expect(output).toContain(
-      "frontmatter: 'description' must use one double-quoted scalar",
-    );
-    expect(output).toContain("catalog: missing evals.json");
-    expect(output).toContain(
-      "sources: '## External References' belongs in SOURCES.md, not SKILL.md, references/nested/sources.md",
-    );
-    expect(output).toContain("Result: FAIL");
-  });
-
-  it("rejects a kebab-case name that does not start with a gerund", () => {
-    const fs = memoryFileSystem({directories: [ROOT]});
-    const skill = join(ROOT, "git-skill");
-    fs.writeFile(join(skill, "SKILL.md"), "---\nname: git-skill\n---\n# Git\n");
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    expect(validateSkill([skill], fs)).toBe(1);
-    expect(log.mock.calls.flat().join("\n")).toContain(
-      "frontmatter: name 'git-skill' is not a gerund and then its object (regex ^[a-z0-9]+ing(-[a-z0-9]+)+$)",
-    );
-  });
-
-  it("fails on an em dash or ellipsis anywhere in the package", () => {
-    const fs = memoryFileSystem({directories: [ROOT]});
-    const packageDir = join(ROOT, "skill-dashed");
-    const skill = join(packageDir, "using-dashed");
-    fs.makeDirectory(join(skill, "references"));
-    fs.writeFile(join(packageDir, "package.json"), '{"name": "skill-dashed"}');
-    fs.writeFile(
-      join(skill, "SKILL.md"),
-      `---
-name: using-dashed
-description: "Use when checking punctuation. Triggers on validator fixtures, even when the user doesn't say punctuation."
----
-# Guide
-
-- **Label** \u2014 detail
-`,
-    );
-    fs.writeFile(
-      join(skill, "references", "one.md"),
-      "# One\n\n- Use when\u2026\n",
-    );
-    fs.writeFile(
-      join(skill, "eval-queries.json"),
-      String.raw`{"queries": [{"query": "a \u2014 b"}]}`,
-    );
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    const result = validateSkill([skill], fs);
-
-    expect(result).toBe(1);
-    const output = log.mock.calls.flat().join("\n");
-    expect(output).toContain(
-      "punctuation: em dash in using-dashed/SKILL.md line 7, " +
-        "use a comma, colon, or full stop:",
-    );
-    expect(output).toContain(
-      "punctuation: ellipsis in using-dashed/references/one.md line 3, " +
-        "use three periods:",
-    );
-    expect(output).toContain(
-      "punctuation: escaped em dash in using-dashed/eval-queries.json line 1",
-    );
-  });
-
-  it.each([
-    [820, "description: 820 chars (within 820)"],
-    [821, "description: 821 chars (over the 820-character catalog limit)"],
-  ])("checks a %i-character description against the limit", (length, line) => {
-    const fs = memoryFileSystem({directories: [ROOT]});
-    const skill = join(ROOT, "using-limits");
-    const lead =
-      "Use when checking the description limit. Triggers on validator fixtures, even when the user doesn't say limit.";
-    fs.writeFile(
-      join(skill, "SKILL.md"),
-      `---\nname: using-limits\ndescription: "${lead.padEnd(length, "x")}"\n---\n# Guide\n`,
-    );
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
-
-    validateSkill([skill], fs);
-
-    expect(log.mock.calls.flat().join("\n")).toContain(line);
-  });
-
-  it("returns an input error for invalid YAML frontmatter", () => {
-    const fs = memoryFileSystem({directories: [ROOT]});
-    const skill = join(ROOT, "invalid-yaml");
-    fs.writeFile(join(skill, "SKILL.md"), "---\nname: [\n---\n# Guide\n");
-    vi.spyOn(process.stderr, "write").mockImplementation(() => true);
-
-    const result = validateSkill([skill], fs);
-
-    expect(result).toBe(2);
+    expect(stderrMock).toHaveBeenCalledWith("Error: broken");
   });
 });

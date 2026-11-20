@@ -15,6 +15,10 @@
     "./drift-files": {
       "types": "./src/drift-files.ts",
       "default": "./dist/src/drift-files.js"
+    },
+    "./finding": {
+      "types": "./src/finding.ts",
+      "default": "./dist/src/finding.js"
     }
   },
   "dependencies": {

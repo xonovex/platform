@@ -1,5 +1,4 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {
   BUDGET_MANIFEST_FILE,
   evaluateBudgets,
@@ -18,7 +17,7 @@ export interface DriftLintReport {
 export const checkSkillDrift = (
   skillDirectory: string,
   repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): DriftLintReport => {
   const budgets = readBudgetManifest(
     join(repositoryRoot, BUDGET_MANIFEST_FILE),

@@ -1,5 +1,7 @@
-import {type LinkReport} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
-import {checkCrossPackageLinks} from "./cross-package-links.js";
+import {
+  checkCrossPackageLinks,
+  type LinkReport,
+} from "./cross-package-links.js";
 
 const HELP_TEXT = [
   "usage: moon-skill-validate-links [-h] [repo-root]",

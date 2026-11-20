@@ -7,8 +7,14 @@ import {boldSkillNameMentions} from "@xonovex/script-moon-common/skill-name";
 import {
   MD_LINK_RE,
   relativeLinkTarget,
-  type LinkReport,
 } from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
+
+// The sink the checks report through; the CLI collects into it.
+export interface LinkReport {
+  addFail(message: string): void;
+  addPass(message: string): void;
+  addWarn?(message: string): void;
+}
 
 // This module validates relative links that cross package boundaries.
 

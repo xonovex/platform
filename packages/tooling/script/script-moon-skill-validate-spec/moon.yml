@@ -22,25 +22,12 @@ tasks:
     deps: [ts-coverage]
     options:
       cache: false
-  ts-test:
-    inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/assets/**/*
-      # index.test.ts validates these two skills as they stand in the catalog, so
-      # an edit to either must invalidate this project's cached result.
-      - /packages/runtime/plugin/plugin-core/**/*
-      - /packages/runtime/plugin/plugin-agentic/**/*
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "75"
-      TS_COVERAGE_MIN_FUNCTIONS: "89"
-      TS_COVERAGE_MIN_BRANCHES: "60"
-      TS_COVERAGE_MIN_STATEMENTS: "75"
-    inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/assets/**/*
-      # index.test.ts validates these two skills as they stand in the catalog, so
-      # an edit to either must invalidate this project's cached result.
-      - /packages/runtime/plugin/plugin-core/**/*
-      - /packages/runtime/plugin/plugin-agentic/**/*
+      TS_COVERAGE_MIN_LINES: "96"
+      TS_COVERAGE_MIN_FUNCTIONS: "97"
+      TS_COVERAGE_MIN_BRANCHES: "85"
+      TS_COVERAGE_MIN_STATEMENTS: "94"
   # The acceptance tier validates the catalog's own skill packages and the shipped
   # templates rather than a fixture, so a catalog edit has to change this project's
   # hash or moon serves the previous pass from cache.
