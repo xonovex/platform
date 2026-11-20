@@ -146,22 +146,10 @@ func TestMarshalNeverEmitsNullCollections(t *testing.T) {
 	}
 }
 
-func TestDefaultDirFollowsTheXDGStateDirectory(t *testing.T) {
-	env := map[string]string{"XDG_STATE_HOME": "/state"}
-	getenv := func(key string) string { return env[key] }
-	if got := DefaultDir(getenv, "/home/user", "agent-cli"); got != "/state/agent-cli/runs" {
-		t.Errorf("DefaultDir = %q, want the XDG state directory", got)
-	}
-	env["XDG_STATE_HOME"] = "relative"
-	if got := DefaultDir(getenv, "/home/user", "agent-cli"); got != "/home/user/.local/state/agent-cli/runs" {
-		t.Errorf("DefaultDir = %q, want the default below the home directory", got)
-	}
-}
-
 func newStore(t *testing.T) (Store, *memFiles) {
 	t.Helper()
 	files := newMemFiles()
-	store, err := NewStore(files, "/state/agent-cli/runs")
+	store, err := NewStore(files, "/state/agentic/runs")
 	if err != nil {
 		t.Fatalf("NewStore() error = %v", err)
 	}
@@ -178,11 +166,11 @@ func TestStoreWritesPrivateRecordsWithDistinctIDs(t *testing.T) {
 	if err != nil || second != "20261120T123005Z-2" {
 		t.Fatalf("Write(same second) = (%q, %v), want a suffixed id", second, err)
 	}
-	info, err := files.Stat("/state/agent-cli/runs/" + first + ".json")
+	info, err := files.Stat("/state/agentic/runs/" + first + ".json")
 	if err != nil || info.Mode().Perm() != 0o600 {
 		t.Errorf("record file = (%v, %v), want a private file", info, err)
 	}
-	if store.Dir() != "/state/agent-cli/runs" {
+	if store.Dir() != "/state/agentic/runs" {
 		t.Errorf("Dir() = %q", store.Dir())
 	}
 	read, err := store.Read(second)
@@ -219,7 +207,7 @@ func TestStoreListIgnoresForeignFilesAndAnAbsentDirectory(t *testing.T) {
 	if records, err := store.List(); err != nil || len(records) != 0 {
 		t.Fatalf("List(absent) = (%v, %v), want none", records, err)
 	}
-	files.AddFile("/state/agent-cli/runs/notes.txt", "x", 0o600).AddDir("/state/agent-cli/runs/20261120T123005Z.json")
+	files.AddFile("/state/agentic/runs/notes.txt", "x", 0o600).AddDir("/state/agentic/runs/20261120T123005Z.json")
 	if records, err := store.List(); err != nil || len(records) != 0 {
 		t.Fatalf("List(foreign files) = (%v, %v), want none", records, err)
 	}
@@ -235,7 +223,7 @@ func TestStoreReadRefusesABadIDAndAMissingOrBrokenRecord(t *testing.T) {
 	if _, err := store.Read("20261120T123005Z"); !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("Read(missing) error = %v, want a missing-file error", err)
 	}
-	files.AddFile("/state/agent-cli/runs/20261120T123005Z.json", "not json", 0o600)
+	files.AddFile("/state/agentic/runs/20261120T123005Z.json", "not json", 0o600)
 	if _, err := store.Read("20261120T123005Z"); err == nil || !strings.Contains(err.Error(), "20261120T123005Z") {
 		t.Errorf("Read(broken) error = %v, want the record named", err)
 	}
@@ -308,9 +296,9 @@ func TestStoreReportsDiskFailures(t *testing.T) {
 
 func TestStoreGivesUpWhenEveryIDIsTaken(t *testing.T) {
 	store, files := newStore(t)
-	files.AddFile("/state/agent-cli/runs/20261120T123005Z.json", "{}", 0o600)
+	files.AddFile("/state/agentic/runs/20261120T123005Z.json", "{}", 0o600)
 	for suffix := 2; suffix <= maxSuffix; suffix++ {
-		files.AddFile("/state/agent-cli/runs/20261120T123005Z-"+strconv.Itoa(suffix)+".json", "{}", 0o600)
+		files.AddFile("/state/agentic/runs/20261120T123005Z-"+strconv.Itoa(suffix)+".json", "{}", 0o600)
 	}
 	if _, err := store.Write(exited(0)); err == nil || !strings.Contains(err.Error(), "no free run record id") {
 		t.Errorf("Write() error = %v, want the exhaustion reported", err)
