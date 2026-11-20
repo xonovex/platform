@@ -18,7 +18,11 @@ import (
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
-const e2eAgentImage = "e2e-agent:e2e"
+const (
+	e2eAgentImage = "e2e-agent:e2e"
+	// busyboxImage names busybox:1.37 by its Docker Hub digest, which the node pulls.
+	busyboxImage = "busybox@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec"
+)
 
 func createNamespace(t *testing.T, prefix string) string {
 	t.Helper()
@@ -42,10 +46,11 @@ func gitWorkspaceRoot(t *testing.T) string {
 	return filepath.Clean(string(out[:len(out)-1]))
 }
 
-func buildAndLoadE2EAgentImage(t *testing.T) {
+// buildAndLoadE2EAgentImage returns the reference of the loaded image by digest.
+func buildAndLoadE2EAgentImage(t *testing.T) string {
 	t.Helper()
 	workspaceRoot := gitWorkspaceRoot(t)
-	dockerfile := filepath.Join(workspaceRoot, "packages", "agent", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
+	dockerfile := filepath.Join(workspaceRoot, "packages", "sandbox", "operator", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
 
 	buildCmd := exec.Command("docker", "build", "-f", dockerfile, "-t", e2eAgentImage, ".")
 	buildCmd.Dir = workspaceRoot
@@ -54,17 +59,11 @@ func buildAndLoadE2EAgentImage(t *testing.T) {
 		t.Fatalf("docker build failed: %v\n%s", err, out)
 	}
 
-	var loadErr error
-	for range 5 {
-		loadErr = runCmd("kind", "load", "docker-image", e2eAgentImage, "--name", clusterName)
-		if loadErr == nil {
-			break
-		}
-		time.Sleep(3 * time.Second)
+	pinned, err := testutil.LoadKindImage(clusterName, e2eAgentImage)
+	if err != nil {
+		t.Fatalf("failed to load the agent image into Kind: %v", err)
 	}
-	if loadErr != nil {
-		t.Fatalf("kind load failed after retries: %v", loadErr)
-	}
+	return pinned
 }
 
 // TestE2E_CoCo_AgentRunWithKataCC verifies that an AgentRun with
@@ -73,7 +72,7 @@ func TestE2E_CoCo_AgentRunWithKataCC(t *testing.T) {
 	ns := createNamespace(t, "e2e-coco-cc")
 
 	run := testutil.NewAgentRun(ns, "coco-cc-run",
-		testutil.WithImage("busybox:1.37"),
+		testutil.WithImage(busyboxImage),
 		testutil.WithRuntimeClassName("kata-cc"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -134,7 +133,7 @@ func TestE2E_CoCo_AgentRunWithKataTDX(t *testing.T) {
 	ns := createNamespace(t, "e2e-coco-tdx")
 
 	run := testutil.NewAgentRun(ns, "coco-tdx-run",
-		testutil.WithImage("busybox:1.37"),
+		testutil.WithImage(busyboxImage),
 		testutil.WithRuntimeClassName("kata-tdx"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -172,13 +171,14 @@ func TestE2E_CoCo_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 	harness := testutil.NewAgentHarness(ns, "coco-harness",
 		testutil.WithDefaultRuntimeClassName("kata-cc"),
 	)
-	if err := k8sClient.Create(ctx, harness); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, harness); err != nil {
 		t.Fatalf("failed to create AgentHarness: %v", err)
 	}
 
 	run := testutil.NewAgentRun(ns, "coco-harness-run",
 		testutil.WithHarnessRef("coco-harness"),
-		testutil.WithImage("busybox:1.37"),
+		testutil.WithoutRuntimeClassName(),
+		testutil.WithImage(busyboxImage),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
@@ -221,14 +221,14 @@ func TestE2E_CoCo_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 // (Secret + AgentProvider + git clone + fake claude) works end-to-end
 // with the kata-cc runtimeClassName.
 func TestE2E_CoCo_FullCycleWithGitClone(t *testing.T) {
-	buildAndLoadE2EAgentImage(t)
+	agentImage := buildAndLoadE2EAgentImage(t)
 
 	ns := createNamespace(t, "e2e-coco-fullcycle")
 
 	secret := testutil.NewSecret(ns, "provider-token", map[string][]byte{
 		"api-key": []byte("fake-token-for-e2e"),
 	})
-	if err := k8sClient.Create(ctx, secret); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, secret); err != nil {
 		t.Fatalf("failed to create Secret: %v", err)
 	}
 
@@ -240,14 +240,14 @@ func TestE2E_CoCo_FullCycleWithGitClone(t *testing.T) {
 			"TEST_ENV_VAR":      "e2e-value",
 		}),
 	)
-	if err := k8sClient.Create(ctx, provider); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, provider); err != nil {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
 	run := testutil.NewAgentRun(ns, "coco-fullcycle",
 		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
-		testutil.WithImage(e2eAgentImage),
+		testutil.WithImage(agentImage),
 		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
 			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
 			StorageSize: "1Gi",
@@ -336,16 +336,16 @@ func TestE2E_CoCo_FullCycleWithGitClone(t *testing.T) {
 	if len(podSpec.InitContainers) == 0 {
 		t.Fatal("expected at least one init container")
 	}
-	if podSpec.InitContainers[0].Image != e2eAgentImage {
-		t.Errorf("init container image = %q, want %q", podSpec.InitContainers[0].Image, e2eAgentImage)
+	if podSpec.InitContainers[0].Image != agentImage {
+		t.Errorf("init container image = %q, want %q", podSpec.InitContainers[0].Image, agentImage)
 	}
 
 	if len(podSpec.Containers) == 0 {
 		t.Fatal("expected at least one main container")
 	}
 	mainC := podSpec.Containers[0]
-	if mainC.Image != e2eAgentImage {
-		t.Errorf("main container image = %q, want %q", mainC.Image, e2eAgentImage)
+	if mainC.Image != agentImage {
+		t.Errorf("main container image = %q, want %q", mainC.Image, agentImage)
 	}
 	if len(mainC.Command) == 0 || mainC.Command[0] != "claude" {
 		t.Errorf("main container command = %v, want [claude]", mainC.Command)
@@ -382,7 +382,7 @@ func TestE2E_CoCo_WorkspaceJobWithRuntimeClassName(t *testing.T) {
 		testutil.WithWorkspaceStorageSize("1Gi"),
 		testutil.WithWorkspaceRuntimeClassName("kata-cc"),
 	)
-	if err := k8sClient.Create(ctx, ws); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, ws); err != nil {
 		t.Fatalf("failed to create AgentWorkspace: %v", err)
 	}
 

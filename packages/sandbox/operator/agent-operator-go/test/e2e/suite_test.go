@@ -26,7 +26,14 @@ var (
 	cancel             context.CancelFunc
 	clusterName        = "agent-operator-e2e"
 	useExistingCluster bool
+	// busyboxImage names the image of the AgentRun fixtures by digest.
+	busyboxImage = "busybox@" + busyboxRegistryDigest
 )
+
+// busyboxRegistryDigest is the digest of busybox:1.37 in Docker Hub, which an
+// existing cluster pulls. A Kind cluster loads the image and uses the digest of
+// that copy instead.
+const busyboxRegistryDigest = "sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec"
 
 func TestMain(m *testing.M) {
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
@@ -43,12 +50,17 @@ func TestMain(m *testing.M) {
 			panic("failed to create Kind cluster: " + err.Error())
 		}
 
-		// Pre-pull images used by tests into the Kind node to avoid
-		// Docker Hub rate limits and slow pulls during test timeouts.
-		for _, img := range []string{"busybox:1.37"} {
-			_ = runCmd("docker", "pull", img)
-			_ = runCmd("kind", "load", "docker-image", img, "--name", clusterName)
+		// Load the image into the Kind node to avoid Docker Hub rate limits and
+		// slow pulls during test timeouts.
+		if err := runCmd("docker", "pull", "busybox:1.37"); err != nil {
+			panic("failed to pull busybox: " + err.Error())
 		}
+		pinned, err := testutil.LoadKindImage(clusterName, "busybox:1.37")
+		if err != nil {
+			_ = runCmd("kind", "delete", "cluster", "--name", clusterName)
+			panic("failed to load busybox into the Kind cluster: " + err.Error())
+		}
+		busyboxImage = pinned
 	}
 
 	// Install CRDs
@@ -58,6 +70,17 @@ func TestMain(m *testing.M) {
 			_ = runCmd("kind", "delete", "cluster", "--name", clusterName)
 		}
 		panic("failed to install CRDs: " + err.Error())
+	}
+
+	// The AgentRun fixtures name the kata runtime class, which a Kind node lacks.
+	// These tests check scheduling and garbage collection, not isolation, so the
+	// class runs on the runc handler; the e2e-kata suite runs a real Kata VM.
+	if !useExisting {
+		runtimeClass := filepath.Join("..", "testdata", "runtimeclass-kata.yaml")
+		if err := runCmd("kubectl", "apply", "-f", runtimeClass); err != nil {
+			_ = runCmd("kind", "delete", "cluster", "--name", clusterName)
+			panic("failed to create the kata RuntimeClass: " + err.Error())
+		}
 	}
 
 	// Build kubeconfig

@@ -26,7 +26,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 
 	// Build the test image with a fake claude binary
 	workspaceRoot := gitWorkspaceRoot(t)
-	dockerfile := filepath.Join(workspaceRoot, "packages", "agent", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
+	dockerfile := filepath.Join(workspaceRoot, "packages", "sandbox", "operator", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
 
 	buildCmd := exec.Command("docker", "build", "-f", dockerfile, "-t", e2eAgentImage, ".")
 	buildCmd.Dir = workspaceRoot
@@ -35,17 +35,9 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 		t.Fatalf("docker build failed: %v\n%s", err, out)
 	}
 
-	// Retry kind load — containerd may not be ready immediately after cluster creation
-	var loadErr error
-	for range 5 {
-		loadErr = runCmd("kind", "load", "docker-image", e2eAgentImage, "--name", clusterName)
-		if loadErr == nil {
-			break
-		}
-		time.Sleep(3 * time.Second)
-	}
-	if loadErr != nil {
-		t.Fatalf("kind load failed after retries: %v", loadErr)
+	agentImage, err := testutil.LoadKindImage(clusterName, e2eAgentImage)
+	if err != nil {
+		t.Fatalf("failed to load the agent image into Kind: %v", err)
 	}
 
 	ns := createNamespace(t, "e2e-fullcycle")
@@ -54,7 +46,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 	secret := testutil.NewSecret(ns, "provider-token", map[string][]byte{
 		"api-key": []byte("fake-token-for-e2e"),
 	})
-	if err := k8sClient.Create(ctx, secret); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, secret); err != nil {
 		t.Fatalf("failed to create Secret: %v", err)
 	}
 
@@ -67,7 +59,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 			"TEST_ENV_VAR":      "e2e-value",
 		}),
 	)
-	if err := k8sClient.Create(ctx, provider); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, provider); err != nil {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
@@ -75,7 +67,7 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 	opts := append([]testutil.AgentRunOption{
 		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
-		testutil.WithImage(e2eAgentImage),
+		testutil.WithImage(agentImage),
 		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
 			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
 			StorageSize: "1Gi",
@@ -161,8 +153,8 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 		t.Fatal("expected at least one init container")
 	}
 	initC := podSpec.InitContainers[0]
-	if initC.Image != e2eAgentImage {
-		t.Errorf("init container image = %q, want %q", initC.Image, e2eAgentImage)
+	if initC.Image != agentImage {
+		t.Errorf("init container image = %q, want %q", initC.Image, agentImage)
 	}
 
 	// Main container
@@ -170,8 +162,8 @@ func TestE2E_FullCycleWithPrompt(t *testing.T) {
 		t.Fatal("expected at least one main container")
 	}
 	mainC := podSpec.Containers[0]
-	if mainC.Image != e2eAgentImage {
-		t.Errorf("main container image = %q, want %q", mainC.Image, e2eAgentImage)
+	if mainC.Image != agentImage {
+		t.Errorf("main container image = %q, want %q", mainC.Image, agentImage)
 	}
 	if len(mainC.Command) == 0 || mainC.Command[0] != "claude" {
 		t.Errorf("main container command = %v, want [claude]", mainC.Command)

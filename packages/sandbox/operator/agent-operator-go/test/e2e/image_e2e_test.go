@@ -27,7 +27,7 @@ func TestE2E_ImageDeployment(t *testing.T) {
 	}
 
 	workspaceRoot := gitWorkspaceRoot(t)
-	operatorDir := filepath.Join(workspaceRoot, "packages", "agent", "agent-operator-go")
+	operatorDir := filepath.Join(workspaceRoot, "packages", "sandbox", "operator", "agent-operator-go")
 
 	// Build image
 	dockerfile := filepath.Join(operatorDir, "Dockerfile")
@@ -39,17 +39,8 @@ func TestE2E_ImageDeployment(t *testing.T) {
 		t.Fatalf("docker build failed: %v", err)
 	}
 
-	// Retry kind load — containerd may not be ready immediately after cluster creation
-	var loadErr error
-	for range 5 {
-		loadErr = runCmd("kind", "load", "docker-image", "agent-operator:latest", "--name", clusterName)
-		if loadErr == nil {
-			break
-		}
-		time.Sleep(3 * time.Second)
-	}
-	if loadErr != nil {
-		t.Fatalf("kind load failed after retries: %v", loadErr)
+	if _, err := testutil.LoadKindImage(clusterName, "agent-operator:latest"); err != nil {
+		t.Fatalf("failed to load the operator image into Kind: %v", err)
 	}
 
 	ns := createNamespace(t, "e2e-image")

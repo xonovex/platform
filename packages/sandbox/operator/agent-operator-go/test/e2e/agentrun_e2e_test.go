@@ -38,7 +38,7 @@ func TestE2E_JobActuallyScheduled(t *testing.T) {
 
 	// Use busybox as the image — the init container (git clone) will fail
 	// because busybox lacks git, but the Job/Pod will be scheduled.
-	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage(busyboxImage)}, testutil.E2ESecurityOverrides()...)
 	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -74,7 +74,7 @@ func TestE2E_JobActuallyScheduled(t *testing.T) {
 func TestE2E_PVCBinds(t *testing.T) {
 	ns := createNamespace(t, "e2e-pvc-bind")
 
-	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage(busyboxImage)}, testutil.E2ESecurityOverrides()...)
 	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -108,7 +108,7 @@ func TestE2E_InitContainerFailurePath(t *testing.T) {
 	ns := createNamespace(t, "e2e-init-fail")
 
 	// busybox lacks git, so the init container's git clone will fail
-	opts := append([]testutil.AgentRunOption{testutil.WithImage("busybox:1.37")}, testutil.E2ESecurityOverrides()...)
+	opts := append([]testutil.AgentRunOption{testutil.WithImage(busyboxImage)}, testutil.E2ESecurityOverrides()...)
 	run := testutil.NewAgentRun(ns, "test-run", opts...)
 
 	if err := k8sClient.Create(ctx, run); err != nil {

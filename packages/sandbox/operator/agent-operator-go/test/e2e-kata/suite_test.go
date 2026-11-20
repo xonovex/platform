@@ -98,6 +98,9 @@ nodes:
 	// Symlink shim inside the kind node and configure containerd
 	setupScript := `
 set -e
+# Kata backs guest memory with a file in /dev/shm; the 64 MiB default of a Docker
+# container faults the guest as soon as it touches more memory than that.
+mount -o remount,size=4G /dev/shm
 ln -sf /opt/kata/bin/containerd-shim-kata-v2 /usr/local/bin/containerd-shim-kata-v2
 cat >> /etc/containerd/config.toml <<'TOML'
 

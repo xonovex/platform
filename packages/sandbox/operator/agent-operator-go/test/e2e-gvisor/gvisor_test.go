@@ -20,7 +20,11 @@ import (
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
-const e2eAgentImage = "e2e-agent:e2e"
+const (
+	e2eAgentImage = "e2e-agent:e2e"
+	// busyboxImage names busybox:1.37 by its Docker Hub digest, which the node pulls.
+	busyboxImage = "busybox@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec"
+)
 
 func createNamespace(t *testing.T, prefix string) string {
 	t.Helper()
@@ -44,10 +48,11 @@ func gitWorkspaceRoot(t *testing.T) string {
 	return filepath.Clean(string(out[:len(out)-1]))
 }
 
-func buildAndLoadE2EAgentImage(t *testing.T) {
+// buildAndLoadE2EAgentImage returns the reference of the loaded image by digest.
+func buildAndLoadE2EAgentImage(t *testing.T) string {
 	t.Helper()
 	workspaceRoot := gitWorkspaceRoot(t)
-	dockerfile := filepath.Join(workspaceRoot, "packages", "agent", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
+	dockerfile := filepath.Join(workspaceRoot, "packages", "sandbox", "operator", "agent-operator-go", "test", "testdata", "Dockerfile.e2e-agent")
 
 	buildCmd := exec.Command("docker", "build", "-f", dockerfile, "-t", e2eAgentImage, ".")
 	buildCmd.Dir = workspaceRoot
@@ -56,17 +61,11 @@ func buildAndLoadE2EAgentImage(t *testing.T) {
 		t.Fatalf("docker build failed: %v\n%s", err, out)
 	}
 
-	var loadErr error
-	for range 5 {
-		loadErr = runCmd("kind", "load", "docker-image", e2eAgentImage, "--name", clusterName)
-		if loadErr == nil {
-			break
-		}
-		time.Sleep(3 * time.Second)
+	pinned, err := testutil.LoadKindImage(clusterName, e2eAgentImage)
+	if err != nil {
+		t.Fatalf("failed to load the agent image into Kind: %v", err)
 	}
-	if loadErr != nil {
-		t.Fatalf("kind load failed after retries: %v", loadErr)
-	}
+	return pinned
 }
 
 // TestE2E_GVisor_SandboxIsolation verifies that gVisor actually intercepts
@@ -138,7 +137,7 @@ func TestE2E_GVisor_AgentRunWithRuntimeClassName(t *testing.T) {
 	ns := createNamespace(t, "e2e-gvisor")
 
 	run := testutil.NewAgentRun(ns, "gvisor-run",
-		testutil.WithImage("busybox:1.37"),
+		testutil.WithImage(busyboxImage),
 		testutil.WithRuntimeClassName("gvisor"),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
@@ -206,14 +205,15 @@ func TestE2E_GVisor_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 	harness := testutil.NewAgentHarness(ns, "agent-harness",
 		testutil.WithDefaultRuntimeClassName("gvisor"),
 	)
-	if err := k8sClient.Create(ctx, harness); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, harness); err != nil {
 		t.Fatalf("failed to create AgentHarness: %v", err)
 	}
 
 	// AgentRun without explicit runtimeClassName — should inherit from harness
 	run := testutil.NewAgentRun(ns, "gvisor-default-run",
 		testutil.WithHarnessRef("agent-harness"),
-		testutil.WithImage("busybox:1.37"),
+		testutil.WithoutRuntimeClassName(),
+		testutil.WithImage(busyboxImage),
 	)
 	if err := k8sClient.Create(ctx, run); err != nil {
 		t.Fatalf("failed to create AgentRun: %v", err)
@@ -257,7 +257,7 @@ func TestE2E_GVisor_DefaultRuntimeClassNameFromHarness(t *testing.T) {
 // (Secret + AgentProvider + AgentHarness + git clone init container + fake claude)
 // works end-to-end inside a gVisor sandbox.
 func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
-	buildAndLoadE2EAgentImage(t)
+	agentImage := buildAndLoadE2EAgentImage(t)
 
 	ns := createNamespace(t, "e2e-gvisor-fullcycle")
 
@@ -265,7 +265,7 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 	secret := testutil.NewSecret(ns, "provider-token", map[string][]byte{
 		"api-key": []byte("fake-token-for-e2e"),
 	})
-	if err := k8sClient.Create(ctx, secret); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, secret); err != nil {
 		t.Fatalf("failed to create Secret: %v", err)
 	}
 
@@ -278,7 +278,7 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 			"TEST_ENV_VAR":      "e2e-value",
 		}),
 	)
-	if err := k8sClient.Create(ctx, provider); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, provider); err != nil {
 		t.Fatalf("failed to create AgentProvider: %v", err)
 	}
 
@@ -286,7 +286,7 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 	run := testutil.NewAgentRun(ns, "gvisor-fullcycle",
 		testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeClaude}),
 		testutil.WithPrompt("echo test-prompt"),
-		testutil.WithImage(e2eAgentImage),
+		testutil.WithImage(agentImage),
 		testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
 			Repository:  agentv1alpha1.RepositorySpec{URL: "https://github.com/octocat/Hello-World.git"},
 			StorageSize: "1Gi",
@@ -381,8 +381,8 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 		t.Fatal("expected at least one init container")
 	}
 	initC := podSpec.InitContainers[0]
-	if initC.Image != e2eAgentImage {
-		t.Errorf("init container image = %q, want %q", initC.Image, e2eAgentImage)
+	if initC.Image != agentImage {
+		t.Errorf("init container image = %q, want %q", initC.Image, agentImage)
 	}
 
 	// Main container
@@ -390,8 +390,8 @@ func TestE2E_GVisor_FullCycleWithGitClone(t *testing.T) {
 		t.Fatal("expected at least one main container")
 	}
 	mainC := podSpec.Containers[0]
-	if mainC.Image != e2eAgentImage {
-		t.Errorf("main container image = %q, want %q", mainC.Image, e2eAgentImage)
+	if mainC.Image != agentImage {
+		t.Errorf("main container image = %q, want %q", mainC.Image, agentImage)
 	}
 	if len(mainC.Command) == 0 || mainC.Command[0] != "claude" {
 		t.Errorf("main container command = %v, want [claude]", mainC.Command)
@@ -443,7 +443,7 @@ func TestE2E_GVisor_WorkspaceJobWithRuntimeClassName(t *testing.T) {
 		testutil.WithWorkspaceStorageSize("1Gi"),
 		testutil.WithWorkspaceRuntimeClassName("gvisor"),
 	)
-	if err := k8sClient.Create(ctx, ws); err != nil {
+	if err := testutil.CreateAndWait(ctx, k8sClient, ws); err != nil {
 		t.Fatalf("failed to create AgentWorkspace: %v", err)
 	}
 

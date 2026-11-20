@@ -101,6 +101,14 @@ func WithRuntimeClassName(name string) AgentRunOption {
 	}
 }
 
+// WithoutRuntimeClassName clears the runtime class name, so the run inherits the
+// default of its AgentHarness.
+func WithoutRuntimeClassName() AgentRunOption {
+	return func(r *agentv1alpha1.AgentRun) {
+		r.Spec.RuntimeClassName = nil
+	}
+}
+
 // WithWorkspaceRef sets the workspace reference.
 func WithWorkspaceRef(ref string) AgentRunOption {
 	return func(r *agentv1alpha1.AgentRun) {
