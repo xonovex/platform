@@ -5,6 +5,9 @@ export default defineConfig(
   mergeConfig(baseConfig, {
     test: {
       coverage: {
+        // bin.ts is the composition root: it holds the spawn, filesystem and
+        // process adapters, which only the launched binary exercises.
+        exclude: ["src/bin.ts"],
         thresholds: {
           "src/launcher.ts": {
             statements: 95,
