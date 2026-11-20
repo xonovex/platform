@@ -4,7 +4,7 @@ import type {FileSystem} from "./file-system.js";
 
 export const resolveSkillDirectory = (
   base: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: Pick<FileSystem, "isFile" | "readDirectory"> = nodeFileSystem,
 ): string => {
   if (fs.isFile(join(base, "SKILL.md"))) return base;
   const nested = fs
