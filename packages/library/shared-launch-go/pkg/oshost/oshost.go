@@ -173,6 +173,17 @@ func (System) ReadDir(path string) ([]fs.DirEntry, error) { return os.ReadDir(pa
 // ReadFile returns the content of the file at path.
 func (System) ReadFile(path string) ([]byte, error) { return os.ReadFile(path) }
 
+// ReadPrefix returns at most limit bytes from the start of the file at path, so
+// a caller can read the header of a large executable without reading all of it.
+func (System) ReadPrefix(path string, limit int) (data []byte, err error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { err = errors.Join(err, file.Close()) }()
+	return io.ReadAll(io.LimitReader(file, int64(limit)))
+}
+
 // WriteFile replaces the content of the file at path.
 func (System) WriteFile(path string, data []byte, perm fs.FileMode) error {
 	return os.WriteFile(path, data, perm)

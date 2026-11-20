@@ -22,6 +22,8 @@ type Host interface {
 	Environ() []string
 	Getenv(key string) string
 	LookPath(file string) (string, error)
+	// ReadPrefix returns at most limit bytes from the start of the file at path.
+	ReadPrefix(path string, limit int) ([]byte, error)
 	// Capture runs name in dir and returns its trimmed standard output.
 	Capture(name string, args []string, dir string) (string, error)
 	// Run starts name attached to the terminal of this process and returns its

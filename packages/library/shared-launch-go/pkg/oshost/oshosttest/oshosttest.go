@@ -279,6 +279,15 @@ func (f *Fake) ReadFile(p string) ([]byte, error) {
 	return append([]byte(nil), e.data...), nil
 }
 
+// ReadPrefix returns at most limit bytes from the start of the file p.
+func (f *Fake) ReadPrefix(p string, limit int) ([]byte, error) {
+	data, err := f.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+	return data[:min(limit, len(data))], nil
+}
+
 // WriteFile replaces the content of the existing or new file p.
 func (f *Fake) WriteFile(p string, data []byte, perm fs.FileMode) error {
 	parent, err := f.resolve(path.Dir(p), 0)

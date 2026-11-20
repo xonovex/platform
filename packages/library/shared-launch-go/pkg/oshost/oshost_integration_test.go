@@ -164,6 +164,15 @@ func TestFileOperations(t *testing.T) {
 	if data, err := s.ReadFile(path); err != nil || string(data) != "content" {
 		t.Errorf("ReadFile() = %q, %v", data, err)
 	}
+	if data, err := s.ReadPrefix(path, 3); err != nil || string(data) != "con" {
+		t.Errorf("ReadPrefix(3) = %q, %v", data, err)
+	}
+	if data, err := s.ReadPrefix(path, 64); err != nil || string(data) != "content" {
+		t.Errorf("ReadPrefix(64) = %q, %v", data, err)
+	}
+	if _, err := s.ReadPrefix(filepath.Join(dir, "missing"), 3); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("ReadPrefix(missing) error = %v, want ErrNotExist", err)
+	}
 	if err := s.Remove(path); err != nil {
 		t.Fatalf("Remove() error = %v", err)
 	}

@@ -286,7 +286,9 @@ func flakeLine(ref, shell string) string {
 
 func TestResolveClosure_Flake(t *testing.T) {
 	host := oshosttest.New()
-	host.Outcomes[flakeLine("/repo", "default")] = oshosttest.Outcome{Stdout: `{"variables":{"PATH":{"type":"exported","value":"/nix/store/ccc-tool/bin:/usr/bin"}}}`}
+	// The other variables carry the value shapes of a real devShell: an array
+	// and an associative array.
+	host.Outcomes[flakeLine("/repo", "default")] = oshosttest.Outcome{Stdout: `{"variables":{"PATH":{"type":"exported","value":"/nix/store/ccc-tool/bin:/usr/bin"},"envBuildBuildHooks":{"type":"array","value":["hook"]},"outputs":{"type":"associative","value":{"out":"/nix/store/ddd-out"}}}}`}
 	host.Outcomes[pathInfoLine("/nix/store/ccc-tool")] = oshosttest.Outcome{Stdout: "/nix/store/ccc-tool\n"}
 
 	flake, err := New(host).ResolveClosure(sharednix.NixSource{Kind: sharednix.NixSourceProjectFlake, FlakeRef: "/repo", Shell: "default"})
@@ -311,6 +313,7 @@ func TestResolveFlake_RejectsInvalidOutput(t *testing.T) {
 		{"command fails", oshosttest.Outcome{Err: errors.New("print-dev-env failed")}, "print-dev-env failed"},
 		{"invalid JSON", oshosttest.Outcome{Stdout: "not-json"}, "parse print-dev-env JSON"},
 		{"missing PATH", oshosttest.Outcome{Stdout: `{ "variables": {} }`}, "exposes no PATH"},
+		{"PATH that is no string", oshosttest.Outcome{Stdout: `{ "variables": { "PATH": { "type": "array", "value": ["/nix/store/ccc-tool/bin"] } } }`}, "exposes no PATH"},
 		{"PATH outside store", oshosttest.Outcome{Stdout: `{ "variables": { "PATH": { "value": "/usr/bin" } } }`}, "has no /nix/store entries"},
 	}
 

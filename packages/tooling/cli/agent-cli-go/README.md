@@ -113,6 +113,8 @@ Each isolation declares what it can guarantee, and `--require-*` stops a run tha
 | `docker-sandboxes` | `sbx` sandbox | no | no | Runs the agent in its own sandbox image. Fails closed for `none` and `managed`, because `sbx` has deny rules only. |
 | `openshell` | OpenShell gateway sandbox | yes | policy | Needs an image. Uploads the work directory, downloads it after the run, and refuses credentials and binds. |
 
+`--isolation-bwrap-passthrough` binds `/usr`, `/lib`, `/lib64`, `/bin` and `/etc` read-only, and never `/nix/store`. A run stops before it starts when the agent, the interpreter of its `#!` line or the loader of a dynamically linked agent resolves outside these binds and the workspace, as `/bin/sh` does on NixOS. The error names the path and its target; use `--provision nix` or a static agent binary.
+
 `docker` and `openshell` start the agent from a container image, and agent-cli ships no image: the image is your setting. Set `image` in the `run` section of a user or managed `agentic.json` (`run.image`), or pass `--image`. A run on either isolation without an image stops before it starts. The image must hold the agent unless a `nix` or `command` provision supplies it, and only a digest-pinned image (`name@sha256:<digest>`) counts toward `--require-pinned-provision` and `--require-host-tools-unreachable`.
 
 ### Managed network egress

@@ -76,18 +76,20 @@ func (p *Provisioner) resolveFlake(src sharednix.NixSource) (sharednix.ClosureDe
 		return sharednix.ClosureDescriptor{}, err
 	}
 
+	// A variable value is a string, an array or an associative array by its
+	// type, so only PATH, which is always a string, is decoded.
 	var devEnv struct {
-		Variables map[string]struct {
-			Type  string `json:"type"`
-			Value string `json:"value"`
-		} `json:"variables"`
+		Variables map[string]json.RawMessage `json:"variables"`
 	}
 	if err := json.Unmarshal([]byte(out), &devEnv); err != nil {
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("parse print-dev-env JSON: %w", err)
 	}
 
-	pathVar, ok := devEnv.Variables["PATH"]
-	if !ok || pathVar.Value == "" {
+	var pathVar struct {
+		Value string `json:"value"`
+	}
+	raw, ok := devEnv.Variables["PATH"]
+	if !ok || json.Unmarshal(raw, &pathVar) != nil || pathVar.Value == "" {
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("devShell %q exposes no PATH", installable)
 	}
 

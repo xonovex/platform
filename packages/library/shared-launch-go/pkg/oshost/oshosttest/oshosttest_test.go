@@ -75,6 +75,15 @@ func TestFilesAndDirectories(t *testing.T) {
 	if _, err := f.ReadFile("/a/b"); err == nil {
 		t.Error("ReadFile(dir) error = nil")
 	}
+	if prefix, err := f.ReadPrefix("/a/b/file", 2); err != nil || string(prefix) != "da" {
+		t.Errorf("ReadPrefix(2) = %q, %v", prefix, err)
+	}
+	if prefix, err := f.ReadPrefix("/a/b/file", 64); err != nil || string(prefix) != "data" {
+		t.Errorf("ReadPrefix(64) = %q, %v", prefix, err)
+	}
+	if _, err := f.ReadPrefix("/missing", 2); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("ReadPrefix(missing) error = %v, want ErrNotExist", err)
+	}
 	if _, err := f.ReadFile("/missing"); !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("ReadFile(missing) error = %v, want ErrNotExist", err)
 	}

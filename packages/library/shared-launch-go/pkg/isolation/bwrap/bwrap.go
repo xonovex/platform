@@ -24,7 +24,9 @@ import (
 // full --dev-bind, which would expose /dev/sda, /dev/mem and input devices); the
 // environment is reduced to an explicit allowlist with --unsetenv.
 // HostPassthrough on restores the leaky behavior: host /usr,/lib,/bin,/etc are
-// ro-bound and the host PATH is appended.
+// ro-bound and the host PATH is appended. It does not bind /nix/store, so a run
+// fails before it starts when the agent or its interpreter resolves outside the
+// binds.
 //
 // bwrap and default runc are attack-surface reduction, not a kernel trust
 // boundary (see KernelIsolated); no-new-privs and cap-drop are bwrap defaults.
@@ -156,6 +158,13 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--proc", "/proc",
 		"--tmpfs", "/tmp",
 	}
+	// bound collects the destination of every bind, which is all that the
+	// sandbox reaches of the host file system.
+	var bound []string
+	bind := func(flag, src, dest string) {
+		args = append(args, flag, src, dest)
+		bound = append(bound, dest)
+	}
 	inherited := envutil.ParseEnv(i.host.Environ())
 	unset := make([]string, 0, len(inherited))
 	for key := range inherited {
@@ -180,21 +189,21 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 			return nil, err
 		}
 		if exists {
-			args = append(args, "--ro-bind", src, filepath.Join(homeDir, configPath))
+			bind("--ro-bind", src, filepath.Join(homeDir, configPath))
 		}
 	}
 
 	// Workspace (rw) + source repo (ro for worktrees).
-	args = append(args, "--bind", workDir, workDir)
+	bind("--bind", workDir, workDir)
 	if repoDir != "" && repoDir != workDir {
-		args = append(args, "--ro-bind", repoDir, repoDir)
+		bind("--ro-bind", repoDir, repoDir)
 	}
 
 	// HostPassthrough: restore host tool reachability (leaky mode).
 	if cfg.HostPassthrough {
 		for _, dir := range []string{"/usr", "/lib", "/lib64", "/bin", "/etc"} {
 			if _, err := i.host.Stat(dir); err == nil {
-				args = append(args, "--ro-bind", dir, dir)
+				bind("--ro-bind", dir, dir)
 			}
 		}
 	}
@@ -205,7 +214,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, "--ro-bind", resolved, resolved)
+		bind("--ro-bind", resolved, resolved)
 	}
 
 	// Caller-supplied extra binds.
@@ -214,14 +223,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, "--bind", resolved, resolved)
+		bind("--bind", resolved, resolved)
 	}
 	for _, path := range cfg.RoBindPaths {
 		resolved, err := hostlaunch.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return nil, err
 		}
-		args = append(args, "--ro-bind", resolved, resolved)
+		bind("--ro-bind", resolved, resolved)
 	}
 
 	args = append(args, "--chdir", workDir)
@@ -236,13 +245,38 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 			return nil, err
 		}
 		socketDir, bridge := isoshared.BridgeMounts(route)
-		args = append(args, "--bind", socketDir, socketDir, "--ro-bind", bridge, bridge)
+		bind("--bind", socketDir, socketDir)
+		bind("--ro-bind", bridge, bridge)
 		command = isoshared.WrapWithBridge(route, command)
+	}
+	if cfg.HostPassthrough {
+		if err := i.checkPrograms(cfg, c, sandboxView{binds: bound, path: filepath.SplitList(sandboxEnv["PATH"]), workDir: workDir}); err != nil {
+			return nil, err
+		}
 	}
 	args = append(args, "--")
 	args = append(args, command...)
 
 	return args, nil
+}
+
+// checkPrograms requires the programs that the sandbox starts by name to resolve
+// inside its binds: the agent, and the shell that runs the init commands of the
+// provisioner.
+func (i *Isolator) checkPrograms(cfg isoshared.RunConfig, c provision.Contribution, view sandboxView) error {
+	var programs []string
+	if len(cfg.Process.Argv) > 0 {
+		programs = append(programs, cfg.Process.Argv[0])
+	}
+	if len(c.InitCommands) > 0 {
+		programs = append(programs, hostlaunch.WrapWithInitCommands(nil, c.InitCommands)[0])
+	}
+	for _, program := range programs {
+		if err := i.checkReachable(view, program); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
