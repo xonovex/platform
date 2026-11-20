@@ -9,16 +9,31 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
+
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
 
+// schemaSource returns one JSON Schema.
+type schemaSource func() ([]byte, error)
+
 // schemas are the JSON Schemas the CLI prints, by name.
-var schemas = map[string]func() []byte{
-	"config":     config.Schema,
-	"provider":   providers.Schema,
-	"run-record": record.Schema,
+var schemas = map[string]schemaSource{
+	"config":     infallible(config.Schema),
+	"provider":   providerSchema,
+	"run-record": infallible(record.Schema),
+}
+
+func infallible(build func() []byte) schemaSource {
+	return func() ([]byte, error) { return build(), nil }
+}
+
+// providerSchema returns the provider schema, which shared-contract-go owns
+// because the providers section of agentic.json references it.
+func providerSchema() ([]byte, error) {
+	documents, err := contract.Documents()
+	return documents[contract.Provider], err
 }
 
 func schemaNames() []string {
@@ -43,6 +58,10 @@ func writeJSON(out io.Writer, value any) error {
 // editor or a pipeline can validate a configuration file or a run record without
 // reading the source.
 func newSchemaCommand(out io.Writer) *cobra.Command {
+	return schemaCommand(out, schemas)
+}
+
+func schemaCommand(out io.Writer, sources map[string]schemaSource) *cobra.Command {
 	return &cobra.Command{
 		Use:       "schema [" + strings.Join(schemaNames(), "|") + "]",
 		Short:     "Print a JSON Schema of the configuration file, a provider file or the run record",
@@ -53,12 +72,16 @@ func newSchemaCommand(out io.Writer) *cobra.Command {
 				_, err := fmt.Fprintln(out, strings.Join(schemaNames(), "\n"))
 				return err
 			}
-			build, ok := schemas[args[0]]
+			build, ok := sources[args[0]]
 			if !ok {
 				return UsageError{Err: fmt.Errorf("unknown schema %q; available schemas: %s", args[0], strings.Join(schemaNames(), ", "))}
 			}
-			// Both schemas end with a newline.
-			_, err := out.Write(build())
+			document, err := build()
+			if err != nil {
+				return fmt.Errorf("read the %s schema: %w", args[0], err)
+			}
+			// Every schema ends with a newline.
+			_, err = out.Write(document)
 			return err
 		},
 	}

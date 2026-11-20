@@ -7,6 +7,7 @@ tags:
   - npm
   - cli
 dependsOn:
+  - shared-agent-go
   - shared-config-go
   - shared-contract-go
   - shared-core-go

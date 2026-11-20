@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/discover"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
@@ -43,10 +44,9 @@ type Dependencies struct {
 	Prompter    trust.Prompter
 	// Protocols holds the eval protocols by name.
 	Protocols *protocol.Registry
-	// Exec runs one model request.
-	Exec harness.Executor
-	// Predicates checks what a run showed.
-	Predicates *predicate.Registry
+	// Engine builds, over the facts of the harnesses, the executor that runs one
+	// model request and the predicates that check what a run showed.
+	Engine func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error)
 	// Env holds the environment variables the tool reads.
 	Env map[string]string
 	// Dir is the working directory that relative paths resolve against.

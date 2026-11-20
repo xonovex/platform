@@ -6,13 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
+
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
 
 func TestSchemaPrintsEachSchemaAsJSON(t *testing.T) {
-	for name, id := range map[string]string{"config": config.SchemaID, "provider": providers.SchemaID, "run-record": record.SchemaID} {
+	for name, id := range map[string]string{"config": config.SchemaID, "provider": contract.Provider, "run-record": record.SchemaID} {
 		r := newTestRoot()
 
 		if err := r.execute("schema", name); err != nil {
@@ -58,6 +59,15 @@ func TestSchemaReportsAFailureToWrite(t *testing.T) {
 		if err := command.Execute(); err == nil {
 			t.Errorf("schema %v error = nil, want the write failure", args)
 		}
+	}
+}
+
+func TestSchemaReportsAnUnreadableSchema(t *testing.T) {
+	broken := map[string]schemaSource{"provider": func() ([]byte, error) { return nil, errors.New("embed fault") }}
+	command := schemaCommand(&strings.Builder{}, broken)
+	command.SetArgs([]string{"provider"})
+	if err := command.Execute(); err == nil || !strings.Contains(err.Error(), "read the provider schema: embed fault") {
+		t.Errorf("schema provider error = %v, want the read failure", err)
 	}
 }
 

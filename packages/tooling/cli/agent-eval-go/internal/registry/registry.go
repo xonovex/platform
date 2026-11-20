@@ -4,6 +4,7 @@
 package registry
 
 import (
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness/claude"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness/codex"
@@ -20,12 +21,36 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/protocol/trigger"
 )
 
-// Harnesses returns the registry of agent harnesses.
-func Harnesses() *harness.Registry {
+// Facts returns the facts of a harness.
+type Facts func(types.AgentType) (*types.AgentConfig, error)
+
+// leaf builds one harness leaf over its facts.
+type leaf func(Facts) (harness.Harness, error)
+
+func over[H harness.Harness](agentType types.AgentType, build func(*types.AgentConfig) (H, error)) leaf {
+	return func(facts Facts) (harness.Harness, error) {
+		agent, err := facts(agentType)
+		if err != nil {
+			return nil, err
+		}
+		return build(agent)
+	}
+}
+
+// Harnesses returns the registry of agent harnesses, each leaf over its facts.
+func Harnesses(facts Facts) (*harness.Registry, error) {
 	r := harness.NewRegistry()
-	r.Register(claude.New())
-	r.Register(codex.New())
-	return r
+	for _, build := range []leaf{
+		over(types.AgentClaude, claude.New),
+		over(types.AgentCodex, codex.New),
+	} {
+		h, err := build(facts)
+		if err != nil {
+			return nil, err
+		}
+		r.Register(h)
+	}
+	return r, nil
 }
 
 // Protocols returns the registry of eval protocols.

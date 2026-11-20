@@ -27,7 +27,7 @@ const module = "github.com/xonovex/platform/packages/tooling/cli/agent-eval-go"
 var allowed = map[string][]string{
 	// The composition root binds every adapter and the registries.
 	"cmd/agent-eval": {
-		"internal/cmd", "internal/execute", "internal/registry",
+		"internal/cmd", "internal/execute", "internal/harness", "internal/predicate", "internal/registry",
 	},
 
 	// The driving adapter reaches the core and the ports, never an adapter.
@@ -94,17 +94,19 @@ const library = "github.com/xonovex/platform/packages/library/"
 // new edge into a library is a decision in this file.
 var libraries = map[string][]string{
 	"cmd/agent-eval": {
+		"shared-agent-go/pkg/agents",
 		"shared-config-go/pkg/osfiles",
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
 		"shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
 	},
 	"internal/baseline": {"shared-contract-go/pkg/fs"},
 	"internal/budget":   {"shared-config-go/pkg/section/eval"},
-	"internal/catalog":  {"shared-contract-go/pkg/fs"},
+	"internal/catalog":  {"shared-agent-go/pkg/types", "shared-contract-go/pkg/fs"},
 	"internal/cmd": {
+		"shared-agent-go/pkg/agents", "shared-agent-go/pkg/types",
 		"shared-config-go/pkg/discover", "shared-config-go/pkg/explain", "shared-config-go/pkg/merge",
-		"shared-config-go/pkg/resolve", "shared-config-go/pkg/section/eval", "shared-config-go/pkg/spec",
-		"shared-config-go/pkg/trust",
+		"shared-config-go/pkg/resolve", "shared-config-go/pkg/section/eval", "shared-config-go/pkg/shard",
+		"shared-config-go/pkg/spec", "shared-config-go/pkg/trust",
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
 		"shared-contract-go/pkg/report",
 	},
@@ -112,12 +114,13 @@ var libraries = map[string][]string{
 	"internal/document":              {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema", "shared-contract-go/pkg/schemas"},
 	"internal/execute":               {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process", "shared-core-go/pkg/scratch"},
 	"internal/harness":               {"shared-core-go/pkg/process"},
-	"internal/harness/claude":        {"shared-core-go/pkg/process"},
-	"internal/harness/codex":         {"shared-core-go/pkg/process"},
+	"internal/harness/claude":        {"shared-agent-go/pkg/agents", "shared-agent-go/pkg/types", "shared-core-go/pkg/process"},
+	"internal/harness/codex":         {"shared-agent-go/pkg/agents", "shared-agent-go/pkg/types", "shared-core-go/pkg/process"},
 	"internal/migrate":               {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/schemas"},
 	"internal/model":                 {"shared-contract-go/pkg/condition"},
 	"internal/protocol":              {"shared-contract-go/pkg/fs"},
-	"internal/protocol/protocoltest": {"shared-contract-go/pkg/fs/memfs", "shared-contract-go/pkg/wiring"},
+	"internal/protocol/protocoltest": {"shared-agent-go/pkg/agents", "shared-agent-go/pkg/types", "shared-contract-go/pkg/fs/memfs", "shared-contract-go/pkg/wiring"},
+	"internal/registry":              {"shared-agent-go/pkg/types"},
 	"internal/report":                {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/report"},
 	"internal/store":                 {"shared-contract-go/pkg/fs"},
 }

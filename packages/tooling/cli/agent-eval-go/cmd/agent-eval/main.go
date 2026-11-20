@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/osfiles"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
@@ -18,6 +19,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/osscratch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/execute"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/predicate"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/registry"
 )
 
@@ -39,16 +42,22 @@ func run() int {
 		return findings.ExitUsage
 	}
 	fsys := osfs.New()
-	exec := execute.Executor{
-		Harnesses: registry.Harnesses(), Runner: osexec.New(), Scratch: osscratch.New(), FS: fsys,
-		Now:   time.Now,
-		Pause: func(attempt int) { time.Sleep(time.Duration(attempt) * retryPause) },
+	engine := func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+		harnesses, err := registry.Harnesses(facts.Get)
+		if err != nil {
+			return nil, nil, err
+		}
+		exec := execute.Executor{
+			Harnesses: harnesses, Runner: osexec.New(), Scratch: osscratch.New(), FS: fsys,
+			Now:   time.Now,
+			Pause: func(attempt int) { time.Sleep(time.Duration(attempt) * retryPause) },
+		}
+		return exec, registry.Predicates(exec), nil
 	}
 	deps := cmd.Dependencies{
 		FS: fsys, Validator: validator, ConfigFiles: osfiles.Files{}, Places: osfiles.Places{},
-		Prompter: osfiles.NewPrompter(), Protocols: registry.Protocols(), Exec: exec,
-		Predicates: registry.Predicates(exec), Env: environment(), Dir: dir,
-		Now: time.Now, Out: os.Stdout, Err: os.Stderr,
+		Prompter: osfiles.NewPrompter(), Protocols: registry.Protocols(), Engine: engine,
+		Env: environment(), Dir: dir, Now: time.Now, Out: os.Stdout, Err: os.Stderr,
 	}
 
 	err = cmd.NewRootCommand(deps).Execute()

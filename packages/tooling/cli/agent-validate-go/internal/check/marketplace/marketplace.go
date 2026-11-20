@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
@@ -35,10 +37,12 @@ type Options struct {
 	PackagePrefix string `json:"packagePrefix"`
 }
 
+// The manifest and the marketplace paths of each harness come from its facts.
 func defaults() Options {
+	facts := agents.Embedded()
 	return Options{
-		Claude:          ".claude-plugin/marketplace.json",
-		Codex:           ".agents/plugins/marketplace.json",
+		Claude:          facts.PluginLayout(types.AgentClaude).Marketplace,
+		Codex:           facts.PluginLayout(types.AgentCodex).Marketplace,
 		Lockfile:        "package-lock.json",
 		DirectoryPrefix: "plugin-",
 		PluginPrefix:    "xonovex-",
@@ -251,10 +255,13 @@ func (r *run) manifest(dir, name, label string) *manifest {
 }
 
 func (r *run) checkPackage(p pluginPackage, release string, claudeEntries, codexEntries entries) {
+	facts := agents.Embedded()
+	claudeManifest := facts.PluginLayout(types.AgentClaude).Manifest
+	codexManifest := facts.PluginLayout(types.AgentCodex).Manifest
 	pkg := r.manifest(p.dir, "package.json", "package.json")
 	neutral := r.manifest(p.dir, "plugin.json", "a neutral plugin manifest")
-	claude := r.manifest(p.dir, ".claude-plugin/plugin.json", "a Claude plugin manifest")
-	codex := r.manifest(p.dir, ".codex-plugin/plugin.json", "a Codex plugin manifest")
+	claude := r.manifest(p.dir, claudeManifest, "a Claude plugin manifest")
+	codex := r.manifest(p.dir, codexManifest, "a Codex plugin manifest")
 	if pkg == nil || neutral == nil || claude == nil || codex == nil {
 		return
 	}
@@ -266,10 +273,10 @@ func (r *run) checkPackage(p pluginPackage, release string, claudeEntries, codex
 		r.report.Fail("marketplace.version-package", path.Join(p.dir, "package.json"), 1, "%s package version matches %s", pkg.Name, release)
 	}
 	if claude.Version != release {
-		r.report.Fail("marketplace.version-claude", path.Join(p.dir, ".claude-plugin/plugin.json"), 1, "%s Claude manifest version matches %s", claude.Name, release)
+		r.report.Fail("marketplace.version-claude", path.Join(p.dir, claudeManifest), 1, "%s Claude manifest version matches %s", claude.Name, release)
 	}
 	if codex.Version != release {
-		r.report.Fail("marketplace.version-codex", path.Join(p.dir, ".codex-plugin/plugin.json"), 1, "%s Codex manifest version matches %s", codex.Name, release)
+		r.report.Fail("marketplace.version-codex", path.Join(p.dir, codexManifest), 1, "%s Codex manifest version matches %s", codex.Name, release)
 	}
 	if claudeEntries.sources[claude.Name] != source {
 		r.report.Fail("marketplace.source-claude", r.options.Claude, 1, "%s has the expected Claude marketplace source %s", claude.Name, source)
@@ -288,9 +295,9 @@ func (r *run) checkPackage(p pluginPackage, release string, claudeEntries, codex
 	for _, c := range []struct {
 		label, got, file string
 	}{
-		{"Claude manifest", claude.Description, path.Join(p.dir, ".claude-plugin/plugin.json")},
+		{"Claude manifest", claude.Description, path.Join(p.dir, claudeManifest)},
 		{"Claude marketplace", claudeEntries.descriptions[claude.Name], r.options.Claude},
-		{"Codex manifest", codex.Description, path.Join(p.dir, ".codex-plugin/plugin.json")},
+		{"Codex manifest", codex.Description, path.Join(p.dir, codexManifest)},
 		{"Codex marketplace", codexEntries.descriptions[codex.Name], r.options.Codex},
 	} {
 		if c.got != pkg.Description {

@@ -11,12 +11,10 @@ import (
 	"path"
 	"sort"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 )
-
-// ManifestPath is where a plugin keeps its manifest, relative to the plugin.
-const ManifestPath = ".claude-plugin/plugin.json"
 
 // executable lists what a skill-only plugin must not contain: anything that runs
 // code or changes settings on the machine that loads the plugin.
@@ -50,13 +48,17 @@ type Catalog struct {
 	Plugins []Plugin
 }
 
-// Load discovers the plugins below the roots. A root is a plugin directory or a
-// directory whose children are plugin directories.
-func Load(fsys fs.FileSystem, roots []string) (Catalog, error) {
+// Load discovers the plugins below the roots that follow the plugin layout: the
+// manifest and the skills directory, relative to the plugin. A root is a plugin
+// directory or a directory whose children are plugin directories.
+func Load(fsys fs.FileSystem, layout types.PluginLayout, roots []string) (Catalog, error) {
+	if layout.Manifest == "" || layout.SkillsDir == "" {
+		return Catalog{}, errors.New("the plugin layout needs a manifest and a skills directory")
+	}
 	var cat Catalog
 	seen := map[string]string{}
 	add := func(dir string) error {
-		plugin, err := readPlugin(fsys, dir)
+		plugin, err := readPlugin(fsys, layout, dir)
 		if err != nil {
 			return err
 		}
@@ -68,7 +70,7 @@ func Load(fsys fs.FileSystem, roots []string) (Catalog, error) {
 		return nil
 	}
 	for _, root := range roots {
-		isPlugin, err := fs.Exists(fsys, path.Join(root, ManifestPath))
+		isPlugin, err := fs.Exists(fsys, path.Join(root, layout.Manifest))
 		if err != nil {
 			return Catalog{}, err
 		}
@@ -84,7 +86,7 @@ func Load(fsys fs.FileSystem, roots []string) (Catalog, error) {
 		}
 		for _, entry := range entries {
 			dir := path.Join(root, entry.Name)
-			if ok, err := fs.Exists(fsys, path.Join(dir, ManifestPath)); err != nil {
+			if ok, err := fs.Exists(fsys, path.Join(dir, layout.Manifest)); err != nil {
 				return Catalog{}, err
 			} else if entry.IsDir && ok {
 				if err := add(dir); err != nil {
@@ -97,8 +99,8 @@ func Load(fsys fs.FileSystem, roots []string) (Catalog, error) {
 	return cat, nil
 }
 
-func readPlugin(fsys fs.FileSystem, dir string) (Plugin, error) {
-	file := path.Join(dir, ManifestPath)
+func readPlugin(fsys fs.FileSystem, layout types.PluginLayout, dir string) (Plugin, error) {
+	file := path.Join(dir, layout.Manifest)
 	data, err := fsys.ReadFile(file)
 	if err != nil {
 		return Plugin{}, err
@@ -126,15 +128,14 @@ func readPlugin(fsys fs.FileSystem, dir string) (Plugin, error) {
 			return Plugin{}, fmt.Errorf("plugin %s is not skill-only: it contains %s", dir, name)
 		}
 	}
-	skills, err := readSkills(fsys, manifest.Name, dir)
+	skills, err := readSkills(fsys, manifest.Name, path.Join(dir, layout.SkillsDir))
 	if err != nil {
 		return Plugin{}, err
 	}
 	return Plugin{Name: manifest.Name, Dir: dir, Dependencies: manifest.Dependencies, Skills: skills}, nil
 }
 
-func readSkills(fsys fs.FileSystem, plugin, dir string) ([]Skill, error) {
-	root := path.Join(dir, "skills")
+func readSkills(fsys fs.FileSystem, plugin, root string) ([]Skill, error) {
 	entries, err := fsys.ReadDir(root)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {

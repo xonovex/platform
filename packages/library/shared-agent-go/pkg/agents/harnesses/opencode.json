@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "name": "opencode",
+  "displayName": "OpenCode",
+  "description": "OpenCode takes the provider through arguments and reads no provider environment.",
+  "binary": "opencode",
+  "nixPackage": "opencode",
+  "access": "provider",
+  "providerArgs": true,
+  "versionArgs": ["--version"],
+  "userConfigPaths": [".config/opencode"]
+}

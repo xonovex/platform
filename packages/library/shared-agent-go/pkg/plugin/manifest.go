@@ -11,12 +11,35 @@ import (
 	"maps"
 	"slices"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
-// The manifest locations of a plugin. A plugin carries one or more, and every
-// one that is present must agree on the name, the version and the dependencies.
-var manifestPaths = []string{".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "plugin.json"}
+// NeutralManifestPath is the manifest a plugin carries for no harness in
+// particular.
+const NeutralManifestPath = "plugin.json"
+
+// ManifestPaths lists the manifest locations of a plugin: the manifest of every
+// harness that declares one, in the order of the harness names, then the
+// neutral manifest. A plugin carries one or more, and every one that is present
+// must agree on the name, the version and the dependencies.
+func ManifestPaths() []string {
+	return append(harnessPaths(func(layout types.PluginLayout) string { return layout.Manifest }), NeutralManifestPath)
+}
+
+// harnessPaths lists one path of the plugin layout of every harness that
+// declares it, in the order of the harness names.
+func harnessPaths(pick func(types.PluginLayout) string) []string {
+	facts := agents.Embedded()
+	var paths []string
+	for _, agentType := range facts.Types() {
+		if p := pick(facts.PluginLayout(agentType)); p != "" {
+			paths = append(paths, p)
+		}
+	}
+	return paths
+}
 
 // Manifest is what the manifests of a plugin agree on.
 type Manifest struct {
@@ -43,7 +66,7 @@ func ReadManifest(tree artifact.Tree) (Manifest, error) {
 	var manifest Manifest
 	keys := map[string]bool{}
 	found := ""
-	for _, path := range manifestPaths {
+	for _, path := range ManifestPaths() {
 		file, ok := tree.Get(path)
 		if !ok {
 			continue

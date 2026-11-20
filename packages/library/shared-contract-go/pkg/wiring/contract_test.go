@@ -104,8 +104,59 @@ func contracts() map[string]contract {
 				`{"local":{"agent":"claude"},"cloud-2":{"agent":"codex","extends":"cloud"}}`,
 			},
 			invalid: []invalid{
-				{"name not a slug", `{"Local":{}}`, ""},
+				{"name not a slug", `{"Local":{"agent":"claude"}}`, ""},
 				{"route not an object", `{"local":"claude"}`, "/local"},
+				{"route without agent", `{"local":{"extends":"cloud"}}`, "/local"},
+				{"unknown route member", `{"local":{"agent":"claude","model":"m"}}`, "/local"},
+				{"credential without target", `{"local":{"agent":"claude","credential":{"sourceEnv":"KEY"}}}`, "/local/credential"},
+				{"model slot without id", `{"local":{"agent":"claude","models":{"main":{}}}}`, "/local/models/main"},
+				{"bad variable name", `{"local":{"agent":"claude","environment":{"1X":"v"}}}`, "/local/environment"},
+			},
+		},
+		schemas.Provider: {
+			valid: []string{
+				`{"name":"local","agent":"claude"}`,
+				`{"$schema":"x","name":"cloud-2","displayName":"Cloud","agent":"codex","extends":"cloud","portable":true,
+					"credential":{"sourceEnv":"HOST_KEY","targetEnv":"API_KEY"},
+					"models":{"main":{"id":"m-1","effort":"high"}},"environment":{"BASE":"{model:main}"},"args":["-c","x"]}`,
+			},
+			invalid: []invalid{
+				{"no name", `{"agent":"claude"}`, ""},
+				{"no agent", `{"name":"local"}`, ""},
+				{"name not a slug", `{"name":"Local","agent":"claude"}`, "/name"},
+				{"model id with space", `{"name":"a","agent":"claude","models":{"main":{"id":"a b"}}}`, "/models/main/id"},
+				{"model slot name", `{"name":"a","agent":"claude","models":{"Main":{"id":"m"}}}`, "/models"},
+				{"args not strings", `{"name":"a","agent":"claude","args":[1]}`, "/args/0"},
+			},
+		},
+		schemas.Harness: {
+			valid: []string{
+				`{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"native-login","versionArgs":["--version"]}`,
+				`{"$schema":"x","name":"h","displayName":"H","description":"d","binary":"/opt/h","nixPackage":"h","protocol":"responses","access":"provider",
+					"providerEnv":true,"providerArgs":true,"launchArgs":["chat"],"sandboxArgs":["--open"],"versionArgs":["-V"],
+					"userConfigPaths":[".h",".config/h"],"configHome":{"env":"H_HOME","dir":".h"},"instructionFile":"H.md","skillsDir":".h/skills",
+					"plugin":{"manifest":".h-plugin/plugin.json","marketplace":".h-plugin/marketplace.json","skillsDir":"skills"},
+					"headless":{"args":["-p"],"hermeticArgs":["--clean"],"output":{"stream":["--json"]},"options":{"model":["--model","{value}"]},"skillPrompt":"/{skill} {prompt}"}}`,
+			},
+			invalid: []invalid{
+				{"no binary", `{"name":"h","displayName":"H","nixPackage":"h","access":"provider","versionArgs":["-v"]}`, ""},
+				{"empty version probe", `{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"provider","versionArgs":[]}`, "/versionArgs"},
+				{"unknown access", `{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"key","versionArgs":["-v"]}`, "/access"},
+				{"absolute config path", `{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"provider","versionArgs":["-v"],"userConfigPaths":["/etc/h"]}`, "/userConfigPaths/0"},
+				{"unknown member", `{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"provider","versionArgs":["-v"],"flags":[]}`, ""},
+			},
+		},
+		schemas.HarnessOverride: {
+			valid: []string{
+				`{}`,
+				`{"$schema":"x","binary":"/opt/claude/bin/claude"}`,
+				`{"headless":{"options":{"maxTurns":["--turns","{value}"]}}}`,
+			},
+			invalid: []invalid{
+				{"empty binary", `{"binary":""}`, "/binary"},
+				{"option not a list", `{"headless":{"options":{"model":"--model"}}}`, "/headless/options/model"},
+				{"unknown member", `{"argv":["x"]}`, ""},
+				{"plugin manifest absolute", `{"plugin":{"manifest":"/p.json"}}`, "/plugin/manifest"},
 			},
 		},
 		schemas.AgenticAudit: {

@@ -8,9 +8,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/resolve"
 	evalsection "github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/eval"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/shard"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/spec"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 
@@ -52,13 +55,45 @@ func (d Dependencies) resolveConfig(r configRequest) (merge.Resolved, error) {
 	}
 	env := resolve.Env{
 		Files: d.ConfigFiles, Places: d.Places, Validator: d.Validator,
-		Approvals: trust.Ledger{Store: d.ConfigFiles, StateDir: d.Places.StateDir},
-		Prompter:  d.Prompter, Out: d.Err,
+		Approvals: d.approvals(), Prompter: d.Prompter, Out: d.Err,
 	}
 	return resolve.Resolve(env, resolve.Request{
 		Sections: []spec.Section{evalsection.Section()}, Start: d.Dir,
 		Project: r.project, ApproveDigest: r.approveDigest, Flags: flags,
 	})
+}
+
+func (d Dependencies) approvals() trust.Ledger {
+	return trust.Ledger{Store: d.ConfigFiles, StateDir: d.Places.StateDir}
+}
+
+// sourceHarness is the harness whose plugin layout the plugin sources follow:
+// the plugins of a repository ship the Claude Code layout, and each leaf stages
+// the skills it offers in the layout of its own harness.
+const sourceHarness = types.AgentClaude
+
+// loadHarnesses returns the facts of the harnesses with the override files of
+// every layer applied: user, then project, then managed. A project override
+// passes the trust gate first, because it can change the program a run starts.
+func (d Dependencies) loadHarnesses(r configRequest) (agents.Catalog, error) {
+	base := agents.Embedded()
+	var names []string
+	for _, agentType := range base.Types() {
+		names = append(names, string(agentType))
+	}
+	env := shard.Env{Files: d.ConfigFiles, Places: d.Places, Approvals: d.approvals(), Prompter: d.Prompter, Out: d.Err}
+	shards, err := shard.Read(env, shard.Request{
+		Dir: agents.OverrideDir, Names: names, Kind: agents.OverrideKind,
+		Start: d.Dir, Project: r.project, ApproveDigest: r.approveDigest,
+	})
+	if err != nil {
+		return agents.Catalog{}, err
+	}
+	overrides := make([]agents.Override, len(shards))
+	for i, s := range shards {
+		overrides[i] = agents.Override{Name: types.AgentType(s.Name), Origin: s.Path, Data: s.Data}
+	}
+	return base.Apply(d.Validator, overrides...)
 }
 
 // loadProject decodes the merged eval section and checks that its default
@@ -88,7 +123,11 @@ func (d Dependencies) loadProject(r configRequest) (model.Project, string, error
 
 // loadCatalog discovers the plugins in the project's plugin directories and the
 // directories the flags add. With neither, it looks in the working directory.
-func (d Dependencies) loadCatalog(project model.Project, projectDir string, extra []string) (catalog.Catalog, error) {
+func (d Dependencies) loadCatalog(facts agents.Catalog, project model.Project, projectDir string, extra []string) (catalog.Catalog, error) {
+	source, err := facts.Get(sourceHarness)
+	if err != nil {
+		return catalog.Catalog{}, err
+	}
 	var roots []string
 	for _, dir := range project.PluginDirs {
 		roots = append(roots, resolvePath(projectDir, dir))
@@ -99,5 +138,5 @@ func (d Dependencies) loadCatalog(project model.Project, projectDir string, extr
 	if len(roots) == 0 {
 		roots = []string{d.Dir}
 	}
-	return catalog.Load(d.FS, roots)
+	return catalog.Load(d.FS, source.Plugin, roots)
 }

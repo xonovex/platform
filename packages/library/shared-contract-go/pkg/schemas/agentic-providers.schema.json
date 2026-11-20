@@ -2,10 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.xonovex.com/agent/agentic-providers.schema.json",
   "title": "Providers section",
-  "description": "The providers section of an agentic.json file: the model provider routes a run may select, by name. Each value is one provider route.",
+  "description": "The providers section of an agentic.json file: the model provider routes a run may select, by name. Each value is one provider route; the key is its name, so the route may leave the name out.",
   "type": "object",
   "patternProperties": {
-    "^[a-z0-9][a-z0-9-]*$": {"type": "object"}
+    "^[a-z0-9][a-z0-9-]*$": {
+      "$ref": "https://schemas.xonovex.com/agent/provider.schema.json#/$defs/route",
+      "required": ["agent"]
+    }
   },
   "additionalProperties": false
 }

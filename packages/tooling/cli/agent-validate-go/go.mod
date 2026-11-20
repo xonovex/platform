@@ -4,6 +4,7 @@ go 1.27.0
 
 require (
 	github.com/spf13/cobra v1.10.2
+	github.com/xonovex/platform/packages/library/shared-agent-go v0.0.0-00010101000000-000000000000
 	github.com/xonovex/platform/packages/library/shared-config-go v0.0.0-00010101000000-000000000000
 	github.com/xonovex/platform/packages/library/shared-contract-go v0.0.0-00010101000000-000000000000
 	gopkg.in/yaml.v3 v3.0.1
@@ -19,3 +20,5 @@ require (
 replace github.com/xonovex/platform/packages/library/shared-config-go => ../../../library/shared-config-go
 
 replace github.com/xonovex/platform/packages/library/shared-contract-go => ../../../library/shared-contract-go
+
+replace github.com/xonovex/platform/packages/library/shared-agent-go => ../../../library/shared-agent-go

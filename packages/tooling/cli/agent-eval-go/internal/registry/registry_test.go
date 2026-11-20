@@ -2,8 +2,12 @@ package registry_test
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
@@ -18,7 +22,11 @@ func (exec) Execute(context.Context, harness.Request) (harness.Observation, erro
 }
 
 func TestEveryLeafIsRegistered(t *testing.T) {
-	if got := strings.Join(registry.Harnesses().Names(), ","); got != "claude,codex" {
+	harnesses, err := registry.Harnesses(agents.Embedded().Get)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(harnesses.Names(), ","); got != "claude,codex" {
 		t.Fatal(got)
 	}
 	names := registry.Protocols().Names()
@@ -29,6 +37,19 @@ func TestEveryLeafIsRegistered(t *testing.T) {
 		if _, err := registry.Protocols().Get(p); err != nil {
 			t.Error(err)
 		}
+	}
+}
+
+func TestHarnessesFailOnFactsALeafCannotUse(t *testing.T) {
+	missing := func(types.AgentType) (*types.AgentConfig, error) { return nil, errors.New("no facts") }
+	if _, err := registry.Harnesses(missing); err == nil || err.Error() != "no facts" {
+		t.Errorf("Harnesses() error = %v, want the lookup fault", err)
+	}
+	bare := func(agentType types.AgentType) (*types.AgentConfig, error) {
+		return &types.AgentConfig{Type: agentType}, nil
+	}
+	if _, err := registry.Harnesses(bare); err == nil {
+		t.Error("Harnesses() over facts without a layout must fail")
 	}
 }
 

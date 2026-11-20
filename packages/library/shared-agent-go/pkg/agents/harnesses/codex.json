@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "name": "codex",
+  "displayName": "Codex",
+  "description": "Codex speaks the Responses protocol and takes its provider through -c arguments. It reads the credential from the variable the provider arguments name, so it takes the provider environment too. Codex sandboxes its own commands, and that fails inside another sandbox, so an isolation turns it off. A headless run is an ephemeral exec that reads neither the user configuration nor user rules.",
+  "binary": "codex",
+  "nixPackage": "codex",
+  "protocol": "responses",
+  "access": "provider",
+  "providerEnv": true,
+  "providerArgs": true,
+  "sandboxArgs": ["--sandbox", "danger-full-access"],
+  "versionArgs": ["--version"],
+  "configHome": {"env": "CODEX_HOME", "dir": ".codex"},
+  "instructionFile": "AGENTS.md",
+  "skillsDir": ".agents/skills",
+  "plugin": {
+    "manifest": ".codex-plugin/plugin.json",
+    "marketplace": ".agents/plugins/marketplace.json"
+  },
+  "headless": {
+    "args": ["exec"],
+    "hermeticArgs": [
+      "--ephemeral",
+      "--ignore-user-config",
+      "--ignore-rules",
+      "--skip-git-repo-check"
+    ],
+    "output": {
+      "stream": ["--json"]
+    },
+    "options": {
+      "effort": ["-c", "model_reasoning_effort=\"{value}\""],
+      "model": ["--model", "{value}"],
+      "readOnly": ["--sandbox", "read-only"],
+      "workspaceWrite": ["--sandbox", "workspace-write"]
+    },
+    "skillPrompt": "${skill}\n\n{prompt}"
+  }
+}

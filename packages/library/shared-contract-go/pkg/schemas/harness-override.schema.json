@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/harness-override.schema.json",
+  "title": "Harness override",
+  "description": "A harnesses.d/<name>.json file: the facts of one harness that it changes. An object member merges into the shipped object member by member, and any other member replaces the shipped value whole.",
+  "$ref": "harness.schema.json#/$defs/facts"
+}

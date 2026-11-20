@@ -4,12 +4,14 @@ tags:
   - shared
 language: go
 layer: library
+dependsOn:
+  - shared-contract-go
 fileGroups:
-  # The provider schema is embedded in pkg/providers, so a change to it
+  # The harness facts are embedded in pkg/agents, so a change to one
   # invalidates the build, the tests and the coverage runs.
   sources:
     - "**/*.go"
-    - pkg/providers/*.json
+    - pkg/agents/harnesses/*.json
 tasks:
   go-test-coverage:
     env:
@@ -48,6 +50,8 @@ tasks:
       - /packages/library/shared-agent-go/pkg/**/*.json
       - /packages/library/shared-agent-go/go.mod
       - /packages/library/shared-agent-go/go.sum
+      - /packages/library/shared-contract-go/**/*.go
+      - /packages/library/shared-contract-go/**/*.json
       - /.moon/scripts/check-go-package-coverage.sh
       - /.moon/scripts/strip-generated-coverage.sh
     options:
@@ -70,6 +74,7 @@ tasks:
       - "@globs(tests)"
       - /packages/tooling/cli/agent-cli-go/**/*.go
       - /packages/tooling/cli/agent-eval-go/**/*.go
+      - /packages/tooling/cli/agent-validate-go/**/*.go
       - /packages/sandbox/operator/agent-operator-go/**/*.go
     outputs: []
     options:

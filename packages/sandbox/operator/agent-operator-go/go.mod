@@ -49,6 +49,7 @@ require (
 	github.com/prometheus/procfs v0.21.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	github.com/xonovex/platform/packages/library/shared-contract-go v0.0.0-00010101000000-000000000000 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.28.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
@@ -77,3 +78,5 @@ replace (
 	github.com/xonovex/platform/packages/library/shared-agent-go => ../../../library/shared-agent-go
 	github.com/xonovex/platform/packages/library/shared-core-go => ../../../library/shared-core-go
 )
+
+replace github.com/xonovex/platform/packages/library/shared-contract-go => ../../../library/shared-contract-go

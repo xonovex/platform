@@ -6,16 +6,18 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/explain"
 	evalsection "github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/eval"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 )
 
-// bindConfig binds the flags that choose and approve the project agentic.json.
+// bindConfig binds the flags that choose and approve the project files: the
+// project agentic.json and the harness override files beside it.
 func bindConfig(c *cobra.Command, project, approveDigest *string) {
 	f := c.Flags()
 	f.StringVar(project, "project", "", "project agentic.json (default the nearest agentic.json from the working directory up to the repository root)")
-	f.StringVar(approveDigest, trust.ApproveFlag, "", "approve the eval section of the project agentic.json with this digest")
+	f.StringVar(approveDigest, trust.ApproveFlag, "", "approve a project file with this digest: the eval section of the project agentic.json, or a harness override in "+agents.OverrideDir)
 }
 
 func newConfigCommand(deps Dependencies) *cobra.Command {

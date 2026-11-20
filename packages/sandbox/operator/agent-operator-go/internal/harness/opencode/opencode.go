@@ -19,7 +19,7 @@ func (CommandBuilder) Command(_ *agentv1alpha1.AgentRun, providerCliArgs []strin
 	if err != nil {
 		return nil, nil, err
 	}
-	args := agents.BuildOpencodeArgs(nil, types.AgentExecOptions{
+	args := agents.BuildArgs(agent, nil, types.AgentExecOptions{
 		Sandbox:         true,
 		ProviderCliArgs: providerCliArgs,
 	})

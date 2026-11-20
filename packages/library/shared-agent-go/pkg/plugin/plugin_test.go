@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 
@@ -18,6 +19,21 @@ func tree(t *testing.T, files map[string]string) artifact.Tree {
 		t.Fatal(err)
 	}
 	return built
+}
+
+// The marketplace files the shipped harness facts declare.
+const (
+	claudeMarketplacePath = ".claude-plugin/marketplace.json"
+	codexMarketplacePath  = ".agents/plugins/marketplace.json"
+)
+
+func TestPathsComeFromTheHarnessFacts(t *testing.T) {
+	if got, want := MarketplacePaths(), []string{claudeMarketplacePath, codexMarketplacePath}; !reflect.DeepEqual(got, want) {
+		t.Errorf("MarketplacePaths() = %v, want %v", got, want)
+	}
+	if got, want := ManifestPaths(), []string{".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "plugin.json"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("ManifestPaths() = %v, want %v", got, want)
+	}
 }
 
 const manifestJSON = `{"name":"xonovex-core","version":"6.0.0","description":"d","dependencies":["b-dep","a-dep"],"interface":{"x":1}}`
@@ -119,7 +135,7 @@ const claudeMarketplace = `{"name":"mk","plugins":[{"name":"b-plugin","source":"
 const codexMarketplace = `{"name":"mk","plugins":[{"name":"a-plugin","source":"./plugins/a/"},{"name":"c-plugin","source":"./plugins/c"}]}`
 
 func TestReadMarketplaceMergesBothFormats(t *testing.T) {
-	marketplace, err := ReadMarketplace(tree(t, map[string]string{ClaudeMarketplacePath: claudeMarketplace, CodexMarketplacePath: codexMarketplace}))
+	marketplace, err := ReadMarketplace(tree(t, map[string]string{claudeMarketplacePath: claudeMarketplace, codexMarketplacePath: codexMarketplace}))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,12 +166,12 @@ func TestReadMarketplaceReadsOneFormat(t *testing.T) {
 func TestReadMarketplaceFailsClosed(t *testing.T) {
 	for name, files := range map[string]map[string]string{
 		"none":          {},
-		"not json":      {ClaudeMarketplacePath: "{"},
-		"bad name":      {ClaudeMarketplacePath: `{"name":"Bad","plugins":[]}`},
-		"bad plugin":    {ClaudeMarketplacePath: `{"name":"mk","plugins":[{"name":"Bad","source":"./a"}]}`},
-		"other name":    {ClaudeMarketplacePath: claudeMarketplace, CodexMarketplacePath: `{"name":"other","plugins":[]}`},
-		"other source":  {ClaudeMarketplacePath: claudeMarketplace, CodexMarketplacePath: `{"name":"mk","plugins":[{"name":"a-plugin","source":"./elsewhere"}]}`},
-		"second broken": {ClaudeMarketplacePath: claudeMarketplace, CodexMarketplacePath: "{"},
+		"not json":      {claudeMarketplacePath: "{"},
+		"bad name":      {claudeMarketplacePath: `{"name":"Bad","plugins":[]}`},
+		"bad plugin":    {claudeMarketplacePath: `{"name":"mk","plugins":[{"name":"Bad","source":"./a"}]}`},
+		"other name":    {claudeMarketplacePath: claudeMarketplace, codexMarketplacePath: `{"name":"other","plugins":[]}`},
+		"other source":  {claudeMarketplacePath: claudeMarketplace, codexMarketplacePath: `{"name":"mk","plugins":[{"name":"a-plugin","source":"./elsewhere"}]}`},
+		"second broken": {claudeMarketplacePath: claudeMarketplace, codexMarketplacePath: "{"},
 	} {
 		if _, err := ReadMarketplace(tree(t, files)); err == nil {
 			t.Errorf("%s: ReadMarketplace passed", name)

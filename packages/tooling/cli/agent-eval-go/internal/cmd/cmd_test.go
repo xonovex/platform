@@ -7,14 +7,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/configtest"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/predicate"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/protocol/protocoltest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/registry"
 )
@@ -47,6 +51,8 @@ type fixture struct {
 	out  *bytes.Buffer
 	fs   fs.FileSystem
 	exec *protocoltest.Exec
+	// facts are the harness facts the last run built its engine over.
+	facts agents.Catalog
 }
 
 func selects(by map[string]string) *protocoltest.Exec {
@@ -65,8 +71,12 @@ func newFixture(t *testing.T, files map[string]string, exec *protocoltest.Exec) 
 	f := &fixture{out: &bytes.Buffer{}, fs: fsys, exec: exec}
 	f.deps = cmd.Dependencies{
 		FS: fsys, Validator: validator, ConfigFiles: approved(files), Prompter: &configtest.Prompter{},
-		Places: configtest.Places{User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}, Protocols: registry.Protocols(), Exec: exec,
-		Predicates: registry.Predicates(exec), Env: map[string]string{}, Dir: "/w",
+		Places: configtest.Places{User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}, Protocols: registry.Protocols(),
+		Engine: func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+			f.facts = facts
+			return exec, registry.Predicates(exec), nil
+		},
+		Env: map[string]string{}, Dir: "/w",
 		Now: func() time.Time { return today }, Out: f.out, Err: &bytes.Buffer{},
 	}
 	return f
@@ -436,6 +446,68 @@ func TestAnUnapprovedProjectFileFailsClosedAndTheFlagApprovesIt(t *testing.T) {
 	}
 	if code, err := f.run("trigger", "alpha", "--runs", "1", "--dry-run"); err != nil || code != 0 {
 		t.Fatalf("the approval is kept: %d %v", code, err)
+	}
+}
+
+func claudeFacts(t *testing.T, catalog agents.Catalog) *types.AgentConfig {
+	t.Helper()
+	agent, err := catalog.Get(types.AgentClaude)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return agent
+}
+
+func TestTheHarnessOverridesOfEveryLayerApply(t *testing.T) {
+	files := baseFiles()
+	files["/home/u/.config/agentic/harnesses.d/claude.json"] = `{"binary":"/home/u/bin/claude","sandboxArgs":["--user"]}`
+	files["/etc/agentic/harnesses.d/claude.json"] = `{"binary":"/opt/claude"}`
+	f := newFixture(t, files, selects(good))
+	f.deps.Places = configtest.Places{Managed: "/etc/agentic", User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--dry-run"); err != nil || code != 0 {
+		t.Fatalf("%d %v", code, err)
+	}
+	if got := claudeFacts(t, f.facts); got.Binary != "/opt/claude" || len(got.SandboxArgs) != 1 || got.SandboxArgs[0] != "--user" {
+		t.Errorf("the managed override wins and the user override keeps the rest: %+v", got)
+	}
+}
+
+func TestAnInvalidHarnessOverrideVoidsTheRun(t *testing.T) {
+	files := baseFiles()
+	files["/home/u/.config/agentic/harnesses.d/claude.json"] = `{"argv":["claude"]}`
+	f := newFixture(t, files, selects(good))
+	if _, err := f.run("trigger", "alpha", "--runs", "1"); err == nil || !strings.Contains(err.Error(), "harness override /home/u/.config/agentic/harnesses.d/claude.json") {
+		t.Fatalf("an override outside the schema must stop the run: %v", err)
+	}
+	if len(f.exec.Calls()) != 0 {
+		t.Error("the run started a model")
+	}
+}
+
+func TestAProjectHarnessOverrideNeedsItsOwnApproval(t *testing.T) {
+	const override = `{"binary":"./tools/claude"}`
+	files := baseFiles()
+	files["/w/harnesses.d/claude.json"] = override
+	f := newFixture(t, files, selects(good))
+	digest := layer.Digest([]byte(override))
+	if _, err := f.run("trigger", "alpha", "--runs", "1"); !errors.Is(err, trust.ErrNotApproved) || !strings.Contains(err.Error(), "--approve-config-digest "+digest) {
+		t.Fatalf("an unapproved project override must stop the run: %v", err)
+	}
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--dry-run", "--approve-config-digest", digest); err != nil || code != 0 {
+		t.Fatalf("%d %v", code, err)
+	}
+	if got := claudeFacts(t, f.facts); got.Binary != "./tools/claude" {
+		t.Errorf("the approved override applies: %+v", got)
+	}
+}
+
+func TestAnEngineFaultVoidsTheRun(t *testing.T) {
+	f := newFixture(t, baseFiles(), selects(good))
+	f.deps.Engine = func(agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+		return nil, nil, errors.New("no leaf")
+	}
+	if _, err := f.run("trigger", "alpha", "--runs", "1"); err == nil || err.Error() != "no leaf" {
+		t.Fatalf("run error = %v, want the engine fault", err)
 	}
 }
 

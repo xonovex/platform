@@ -5,11 +5,31 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness/claude"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 )
+
+func facts(t *testing.T) *types.AgentConfig {
+	t.Helper()
+	agent, err := agents.Embedded().Get(types.AgentClaude)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return agent
+}
+
+func leaf(t *testing.T) claude.Harness {
+	t.Helper()
+	h, err := claude.New(facts(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return h
+}
 
 func has(args []string, flag string, value ...string) bool {
 	for i, a := range args {
@@ -31,14 +51,14 @@ func offer() []harness.Offer {
 }
 
 func TestNameAndBinary(t *testing.T) {
-	h := claude.New()
+	h := leaf(t)
 	if h.Name() != "claude" || h.Binary() != "claude" {
 		t.Fatal(h.Name(), h.Binary())
 	}
 }
 
 func TestTriggerPlanIsHermeticAndStagesOnlyTheOffer(t *testing.T) {
-	plan, err := claude.New().Plan(harness.Request{
+	plan, err := leaf(t).Plan(harness.Request{
 		Role: harness.RoleTrigger, Model: "m", Prompt: "q", Target: "one", Offer: offer(),
 		Caps: harness.Caps{BudgetUSD: 0.05}, Effort: model.Effort("low"),
 	}, "/ws")
@@ -79,14 +99,14 @@ func TestTriggerPlanIsHermeticAndStagesOnlyTheOffer(t *testing.T) {
 }
 
 func TestGeneratePlanArms(t *testing.T) {
-	with, err := claude.New().Plan(harness.Request{Role: harness.RoleGenerate, Prompt: "do", Target: "one", Offer: offer(), WithSkill: true}, "/ws")
+	with, err := leaf(t).Plan(harness.Request{Role: harness.RoleGenerate, Prompt: "do", Target: "one", Offer: offer(), WithSkill: true}, "/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if with.Prompt != "/one do" || !has(with.Args, "--tools", "Skill,Read") || !has(with.Args, "--max-turns", "12") || len(with.Stage) == 0 {
 		t.Fatalf("%+v", with)
 	}
-	without, err := claude.New().Plan(harness.Request{Role: harness.RoleGenerate, Prompt: "do", Caps: harness.Caps{MaxTurns: 5}}, "/ws")
+	without, err := leaf(t).Plan(harness.Request{Role: harness.RoleGenerate, Prompt: "do", Caps: harness.Caps{MaxTurns: 5}}, "/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +117,7 @@ func TestGeneratePlanArms(t *testing.T) {
 }
 
 func TestJudgePlanHasStrictSchemaAndNoTools(t *testing.T) {
-	plan, err := claude.New().Plan(harness.Request{Role: harness.RoleJudge, Prompt: "grade", Assertions: 3, Model: "j", Caps: harness.Caps{BudgetUSD: 0.1}}, "/ws")
+	plan, err := leaf(t).Plan(harness.Request{Role: harness.RoleJudge, Prompt: "grade", Assertions: 3, Model: "j", Caps: harness.Caps{BudgetUSD: 0.1}}, "/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +136,7 @@ func TestJudgePlanHasStrictSchemaAndNoTools(t *testing.T) {
 }
 
 func TestAgentPlanStagesInstructionsAndDeniesBash(t *testing.T) {
-	plan, err := claude.New().Plan(harness.Request{Role: harness.RoleAgent, Prompt: "work", Instructions: "# Rules"}, "/ws")
+	plan, err := leaf(t).Plan(harness.Request{Role: harness.RoleAgent, Prompt: "work", Instructions: "# Rules"}, "/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,20 +146,99 @@ func TestAgentPlanStagesInstructionsAndDeniesBash(t *testing.T) {
 	if len(plan.Stage) != 1 || plan.Stage[0].Dst != "/ws/CLAUDE.md" || plan.Stage[0].Content != "# Rules" {
 		t.Fatalf("%+v", plan.Stage)
 	}
-	bare, _ := claude.New().Plan(harness.Request{Role: harness.RoleAgent, Prompt: "work"}, "/ws")
+	bare, _ := leaf(t).Plan(harness.Request{Role: harness.RoleAgent, Prompt: "work"}, "/ws")
 	if len(bare.Stage) != 0 {
 		t.Fatal("no instructions, no stage")
 	}
 }
 
+func TestNewNeedsTheLayoutItStages(t *testing.T) {
+	for name, strip := range map[string]func(*types.AgentConfig){
+		"manifest":         func(a *types.AgentConfig) { a.Plugin.Manifest = "" },
+		"skills directory": func(a *types.AgentConfig) { a.Plugin.SkillsDir = "" },
+		"instruction file": func(a *types.AgentConfig) { a.InstructionFile = "" },
+	} {
+		agent := facts(t)
+		strip(agent)
+		if _, err := claude.New(agent); err == nil {
+			t.Errorf("New() without the %s must fail", name)
+		}
+	}
+}
+
+func TestTheFactsShapeThePlan(t *testing.T) {
+	agent := facts(t)
+	agent.Binary = "/opt/claude"
+	agent.InstructionFile = "RULES.md"
+	agent.Plugin.Manifest = "meta/plugin.json"
+	agent.Plugin.SkillsDir = "lib"
+	agent.Headless.HermeticArgs = []string{"--clean"}
+	h, err := claude.New(agent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if h.Binary() != "/opt/claude" {
+		t.Errorf("Binary() = %s", h.Binary())
+	}
+	trigger, err := h.Plan(harness.Request{Role: harness.RoleTrigger, Prompt: "q", Offer: offer()}, "/ws")
+	if err != nil || !has(trigger.Args, "--clean") || has(trigger.Args, "--no-chrome") {
+		t.Fatalf("trigger args = %v, %v", trigger.Args, err)
+	}
+	var dsts []string
+	for _, s := range trigger.Stage {
+		dsts = append(dsts, s.Dst)
+	}
+	if got := strings.Join(dsts, " "); got != "/ws/plugin-0/lib/one /ws/plugin-0/lib/two /ws/plugin-0/meta/plugin.json" ||
+		!strings.Contains(trigger.Stage[2].Content, `"./lib/one"`) {
+		t.Errorf("stages = %s, manifest %s", got, trigger.Stage[2].Content)
+	}
+	agentPlan, _ := h.Plan(harness.Request{Role: harness.RoleAgent, Prompt: "w", Instructions: "x"}, "/ws")
+	if agentPlan.Stage[0].Dst != "/ws/RULES.md" {
+		t.Errorf("instruction stage = %+v", agentPlan.Stage)
+	}
+}
+
+func TestAPlanFailsWhenTheFactsLackWhatItNeeds(t *testing.T) {
+	requests := map[string]harness.Request{
+		"trigger":          {Role: harness.RoleTrigger, Prompt: "q", Offer: offer()},
+		"generate":         {Role: harness.RoleGenerate, Prompt: "q"},
+		"generate (skill)": {Role: harness.RoleGenerate, Prompt: "q", Target: "one", Offer: offer(), WithSkill: true},
+		"judge":            {Role: harness.RoleJudge, Prompt: "q", Assertions: 1},
+		"agent":            {Role: harness.RoleAgent, Prompt: "q"},
+	}
+	for name, strip := range map[string]func(*types.AgentConfig){
+		"options":      func(a *types.AgentConfig) { a.Headless.Options = nil },
+		"outputs":      func(a *types.AgentConfig) { a.Headless.Output = nil },
+		"skill prompt": func(a *types.AgentConfig) { a.Headless.SkillPrompt = "" },
+	} {
+		agent := facts(t)
+		strip(agent)
+		h, err := claude.New(agent)
+		if err != nil {
+			t.Fatal(err)
+		}
+		failed := 0
+		for role, req := range requests {
+			if _, err := h.Plan(req, "/ws"); err != nil {
+				failed++
+			} else if name != "skill prompt" {
+				t.Errorf("without the %s, the %s plan must fail", name, role)
+			}
+		}
+		if failed == 0 {
+			t.Errorf("without the %s, no plan failed", name)
+		}
+	}
+}
+
 func TestUnknownRoleFails(t *testing.T) {
-	if _, err := claude.New().Plan(harness.Request{Role: "x"}, "/ws"); err == nil {
+	if _, err := leaf(t).Plan(harness.Request{Role: "x"}, "/ws"); err == nil {
 		t.Fatal("want an error")
 	}
 }
 
 func scan(req harness.Request, lines ...string) (harness.Scanner, bool) {
-	s := claude.New().Scan(req)
+	s := claude.Harness{}.Scan(req)
 	settled := false
 	for _, l := range lines {
 		if s.Feed(l) {

@@ -8,6 +8,7 @@ tags:
   - cli
 dependsOn:
   - shared-agent-go
+  - shared-contract-go
   - shared-core-go
   - id: eslint-config-cli
     scope: development

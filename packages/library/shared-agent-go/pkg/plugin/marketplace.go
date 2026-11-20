@@ -8,16 +8,14 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
-// The two marketplace file formats, one for each plugin loader.
-const (
-	ClaudeMarketplacePath = ".claude-plugin/marketplace.json"
-	CodexMarketplacePath  = ".agents/plugins/marketplace.json"
-)
-
-// MarketplacePaths lists the files a marketplace root may hold.
-func MarketplacePaths() []string { return []string{ClaudeMarketplacePath, CodexMarketplacePath} }
+// MarketplacePaths lists the files a marketplace root may hold: the marketplace
+// file of every harness that declares one, in the order of the harness names.
+func MarketplacePaths() []string {
+	return harnessPaths(func(layout types.PluginLayout) string { return layout.Marketplace })
+}
 
 // Entry is one plugin a marketplace lists.
 type Entry struct {

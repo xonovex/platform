@@ -189,7 +189,7 @@ A Claude Code route through an Anthropic-compatible endpoint, `zai.json`:
 
 ```json
 {
-  "$schema": "https://schemas.xonovex.com/agent-cli/provider.schema.json",
+  "$schema": "https://schemas.xonovex.com/agent/provider.schema.json",
   "name": "zai",
   "agent": "claude",
   "portable": true,

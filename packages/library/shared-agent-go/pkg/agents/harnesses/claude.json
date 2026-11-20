@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "name": "claude",
+  "displayName": "Claude Code",
+  "description": "Claude Code reads the provider environment, takes no provider arguments, and needs its permission prompts off inside an isolation. A headless run reads no settings, no MCP servers, no persisted session and no browser of the machine.",
+  "binary": "claude",
+  "nixPackage": "claude-code",
+  "protocol": "messages",
+  "access": "provider",
+  "providerEnv": true,
+  "sandboxArgs": ["--permission-mode", "bypassPermissions"],
+  "versionArgs": ["--version"],
+  "userConfigPaths": [".claude", ".claude.json"],
+  "instructionFile": "CLAUDE.md",
+  "plugin": {
+    "manifest": ".claude-plugin/plugin.json",
+    "marketplace": ".claude-plugin/marketplace.json",
+    "skillsDir": "skills"
+  },
+  "headless": {
+    "args": ["-p"],
+    "hermeticArgs": [
+      "--setting-sources",
+      "",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "{\"mcpServers\":{}}",
+      "--no-session-persistence",
+      "--no-chrome"
+    ],
+    "output": {
+      "json": ["--output-format", "json"],
+      "stream": [
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-partial-messages"
+      ]
+    },
+    "options": {
+      "allowedTools": ["--allowedTools", "{value}"],
+      "disallowedTools": ["--disallowedTools={value}"],
+      "effort": ["--effort", "{value}"],
+      "jsonSchema": ["--json-schema", "{value}"],
+      "maxBudgetUsd": ["--max-budget-usd", "{value}"],
+      "maxTurns": ["--max-turns", "{value}"],
+      "model": ["--model", "{value}"],
+      "pluginDir": ["--plugin-dir", "{value}"],
+      "systemPrompt": ["--system-prompt", "{value}"],
+      "tools": ["--tools", "{value}"]
+    },
+    "skillPrompt": "/{skill} {prompt}"
+  }
+}

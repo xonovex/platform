@@ -4,10 +4,30 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/catalog"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 )
+
+// layout is the plugin layout of the trees below.
+var layout = types.PluginLayout{Manifest: ".claude-plugin/plugin.json", SkillsDir: "skills"}
+
+func TestLoadNeedsAPluginLayout(t *testing.T) {
+	for _, bad := range []types.PluginLayout{{SkillsDir: "skills"}, {Manifest: "plugin.json"}} {
+		if _, err := catalog.Load(memfs.New(tree()), bad, []string{"/p"}); err == nil {
+			t.Errorf("Load(%+v) must fail", bad)
+		}
+	}
+}
+
+func TestLoadFollowsTheLayout(t *testing.T) {
+	files := map[string]string{"/p/x/meta.json": `{"name":"x"}`, "/p/x/lib/one/SKILL.md": "o", "/p/y/.claude-plugin/plugin.json": `{"name":"y"}`}
+	cat, err := catalog.Load(memfs.New(files), types.PluginLayout{Manifest: "meta.json", SkillsDir: "lib"}, []string{"/p"})
+	if err != nil || len(cat.Plugins) != 1 || cat.Plugins[0].Name != "x" || len(cat.Plugins[0].Skills) != 1 || cat.Plugins[0].Skills[0].Dir != "/p/x/lib/one" {
+		t.Fatalf("Load() = %+v, %v", cat, err)
+	}
+}
 
 func manifest(name string, deps ...string) string {
 	d := ""
@@ -33,15 +53,15 @@ func tree() map[string]string {
 }
 
 func TestLoadFindsPluginsBelowARootAndAPluginRoot(t *testing.T) {
-	cat, err := catalog.Load(memfs.New(tree()), []string{"/p", "/p/lang"})
+	cat, err := catalog.Load(memfs.New(tree()), layout, []string{"/p", "/p/lang"})
 	if err == nil {
 		t.Fatalf("lang is found twice: %+v", cat)
 	}
-	cat, err = catalog.Load(memfs.New(tree()), []string{"/p"})
+	cat, err = catalog.Load(memfs.New(tree()), layout, []string{"/p"})
 	if err != nil || len(cat.Plugins) != 3 || cat.Plugins[0].Name != "core" {
 		t.Fatalf("%v %+v", err, cat)
 	}
-	direct, err := catalog.Load(memfs.New(tree()), []string{"/p/lang"})
+	direct, err := catalog.Load(memfs.New(tree()), layout, []string{"/p/lang"})
 	if err != nil || len(direct.Plugins) != 1 || len(direct.Plugins[0].Skills) != 1 {
 		t.Fatalf("%v %+v", err, direct)
 	}
@@ -67,11 +87,11 @@ func TestLoadRejectsPluginsThatAreNotSkillOnly(t *testing.T) {
 		"no name":     {"/p/x/.claude-plugin/plugin.json": `{"skills":"./skills/"}`},
 		"bad deps":    {"/p/x/.claude-plugin/plugin.json": `{"name":"x","dependencies":[1]}`},
 	} {
-		if _, err := catalog.Load(memfs.New(files), []string{"/p"}); err == nil {
+		if _, err := catalog.Load(memfs.New(files), layout, []string{"/p"}); err == nil {
 			t.Errorf("%s: want an error", name)
 		}
 	}
-	if _, err := catalog.Load(memfs.New(nil), []string{"/missing"}); err == nil {
+	if _, err := catalog.Load(memfs.New(nil), layout, []string{"/missing"}); err == nil {
 		t.Fatal("a missing root is an error")
 	}
 }
@@ -80,7 +100,7 @@ func TestSkillLookup(t *testing.T) {
 	files := tree()
 	files["/p/other/.claude-plugin/plugin.json"] = manifest("other")
 	files["/p/other/skills/alpha/SKILL.md"] = "a2"
-	cat, err := catalog.Load(memfs.New(files), []string{"/p"})
+	cat, err := catalog.Load(memfs.New(files), layout, []string{"/p"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +119,7 @@ func TestSkillLookup(t *testing.T) {
 }
 
 func TestClosureOrdersDependenciesFirst(t *testing.T) {
-	cat, _ := catalog.Load(memfs.New(tree()), []string{"/p"})
+	cat, _ := catalog.Load(memfs.New(tree()), layout, []string{"/p"})
 	got, err := cat.Closure("lang")
 	if err != nil || len(got) != 2 || got[0].Name != "core" || got[1].Name != "lang" {
 		t.Fatalf("%v %+v", err, got)
@@ -109,19 +129,19 @@ func TestClosureOrdersDependenciesFirst(t *testing.T) {
 	}
 	files := tree()
 	files["/p/lang/.claude-plugin/plugin.json"] = manifest("lang", "missing")
-	broken, _ := catalog.Load(memfs.New(files), []string{"/p"})
+	broken, _ := catalog.Load(memfs.New(files), layout, []string{"/p"})
 	if _, err := broken.Closure("lang"); err == nil || !strings.Contains(err.Error(), "not found") {
 		t.Fatalf("%v", err)
 	}
 	files["/p/lang/.claude-plugin/plugin.json"] = manifest("lang", "core")
 	files["/p/core/.claude-plugin/plugin.json"] = manifest("core", "lang")
-	cyclic, _ := catalog.Load(memfs.New(files), []string{"/p"})
+	cyclic, _ := catalog.Load(memfs.New(files), layout, []string{"/p"})
 	if _, err := cyclic.Closure("lang"); err == nil || !strings.Contains(err.Error(), "cycle") {
 		t.Fatalf("%v", err)
 	}
 	files["/p/lang/.claude-plugin/plugin.json"] = manifest("lang", "core", "core")
 	files["/p/core/.claude-plugin/plugin.json"] = manifest("core")
-	diamond, _ := catalog.Load(memfs.New(files), []string{"/p"})
+	diamond, _ := catalog.Load(memfs.New(files), layout, []string{"/p"})
 	if got, err := diamond.Closure("lang"); err != nil || len(got) != 2 {
 		t.Fatalf("a repeated dependency is visited once: %v %+v", err, got)
 	}

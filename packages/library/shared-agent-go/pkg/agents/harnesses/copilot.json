@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "name": "copilot",
+  "displayName": "GitHub Copilot CLI",
+  "description": "GitHub Copilot CLI takes its model access from the login of the user with GitHub and takes no provider. Its command sandbox is off unless the user turns it on.",
+  "binary": "copilot",
+  "nixPackage": "github-copilot-cli",
+  "access": "native-login",
+  "versionArgs": ["--version"]
+}

@@ -8,7 +8,8 @@ Import the package that owns the required agent concern.
 
 | Package | Description |
 | --- | --- |
-| `pkg/agents` | Agent type definitions and command building |
+| `pkg/agents` | Harness facts as embedded JSON, one `harnesses/<name>.json` per harness under the schema `https://schemas.xonovex.com/agent/harness.schema.json`; overrides from `harnesses.d/<name>.json`, and the command builders that read the facts |
+| `pkg/network` | Network method parsing and the checks of the managed method |
 | `pkg/config` | Configuration loading and validation |
 | `pkg/nix` | Nix package sets, defaults, pins, and expansion |
 | `pkg/providers` | Model provider files, catalog with `extends` and model slot overrides, and environment building; ships no provider and no model id |

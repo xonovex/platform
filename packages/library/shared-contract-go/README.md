@@ -18,7 +18,7 @@ Import the package that owns the concern.
 | `pkg/condition` | The instruction conditions present, absent and ablated |
 | `pkg/jsonschema` | Port that checks a JSON document against a named schema |
 | `pkg/jsonschema/tekuri` | Draft 2020-12 adapter with format assertions that resolves every reference offline |
-| `pkg/schemas` | Embedded schemas for sources, evals, results, baselines and cost history |
+| `pkg/schemas` | Embedded schemas for sources, evals, results, baselines, cost history, `agentic.json`, provider routes and harness facts |
 | `pkg/sources` | Typed source catalog, loader for `sources.json` and `sources.d`, and catalog checks |
 | `pkg/wiring` | Composition root that binds the adapters |
 
@@ -38,7 +38,10 @@ Each schema has an `$id` under `https://schemas.xonovex.com/agent/`.
 | `cost-history.schema.json` | Model cost of each eval run |
 | `agentic.schema.json` | One layer of `agentic.json`: the version and one section for each tool |
 | `agentic-run.schema.json` | The `run` section: agent, provider, sandbox axes, reachable paths and hosts, required guarantees |
-| `agentic-providers.schema.json` | The `providers` section: provider routes by name |
+| `agentic-providers.schema.json` | The `providers` section: provider routes by name, each checked against the route of `provider.schema.json` |
+| `provider.schema.json` | One model provider route: agent, credential, environment, arguments and model slots |
+| `harness.schema.json` | The facts of one agent harness: binary, nix package, model access, launch, sandbox, version and headless arguments, and the files it reads |
+| `harness-override.schema.json` | A `harnesses.d/<name>.json` file that changes some facts of one harness |
 | `agentic-validate.schema.json` | The `validate` section: skipped directories and the paths, options and level cap of each check |
 | `agentic-audit.schema.json` | The `audit` section: review ages and the directory that needs sources |
 | `agentic-eval.schema.json` | The `eval` section: profiles, protocol settings, plugin directories and budgets |

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "title": "Harness facts",
+  "description": "The facts of one agent harness: the program and the nix package that hold it, how it reaches a model, the arguments of a launch, of an isolated launch, of the version probe and of a headless run, and the files and directories the harness reads. A tool ships these facts for every harness it supports, and a harnesses.d/<name>.json file overrides the ones it names.",
+  "$ref": "#/$defs/facts",
+  "required": [
+    "name",
+    "displayName",
+    "binary",
+    "nixPackage",
+    "access",
+    "versionArgs"
+  ],
+  "$defs": {
+    "args": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "path": {
+      "description": "A slash-separated path relative to the directory it belongs to.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/\\\\]"
+    },
+    "facts": {
+      "description": "The members of the facts of a harness. A shipped facts file sets every required member; an override sets only the members it changes.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {"type": "string"},
+        "name": {
+          "description": "The agent type the facts describe. An override file is named <name>.json.",
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "displayName": {"type": "string", "minLength": 1},
+        "description": {
+          "description": "Why the facts are as they are, for a reader of the file.",
+          "type": "string"
+        },
+        "binary": {
+          "description": "The program to start: a name on the path or an absolute path.",
+          "type": "string",
+          "minLength": 1
+        },
+        "nixPackage": {
+          "description": "The nix package that provides the binary.",
+          "type": "string",
+          "minLength": 1
+        },
+        "protocol": {
+          "description": "The model API wire protocol the harness speaks, absent when it chooses its own service or takes any provider.",
+          "enum": ["messages", "responses"]
+        },
+        "access": {
+          "description": "How the harness obtains model access: from a provider route, or from the login of its own vendor.",
+          "enum": ["provider", "native-login"]
+        },
+        "providerEnv": {
+          "description": "True when the harness reads the provider environment.",
+          "type": "boolean"
+        },
+        "providerArgs": {
+          "description": "True when the harness takes the provider arguments.",
+          "type": "boolean"
+        },
+        "launchArgs": {
+          "$ref": "#/$defs/args",
+          "description": "The arguments every launch passes first, such as a subcommand."
+        },
+        "sandboxArgs": {
+          "$ref": "#/$defs/args",
+          "description": "The arguments a launch inside an isolation adds, such as the one that turns off the command sandbox or the permission prompts of the harness."
+        },
+        "versionArgs": {
+          "$ref": "#/$defs/args",
+          "minItems": 1,
+          "description": "The arguments that make the binary print its version."
+        },
+        "userConfigPaths": {
+          "description": "The smallest set of paths below the home directory that the harness needs from the user, which an isolation binds.",
+          "type": "array",
+          "items": {"$ref": "#/$defs/path"}
+        },
+        "configHome": {
+          "description": "The directory the harness keeps its configuration in, and the variable that moves it.",
+          "type": "object",
+          "required": ["env", "dir"],
+          "additionalProperties": false,
+          "properties": {
+            "env": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"},
+            "dir": {"$ref": "#/$defs/path"}
+          }
+        },
+        "instructionFile": {
+          "$ref": "#/$defs/path",
+          "description": "The project file the harness reads as its instructions."
+        },
+        "skillsDir": {
+          "$ref": "#/$defs/path",
+          "description": "The directory below a project or the home directory that the harness reads skills from."
+        },
+        "plugin": {
+          "description": "Where a plugin of the harness keeps its parts, relative to the plugin or to the marketplace root.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "manifest": {"$ref": "#/$defs/path"},
+            "marketplace": {"$ref": "#/$defs/path"},
+            "skillsDir": {"$ref": "#/$defs/path"}
+          }
+        },
+        "headless": {
+          "description": "The arguments of a run that takes one prompt and exits.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "args": {
+              "$ref": "#/$defs/args",
+              "description": "The arguments that make the run non-interactive."
+            },
+            "hermeticArgs": {
+              "$ref": "#/$defs/args",
+              "description": "The arguments that keep the run from reading the configuration, sessions and servers of the machine."
+            },
+            "output": {
+              "description": "The arguments of each output format, by format name.",
+              "type": "object",
+              "additionalProperties": {"$ref": "#/$defs/args"}
+            },
+            "options": {
+              "description": "Named options. Each is a list of arguments, and {value} in an argument stands for the value the run gives the option.",
+              "type": "object",
+              "additionalProperties": {"$ref": "#/$defs/args"}
+            },
+            "skillPrompt": {
+              "description": "The prompt that invokes a skill by name: {skill} stands for the skill and {prompt} for the request.",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

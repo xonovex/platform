@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/provider.schema.json",
+  "title": "Model provider",
+  "description": "One model provider route: the agent it serves, the credential it reads, the environment and arguments of the route, and the models the route uses as named slots. A value may hold {model:<slot>} for the id of a slot and {model:<slot>:effort} for the id with its effort in parentheses. A provider file is one route that names itself; the providers section of agentic.json holds routes by name.",
+  "$ref": "#/$defs/route",
+  "required": ["name", "agent"],
+  "$defs": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "variable": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "route": {
+      "description": "The members of a provider route. A provider file and a route of the providers section share them.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {"type": "string"},
+        "name": {
+          "$ref": "#/$defs/name",
+          "description": "The name a launch selects. A provider file is named <name>.json."
+        },
+        "displayName": {"type": "string"},
+        "agent": {
+          "$ref": "#/$defs/name",
+          "description": "The agent the route serves."
+        },
+        "extends": {
+          "$ref": "#/$defs/name",
+          "description": "A provider of the same agent to refine. Models and environment merge entry by entry, and args replace the inherited ones when set."
+        },
+        "portable": {
+          "type": "boolean",
+          "description": "True when the route is safe outside the local host environment."
+        },
+        "credential": {
+          "type": "object",
+          "required": ["sourceEnv", "targetEnv"],
+          "additionalProperties": false,
+          "properties": {
+            "sourceEnv": {
+              "$ref": "#/$defs/variable",
+              "description": "The host variable that holds the credential."
+            },
+            "targetEnv": {
+              "$ref": "#/$defs/variable",
+              "description": "The variable the agent reads the credential from."
+            }
+          }
+        },
+        "models": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z][a-z0-9-]*$": {
+              "type": "object",
+              "required": ["id"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {"type": "string", "minLength": 1, "pattern": "^\\S+$"},
+                "effort": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"}
+              }
+            }
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[A-Za-z_][A-Za-z0-9_]*$": {"type": "string"}
+          }
+        },
+        "args": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

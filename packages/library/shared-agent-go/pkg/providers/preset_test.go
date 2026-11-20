@@ -5,6 +5,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 )
 
 func TestParsePresetFailsClosed(t *testing.T) {
@@ -78,41 +81,56 @@ func TestOverlayKeepsBothMapsAndAllocatesNothingForTwoEmptyOnes(t *testing.T) {
 }
 
 func TestSchemaListsEveryPresetMember(t *testing.T) {
-	var parsed struct {
-		Properties map[string]struct {
-			Properties map[string]json.RawMessage `json:"properties"`
-		} `json:"properties"`
+	documents, err := schemas.Documents()
+	if err != nil {
+		t.Fatal(err)
 	}
-	if err := json.Unmarshal(Schema(), &parsed); err != nil {
+	var parsed struct {
+		Defs struct {
+			Route struct {
+				Properties map[string]json.RawMessage `json:"properties"`
+			} `json:"route"`
+		} `json:"$defs"`
+	}
+	if err := json.Unmarshal(documents[schemas.Provider], &parsed); err != nil {
 		t.Fatalf("the schema is not JSON: %v", err)
 	}
+	properties := parsed.Defs.Route.Properties
 	var members []string
 	typeOf := reflect.TypeOf(Preset{})
 	for index := range typeOf.NumField() {
 		members = append(members, strings.Split(typeOf.Field(index).Tag.Get("json"), ",")[0])
 	}
 	for _, member := range members {
-		if _, ok := parsed.Properties[member]; !ok {
+		if _, ok := properties[member]; !ok {
 			t.Errorf("the schema has no property %q", member)
 		}
 	}
-	if len(parsed.Properties) != len(members) {
-		t.Errorf("the schema holds %d properties, the Preset type %d", len(parsed.Properties), len(members))
+	if len(properties) != len(members) {
+		t.Errorf("the schema holds %d properties, the Preset type %d", len(properties), len(members))
 	}
 }
 
-func TestSchemaCarriesItsID(t *testing.T) {
-	var parsed map[string]any
-	if err := json.Unmarshal(Schema(), &parsed); err != nil || parsed["$id"] != SchemaID {
-		t.Errorf("schema $id = %v, %v, want %s", parsed["$id"], err, SchemaID)
+func TestParsePresetAgreesWithTheSchema(t *testing.T) {
+	validator, err := wiring.NewValidator()
+	if err != nil {
+		t.Fatal(err)
 	}
-}
-
-func TestSchemaReturnsACopy(t *testing.T) {
-	first := Schema()
-	first[0] = 'X'
-	if Schema()[0] == 'X' {
-		t.Error("Schema() shares its buffer")
+	for _, document := range []string{
+		`{"name":"p","agent":"claude"}`,
+		`{"$schema":"x","name":"p","agent":"codex","extends":"q","portable":true,"credential":{"sourceEnv":"A","targetEnv":"B"},"models":{"main":{"id":"m","effort":"high"}},"environment":{"X":"1"},"args":["-c"]}`,
+		`{"agent":"claude"}`,
+		`{"name":"p","agent":"claude","mdl":{}}`,
+		`{"name":"p","agent":"claude","credential":{"sourceEnv":"A"}}`,
+	} {
+		violations, err := validator.Validate(schemas.Provider, []byte(document))
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, parseErr := ParsePreset([]byte(document))
+		if (len(violations) == 0) != (parseErr == nil) {
+			t.Errorf("%s: schema violations %v, ParsePreset error %v", document, violations, parseErr)
+		}
 	}
 }
 

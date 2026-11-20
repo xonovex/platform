@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/catalog"
@@ -152,13 +154,16 @@ func (r *run) load() error {
 func (r *run) read(dir, name string) (*pkg, bool, error) {
 	p := &pkg{dir: dir, name: name, pluginName: r.options.PluginPrefix + strings.TrimPrefix(name, r.options.DirectoryPrefix)}
 	hasSkills := r.ctx.Tree.IsDir(path.Join(dir, "skills"))
-	p.hasClaude = r.ctx.Tree.IsFile(path.Join(dir, ".claude-plugin", "plugin.json"))
-	p.hasCodex = r.ctx.Tree.IsFile(path.Join(dir, ".codex-plugin", "plugin.json"))
+	facts := agents.Embedded()
+	claudeManifest := path.Join(dir, facts.PluginLayout(types.AgentClaude).Manifest)
+	codexManifest := path.Join(dir, facts.PluginLayout(types.AgentCodex).Manifest)
+	p.hasClaude = r.ctx.Tree.IsFile(claudeManifest)
+	p.hasCodex = r.ctx.Tree.IsFile(codexManifest)
 	var err error
-	if p.claude, err = r.manifest(path.Join(dir, ".claude-plugin", "plugin.json")); err != nil {
+	if p.claude, err = r.manifest(claudeManifest); err != nil {
 		return nil, false, err
 	}
-	if p.codex, err = r.manifest(path.Join(dir, ".codex-plugin", "plugin.json")); err != nil {
+	if p.codex, err = r.manifest(codexManifest); err != nil {
 		return nil, false, err
 	}
 	if p.neutral, err = r.manifest(path.Join(dir, "plugin.json")); err != nil {

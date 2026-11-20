@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/harness.schema.json",
+  "name": "kiro",
+  "displayName": "Kiro CLI",
+  "description": "Kiro CLI takes its model access from the login of the user with the vendor and takes no provider. It starts the chat program directly, because the kiro-cli router starts a program at a path under the real home directory, and the nix package that holds the chat program is the unwrapped one.",
+  "binary": "kiro-cli-chat",
+  "nixPackage": "kiro-cli-unwrapped",
+  "access": "native-login",
+  "launchArgs": ["chat", "--agent-engine", "v3"],
+  "versionArgs": ["--version"]
+}

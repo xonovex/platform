@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
@@ -131,7 +130,7 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 	}
 	// The agent keeps its login and its sessions in its configuration, so it reads
 	// and writes those places; the rest of the home directory stays hidden.
-	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
+	for _, configPath := range cfg.Agent.UserConfigPaths {
 		source, exists, err := isoshared.ResolveContainedOptionalPath(i.host, home, configPath, "user config path")
 		if err != nil {
 			return profileSpec{}, err

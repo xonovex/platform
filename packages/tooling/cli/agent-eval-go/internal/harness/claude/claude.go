@@ -6,15 +6,18 @@ package claude
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path"
 	"strconv"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 )
 
 // Name is the harness name.
-const Name = "claude"
+const Name = string(types.AgentClaude)
 
 const (
 	// triggerTurns is one turn to choose a skill and a second for a run that
@@ -34,55 +37,57 @@ const (
 		"as necessary. Keep the final response under 1,000 words."
 	judgeSystem = "Grade only the supplied response against the supplied assertions and " +
 		"return exactly the requested JSON."
-
-	instructionFile = "CLAUDE.md"
 )
 
-// Harness is the Claude Code leaf.
-type Harness struct{}
+// The output formats of the facts the leaf runs with.
+const (
+	streamOutput = "stream"
+	jsonOutput   = "json"
+)
 
-// New returns the leaf.
-func New() Harness { return Harness{} }
+// Harness is the Claude Code leaf. Its facts name the program, its flags and
+// the plugin layout; the leaf holds the tools of each role and the stream
+// dialect.
+type Harness struct {
+	facts *types.AgentConfig
+}
+
+// New returns the leaf over the facts of the harness. It fails when the facts
+// lack the plugin layout or the instruction file the leaf stages.
+func New(facts *types.AgentConfig) (Harness, error) {
+	if facts.Plugin.Manifest == "" || facts.Plugin.SkillsDir == "" || facts.InstructionFile == "" {
+		return Harness{}, errors.New("the claude facts need a plugin manifest, a plugin skills directory and an instruction file")
+	}
+	return Harness{facts: facts}, nil
+}
 
 // Name returns the harness name.
 func (Harness) Name() string { return Name }
 
 // Binary returns the program name.
-func (Harness) Binary() string { return "claude" }
+func (h Harness) Binary() string { return h.facts.Binary }
 
-// isolated lists the flags that keep a run hermetic.
-func isolated(format string) []string {
-	return []string{
-		"-p", "--output-format", format,
-		"--setting-sources", "",
-		"--strict-mcp-config", "--mcp-config", `{"mcpServers":{}}`,
-		"--no-session-persistence",
-		"--no-chrome",
-	}
-}
+func formatUSD(value float64) string { return strconv.FormatFloat(value, 'f', -1, 64) }
 
-// stream lists the flags of a run that streams its events.
-func stream() []string {
-	return append(isolated("stream-json"), "--verbose", "--include-partial-messages")
-}
-
-func limits(req harness.Request, turns int) []string {
-	args := []string{}
+// limits returns the settings of the model, the effort, the budget and the
+// turn cap of a run.
+func limits(req harness.Request, turns int) []agents.Setting {
+	var settings []agents.Setting
 	if req.Model != "" {
-		args = append(args, "--model", req.Model)
+		settings = append(settings, agents.Setting{Name: "model", Value: req.Model})
 	}
 	if req.Effort != "" {
-		args = append(args, "--effort", string(req.Effort))
+		settings = append(settings, agents.Setting{Name: "effort", Value: string(req.Effort)})
 	}
 	if req.Caps.BudgetUSD > 0 {
-		args = append(args, "--max-budget-usd", strconv.FormatFloat(req.Caps.BudgetUSD, 'f', -1, 64))
+		settings = append(settings, agents.Setting{Name: "maxBudgetUsd", Value: formatUSD(req.Caps.BudgetUSD)})
 	}
-	return append(args, "--max-turns", strconv.Itoa(turns))
+	return append(settings, agents.Setting{Name: "maxTurns", Value: strconv.Itoa(turns)})
 }
 
 // stagePlugins stages each offered plugin in the workspace with only the
 // offered skills, and returns the stage steps and the plugin directories.
-func stagePlugins(workspace string, offers []harness.Offer) ([]harness.Stage, []string, error) {
+func (h Harness) stagePlugins(workspace string, offers []harness.Offer) ([]harness.Stage, []string, error) {
 	var stages []harness.Stage
 	var dirs []string
 	for i, offer := range offers {
@@ -90,95 +95,116 @@ func stagePlugins(workspace string, offers []harness.Offer) ([]harness.Stage, []
 		skills := make([]string, 0, len(offer.SkillDirs))
 		for _, skill := range offer.SkillDirs {
 			name := path.Base(skill)
-			stages = append(stages, harness.Stage{Kind: harness.StageCopy, Src: skill, Dst: path.Join(dir, "skills", name)})
-			skills = append(skills, "./skills/"+name)
+			stages = append(stages, harness.Stage{Kind: harness.StageCopy, Src: skill, Dst: path.Join(dir, h.facts.Plugin.SkillsDir, name)})
+			skills = append(skills, "./"+path.Join(h.facts.Plugin.SkillsDir, name))
 		}
 		manifest, err := json.Marshal(map[string]any{"name": offer.Name, "skills": skills})
 		if err != nil {
 			return nil, nil, err
 		}
 		stages = append(stages, harness.Stage{
-			Kind: harness.StageWrite, Dst: path.Join(dir, ".claude-plugin", "plugin.json"), Content: string(manifest),
+			Kind: harness.StageWrite, Dst: path.Join(dir, h.facts.Plugin.Manifest), Content: string(manifest),
 		})
 		dirs = append(dirs, dir)
 	}
 	return stages, dirs, nil
 }
 
-func pluginFlags(dirs []string) []string {
-	var args []string
+func pluginSettings(dirs []string) []agents.Setting {
+	var settings []agents.Setting
 	for _, dir := range dirs {
-		args = append(args, "--plugin-dir", dir)
+		settings = append(settings, agents.Setting{Name: "pluginDir", Value: dir})
 	}
-	return args
+	return settings
+}
+
+// command returns the arguments of a headless run that writes format, with the
+// settings after them.
+func (h Harness) command(format string, settings ...[]agents.Setting) ([]string, error) {
+	args, err := agents.HeadlessArgs(h.facts, format)
+	if err != nil {
+		return nil, err
+	}
+	for _, group := range settings {
+		options, err := agents.Options(h.facts, group...)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, options...)
+	}
+	return args, nil
+}
+
+func turnsOf(req harness.Request) int {
+	if req.Caps.MaxTurns == 0 {
+		return defaultTurns
+	}
+	return req.Caps.MaxTurns
 }
 
 // Plan derives the invocation of a request.
-func (Harness) Plan(req harness.Request, workspace string) (harness.Plan, error) {
+func (h Harness) Plan(req harness.Request, workspace string) (harness.Plan, error) {
 	plan := harness.Plan{Dir: workspace, Prompt: req.Prompt}
+	var err error
 	switch req.Role {
 	case harness.RoleTrigger:
-		stages, dirs, err := stagePlugins(workspace, req.Offer)
-		if err != nil {
-			return plan, err
+		stages, dirs, stageErr := h.stagePlugins(workspace, req.Offer)
+		if stageErr != nil {
+			return plan, stageErr
 		}
 		plan.Stage = stages
-		plan.Args = append(stream(), limits(req, triggerTurns)...)
-		plan.Args = append(plan.Args, "--system-prompt", triggerSystem, "--tools", "Skill")
-		plan.Args = append(plan.Args, pluginFlags(dirs)...)
+		plan.Args, err = h.command(streamOutput, limits(req, triggerTurns),
+			[]agents.Setting{{Name: "systemPrompt", Value: triggerSystem}, {Name: "tools", Value: "Skill"}},
+			pluginSettings(dirs))
 	case harness.RoleGenerate:
-		turns := req.Caps.MaxTurns
-		if turns == 0 {
-			turns = defaultTurns
-		}
-		plan.Args = append(stream(), limits(req, turns)...)
-		plan.Args = append(plan.Args, "--system-prompt", generateSystem)
+		tools := []agents.Setting{{Name: "tools", Value: "Read"}, {Name: "disallowedTools", Value: "Skill"}}
+		var dirs []string
 		if req.WithSkill {
-			stages, dirs, err := stagePlugins(workspace, req.Offer)
-			if err != nil {
+			stages, staged, stageErr := h.stagePlugins(workspace, req.Offer)
+			if stageErr != nil {
+				return plan, stageErr
+			}
+			plan.Stage, dirs = stages, staged
+			tools = []agents.Setting{{Name: "tools", Value: "Skill,Read"}}
+			if plan.Prompt, err = agents.SkillPrompt(h.facts, req.Target, req.Prompt); err != nil {
 				return plan, err
 			}
-			plan.Stage = stages
-			plan.Args = append(plan.Args, "--tools", "Skill,Read")
-			plan.Args = append(plan.Args, pluginFlags(dirs)...)
-			plan.Prompt = "/" + req.Target + " " + req.Prompt
-		} else {
-			plan.Args = append(plan.Args, "--tools", "Read", "--disallowedTools=Skill")
 		}
+		plan.Args, err = h.command(streamOutput, limits(req, turnsOf(req)),
+			[]agents.Setting{{Name: "systemPrompt", Value: generateSystem}}, tools, pluginSettings(dirs))
 	case harness.RoleJudge:
-		schema, err := judgeSchema(req.Assertions)
-		if err != nil {
-			return plan, err
+		schema, schemaErr := judgeSchema(req.Assertions)
+		if schemaErr != nil {
+			return plan, schemaErr
 		}
-		plan.Args = append(isolated("json"), "--tools", "")
+		settings := []agents.Setting{{Name: "tools", Value: ""}}
 		if req.Caps.BudgetUSD > 0 {
-			plan.Args = append(plan.Args, "--max-budget-usd", strconv.FormatFloat(req.Caps.BudgetUSD, 'f', -1, 64))
+			settings = append(settings, agents.Setting{Name: "maxBudgetUsd", Value: formatUSD(req.Caps.BudgetUSD)})
 		}
-		plan.Args = append(plan.Args, "--max-turns", "1", "--system-prompt", judgeSystem, "--json-schema", schema)
+		settings = append(settings,
+			agents.Setting{Name: "maxTurns", Value: "1"}, agents.Setting{Name: "systemPrompt", Value: judgeSystem},
+			agents.Setting{Name: "jsonSchema", Value: schema})
 		if req.Model != "" {
-			plan.Args = append(plan.Args, "--model", req.Model)
+			settings = append(settings, agents.Setting{Name: "model", Value: req.Model})
 		}
+		plan.Args, err = h.command(jsonOutput, settings)
 	case harness.RoleAgent:
-		turns := req.Caps.MaxTurns
-		if turns == 0 {
-			turns = defaultTurns
-		}
-		plan.Args = append(stream(), limits(req, turns)...)
 		// Bash is on offer but not allowed, so the run asks for it and the
 		// harness denies it: the attempt shows in the stream without a command
 		// ever running on the host.
-		plan.Args = append(plan.Args,
-			"--tools", "Read,Write,Edit,Glob,Grep,Bash",
-			"--allowedTools", "Read,Write,Edit,Glob,Grep")
+		plan.Args, err = h.command(streamOutput, limits(req, turnsOf(req)), []agents.Setting{
+			{Name: "tools", Value: "Read,Write,Edit,Glob,Grep,Bash"},
+			{Name: "allowedTools", Value: "Read,Write,Edit,Glob,Grep"},
+		})
 		if req.Instructions != "" {
 			plan.Stage = append(plan.Stage, harness.Stage{
-				Kind: harness.StageWrite, Dst: path.Join(workspace, instructionFile), Content: req.Instructions,
+				Kind: harness.StageWrite, Dst: path.Join(workspace, h.facts.InstructionFile), Content: req.Instructions,
 			})
 		}
 	default:
 		return plan, fmt.Errorf("claude has no invocation for role %q", req.Role)
 	}
-	return plan, nil
+	return plan, err
 }
 
 // judgeSchema is the strict JSON schema of a judge answer: one verdict per

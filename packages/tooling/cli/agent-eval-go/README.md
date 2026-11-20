@@ -30,7 +30,7 @@ npm install -g @xonovex/agent-eval-go
 | Option | Effect |
 | --- | --- |
 | `--project FILE` | Project `agentic.json`, by default the nearest one from the working directory up to the repository root |
-| `--approve-config-digest DIGEST` | Approves the eval section of the project `agentic.json` with this digest |
+| `--approve-config-digest DIGEST` | Approves a project file with this digest: the eval section of the project `agentic.json`, or a harness override in `harnesses.d` beside it |
 | `--profile NAME` | Profile of the eval section |
 | `--harness claude\|codex` | Agent harness, from `SKILL_EVAL_HARNESS` or the profile by default |
 | `--model`, `--judge-model` | Models that answer and that grade. Without them, a profile model or the variables `CLAUDE_MODEL`, `JUDGE_MODEL`, `CODEX_MODEL` and `CODEX_JUDGE_MODEL`, the run names no model and the harness uses its own default; the report and the results say `harness default` |
@@ -64,6 +64,8 @@ The `eval` section of `agentic.json` holds the plugin directories, the profiles,
 ```
 
 The eval section of a project file takes effect only after the user approves the digest of the file: at the terminal prompt, or with `--approve-config-digest`. The approval is kept in `$XDG_STATE_HOME/agentic/trust.json`, and a changed file needs a new approval. Without an approval the run stops with exit status 2. The budgets are caps: a user or managed file sets them, a project file may only lower them, and a flag may raise them up to the managed cap.
+
+The program, the flags and the file layout of each harness come from the harness facts of `shared-agent-go`. A file `harnesses.d/<harness>.json` beside the `agentic.json` of a layer overrides the facts it names, and the schema `https://schemas.xonovex.com/agent/harness-override.schema.json` checks it. The user file applies first, then the project file, then the managed file. A project override can change the program a run starts, so it takes effect only after the user approves its own digest, like the eval section.
 
 ## Layout
 

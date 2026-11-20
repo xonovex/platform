@@ -64,6 +64,10 @@ var thirdParty = map[string][]string{
 	"internal/document":        {"gopkg.in/yaml.v3"},
 	"internal/check/kit":       {"gopkg.in/yaml.v3"},
 	"internal/check/workspace": {"gopkg.in/yaml.v3"},
+	// The plugin checks read the manifest and the marketplace paths of each
+	// harness from its facts.
+	"internal/check/marketplace": {agentLibrary + "pkg/agents", agentLibrary + "pkg/types"},
+	"internal/check/plugin":      {agentLibrary + "pkg/agents", agentLibrary + "pkg/types"},
 	"internal/cmd": {
 		"github.com/spf13/cobra",
 		configLibrary + "pkg/discover", configLibrary + "pkg/explain", configLibrary + "pkg/merge",
@@ -73,6 +77,9 @@ var thirdParty = map[string][]string{
 	// The composition root binds the configuration ports to the disk.
 	"cmd/agent-validate": {configLibrary + "pkg/osfiles"},
 }
+
+// agentLibrary holds the facts of the harnesses.
+const agentLibrary = "github.com/xonovex/platform/packages/library/shared-agent-go/"
 
 // configLibrary reads the layered agentic.json. Only the command tree reads it,
 // and only the composition root binds its host adapter.

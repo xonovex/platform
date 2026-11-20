@@ -130,9 +130,17 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if err != nil {
 		return err
 	}
-	env := protocol.Env{FS: deps.FS, Reader: deps.reader(), Exec: deps.Exec, Predicates: deps.Predicates}
+	facts, err := deps.loadHarnesses(o.config(c))
+	if err != nil {
+		return err
+	}
+	exec, predicates, err := deps.Engine(facts)
+	if err != nil {
+		return err
+	}
+	env := protocol.Env{FS: deps.FS, Reader: deps.reader(), Exec: exec, Predicates: predicates}
 	if spec.catalog {
-		if env.Catalog, err = deps.loadCatalog(project, projectDir, o.pluginDirs); err != nil {
+		if env.Catalog, err = deps.loadCatalog(facts, project, projectDir, o.pluginDirs); err != nil {
 			return err
 		}
 	}

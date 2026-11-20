@@ -148,19 +148,19 @@ func TestBuildArgsDoesNotMutateLaunchArgs(t *testing.T) {
 	}
 }
 
-func TestBuildClaudeArgs(t *testing.T) {
-	got := BuildClaudeArgs([]string{"review"}, types.AgentExecOptions{Sandbox: true, ProviderCliArgs: []string{"ignored"}})
+func TestBuildClaudeArgsTurnOffThePromptsInsideAnIsolation(t *testing.T) {
+	got := BuildArgs(agentOf(t, types.AgentClaude), []string{"review"}, types.AgentExecOptions{Sandbox: true, ProviderCliArgs: []string{"ignored"}})
 	want := []string{"--permission-mode", "bypassPermissions", "review"}
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("BuildClaudeArgs() = %v, want %v", got, want)
+		t.Fatalf("BuildArgs() = %v, want %v", got, want)
 	}
 }
 
-func TestBuildOpencodeArgs(t *testing.T) {
-	got := BuildOpencodeArgs([]string{"review"}, types.AgentExecOptions{ProviderCliArgs: []string{"--model", "gemini"}})
+func TestBuildOpencodeArgsTakeTheProviderArguments(t *testing.T) {
+	got := BuildArgs(agentOf(t, types.AgentOpencode), []string{"review"}, types.AgentExecOptions{ProviderCliArgs: []string{"--model", "gemini"}})
 	want := []string{"--model", "gemini", "review"}
 	if !reflect.DeepEqual(got, want) {
-		t.Fatalf("BuildOpencodeArgs() = %v, want %v", got, want)
+		t.Fatalf("BuildArgs() = %v, want %v", got, want)
 	}
 }
 

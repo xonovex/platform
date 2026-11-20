@@ -8,6 +8,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/catalog"
@@ -55,7 +57,11 @@ func NewEnv(t *testing.T, files map[string]string, roots []string, exec harness.
 	fsys := memfs.New(files)
 	cat := catalog.Catalog{}
 	if len(roots) > 0 {
-		if cat, err = catalog.Load(fsys, roots); err != nil {
+		source, err := agents.Embedded().Get(types.AgentClaude)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if cat, err = catalog.Load(fsys, source.Plugin, roots); err != nil {
 			t.Fatal(err)
 		}
 	}

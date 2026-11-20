@@ -19,7 +19,7 @@ func (CommandBuilder) Command(run *agentv1alpha1.AgentRun, _ []string) ([]string
 	if err != nil {
 		return nil, nil, err
 	}
-	args := agents.BuildClaudeArgs(nil, types.AgentExecOptions{Sandbox: true})
+	args := agents.BuildArgs(agent, nil, types.AgentExecOptions{Sandbox: true})
 	if run.Spec.Prompt != "" {
 		args = append(args, "--print", "--prompt", run.Spec.Prompt)
 	}

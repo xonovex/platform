@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
@@ -162,7 +161,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// Sandbox-local HOME: a tmpfs at the home path (no host-$HOME bind), with only
 	// the curated config paths bound back read-only.
 	args = append(args, "--tmpfs", homeDir)
-	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
+	for _, configPath := range cfg.Agent.UserConfigPaths {
 		src, exists, err := isoshared.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
