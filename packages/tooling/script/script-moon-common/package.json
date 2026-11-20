@@ -20,6 +20,10 @@
       "types": "./src/adapters/file-system-node.ts",
       "default": "./dist/src/adapters/file-system-node.js"
     },
+    "./adapters/git-node": {
+      "types": "./src/adapters/git-node.ts",
+      "default": "./dist/src/adapters/git-node.js"
+    },
     "./adapters/moon-query-node": {
       "types": "./src/adapters/moon-query-node.ts",
       "default": "./dist/src/adapters/moon-query-node.js"
@@ -51,6 +55,10 @@
     "./frontmatter": {
       "types": "./src/frontmatter.ts",
       "default": "./dist/src/frontmatter.js"
+    },
+    "./git": {
+      "types": "./src/git.ts",
+      "default": "./dist/src/git.js"
     },
     "./logging": {
       "types": "./src/logging.ts",

@@ -1,18 +1,13 @@
-import {execFileSync} from "node:child_process";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {GitRepository} from "@xonovex/script-moon-common/git";
 import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
 
 interface PackageJson {
   readonly name?: unknown;
   readonly version?: unknown;
   readonly private?: unknown;
-}
-
-interface GitReader {
-  readonly readFile: (commit: string, path: string) => string | undefined;
 }
 
 const parsePackage = (text: string, path: string): PackageJson => {
@@ -37,38 +32,11 @@ const publishableVersion = (
   return pkg.version;
 };
 
-export const resolveGitRef = (rootDir: string, ref: string): string =>
-  execFileSync(
-    resolveExecutable("git"),
-    ["rev-parse", "--verify", "--end-of-options", `${ref}^{commit}`],
-    {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
-  ).trim();
-
-export const createGitReader = (rootDir: string): GitReader => ({
-  readFile: (commit, path) => {
-    const listed = execFileSync(
-      resolveExecutable("git"),
-      ["ls-tree", "-z", "--name-only", commit, "--", path],
-      {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
-    );
-    if (listed.length === 0) return;
-    return execFileSync(
-      resolveExecutable("git"),
-      ["show", `${commit}:${path}`],
-      {
-        cwd: rootDir,
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      },
-    );
-  },
-});
-
 export const detectVersionChanges = (
   rootDir: string,
   commit: string,
   projects: readonly MoonProject[],
-  git: GitReader,
+  git: Pick<GitRepository, "readFile">,
   fs: FileSystem = nodeFileSystem,
 ): readonly string[] => {
   const changed: string[] = [];
@@ -99,5 +67,3 @@ export const detectVersionChanges = (
 
   return changed;
 };
-
-export type {GitReader};

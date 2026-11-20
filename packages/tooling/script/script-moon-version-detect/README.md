@@ -8,5 +8,5 @@ Run without a flag for `HEAD~1`, or set an explicit base reference.
 
 ```bash
 npx moon-version-detect
-npx moon-version-detect --base main
+npx moon-version-detect --ref main
 ```

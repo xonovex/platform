@@ -1,43 +1,23 @@
 #!/usr/bin/env node
 import {dirname} from "node:path";
 import {fileURLToPath} from "node:url";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
-import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
-import {
-  createGitReader,
-  detectVersionChanges,
-  resolveGitRef,
-} from "./detect.js";
+import {logError} from "@xonovex/script-moon-common/logging";
+import {main} from "./version-detect.js";
 
-const ROOT_DIR = findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)));
-
-const args = parseCliArgs(
-  {
-    name: "moon-version-detect",
-    description: "Detect moon projects with version changes since a git ref",
-    options: {
-      ref: {
-        type: "string",
-        short: "r",
-        description: "Git ref to compare against (default: HEAD~1)",
-      },
+try {
+  process.exitCode = main(
+    process.argv.slice(2),
+    dirname(fileURLToPath(import.meta.url)),
+    {
+      openRepository: nodeGitRepository,
+      listProjects: queryMoonProjects,
+      fs: nodeFileSystem,
     },
-  },
-  process.argv.slice(2),
-);
-if (args.kind === "help") {
-  console.log(args.text);
-} else {
-  const ref =
-    (args.values.ref as string | undefined) ?? args.positionals[0] ?? "HEAD~1";
-  const commit = resolveGitRef(ROOT_DIR, ref);
-  const projects = queryMoonProjects(ROOT_DIR);
-  const changed = detectVersionChanges(
-    ROOT_DIR,
-    commit,
-    projects,
-    createGitReader(ROOT_DIR),
   );
-  console.log(JSON.stringify(changed));
+} catch (error: unknown) {
+  logError(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
 }

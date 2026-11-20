@@ -8,6 +8,7 @@ Import the module that owns the required script concern.
 
 - `file-system` - the `FileSystem` port; `adapters/file-system-node` reaches the real disk, `adapters/file-system-memory` holds a tree in memory
 - `moon-query` - `parseMoonProjects` and `packageJsonPaths`; `adapters/moon-query-node` runs `moon query projects`
+- `git` - the `GitRepository` port and the log parsers; `adapters/git-node` runs git in a repository
 - `adapters/executable-node` - `resolveExecutable` finds a command on the PATH of the current process
 - `adapters/child-process` - `terminateProcess` ends a child process
 - `cli-args` - `parseCliArgs` returns the parsed arguments or the help text
