@@ -1,12 +1,4 @@
-import {execFileSync} from "node:child_process";
-import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
-import {basename, dirname, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {
-  packageLayout,
-  pluginSkillDirectories,
-} from "@xonovex/script-moon-common/package-layout";
-import {type z} from "zod";
+import {basename, dirname} from "node:path";
 import {
   binEntries,
   binTargetFailures,
@@ -14,42 +6,34 @@ import {
 } from "./bin-targets.js";
 import {coverageFloorFailures} from "./coverage-floors.js";
 import {dependencySourceFailures} from "./dependency-sources.js";
+import {jsonInput, textInput} from "./file-input.js";
 import {workspaceHasherFailures} from "./hasher-ignore.js";
+import {instructionDocFailures} from "./instruction-docs.js";
 import {
-  instructionDocFailures,
-  type InstructionDirectory,
-} from "./instruction-docs.js";
+  expectedPluginName,
+  marketplaceEntries,
+  validateMarketplaceInventory,
+} from "./marketplace.js";
+import {validatePluginPackage} from "./plugin-package.js";
 import {
   LockfileSchema,
   MarketplaceSchema,
   PackageManifestSchema,
-  PluginManifestSchema,
   type Lockfile,
   type Marketplace,
-  type PackageManifest,
-  type PluginManifest,
 } from "./release-inputs.js";
+import type {
+  PluginPackageSnapshot,
+  ReleaseSnapshot,
+} from "./release-snapshot.js";
 import {taskInheritanceFailures} from "./task-inheritance.js";
 import {
   createChecker,
   forbiddenClaims,
   markdownLinkTargets,
   releaseWorkflowFailures,
+  type Checker,
 } from "./validate.js";
-
-// The files a project names a config package in, which is how eslint, prettier,
-// vitest, and tsc are configured without a dependsOn edge that would cycle.
-const CONFIG_FILE_NAMES = [
-  "eslint.config.ts",
-  "eslint.config.js",
-  "prettier.config.ts",
-  "prettier.config.js",
-  "vitest.config.ts",
-  "vite.config.ts",
-  "tsconfig.json",
-  "tsconfig.build.json",
-  "tsconfig.test.json",
-] as const;
 
 export interface ReleaseValidationResult {
   readonly checks: number;
@@ -57,665 +41,242 @@ export interface ReleaseValidationResult {
   readonly pluginPackages: number;
 }
 
-type Check = (condition: boolean, message: string) => void;
+type Check = Checker["check"];
 
-const issueDetail = (issue: z.core.$ZodIssue): string => {
-  const path =
-    issue.path.length > 0 ? issue.path.map(String).join(".") : "root";
-  return `${path}: ${issue.message}`;
-};
-
-const readJson = <Output>(
-  path: string,
-  label: string,
-  schema: z.ZodType<Output>,
-  check: Check,
-): Output | undefined => {
-  let input: unknown;
-  try {
-    input = JSON.parse(readFileSync(path, "utf8"));
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    check(false, `${label} could not be read or parsed: ${message}`);
-    return undefined;
-  }
-
-  const result = schema.safeParse(input);
-  if (!result.success) {
-    for (const issue of result.error.issues) {
-      check(false, `${label} is invalid: ${issueDetail(issue)}`);
-    }
-    return undefined;
-  }
-  return result.data;
-};
-
-const childDirectories = (
-  path: string,
-  label: string,
-  check: Check,
-): readonly string[] => {
-  try {
-    return readdirSync(path)
-      .map((name) => resolve(path, name))
-      .filter((entry) => statSync(entry).isDirectory())
-      .toSorted();
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    check(false, `${label} could not be enumerated: ${message}`);
-    return [];
-  }
-};
-
-const readText = (
-  path: string,
-  label: string,
-  check: Check,
-): string | undefined => {
-  try {
-    return readFileSync(path, "utf8");
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    check(false, `${label} could not be read: ${message}`);
-    return undefined;
-  }
-};
-
-// gitIgnoredPaths lists what git excludes from the working tree, collapsing a
-// fully ignored directory to a single entry. Returns undefined when git cannot
-// answer, so a checkout without a git directory reports one clear failure
-// rather than a missing-coverage failure per pattern.
-const gitIgnoredPaths = (
-  repositoryRoot: string,
-): readonly string[] | undefined => {
-  try {
-    return execFileSync(
-      resolveExecutable("git"),
-      [
-        "ls-files",
-        "--others",
-        "--ignored",
-        "--exclude-standard",
-        "--directory",
-      ],
-      {cwd: repositoryRoot, encoding: "utf8", maxBuffer: 64 * 1024 * 1024},
-    )
-      .split("\n")
-      .filter((line) => line !== "");
-  } catch {
-    return undefined;
-  }
-};
-
-// gitTrackedPaths lists the committed files, which is the tree npm links a
-// workspace bin from. Returns undefined when git cannot answer, so a checkout
-// without a git directory reports one clear failure rather than one per bin.
-const gitTrackedPaths = (
-  repositoryRoot: string,
-): ReadonlySet<string> | undefined => {
-  try {
-    return new Set(
-      execFileSync(resolveExecutable("git"), ["ls-files"], {
-        cwd: repositoryRoot,
-        encoding: "utf8",
-        maxBuffer: 64 * 1024 * 1024,
-      })
-        .split("\n")
-        .filter((line) => line !== ""),
-    );
-  } catch {
-    return undefined;
-  }
-};
-
-// validateBinTargets keeps every workspace bin linkable on a cold install.
-const validateBinTargets = (repositoryRoot: string, check: Check): void => {
-  const trackedPaths = gitTrackedPaths(repositoryRoot);
-  if (trackedPaths === undefined) {
-    check(false, "git could not list the committed files");
-    return;
-  }
-  const packages: PackageBins[] = [];
-  for (const packageDirectory of packageLayout(repositoryRoot).packages) {
-    const manifestPath = resolve(packageDirectory, "package.json");
-    if (!existsSync(manifestPath)) continue;
-    const relative = packageDirectory.slice(repositoryRoot.length + 1);
-    const manifest = readJson<PackageManifest>(
-      manifestPath,
-      `${relative}/package.json`,
-      PackageManifestSchema,
-      check,
-    );
-    if (manifest?.bin === undefined) continue;
-    packages.push({
-      manifestPath: `${relative}/package.json`,
-      packageDirectory: relative,
-      isPrivate: manifest.private === true,
-      files: manifest.files,
-      bins: binEntries(manifest.bin, manifest.name),
-    });
-  }
-  for (const failure of binTargetFailures({packages, trackedPaths})) {
-    check(false, failure);
-  }
-};
-
-// validateHasherIgnore keeps hasher.ignorePatterns aligned with .gitignore.
-// The glob walk does not apply .gitignore, so an ignored directory that no
-// pattern covers starts being hashed, and a pattern that matches a declared
-// input stops that task from re-running when the input changes.
-const validateHasherIgnore = (
-  repositoryRoot: string,
-  projectFiles: readonly {path: string; text: string}[],
-  check: Check,
-): void => {
-  const workspacePath = resolve(repositoryRoot, ".moon/workspace.yml");
-  const failures = workspaceHasherFailures({
-    workspaceText: existsSync(workspacePath)
-      ? readFileSync(workspacePath, "utf8")
-      : undefined,
-    ignoredPaths: gitIgnoredPaths(repositoryRoot),
-    projectFiles,
-  });
+const reportAll = (failures: readonly string[], check: Check): void => {
   for (const failure of failures) check(false, failure);
 };
 
-const marketplaceSource = (
-  marketplace: Marketplace,
-): ReadonlyMap<string, string | undefined> =>
-  new Map(
-    marketplace.plugins.map((entry) => [
-      entry.name,
-      typeof entry.source === "string" ? entry.source : entry.source.path,
-    ]),
-  );
-
-const marketplaceDescriptions = (
-  marketplace: Marketplace,
-): ReadonlyMap<string, string | undefined> =>
-  new Map(marketplace.plugins.map((entry) => [entry.name, entry.description]));
-
-const expectedPluginName = (pluginPackage: string): string => {
-  const packageDirectory = basename(pluginPackage);
-  return packageDirectory.startsWith("plugin-")
-    ? `xonovex-${packageDirectory.slice("plugin-".length)}`
-    : `xonovex-${packageDirectory}`;
-};
-
-const validateMarketplaceInventory = (
-  label: string,
-  marketplace: Marketplace,
-  expectedNames: readonly string[],
-  check: Check,
-): void => {
-  const counts = marketplace.plugins.reduce<ReadonlyMap<string, number>>(
-    (current, entry) => {
-      const next = new Map(current);
-      next.set(entry.name, (next.get(entry.name) ?? 0) + 1);
-      return next;
-    },
-    new Map(),
-  );
-  const expected = new Set(expectedNames);
-  const missing = expectedNames.filter((name) => !counts.has(name)).toSorted();
-  const unexpected = [...counts.keys()]
-    .filter((name) => !expected.has(name))
-    .toSorted();
-  const duplicates = [...counts.entries()]
-    .filter(([, count]) => count > 1)
-    .map(([name, count]) => `${name} (${String(count)})`)
-    .toSorted();
-
-  check(
-    missing.length === 0,
-    `${label} is missing plugin entries: ${missing.join(", ")}`,
-  );
-  check(
-    unexpected.length === 0,
-    `${label} has unexpected plugin entries: ${unexpected.join(", ")}`,
-  );
-  check(
-    duplicates.length === 0,
-    `${label} has duplicate plugin entries: ${duplicates.join(", ")}`,
-  );
-};
-
-const dependencyEntries = (
-  manifest: PackageManifest,
-): readonly (readonly [string, string])[] =>
-  Object.entries({
-    ...manifest.dependencies,
-    ...manifest.devDependencies,
-    ...manifest.peerDependencies,
-    ...manifest.optionalDependencies,
-  });
-
-const skillPaths = (manifest: PluginManifest): readonly string[] =>
-  typeof manifest.skills === "string"
-    ? [manifest.skills]
-    : (manifest.skills ?? []);
-
-const validateSkillPackaging = (
-  pluginPackage: string,
-  packageLabel: string,
-  claudeManifest: PluginManifest,
-  codexManifest: PluginManifest,
-  check: Check,
-): void => {
-  const skillDirectories = pluginSkillDirectories(pluginPackage);
-  check(skillDirectories.length > 0, `${packageLabel} contains skills`);
-  const expectedPaths = ["./skills/"];
-  const claudePaths = skillPaths(claudeManifest);
-  const codexPaths = skillPaths(codexManifest);
-  const samePaths = (paths: readonly string[]): boolean =>
-    paths.length === expectedPaths.length &&
-    paths.toSorted().every((path, index) => path === expectedPaths[index]);
-
-  check(
-    typeof claudeManifest.skills === "string" && claudePaths.length > 0,
-    `${packageLabel} Claude manifest exposes a skill directory`,
-  );
-  check(
-    typeof codexManifest.skills === "string",
-    `${packageLabel} Codex manifest exposes a skill directory`,
-  );
-  check(
-    samePaths(claudePaths),
-    `${packageLabel} Claude manifest skill paths match ${expectedPaths.join(", ")}`,
-  );
-  check(
-    samePaths(codexPaths),
-    `${packageLabel} Codex manifest skill paths match ${expectedPaths.join(", ")}`,
-  );
-  for (const path of [...claudePaths, ...codexPaths]) {
-    const direct = path === "./skills/";
-    check(direct, `${packageLabel} manifest skill path is direct: ${path}`);
-    if (direct) {
-      check(
-        existsSync(resolve(pluginPackage, path)),
-        `${packageLabel} manifest skill path resolves: ${path}`,
-      );
-    }
-  }
-};
-
-const validatePackage = (
-  pluginPackage: string,
-  repositoryRoot: string,
-  releaseVersion: string,
-  claudeSources: ReadonlyMap<string, string | undefined>,
-  codexSources: ReadonlyMap<string, string | undefined>,
-  claudeDescriptions: ReadonlyMap<string, string | undefined>,
-  codexDescriptions: ReadonlyMap<string, string | undefined>,
-  check: Check,
-): void => {
-  const relativePath = (path: string): string =>
-    path.slice(repositoryRoot.length + 1);
-  const packageLabel = relativePath(pluginPackage);
-  const packageJsonPath = resolve(pluginPackage, "package.json");
-  const neutralManifestPath = resolve(pluginPackage, "plugin.json");
-  const claudeManifestPath = resolve(
-    pluginPackage,
-    ".claude-plugin/plugin.json",
-  );
-  const codexManifestPath = resolve(pluginPackage, ".codex-plugin/plugin.json");
-
-  check(existsSync(packageJsonPath), `${packageLabel} has package.json`);
-  check(
-    existsSync(neutralManifestPath),
-    `${packageLabel} has a neutral plugin manifest`,
-  );
-  check(
-    existsSync(claudeManifestPath),
-    `${packageLabel} has a Claude plugin manifest`,
-  );
-  check(
-    existsSync(codexManifestPath),
-    `${packageLabel} has a Codex plugin manifest`,
-  );
-  if (
-    !existsSync(packageJsonPath) ||
-    !existsSync(neutralManifestPath) ||
-    !existsSync(claudeManifestPath) ||
-    !existsSync(codexManifestPath)
-  ) {
-    return;
-  }
-
-  const packageJson = readJson<PackageManifest>(
-    packageJsonPath,
-    relativePath(packageJsonPath),
-    PackageManifestSchema,
-    check,
-  );
-  const claudeManifest = readJson<PluginManifest>(
-    claudeManifestPath,
-    relativePath(claudeManifestPath),
-    PluginManifestSchema,
-    check,
-  );
-  const neutralManifest = readJson<PluginManifest>(
-    neutralManifestPath,
-    relativePath(neutralManifestPath),
-    PluginManifestSchema,
-    check,
-  );
-  const codexManifest = readJson<PluginManifest>(
-    codexManifestPath,
-    relativePath(codexManifestPath),
-    PluginManifestSchema,
-    check,
-  );
-  if (
-    packageJson === undefined ||
-    neutralManifest === undefined ||
-    claudeManifest === undefined ||
-    codexManifest === undefined
-  ) {
-    return;
-  }
-
-  const source = `./${relativePath(pluginPackage)}`;
-  check(
-    neutralManifest.name === claudeManifest.name &&
-      neutralManifest.version === releaseVersion &&
-      neutralManifest.description === packageJson.description &&
-      neutralManifest.skills === "./skills/",
-    `${packageJson.name} neutral manifest matches the plugin identity and skill directory`,
-  );
-  check(
-    packageJson.version === releaseVersion,
-    `${packageJson.name} package version matches ${releaseVersion}`,
-  );
-  check(
-    claudeManifest.version === releaseVersion,
-    `${claudeManifest.name} Claude manifest version matches ${releaseVersion}`,
-  );
-  check(
-    claudeSources.get(claudeManifest.name) === source,
-    `${claudeManifest.name} has the expected Claude marketplace source`,
-  );
-
-  check(
-    codexManifest.version === releaseVersion,
-    `${codexManifest.name} Codex manifest version matches ${releaseVersion}`,
-  );
-  check(
-    claudeManifest.name === codexManifest.name,
-    `${packageJson.name} manifest names match`,
-  );
-  check(
-    codexSources.get(codexManifest.name) === source,
-    `${codexManifest.name} has the expected Codex marketplace source`,
-  );
-  validateSkillPackaging(
-    pluginPackage,
-    packageLabel,
-    claudeManifest,
-    codexManifest,
-    check,
-  );
-
-  // package.json is the single description source: a plugin package must declare
-  // one, and every manifest and marketplace entry must repeat it verbatim.
-  check(
-    packageJson.description !== undefined && packageJson.description !== "",
-    `${packageJson.name} package declares a description`,
-  );
-  check(
-    claudeManifest.description === packageJson.description,
-    `${packageJson.name} package and Claude manifest descriptions match`,
-  );
-  check(
-    claudeDescriptions.get(claudeManifest.name) === packageJson.description,
-    `${packageJson.name} package and Claude marketplace descriptions match`,
-  );
-  check(
-    codexManifest.description === packageJson.description,
-    `${packageJson.name} package and Codex manifest descriptions match`,
-  );
-  check(
-    codexDescriptions.get(codexManifest.name) === packageJson.description,
-    `${packageJson.name} package and Codex marketplace descriptions match`,
-  );
-
-  for (const [dependency, version] of dependencyEntries(packageJson)) {
-    if (dependency.startsWith("@xonovex/plugin-")) {
-      check(
-        version === releaseVersion,
-        `${packageJson.name} dependency ${dependency} matches ${releaseVersion}`,
-      );
-    }
-  }
-};
-
 const validateLockfile = (
-  repositoryRoot: string,
   releaseVersion: string,
-  pluginPackages: readonly string[],
+  pluginPackages: readonly PluginPackageSnapshot[],
   lockfile: Lockfile,
   check: Check,
 ): void => {
   for (const pluginPackage of pluginPackages) {
-    const key = pluginPackage.slice(repositoryRoot.length + 1);
     check(
-      lockfile.packages?.[key]?.version === releaseVersion,
-      `package-lock records ${key}@${releaseVersion}`,
+      lockfile.packages?.[pluginPackage.path]?.version === releaseVersion,
+      `package-lock records ${pluginPackage.path}@${releaseVersion}`,
     );
   }
 };
 
-export const validateRelease = (
-  repositoryRoot: string,
-): ReleaseValidationResult => {
-  const checker = createChecker();
-  const check = checker.check;
-
-  const marketplace = readJson<Marketplace>(
-    resolve(repositoryRoot, ".claude-plugin/marketplace.json"),
-    ".claude-plugin/marketplace.json",
-    MarketplaceSchema,
-    check,
-  );
-  const codexMarketplace = readJson<Marketplace>(
-    resolve(repositoryRoot, ".agents/plugins/marketplace.json"),
-    ".agents/plugins/marketplace.json",
-    MarketplaceSchema,
-    check,
-  );
-  if (marketplace === undefined || codexMarketplace === undefined) {
-    return {
-      checks: checker.checks(),
-      failures: checker.failures(),
-      pluginPackages: 0,
-    };
-  }
-
-  const releaseVersion = marketplace.metadata?.version ?? "";
+// The plugin packages move in lockstep: one release version across both
+// marketplaces, every plugin package, and the lockfile.
+const validatePluginRelease = (
+  snapshot: ReleaseSnapshot,
+  claudeMarketplace: Marketplace,
+  codexMarketplace: Marketplace,
+  check: Check,
+): readonly PluginPackageSnapshot[] => {
+  const releaseVersion = claudeMarketplace.metadata?.version ?? "";
   check(
     /^\d+\.\d+\.\d+$/u.test(releaseVersion),
     "marketplace release must use a semantic version",
   );
 
-  const pluginPackages = childDirectories(
-    resolve(repositoryRoot, "packages/runtime/plugin"),
-    "packages/runtime/plugin",
-    check,
-  );
-  const claudeSources = marketplaceSource(marketplace);
-  const codexSources = marketplaceSource(codexMarketplace);
-  const claudeDescriptions = marketplaceDescriptions(marketplace);
-  const codexDescriptions = marketplaceDescriptions(codexMarketplace);
-
+  const pluginPackages =
+    snapshot.pluginPackages.kind === "listed"
+      ? snapshot.pluginPackages.packages
+      : [];
+  if (snapshot.pluginPackages.kind === "unlisted") {
+    check(
+      false,
+      `packages/runtime/plugin could not be enumerated: ${snapshot.pluginPackages.reason}`,
+    );
+  }
+  const claudeEntries = marketplaceEntries(claudeMarketplace);
+  const codexEntries = marketplaceEntries(codexMarketplace);
   for (const pluginPackage of pluginPackages) {
-    validatePackage(
+    validatePluginPackage(
       pluginPackage,
-      repositoryRoot,
       releaseVersion,
-      claudeSources,
-      codexSources,
-      claudeDescriptions,
-      codexDescriptions,
+      claudeEntries,
+      codexEntries,
       check,
     );
   }
 
+  const expectedNames = pluginPackages.map((pluginPackage) =>
+    expectedPluginName(pluginPackage.path),
+  );
   validateMarketplaceInventory(
     "Claude marketplace",
-    marketplace,
-    pluginPackages.map(expectedPluginName),
+    claudeMarketplace,
+    expectedNames,
     check,
   );
   validateMarketplaceInventory(
     "Codex marketplace",
     codexMarketplace,
-    pluginPackages.map(expectedPluginName),
+    expectedNames,
     check,
   );
 
-  const lockfile = readJson<Lockfile>(
-    resolve(repositoryRoot, "package-lock.json"),
+  const lockfile = jsonInput(
+    snapshot.lockfile,
     "package-lock.json",
     LockfileSchema,
     check,
   );
   if (lockfile !== undefined) {
-    validateLockfile(
-      repositoryRoot,
-      releaseVersion,
-      pluginPackages,
-      lockfile,
-      check,
+    validateLockfile(releaseVersion, pluginPackages, lockfile, check);
+  }
+  return pluginPackages;
+};
+
+const validateReadme = (snapshot: ReleaseSnapshot, check: Check): void => {
+  const readme = textInput(snapshot.readme, "README.md", check);
+  if (readme === undefined) return;
+  for (const target of markdownLinkTargets(readme)) {
+    check(
+      snapshot.existingLinkTargets.has(target),
+      `README.md link resolves: ${target}`,
     );
   }
-
-  const rootReadme = readText(
-    resolve(repositoryRoot, "README.md"),
-    "README.md",
-    check,
-  );
-  if (rootReadme !== undefined) {
-    for (const target of markdownLinkTargets(rootReadme)) {
-      check(
-        existsSync(resolve(repositoryRoot, target)),
-        `README.md link resolves: ${target}`,
-      );
-    }
-    for (const forbiddenClaim of forbiddenClaims) {
-      check(
-        !forbiddenClaim.test(rootReadme),
-        `root README rejects ${String(forbiddenClaim)}`,
-      );
-    }
+  for (const forbiddenClaim of forbiddenClaims) {
+    check(
+      !forbiddenClaim.test(readme),
+      `root README rejects ${String(forbiddenClaim)}`,
+    );
   }
+};
 
-  const releaseWorkflow = readText(
-    resolve(repositoryRoot, ".github/workflows/release.yml"),
+const validateReleaseWorkflow = (
+  snapshot: ReleaseSnapshot,
+  check: Check,
+): void => {
+  const workflow = textInput(
+    snapshot.releaseWorkflow,
     ".github/workflows/release.yml",
     check,
   );
-  if (releaseWorkflow !== undefined) {
-    for (const failure of releaseWorkflowFailures(releaseWorkflow)) {
-      check(false, failure);
-    }
+  if (workflow !== undefined) {
+    reportAll(releaseWorkflowFailures(workflow), check);
   }
+};
 
-  const tagTaskDirectory = resolve(repositoryRoot, ".moon/tasks");
-  const tagTaskFiles = existsSync(tagTaskDirectory)
-    ? readdirSync(tagTaskDirectory)
-        .toSorted()
-        .filter((entry) => entry.endsWith(".yml"))
-        .map((entry) => ({
-          name: entry,
-          text: readFileSync(resolve(tagTaskDirectory, entry), "utf8"),
-        }))
-    : [];
-  check(tagTaskFiles.length > 0, ".moon/tasks must define tag task files");
-  for (const failure of taskInheritanceFailures(tagTaskFiles)) {
-    check(false, failure);
-  }
+const validateTaskFiles = (snapshot: ReleaseSnapshot, check: Check): void => {
+  check(
+    snapshot.tagTaskFiles.length > 0,
+    ".moon/tasks must define tag task files",
+  );
+  reportAll(taskInheritanceFailures(snapshot.tagTaskFiles), check);
 
-  const layout = packageLayout(repositoryRoot);
-  const groupDirectories = layout.groups;
-  const projectDirectories = layout.packages.flatMap((directory) => [
-    directory,
-    ...pluginSkillDirectories(directory),
-  ]);
-  const projectFiles = projectDirectories
-    .map((project) => resolve(project, "moon.yml"))
-    .filter((path) => existsSync(path))
-    .map((path) => ({
-      path: path.slice(repositoryRoot.length + 1),
-      text: readFileSync(path, "utf8"),
-    }));
+  const projectFiles = snapshot.projects.map(({path, text}) => ({path, text}));
   check(projectFiles.length > 0, "packages must define project task files");
-  for (const failure of coverageFloorFailures(projectFiles)) {
-    check(false, failure);
-  }
+  reportAll(coverageFloorFailures(projectFiles), check);
 
   // A project's id is its directory name and its source is the directory itself,
   // which is how a dependency named in dependsOn resolves to the src glob its
   // dependents must declare.
-  const dependencyProjects = projectFiles.map((file) => {
-    const directory = resolve(repositoryRoot, dirname(file.path));
-    const readIfPresent = (name: string): string | undefined => {
-      const path = resolve(directory, name);
-      return existsSync(path) ? readFileSync(path, "utf8") : undefined;
-    };
-    const manifest = readIfPresent("package.json");
-    return {
-      id: basename(dirname(file.path)),
-      source: dirname(file.path),
-      text: file.text,
-      packageName:
-        manifest === undefined
-          ? undefined
-          : (JSON.parse(manifest) as {name?: string}).name,
-      // Where a config package is named: a config package cannot be a dependsOn
-      // edge without cycling, so its source reaches the hash through here.
-      configTexts: CONFIG_FILE_NAMES.map((name) => readIfPresent(name)).filter(
-        (text): text is string => text !== undefined,
-      ),
-    };
+  reportAll(
+    dependencySourceFailures(
+      snapshot.projects.map((project) => ({
+        id: basename(dirname(project.path)),
+        source: dirname(project.path),
+        text: project.text,
+        packageName:
+          project.packageJsonText === undefined
+            ? undefined
+            : (JSON.parse(project.packageJsonText) as {name?: string}).name,
+        configTexts: project.configTexts,
+      })),
+    ),
+    check,
+  );
+
+  // hasher.ignorePatterns must follow .gitignore. The glob walk does not apply
+  // .gitignore, so an ignored directory that no pattern covers starts being
+  // hashed, and a pattern that matches a declared input stops that task from
+  // re-running when the input changes.
+  reportAll(
+    workspaceHasherFailures({
+      workspaceText: snapshot.workspaceText,
+      ignoredPaths: snapshot.ignoredPaths,
+      projectFiles,
+    }),
+    check,
+  );
+};
+
+// Every workspace bin must stay linkable on a cold install.
+const validateBinTargets = (snapshot: ReleaseSnapshot, check: Check): void => {
+  if (snapshot.trackedPaths === undefined) {
+    check(false, "git could not list the committed files");
+    return;
+  }
+  const packages: PackageBins[] = [];
+  for (const {directory, manifest: read} of snapshot.packageManifests) {
+    const manifest = jsonInput(
+      read,
+      `${directory}/package.json`,
+      PackageManifestSchema,
+      check,
+    );
+    if (manifest?.bin === undefined) continue;
+    packages.push({
+      manifestPath: `${directory}/package.json`,
+      packageDirectory: directory,
+      isPrivate: manifest.private === true,
+      files: manifest.files,
+      bins: binEntries(manifest.bin, manifest.name),
+    });
+  }
+  reportAll(
+    binTargetFailures({packages, trackedPaths: snapshot.trackedPaths}),
+    check,
+  );
+};
+
+/** Checks every release input the snapshot holds. */
+export const validateRelease = (
+  snapshot: ReleaseSnapshot,
+): ReleaseValidationResult => {
+  const checker = createChecker();
+  const check = checker.check;
+  const result = (pluginPackages: number): ReleaseValidationResult => ({
+    checks: checker.checks(),
+    failures: checker.failures(),
+    pluginPackages,
   });
-  for (const failure of dependencySourceFailures(dependencyProjects)) {
-    check(false, failure);
+
+  const claudeMarketplace = jsonInput(
+    snapshot.claudeMarketplace,
+    ".claude-plugin/marketplace.json",
+    MarketplaceSchema,
+    check,
+  );
+  const codexMarketplace = jsonInput(
+    snapshot.codexMarketplace,
+    ".agents/plugins/marketplace.json",
+    MarketplaceSchema,
+    check,
+  );
+  if (claudeMarketplace === undefined || codexMarketplace === undefined) {
+    return result(0);
   }
 
-  validateHasherIgnore(repositoryRoot, projectFiles, check);
-  validateBinTargets(repositoryRoot, check);
+  const pluginPackages = validatePluginRelease(
+    snapshot,
+    claudeMarketplace,
+    codexMarketplace,
+    check,
+  );
+  validateReadme(snapshot, check);
+  validateReleaseWorkflow(snapshot, check);
+  validateTaskFiles(snapshot, check);
+  validateBinTargets(snapshot, check);
 
   // Every package group documents itself, and every AGENTS.md anywhere in the
   // repository carries the CLAUDE.md pointer that makes it load in Claude Code.
-  const instructionDirectory = (directory: string): InstructionDirectory => {
-    const claudePath = resolve(directory, "CLAUDE.md");
-    return {
-      path: directory.slice(repositoryRoot.length + 1) || ".",
-      hasAgentsFile: existsSync(resolve(directory, "AGENTS.md")),
-      claudeText: existsSync(claudePath)
-        ? readFileSync(claudePath, "utf8")
-        : undefined,
-    };
-  };
-  const instructionDirectories = [
-    repositoryRoot,
-    resolve(repositoryRoot, ".moon"),
-    ...groupDirectories,
-    ...projectDirectories,
-  ].map(instructionDirectory);
-  const requiredInstructionDirectories = groupDirectories.map((group) =>
-    group.slice(repositoryRoot.length + 1),
+  reportAll(
+    instructionDocFailures(
+      snapshot.instructionDirectories,
+      snapshot.requiredInstructionDirectories,
+    ),
+    check,
   );
-  for (const failure of instructionDocFailures(
-    instructionDirectories,
-    requiredInstructionDirectories,
-  )) {
-    check(false, failure);
-  }
 
-  return {
-    checks: checker.checks(),
-    failures: checker.failures(),
-    pluginPackages: pluginPackages.length,
-  };
+  return result(pluginPackages.length);
 };

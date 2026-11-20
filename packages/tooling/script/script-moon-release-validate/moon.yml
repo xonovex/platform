@@ -20,21 +20,12 @@ tasks:
     deps: [ts-coverage]
     options:
       cache: false
-  ts-test:
-    deps:
-      - ~:ts-build
-    options:
-      mergeDeps: append
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "46"
-      TS_COVERAGE_MIN_FUNCTIONS: "49"
-      TS_COVERAGE_MIN_BRANCHES: "54"
-      TS_COVERAGE_MIN_STATEMENTS: "48"
-    deps:
-      - ~:ts-build
-    options:
-      mergeDeps: append
+      TS_COVERAGE_MIN_LINES: "99"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "90"
+      TS_COVERAGE_MIN_STATEMENTS: "99"
   release-validate:
     command: node packages/tooling/script/script-moon-release-validate/dist/src/index.js
     deps:
