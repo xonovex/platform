@@ -50,7 +50,7 @@ func TestRunCommand_Help(t *testing.T) {
 		"--require-kernel-isolation",
 		"--work-dir",
 		"--worktree-branch",
-		"--config",
+		"--project",
 	}
 
 	for _, expected := range expectedTexts {
