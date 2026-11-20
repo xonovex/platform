@@ -1,7 +1,7 @@
 import {spawn, type ChildProcess} from "node:child_process";
 import {once} from "node:events";
 import {describe, expect, it} from "vitest";
-import {terminateProcess} from "../../../src/child-process.js";
+import {terminateProcess} from "../../../../src/adapters/child-process.js";
 
 const spawnNode = (script: string): ChildProcess =>
   spawn(process.execPath, ["--eval", script], {

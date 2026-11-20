@@ -1,6 +1,7 @@
 import {join} from "node:path";
 import {z} from "zod";
-import {nodeFileSystem, type FileSystem} from "./file-system.js";
+import {nodeFileSystem} from "./adapters/file-system-node.js";
+import type {FileSystem} from "./file-system.js";
 
 const PlatformMetaSchema = z.strictObject({
   os: z.array(z.string().min(1)).min(1),

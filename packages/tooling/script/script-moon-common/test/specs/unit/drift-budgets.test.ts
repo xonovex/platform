@@ -1,4 +1,5 @@
 import {describe, expect, it} from "vitest";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
 import {
   countProseWords,
   evaluateBudgets,
@@ -6,7 +7,6 @@ import {
   resolveDriftLintMode,
   seedBudgets,
 } from "../../../src/drift-budgets.js";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
 
 const file = (path: string, text: string, kind = "reference" as const) => ({
   kind,

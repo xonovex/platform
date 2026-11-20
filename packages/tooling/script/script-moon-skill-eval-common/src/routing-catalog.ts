@@ -1,10 +1,7 @@
 import {join, resolve} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
-import {isDirectory, isFile} from "@xonovex/script-moon-common/fs";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {parseQueries, type Query} from "./validation.js";
 
@@ -49,12 +46,12 @@ const catalogCandidates = (
     .readDirectory(catalogRoot)
     .filter((entry) => entry.startsWith("plugin-"))
     .map((entry) => join(catalogRoot, entry))
-    .filter((path) => isDirectory(path, fs))
+    .filter((path) => fs.isDirectory(path))
     .flatMap((pluginDirectory) =>
       pluginSkillDirectories(pluginDirectory, fs).flatMap((skillDirectory) => {
         const skillFile = join(skillDirectory, "SKILL.md");
         const queriesFile = join(skillDirectory, "eval-queries.json");
-        if (!isFile(skillFile, fs) || !isFile(queriesFile, fs)) return [];
+        if (!fs.isFile(skillFile) || !fs.isFile(queriesFile)) return [];
         const shortName = parseFrontmatterName(skillFile, fs);
         if (shortName === undefined) {
           throw new Error(`skill name missing from ${skillFile}`);
@@ -68,8 +65,7 @@ export const buildRoutingScenarios = (
   fs: FileSystem = nodeFileSystem,
 ): readonly RoutingScenario[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root, fs))
-    throw new Error(`catalog root not found: ${root}`);
+  if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
 
   const occurrencesByQuery = new Map<string, QueryOccurrence[]>();
   for (const candidate of catalogCandidates(root, fs)) {
@@ -120,8 +116,7 @@ export const catalogQueryOwners = (
   fs: FileSystem = nodeFileSystem,
 ): ReadonlyMap<string, string> => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root, fs))
-    throw new Error(`catalog root not found: ${root}`);
+  if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
 
   const positivesByQuery = new Map<string, string[]>();
   for (const candidate of catalogCandidates(root, fs)) {
@@ -169,8 +164,7 @@ export const conflictingQueryOwners = (
   fs: FileSystem = nodeFileSystem,
 ): readonly QueryOwnerConflict[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root, fs))
-    throw new Error(`catalog root not found: ${root}`);
+  if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
 
   const claimants = new Map<string, {owners: Set<string>; query: string}>();
   for (const candidate of catalogCandidates(root, fs)) {
@@ -212,14 +206,13 @@ export const unresolvedOperationRationales = (
   fs: FileSystem = nodeFileSystem,
 ): readonly UnresolvedOperation[] => {
   const root = resolve(catalogRoot);
-  if (!isDirectory(root, fs))
-    throw new Error(`catalog root not found: ${root}`);
+  if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
 
   const candidates = catalogCandidates(root, fs);
   const references = new Set(
     candidates.flatMap(({skillDirectory}) => {
       const directory = join(skillDirectory, "references");
-      if (!isDirectory(directory, fs)) return [];
+      if (!fs.isDirectory(directory)) return [];
       return fs
         .readDirectory(directory)
         .filter((entry) => entry.endsWith(".md"))

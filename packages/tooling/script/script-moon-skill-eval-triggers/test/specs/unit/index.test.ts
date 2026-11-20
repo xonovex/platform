@@ -1,6 +1,6 @@
 import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import type {TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type TriggerDependencies} from "../../../src/evaluate.js";

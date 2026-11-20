@@ -1,5 +1,6 @@
 import {z} from "zod";
-import {nodeFileSystem, type FileSystem} from "./file-system.js";
+import {nodeFileSystem} from "./adapters/file-system-node.js";
+import type {FileSystem} from "./file-system.js";
 
 const DependencyMapSchema = z.record(z.string(), z.string());
 const BinSchema = z.union([z.string(), z.record(z.string(), z.string())]);

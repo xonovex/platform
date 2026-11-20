@@ -1,8 +1,6 @@
 import {basename, dirname, join, relative, resolve, sep} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {isRecord} from "@xonovex/script-moon-common/records";
 import {boldSkillNameMentions} from "@xonovex/script-moon-common/skill-name";

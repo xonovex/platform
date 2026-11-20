@@ -1,8 +1,15 @@
-import {chmodSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
+import {
+  chmodSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {afterEach, beforeEach, describe, expect, it} from "vitest";
-import {nodeFileSystem} from "../../../src/file-system.js";
+import {nodeFileSystem} from "../../../../src/adapters/file-system-node.js";
 
 // nodeFileSystem is the one FileSystem implementation the unit tier cannot drive,
 // because it is the adapter onto a real disk. These cases pin its behaviour so the
@@ -79,5 +86,24 @@ describe("nodeFileSystem", () => {
     // A directory carries the execute bit to allow traversal, so a bare access
     // check would accept one; isExecutableFile has to require a file as well.
     expect(nodeFileSystem.isExecutableFile(root)).toBe(false);
+  });
+
+  it("copies a tree byte for byte, creating the directories above the target", () => {
+    const binary = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0xff, 0x00]);
+    mkdirSync(join(root, "source", "nested"), {recursive: true});
+    writeFileSync(join(root, "source", "nested", "image.png"), binary);
+    writeFileSync(join(root, "source", "text.md"), "text");
+
+    nodeFileSystem.copyDirectory(
+      join(root, "source"),
+      join(root, "target", "copy"),
+    );
+
+    expect(
+      readFileSync(join(root, "target", "copy", "nested", "image.png")),
+    ).toEqual(binary);
+    expect(
+      nodeFileSystem.readText(join(root, "target", "copy", "text.md")),
+    ).toBe("text");
   });
 });

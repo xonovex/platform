@@ -1,9 +1,7 @@
 import {join, relative, sep} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import type {BudgetedFile} from "@xonovex/script-moon-common/drift-budgets";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 
 // An absent directory reads as empty, so a catalog missing a whole tier is a

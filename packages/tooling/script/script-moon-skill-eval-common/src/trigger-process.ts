@@ -3,7 +3,7 @@ import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import {createInterface} from "node:readline";
-import {terminateProcess} from "@xonovex/script-moon-common/child-process";
+import {terminateProcess} from "@xonovex/script-moon-common/adapters/child-process";
 import {stageClaudePluginArguments} from "@xonovex/script-moon-common/claude-plugin";
 import {
   CODEX_TRIGGER_SIGNAL,

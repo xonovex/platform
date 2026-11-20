@@ -1,8 +1,6 @@
 import {basename} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {pluginHandoffNames} from "@xonovex/script-moon-common/skill-handoffs";
 import {z} from "zod";

@@ -4,13 +4,33 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./adapters/child-process": {
+      "types": "./src/adapters/child-process.ts",
+      "default": "./dist/src/adapters/child-process.js"
+    },
+    "./adapters/executable-node": {
+      "types": "./src/adapters/executable-node.ts",
+      "default": "./dist/src/adapters/executable-node.js"
+    },
+    "./adapters/file-system-memory": {
+      "types": "./src/adapters/file-system-memory.ts",
+      "default": "./dist/src/adapters/file-system-memory.js"
+    },
+    "./adapters/file-system-node": {
+      "types": "./src/adapters/file-system-node.ts",
+      "default": "./dist/src/adapters/file-system-node.js"
+    },
+    "./adapters/moon-query-node": {
+      "types": "./src/adapters/moon-query-node.ts",
+      "default": "./dist/src/adapters/moon-query-node.js"
+    },
     "./batches": {
       "types": "./src/batches.ts",
       "default": "./dist/src/batches.js"
     },
-    "./child-process": {
-      "types": "./src/child-process.ts",
-      "default": "./dist/src/child-process.js"
+    "./claude-plugin": {
+      "types": "./src/claude-plugin.ts",
+      "default": "./dist/src/claude-plugin.js"
     },
     "./cli-args": {
       "types": "./src/cli-args.ts",
@@ -24,25 +44,13 @@
       "types": "./src/drift-budgets.ts",
       "default": "./dist/src/drift-budgets.js"
     },
-    "./executable": {
-      "types": "./src/executable.ts",
-      "default": "./dist/src/executable.js"
-    },
-    "./frontmatter": {
-      "types": "./src/frontmatter.ts",
-      "default": "./dist/src/frontmatter.js"
-    },
     "./file-system": {
       "types": "./src/file-system.ts",
       "default": "./dist/src/file-system.js"
     },
-    "./file-system-memory": {
-      "types": "./src/file-system-memory.ts",
-      "default": "./dist/src/file-system-memory.js"
-    },
-    "./fs": {
-      "types": "./src/fs.ts",
-      "default": "./dist/src/fs.js"
+    "./frontmatter": {
+      "types": "./src/frontmatter.ts",
+      "default": "./dist/src/frontmatter.js"
     },
     "./logging": {
       "types": "./src/logging.ts",
@@ -56,6 +64,10 @@
       "types": "./src/package-json.ts",
       "default": "./dist/src/package-json.js"
     },
+    "./package-layout": {
+      "types": "./src/package-layout.ts",
+      "default": "./dist/src/package-layout.js"
+    },
     "./platform-meta": {
       "types": "./src/platform-meta.ts",
       "default": "./dist/src/platform-meta.js"
@@ -68,29 +80,25 @@
       "types": "./src/records.ts",
       "default": "./dist/src/records.js"
     },
+    "./skill-directory": {
+      "types": "./src/skill-directory.ts",
+      "default": "./dist/src/skill-directory.js"
+    },
     "./skill-eval-models": {
       "types": "./src/skill-eval-models.ts",
       "default": "./dist/src/skill-eval-models.js"
-    },
-    "./skill-name": {
-      "types": "./src/skill-name.ts",
-      "default": "./dist/src/skill-name.js"
     },
     "./skill-handoffs": {
       "types": "./src/skill-handoffs.ts",
       "default": "./dist/src/skill-handoffs.js"
     },
+    "./skill-name": {
+      "types": "./src/skill-name.ts",
+      "default": "./dist/src/skill-name.js"
+    },
     "./workspace": {
       "types": "./src/workspace.ts",
       "default": "./dist/src/workspace.js"
-    },
-    "./package-layout": {
-      "types": "./src/package-layout.ts",
-      "default": "./dist/src/package-layout.js"
-    },
-    "./claude-plugin": {
-      "types": "./src/claude-plugin.ts",
-      "default": "./dist/src/claude-plugin.js"
     }
   },
   "dependencies": {

@@ -1,8 +1,6 @@
 import {join} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {isRecord} from "@xonovex/script-moon-common/records";
 
 const OUTPUT_TIERS = new Set(["aggressive", "moderate", "conservative"]);

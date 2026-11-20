@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
 import {parseFrontmatterName} from "../../../src/frontmatter.js";
 
 const nameIn = (contents: string): string | undefined =>

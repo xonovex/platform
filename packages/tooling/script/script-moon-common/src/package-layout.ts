@@ -1,5 +1,6 @@
 import {join} from "node:path";
-import {nodeFileSystem, type FileSystem} from "./file-system.js";
+import {nodeFileSystem} from "./adapters/file-system-node.js";
+import type {FileSystem} from "./file-system.js";
 
 export interface PackageLayout {
   readonly groups: readonly string[];

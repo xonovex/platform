@@ -1,5 +1,6 @@
 import {z} from "zod";
-import {nodeFileSystem, type FileSystem} from "./file-system.js";
+import {nodeFileSystem} from "./adapters/file-system-node.js";
+import type {FileSystem} from "./file-system.js";
 
 // Drift findings are advisory until the mode is switched to enforce.
 export type DriftLintMode = "warn" | "enforce";

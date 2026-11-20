@@ -1,9 +1,7 @@
 import {rmSync} from "node:fs";
 import {join} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
   checkCodexTriggered,
   checkTriggered,

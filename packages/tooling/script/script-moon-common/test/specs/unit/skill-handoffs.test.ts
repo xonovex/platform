@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
 import {pluginHandoffNames} from "../../../src/skill-handoffs.js";
 
 describe("pluginHandoffNames", () => {

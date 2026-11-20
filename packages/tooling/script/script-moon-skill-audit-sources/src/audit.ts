@@ -1,12 +1,10 @@
 import {execFileSync} from "node:child_process";
 import {createHash} from "node:crypto";
 import {basename, join, resolve, sep} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
-import {resolveSkillDirectory} from "@xonovex/script-moon-common/fs";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {resolveSkillDirectory} from "@xonovex/script-moon-common/skill-directory";
 import {parseArgs, type ParsedArgs} from "./args.js";
 import {
   hasReferenceMapping,

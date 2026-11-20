@@ -2,7 +2,7 @@ import {execFileSync} from "node:child_process";
 import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {dirname, join, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {describe, expect, it} from "vitest";
 import {validateRelease} from "../../../src/release-validation.js";
 

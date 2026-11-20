@@ -1,6 +1,6 @@
-import {join} from "node:path";
+import {basename, dirname, join, relative} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import type {FileChange} from "../../../src/file-transaction.js";
 import type {GitRunner} from "../../../src/git.js";
@@ -56,7 +56,11 @@ const dependencies = (
 ): VersionBumpDependencies => ({
   git,
   fs,
-  listPackagePaths: () => paths,
+  listProjects: () =>
+    paths.map((path) => ({
+      id: basename(dirname(path)),
+      source: relative(ROOT, dirname(path)),
+    })),
   applyChanges: (changes: readonly FileChange[]) => {
     for (const change of changes) fs.writeFile(change.path, change.content);
   },

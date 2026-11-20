@@ -1,4 +1,4 @@
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {loadPlugins} from "../../../src/catalog.js";
 import {

@@ -1,6 +1,9 @@
 import {describe, expect, it} from "vitest";
-import {planClaudePluginStages} from "../../../src/claude-plugin.js";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
+import {
+  planClaudePluginStages,
+  stageClaudePluginArguments,
+} from "../../../src/claude-plugin.js";
 
 describe("Claude evaluation plugins", () => {
   it("stages selected skills and dependency skills without the other skills of the plugin", () => {
@@ -72,5 +75,38 @@ describe("Claude evaluation plugins", () => {
     expect(
       planClaudePluginStages(["--model", "model"], "/staged", [], fs),
     ).toEqual({args: ["--model", "model"], stages: []});
+  });
+
+  it("writes each staged plugin with only the selected skills and their resources", () => {
+    const fs = memoryFileSystem({
+      files: {
+        "/core/.claude-plugin/plugin.json": JSON.stringify({
+          name: "xonovex-core",
+          skills: "./skills/",
+        }),
+        "/core/skills/using-git/SKILL.md": "# Git",
+        "/core/skills/using-git/references/commits.md":
+          "Use conventional commits.",
+        "/core/skills/authoring-tests/SKILL.md": "# Testing",
+      },
+    });
+
+    const args = stageClaudePluginArguments(
+      ["--plugin-dir", "/core"],
+      "/staged",
+      ["using-git"],
+      fs,
+    );
+
+    expect(args).toEqual(["--plugin-dir", "/staged/plugin-1"]);
+    expect(
+      fs.readText("/staged/plugin-1/skills/using-git/references/commits.md"),
+    ).toBe("Use conventional commits.");
+    expect(fs.isDirectory("/staged/plugin-1/skills/authoring-tests")).toBe(
+      false,
+    );
+    expect(
+      JSON.parse(fs.readText("/staged/plugin-1/.claude-plugin/plugin.json")),
+    ).toEqual({name: "xonovex-core", skills: ["./skills/using-git"]});
   });
 });

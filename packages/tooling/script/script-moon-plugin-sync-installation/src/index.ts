@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import {dirname} from "node:path";
 import {fileURLToPath} from "node:url";
-import {nodeFileSystem} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {logError} from "@xonovex/script-moon-common/logging";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {runCli} from "./cli.js";

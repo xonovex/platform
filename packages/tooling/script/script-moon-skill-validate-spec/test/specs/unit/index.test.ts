@@ -1,5 +1,5 @@
 import {join} from "node:path";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main as validateSkill} from "../../../src/validate-skill.js";
 

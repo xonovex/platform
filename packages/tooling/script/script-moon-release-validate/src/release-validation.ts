@@ -1,7 +1,7 @@
 import {execFileSync} from "node:child_process";
 import {existsSync, readdirSync, readFileSync, statSync} from "node:fs";
 import {basename, dirname, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {
   packageLayout,
   pluginSkillDirectories,

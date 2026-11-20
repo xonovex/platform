@@ -2,9 +2,9 @@ import {spawn} from "node:child_process";
 import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {basename, join} from "node:path";
-import {terminateProcess} from "@xonovex/script-moon-common/child-process";
+import {terminateProcess} from "@xonovex/script-moon-common/adapters/child-process";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {stageClaudePluginArguments} from "@xonovex/script-moon-common/claude-plugin";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {CODEX_SKILL_SIGNAL, streamedAnswerLength} from "./output-parse.js";
 import {claudeFailureDetail} from "./output-results.js";
 

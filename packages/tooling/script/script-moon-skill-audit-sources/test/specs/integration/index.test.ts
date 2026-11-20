@@ -1,7 +1,7 @@
 import {execFileSync, spawnSync} from "node:child_process";
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join, resolve} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main} from "../../../src/audit.js";
 import {skillDirectories} from "../../util/skill-directory.js";

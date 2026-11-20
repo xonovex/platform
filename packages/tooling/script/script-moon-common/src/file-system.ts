@@ -1,19 +1,8 @@
-import {
-  accessSync,
-  constants,
-  mkdirSync,
-  readdirSync,
-  readFileSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import {dirname} from "node:path";
-
 /**
  * The filesystem operations this workspace's scripts reach for. Every module that
- * walks or reads a tree takes this as a port, so the unit tier drives it from the
- * in-memory implementation in file-system-memory.ts and only the integration tier
- * touches a real disk.
+ * walks or reads a tree takes this as a port, so the unit tier drives it from
+ * adapters/file-system-memory.ts and only the integration tier touches a real
+ * disk through adapters/file-system-node.ts.
  */
 export interface FileSystem {
   /** Returns the file's text, throwing when it is absent or is a directory. */
@@ -27,42 +16,10 @@ export interface FileSystem {
   /** Writes text to path, creating the directories above it. */
   readonly writeFile: (path: string, text: string) => void;
   readonly makeDirectory: (path: string) => void;
+  /**
+   * Copies the tree under source to target byte for byte, creating target and the
+   * directories above it. A skill directory can hold binary resources, which a
+   * read and a write of text would corrupt.
+   */
+  readonly copyDirectory: (source: string, target: string) => void;
 }
-
-/**
- * The adapter that reaches the real disk. It is the one implementation the unit
- * tier cannot drive, so test/specs/integration/file-system.test.ts covers it.
- */
-export const nodeFileSystem: FileSystem = {
-  readText: (path) => readFileSync(path, "utf8"),
-  readDirectory: (path) => readdirSync(path),
-  isFile: (path) => {
-    try {
-      return statSync(path).isFile();
-    } catch {
-      return false;
-    }
-  },
-  isDirectory: (path) => {
-    try {
-      return statSync(path).isDirectory();
-    } catch {
-      return false;
-    }
-  },
-  isExecutableFile: (path) => {
-    try {
-      accessSync(path, constants.X_OK);
-      return statSync(path).isFile();
-    } catch {
-      return false;
-    }
-  },
-  writeFile: (path, text) => {
-    mkdirSync(dirname(path), {recursive: true});
-    writeFileSync(path, text, "utf8");
-  },
-  makeDirectory: (path) => {
-    mkdirSync(path, {recursive: true});
-  },
-};

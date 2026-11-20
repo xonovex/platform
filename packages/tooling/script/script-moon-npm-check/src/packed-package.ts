@@ -1,6 +1,6 @@
 import {spawnSync} from "node:child_process";
 import {posix} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {isRecord} from "@xonovex/script-moon-common/records";
 

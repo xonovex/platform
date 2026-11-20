@@ -1,9 +1,7 @@
 import {rmSync} from "node:fs";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
   buildEvaluationPrompt,
   cliDefinition,

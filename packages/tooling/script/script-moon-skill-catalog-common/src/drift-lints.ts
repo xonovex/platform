@@ -1,13 +1,11 @@
 import {join} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {
   BUDGET_MANIFEST_FILE,
   evaluateBudgets,
   readBudgetManifest,
 } from "@xonovex/script-moon-common/drift-budgets";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {collectSkillFiles} from "./drift-files.js";
 
 export interface DriftLintReport {

@@ -1,5 +1,5 @@
 import {spawnSync} from "node:child_process";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 
 interface PackageIdentity {
   readonly name: string;

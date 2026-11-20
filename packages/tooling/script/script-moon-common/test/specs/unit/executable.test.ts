@@ -1,13 +1,22 @@
 import {delimiter, join} from "node:path";
 import {describe, expect, it} from "vitest";
-import {resolveExecutable} from "../../../src/executable.js";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
+import {
+  findExecutable,
+  type ExecutableEnvironment,
+} from "../../../src/executable.js";
 
 const FIRST = "/path/first";
 const SECOND = "/path/second";
 const SEARCH_PATH = [FIRST, SECOND].join(delimiter);
 
-describe("resolveExecutable", () => {
+const posix = (searchPath: string): ExecutableEnvironment => ({
+  searchPath,
+  extensions: undefined,
+  platform: "linux",
+});
+
+describe("findExecutable", () => {
   it("returns the absolute executable from the first matching PATH entry", () => {
     const executable = join(SECOND, "example-command");
     const fs = memoryFileSystem({
@@ -15,7 +24,7 @@ describe("resolveExecutable", () => {
       executables: [executable],
     });
 
-    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(
+    expect(findExecutable("example-command", posix(SEARCH_PATH), fs)).toBe(
       executable,
     );
   });
@@ -28,7 +37,9 @@ describe("resolveExecutable", () => {
       executables: [first, second],
     });
 
-    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(first);
+    expect(findExecutable("example-command", posix(SEARCH_PATH), fs)).toBe(
+      first,
+    );
   });
 
   it("skips a match that is present but not executable", () => {
@@ -39,7 +50,9 @@ describe("resolveExecutable", () => {
       executables: [second],
     });
 
-    expect(resolveExecutable("example-command", SEARCH_PATH, fs)).toBe(second);
+    expect(findExecutable("example-command", posix(SEARCH_PATH), fs)).toBe(
+      second,
+    );
   });
 
   it("skips an executable directory that shares the command name", () => {
@@ -48,32 +61,32 @@ describe("resolveExecutable", () => {
       executables: [join(FIRST, "example-command")],
     });
 
-    expect(() => resolveExecutable("example-command", FIRST, fs)).toThrow(
+    expect(() => findExecutable("example-command", posix(FIRST), fs)).toThrow(
       "was not found on PATH",
     );
   });
 
   it("rejects command paths", () => {
     expect(() =>
-      resolveExecutable("./example-command", "/bin", memoryFileSystem()),
+      findExecutable("./example-command", posix("/bin"), memoryFileSystem()),
     ).toThrow("must be a bare command");
   });
 
   it("rejects an empty command name", () => {
-    expect(() => resolveExecutable("", "/bin", memoryFileSystem())).toThrow(
+    expect(() => findExecutable("", posix("/bin"), memoryFileSystem())).toThrow(
       "must be a bare command",
     );
   });
 
   it("rejects an empty PATH", () => {
     expect(() =>
-      resolveExecutable("example-command", "", memoryFileSystem()),
+      findExecutable("example-command", posix(""), memoryFileSystem()),
     ).toThrow("PATH is empty");
   });
 
   it("rejects a command missing from PATH", () => {
     expect(() =>
-      resolveExecutable("missing-command", FIRST, memoryFileSystem()),
+      findExecutable("missing-command", posix(FIRST), memoryFileSystem()),
     ).toThrow("was not found on PATH");
   });
 
@@ -83,8 +96,46 @@ describe("resolveExecutable", () => {
       executables: ["/example-command"],
     });
 
-    expect(() => resolveExecutable("example-command", ".", fs)).toThrow(
+    expect(() => findExecutable("example-command", posix("."), fs)).toThrow(
       "was not found on PATH",
     );
+  });
+});
+
+const windows = (extensions: string | undefined): ExecutableEnvironment => ({
+  searchPath: FIRST,
+  extensions,
+  platform: "win32",
+});
+
+describe("findExecutable on Windows", () => {
+  it("tries each PATHEXT extension in order", () => {
+    const executable = join(FIRST, "example-command.CMD");
+    const fs = memoryFileSystem({
+      files: {[executable]: "@echo off\r\n"},
+      executables: [executable],
+    });
+
+    expect(findExecutable("example-command", windows(".EXE;.CMD"), fs)).toBe(
+      executable,
+    );
+  });
+
+  it("falls back to the default extensions without PATHEXT", () => {
+    const executable = join(FIRST, "example-command.BAT");
+    const fs = memoryFileSystem({
+      files: {[executable]: "@echo off\r\n"},
+      executables: [executable],
+    });
+
+    expect(findExecutable("example-command", windows(undefined), fs)).toBe(
+      executable,
+    );
+  });
+
+  it("rejects a command name holding a forward slash", () => {
+    expect(() =>
+      findExecutable("bin/example", windows(undefined), memoryFileSystem()),
+    ).toThrow("must be a bare command");
   });
 });

@@ -1,4 +1,5 @@
-import {nodeFileSystem, type FileSystem} from "./file-system.js";
+import {nodeFileSystem} from "./adapters/file-system-node.js";
+import type {FileSystem} from "./file-system.js";
 
 // The name a markdown document declares in its YAML frontmatter, used to identify a
 // skill by the name it publishes rather than by its directory.

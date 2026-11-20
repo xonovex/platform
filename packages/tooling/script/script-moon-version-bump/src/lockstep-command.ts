@@ -1,10 +1,10 @@
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
-import {findAllPackageJsonPaths} from "@xonovex/script-moon-common/moon-query";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import type {BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
 import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getGitVersion, runGit, type GitRunner} from "./git.js";
+import {getGitVersion, type GitRunner} from "./git.js";
 import {
   planLockstep,
   type DependentPlan,
@@ -31,14 +31,13 @@ interface LockstepOptions {
 
 const readWorkspacePackages = (
   rootDir: string,
-  git: GitRunner = runGit,
-  listPackagePaths: (
-    dir: string,
-  ) => readonly string[] = findAllPackageJsonPaths,
+  git: GitRunner,
+  packagePaths: readonly string[],
+  fs: FileSystem,
 ): readonly WorkspacePackage[] =>
-  listPackagePaths(rootDir).map((path) => ({
+  packagePaths.map((path) => ({
     path,
-    pkg: readPkg(path),
+    pkg: readPkg(path, fs),
     headVersion: getGitVersion(rootDir, path, git),
   }));
 

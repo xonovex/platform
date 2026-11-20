@@ -1,10 +1,8 @@
 import {execFileSync} from "node:child_process";
 import {join} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
 
 interface PackageJson {

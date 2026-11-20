@@ -1,11 +1,13 @@
 import {join} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
-import {findAllPackageJsonPaths} from "@xonovex/script-moon-common/moon-query";
+import {
+  packageJsonPaths,
+  type MoonProject,
+} from "@xonovex/script-moon-common/moon-query";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {bumpVersion, type BumpType} from "./bump.js";
@@ -41,7 +43,7 @@ const validateVersionRequest = (
 // plain directory tree with no repository and no moon invocation.
 export interface VersionBumpDependencies {
   readonly git: GitRunner;
-  readonly listPackagePaths: (rootDir: string) => readonly string[];
+  readonly listProjects: (rootDir: string) => readonly MoonProject[];
   readonly fs: FileSystem;
   // How the planned changes are installed. The transaction owns the ordering and
   // the rollback; supplying it here lets a run be planned without a disk.
@@ -50,7 +52,7 @@ export interface VersionBumpDependencies {
 
 export const defaultDependencies: VersionBumpDependencies = {
   git: runGit,
-  listPackagePaths: findAllPackageJsonPaths,
+  listProjects: queryMoonProjects,
   fs: nodeFileSystem,
   applyChanges: (changes) => {
     applyFileChanges(changes);
@@ -62,7 +64,9 @@ export const main = (
   workingDirectory = process.cwd(),
   dependencies: VersionBumpDependencies = defaultDependencies,
 ): number => {
-  const {applyChanges, fs, git, listPackagePaths} = dependencies;
+  const {applyChanges, fs, git, listProjects} = dependencies;
+  const listPackagePaths = (rootDir: string): readonly string[] =>
+    packageJsonPaths(rootDir, listProjects(rootDir), fs);
   const args = parseCliArgs(
     {
       name: "moon-version-bump",
@@ -142,7 +146,12 @@ export const main = (
     const lockstepRoot = findWorkspaceRoot(workingDirectory, undefined, fs);
     return runLockstep({
       rootDir: lockstepRoot,
-      packages: readWorkspacePackages(lockstepRoot, git, listPackagePaths),
+      packages: readWorkspacePackages(
+        lockstepRoot,
+        git,
+        listPackagePaths(lockstepRoot),
+        fs,
+      ),
       names: parseLockstepNames(lockstep),
       bumpType,
       preid,

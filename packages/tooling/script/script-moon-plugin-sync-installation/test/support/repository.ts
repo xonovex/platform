@@ -1,4 +1,4 @@
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 
 export const ROOT = "/repo";
 

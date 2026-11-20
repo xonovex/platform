@@ -1,5 +1,6 @@
 import {dirname, join, resolve} from "node:path";
 import {fileURLToPath} from "node:url";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {
   BUDGET_MANIFEST_FILE,
   DRIFT_LINT_MODE_ENV,
@@ -8,10 +9,7 @@ import {
   resolveDriftLintMode,
   seedBudgets,
 } from "@xonovex/script-moon-common/drift-budgets";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {collectSkillCatalogFiles} from "@xonovex/script-moon-skill-catalog-common/drift-files";
 import {evaluateDuplication} from "./drift-duplication.js";

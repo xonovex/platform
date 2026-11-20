@@ -1,6 +1,6 @@
 import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {beforeEach, describe, expect, it} from "vitest";
 import {
   resolveTriggerConfig,

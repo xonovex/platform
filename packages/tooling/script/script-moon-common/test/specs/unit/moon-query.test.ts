@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {parseMoonProjects} from "../../../src/moon-query.js";
+import {memoryFileSystem} from "../../../src/adapters/file-system-memory.js";
+import {packageJsonPaths, parseMoonProjects} from "../../../src/moon-query.js";
 
 describe("parseMoonProjects", () => {
   it("retains project identity while accepting additional Moon fields", () => {
@@ -34,5 +35,25 @@ describe("parseMoonProjects", () => {
     expect(() => parseMoonProjects("{")).toThrow(
       "invalid Moon project query output: malformed JSON",
     );
+  });
+});
+
+describe("packageJsonPaths", () => {
+  it("lists the manifest of every project that holds one", () => {
+    const fs = memoryFileSystem({
+      files: {"/repo/packages/with/package.json": "{}"},
+      directories: ["/repo/packages/without"],
+    });
+
+    expect(
+      packageJsonPaths(
+        "/repo",
+        [
+          {id: "with", source: "packages/with"},
+          {id: "without", source: "packages/without"},
+        ],
+        fs,
+      ),
+    ).toEqual(["/repo/packages/with/package.json"]);
   });
 });

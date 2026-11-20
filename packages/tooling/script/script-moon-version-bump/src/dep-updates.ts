@@ -1,6 +1,6 @@
 import {execFileSync} from "node:child_process";
 import {relative} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/executable";
+import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {
   parsePackageJson,
   type PackageJson,

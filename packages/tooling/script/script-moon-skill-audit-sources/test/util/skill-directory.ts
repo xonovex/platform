@@ -1,8 +1,8 @@
 import {mkdirSync, mkdtempSync, rmSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach} from "vitest";
 
 export const MEMORY_ROOT = "/catalog";

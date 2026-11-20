@@ -2,7 +2,7 @@ import {join} from "node:path";
 import {
   memoryFileSystem,
   type MemoryTree,
-} from "@xonovex/script-moon-common/file-system-memory";
+} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {describe, expect, it} from "vitest";
 import {
   checkReferenceFileLinks,

@@ -1,5 +1,5 @@
 import {dirname, sep} from "node:path";
-import type {FileSystem} from "./file-system.js";
+import type {FileSystem} from "../file-system.js";
 
 /** The tree a memory filesystem starts from: absolute path to file text. */
 export interface MemoryTree {
@@ -48,6 +48,16 @@ export const memoryFileSystem = (tree: MemoryTree = {}): FileSystem => {
   }
 
   const isFile = (path: string): boolean => files.has(normalize(path));
+  const writeFile = (path: string, text: string): void => {
+    const file = normalize(path);
+    files.set(file, text);
+    for (const parent of parents(file)) directories.add(parent);
+  };
+  const makeDirectory = (path: string): void => {
+    const directory = normalize(path);
+    directories.add(directory);
+    for (const parent of parents(directory)) directories.add(parent);
+  };
 
   return {
     isFile,
@@ -75,15 +85,24 @@ export const memoryFileSystem = (tree: MemoryTree = {}): FileSystem => {
       }
       return [...names].toSorted();
     },
-    writeFile: (path, text) => {
-      const file = normalize(path);
-      files.set(file, text);
-      for (const parent of parents(file)) directories.add(parent);
-    },
-    makeDirectory: (path) => {
-      const directory = normalize(path);
-      directories.add(directory);
-      for (const parent of parents(directory)) directories.add(parent);
+    writeFile,
+    makeDirectory,
+    copyDirectory: (source, target) => {
+      const from = normalize(source);
+      if (!directories.has(from)) {
+        throw new Error(`ENOENT: no such file or directory, cp '${source}'`);
+      }
+      const to = normalize(target);
+      const rebase = (path: string): string => to + path.slice(from.length);
+      const below = (path: string): boolean => path.startsWith(`${from}${sep}`);
+      makeDirectory(to);
+      for (const directory of [...directories].filter(below)) {
+        makeDirectory(rebase(directory));
+      }
+      for (const [path, text] of [...files].filter(([path]) => below(path))) {
+        writeFile(rebase(path), text);
+        if (executables.has(path)) executables.add(rebase(path));
+      }
     },
   };
 };

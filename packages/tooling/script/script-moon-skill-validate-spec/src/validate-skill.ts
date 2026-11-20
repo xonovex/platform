@@ -1,14 +1,12 @@
 import {basename, dirname, join, resolve} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {
   DRIFT_LINT_MODE_ENV,
   resolveDriftLintMode,
 } from "@xonovex/script-moon-common/drift-budgets";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
-import {resolveSkillDirectory} from "@xonovex/script-moon-common/fs";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
+import {resolveSkillDirectory} from "@xonovex/script-moon-common/skill-directory";
 import {
   isSkillName,
   SKILL_NAME_RULE,

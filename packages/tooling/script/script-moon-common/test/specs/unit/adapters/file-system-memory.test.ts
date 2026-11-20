@@ -1,5 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {memoryFileSystem} from "../../../src/file-system-memory.js";
+import {memoryFileSystem} from "../../../../src/adapters/file-system-memory.js";
 
 describe("memoryFileSystem", () => {
   it("reads a file it was seeded with", () => {
@@ -99,5 +99,26 @@ describe("memoryFileSystem", () => {
     expect(fs.isExecutableFile("/bin/data")).toBe(false);
     expect(fs.isExecutableFile("/bin/absent")).toBe(false);
     expect(fs.isExecutableFile("/bin/dir")).toBe(false);
+  });
+
+  it("copies a tree to a new place and keeps the source", () => {
+    const fs = memoryFileSystem({
+      files: {"/source/nested/run": "#!/bin/sh\n", "/source/text.md": "text"},
+      directories: ["/source/empty"],
+      executables: ["/source/nested/run"],
+    });
+
+    fs.copyDirectory("/source", "/target/copy");
+
+    expect(fs.readText("/target/copy/text.md")).toBe("text");
+    expect(fs.isExecutableFile("/target/copy/nested/run")).toBe(true);
+    expect(fs.isDirectory("/target/copy/empty")).toBe(true);
+    expect(fs.readText("/source/text.md")).toBe("text");
+  });
+
+  it("throws when the source of a copy is not a directory", () => {
+    expect(() => {
+      memoryFileSystem().copyDirectory("/missing", "/target");
+    }).toThrow("ENOENT");
   });
 });

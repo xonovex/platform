@@ -1,6 +1,6 @@
 import {join} from "node:path";
+import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type EvaluatorDependencies} from "../../../src/evaluate.js";
 import type {HarnessRequest} from "../../../src/output-harness.js";

@@ -1,7 +1,5 @@
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {logInfo} from "@xonovex/script-moon-common/logging";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {updateDependent} from "./dependents.js";

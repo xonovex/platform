@@ -1,8 +1,6 @@
 import {isAbsolute, relative, resolve, sep} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {z} from "zod";
 
 export const inside = (root: string, path: string): string => {

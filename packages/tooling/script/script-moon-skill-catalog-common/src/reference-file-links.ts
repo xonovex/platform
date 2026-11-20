@@ -1,8 +1,6 @@
 import {join} from "node:path";
-import {
-  nodeFileSystem,
-  type FileSystem,
-} from "@xonovex/script-moon-common/file-system";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 
 export const MD_LINK_RE = /\[[^\]]*\]\(([^)\s]+)\)/g;
 const EXTERNAL_LINK_RE = /^(?:https?|mailto):/i;
