@@ -11,10 +11,17 @@ import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {packagedFilePaths, validatePackedPackage} from "./packed-package.js";
 import {validateDeclaredFiles, validatePackage} from "./validate.js";
 
-parseCliArgs({
-  name: "moon-npm-check",
-  description: "Validate a package is ready for npm publishing",
-});
+const args = parseCliArgs(
+  {
+    name: "moon-npm-check",
+    description: "Validate a package is ready for npm publishing",
+  },
+  process.argv.slice(2),
+);
+if (args.kind === "help") {
+  console.log(args.text);
+  process.exit(0);
+}
 
 const packageJsonPath = join(process.cwd(), "package.json");
 const packageRoot = process.cwd();

@@ -1,13 +1,11 @@
+import {describe, expect, it} from "vitest";
 import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-  type MockInstance,
-} from "vitest";
-import {formatHelp, parseCliArgs, type CliSpec} from "../../../src/cli-args.js";
+  formatHelp,
+  parseCliArgs,
+  type CliArgs,
+  type CliSpec,
+  type ParsedArgs,
+} from "../../../src/cli-args.js";
 
 const spec: CliSpec = {
   name: "test-cli",
@@ -18,58 +16,46 @@ const spec: CliSpec = {
   },
 };
 
+const parsed = (result: CliArgs): ParsedArgs => {
+  if (result.kind !== "parsed") throw new Error("expected parsed arguments");
+  return result;
+};
+
 describe("parseCliArgs", () => {
-  let consoleLogSpy: MockInstance<typeof console.log>;
-  let processExitSpy: MockInstance<typeof process.exit>;
-
-  beforeEach(() => {
-    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-    processExitSpy = vi
-      .spyOn(process, "exit")
-      .mockImplementation(() => undefined as never);
-  });
-
-  afterEach(() => {
-    consoleLogSpy.mockRestore();
-    processExitSpy.mockRestore();
-  });
-
   it("should parse named string and boolean options", () => {
-    const result = parseCliArgs(spec, ["--name", "alice", "--verbose"]);
+    const result = parsed(parseCliArgs(spec, ["--name", "alice", "--verbose"]));
     expect(result.values.name).toBe("alice");
     expect(result.values.verbose).toBe(true);
   });
 
   it("should use defaults when options are not provided", () => {
-    const result = parseCliArgs(spec, []);
+    const result = parsed(parseCliArgs(spec, []));
     expect(result.values.name).toBe("world");
     expect(result.values.verbose).toBeUndefined();
   });
 
   it("should return positionals", () => {
-    const result = parseCliArgs(spec, ["foo", "bar"]);
+    const result = parsed(parseCliArgs(spec, ["foo", "bar"]));
     expect(result.positionals).toEqual(["foo", "bar"]);
   });
 
-  it("should print help and exit on --help", () => {
-    parseCliArgs(spec, ["--help"]);
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining("test-cli"),
-    );
-    expect(processExitSpy).toHaveBeenCalledWith(0);
+  it("should return the help text on --help", () => {
+    expect(parseCliArgs(spec, ["--help"])).toEqual({
+      kind: "help",
+      text: formatHelp(spec),
+    });
   });
 
-  it("should print help and exit on -h", () => {
-    parseCliArgs(spec, ["-h"]);
-    expect(processExitSpy).toHaveBeenCalledWith(0);
+  it("should return the help text on -h", () => {
+    expect(parseCliArgs(spec, ["-h"]).kind).toBe("help");
   });
 
   it("should throw on unknown flags", () => {
     expect(() => parseCliArgs(spec, ["--unknown"])).toThrow();
   });
 
-  it("should use custom argv parameter", () => {
-    const result = parseCliArgs(spec, ["-n", "custom"]);
+  it("should parse a short option", () => {
+    const result = parsed(parseCliArgs(spec, ["-n", "custom"]));
     expect(result.values.name).toBe("custom");
   });
 });

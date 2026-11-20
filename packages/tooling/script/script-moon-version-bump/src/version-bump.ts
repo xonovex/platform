@@ -63,7 +63,7 @@ export const main = (
   dependencies: VersionBumpDependencies = defaultDependencies,
 ): number => {
   const {applyChanges, fs, git, listPackagePaths} = dependencies;
-  const {values, positionals} = parseCliArgs(
+  const args = parseCliArgs(
     {
       name: "moon-version-bump",
       description: "Bump package version and update workspace dependents",
@@ -116,6 +116,11 @@ export const main = (
     },
     argv,
   );
+  if (args.kind === "help") {
+    console.log(args.text);
+    return 0;
+  }
+  const {values, positionals} = args;
   const bumpType = ((values.type as string | undefined) ??
     positionals[0] ??
     "patch") as BumpType;

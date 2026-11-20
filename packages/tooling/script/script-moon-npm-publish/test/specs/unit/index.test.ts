@@ -19,3 +19,24 @@ it("passes the dry-run option through the executable entrypoint", () => {
   expect(main(["--dry-run"], dependencies)).toBe(0);
   expect(publish).toHaveBeenCalledWith(true);
 });
+
+it("prints the help text and publishes nothing on --help", () => {
+  const log = vi.spyOn(console, "log").mockImplementation(() => {});
+  const publish = vi.fn();
+  const dependencies: PublishDependencies = {
+    readPackageJson: () => '{"name":"example","version":"1.2.3"}',
+    writePackageJson: vi.fn(),
+    currentDirectory: () => "/workspace/package",
+    readPlatformMeta: () => {
+      return;
+    },
+    isPublished: () => false,
+    publish,
+    log: vi.fn(),
+  };
+
+  expect(main(["--help"], dependencies)).toBe(0);
+  expect(log).toHaveBeenCalledWith(expect.stringContaining("moon-npm-publish"));
+  expect(publish).not.toHaveBeenCalled();
+  log.mockRestore();
+});

@@ -63,6 +63,25 @@ const dependencies = (
 });
 
 describe("main", () => {
+  it("prints the help text and plans nothing on --help", () => {
+    const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const code = main(
+      ["--help"],
+      join(ROOT, "packages", "core"),
+      dependencies(gitAtHead({}), [packagePath("core")], fs),
+    );
+
+    expect(code).toBe(0);
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining("moon-version-bump"),
+    );
+    expect(JSON.parse(fs.readText(packagePath("core")))).toMatchObject({
+      version: "1.2.3",
+    });
+  });
+
   it("bumps a package that is unchanged at HEAD and writes the manifest", () => {
     const fs = workspace({
       core: {name: "@xonovex/core", version: "1.2.3"},

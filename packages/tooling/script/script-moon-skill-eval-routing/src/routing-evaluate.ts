@@ -178,7 +178,12 @@ export const main = async (
   argv: readonly string[],
   dependencies: RoutingDependencies = defaultDependencies,
 ): Promise<number> => {
-  const {values, positionals} = parseCliArgs(cliDefinition, argv);
+  const args = parseCliArgs(cliDefinition, argv);
+  if (args.kind === "help") {
+    console.log(args.text);
+    return 0;
+  }
+  const {values, positionals} = args;
   if (positionals.length > 1) {
     throw new Error(
       `unrecognized arguments: ${positionals.slice(1).join(" ")}`,

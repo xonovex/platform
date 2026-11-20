@@ -1,9 +1,14 @@
 import {join} from "node:path";
+import {
+  parseCliArgs,
+  type ParsedArgs,
+} from "@xonovex/script-moon-common/cli-args";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {memoryFileSystem} from "@xonovex/script-moon-common/file-system-memory";
 import {beforeEach, describe, expect, it} from "vitest";
 import {
   buildEvaluationPrompt,
+  cliDefinition,
   resolveEvaluationConfig,
   type EvaluationConfig,
 } from "../../../src/evaluation-config.js";
@@ -24,6 +29,12 @@ const evalFile = (evals: readonly unknown[], skillName = "test-skill") => ({
 });
 
 type EvaluationConfigResult = ReturnType<typeof resolveEvaluationConfig>;
+
+const parsedArguments = (argv: readonly string[]): ParsedArgs => {
+  const args = parseCliArgs(cliDefinition, argv);
+  if (args.kind === "help") throw new Error("unexpected help request");
+  return args;
+};
 
 const successfulConfig = (result: EvaluationConfigResult): EvaluationConfig => {
   expect(result.success).toBe(true);
@@ -75,7 +86,7 @@ describe("evaluation configuration", () => {
     argv: readonly string[] = [],
     environment: Readonly<Record<string, string | undefined>> = {},
   ) =>
-    resolveEvaluationConfig(argv, {
+    resolveEvaluationConfig(parsedArguments(argv), {
       environment,
       executableAvailable: () => true,
       workingDirectory: directory,
@@ -255,7 +266,7 @@ describe("evaluation configuration", () => {
       error: "evals file not found: missing.json",
     });
     expect(
-      resolveEvaluationConfig([], {
+      resolveEvaluationConfig(parsedArguments([]), {
         environment: {},
         executableAvailable: () => false,
         workingDirectory: directory,

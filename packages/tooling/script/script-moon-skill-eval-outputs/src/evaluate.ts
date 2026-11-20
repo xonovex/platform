@@ -1,10 +1,12 @@
 import {rmSync} from "node:fs";
+import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
 import {
   buildEvaluationPrompt,
+  cliDefinition,
   resolveEvaluationConfig,
 } from "./evaluation-config.js";
 import {spawnHarness, type HarnessRunner} from "./output-harness.js";
@@ -188,7 +190,12 @@ export const main = async (
   argv: readonly string[],
   dependencies: EvaluatorDependencies = defaultDependencies,
 ): Promise<number> => {
-  const configResult = resolveEvaluationConfig(argv, {
+  const args = parseCliArgs(cliDefinition, argv);
+  if (args.kind === "help") {
+    console.log(args.text);
+    return 0;
+  }
+  const configResult = resolveEvaluationConfig(args, {
     fs: dependencies.fs,
     workingDirectory: dependencies.workingDirectory,
     executableAvailable: dependencies.executableAvailable,

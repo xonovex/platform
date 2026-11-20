@@ -32,6 +32,18 @@ afterEach(() => {
 });
 
 describe("runCli", () => {
+  it("prints the help text and writes nothing on --help", () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const fs = repositoryFileSystem([core]);
+    const before = fs.readText(readmePath);
+
+    expect(runCli(["--help"], ROOT, fs)).toBe(0);
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining("moon-plugin-sync-installation"),
+    );
+    expect(fs.readText(readmePath)).toBe(before);
+  });
+
   it("exits 1 and names the stale README under --check without writing", () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});

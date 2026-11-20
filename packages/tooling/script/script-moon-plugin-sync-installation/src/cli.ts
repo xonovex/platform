@@ -27,7 +27,12 @@ export const runCli = (
   root: string,
   fs: FileSystem,
 ): number => {
-  const {values} = parseCliArgs(cliSpec, argv);
+  const args = parseCliArgs(cliSpec, argv);
+  if (args.kind === "help") {
+    console.log(args.text);
+    return 0;
+  }
+  const {values} = args;
   if (values.check === true) {
     const drifted = checkInstallations(root, fs);
     if (drifted.length === 0) {

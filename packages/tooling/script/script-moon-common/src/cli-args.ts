@@ -14,9 +14,19 @@ interface CliSpec {
 }
 
 interface ParsedArgs {
+  readonly kind: "parsed";
   readonly values: Record<string, string | boolean | undefined>;
   readonly positionals: readonly string[];
 }
+
+interface HelpRequest {
+  readonly kind: "help";
+  readonly text: string;
+}
+
+// Help is a result rather than a side effect, so the entry point owns the
+// output stream and the exit code.
+type CliArgs = ParsedArgs | HelpRequest;
 
 const formatHelp = (spec: CliSpec): string => {
   const lines = [
@@ -33,13 +43,9 @@ const formatHelp = (spec: CliSpec): string => {
   return lines.join("\n");
 };
 
-const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
-  const args = argv ?? process.argv.slice(2);
-
+const parseCliArgs = (spec: CliSpec, args: readonly string[]): CliArgs => {
   if (args.includes("--help") || args.includes("-h")) {
-    console.log(formatHelp(spec));
-    process.exit(0);
-    return {values: {}, positionals: []};
+    return {kind: "help", text: formatHelp(spec)};
   }
 
   const options: Record<
@@ -64,10 +70,11 @@ const parseCliArgs = (spec: CliSpec, argv?: readonly string[]): ParsedArgs => {
   });
 
   return {
+    kind: "parsed",
     values: result.values,
     positionals: result.positionals,
   };
 };
 
 export {parseCliArgs, formatHelp};
-export type {CliSpec, ParsedArgs};
+export type {CliArgs, CliSpec, HelpRequest, ParsedArgs};

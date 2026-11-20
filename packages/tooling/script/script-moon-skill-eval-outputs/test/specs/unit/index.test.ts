@@ -101,6 +101,15 @@ describe("output evaluation helpers", () => {
 });
 
 describe("main", () => {
+  it("prints the help text and runs nothing on --help", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    await expect(main(["--help"])).resolves.toBe(0);
+    expect(log).toHaveBeenCalledWith(
+      expect.stringContaining("moon-skill-eval-outputs"),
+    );
+    log.mockRestore();
+  });
+
   it("fails cleanly when the evaluation file is missing", async () => {
     await expect(main(["missing-evals.json"])).resolves.toBe(2);
   });

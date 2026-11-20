@@ -43,7 +43,12 @@ export const main = (
   argv: readonly string[] = process.argv.slice(2),
   dependencies: PublishDependencies = defaultDependencies,
 ): number => {
-  const {values} = parseCliArgs(cliSpec, argv);
+  const args = parseCliArgs(cliSpec, argv);
+  if (args.kind === "help") {
+    console.log(args.text);
+    return 0;
+  }
+  const {values} = args;
   publishPackage(values["dry-run"] === true, dependencies);
   return 0;
 };

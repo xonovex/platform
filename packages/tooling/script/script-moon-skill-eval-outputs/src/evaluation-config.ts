@@ -1,6 +1,6 @@
 import {dirname, join, resolve} from "node:path";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
-import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
+import type {ParsedArgs} from "@xonovex/script-moon-common/cli-args";
 import {resolveExecutable} from "@xonovex/script-moon-common/executable";
 import {
   nodeFileSystem,
@@ -86,7 +86,7 @@ export interface EvaluationConfig {
   readonly withoutArgs: readonly string[];
 }
 
-const cliDefinition = {
+export const cliDefinition = {
   name: "moon-skill-eval-outputs",
   description:
     "Run output-quality evals against a skill: with-skill vs without-skill.",
@@ -276,7 +276,7 @@ export const buildEvaluationPrompt = (
 };
 
 export const resolveEvaluationConfig = (
-  argv: readonly string[],
+  args: ParsedArgs,
   options: EvaluationConfigOptions = {},
 ): EvaluationConfigResult => {
   const environment = options.environment ?? process.env;
@@ -284,7 +284,7 @@ export const resolveEvaluationConfig = (
     options.executableAvailable ?? defaultExecutableAvailable;
   const workingDirectory = options.workingDirectory ?? resolve(".");
   const fs = options.fs ?? nodeFileSystem;
-  const {values, positionals} = parseCliArgs(cliDefinition, argv);
+  const {values, positionals} = args;
   const skillDirectory = resolveSkillDirectory(workingDirectory, fs);
   const evaluationsArgument =
     positionals[0] ?? join(skillDirectory, "evals.json");
