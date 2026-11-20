@@ -30,63 +30,51 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "92"
-  go-package-coverage:
-    script: |
-      set -euo pipefail
+      GO_COVERAGE_MIN: "94"
       # Every package the module builds is named here. cmd/agent-validate is the
       # composition root that binds the disk, the schema engine and git, so
       # go-integration covers it. internal/checktest is test support and
       # internal/arch holds only architecture tests behind a build tag. Every
       # other package reaches the machine through a port, so the unit tier
       # covers it over an in-memory file system.
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./cmd/agent-validate=exempt \
-        ./internal/arch=exempt \
-        ./internal/budget=100 \
-        ./internal/catalog=100 \
-        ./internal/check=100 \
-        ./internal/check/agent=91 \
-        ./internal/check/command=96 \
-        ./internal/check/drift=93 \
-        ./internal/check/hook=97 \
-        ./internal/check/instructions=91 \
-        ./internal/check/kit=92 \
-        ./internal/check/links=85 \
-        ./internal/check/llms=93 \
-        ./internal/check/marketplace=93 \
-        ./internal/check/outputstyle=86 \
-        ./internal/check/plugin=91 \
-        ./internal/check/repository=89 \
-        ./internal/check/routing=94 \
-        ./internal/check/schema=92 \
-        ./internal/check/skill=93 \
-        ./internal/check/sources=90 \
-        ./internal/check/text=93 \
-        ./internal/check/workspace=94 \
-        ./internal/checktest=exempt \
-        ./internal/cmd=95 \
-        ./internal/component=100 \
-        ./internal/document=100 \
-        ./internal/gitrepo=100 \
-        ./internal/glob=100 \
-        ./internal/markdown=99 \
-        ./internal/project=100 \
-        ./internal/registry=100 \
-        ./internal/report=100 \
-        ./internal/runner=100 \
+      GO_PACKAGE_FLOORS: |
+        ./cmd/agent-validate=exempt
+        ./internal/arch=exempt
+        ./internal/budget=100
+        ./internal/catalog=100
+        ./internal/check=100
+        ./internal/check/agent=91
+        ./internal/check/command=96
+        ./internal/check/drift=93
+        ./internal/check/hook=97
+        ./internal/check/instructions=91
+        ./internal/check/kit=92
+        ./internal/check/links=85
+        ./internal/check/llms=93
+        ./internal/check/marketplace=93
+        ./internal/check/outputstyle=86
+        ./internal/check/plugin=91
+        ./internal/check/repository=89
+        ./internal/check/routing=94
+        ./internal/check/schema=92
+        ./internal/check/skill=93
+        ./internal/check/sources=90
+        ./internal/check/text=93
+        ./internal/check/workspace=94
+        ./internal/checktest=exempt
+        ./internal/cmd=95
+        ./internal/component=100
+        ./internal/document=100
+        ./internal/gitrepo=100
+        ./internal/glob=100
+        ./internal/markdown=99
+        ./internal/project=100
+        ./internal/registry=100
+        ./internal/report=100
+        ./internal/runner=100
         ./internal/tree=94
-    inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - /.moon/scripts/check-go-package-coverage.sh
-      - /.moon/scripts/strip-generated-coverage.sh
-    options:
-      cache: true
-      runInCI: true
   coverage:
     deps:
-      - go-package-coverage
       - ts-coverage
   # The architecture tests read the source tree, so they carry the arch build
   # tag and run here instead of in go-test.

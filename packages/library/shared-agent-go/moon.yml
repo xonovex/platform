@@ -15,50 +15,35 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "88"
-  go-package-coverage:
-    script: |
-      set -euo pipefail
+      GO_COVERAGE_MIN: "98"
       # Every package the module builds is named here. pkg/provision and
       # pkg/types declare shared types and hold no statements.
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./pkg/agentcmd=100 \
-        ./pkg/agents=100 \
-        ./pkg/egress=100 \
-        ./pkg/artifact=100 \
-        ./pkg/isolation=100 \
-        ./pkg/network=100 \
-        ./pkg/overlay=100 \
-        ./pkg/overlay/claude=100 \
-        ./pkg/overlay/codex=100 \
-        ./pkg/overlay/copilot=100 \
-        ./pkg/overlay/kiro=100 \
-        ./pkg/overlay/opencode=100 \
-        ./pkg/overlay/pi=100 \
-        ./pkg/overlay/shared=100 \
-        ./pkg/plugin=100 \
-        ./pkg/policy=100 \
-        ./pkg/providers=98 \
-        ./pkg/provision=exempt \
-        ./pkg/provision/nix=85 \
-        ./pkg/types=exempt \
-        ./pkg/validation=85 \
+      GO_PACKAGE_FLOORS: |
+        ./pkg/agentcmd=100
+        ./pkg/agents=100
+        ./pkg/egress=100
+        ./pkg/artifact=100
+        ./pkg/isolation=100
+        ./pkg/network=100
+        ./pkg/overlay=100
+        ./pkg/overlay/claude=100
+        ./pkg/overlay/codex=100
+        ./pkg/overlay/copilot=100
+        ./pkg/overlay/kiro=100
+        ./pkg/overlay/opencode=100
+        ./pkg/overlay/pi=100
+        ./pkg/overlay/shared=100
+        ./pkg/plugin=100
+        ./pkg/policy=100
+        ./pkg/providers=98
+        ./pkg/provision=exempt
+        ./pkg/provision/nix=85
+        ./pkg/types=exempt
+        ./pkg/validation=85
         ./pkg/workspace=100
     inputs:
-      - /packages/library/shared-agent-go/pkg/**/*.go
-      - /packages/library/shared-agent-go/pkg/**/*.json
-      - /packages/library/shared-agent-go/go.mod
-      - /packages/library/shared-agent-go/go.sum
       - /packages/library/shared-contract-go/**/*.go
       - /packages/library/shared-contract-go/**/*.json
-      - /.moon/scripts/check-go-package-coverage.sh
-      - /.moon/scripts/strip-generated-coverage.sh
-    options:
-      cache: true
-      runInCI: true
-  coverage:
-    deps:
-      - go-package-coverage
   # The architecture tests read the source of every library module and of every
   # module that ships a binary, so they carry the arch build tag and run here
   # instead of in go-test.

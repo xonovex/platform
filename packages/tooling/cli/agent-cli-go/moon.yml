@@ -32,7 +32,33 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "80"
+      GO_COVERAGE_MIN: "99"
+      # Every package the module builds is named here. cmd/agent-cli is the
+      # composition root, which go-integration covers, because a unit test may
+      # not start a process or touch a file. Every other package reaches the
+      # machine through a port, so the unit tier covers it with the oshosttest
+      # double of shared-launch-go.
+      GO_PACKAGE_FLOORS: |
+        ./cmd/agent-cli=exempt
+        ./internal/cmd=97
+        ./internal/launch=99
+        ./internal/legacy=100
+        ./internal/origin=exempt
+        ./internal/origin/directory=100
+        ./internal/origin/git=100
+        ./internal/origin/plugins=100
+        ./internal/origin/shared=100
+        ./internal/overlay=100
+        ./internal/plugin=100
+        ./internal/runconfig=100
+        ./internal/sandbox/plugins=100
+        ./internal/schematest=92
+        ./internal/terminal/herdr=100
+        ./internal/terminal/shared=100
+        ./internal/terminal/tmux=100
+        ./internal/workspace/git=98
+        ./internal/workspace/jj=100
+        ./internal/workspace/shared=100
   ts-build:
     script: npx tsc -p tsconfig.build.json
     deps:
@@ -67,42 +93,6 @@ tasks:
       - vitest.config.ts
     outputs:
       - coverage
-  go-package-coverage:
-    script: |
-      set -euo pipefail
-      # Every package the module builds is named here. cmd/agent-cli is the
-      # composition root, which go-integration covers, because a unit test may
-      # not start a process or touch a file. Every other package reaches the
-      # machine through a port, so the unit tier covers it with the oshosttest
-      # double of shared-launch-go.
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./cmd/agent-cli=exempt \
-        ./internal/cmd=97 \
-        ./internal/launch=99 \
-        ./internal/legacy=100 \
-        ./internal/origin=exempt \
-        ./internal/origin/directory=100 \
-        ./internal/origin/git=100 \
-        ./internal/origin/plugins=100 \
-        ./internal/origin/shared=100 \
-        ./internal/overlay=100 \
-        ./internal/plugin=100 \
-        ./internal/runconfig=100 \
-        ./internal/sandbox/plugins=100 \
-        ./internal/schematest=92 \
-        ./internal/terminal/herdr=100 \
-        ./internal/terminal/shared=100 \
-        ./internal/terminal/tmux=100 \
-        ./internal/workspace/git=98 \
-        ./internal/workspace/jj=100 \
-        ./internal/workspace/shared=100
-    inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - /.moon/scripts/check-go-package-coverage.sh
-      - /.moon/scripts/strip-generated-coverage.sh
-    options:
-      cache: true
   go-integration:
     script: |
       set -euo pipefail
@@ -146,7 +136,6 @@ tasks:
     command: noop
     deps:
       - go-test-coverage
-      - go-package-coverage
       - ts-coverage
     options:
       cache: false

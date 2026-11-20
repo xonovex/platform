@@ -30,10 +30,7 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "95"
-  go-package-coverage:
-    script: |
-      set -euo pipefail
+      GO_COVERAGE_MIN: "99"
       # Every package the module builds is named here. cmd/agent-audit is the
       # composition root and internal/web/nethttp is the host adapter;
       # go-integration covers both, because a unit test may not start a process
@@ -41,37 +38,28 @@ tasks:
       # statements. Every other package reaches the machine through a port, so
       # the unit tier covers it with the memory file system, processtest and
       # webtest.
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./cmd/agent-audit=exempt \
-        ./internal/audit=100 \
-        ./internal/catalogs=100 \
-        ./internal/cmd=96 \
-        ./internal/compare=100 \
-        ./internal/compare/gitbase=100 \
-        ./internal/gitfs=100 \
-        ./internal/legacy=98 \
-        ./internal/observe=100 \
-        ./internal/render=100 \
-        ./internal/rules=100 \
-        ./internal/stamp=97 \
-        ./internal/transport/filesystem=100 \
-        ./internal/transport/git=99 \
-        ./internal/transport/http=100 \
-        ./internal/transport/plugins=100 \
-        ./internal/web=exempt \
-        ./internal/web/nethttp=exempt \
+      GO_PACKAGE_FLOORS: |
+        ./cmd/agent-audit=exempt
+        ./internal/audit=100
+        ./internal/catalogs=100
+        ./internal/cmd=96
+        ./internal/compare=100
+        ./internal/compare/gitbase=100
+        ./internal/gitfs=100
+        ./internal/legacy=98
+        ./internal/observe=100
+        ./internal/render=100
+        ./internal/rules=100
+        ./internal/stamp=97
+        ./internal/transport/filesystem=100
+        ./internal/transport/git=99
+        ./internal/transport/http=100
+        ./internal/transport/plugins=100
+        ./internal/web=exempt
+        ./internal/web/nethttp=exempt
         ./internal/web/webtest=100
-    inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - /.moon/scripts/check-go-package-coverage.sh
-      - /.moon/scripts/strip-generated-coverage.sh
-    options:
-      cache: true
-      runInCI: true
   coverage:
     deps:
-      - go-package-coverage
       - ts-coverage
   # The architecture tests read the source tree, so they carry the arch build
   # tag and run here instead of in go-test.

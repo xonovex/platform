@@ -32,10 +32,7 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "94"
-  go-package-coverage:
-    script: |
-      set -euo pipefail
+      GO_COVERAGE_MIN: "97"
       # Every package the module builds is named here. cmd/agent-eval is the
       # composition root that binds the host adapters of the shared libraries;
       # go-integration covers it, because a unit test may not start a process or
@@ -43,52 +40,43 @@ tasks:
       # so the unit tier covers it with memfs, processtest, scratchtest and
       # protocoltest. internal/confine is the port of the sandbox and holds no
       # statements.
-      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./cmd/agent-eval=exempt \
-        ./internal/ablation=100 \
-        ./internal/baseline=97 \
-        ./internal/budget=100 \
-        ./internal/catalog=94 \
-        ./internal/cmd=92 \
-        ./internal/confine=exempt \
-        ./internal/confine/launch=95 \
-        ./internal/confine/none=100 \
-        ./internal/cost=96 \
-        ./internal/document=98 \
-        ./internal/execute=92 \
-        ./internal/harness=100 \
-        ./internal/harness/claude=96 \
-        ./internal/harness/codex=100 \
-        ./internal/judge=100 \
-        ./internal/migrate=91 \
-        ./internal/model=100 \
-        ./internal/predicate=100 \
-        ./internal/predicate/filesystem=100 \
-        ./internal/predicate/llm=100 \
-        ./internal/predicate/session=100 \
-        ./internal/protocol=98 \
-        ./internal/protocol/instruction=100 \
-        ./internal/protocol/orchestration=96 \
-        ./internal/protocol/output=98 \
-        ./internal/protocol/protocoltest=exempt \
-        ./internal/protocol/routing=98 \
-        ./internal/protocol/trigger=100 \
-        ./internal/registry=100 \
-        ./internal/report=100 \
-        ./internal/run=98 \
-        ./internal/settings=95 \
+      GO_PACKAGE_FLOORS: |
+        ./cmd/agent-eval=exempt
+        ./internal/ablation=100
+        ./internal/baseline=97
+        ./internal/budget=100
+        ./internal/catalog=94
+        ./internal/cmd=92
+        ./internal/confine=exempt
+        ./internal/confine/launch=95
+        ./internal/confine/none=100
+        ./internal/cost=96
+        ./internal/document=98
+        ./internal/execute=92
+        ./internal/harness=100
+        ./internal/harness/claude=96
+        ./internal/harness/codex=100
+        ./internal/judge=100
+        ./internal/migrate=91
+        ./internal/model=100
+        ./internal/predicate=100
+        ./internal/predicate/filesystem=100
+        ./internal/predicate/llm=100
+        ./internal/predicate/session=100
+        ./internal/protocol=98
+        ./internal/protocol/instruction=100
+        ./internal/protocol/orchestration=96
+        ./internal/protocol/output=98
+        ./internal/protocol/protocoltest=exempt
+        ./internal/protocol/routing=98
+        ./internal/protocol/trigger=100
+        ./internal/registry=100
+        ./internal/report=100
+        ./internal/run=98
+        ./internal/settings=95
         ./internal/store=96
-    inputs:
-      - "@globs(sources)"
-      - "@globs(tests)"
-      - /.moon/scripts/check-go-package-coverage.sh
-      - /.moon/scripts/strip-generated-coverage.sh
-    options:
-      cache: true
-      runInCI: true
   coverage:
     deps:
-      - go-package-coverage
       - ts-coverage
   # The architecture tests read the source tree, so they carry the arch build
   # tag and run here instead of in go-test.
