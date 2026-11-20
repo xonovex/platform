@@ -5,16 +5,20 @@
 package launch
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/validation"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runspec"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	launchcore "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
+	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
@@ -31,7 +35,7 @@ type Checkout struct {
 // the isolator and provisioner it launches through, the checkout it creates,
 // the overlay it builds and the terminal it runs in.
 type Plan struct {
-	runspec.Spec
+	launchcore.Spec
 	Isolator    isoshared.Isolator
 	Provisioner provshared.Provisioner
 	// SourceDir is the absolute directory the run starts from; Checkout is nil
@@ -83,7 +87,7 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry[iso
 	if err != nil {
 		return Plan{}, err
 	}
-	spec, choice, err := planSpec(options, agent, provider, sourceDir, cwd, home, registry, enforce)
+	spec, choice, err := launchcore.PlanSpec(options.Request, agent, provider, sourceDir, cwd, home, registry, enforce)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -99,6 +103,30 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry[iso
 		DryRun:      options.DryRun,
 		Verbose:     options.Verbose,
 	}, nil
+}
+
+// planAgent resolves the agent and its provider route, and explains a provider
+// that no layer defines and where the user adds one.
+func planAgent(options Options) (*types.AgentConfig, *types.ModelProvider, error) {
+	agent, provider, err := launchcore.ResolveAgent(options.Request)
+	if errors.Is(err, providers.ErrNotDefined) {
+		return nil, nil, notDefined(options, err)
+	}
+	return agent, provider, err
+}
+
+// notDefined explains an undefined provider and where to add one.
+func notDefined(options Options, cause error) error {
+	hint := "add a file to a providers directory"
+	if options.UserProviderDir != "" {
+		hint = fmt.Sprintf("add %s%s to %s", options.Provider, providers.Extension, options.UserProviderDir)
+	}
+	agent := types.AgentType(options.Agent)
+	defined := options.Catalog.Names(agent)
+	if len(defined) == 0 {
+		return fmt.Errorf("provider %s is not defined; %s (no provider is defined for agent %s): %w", options.Provider, hint, agent, cause)
+	}
+	return fmt.Errorf("provider %s is not defined; %s (defined for agent %s: %s): %w", options.Provider, hint, agent, strings.Join(defined, ", "), cause)
 }
 
 // DisplayDir is the directory a dry run reports: the checkout it would create,
@@ -155,4 +183,23 @@ func planTerminal(options Options) *termshared.TerminalConfig {
 		WindowName:  options.TerminalWindow,
 		Detach:      options.TerminalDetach,
 	}
+}
+
+// absolute resolves path against base and cleans it.
+func absolute(base, path string) string {
+	if filepath.IsAbs(path) {
+		return filepath.Clean(path)
+	}
+	return filepath.Join(base, path)
+}
+
+func absoluteAll(base string, paths []string) []string {
+	if len(paths) == 0 {
+		return nil
+	}
+	out := make([]string, len(paths))
+	for i, path := range paths {
+		out[i] = absolute(base, path)
+	}
+	return out
 }

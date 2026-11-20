@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
 
 const userConfig = "/home/user/.config/sandboxed-claude/config.yaml"

@@ -1,0 +1,35 @@
+version: "2"
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
+    - misspell
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/xonovex/platform
+
+run:
+  timeout: 5m
+  tests: true
+  # The architecture and integration tests carry build tags, so lint reads them.
+  build-tags:
+    - arch
+    - integration
+  modules-download-mode: readonly

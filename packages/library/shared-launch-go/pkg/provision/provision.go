@@ -1,19 +1,19 @@
-// Package shared is the provision axis core: the Provisioner port plus the
-// neutral Input the composition root hands every provisioner. It names no
-// concrete provisioner (none/command/nix). Input carries the shared-module nix
-// source type, so this core depends on no CLI leaf.
-package shared
+// Package provision is the provision axis core: the Provisioner port and the
+// neutral Input every provisioner receives. It names no concrete provisioner.
+// Input carries the nix source type of the shared agent module, so this core
+// depends on no provisioner leaf.
+package provision
 
 import (
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	agentprovision "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
 // Input is the neutral per-run carrier handed to Contribute. Each provisioner
 // reads only the field it needs (none reads nothing); it holds no method-specific
-// behavior flag. NixSource is the shared-module value type, keeping this core free
-// of any CLI provision leaf.
+// behavior flag. NixSource is the value type of the shared agent module, keeping
+// this core free of any provisioner leaf.
 type Input struct {
 	InitCommands []string
 	NixSource    sharednix.NixSource
@@ -22,7 +22,7 @@ type Input struct {
 // Provisioner produces a Contribution (tools/binds/env/init) that an Isolator
 // applies, and declares its own guarantees so the policy engine never names it.
 type Provisioner interface {
-	Contribute(in Input) (provision.Contribution, error)
+	Contribute(in Input) (agentprovision.Contribution, error)
 	// Pinned reports whether provisioning comes from a pinned source (so
 	// RequirePinnedProvision can be honored).
 	Pinned() bool
@@ -30,5 +30,5 @@ type Provisioner interface {
 	// executable. A provisioner that supplies no tools returns false so that the
 	// isolator checks its own base; one that must supply the agent and did not
 	// returns an error.
-	CheckAgent(c provision.Contribution, agent *types.AgentConfig) (bool, error)
+	CheckAgent(c agentprovision.Contribution, agent *types.AgentConfig) (bool, error)
 }

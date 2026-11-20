@@ -7,13 +7,14 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
-func agentConfig() RunConfig {
-	return RunConfig{
+func agentConfig() isoshared.RunConfig {
+	return isoshared.RunConfig{
 		Agent:   &types.AgentConfig{Type: "agent", Binary: "agent"},
-		Process: Process{Argv: []string{"agent", "--flag", "review"}, Dir: "/work"},
+		Process: isoshared.Process{Argv: []string{"agent", "--flag", "review"}, Dir: "/work"},
 		HomeDir: "/home/user",
 	}
 }

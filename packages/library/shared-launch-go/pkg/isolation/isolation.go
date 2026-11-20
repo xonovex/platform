@@ -1,10 +1,8 @@
-// Package shared is the isolation axis core: the Confinement and Launcher
-// ports, the Host port the isolators consume, the Process and the neutral
-// RunConfig the composition root hands every isolator, and the path checks they
-// share. It names no concrete isolator (none/bwrap/docker) and no sibling axis
-// leaf; the per-isolator network flags live in isolation/<type>/network.go
-// bridge files.
-package shared
+// Package isolation is the isolation axis core: the Confinement and Launcher
+// ports, the Process an isolation confines, the neutral RunConfig every
+// isolation receives and the EgressRoute of a managed run. It names no concrete
+// isolation and starts nothing.
+package isolation
 
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
@@ -25,8 +23,8 @@ type Process struct {
 // RunConfig carries the run-wide inputs every isolator needs to confine the
 // agent process. Every path in it is absolute, and HomeDir is always set. The
 // per-isolator knobs (bwrap HostPassthrough, docker Image and Runtime) sit
-// here because the composition root builds the isolators before the flags are
-// parsed.
+// here because a registry builds the isolators before the request of a run is
+// known.
 type RunConfig struct {
 	HomeDir string
 	RepoDir string
@@ -110,7 +108,8 @@ type Launcher interface {
 	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string, err error)
 }
 
-// Isolator is an isolation this CLI both declares and launches.
+// Isolator is an isolation that an executor both declares and launches on the
+// machine it runs on.
 type Isolator interface {
 	Confinement
 	Launcher

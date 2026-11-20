@@ -3,6 +3,7 @@ package record
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/fs"
 	"reflect"
 	"strconv"
@@ -10,8 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/schematest"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema/tekuri"
 )
 
 var started = time.Date(2026, time.November, 20, 12, 30, 5, 0, time.UTC)
@@ -35,6 +35,24 @@ func exited(code int) Record {
 	}
 }
 
+// validateRecord checks data against the run record schema and returns the
+// violations as one error, or nil.
+func validateRecord(t *testing.T, data []byte) error {
+	t.Helper()
+	validator, err := tekuri.New(map[string][]byte{SchemaID: Schema()})
+	if err != nil {
+		t.Fatalf("compile the run record schema: %v", err)
+	}
+	violations, err := validator.Validate(SchemaID, data)
+	if err != nil {
+		t.Fatalf("validate: %v", err)
+	}
+	if len(violations) > 0 {
+		return fmt.Errorf("%+v", violations)
+	}
+	return nil
+}
+
 func TestMarshalProducesADocumentThatSatisfiesTheSchema(t *testing.T) {
 	failed := Record{StartedAt: started, EndedAt: started, Status: StatusFailed, Error: "isolation bwrap is not available",
 		Agent: Agent{Name: "claude", VersionProbe: "claude --version"}, Axes: Axes{Isolation: "bwrap", Provision: "none", Network: "host", Workspace: Workspace{Mode: ModeInPlace}}, WorkDir: "/work"}
@@ -44,7 +62,7 @@ func TestMarshalProducesADocumentThatSatisfiesTheSchema(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: Marshal() error = %v", name, err)
 		}
-		if err := schematest.Validate(Schema(), data); err != nil {
+		if err := validateRecord(t, data); err != nil {
 			t.Errorf("%s: the record violates the schema: %v\n%s", name, err, data)
 		}
 		if !strings.HasSuffix(string(data), "}\n") {
@@ -87,7 +105,7 @@ func TestSchemaRejectsABrokenRecord(t *testing.T) {
 		}
 		mutate(copyOf)
 		mutated, _ := json.Marshal(copyOf)
-		if err := schematest.Validate(Schema(), mutated); err == nil {
+		if err := validateRecord(t, mutated); err == nil {
 			t.Errorf("%s: the schema accepted the document", name)
 		}
 	}
@@ -138,18 +156,18 @@ func TestMarshalNeverEmitsNullCollections(t *testing.T) {
 func TestDefaultDirFollowsTheXDGStateDirectory(t *testing.T) {
 	env := map[string]string{"XDG_STATE_HOME": "/state"}
 	getenv := func(key string) string { return env[key] }
-	if got := DefaultDir(getenv, "/home/user"); got != "/state/agent-cli/runs" {
+	if got := DefaultDir(getenv, "/home/user", "agent-cli"); got != "/state/agent-cli/runs" {
 		t.Errorf("DefaultDir = %q, want the XDG state directory", got)
 	}
 	env["XDG_STATE_HOME"] = "relative"
-	if got := DefaultDir(getenv, "/home/user"); got != "/home/user/.local/state/agent-cli/runs" {
+	if got := DefaultDir(getenv, "/home/user", "agent-cli"); got != "/home/user/.local/state/agent-cli/runs" {
 		t.Errorf("DefaultDir = %q, want the default below the home directory", got)
 	}
 }
 
-func newStore(t *testing.T) (Store, *systemtest.Fake) {
+func newStore(t *testing.T) (Store, *memFiles) {
 	t.Helper()
-	files := systemtest.New()
+	files := newMemFiles()
 	store, err := NewStore(files, "/state/agent-cli/runs")
 	if err != nil {
 		t.Fatalf("NewStore() error = %v", err)
@@ -235,14 +253,14 @@ func TestStoreReadRefusesABadIDAndAMissingOrBrokenRecord(t *testing.T) {
 
 func TestNewStoreRefusesARelativeDirectory(t *testing.T) {
 	for _, dir := range []string{"runs", "/a/../b", "/a/"} {
-		if _, err := NewStore(systemtest.New(), dir); err == nil {
+		if _, err := NewStore(newMemFiles(), dir); err == nil {
 			t.Errorf("NewStore(%q) error = nil, want a refusal", dir)
 		}
 	}
 }
 
 type brokenFiles struct {
-	*systemtest.Fake
+	*memFiles
 	mkdirErr, writeErr, statErr, readDirErr error
 }
 
@@ -250,35 +268,35 @@ func (b brokenFiles) MkdirAll(p string, perm fs.FileMode) error {
 	if b.mkdirErr != nil {
 		return b.mkdirErr
 	}
-	return b.Fake.MkdirAll(p, perm)
+	return b.memFiles.MkdirAll(p, perm)
 }
 
 func (b brokenFiles) WriteFile(p string, data []byte, perm fs.FileMode) error {
 	if b.writeErr != nil {
 		return b.writeErr
 	}
-	return b.Fake.WriteFile(p, data, perm)
+	return b.memFiles.WriteFile(p, data, perm)
 }
 
 func (b brokenFiles) Stat(p string) (fs.FileInfo, error) {
 	if b.statErr != nil {
 		return nil, b.statErr
 	}
-	return b.Fake.Stat(p)
+	return b.memFiles.Stat(p)
 }
 
 func (b brokenFiles) ReadDir(p string) ([]fs.DirEntry, error) {
 	if b.readDirErr != nil {
 		return nil, b.readDirErr
 	}
-	return b.Fake.ReadDir(p)
+	return b.memFiles.ReadDir(p)
 }
 
 func TestStoreReportsDiskFailures(t *testing.T) {
 	cases := map[string]brokenFiles{
-		"mkdir": {Fake: systemtest.New(), mkdirErr: errors.New("read-only")},
-		"write": {Fake: systemtest.New(), writeErr: errors.New("disk full")},
-		"stat":  {Fake: systemtest.New(), statErr: errors.New("denied")},
+		"mkdir": {memFiles: newMemFiles(), mkdirErr: errors.New("read-only")},
+		"write": {memFiles: newMemFiles(), writeErr: errors.New("disk full")},
+		"stat":  {memFiles: newMemFiles(), statErr: errors.New("denied")},
 	}
 	for name, files := range cases {
 		store, err := NewStore(files, "/state/runs")
@@ -289,7 +307,7 @@ func TestStoreReportsDiskFailures(t *testing.T) {
 			t.Errorf("%s: Write() error = nil, want the failure reported", name)
 		}
 	}
-	store, _ := NewStore(brokenFiles{Fake: systemtest.New(), readDirErr: errors.New("denied")}, "/state/runs")
+	store, _ := NewStore(brokenFiles{memFiles: newMemFiles(), readDirErr: errors.New("denied")}, "/state/runs")
 	if _, err := store.List(); err == nil || !strings.Contains(err.Error(), "denied") {
 		t.Errorf("List() error = %v, want the failure reported", err)
 	}

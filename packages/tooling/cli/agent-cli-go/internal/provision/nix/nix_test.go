@@ -10,7 +10,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
-	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
+	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 

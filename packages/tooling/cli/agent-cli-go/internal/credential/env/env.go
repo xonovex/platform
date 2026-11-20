@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 )
 
 // Host is the port the store reads the environment through.
@@ -26,13 +26,13 @@ func New(host Host) Store { return Store{host: host} }
 func (Store) Available() bool { return true }
 
 // Lookup returns the value of the variable named by locator.
-func (s Store) Lookup(locator string) (shared.Secret, error) {
+func (s Store) Lookup(locator string) (credential.Secret, error) {
 	if !variable.MatchString(locator) {
-		return shared.Secret{}, fmt.Errorf("%q is not an environment variable name", locator)
+		return credential.Secret{}, fmt.Errorf("%q is not an environment variable name", locator)
 	}
 	value := s.host.Getenv(locator)
 	if value == "" {
-		return shared.Secret{}, shared.ErrNotFound
+		return credential.Secret{}, credential.ErrNotFound
 	}
-	return shared.NewSecret(value), nil
+	return credential.NewSecret(value), nil
 }

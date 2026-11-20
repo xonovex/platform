@@ -11,7 +11,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // Isolator confines the agent with bubblewrap namespaces and applies a
@@ -28,12 +29,12 @@ import (
 // bwrap and default runc are attack-surface reduction, not a kernel trust
 // boundary (see KernelIsolated); no-new-privs and cap-drop are bwrap defaults.
 type Isolator struct {
-	host isoshared.Host
+	host isohost.Host
 	log  logging.Logger
 }
 
 // NewIsolator creates a bwrap isolator over host, writing through log.
-func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+func NewIsolator(host isohost.Host, log logging.Logger) *Isolator {
 	return &Isolator{host: host, log: log}
 }
 
@@ -89,7 +90,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, "bwrap", args, env, "", "Bubblewrap sandbox")
+	return isohost.SpawnSandbox(i.host, i.log, "bwrap", args, env, "", "Bubblewrap sandbox")
 }
 
 // Command returns the full bwrap command (for display / terminal wrappers).
@@ -112,17 +113,17 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
+	homeDir, err := isohost.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
+	workDir, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return nil, err
 	}
 	repoDir := ""
 	if cfg.RepoDir != "" {
-		repoDir, err = isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
+		repoDir, err = isohost.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
 		if err != nil {
 			return nil, err
 		}
@@ -164,7 +165,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// the curated config paths bound back read-only.
 	args = append(args, "--tmpfs", homeDir)
 	for _, configPath := range cfg.Agent.UserConfigPaths {
-		src, exists, err := isoshared.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
+		src, exists, err := isohost.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +191,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, p, "provisioned read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, p, "provisioned read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -199,14 +200,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-write bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-write bind")
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, "--bind", resolved, resolved)
 	}
 	for _, path := range cfg.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -216,17 +217,17 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, "--chdir", workDir)
 
 	// Agent process, wrapped with the provisioner's init commands.
-	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
+	command := isohost.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
 	// Managed egress: bind the proxy socket directory and the bridge executable,
 	// and run the command under the bridge.
 	if cfg.Network == network.NetworkManaged {
-		route, err := isoshared.ResolveBridge(i.host, cfg.Egress)
+		route, err := isohost.ResolveBridge(i.host, cfg.Egress)
 		if err != nil {
 			return nil, err
 		}
-		socketDir, bridge := isoshared.BridgeMounts(route)
+		socketDir, bridge := isohost.BridgeMounts(route)
 		args = append(args, "--bind", socketDir, socketDir, "--ro-bind", bridge, bridge)
-		command = isoshared.WrapWithBridge(route, command)
+		command = isohost.WrapWithBridge(route, command)
 	}
 	args = append(args, "--")
 	args = append(args, command...)
@@ -235,7 +236,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 }
 
 func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
+	homeDir, err := isohost.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +275,7 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	customEnv, err := isoshared.RunEnv(cfg)
+	customEnv, err := isohost.RunEnv(cfg)
 	if err != nil {
 		return nil, err
 	}

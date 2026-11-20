@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -118,5 +119,20 @@ func TestResolveExistingPath(t *testing.T) {
 	}
 	if _, err := ResolveExistingPath(fsys, "file", "fixture"); err == nil || !strings.Contains(err.Error(), "absolute") {
 		t.Fatalf("ResolveExistingPath(relative) error = %v, want absolute path error", err)
+	}
+}
+
+// unresolvable is a FileSystem whose symbolic links never resolve.
+type unresolvable struct{ FileSystem }
+
+func (unresolvable) EvalSymlinks(string) (string, error) { return "", errors.New("loop") }
+
+func TestResolveDirectoryReportsAnUnresolvableDirectory(t *testing.T) {
+	fsys := unresolvable{systemtest.New().AddDir("/work")}
+
+	_, err := ResolveDirectory(fsys, "/work", "work directory")
+
+	if err == nil || !strings.Contains(err.Error(), "resolve canonical work directory") {
+		t.Fatalf("ResolveDirectory() error = %v, want resolution error", err)
 	}
 }

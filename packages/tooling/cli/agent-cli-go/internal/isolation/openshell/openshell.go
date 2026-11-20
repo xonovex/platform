@@ -19,7 +19,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // program is the OpenShell command line tool.
@@ -41,7 +42,7 @@ var ErrUnsupported = errors.New("openshell cannot run this")
 // Host is what the leaf needs of the machine: the isolation host plus a private
 // place to write the policy document.
 type Host interface {
-	isoshared.Host
+	isohost.Host
 	MkdirTemp(pattern string) (string, error)
 	WriteFile(path string, data []byte, perm fs.FileMode) error
 	RemoveAll(path string) error
@@ -176,7 +177,7 @@ func (i *Isolator) session(p plan) (int, error) {
 	if _, err := i.host.Capture(program, p.upload, ""); err != nil {
 		return 1, fmt.Errorf("upload work directory: %w", err)
 	}
-	code, runErr := isoshared.SpawnSandbox(i.host, i.log, program, p.exec, nil, "", "OpenShell sandbox")
+	code, runErr := isohost.SpawnSandbox(i.host, i.log, program, p.exec, nil, "", "OpenShell sandbox")
 	if _, err := i.host.Capture(program, p.download, ""); err != nil {
 		return code, errors.Join(runErr, fmt.Errorf("download work directory: %w", err))
 	}
@@ -225,12 +226,12 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	if err != nil {
 		return plan{}, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
+	workDir, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return plan{}, err
 	}
-	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
-	env, err := isoshared.RunEnv(cfg)
+	command := isohost.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
+	env, err := isohost.RunEnv(cfg)
 	if err != nil {
 		return plan{}, err
 	}

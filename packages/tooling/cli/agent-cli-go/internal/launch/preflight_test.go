@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 )
 
 func findCheck(report Report, prefix string) (Check, bool) {

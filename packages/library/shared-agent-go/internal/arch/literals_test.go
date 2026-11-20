@@ -23,6 +23,7 @@ import (
 // and no provider preset: both are data a user supplies.
 var modules = []string{
 	"library/shared-agent-go",
+	"library/shared-launch-go",
 	"tooling/cli/agent-cli-go",
 	"tooling/cli/agent-eval-go",
 	"sandbox/operator/agent-operator-go",

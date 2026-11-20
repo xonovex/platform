@@ -13,7 +13,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // containerHome is the synthetic, writable HOME inside the container. The host
@@ -46,7 +47,7 @@ type Isolator struct {
 // Host is the port the docker isolator consumes: the isolation host plus the
 // identity the container runs as and the CPU count it is clamped to.
 type Host interface {
-	isoshared.Host
+	isohost.Host
 	Getuid() int
 	Getgid() int
 	NumCPU() int
@@ -116,7 +117,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, "docker", args, env, "", "Docker sandbox")
+	return isohost.SpawnSandbox(i.host, i.log, "docker", args, env, "", "Docker sandbox")
 }
 
 // Command returns the full docker command (for display / terminal wrappers).
@@ -139,17 +140,17 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
+	homeDir, err := isohost.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
+	workDir, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return nil, err
 	}
 	repoDir := ""
 	if cfg.RepoDir != "" {
-		repoDir, err = isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
+		repoDir, err = isohost.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +191,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Curated config paths, read-only, into the synthetic HOME.
 	for _, configPath := range cfg.Agent.UserConfigPaths {
-		src, exists, err := isoshared.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
+		src, exists, err := isohost.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
 		}
@@ -201,7 +202,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, p, "provisioned read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, p, "provisioned read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -210,14 +211,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-write bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-write bind")
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, "-v", fmt.Sprintf("%s:%s", resolved, resolved))
 	}
 	for _, path := range cfg.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -228,11 +229,11 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// the command runs under the bridge below.
 	var route isoshared.EgressRoute
 	if cfg.Network == network.NetworkManaged {
-		route, err = isoshared.ResolveBridge(i.host, cfg.Egress)
+		route, err = isohost.ResolveBridge(i.host, cfg.Egress)
 		if err != nil {
 			return nil, err
 		}
-		socketDir, bridge := isoshared.BridgeMounts(route)
+		socketDir, bridge := isohost.BridgeMounts(route)
 		args = append(args, "-v", fmt.Sprintf("%s:%s", socketDir, socketDir), "-v", fmt.Sprintf("%s:%s:ro", bridge, bridge))
 	}
 
@@ -254,9 +255,9 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, resolveImage(cfg.Image))
 
 	// Agent process, wrapped with the provisioner's init commands.
-	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
+	command := isohost.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
 	if cfg.Network == network.NetworkManaged {
-		command = isoshared.WrapWithBridge(route, command)
+		command = isohost.WrapWithBridge(route, command)
 	}
 	args = append(args, command...)
 
@@ -300,7 +301,7 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	for k, v := range c.Env {
 		env[k] = v
 	}
-	customEnv, err := isoshared.RunEnv(cfg)
+	customEnv, err := isohost.RunEnv(cfg)
 	if err != nil {
 		return nil, err
 	}

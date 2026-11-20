@@ -10,6 +10,7 @@ dependsOn:
   - shared-agent-go
   - shared-contract-go
   - shared-core-go
+  - shared-launch-go
   - id: eslint-config-cli
     scope: development
   - id: ts-config-cli
@@ -71,9 +72,7 @@ tasks:
       # Every package the module builds is named here. cmd/agent-cli is the
       # composition root and internal/system the operating-system adapter; both
       # are covered by go-integration, because a unit test may not start a
-      # process or touch a file. The shared package of provision declares
-      # interfaces and runspec declares the run spec; neither holds
-      # statements. Every other package reaches the machine through a port, so
+      # process or touch a file. Every other package reaches the machine through a port, so
       # the unit tier covers it with internal/system/systemtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
@@ -84,7 +83,6 @@ tasks:
         ./internal/credential/keychain=100 \
         ./internal/credential/pass=100 \
         ./internal/credential/secretservice=100 \
-        ./internal/credential/shared=100 \
         ./internal/launch=99 \
         ./internal/network/managed=100 \
         ./internal/origin=exempt \
@@ -98,9 +96,6 @@ tasks:
         ./internal/provision/command=100 \
         ./internal/provision/nix=99 \
         ./internal/provision/none=100 \
-        ./internal/provision/shared=exempt \
-        ./internal/record=100 \
-        ./internal/runspec=exempt \
         ./internal/isolation/bwrap=98 \
         ./internal/isolation/docker=98 \
         ./internal/isolation/dockersandboxes=98 \
@@ -108,7 +103,6 @@ tasks:
         ./internal/isolation/openshell=99 \
         ./internal/isolation/seatbelt=96 \
         ./internal/isolation/shared=98 \
-        ./internal/sandbox=97 \
         ./internal/sandbox/plugins=100 \
         ./internal/schematest=92 \
         ./internal/system=exempt \
@@ -142,6 +136,29 @@ tasks:
     options:
       cache: false
       runInCI: false
+  # The architecture tests read the source tree, so they carry the arch build
+  # tag and run here instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
+      - ts-test
+    options:
+      cache: false
+      mergeDeps: replace
   coverage:
     command: noop
     deps:

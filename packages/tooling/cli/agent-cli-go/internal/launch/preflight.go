@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 )
 
 // defaultSource is the source of an axis no layer set.

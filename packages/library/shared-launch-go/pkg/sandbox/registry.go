@@ -1,8 +1,7 @@
-// Package sandbox is the confinement composition/selection layer: it holds only
-// the Registry (lazy plugin factories), Select (fail-closed policy gate), and the
-// plugins composition root. The axis ports and concrete leaves live under
-// internal/{isolation,provision,network}; this package names no concrete leaf
-// (only internal/sandbox/plugins does).
+// Package sandbox is the selection layer of the confinement axes: the Registry
+// of lazy plugin factories, Evaluate, which computes the guarantees of a
+// request, and Select, which enforces a policy on them fail-closed. It names no
+// concrete isolation or provisioner; a composition root registers them.
 package sandbox
 
 import (
@@ -14,8 +13,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 )
 
 var (
@@ -32,7 +31,7 @@ type (
 )
 
 // Registry maps method names to plugin factories. It is built once at the
-// composition root and passed explicitly to Select — there is no global mutable
+// composition root and passed explicitly to Select, so there is no global mutable
 // state, and tests build their own minimal Registry. Adding a plugin is one
 // Register call at the root; the core selection/policy code never changes.
 //
@@ -116,9 +115,10 @@ type Choice[I isoshared.Confinement] struct {
 // Evaluate resolves the isolator and provisioner for a request and computes the
 // guarantees they establish, without demanding any. Registry membership is the
 // validity check; the resolved plugins declare their own capabilities, so this
-// layer never names a concrete isolator or provisioner. A network mode that needs
-// confinement fails for an isolator that cannot confine the network, and a managed
-// run fails for an isolator that declares no egress transport, whatever the policy.
+// layer never names a concrete isolator or provisioner. Bind paths fail for an
+// isolator that cannot bind a host path, a network mode that needs confinement
+// fails for an isolator that cannot confine the network, and a managed run fails
+// for an isolator that declares no egress transport, whatever the policy.
 func Evaluate[I isoshared.Confinement](reg *Registry[I], req Request) (Choice[I], error) {
 	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {

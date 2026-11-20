@@ -20,6 +20,7 @@ import (
 // harness, relative to the packages directory.
 var harnessModules = []string{
 	"library/shared-agent-go",
+	"library/shared-launch-go",
 	"tooling/cli/agent-cli-go",
 	"tooling/cli/agent-eval-go",
 	"tooling/cli/agent-validate-go",

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -32,10 +32,10 @@ func TestLookup(t *testing.T) {
 	if secret, err := store.Lookup("svc"); err != nil || secret.Reveal() != "pw2" {
 		t.Errorf("Lookup(svc) = %v, %v", secret, err)
 	}
-	if _, err := store.Lookup("blank"); !errors.Is(err, shared.ErrNotFound) {
+	if _, err := store.Lookup("blank"); !errors.Is(err, credential.ErrNotFound) {
 		t.Errorf("an empty value error = %v, want ErrNotFound", err)
 	}
-	if _, err := store.Lookup("absent"); !errors.Is(err, shared.ErrNotFound) {
+	if _, err := store.Lookup("absent"); !errors.Is(err, credential.ErrNotFound) {
 		t.Errorf("a failed tool error = %v, want ErrNotFound", err)
 	}
 	for _, bad := range []string{"-x", "svc/", ""} {

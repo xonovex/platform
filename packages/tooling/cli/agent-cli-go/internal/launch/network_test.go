@@ -7,8 +7,8 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 )
 
 // fakeOpener records the managed egress a run starts and stops.

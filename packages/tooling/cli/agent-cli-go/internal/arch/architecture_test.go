@@ -1,47 +1,37 @@
-package sandbox
+//go:build arch
 
-// Architecture / import fitness tests. Each test locks one structural invariant of
-// the orthogonal-axis layout so it cannot silently regress:
+// Package arch holds the architecture fitness tests of agent-cli. They read the
+// source tree, so they carry the arch build tag and run in the go-test-arch
+// task, not in the unit run. Each test locks one structural invariant:
 //
-//   - TestLeavesDoNotImportCompositionRoot — hexagonal: leaves never import the
-//     composition root (internal/sandbox); only internal/sandbox/plugins may know
-//     the concrete leaves.
-//   - TestLeavesDoNotImportSiblings — orthogonal bare leaves: no leaf imports a
-//     sibling leaf in the same axis; cross-leaf knowledge lives in shared/.
-//   - TestSharedCoresImportNoLeaf — one-way cross-axis glue: an axis shared/ core
-//     imports no leaf of any axis; bridges flow leaf -> other-axis/shared only.
-//   - TestSelectionLayerNamesNoVariant — microkernel capability gate: the Select /
-//     policy layer names no concrete method constant; it gates on Capabilities.
-//   - TestConcreteConstructorsOnlyInPlugins — sole composition root: the leaf
-//     constructors are referenced only from plugins.go.
-//   - TestRegistryFactoriesAreLazy — microkernel lazy binding: the registry stores
-//     func()-typed factories, not eager instances.
-//   - TestOnlySystemAdapterTouchesTheOperatingSystem — hexagonal edge: only
-//     internal/system imports os, os/exec, runtime or syscall; every other
-//     package reaches the machine through a port it declares.
-//   - TestInternalPackagesDoNotPrint — explicit output: no package writes to the
-//     process streams through fmt.Print*; output goes through a logger or writer.
-//   - TestNoHarnessIsNamedOutsideTheAgentRegistry — facts, not names: no
-//     production file of this module names a concrete agent type; the planner and
-//     the isolators compare the facts a harness declares.
-//   - TestCredentialValuesStayInsideSecret — a credential reaches code only
-//     through the Secret type that redacts itself.
-//   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
-//     name no concrete plugin, no OS adapter, no origin leaf, no overlay adapter,
-//     and (for launch) no cobra and no plugin store.
-//   - TestConfinementCannotStartAProcess — a sandbox declaration holds no way to
-//     start the agent, so selection and policy need no launcher.
-//   - TestPortableSpecReachesNoCLIConcern — the run spec, directly or through any
-//     package of this module, imports no command, terminal, workspace, origin,
-//     plugin, overlay, record or configuration package, and the planner core file
-//     beside it imports none of those either.
-//   - TestIsolationBuildsNoAgentCommand — an isolation confines the process the
+//   - TestLeavesDoNotImportCompositionRoot: leaves never import the registry
+//     package internal/sandbox/plugins.
+//   - TestLeavesDoNotImportSiblings: no leaf imports a sibling leaf in the same
+//     axis; cross-leaf knowledge lives in shared/.
+//   - TestSharedCoresImportNoLeaf: an axis shared/ package imports no leaf of
+//     any axis; bridges flow leaf -> other-axis/shared only.
+//   - TestConcreteLeavesHaveOneImporter: only the registry packages and the
+//     composition root import a concrete leaf.
+//   - TestLaunchLibraryImportsFollowTheTable: each package imports only the
+//     shared-launch-go packages its entry lists.
+//   - TestOnlySystemAdapterTouchesTheOperatingSystem: only internal/system
+//     imports os, os/exec, runtime or syscall.
+//   - TestInternalPackagesDoNotPrint: output goes through a logger or writer.
+//   - TestNoHarnessIsNamedOutsideTheAgentRegistry: the planner and the
+//     isolators compare the facts a harness declares, never its name.
+//   - TestCredentialValuesStayInsideSecret: a credential store hands the Secret
+//     on unrevealed.
+//   - TestApplicationCoreNamesNoAdapter: the launch core and the cobra adapter
+//     name no concrete plugin, no OS adapter, no origin leaf and no overlay
+//     adapter.
+//   - TestIsolationBuildsNoAgentCommand: an isolation confines the process the
 //     planner built and never builds the agent command line or its provider
 //     environment itself.
 //
-// The origin axis (internal/origin) has its own fitness tests beside it.
-//
-// The checks use only the standard library (go/parser, go/ast) — no new dependency.
+// The origin axis (internal/origin) has its own fitness tests beside it, and
+// shared-launch-go holds the tests of the selection layer, the ports and the
+// run spec.
+package arch
 
 import (
 	"go/ast"
@@ -49,13 +39,11 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
-	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
-
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
@@ -69,7 +57,7 @@ func internalRoot(t *testing.T) string {
 	if !ok {
 		t.Fatal("runtime.Caller failed")
 	}
-	// file = .../internal/sandbox/architecture_test.go
+	// file = .../internal/arch/architecture_test.go
 	return filepath.Dir(filepath.Dir(file))
 }
 
@@ -128,9 +116,131 @@ func TestLeavesDoNotImportCompositionRoot(t *testing.T) {
 	for _, axis := range axisNames {
 		for _, dir := range leafDirs(t, filepath.Join(root, axis)) {
 			for _, imp := range dirImports(t, dir) {
-				if imp == sandboxPath || (strings.HasPrefix(imp, sandboxPath+"/") && imp != sandboxPath+"/plugins") {
-					t.Errorf("%s imports composition root %s", dir, imp)
+				if imp == sandboxPath || strings.HasPrefix(imp, sandboxPath+"/") {
+					t.Errorf("%s imports the registry package %s", dir, imp)
 				}
+			}
+		}
+	}
+}
+
+// concrete names, for each leaf of this module, the only packages that may
+// import it from non-test code: a registry package or the composition root.
+var concrete = map[string][]string{
+	"internal/isolation/none":            {"internal/sandbox/plugins"},
+	"internal/isolation/bwrap":           {"internal/sandbox/plugins"},
+	"internal/isolation/docker":          {"internal/sandbox/plugins"},
+	"internal/isolation/seatbelt":        {"internal/sandbox/plugins"},
+	"internal/isolation/dockersandboxes": {"internal/sandbox/plugins"},
+	"internal/isolation/openshell":       {"internal/sandbox/plugins"},
+	"internal/provision/none":            {"internal/sandbox/plugins"},
+	"internal/provision/command":         {"internal/sandbox/plugins"},
+	"internal/provision/nix":             {"internal/sandbox/plugins"},
+	"internal/credential/env":            {"internal/sandbox/plugins"},
+	"internal/credential/file":           {"internal/sandbox/plugins"},
+	"internal/credential/keychain":       {"internal/sandbox/plugins"},
+	"internal/credential/pass":           {"internal/sandbox/plugins"},
+	"internal/credential/secretservice":  {"internal/sandbox/plugins"},
+	"internal/origin/directory":          {"internal/origin/plugins"},
+	"internal/origin/git":                {"internal/origin/plugins"},
+	"internal/network/managed":           {"cmd/agent-cli"},
+	"internal/system":                    {"cmd/agent-cli"},
+	"internal/terminal/tmux":             {"cmd/agent-cli"},
+	"internal/terminal/herdr":            {"cmd/agent-cli"},
+	"internal/workspace/git":             {"cmd/agent-cli"},
+	"internal/workspace/jj":              {"cmd/agent-cli"},
+	"internal/origin/plugins":            {"cmd/agent-cli"},
+	"internal/overlay":                   {"cmd/agent-cli"},
+	"internal/sandbox/plugins":           {"cmd/agent-cli"},
+}
+
+// packageImports returns the non-test imports of every package of the module,
+// keyed by the directory of the package relative to the module root.
+func packageImports(t *testing.T) map[string][]string {
+	t.Helper()
+	moduleDir := filepath.Dir(internalRoot(t))
+	out := map[string][]string{}
+	for _, top := range []string{"cmd", "internal"} {
+		for _, file := range productionFiles(t, filepath.Join(moduleDir, top)) {
+			rel, err := filepath.Rel(moduleDir, filepath.Dir(file))
+			if err != nil {
+				t.Fatal(err)
+			}
+			f, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
+			if err != nil {
+				t.Fatalf("parse %s: %v", file, err)
+			}
+			dir := filepath.ToSlash(rel)
+			if _, seen := out[dir]; !seen {
+				out[dir] = nil
+			}
+			for _, im := range f.Imports {
+				if path, err := strconv.Unquote(im.Path.Value); err == nil {
+					out[dir] = append(out[dir], path)
+				}
+			}
+		}
+	}
+	return out
+}
+
+func TestConcreteLeavesHaveOneImporter(t *testing.T) {
+	imports := packageImports(t)
+	for leaf := range concrete {
+		if _, ok := imports[leaf]; !ok {
+			t.Errorf("the concrete table names %s, which has no Go files", leaf)
+		}
+	}
+	for dir, paths := range imports {
+		for _, imp := range paths {
+			leaf, inside := strings.CutPrefix(imp, modPath+"/")
+			if importers, isLeaf := concrete[leaf]; inside && isLeaf && !slices.Contains(importers, dir) {
+				t.Errorf("%s imports the concrete leaf %s; only %v may", dir, leaf, importers)
+			}
+		}
+	}
+}
+
+// launchLibrary is the module path of the shared run kernel.
+const launchLibrary = "github.com/xonovex/platform/packages/library/shared-launch-go"
+
+// launchImports lists, for each package of this module, the packages of
+// shared-launch-go it may import from non-test code. A package missing here
+// imports none.
+var launchImports = map[string][]string{
+	"cmd/agent-cli":                      {"pkg/record"},
+	"internal/cmd":                       {"pkg/record"},
+	"internal/launch":                    {"pkg/credential", "pkg/isolation", "pkg/launch", "pkg/provision", "pkg/record", "pkg/sandbox"},
+	"internal/sandbox/plugins":           {"pkg/credential", "pkg/isolation", "pkg/provision", "pkg/sandbox"},
+	"internal/isolation/shared":          {"pkg/isolation"},
+	"internal/isolation/none":            {"pkg/isolation"},
+	"internal/isolation/bwrap":           {"pkg/isolation"},
+	"internal/isolation/docker":          {"pkg/isolation"},
+	"internal/isolation/seatbelt":        {"pkg/isolation"},
+	"internal/isolation/dockersandboxes": {"pkg/isolation"},
+	"internal/isolation/openshell":       {"pkg/isolation"},
+	"internal/network/managed":           {"pkg/isolation"},
+	"internal/provision/none":            {"pkg/provision"},
+	"internal/provision/command":         {"pkg/provision"},
+	"internal/provision/nix":             {"pkg/provision"},
+	"internal/credential/env":            {"pkg/credential"},
+	"internal/credential/file":           {"pkg/credential"},
+	"internal/credential/keychain":       {"pkg/credential"},
+	"internal/credential/pass":           {"pkg/credential"},
+	"internal/credential/secretservice":  {"pkg/credential"},
+}
+
+func TestLaunchLibraryImportsFollowTheTable(t *testing.T) {
+	imports := packageImports(t)
+	for dir := range launchImports {
+		if _, ok := imports[dir]; !ok {
+			t.Errorf("the launch table names %s, which has no Go files", dir)
+		}
+	}
+	for dir, paths := range imports {
+		for _, imp := range paths {
+			if pkg, inside := strings.CutPrefix(imp, launchLibrary+"/"); inside && !slices.Contains(launchImports[dir], pkg) {
+				t.Errorf("%s imports %s of shared-launch-go; it may import only %v", dir, pkg, launchImports[dir])
 			}
 		}
 	}
@@ -173,108 +283,12 @@ func TestSharedCoresImportNoLeaf(t *testing.T) {
 	}
 }
 
-func TestSelectionLayerNamesNoVariant(t *testing.T) {
-	root := internalRoot(t)
-	banned := map[string]bool{
-		"IsolationNone": true, "IsolationBwrap": true, "IsolationDocker": true,
-		"ProvisionNone": true, "ProvisionNix": true, "ProvisionCommand": true,
-		"NetworkHost": true, "NetworkNone": true,
-		"ModeHost": true, "ModeNone": true, "ModeManaged": true, "NetworkManaged": true,
-		"IsolationSeatbelt": true, "IsolationDockerSandboxes": true, "IsolationOpenShell": true,
-	}
-	// The selection / policy gate (registry.go: Select + Capabilities + EnforcePolicy)
-	// must name no concrete variant; it gates on the Capabilities booleans only.
-	file := filepath.Join(root, "sandbox", "registry.go")
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, file, nil, 0)
-	if err != nil {
-		t.Fatalf("parse %s: %v", file, err)
-	}
-	ast.Inspect(f, func(n ast.Node) bool {
-		if id, ok := n.(*ast.Ident); ok && banned[id.Name] {
-			t.Errorf("selection layer names concrete variant %q", id.Name)
-		}
-		return true
-	})
-}
-
-func TestConcreteConstructorsOnlyInPlugins(t *testing.T) {
-	root := internalRoot(t)
-	// leaf import path -> its concrete constructor name.
-	ctors := map[string]string{
-		modPath + "/internal/isolation/none":    "NewIsolator",
-		modPath + "/internal/isolation/bwrap":   "NewIsolator",
-		modPath + "/internal/isolation/docker":  "NewIsolator",
-		modPath + "/internal/provision/none":    "New",
-		modPath + "/internal/provision/command": "New",
-		modPath + "/internal/provision/nix":     "New",
-
-		modPath + "/internal/isolation/seatbelt":        "NewIsolator",
-		modPath + "/internal/isolation/dockersandboxes": "NewIsolator",
-		modPath + "/internal/isolation/openshell":       "NewIsolator",
-		modPath + "/internal/credential/env":            "New",
-		modPath + "/internal/credential/file":           "New",
-		modPath + "/internal/credential/keychain":       "New",
-		modPath + "/internal/credential/secretservice":  "New",
-		modPath + "/internal/credential/pass":           "New",
-	}
-	pluginsFile := filepath.Join(root, "sandbox", "plugins", "plugins.go")
-
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, root) {
-		f, err := parser.ParseFile(fset, file, nil, 0)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
-		}
-		// alias -> import path for this file.
-		alias := map[string]string{}
-		for _, im := range f.Imports {
-			path, err := strconv.Unquote(im.Path.Value)
-			if err != nil {
-				continue
-			}
-			name := topSegmentLast(path)
-			if im.Name != nil {
-				name = im.Name.Name
-			}
-			alias[name] = path
-		}
-		ast.Inspect(f, func(n ast.Node) bool {
-			sel, ok := n.(*ast.SelectorExpr)
-			if !ok {
-				return true
-			}
-			x, ok := sel.X.(*ast.Ident)
-			if !ok {
-				return true
-			}
-			path, ok := alias[x.Name]
-			if !ok {
-				return true
-			}
-			if ctor, banned := ctors[path]; banned && sel.Sel.Name == ctor && file != pluginsFile {
-				t.Errorf("concrete constructor %s.%s referenced outside plugins.go: %s", x.Name, ctor, file)
-			}
-			return true
-		})
-	}
-}
-
 // topSegmentLast returns the final path segment (the default import identifier).
 func topSegmentLast(path string) string {
 	if i := strings.LastIndexByte(path, '/'); i >= 0 {
 		return path[i+1:]
 	}
 	return path
-}
-
-func TestRegistryFactoriesAreLazy(t *testing.T) {
-	if reflect.TypeOf(IsolatorFactory[isoshared.Confinement](nil)).Kind() != reflect.Func {
-		t.Error("IsolatorFactory must be a func()-typed factory (lazy binding)")
-	}
-	if reflect.TypeOf(ProvisionerFactory(nil)).Kind() != reflect.Func {
-		t.Error("ProvisionerFactory must be a func()-typed factory (lazy binding)")
-	}
 }
 
 // productionFiles returns every non-test Go file under root.
@@ -434,85 +448,6 @@ func TestCredentialValuesStayInsideSecret(t *testing.T) {
 				}
 				return true
 			})
-		}
-	}
-}
-
-func TestConfinementCannotStartAProcess(t *testing.T) {
-	confinement := reflect.TypeFor[isoshared.Confinement]()
-	launcher := reflect.TypeFor[isoshared.Launcher]()
-	if launcher.NumMethod() == 0 {
-		t.Fatal("Launcher declares no method")
-	}
-	for i := range launcher.NumMethod() {
-		name := launcher.Method(i).Name
-		if _, found := confinement.MethodByName(name); found {
-			t.Errorf("Confinement declares the launcher method %s", name)
-		}
-	}
-	for _, name := range []string{"Run", "Command", "TerminalCommand", "CheckAgent", "Available"} {
-		if _, found := confinement.MethodByName(name); found {
-			t.Errorf("Confinement declares %s", name)
-		}
-	}
-}
-
-// cliConcerns are the packages of this module a portable run spec must not reach.
-var cliConcerns = []string{
-	modPath + "/internal/cmd",
-	modPath + "/internal/terminal",
-	modPath + "/internal/workspace",
-	modPath + "/internal/origin",
-	modPath + "/internal/plugin",
-	modPath + "/internal/overlay",
-	modPath + "/internal/record",
-	modPath + "/internal/config",
-	modPath + "/internal/launch",
-	modPath + "/internal/sandbox",
-	modPath + "/internal/system",
-	"github.com/spf13/cobra",
-}
-
-func isCLIConcern(path string) bool {
-	for _, concern := range cliConcerns {
-		if path == concern || strings.HasPrefix(path, concern+"/") {
-			return true
-		}
-	}
-	return false
-}
-
-func TestPortableSpecReachesNoCLIConcern(t *testing.T) {
-	root := internalRoot(t)
-	moduleDir := filepath.Dir(root)
-	seen := map[string]bool{}
-	queue := []string{modPath + "/internal/runspec"}
-	for len(queue) > 0 {
-		current := queue[0]
-		queue = queue[1:]
-		if seen[current] {
-			continue
-		}
-		seen[current] = true
-		for _, imp := range dirImports(t, filepath.Join(moduleDir, strings.TrimPrefix(current, modPath+"/"))) {
-			if isCLIConcern(imp) {
-				t.Errorf("internal/runspec reaches %s through %s", imp, current)
-			}
-			if strings.HasPrefix(imp, modPath+"/") {
-				queue = append(queue, imp)
-			}
-		}
-	}
-
-	file := filepath.Join(root, "launch", "spec.go")
-	f, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
-	if err != nil {
-		t.Fatalf("parse %s: %v", file, err)
-	}
-	for _, im := range f.Imports {
-		path, _ := strconv.Unquote(im.Path.Value)
-		if isCLIConcern(path) && path != modPath+"/internal/sandbox" {
-			t.Errorf("%s imports %s", file, path)
 		}
 	}
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 )
 
 // program is the libsecret command line tool.
@@ -32,24 +32,24 @@ func (s Store) Available() bool {
 
 // Lookup reads the secret whose "service" attribute is the first part of locator
 // and whose "account" attribute is the second, when there is one.
-func (s Store) Lookup(locator string) (shared.Secret, error) {
-	if err := shared.ValidateLocator(locator); err != nil {
-		return shared.Secret{}, err
+func (s Store) Lookup(locator string) (credential.Secret, error) {
+	if err := credential.ValidateLocator(locator); err != nil {
+		return credential.Secret{}, err
 	}
 	service, account, hasAccount := strings.Cut(locator, "/")
 	args := []string{"lookup", "service", service}
 	if hasAccount {
 		if account == "" {
-			return shared.Secret{}, fmt.Errorf("secret-service locator %q has an empty account", locator)
+			return credential.Secret{}, fmt.Errorf("secret-service locator %q has an empty account", locator)
 		}
 		args = append(args, "account", account)
 	}
 	value, err := s.host.Capture(program, args, "")
 	if err != nil {
-		return shared.Secret{}, fmt.Errorf("%w: %w", shared.ErrNotFound, err)
+		return credential.Secret{}, fmt.Errorf("%w: %w", credential.ErrNotFound, err)
 	}
 	if value == "" {
-		return shared.Secret{}, shared.ErrNotFound
+		return credential.Secret{}, credential.ErrNotFound
 	}
-	return shared.NewSecret(value), nil
+	return credential.NewSecret(value), nil
 }

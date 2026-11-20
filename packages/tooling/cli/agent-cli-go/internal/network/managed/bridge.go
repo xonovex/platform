@@ -7,7 +7,7 @@ import (
 	"net"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // BridgeHost is the port the bridge consumes. It runs inside the sandbox.
@@ -40,7 +40,7 @@ func (b Bridge) Run(socket, listen string, command []string) (int, error) {
 	}
 	defer func() { _ = listener.Close() }()
 	go b.serve(listener, socket)
-	env := envutil.MergeEnvMaps(envutil.ParseEnv(b.Host.Environ()), isoshared.ProxyEnv(listen))
+	env := envutil.MergeEnvMaps(envutil.ParseEnv(b.Host.Environ()), isohost.ProxyEnv(listen))
 	code, err := b.Host.Run(command[0], command[1:], envutil.EnvMapToSlice(env), "")
 	if err != nil {
 		return 1, fmt.Errorf("run %s: %w", command[0], err)

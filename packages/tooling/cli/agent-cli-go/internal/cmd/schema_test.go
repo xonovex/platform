@@ -8,8 +8,8 @@ import (
 
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
 
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
 
 func TestSchemaPrintsEachSchemaAsJSON(t *testing.T) {

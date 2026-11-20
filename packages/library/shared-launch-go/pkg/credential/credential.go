@@ -1,9 +1,9 @@
-// Package shared is the credential axis core: the Store port that a credential
+// Package credential is the credential axis core: the Store port that a credential
 // store implements, the Secret value that never prints, the Binding of an
 // environment variable to a stored credential, and the Registry that maps a
 // scheme to a store. It names no concrete store; the per-store packages are the
 // leaves.
-package shared
+package credential
 
 import (
 	"errors"

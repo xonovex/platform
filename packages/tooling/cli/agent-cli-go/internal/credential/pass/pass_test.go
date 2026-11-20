@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -28,10 +28,10 @@ func TestLookup(t *testing.T) {
 	if secret, err := store.Lookup("work/api"); err != nil || secret.Reveal() != "line-one" {
 		t.Errorf("Lookup = %v, %v; want only the first line", secret, err)
 	}
-	if _, err := store.Lookup("work/blank"); !errors.Is(err, shared.ErrNotFound) {
+	if _, err := store.Lookup("work/blank"); !errors.Is(err, credential.ErrNotFound) {
 		t.Errorf("an empty first line error = %v, want ErrNotFound", err)
 	}
-	if _, err := store.Lookup("work/absent"); !errors.Is(err, shared.ErrNotFound) {
+	if _, err := store.Lookup("work/absent"); !errors.Is(err, credential.ErrNotFound) {
 		t.Errorf("a failed tool error = %v, want ErrNotFound", err)
 	}
 	for _, bad := range []string{"../etc", "a/../../b", "-x", ""} {

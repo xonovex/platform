@@ -20,14 +20,15 @@ type Files interface {
 	WriteFile(path string, data []byte, perm fs.FileMode) error
 }
 
-// DefaultDir returns the directory of the run records: agent-cli/runs below the
-// XDG state directory when it is absolute, else below ~/.local/state.
-func DefaultDir(getenv func(string) string, home string) string {
+// DefaultDir returns the directory of the run records of the tool app:
+// app/runs below the XDG state directory when it is absolute, else below
+// ~/.local/state.
+func DefaultDir(getenv func(string) string, home, app string) string {
 	state := getenv("XDG_STATE_HOME")
 	if !path.IsAbs(state) {
 		state = path.Join(home, ".local", "state")
 	}
-	return path.Join(state, "agent-cli", "runs")
+	return path.Join(state, app, "runs")
 }
 
 var idPattern = regexp.MustCompile(`^[0-9]{8}T[0-9]{6}Z(-[0-9]+)?$`)

@@ -1,8 +1,9 @@
-// Package runspec holds the portable plan of one agent run: what runs, under
-// which confinement, and with which guarantees. It holds no checkout, terminal
-// or overlay, and no part of the command line or the configuration files that
-// produced it, so any executor can carry a Spec out.
-package runspec
+// Package launch is the planning core of an agent run: Plan turns a Request
+// into the portable Spec of the run and selects the confinement from a sandbox
+// registry. The Spec holds what runs, under which confinement and with which
+// guarantees, and no checkout, terminal, overlay, command line or configuration
+// file, so any executor can carry it out. The package does no I/O.
+package launch
 
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
@@ -10,9 +11,9 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
-	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
+	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 )
 
 // Spec is a run with every choice resolved and every input validated.

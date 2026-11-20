@@ -14,7 +14,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // program is the Docker Sandboxes command line tool.
@@ -38,12 +39,12 @@ var ErrUnsupported = errors.New("docker-sandboxes cannot run this")
 // can be installed, and a run that asks for none or managed fails closed in the
 // registry instead of running with the host network.
 type Isolator struct {
-	host isoshared.Host
+	host isohost.Host
 	log  logging.Logger
 }
 
 // NewIsolator creates a Docker Sandboxes isolator over host, writing through log.
-func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+func NewIsolator(host isohost.Host, log logging.Logger) *Isolator {
 	return &Isolator{host: host, log: log}
 }
 
@@ -119,7 +120,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 		return 1, fmt.Errorf("create sandbox: %w", err)
 	}
 	env := append(i.host.Environ(), envutil.EnvMapToSlice(p.values)...)
-	code, runErr := isoshared.SpawnSandbox(i.host, i.log, program, p.exec, env, "", "Docker Sandboxes")
+	code, runErr := isohost.SpawnSandbox(i.host, i.log, program, p.exec, env, "", "Docker Sandboxes")
 	if err := i.release(name); err != nil {
 		i.log.Warning(fmt.Sprintf("Could not remove sandbox %s: %v", name, err))
 	}
@@ -171,11 +172,11 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	case len(c.PathEntries) > 0:
 		return plan{}, fmt.Errorf("%w: a provisioned tool directory cannot reach the sandbox PATH", ErrUnsupported)
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
+	workDir, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return plan{}, err
 	}
-	runEnv, err := isoshared.RunEnv(cfg)
+	runEnv, err := isohost.RunEnv(cfg)
 	if err != nil {
 		return plan{}, err
 	}
@@ -183,7 +184,7 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 
 	mounts := []string{workDir}
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-write bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-write bind")
 		if err != nil {
 			return plan{}, err
 		}
@@ -191,7 +192,7 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	}
 	var readOnly []string
 	for _, path := range append(append([]string(nil), c.RoBindPaths...), cfg.RoBindPaths...) {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return plan{}, err
 		}

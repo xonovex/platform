@@ -6,13 +6,14 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 )
 
 // HostExecution builds the command and the environment of an agent process
 // that runs on the host, under the wrapper of the isolator or none at all: the
 // host environment, the provider environment, the environment of the process
 // and credential values, and the provisioner's environment and tool directories.
-func HostExecution(host Host, cfg RunConfig, c provision.Contribution) ([]string, []string, error) {
+func HostExecution(host Host, cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	if len(cfg.Process.Argv) == 0 {
 		return nil, nil, errors.New("the agent process has no command")
 	}

@@ -10,7 +10,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // program is the macOS command that runs a process under a profile.
@@ -23,12 +24,12 @@ const program = "sandbox-exec"
 // a managed run reaches an allowlist proxy on the host loopback, and the profile
 // allows that one port.
 type Isolator struct {
-	host isoshared.Host
+	host isohost.Host
 	log  logging.Logger
 }
 
 // NewIsolator creates a seatbelt isolator over host, writing through log.
-func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+func NewIsolator(host isohost.Host, log logging.Logger) *Isolator {
 	return &Isolator{host: host, log: log}
 }
 
@@ -74,7 +75,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "Seatbelt sandbox")
+	return isohost.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "Seatbelt sandbox")
 }
 
 // Command returns the sandbox-exec command (for display and terminal wrappers).
@@ -97,7 +98,7 @@ func (i *Isolator) command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	if err != nil {
 		return nil, nil, err
 	}
-	agent, env, err := isoshared.HostExecution(i.host, cfg, c)
+	agent, env, err := isohost.HostExecution(i.host, cfg, c)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -106,11 +107,11 @@ func (i *Isolator) command(cfg isoshared.RunConfig, c provision.Contribution) ([
 
 // spec resolves every path the run names to its canonical form.
 func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (profileSpec, error) {
-	home, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
+	home, err := isohost.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return profileSpec{}, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
+	workDir, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return profileSpec{}, err
 	}
@@ -125,7 +126,7 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 		spec.ProxyAddress = cfg.Egress.Proxy
 	}
 	if cfg.RepoDir != "" {
-		repo, err := isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
+		repo, err := isohost.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
 		if err != nil {
 			return profileSpec{}, err
 		}
@@ -134,7 +135,7 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 	// The agent keeps its login and its sessions in its configuration, so it reads
 	// and writes those places; the rest of the home directory stays hidden.
 	for _, configPath := range cfg.Agent.UserConfigPaths {
-		source, exists, err := isoshared.ResolveContainedOptionalPath(i.host, home, configPath, "user config path")
+		source, exists, err := isohost.ResolveContainedOptionalPath(i.host, home, configPath, "user config path")
 		if err != nil {
 			return profileSpec{}, err
 		}
@@ -144,14 +145,14 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 		}
 	}
 	for _, path := range c.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "provisioned read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "provisioned read-only bind")
 		if err != nil {
 			return profileSpec{}, err
 		}
 		spec.Readable = append(spec.Readable, resolved)
 	}
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, filepath.Clean(path), "read-write bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, filepath.Clean(path), "read-write bind")
 		if err != nil {
 			return profileSpec{}, err
 		}
@@ -159,7 +160,7 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 		spec.Readable = append(spec.Readable, resolved)
 	}
 	for _, path := range cfg.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
+		resolved, err := isohost.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return profileSpec{}, err
 		}

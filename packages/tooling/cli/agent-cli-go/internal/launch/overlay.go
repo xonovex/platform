@@ -9,7 +9,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/overlay"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 )
 
 // OverlayRequest asks for the artifact overlay of one run: the skills, agents,

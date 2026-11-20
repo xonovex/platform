@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 )
 
 // program is the pass command line tool.
@@ -32,23 +32,23 @@ func (s Store) Available() bool {
 
 // Lookup reads the first line of the entry named by locator. It refuses an entry
 // name that climbs out of the store.
-func (s Store) Lookup(locator string) (shared.Secret, error) {
-	if err := shared.ValidateLocator(locator); err != nil {
-		return shared.Secret{}, err
+func (s Store) Lookup(locator string) (credential.Secret, error) {
+	if err := credential.ValidateLocator(locator); err != nil {
+		return credential.Secret{}, err
 	}
 	for _, part := range strings.Split(locator, "/") {
 		if part == ".." {
-			return shared.Secret{}, fmt.Errorf("pass entry %q climbs out of the store", locator)
+			return credential.Secret{}, fmt.Errorf("pass entry %q climbs out of the store", locator)
 		}
 	}
 	output, err := s.host.Capture(program, []string{"show", locator}, "")
 	if err != nil {
-		return shared.Secret{}, fmt.Errorf("%w: %w", shared.ErrNotFound, err)
+		return credential.Secret{}, fmt.Errorf("%w: %w", credential.ErrNotFound, err)
 	}
 	value, _, _ := strings.Cut(output, "\n")
 	value = strings.TrimRight(value, "\r")
 	if value == "" {
-		return shared.Secret{}, shared.ErrNotFound
+		return credential.Secret{}, credential.ErrNotFound
 	}
-	return shared.NewSecret(value), nil
+	return credential.NewSecret(value), nil
 }

@@ -8,7 +8,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	isohost "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 // Isolator runs the agent directly on the host — no namespace boundary. It
@@ -17,12 +18,12 @@ import (
 // runs WITHOUT the sandbox permission bypass and keeps its normal host
 // permission prompts.
 type Isolator struct {
-	host isoshared.Host
+	host isohost.Host
 	log  logging.Logger
 }
 
 // NewIsolator creates a host (no-isolation) isolator over host, writing through log.
-func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+func NewIsolator(host isohost.Host, log logging.Logger) *Isolator {
 	return &Isolator{host: host, log: log}
 }
 
@@ -67,7 +68,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "host execution")
+	return isohost.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "host execution")
 }
 
 // Command returns the host command (for display / terminal wrappers).
@@ -89,8 +90,8 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if cfg.Network != network.NetworkHost {
 		return nil, nil, fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", cfg.Network)
 	}
-	if _, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory"); err != nil {
+	if _, err := isohost.ResolveDirectory(i.host, cfg.Process.Dir, "work directory"); err != nil {
 		return nil, nil, err
 	}
-	return isoshared.HostExecution(i.host, cfg, c)
+	return isohost.HostExecution(i.host, cfg, c)
 }

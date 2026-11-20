@@ -9,12 +9,12 @@ import (
 
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
@@ -82,7 +82,7 @@ func runStore(host system.System) (record.Store, error) {
 	if err != nil {
 		return record.Store{}, err
 	}
-	return record.NewStore(host, record.DefaultDir(host.Getenv, home))
+	return record.NewStore(host, record.DefaultDir(host.Getenv, home, "agent-cli"))
 }
 
 // approvalStore opens the approval ledger of the user.

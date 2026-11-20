@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
 
 // writeRecord stores the record of a finished run. A store that fails costs the

@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 )
 
 // latest is the id that names the newest run.

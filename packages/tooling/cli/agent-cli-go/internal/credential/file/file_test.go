@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -34,7 +34,7 @@ func TestLookup(t *testing.T) {
 			t.Errorf("%s: Lookup(%q) succeeded", name, locator)
 		}
 	}
-	if _, err := store.Lookup("/secrets/empty"); !errors.Is(err, shared.ErrNotFound) {
+	if _, err := store.Lookup("/secrets/empty"); !errors.Is(err, credential.ErrNotFound) {
 		t.Errorf("an empty file error = %v, want ErrNotFound", err)
 	}
 	if _, err := store.Lookup("/secrets/open"); err == nil || !strings.Contains(err.Error(), "chmod 600") {
