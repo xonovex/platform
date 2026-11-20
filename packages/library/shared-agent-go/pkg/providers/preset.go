@@ -11,7 +11,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -213,4 +215,25 @@ func expand(value string, slots map[string]Slot) (string, error) {
 		return "", fmt.Errorf("value %q holds a malformed {model:...} placeholder; write {model:<slot>} or {model:<slot>:effort}", value)
 	}
 	return out, nil
+}
+
+var hostPattern = regexp.MustCompile(`https?://[^\s/"'?#]+`)
+
+// Hosts returns the hosts that the environment values and the arguments of the
+// route name as URLs, sorted. A credential sent to a route reaches these hosts.
+func (p Preset) Hosts() []string {
+	found := map[string]bool{}
+	scan := func(value string) {
+		for _, match := range hostPattern.FindAllString(value, -1) {
+			_, host, _ := strings.Cut(match, "://")
+			found[host] = true
+		}
+	}
+	for _, value := range p.Env {
+		scan(value)
+	}
+	for _, arg := range p.Args {
+		scan(arg)
+	}
+	return slices.Sorted(maps.Keys(found))
 }

@@ -139,3 +139,14 @@ func TestValidateRejectsAndAcceptsDirectly(t *testing.T) {
 		t.Errorf("Validate() error = %v", err)
 	}
 }
+
+func TestHostsNamesTheHostsOfTheRoute(t *testing.T) {
+	preset, err := ParsePreset([]byte(`{"name":"proj","agent":"claude","environment":{"BASE_URL":"https://models.example.test:8443/v1","OTHER":"http://127.0.0.1:8317/v1","NOTE":"no url"},"args":["-c","base_url=\"https://args.example.test/x\""]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"127.0.0.1:8317", "args.example.test", "models.example.test:8443"}
+	if got := preset.Hosts(); !reflect.DeepEqual(got, want) {
+		t.Errorf("Hosts() = %q, want %q", got, want)
+	}
+}
