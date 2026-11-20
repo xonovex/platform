@@ -18,6 +18,6 @@ tasks:
       - skill-configuring-opencode:ci-check
       - skill-configuring-pi:ci-check
       - skill-evaluating-skills:ci-check
-      - skill-using-herdr:ci-check
+      - skill-using-herdr-tui:ci-check
     options:
       mergeDeps: append

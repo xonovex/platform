@@ -123,10 +123,10 @@
     },
     {
       "id": "query-0018",
-      "prompt": "Start a Codex agent in a new Herdr tab using my requested model and reasoning effort, then submit the prompt file as a goal.",
+      "prompt": "Start a Codex agent in a new tab of the herdr TUI using my requested model and reasoning effort, then submit the prompt file as a goal.",
       "shouldTrigger": false,
       "split": "validation",
-      "rationale": "near miss owned by using-herdr"
+      "rationale": "near miss owned by using-herdr-tui"
     },
     {
       "id": "query-0019",

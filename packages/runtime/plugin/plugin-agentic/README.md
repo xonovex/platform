@@ -46,7 +46,7 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [configuring-opencode](skills/configuring-opencode/SKILL.md) | Writing or debugging OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
 | [configuring-pi](skills/configuring-pi/SKILL.md) | Writing or configuring Pi extensions, packages, skills, settings, or permissions. |
 | [evaluating-skills](skills/evaluating-skills/SKILL.md) | Testing by model runs if a skill triggers or helps: trigger evals, output evals with and without it, or a trim ablation. |
-| [using-herdr](skills/using-herdr/SKILL.md) | Using Herdr to launch, inspect, or control agents, panes, tabs, workspaces, and terminal commands. |
+| [using-herdr-tui](skills/using-herdr-tui/SKILL.md) | Using the Herdr terminal multiplexer and its `herdr` CLI to launch, inspect, or control agents, panes, tabs, workspaces, and terminal commands in a Herdr TUI session. |
 
 ## Validation
 

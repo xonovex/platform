@@ -1,11 +1,11 @@
 ---
-name: using-herdr
-description: "Use when using Herdr to launch, inspect, or control agents, panes, tabs, workspaces, and terminal commands. Triggers on `herdr`, sending prompts or native goals to an agent, reading agent status or output, or moving running agents between spaces, even when the user doesn't say 'workspace' and calls it a 'space'."
+name: using-herdr-tui
+description: "Use when controlling the Herdr terminal multiplexer through the `herdr` CLI: launching or inspecting agents, panes, tabs, workspaces, and terminal commands. Triggers on `herdr agent`, `herdr pane`, `herdr tab`, `herdr workspace`, `HERDR_ENV`, prompts or native goals for an agent, agent status or output, or moving running agents between workspaces, even when the user doesn't say 'TUI'."
 ---
 
-# Herdr Terminal and Agent Control
+# Herdr TUI Terminal and Agent Control
 
-Use Herdr for the requested terminal work. Its workspaces, also called spaces, contain tabs and panes. A pane can contain a shell, an ordinary command, or a recognized coding agent.
+Herdr TUI workspaces contain tabs and panes. A pane holds a shell, an ordinary command, or a recognized coding agent.
 
 ## Core Principles
 
@@ -25,15 +25,15 @@ Use Herdr for the requested terminal work. Its workspaces, also called spaces, c
 
 ## Gotchas
 
-- If the environment check fails, report that this agent is outside Herdr and stop session control. Do not attach to the user's focused session as a fallback.
-- Bare `herdr` launches the interface. Use `--help` or a command group for discovery; incomplete mutating commands can execute with defaults.
+- If the environment check fails, report that this agent is outside a Herdr TUI session and stop. Do not attach to the user's focused session as a fallback.
+- Bare `herdr` launches the interface. Discover with `--help`; incomplete mutating commands can execute with defaults.
 - Moving a pane across workspaces changes its pane ID. The inherited old caller ID can still resolve for that process; other callers must use the returned ID or live agent name.
-- `idle` and `done` mean ready for input, not verified task completion. `unknown` does not prove completion.
+- `idle` and `done` mean ready for input, not task completion; an unrecognized approval screen also reads `idle`. `unknown` does not prove completion.
 - A prompt timeout does not prove failed delivery. Inspect before retrying; an unbounded wait can run indefinitely.
-- This skill does not authorize additional agents or unrelated terminal changes. Preserve the user's existing authorization and requested scope.
+- This skill does not authorize additional agents or unrelated terminal changes; keep the user's authorization and requested scope.
 
 ## Progressive Disclosure
 
 - Read [references/agents.md](references/agents.md) - Load when starting or coordinating agents, submitting goals, or resolving uncertain prompt delivery.
-- Read [references/layout.md](references/layout.md) - Load when creating, renaming, splitting, or moving spaces, tabs, and panes.
+- Read [references/layout.md](references/layout.md) - Load when creating, renaming, splitting, or moving workspaces, tabs, and panes.
 - Read [references/commands.md](references/commands.md) - Load when running commands, reading terminal output, or waiting for a result.

@@ -1,62 +1,62 @@
 {
   "version": 1,
-  "skill": "using-herdr",
+  "skill": "using-herdr-tui",
   "queries": [
     {
       "id": "query-0001",
-      "prompt": "Create two Herdr tabs running Codex and submit each task.md file as its native goal.",
+      "prompt": "Create two tabs in my herdr TUI session running Codex and submit each task.md file as its native goal.",
       "shouldTrigger": true,
       "split": "train",
       "rationale": "requested terminal topology and native agent goal submission"
     },
     {
       "id": "query-0002",
-      "prompt": "Use Herdr to read the build agent's latest response without switching my active tab.",
+      "prompt": "In the herdr terminal multiplexer, read the build agent's latest response without switching my active tab.",
       "shouldTrigger": true,
       "split": "train",
       "rationale": "agent output inspection with focus preservation"
     },
     {
       "id": "query-0003",
-      "prompt": "Move the running reviewer in Herdr into its own space without terminating it.",
+      "prompt": "Move the running reviewer pane in herdr into its own workspace without terminating it.",
       "shouldTrigger": true,
       "split": "train",
       "rationale": "workspace move with process and identity preservation"
     },
     {
       "id": "query-0004",
-      "prompt": "Run npm test in another Herdr pane and read the result when it finishes.",
+      "prompt": "Split my herdr pane, run npm test in the new pane, and read the result when it finishes.",
       "shouldTrigger": true,
       "split": "train",
       "rationale": "ordinary terminal command rather than an agent launch"
     },
     {
       "id": "query-0005",
-      "prompt": "The Herdr agent prompt timed out. Check whether the task already started before sending it again.",
+      "prompt": "The herdr agent prompt command timed out. Check whether the task already started before sending it again.",
       "shouldTrigger": true,
       "split": "train",
       "rationale": "reconciliation after uncertain prompt delivery"
     },
     {
       "id": "query-0006",
-      "prompt": "Organize the current Herdr agents into project spaces and give the batch tabs short names.",
+      "prompt": "Organize the agents in my herdr TUI session into project workspaces and give the batch tabs short names.",
       "shouldTrigger": true,
       "split": "validation",
       "rationale": "requested organization of existing agents"
     },
     {
       "id": "query-0007",
-      "prompt": "Start a Codex agent in a new Herdr tab using my requested model and reasoning effort, then submit the prompt file as a goal.",
+      "prompt": "Start a Codex agent in a new tab of the herdr TUI using my requested model and reasoning effort, then submit the prompt file as a goal.",
       "shouldTrigger": true,
       "split": "validation",
       "rationale": "terminal control owns launch and submission; native arguments remain agent-specific"
     },
     {
       "id": "query-0008",
-      "prompt": "Use Herdr to inspect which agents are working, blocked, or ready for another prompt.",
+      "prompt": "HERDR_ENV is 1 here. List the herdr agents and tell me which are working, blocked, or ready for another prompt.",
       "shouldTrigger": true,
       "split": "validation",
-      "rationale": "recognized agent lifecycle inspection"
+      "rationale": "recognized agent lifecycle inspection inside a herdr session"
     },
     {
       "id": "query-0009",
@@ -113,6 +113,20 @@
       "shouldTrigger": false,
       "split": "validation",
       "rationale": "application interface change rather than live Herdr tab organization"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "Start a background Codex reviewer with hc run --bg, then wait for its report with hc wait.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "the hc terminal runtime rather than the herdr TUI CLI"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "Open a new tab in the Herdr desktop app window with herdr-app and start Claude Code in it.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "desktop app window control rather than the herdr TUI CLI"
     }
   ]
 }

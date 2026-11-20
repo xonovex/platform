@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "skill": "using-herdr",
+  "skill": "using-herdr-tui",
   "tier": "moderate",
   "cases": [
     {
       "id": "case-1",
-      "prompt": "Describe the commands to start two Codex agents in new Herdr tabs in this repository, preserving my current focus. Use the model and reasoning effort I requested. Each agent must receive the entire contents of its separate prompt file through the native /goal command. Do not run the commands yet.",
+      "prompt": "Describe the commands to start two Codex agents in new tabs of my herdr TUI session in this repository, preserving my current focus. Use the model and reasoning effort I requested. Each agent must receive the entire contents of its separate prompt file through the native /goal command. Do not run the commands yet.",
       "gate": "required",
       "expect": [
         {
@@ -28,7 +28,7 @@
     },
     {
       "id": "case-2",
-      "prompt": "Explain how to move the existing reviewer agent in Herdr into a new workspace named Review without terminating it. Its current pane is w1:p7. Do not run the move yet.",
+      "prompt": "Explain how to move the existing reviewer agent in herdr into a new workspace named Review without terminating it. Its current pane is w1:p7. Do not run the move yet.",
       "gate": "required",
       "expect": [
         {
@@ -47,7 +47,7 @@
     },
     {
       "id": "case-3",
-      "prompt": "A Herdr prompt submission timed out while the reviewer was already working. I also need npm test running in a separate terminal. Explain the next steps without resubmitting the prompt or running commands yet.",
+      "prompt": "A herdr agent prompt submission timed out while the reviewer was already working. I also need npm test running in a separate herdr pane. Explain the next steps without resubmitting the prompt or running commands yet.",
       "gate": "required",
       "expect": [
         {
@@ -65,6 +65,21 @@
         {
           "kind": "llm",
           "criterion": "Uses bounded waits and checks the command result or artifacts rather than assuming a matched output line proves success."
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "Use herdr to split my pane and start a Claude Code reviewer next to me. In this terminal, `echo $HERDR_ENV` prints an empty line. Tell me what you would do; do not run anything yet.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Treats the empty HERDR_ENV as a failed environment check and reports that this agent is outside a Herdr TUI session."
+        },
+        {
+          "kind": "llm",
+          "criterion": "Stops session control: does not split a pane, start an agent, or attach to the user's focused Herdr session as a fallback."
         }
       ]
     }

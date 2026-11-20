@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "installed-herdr-guidance-and-cli-help",
+      "kind": "original",
+      "title": "Installed Herdr guidance and CLI help",
+      "version": "0.9.5",
+      "outputSha256": "sha256:e5c2fc8c9070b17c36e1186c4d670b8640275eed8abb46845407d4ab7bb9df79",
+      "provenance": "Authoritative output from the installed `herdr --version`, `herdr --skill`, `herdr --help`, then `--help` of `herdr agent`, `herdr pane`, `herdr workspace`, `herdr tab`, `herdr agent list`, `herdr agent get`, `herdr agent read`, `herdr agent send-keys`, `herdr agent prompt`, `herdr agent wait`, `herdr agent start`, `herdr pane list`, `herdr pane current`, `herdr pane layout`, `herdr pane read`, `herdr pane split`, `herdr pane move`, `herdr pane send-keys`, `herdr pane wait-output`, `herdr pane run`, `herdr workspace list`, `herdr workspace create`, `herdr tab list`, and `herdr tab create`.",
+      "reviewedAt": "2026-11-20",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Caller environment requirement; installed help as syntax authority; workspace, tab, pane, and agent surfaces; creation and move response fields; live agent identity; interactive startup; prompt submission; wait semantics; output sources; focus and process preservation; an unrecognized approval dialog can leave an agent idle."
+        }
+      ],
+      "remarks": "The digest covers each listed command's standard output followed by standard error, concatenated in the stated order. `herdr --help` prints the configuration and log paths, so the digest holds for XDG_CONFIG_HOME=/tmp/skill-sources/config. The commands ran with HOME and every XDG directory, including XDG_RUNTIME_DIR, in that temporary directory, so no command could reach a running server. Every probe was read-only; this review did not launch agents or alter terminal layout. The web documentation for 0.9.5 states that integration reports replace screen detection and that blocked detection is strict for screen-detected agents; it states no version change to Codex or Claude Code status detection."
+    },
+    {
+      "id": "repository-workflow-synthesis",
+      "kind": "original",
+      "title": "Repository workflow synthesis",
+      "provenance": "Repository-original procedures derived from requested Herdr workflows: prompt files as native goals, explicit agent settings, project workspaces, short batch tab labels, moves without process termination, and reconciliation after uncertain delivery.",
+      "reviewedAt": "2026-11-20",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Safe argument-based submission of full prompt files, verification of native goals and requested settings, and task-output checks separate from terminal readiness."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh",
+      "text": "After a CLI update, load the installed guide and relevant help again. Check server compatibility before relying on new features. Reconcile changed commands, response fields, and lifecycle behavior, then update the observed version, review date, and CLI digest. Native agent flags and slash commands require separate confirmation from the installed agent.",
+      "after": "repository-workflow-synthesis"
+    }
+  ]
+}
