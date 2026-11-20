@@ -1,8 +1,7 @@
 package tmux
 
 import (
-	"os"
-	"os/exec"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -20,23 +19,41 @@ type gitInfo struct {
 	shortCommit string
 }
 
-// Executor implements tmux terminal wrapper
-type Executor struct{ log logging.Logger }
+// Host is the port the tmux executor consumes: the tmux and git commands it
+// runs, the environment it reads, and the launch script it writes.
+type Host interface {
+	LookPath(file string) (string, error)
+	Getenv(key string) string
+	// Capture runs name in dir and returns its trimmed standard output.
+	Capture(name string, args []string, dir string) (string, error)
+	// Run starts name attached to the terminal of the CLI and returns its exit
+	// code; a nil env inherits the environment of the CLI.
+	Run(name string, args, env []string, dir string) (int, error)
+	CreateTemp(pattern string) (string, error)
+	WriteFile(path string, data []byte, perm fs.FileMode) error
+	Remove(path string) error
+}
 
-// NewExecutor creates a new tmux executor writing through log.
-func NewExecutor(log logging.Logger) *Executor {
-	return &Executor{log: log}
+// Executor implements tmux terminal wrapper
+type Executor struct {
+	host Host
+	log  logging.Logger
+}
+
+// NewExecutor creates a tmux executor over host, writing through log.
+func NewExecutor(host Host, log logging.Logger) *Executor {
+	return &Executor{host: host, log: log}
 }
 
 // IsAvailable checks if tmux is installed
 func (e *Executor) IsAvailable() bool {
-	_, err := exec.LookPath("tmux")
+	_, err := e.host.LookPath("tmux")
 	return err == nil
 }
 
 // IsInside checks if we're already inside a tmux session
 func (e *Executor) IsInside() bool {
-	return os.Getenv("TMUX") != ""
+	return e.host.Getenv("TMUX") != ""
 }
 
 // Execute runs the command in a tmux session
@@ -44,89 +61,66 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 	// Generate session and window names if not provided
 	sessionName := config.SessionName
 	if sessionName == "" {
-		sessionName = generateSessionName(workDir)
+		sessionName = generateSessionName(workDir, getGitInfo(e.host, workDir))
 	}
 
 	windowName := config.WindowName
 	if windowName == "" {
-		windowName = generateWindowName(workDir)
+		windowName = generateWindowName(workDir, getGitInfo(e.host, workDir))
 	}
 
-	launchScript, err := createLaunchScript(command, env)
+	launchScript, err := createLaunchScript(e.host, command, env)
 	if err != nil {
 		return 1, err
 	}
 
-	// Check if session already exists
-	sessionExists := e.sessionExists(sessionName)
-
-	if sessionExists {
-		// Add new window to existing session
-		exitCode, err := e.addWindow(sessionName, windowName, workDir, launchScript, config.Detach)
-		if err != nil || exitCode != 0 {
-			_ = os.Remove(launchScript)
-		}
-		return exitCode, err
+	run := e.createSession
+	if e.sessionExists(sessionName) {
+		run = e.addWindow
 	}
-
-	// Create new session
-	exitCode, err := e.createSession(sessionName, windowName, workDir, launchScript, config.Detach)
+	exitCode, err := run(sessionName, windowName, workDir, launchScript, config.Detach)
 	if err != nil || exitCode != 0 {
-		_ = os.Remove(launchScript)
+		_ = e.host.Remove(launchScript)
 	}
 	return exitCode, err
 }
 
 // sessionExists checks if a tmux session with the given name exists
 func (e *Executor) sessionExists(name string) bool {
-	cmd := exec.Command("tmux", "has-session", "-t", name)
-	err := cmd.Run()
+	_, err := e.host.Capture("tmux", []string{"has-session", "-t", name}, "")
 	return err == nil
 }
 
-// getGitInfo retrieves git repository information for the given directory
-func getGitInfo(workDir string) *gitInfo {
-	info := &gitInfo{}
-
-	// Get repository root and name
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-	cmd.Dir = workDir
-	output, err := cmd.Output()
+// getGitInfo retrieves git repository information for the given directory, or
+// nil when workDir is not in a git repository with a commit.
+func getGitInfo(host Host, workDir string) *gitInfo {
+	repoRoot, err := host.Capture("git", []string{"rev-parse", "--show-toplevel"}, workDir)
 	if err != nil {
 		return nil
 	}
-	repoRoot := strings.TrimSpace(string(output))
-	info.repoName = filepath.Base(repoRoot)
-	info.parentDir = filepath.Base(filepath.Dir(repoRoot))
-
-	// Get current branch name
-	cmd = exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
-	cmd.Dir = workDir
-	output, err = cmd.Output()
+	branchName, err := host.Capture("git", []string{"rev-parse", "--abbrev-ref", "HEAD"}, workDir)
 	if err != nil {
 		return nil
 	}
-	info.branchName = strings.TrimSpace(string(output))
-
-	// Get short commit hash
-	cmd = exec.Command("git", "rev-parse", "--short", "HEAD")
-	cmd.Dir = workDir
-	output, err = cmd.Output()
+	shortCommit, err := host.Capture("git", []string{"rev-parse", "--short", "HEAD"}, workDir)
 	if err != nil {
 		return nil
 	}
-	info.shortCommit = strings.TrimSpace(string(output))
-
-	return info
+	return &gitInfo{
+		repoName:    filepath.Base(repoRoot),
+		parentDir:   filepath.Base(filepath.Dir(repoRoot)),
+		branchName:  branchName,
+		shortCommit: shortCommit,
+	}
 }
 
 // generateSessionName generates a session name from directory and git info
 // Format: <parent>-<dir>/<branch> (e.g., "xonovex-platform/master")
-func generateSessionName(workDir string) string {
+func generateSessionName(workDir string, info *gitInfo) string {
 	dirName := filepath.Base(workDir)
 	parentDir := filepath.Base(filepath.Dir(workDir))
 
-	if info := getGitInfo(workDir); info != nil {
+	if info != nil {
 		if parentDir != "" && parentDir != "." && parentDir != "/" {
 			return sanitizeName(parentDir) + "-" + sanitizeName(dirName) + "/" + sanitizeName(info.branchName)
 		}
@@ -141,8 +135,8 @@ func generateSessionName(workDir string) string {
 
 // generateWindowName generates a window name from git info or work directory
 // Format: <branch>/<short-commit> (e.g., "master/c89010f")
-func generateWindowName(workDir string) string {
-	if info := getGitInfo(workDir); info != nil {
+func generateWindowName(workDir string, info *gitInfo) string {
+	if info != nil {
 		return sanitizeName(info.branchName) + "/" + info.shortCommit
 	}
 	// Fallback to directory-based naming
@@ -186,17 +180,8 @@ func (e *Executor) createSession(sessionName, windowName, workDir, launchScript 
 
 	e.log.Debug("Creating tmux session: " + sessionName)
 
-	cmd := exec.Command("tmux", args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			return exitErr.ExitCode(), nil
-		}
-		return 1, err
+	if code, err := e.host.Run("tmux", args, nil, ""); err != nil || code != 0 {
+		return code, err
 	}
 
 	// If detached, print session info
@@ -221,17 +206,8 @@ func (e *Executor) addWindow(sessionName, windowName, workDir, launchScript stri
 
 	e.log.Debug("Adding window to tmux session: " + sessionName)
 
-	cmd := exec.Command("tmux", args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			return exitErr.ExitCode(), nil
-		}
-		return 1, err
+	if code, err := e.host.Run("tmux", args, nil, ""); err != nil || code != 0 {
+		return code, err
 	}
 
 	// Attach to session if not detaching
@@ -251,20 +227,7 @@ func (e *Executor) attachSession(sessionName string) (int, error) {
 
 	e.log.Debug("Attaching to tmux session: " + sessionName)
 
-	cmd := exec.Command("tmux", args...)
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			return exitErr.ExitCode(), nil
-		}
-		return 1, err
-	}
-
-	return 0, nil
+	return e.host.Run("tmux", args, nil, "")
 }
 
 // buildShellCommand builds a shell command from arguments

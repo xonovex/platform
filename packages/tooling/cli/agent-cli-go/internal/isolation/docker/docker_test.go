@@ -2,44 +2,40 @@ package docker
 
 import (
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
-// dockerCfg builds a run config rooted in an empty temporary home directory, so
-// the arguments depend on the config paths a test creates rather than on the
-// host user's configuration.
-func dockerCfg(t *testing.T, net netshared.Mode, workDir string) isoshared.RunConfig {
-	t.Helper()
+// newHost returns an in-memory host with an empty home and a work directory,
+// uid and gid 1000 and 4 CPUs.
+func newHost() *systemtest.Fake {
+	return systemtest.New().AddDir("/home/user").AddDir("/work")
+}
+
+// dockerCfg builds a run config rooted in the empty home of newHost, so the
+// arguments depend on the config paths a test creates rather than on the host
+// user's configuration.
+func dockerCfg(net netshared.Mode) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:   &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
-		WorkDir: workDir,
-		HomeDir: t.TempDir(),
+		WorkDir: "/work",
+		HomeDir: "/home/user",
 		Network: net,
 	}
 }
 
-// canonicalPath resolves the symlinks a bind source is reported through, which
-// is how the isolator names a path it mounts.
-func canonicalPath(t *testing.T, path string) string {
+func dockerCommand(t *testing.T, host *systemtest.Fake, cfg isoshared.RunConfig, c provision.Contribution) []string {
 	t.Helper()
-	resolved, err := filepath.EvalSymlinks(path)
-	if err != nil {
-		t.Fatalf("EvalSymlinks(%q) error = %v", path, err)
-	}
-	return resolved
-}
-
-func dockerCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
-	t.Helper()
-	command, err := NewIsolator(testLog).Command(cfg, c)
+	command, err := NewIsolator(host, testLog).Command(cfg, c)
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
@@ -65,9 +61,7 @@ func argHasPair(args []string, a, b string) bool {
 }
 
 func TestDocker_SecurityDefaults(t *testing.T) {
-	work := t.TempDir()
-	cfg := dockerCfg(t, netshared.ModeNone, work)
-	args := dockerCommand(t, cfg, provision.Contribution{})
+	args := dockerCommand(t, newHost(), dockerCfg(netshared.ModeNone), provision.Contribution{})
 
 	if !argHas(args, "--read-only") {
 		t.Error("missing --read-only rootfs")
@@ -90,8 +84,11 @@ func TestDocker_SecurityDefaults(t *testing.T) {
 	if !argHasPair(args, "--memory", dockerMemory) {
 		t.Error("missing --memory limit")
 	}
-	if !argHas(args, "--cpus") {
-		t.Error("missing --cpus limit")
+	if !argHasPair(args, "--cpus", "4") {
+		t.Error("missing --cpus limit of the host CPU count")
+	}
+	if !argHasPair(args, "-u", "1000:1000") {
+		t.Error("the container must run as the host user")
 	}
 	// Never disable seccomp.
 	for _, a := range args {
@@ -100,8 +97,7 @@ func TestDocker_SecurityDefaults(t *testing.T) {
 		}
 	}
 	// Only the curated config paths enter the container, never the home as a whole.
-	homeDir := canonicalPath(t, cfg.HomeDir)
-	if argHasPair(args, "-v", homeDir+":"+homeDir) {
+	if argHasPair(args, "-v", "/home/user:/home/user") {
 		t.Error("must not mount the whole host home directory")
 	}
 }
@@ -109,21 +105,12 @@ func TestDocker_SecurityDefaults(t *testing.T) {
 // The curated user config paths are the only home content the container sees,
 // and each is mounted read-only into the synthetic HOME.
 func TestDocker_MountsExistingUserConfigPathsReadOnly(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
-	configDir := filepath.Join(cfg.HomeDir, ".claude")
-	if err := os.Mkdir(configDir, 0o755); err != nil {
-		t.Fatalf("create %q: %v", configDir, err)
-	}
-	configFile := filepath.Join(cfg.HomeDir, ".claude.json")
-	if err := os.WriteFile(configFile, []byte("{}\n"), 0o600); err != nil {
-		t.Fatalf("write %q: %v", configFile, err)
-	}
+	host := newHost().AddDir("/home/user/.claude").AddFile("/home/user/.claude.json", "{}\n", 0o600)
 
-	args := dockerCommand(t, cfg, provision.Contribution{})
+	args := dockerCommand(t, host, dockerCfg(netshared.ModeNone), provision.Contribution{})
 
 	for _, configPath := range []string{".claude", ".claude.json"} {
-		source := canonicalPath(t, filepath.Join(cfg.HomeDir, configPath))
-		bind := source + ":" + filepath.Join(containerHome, configPath) + ":ro"
+		bind := filepath.Join("/home/user", configPath) + ":" + filepath.Join(containerHome, configPath) + ":ro"
 		if !argHasPair(args, "-v", bind) {
 			t.Errorf("missing read-only user config bind %q", bind)
 		}
@@ -133,9 +120,7 @@ func TestDocker_MountsExistingUserConfigPathsReadOnly(t *testing.T) {
 // An absent config path contributes no bind, so a home without agent
 // configuration produces a container that sees none of it.
 func TestDocker_SkipsAbsentUserConfigPaths(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
-
-	args := dockerCommand(t, cfg, provision.Contribution{})
+	args := dockerCommand(t, newHost(), dockerCfg(netshared.ModeNone), provision.Contribution{})
 
 	for _, configPath := range []string{".claude", ".claude.json"} {
 		if strings.Contains(strings.Join(args, " "), filepath.Join(containerHome, configPath)) {
@@ -145,41 +130,41 @@ func TestDocker_SkipsAbsentUserConfigPaths(t *testing.T) {
 }
 
 func TestDocker_NetworkExplicit(t *testing.T) {
-	work := t.TempDir()
-	if args := dockerCommand(t, dockerCfg(t, netshared.ModeNone, work), provision.Contribution{}); !argHasPair(args, "--network", "none") {
+	host := newHost()
+	if args := dockerCommand(t, host, dockerCfg(netshared.ModeNone), provision.Contribution{}); !argHasPair(args, "--network", "none") {
 		t.Error("network none must emit --network none")
 	}
-	if args := dockerCommand(t, dockerCfg(t, netshared.ModeHost, work), provision.Contribution{}); !argHasPair(args, "--network", "host") {
+	if args := dockerCommand(t, host, dockerCfg(netshared.ModeHost), provision.Contribution{}); !argHasPair(args, "--network", "host") {
 		t.Error("network host must emit --network host")
 	}
-	if _, err := NewIsolator(testLog).Command(dockerCfg(t, netshared.ModeProxy, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+	if _, err := NewIsolator(host, testLog).Command(dockerCfg(netshared.ModeProxy), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
 		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
 
 func TestDocker_RuntimeWired(t *testing.T) {
-	work := t.TempDir()
-	cfg := dockerCfg(t, netshared.ModeNone, work)
+	host := newHost()
+	cfg := dockerCfg(netshared.ModeNone)
 	cfg.Runtime = "runsc"
-	if args := dockerCommand(t, cfg, provision.Contribution{}); !argHasPair(args, "--runtime", "runsc") {
+	if args := dockerCommand(t, host, cfg, provision.Contribution{}); !argHasPair(args, "--runtime", "runsc") {
 		t.Error("RunConfig.Runtime must emit --runtime <runtime>")
 	}
 	// Default runc emits no --runtime flag.
-	if args := dockerCommand(t, dockerCfg(t, netshared.ModeNone, work), provision.Contribution{}); argHas(args, "--runtime") {
+	if args := dockerCommand(t, host, dockerCfg(netshared.ModeNone), provision.Contribution{}); argHas(args, "--runtime") {
 		t.Error("empty Runtime must not emit --runtime")
 	}
 }
 
 func TestDocker_AppliesContribution(t *testing.T) {
-	work := t.TempDir()
-	closure := t.TempDir()
+	host := newHost().AddDir("/nix/store/abc")
+	closure := "/nix/store/abc"
 	c := provision.Contribution{
 		RoBindPaths: []string{closure},
 		PathEntries: []string{"/nix/store/abc/bin"},
 		Env:         map[string]string{"FOO": "bar"},
 	}
-	args := dockerCommand(t, dockerCfg(t, netshared.ModeNone, work), c)
-	env, err := NewIsolator(testLog).containerEnv(dockerCfg(t, netshared.ModeNone, work), c)
+	args := dockerCommand(t, host, dockerCfg(netshared.ModeNone), c)
+	env, err := NewIsolator(host, testLog).containerEnv(dockerCfg(netshared.ModeNone), c)
 	if err != nil {
 		t.Fatalf("containerEnv() error = %v", err)
 	}
@@ -204,7 +189,7 @@ func TestDocker_AppliesContribution(t *testing.T) {
 }
 
 func TestDocker_Capabilities(t *testing.T) {
-	i := NewIsolator(testLog)
+	i := NewIsolator(newHost(), testLog)
 	if !i.HidesHost(false, "") {
 		t.Error("docker with the digest-pinned default image hides host-equivalent tools")
 	}
@@ -221,13 +206,16 @@ func TestDocker_Capabilities(t *testing.T) {
 	if i.KernelIsolated("") {
 		t.Error("docker default runc is not a kernel boundary")
 	}
+	if !i.ConfinesNetwork() {
+		t.Error("docker applies --network none")
+	}
 }
 
 func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
-	work := t.TempDir()
-	cfg := dockerCfg(t, netshared.ModeNone, work)
-	cfg.BindPaths = []string{work + "/missing"}
-	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
+	host := newHost()
+	cfg := dockerCfg(netshared.ModeNone)
+	cfg.BindPaths = []string{"/work/missing"}
+	if _, err := NewIsolator(host, testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing bind error")
 	}
 
@@ -236,33 +224,168 @@ func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 		CredentialSourceEnv: "MISSING_DOCKER_TEST_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
 	}
-	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(host, testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
 
 func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	const secret = "docker-secret-must-not-appear"
-	t.Setenv("DOCKER_TEST_TOKEN", secret)
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	host := newHost()
+	host.Env["DOCKER_TEST_TOKEN"] = secret
+	cfg := dockerCfg(netshared.ModeNone)
 	cfg.Provider = &types.ModelProvider{
 		CredentialSourceEnv: "DOCKER_TEST_TOKEN",
 		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
 		Environment:         map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
 	}
 
-	command := dockerCommand(t, cfg, provision.Contribution{})
+	command := dockerCommand(t, host, cfg, provision.Contribution{})
 
 	if strings.Contains(strings.Join(command, " "), secret) {
 		t.Fatal("docker command arguments contain the provider secret")
 	}
+	env, err := NewIsolator(host, testLog).processEnv(cfg, provision.Contribution{})
+	if err != nil {
+		t.Fatalf("processEnv() error = %v", err)
+	}
+	if got, _ := envValue(env, "ANTHROPIC_AUTH_TOKEN"); got != secret {
+		t.Error("the provider secret must reach docker through its environment")
+	}
 }
 
 func TestDocker_CommandRejectsUnknownAgentType(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(netshared.ModeNone)
 	cfg.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
 
-	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("Command() error = nil, want unknown agent type error")
+	}
+}
+
+func TestDocker_MountsTheSourceRepositoryAndCallerPaths(t *testing.T) {
+	host := newHost().AddDir("/repo").AddDir("/data/rw").AddFile("/data/ro.txt", "x", 0o600)
+	cfg := dockerCfg(netshared.ModeNone)
+	cfg.RepoDir = "/repo"
+	cfg.BindPaths = []string{"/data/rw"}
+	cfg.RoBindPaths = []string{"/data/ro.txt"}
+	cfg.Image = digestPinnedImage
+	cfg.AgentArgs = []string{"review"}
+
+	args := dockerCommand(t, host, cfg, provision.Contribution{InitCommands: []string{"echo hi"}})
+
+	for _, bind := range []string{"/work:/work", "/repo:/repo:ro", "/data/rw:/data/rw", "/data/ro.txt:/data/ro.txt:ro"} {
+		if !argHasPair(args, "-v", bind) {
+			t.Errorf("args = %v, want -v %s", args, bind)
+		}
+	}
+	if !argHasPair(args, "-w", "/work") {
+		t.Error("the work directory must be the container working directory")
+	}
+	if !argHas(args, digestPinnedImage) || !strings.Contains(strings.Join(args, " "), "echo hi") {
+		t.Errorf("args = %v, want the image and the wrapped agent command", args)
+	}
+}
+
+func TestDocker_UsesTheDefaultImageWithoutAnImage(t *testing.T) {
+	if args := dockerCommand(t, newHost(), dockerCfg(netshared.ModeNone), provision.Contribution{}); !argHas(args, isolation.DefaultContainerImage) {
+		t.Errorf("args = %v, want the default image", args)
+	}
+}
+
+func TestDocker_CommandRejectsUnresolvablePaths(t *testing.T) {
+	tests := []struct {
+		name   string
+		mutate func(*isoshared.RunConfig, *provision.Contribution)
+	}{
+		{"home", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.HomeDir = "/missing" }},
+		{"work", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.WorkDir = "/missing" }},
+		{"repo", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.RepoDir = "/missing" }},
+		{"closure", func(_ *isoshared.RunConfig, p *provision.Contribution) {
+			p.RoBindPaths = []string{"/nix/store/missing"}
+		}},
+		{"read-only bind", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.RoBindPaths = []string{"/missing"} }},
+		{"user config escape", func(_ *isoshared.RunConfig, _ *provision.Contribution) {}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			host := newHost()
+			if test.name == "user config escape" {
+				host.AddDir("/outside").AddLink("/home/user/.claude", "/outside")
+			}
+			cfg := dockerCfg(netshared.ModeNone)
+			contribution := provision.Contribution{}
+			test.mutate(&cfg, &contribution)
+			if _, err := NewIsolator(host, testLog).Command(cfg, contribution); err == nil {
+				t.Error("Command() error = nil, want an error")
+			}
+		})
+	}
+}
+
+func TestDocker_RunSpawnsDockerWithTheProcessEnvironment(t *testing.T) {
+	host := newHost()
+	host.Env["HOST_VALUE"] = "kept"
+	command := dockerCommand(t, host, dockerCfg(netshared.ModeNone), provision.Contribution{})
+	host.Outcomes[systemtest.CommandLine(command[0], command[1:]...)] = systemtest.Outcome{ExitCode: 5}
+
+	code, err := NewIsolator(host, testLog).Run(dockerCfg(netshared.ModeNone), provision.Contribution{})
+
+	if err != nil || code != 5 {
+		t.Fatalf("Run() = (%d, %v), want (5, nil)", code, err)
+	}
+	if len(host.Calls) != 1 {
+		t.Fatalf("calls = %+v, want one docker run", host.Calls)
+	}
+	if got, _ := envValue(host.Calls[0].Env, "HOST_VALUE"); got != "kept" {
+		t.Error("the docker client must inherit the host environment")
+	}
+}
+
+func TestDocker_RunReportsPreparationErrors(t *testing.T) {
+	for name, mutate := range map[string]func(*isoshared.RunConfig){
+		"arguments":   func(c *isoshared.RunConfig) { c.WorkDir = "/missing" },
+		"environment": func(c *isoshared.RunConfig) { c.CustomEnv = []string{"MISSING_EQUALS"} },
+	} {
+		t.Run(name, func(t *testing.T) {
+			host := newHost()
+			cfg := dockerCfg(netshared.ModeNone)
+			mutate(&cfg)
+			if code, err := NewIsolator(host, testLog).Run(cfg, provision.Contribution{}); err == nil || code != 1 {
+				t.Errorf("Run() = (%d, %v), want (1, error)", code, err)
+			}
+			if len(host.Calls) != 0 {
+				t.Errorf("calls = %+v, want no process", host.Calls)
+			}
+		})
+	}
+}
+
+func TestDocker_AvailableTracksTheDaemon(t *testing.T) {
+	host := newHost()
+	isolator := NewIsolator(host, testLog)
+
+	if available, err := isolator.Available(); available || err != nil {
+		t.Errorf("Available() without a daemon = (%v, %v), want (false, nil)", available, err)
+	}
+	host.Outcomes["docker info"] = systemtest.Outcome{Stdout: "Server Version: 27"}
+	if available, err := isolator.Available(); !available || err != nil {
+		t.Errorf("Available() with a daemon = (%v, %v), want (true, nil)", available, err)
+	}
+}
+
+func TestDocker_CheckAgent(t *testing.T) {
+	isolator := NewIsolator(newHost(), testLog)
+	for _, image := range []string{"", isolation.DefaultContainerImage} {
+		cfg := dockerCfg(netshared.ModeNone)
+		cfg.Image = image
+		if err := isolator.CheckAgent(cfg); err == nil || !strings.Contains(err.Error(), "default docker image") {
+			t.Errorf("CheckAgent(image=%q) error = %v, want default-image error", image, err)
+		}
+	}
+	cfg := dockerCfg(netshared.ModeNone)
+	cfg.Image = digestPinnedImage
+	if err := isolator.CheckAgent(cfg); err != nil {
+		t.Errorf("CheckAgent(custom image) error = %v, want nil", err)
 	}
 }

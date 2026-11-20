@@ -4,10 +4,7 @@ package docker
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 
@@ -41,17 +38,29 @@ const (
 //
 // Default runc is attack-surface reduction; a sandboxed runtime (runsc/gVisor)
 // is the kernel boundary (see KernelIsolated), wired via RunConfig.Runtime.
-type Isolator struct{ log logging.Logger }
+type Isolator struct {
+	host Host
+	log  logging.Logger
+}
 
-// NewIsolator creates a docker isolator.
-func NewIsolator(log logging.Logger) *Isolator { return &Isolator{log: log} }
+// Host is the port the docker isolator consumes: the isolation host plus the
+// identity the container runs as and the CPU count it is clamped to.
+type Host interface {
+	isoshared.Host
+	Getuid() int
+	Getgid() int
+	NumCPU() int
+}
+
+// NewIsolator creates a docker isolator over host, writing through log.
+func NewIsolator(host Host, log logging.Logger) *Isolator {
+	return &Isolator{host: host, log: log}
+}
 
 // Available reports whether the docker daemon is reachable.
 func (i *Isolator) Available() (bool, error) {
-	cmd := exec.Command("docker", "info")
-	cmd.Stdout = nil
-	cmd.Stderr = nil
-	return cmd.Run() == nil, nil
+	_, err := i.host.Capture("docker", []string{"info"}, "")
+	return err == nil, nil
 }
 
 // HidesHost reports whether host tools are unreachable. The host filesystem is
@@ -77,6 +86,18 @@ func (i *Isolator) KernelIsolated(runtime string) bool {
 	return runtime == "runsc" || runtime == "gvisor"
 }
 
+// ConfinesNetwork reports true: docker applies --network none.
+func (i *Isolator) ConfinesNetwork() bool { return true }
+
+// CheckAgent rejects the default image, which does not contain an agent; a
+// caller-supplied image is trusted to contain it.
+func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
+	if cfg.Image == "" || cfg.Image == isolation.DefaultContainerImage {
+		return fmt.Errorf("the default docker image does not contain agent executable %q; use provision=nix or a digest-pinned --image that contains it", cfg.Agent.Binary)
+	}
+	return nil
+}
+
 // Run executes the agent in a docker container.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
 	args, err := i.buildArgs(cfg, c)
@@ -87,7 +108,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.log, "docker", args, env, "Docker sandbox")
+	return isoshared.SpawnSandbox(i.host, i.log, "docker", args, env, "", "Docker sandbox")
 }
 
 // Command returns the full docker command (for display / terminal wrappers).
@@ -110,17 +131,17 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
 	if err != nil {
 		return nil, err
 	}
 	repoDir := ""
 	if cfg.RepoDir != "" {
-		repoDir, err = isoshared.ResolveDirectory(cfg.RepoDir, "repository directory")
+		repoDir, err = isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
 		if err != nil {
 			return nil, err
 		}
@@ -144,7 +165,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--tmpfs", containerHome+":rw,mode=1777",
 		"--pids-limit", dockerPidsLimit,
 		"--memory", dockerMemory,
-		"--cpus", fmt.Sprintf("%d", runtime.NumCPU()),
+		"--cpus", fmt.Sprintf("%d", i.host.NumCPU()),
 	)
 
 	// Network — applied EXPLICITLY via the network bridge.
@@ -155,7 +176,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, netArgs...)
 
 	// Run as the current user so written files are owned by the caller.
-	args = append(args, "-u", fmt.Sprintf("%d:%d", os.Getuid(), os.Getgid()))
+	args = append(args, "-u", fmt.Sprintf("%d:%d", i.host.Getuid(), i.host.Getgid()))
 
 	// Workspace (rw — the only writable host bind) + working directory.
 	args = append(args, "-w", workDir, "-v", fmt.Sprintf("%s:%s", workDir, workDir))
@@ -165,7 +186,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Curated config paths, read-only, into the synthetic HOME.
 	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
-		src, exists, err := isoshared.ResolveContainedOptionalPath(homeDir, configPath, "user config path")
+		src, exists, err := isoshared.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
 		}
@@ -176,7 +197,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(p, "provisioned read-only bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, p, "provisioned read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -185,14 +206,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(path, "read-write bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-write bind")
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, "-v", fmt.Sprintf("%s:%s", resolved, resolved))
 	}
 	for _, path := range cfg.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(path, "read-only bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +252,7 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 	if err != nil {
 		return nil, err
 	}
-	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(os.Environ()), containerEnv)), nil
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(i.host.Environ()), containerEnv)), nil
 }
 
 func resolveImage(image string) string {
@@ -257,7 +278,7 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, os.Getenv)
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
 	if err != nil {
 		return nil, err
 	}

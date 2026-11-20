@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -26,10 +25,10 @@ func envValue(env []string, key string) (string, bool) {
 // processEnv is the environment the docker client is launched with, so it is the
 // host environment rather than the container's allowlist.
 func TestProcessEnv_CarriesTheHostEnvironment(t *testing.T) {
-	t.Setenv("XONOVEX_PROCESS_ENV_PROBE", "host-value")
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	host := newHost()
+	host.Env["XONOVEX_PROCESS_ENV_PROBE"] = "host-value"
 
-	env, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{})
+	env, err := NewIsolator(host, testLog).processEnv(dockerCfg(netshared.ModeNone), provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("processEnv() error = %v", err)
@@ -42,30 +41,30 @@ func TestProcessEnv_CarriesTheHostEnvironment(t *testing.T) {
 // The container HOME is fixed, so the environment fails on an unresolvable
 // provider credential rather than on directories.
 func TestProcessEnv_ReportsAnUnresolvableProviderToken(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(netshared.ModeNone)
 	cfg.Provider = &types.ModelProvider{
 		CredentialSourceEnv: "MISSING_DOCKER_PROCESS_ENV_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
 	}
 
-	if _, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail when the provider token cannot be resolved")
 	}
 }
 
 func TestProcessEnv_ReportsMalformedCustomEnvironment(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(netshared.ModeNone)
 	cfg.CustomEnv = []string{"not-a-key-value-pair"}
 
-	if _, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail on a malformed custom environment entry")
 	}
 }
 
 func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	cfg := dockerCfg(netshared.ModeNone)
 
-	command, env, err := NewIsolator(testLog).TerminalCommand(cfg, provision.Contribution{})
+	command, env, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg, provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("TerminalCommand() error = %v", err)
@@ -73,7 +72,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 	if len(command) == 0 || command[0] != "docker" {
 		t.Fatalf("command = %v, want it to start with docker", command)
 	}
-	expected := dockerCommand(t, cfg, provision.Contribution{})
+	expected := dockerCommand(t, newHost(), cfg, provision.Contribution{})
 	if strings.Join(command, " ") != strings.Join(expected, " ") {
 		t.Errorf("command = %v, want the same command Command() returns", command)
 	}
@@ -83,9 +82,10 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 }
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
-	cfg := dockerCfg(t, netshared.ModeNone, filepath.Join(t.TempDir(), "absent"))
+	cfg := dockerCfg(netshared.ModeNone)
+	cfg.WorkDir = "/work/absent"
 
-	if _, _, err := NewIsolator(testLog).TerminalCommand(
+	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(
 		cfg, provision.Contribution{},
 	); err == nil {
 		t.Fatal("TerminalCommand() must fail when the work directory cannot be resolved")
@@ -133,7 +133,7 @@ func TestPinnedProvision_RequiresADigestPinnedImage(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := NewIsolator(testLog).PinnedProvision(
+			got := NewIsolator(newHost(), testLog).PinnedProvision(
 				test.method, test.provisionerPinned, test.image,
 			)
 			if got != test.want {
@@ -155,14 +155,14 @@ func TestKernelIsolated_OnlyAcceptsGvisorRuntimes(t *testing.T) {
 	}
 
 	for runtime, want := range tests {
-		if got := NewIsolator(testLog).KernelIsolated(runtime); got != want {
+		if got := NewIsolator(newHost(), testLog).KernelIsolated(runtime); got != want {
 			t.Errorf("KernelIsolated(%q) = %v, want %v", runtime, got, want)
 		}
 	}
 }
 
 func TestHidesHost_RequiresADigestPinnedImage(t *testing.T) {
-	isolator := NewIsolator(testLog)
+	isolator := NewIsolator(newHost(), testLog)
 
 	if !isolator.HidesHost(false, digestPinnedImage) {
 		t.Error("HidesHost() = false for a digest-pinned image, want true")

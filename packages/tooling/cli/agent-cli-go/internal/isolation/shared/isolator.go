@@ -1,5 +1,6 @@
-// Package shared is the isolation axis core: the Isolator port plus the neutral
-// RunConfig the composition root hands every isolator. It names no concrete
+// Package shared is the isolation axis core: the Isolator port, the Host port
+// the isolators consume, the neutral RunConfig the composition root hands every
+// isolator, and the path checks they share. It names no concrete
 // isolator (none/bwrap/docker) and no sibling axis leaf; the per-isolator network
 // flags live in isolation/<type>/network.go bridge files.
 package shared
@@ -10,12 +11,11 @@ import (
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
-// RunConfig carries the run-wide inputs every isolator needs to launch the agent.
-// It replaces the old flat SandboxConfig god-struct: it holds only the fields the
-// isolators actually consume (data coupling), and the provisioning inputs live in
-// the provision axis, not here. Per-isolator knobs (docker Image/Runtime, bwrap
-// HostPassthrough) are assembled into their leaf Options at the composition root
-// and copied onto the fields below.
+// RunConfig carries the run-wide inputs every isolator needs to launch the
+// agent. Every path in it is absolute, and HomeDir is always set. The
+// per-isolator knobs (bwrap HostPassthrough, docker Image and Runtime) sit
+// here because the composition root builds the isolators before the flags are
+// parsed.
 type RunConfig struct {
 	HomeDir string
 	WorkDir string
@@ -67,4 +67,11 @@ type Isolator interface {
 	// KernelIsolated reports whether this isolator plus runtime gives a kernel
 	// boundary (so RequireKernelIsolation can be honored).
 	KernelIsolated(runtime string) bool
+	// ConfinesNetwork reports whether this isolator can apply a network mode
+	// other than host.
+	ConfinesNetwork() bool
+	// CheckAgent reports an error when the base of this isolator, the host or
+	// the image, cannot supply the agent executable for cfg. It applies only
+	// when the provisioner supplies no tools.
+	CheckAgent(cfg RunConfig) error
 }

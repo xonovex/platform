@@ -2,7 +2,6 @@ package tmux
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
@@ -54,20 +53,14 @@ func isShellReservedVariable(name string) bool {
 
 // createLaunchScript writes a private, self-deleting script that installs the
 // requested environment before replacing itself with the agent command.
-func createLaunchScript(command []string, env []string) (string, error) {
+func createLaunchScript(host Host, command []string, env []string) (string, error) {
 	if len(command) == 0 {
 		return "", fmt.Errorf("tmux command is required")
 	}
 
-	file, err := os.CreateTemp("", "xonovex-agent-tmux-*.sh")
+	path, err := host.CreateTemp("xonovex-agent-tmux-*.sh")
 	if err != nil {
 		return "", fmt.Errorf("create tmux launch script: %w", err)
-	}
-	path := file.Name()
-	removeOnError := func(cause error) (string, error) {
-		_ = file.Close()
-		_ = os.Remove(path)
-		return "", cause
 	}
 
 	var script strings.Builder
@@ -86,12 +79,9 @@ func createLaunchScript(command []string, env []string) (string, error) {
 	script.WriteString(buildShellCommand(command))
 	script.WriteByte('\n')
 
-	if _, err := file.WriteString(script.String()); err != nil {
-		return removeOnError(fmt.Errorf("write tmux launch script: %w", err))
-	}
-	if err := file.Close(); err != nil {
-		_ = os.Remove(path)
-		return "", fmt.Errorf("close tmux launch script: %w", err)
+	if err := host.WriteFile(path, []byte(script.String()), 0o600); err != nil {
+		_ = host.Remove(path)
+		return "", fmt.Errorf("write tmux launch script: %w", err)
 	}
 	return path, nil
 }

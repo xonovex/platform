@@ -2,41 +2,21 @@ package shared
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
 )
 
-// SpawnSandbox spawns a sandbox process and waits for completion. The process
-// inherits the caller's working directory; isolators that need a specific cwd
-// (e.g. host execution) use SpawnSandboxInDir.
-func SpawnSandbox(log logging.Logger, command string, args []string, env []string, errorPrefix string) (int, error) {
-	return SpawnSandboxInDir(log, command, args, env, "", errorPrefix)
-}
-
-// SpawnSandboxInDir spawns a process in dir (empty = inherit the caller's cwd)
-// and waits for completion, returning the child exit code.
-func SpawnSandboxInDir(log logging.Logger, command string, args []string, env []string, dir string, errorPrefix string) (int, error) {
+// SpawnSandbox starts command in dir under env through host, waits for it, and
+// returns its exit code. An empty dir inherits the working directory of the CLI.
+func SpawnSandbox(host Host, log logging.Logger, command string, args, env []string, dir, errorPrefix string) (int, error) {
 	log.Debug(fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
-
-	cmd := exec.Command(command, args...)
-	cmd.Dir = dir
-	cmd.Env = env
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			return exitErr.ExitCode(), nil
-		}
+	code, err := host.Run(command, args, env, dir)
+	if err != nil {
 		return 1, fmt.Errorf("%s: %w", errorPrefix, err)
 	}
-
-	return 0, nil
+	return code, nil
 }
 
 // buildShellCommand builds a shell command string from an array of arguments.

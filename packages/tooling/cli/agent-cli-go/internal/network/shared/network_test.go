@@ -27,3 +27,12 @@ func TestEgressIsRestricted(t *testing.T) {
 		}
 	}
 }
+
+func TestNeedsConfinement(t *testing.T) {
+	if NeedsConfinement(ModeHost) {
+		t.Error("NeedsConfinement(host) = true, want false")
+	}
+	if !NeedsConfinement(ModeNone) {
+		t.Error("NeedsConfinement(none) = false, want true")
+	}
+}

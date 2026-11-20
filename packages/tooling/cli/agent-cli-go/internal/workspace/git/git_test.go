@@ -2,270 +2,283 @@ package git
 
 import (
 	"errors"
-	"os"
-	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
-// fakeRunner answers from a recording keyed by working directory and command
-// line, so these cases exercise Setup without launching git. commonGitDir asks
-// the same question of two directories, so the cwd is part of the key.
-type fakeRunner struct {
-	output   map[string]string
-	err      map[string]error
-	streamed []string
+const (
+	repoDir   = "/src/repo"
+	sharedDir = "/src/repo/.git"
+	target    = "/src/checkout"
+)
+
+// commonDirLine is the git query whose answer commonGitDir resolves; it asks the
+// same question of two directories, so each recording carries its directory.
+func commonDirLine(dir string) string {
+	return systemtest.InDir(dir, "git rev-parse --git-common-dir")
 }
 
-func key(cwd, name string, args []string) string {
-	return cwd + "\x00" + name + " " + strings.Join(args, " ")
+func branchLine(dir string) string {
+	return systemtest.InDir(dir, "git rev-parse --abbrev-ref HEAD")
 }
 
-func (f *fakeRunner) Capture(name string, args []string, cwd string) (string, error) {
-	k := key(cwd, name, args)
-	if err, ok := f.err[k]; ok {
-		return "", err
+func verifyLine(branch string) string {
+	return systemtest.InDir(repoDir, "git rev-parse --verify refs/heads/"+branch)
+}
+
+// repoHost is a repository at repoDir whose git directory is sharedDir.
+func repoHost() *systemtest.Fake {
+	host := systemtest.New().AddDir(sharedDir)
+	host.Outcomes[commonDirLine(repoDir)] = systemtest.Outcome{Stdout: ".git\n"}
+	return host
+}
+
+// worktreeAt writes the .git pointer file that marks dir as a git worktree whose
+// common git directory is gitDir.
+func worktreeAt(host *systemtest.Fake, dir, gitDir string) {
+	host.AddDir(gitDir).AddFile(dir+"/.git", "gitdir: "+gitDir+"/worktrees/x\n", 0o644)
+	host.Outcomes[commonDirLine(dir)] = systemtest.Outcome{Stdout: gitDir + "\n"}
+}
+
+func streamed(host *systemtest.Fake) []string {
+	var lines []string
+	for _, call := range host.Calls {
+		if call.Kind == "stream" {
+			lines = append(lines, systemtest.InDir(call.Dir, call.Line()))
+		}
 	}
-	if out, ok := f.output[k]; ok {
-		return out, nil
-	}
-	return "", errors.New("no recording for " + k)
-}
-
-func (f *fakeRunner) Stream(name string, args []string, cwd string) error {
-	f.streamed = append(f.streamed, key(cwd, name, args))
-	return f.err[key(cwd, name, args)]
-}
-
-func (f *fakeRunner) Available(string) bool { return true }
-
-// worktreeAt writes the .git pointer file that marks dir as a git worktree.
-func worktreeAt(t *testing.T, dir, gitDir string) {
-	t.Helper()
-	if err := os.WriteFile(
-		filepath.Join(dir, ".git"), []byte("gitdir: "+gitDir+"\n"), 0o600,
-	); err != nil {
-		t.Fatalf("write .git pointer: %v", err)
-	}
-}
-
-func commonDir(cwd string) string {
-	return key(cwd, "git", []string{"rev-parse", "--git-common-dir"})
+	return lines
 }
 
 func TestSetup_ReusesAWorktreeOnTheExpectedBranch(t *testing.T) {
-	repoDir := t.TempDir()
-	target := t.TempDir()
-	// commonGitDir resolves symlinks, so the recorded common dir must exist.
-	shared := t.TempDir()
-	worktreeAt(t, target, shared)
-	runner := &fakeRunner{output: map[string]string{
-		commonDir(target):  shared,
-		commonDir(repoDir): shared,
-		key(target, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "feature/x",
-	}}
+	for _, verbose := range []bool{false, true} {
+		host := repoHost()
+		worktreeAt(host, target, sharedDir)
+		host.Outcomes[branchLine(target)] = systemtest.Outcome{Stdout: "feature/x\n"}
 
-	dir, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, true,
-	)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
+		dir, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, verbose)
+
+		if err != nil {
+			t.Fatalf("Setup() error = %v", err)
+		}
+		if dir != target {
+			t.Errorf("Setup() = %q, want %q", dir, target)
+		}
+		if got := streamed(host); len(got) != 0 {
+			t.Errorf("Setup() ran %v, want nothing for a reusable worktree", got)
+		}
 	}
-	if dir != target {
-		t.Errorf("Setup() = %q, want %q", dir, target)
-	}
-	if len(runner.streamed) != 0 {
-		t.Errorf("Setup() ran %v, want nothing for a reusable worktree", runner.streamed)
+}
+
+func TestSetup_ReusesAWorktreeThroughASymlinkedGitDirectory(t *testing.T) {
+	host := repoHost().AddLink("/links/git", sharedDir)
+	worktreeAt(host, target, "/links/git")
+	host.Outcomes[branchLine(target)] = systemtest.Outcome{Stdout: "feature/x\n"}
+
+	if _, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false); err != nil {
+		t.Fatalf("Setup() error = %v, want the symlinked git directory to match", err)
 	}
 }
 
 func TestSetup_RejectsADirectoryThatIsNotAWorktree(t *testing.T) {
-	target := t.TempDir()
+	tests := []struct {
+		name  string
+		setup func(host *systemtest.Fake)
+	}{
+		{"plain directory", func(host *systemtest.Fake) { host.AddDir(target) }},
+		{"git directory", func(host *systemtest.Fake) { host.AddDir(target + "/.git") }},
+		{"other .git file", func(host *systemtest.Fake) { host.AddFile(target+"/.git", "not a pointer\n", 0o644) }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			host := repoHost()
+			tt.setup(host)
 
-	_, err := New(&fakeRunner{}, testLog).Setup(
-		wsshared.Config{Branch: "feature/x", Dir: target}, t.TempDir(), false,
-	)
-	if err == nil || !strings.Contains(err.Error(), "not a worktree") {
-		t.Errorf("Setup() error = %v, want a not-a-worktree error", err)
+			_, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false)
+
+			if err == nil || !strings.Contains(err.Error(), "not a worktree") {
+				t.Errorf("Setup() error = %v, want a not-a-worktree error", err)
+			}
+		})
 	}
 }
 
 func TestSetup_RejectsAWorktreeFromADifferentRepository(t *testing.T) {
-	repoDir := t.TempDir()
-	target := t.TempDir()
-	other, shared := t.TempDir(), t.TempDir()
-	worktreeAt(t, target, other)
-	runner := &fakeRunner{output: map[string]string{
-		commonDir(target):  other,
-		commonDir(repoDir): shared,
-	}}
+	tests := []struct {
+		name  string
+		setup func(host *systemtest.Fake)
+	}{
+		{"other repository", func(host *systemtest.Fake) { worktreeAt(host, target, "/src/other/.git") }},
+		{"worktree query fails", func(host *systemtest.Fake) {
+			worktreeAt(host, target, sharedDir)
+			host.Outcomes[commonDirLine(target)] = systemtest.Outcome{Err: errors.New("not a repository")}
+		}},
+		{"repository query fails", func(host *systemtest.Fake) {
+			worktreeAt(host, target, sharedDir)
+			host.Outcomes[commonDirLine(repoDir)] = systemtest.Outcome{Err: errors.New("not a repository")}
+		}},
+		{"git directory is missing", func(host *systemtest.Fake) {
+			worktreeAt(host, target, sharedDir)
+			host.Outcomes[commonDirLine(target)] = systemtest.Outcome{Stdout: "/src/missing/.git\n"}
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			host := repoHost()
+			tt.setup(host)
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false,
-	)
-	if err == nil || !strings.Contains(err.Error(), "different repository") {
-		t.Errorf("Setup() error = %v, want a different-repository error", err)
+			_, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false)
+
+			if err == nil || !strings.Contains(err.Error(), "different repository") {
+				t.Errorf("Setup() error = %v, want a different-repository error", err)
+			}
+		})
 	}
 }
 
 func TestSetup_RejectsAWorktreeOnTheWrongBranch(t *testing.T) {
-	repoDir := t.TempDir()
-	target := t.TempDir()
-	shared := t.TempDir()
-	worktreeAt(t, target, shared)
-	runner := &fakeRunner{output: map[string]string{
-		commonDir(target):  shared,
-		commonDir(repoDir): shared,
-		key(target, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "main",
-	}}
+	host := repoHost()
+	worktreeAt(host, target, sharedDir)
+	host.Outcomes[branchLine(target)] = systemtest.Outcome{Stdout: "main\n"}
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false,
-	)
+	_, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false)
+
 	if err == nil || !strings.Contains(err.Error(), "wrong branch") {
 		t.Errorf("Setup() error = %v, want a wrong-branch error", err)
 	}
 }
 
 func TestSetup_CreatesAWorktreeForAnExistingBranch(t *testing.T) {
-	repoDir := t.TempDir()
-	target := filepath.Join(t.TempDir(), "worktree")
-	runner := &fakeRunner{output: map[string]string{
-		// An existing branch resolves, so no new branch is created.
-		key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/existing"}): "abc123",
-	}}
+	for _, verbose := range []bool{false, true} {
+		host := repoHost()
+		host.Outcomes[verifyLine("existing")] = systemtest.Outcome{Stdout: "abc123\n"}
+		add := systemtest.InDir(repoDir, "git worktree add "+target+" existing")
+		host.Outcomes[add] = systemtest.Outcome{}
 
-	dir, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "existing", Dir: target}, repoDir, true,
-	)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
-	}
-	if dir != target {
-		t.Errorf("Setup() = %q, want %q", dir, target)
-	}
-	if len(runner.streamed) != 1 ||
-		!strings.Contains(runner.streamed[0], "worktree add "+target+" existing") {
-		t.Errorf("Setup() ran %v, want one worktree add for the existing branch", runner.streamed)
+		dir, err := New(host, testLog).Setup(wsshared.Config{Branch: "existing", Dir: target}, repoDir, verbose)
+
+		if err != nil {
+			t.Fatalf("Setup() error = %v", err)
+		}
+		if dir != target {
+			t.Errorf("Setup() = %q, want %q", dir, target)
+		}
+		if got := streamed(host); !slices.Equal(got, []string{add}) {
+			t.Errorf("Setup() ran %v, want one worktree add for the existing branch", got)
+		}
 	}
 }
 
-func TestSetup_CreatesANewBranchWorktreeAndRecordsMergeBackTo(t *testing.T) {
-	repoDir := t.TempDir()
-	target := filepath.Join(t.TempDir(), "worktree")
-	runner := &fakeRunner{
-		output: map[string]string{
-			key(repoDir, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "main",
-			key(repoDir, "git", []string{
-				"config", "branch.feature/new.mergeBackTo", "main",
-			}): "",
-		},
-		err: map[string]error{
-			key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/feature/new"}): errors.New("unknown revision"),
-		},
-	}
+func newBranchHost(source string) (*systemtest.Fake, string) {
+	host := repoHost()
+	host.Outcomes[verifyLine("feature/new")] = systemtest.Outcome{Err: errors.New("unknown revision")}
+	add := systemtest.InDir(repoDir, "git worktree add "+target+" -b feature/new "+source)
+	host.Outcomes[add] = systemtest.Outcome{}
+	host.Outcomes[systemtest.InDir(repoDir, "git config branch.feature/new.mergeBackTo "+source)] = systemtest.Outcome{}
+	return host, add
+}
 
-	dir, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, true,
-	)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
-	}
-	if dir != target {
-		t.Errorf("Setup() = %q, want %q", dir, target)
-	}
-	if len(runner.streamed) != 1 ||
-		!strings.Contains(runner.streamed[0], "-b feature/new main") {
-		t.Errorf("Setup() ran %v, want one worktree add branching from main", runner.streamed)
+func TestSetup_CreatesANewBranchWorktreeAndRecordsMergeBackTo(t *testing.T) {
+	for _, verbose := range []bool{false, true} {
+		host, add := newBranchHost("main")
+		host.Outcomes[branchLine(repoDir)] = systemtest.Outcome{Stdout: "main\n"}
+
+		dir, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, verbose)
+
+		if err != nil {
+			t.Fatalf("Setup() error = %v", err)
+		}
+		if dir != target {
+			t.Errorf("Setup() = %q, want %q", dir, target)
+		}
+		if got := streamed(host); !slices.Equal(got, []string{add}) {
+			t.Errorf("Setup() ran %v, want one worktree add branching from main", got)
+		}
+		last := host.Calls[len(host.Calls)-1]
+		if last.Line() != "git config branch.feature/new.mergeBackTo main" {
+			t.Errorf("last call = %q, want the mergeBackTo record", last.Line())
+		}
 	}
 }
 
 func TestSetup_PrefersAnExplicitSourceBranch(t *testing.T) {
-	repoDir := t.TempDir()
-	target := filepath.Join(t.TempDir(), "worktree")
-	runner := &fakeRunner{
-		output: map[string]string{
-			key(repoDir, "git", []string{
-				"config", "branch.feature/new.mergeBackTo", "release",
-			}): "",
-		},
-		err: map[string]error{
-			key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/feature/new"}): errors.New("unknown revision"),
-		},
-	}
+	host, add := newBranchHost("release")
 
-	if _, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/new", Dir: target, SourceBranch: "release"},
-		repoDir, false,
+	if _, err := New(host, testLog).Setup(
+		wsshared.Config{Branch: "feature/new", Dir: target, SourceBranch: "release"}, repoDir, false,
 	); err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
-	if !strings.Contains(runner.streamed[0], "-b feature/new release") {
-		t.Errorf("Setup() ran %v, want the explicit source branch", runner.streamed)
+	if got := streamed(host); !slices.Equal(got, []string{add}) {
+		t.Errorf("Setup() ran %v, want the explicit source branch", got)
 	}
 }
 
 func TestSetup_RequiresASourceBranch(t *testing.T) {
-	repoDir := t.TempDir()
-	runner := &fakeRunner{
-		output: map[string]string{
-			// A detached HEAD names no branch to start the new one from.
-			key(repoDir, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "HEAD",
-		},
-		err: map[string]error{
-			key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/feature/new"}): errors.New("unknown revision"),
-		},
-	}
+	host, _ := newBranchHost("main")
+	// A detached HEAD names no branch to start the new one from.
+	host.Outcomes[branchLine(repoDir)] = systemtest.Outcome{Stdout: "HEAD\n"}
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "feature/new", Dir: filepath.Join(t.TempDir(), "worktree")},
-		repoDir, false,
-	)
+	_, err := New(host, testLog).Setup(wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, false)
+
 	if err == nil || !strings.Contains(err.Error(), "source branch") {
 		t.Errorf("Setup() error = %v, want a missing-source-branch error", err)
 	}
 }
 
-func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
-	repoDir := t.TempDir()
-	runner := &fakeRunner{output: map[string]string{
-		key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/existing"}): "abc123",
-	}}
+func TestSetup_ReportsAFailedMergeBackRecord(t *testing.T) {
+	host, _ := newBranchHost("main")
+	host.Outcomes[systemtest.InDir(repoDir, "git config branch.feature/new.mergeBackTo main")] = systemtest.Outcome{Err: errors.New("locked")}
 
-	dir, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "existing", Dir: "checkout"}, repoDir, false,
-	)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
-	}
-	if want := filepath.Join(repoDir, "checkout"); dir != want {
-		t.Errorf("Setup() = %q, want %q", dir, want)
+	if _, err := New(host, testLog).Setup(
+		wsshared.Config{Branch: "feature/new", Dir: target, SourceBranch: "main"}, repoDir, false,
+	); err == nil {
+		t.Fatal("Setup() must surface a failed mergeBackTo record")
 	}
 }
 
-func TestSetup_ReportsAFailedWorktreeAdd(t *testing.T) {
-	repoDir := t.TempDir()
-	target := filepath.Join(t.TempDir(), "worktree")
-	runner := &fakeRunner{
-		output: map[string]string{
-			key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/existing"}): "abc123",
-		},
-		err: map[string]error{
-			key(repoDir, "git", []string{"worktree", "add", target, "existing"}): errors.New("exit status 128"),
-		},
-	}
+func TestSetup_ReportsAFailedNewBranchWorktreeAdd(t *testing.T) {
+	host, add := newBranchHost("main")
+	host.Outcomes[add] = systemtest.Outcome{Err: errors.New("exit status 128")}
 
-	if _, err := New(runner, testLog).Setup(
-		wsshared.Config{Branch: "existing", Dir: target}, repoDir, false,
+	if _, err := New(host, testLog).Setup(
+		wsshared.Config{Branch: "feature/new", Dir: target, SourceBranch: "main"}, repoDir, false,
 	); err == nil {
 		t.Fatal("Setup() must surface a failed worktree add")
 	}
 }
 
+func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
+	host := repoHost()
+	host.Outcomes[verifyLine("existing")] = systemtest.Outcome{Stdout: "abc123\n"}
+	host.Outcomes[systemtest.InDir(repoDir, "git worktree add checkout existing")] = systemtest.Outcome{}
+
+	dir, err := New(host, testLog).Setup(wsshared.Config{Branch: "existing", Dir: "checkout"}, repoDir, false)
+
+	if err != nil {
+		t.Fatalf("Setup() error = %v", err)
+	}
+	if want := repoDir + "/checkout"; dir != want {
+		t.Errorf("Setup() = %q, want %q", dir, want)
+	}
+}
+
+func TestSetup_ReportsAFailedWorktreeAdd(t *testing.T) {
+	host := repoHost()
+	host.Outcomes[verifyLine("existing")] = systemtest.Outcome{Stdout: "abc123\n"}
+	host.Outcomes[systemtest.InDir(repoDir, "git worktree add "+target+" existing")] = systemtest.Outcome{Err: errors.New("exit status 128")}
+
+	if _, err := New(host, testLog).Setup(wsshared.Config{Branch: "existing", Dir: target}, repoDir, false); err == nil {
+		t.Fatal("Setup() must surface a failed worktree add")
+	}
+}
+
 func TestAvailable(t *testing.T) {
-	if !New(&fakeRunner{}, testLog).Available() {
+	if !New(systemtest.New(), testLog).Available() {
 		t.Error("git worktree variant must always report available")
 	}
 }

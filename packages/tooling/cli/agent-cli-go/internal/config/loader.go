@@ -3,8 +3,9 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 
@@ -21,60 +22,61 @@ type FileConfig struct {
 	CustomEnv   []string `yaml:"customEnv" toml:"customEnv"`
 }
 
-// GetDefaultConfigPath returns the default config file path.
-func GetDefaultConfigPath() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("resolve user home directory: %w", err)
-	}
-	return filepath.Join(home, ".config", "sandboxed-claude", "config"), nil
+// Files is the port the loader reads the configuration through.
+type Files interface {
+	ReadFile(path string) ([]byte, error)
+	UserHomeDir() (string, error)
 }
 
-// LoadConfigFile loads configuration from a YAML or TOML file. If path is empty,
-// it tries the default config path.
-func LoadConfigFile(path string) (*FileConfig, error) {
+// DefaultPath returns the default configuration path under home.
+func DefaultPath(home string) string {
+	return filepath.Join(home, ".config", "sandboxed-claude", "config")
+}
+
+// Load reads the configuration at path, which must exist. An empty path reads
+// the default configuration, and an absent default yields an empty
+// configuration.
+func Load(files Files, path string) (FileConfig, error) {
 	explicit := path != ""
-	if path == "" {
-		defaultPath, err := GetDefaultConfigPath()
+	if !explicit {
+		home, err := files.UserHomeDir()
 		if err != nil {
-			return nil, err
+			return FileConfig{}, fmt.Errorf("resolve user home directory: %w", err)
 		}
-		if _, err := os.Stat(defaultPath); os.IsNotExist(err) {
-			return &FileConfig{}, nil
-		} else if err != nil {
-			return nil, fmt.Errorf("inspect default config %q: %w", defaultPath, err)
-		}
-		path = defaultPath
+		path = DefaultPath(home)
 	}
 
-	data, err := os.ReadFile(path)
+	data, err := files.ReadFile(path)
 	if err != nil {
-		if os.IsNotExist(err) && !explicit {
-			return &FileConfig{}, nil
+		if !explicit && errors.Is(err, fs.ErrNotExist) {
+			return FileConfig{}, nil
 		}
-		return nil, err
+		return FileConfig{}, err
 	}
+	return Parse(data, filepath.Ext(path))
+}
 
-	config := &FileConfig{}
-	ext := filepath.Ext(path)
-
+// Parse decodes configuration data. A ".yaml", ".yml" or ".toml" extension
+// selects the format; any other extension tries YAML, then TOML, then key=value.
+func Parse(data []byte, ext string) (FileConfig, error) {
+	var config FileConfig
+	var err error
 	switch ext {
 	case ".yaml", ".yml":
-		err = decodeYAML(data, config)
+		err = decodeYAML(data, &config)
 	case ".toml":
-		err = decodeTOML(data, config)
+		err = decodeTOML(data, &config)
 	default:
-		if err = decodeYAML(data, config); err != nil {
-			if err = decodeTOML(data, config); err != nil {
+		if err = decodeYAML(data, &config); err != nil {
+			config = FileConfig{}
+			if err = decodeTOML(data, &config); err != nil {
 				config, err = parseKeyValueConfig(string(data))
 			}
 		}
 	}
-
 	if err != nil {
-		return nil, err
+		return FileConfig{}, err
 	}
-
 	return config, nil
 }
 
@@ -89,8 +91,8 @@ func decodeTOML(data []byte, config *FileConfig) error {
 }
 
 // parseKeyValueConfig parses a simple key=value config format.
-func parseKeyValueConfig(content string) (*FileConfig, error) {
-	config := &FileConfig{}
+func parseKeyValueConfig(content string) (FileConfig, error) {
+	var config FileConfig
 	seen := make(map[string]struct{})
 
 	for lineNumber, line := range strings.Split(content, "\n") {
@@ -101,16 +103,16 @@ func parseKeyValueConfig(content string) (*FileConfig, error) {
 
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			return nil, fmt.Errorf("line %d: expected key=value", lineNumber+1)
+			return FileConfig{}, fmt.Errorf("line %d: expected key=value", lineNumber+1)
 		}
 
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 		if key == "" {
-			return nil, fmt.Errorf("line %d: configuration key is empty", lineNumber+1)
+			return FileConfig{}, fmt.Errorf("line %d: configuration key is empty", lineNumber+1)
 		}
 		if _, exists := seen[key]; exists {
-			return nil, fmt.Errorf("line %d: duplicate configuration key %q", lineNumber+1, key)
+			return FileConfig{}, fmt.Errorf("line %d: duplicate configuration key %q", lineNumber+1, key)
 		}
 		seen[key] = struct{}{}
 
@@ -120,7 +122,7 @@ func parseKeyValueConfig(content string) (*FileConfig, error) {
 		case "provider":
 			config.Provider = value
 		default:
-			return nil, fmt.Errorf("line %d: unknown configuration key %q", lineNumber+1, key)
+			return FileConfig{}, fmt.Errorf("line %d: unknown configuration key %q", lineNumber+1, key)
 		}
 	}
 

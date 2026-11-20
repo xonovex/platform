@@ -102,7 +102,8 @@ type Request struct {
 // Select resolves the isolator and provisioner for a request and enforces the
 // policy fail-closed. Registry membership is the validity check; the resolved
 // plugins declare their own capabilities, so the policy engine never names a
-// concrete isolator or provisioner.
+// concrete isolator or provisioner. A network mode that needs confinement
+// fails for an isolator that cannot confine the network, whatever the policy.
 func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Isolator, provshared.Provisioner, error) {
 	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {
@@ -111,6 +112,9 @@ func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Iso
 	prov, err := reg.Provisioner(req.Provision)
 	if err != nil {
 		return nil, nil, err
+	}
+	if netshared.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
+		return nil, nil, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
 	}
 	caps := policy.Capabilities{
 		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),

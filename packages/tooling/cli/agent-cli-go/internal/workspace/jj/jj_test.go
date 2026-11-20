@@ -2,116 +2,110 @@ package jj
 
 import (
 	"errors"
-	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
-// fakeRunner answers from a recording keyed by the joined command line, so these
-// cases exercise Setup without launching jj or git.
-type fakeRunner struct {
-	output    map[string]string
-	err       map[string]error
-	absent    map[string]bool
-	streamed  []string
-	streamErr error
+const (
+	repoDir = "/src/repo"
+	target  = "/src/workspace"
+)
+
+// onBranch is a host with jj on PATH whose repository at repoDir is on branch.
+func onBranch(branch string) *systemtest.Fake {
+	host := systemtest.New().AddExecutable("/usr/bin/jj")
+	host.Env["PATH"] = "/usr/bin"
+	host.Outcomes[systemtest.InDir(repoDir, "git rev-parse --abbrev-ref HEAD")] = systemtest.Outcome{Stdout: branch + "\n"}
+	return host
 }
 
-func key(name string, args []string) string {
-	return name + " " + strings.Join(args, " ")
+func addLine(dir, revision string) string {
+	return systemtest.InDir(repoDir, "jj workspace add "+dir+" --revision "+revision)
 }
 
-func (f *fakeRunner) Capture(name string, args []string, _ string) (string, error) {
-	k := key(name, args)
-	if err, ok := f.err[k]; ok {
-		return "", err
+func streamed(host *systemtest.Fake) []string {
+	var lines []string
+	for _, call := range host.Calls {
+		if call.Kind == "stream" {
+			lines = append(lines, systemtest.InDir(call.Dir, call.Line()))
+		}
 	}
-	return f.output[k], nil
-}
-
-func (f *fakeRunner) Stream(name string, args []string, _ string) error {
-	f.streamed = append(f.streamed, key(name, args))
-	return f.streamErr
-}
-
-func (f *fakeRunner) Available(name string) bool { return !f.absent[name] }
-
-func onBranch(branch string) *fakeRunner {
-	return &fakeRunner{output: map[string]string{
-		"git rev-parse --abbrev-ref HEAD": branch,
-	}}
+	return lines
 }
 
 func TestSetup_CreatesAWorkspaceFromTheCurrentBranch(t *testing.T) {
-	runner := onBranch("main")
-	target := filepath.Join(t.TempDir(), "workspace")
+	for _, verbose := range []bool{false, true} {
+		host := onBranch("main")
+		host.Outcomes[addLine(target, "main")] = systemtest.Outcome{}
 
-	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: target}, t.TempDir(), false)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
-	}
-	if dir != target {
-		t.Errorf("Setup() = %q, want %q", dir, target)
-	}
-	if len(runner.streamed) != 1 ||
-		!strings.Contains(runner.streamed[0], "jj workspace add") ||
-		!strings.HasSuffix(runner.streamed[0], "--revision main") {
-		t.Errorf("Setup() ran %v, want a jj workspace add at revision main", runner.streamed)
+		dir, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, verbose)
+
+		if err != nil {
+			t.Fatalf("Setup() error = %v", err)
+		}
+		if dir != target {
+			t.Errorf("Setup() = %q, want %q", dir, target)
+		}
+		if got := streamed(host); !slices.Equal(got, []string{addLine(target, "main")}) {
+			t.Errorf("Setup() ran %v, want a jj workspace add at revision main", got)
+		}
 	}
 }
 
 func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
-	runner := onBranch("main")
-	repoDir := t.TempDir()
+	host := onBranch("main")
+	host.Outcomes[addLine(repoDir+"/checkout", "main")] = systemtest.Outcome{}
 
-	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: "checkout"}, repoDir, false)
+	dir, err := New(host, testLog).Setup(wsshared.Config{Dir: "checkout"}, repoDir, false)
+
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
-	if want := filepath.Join(repoDir, "checkout"); dir != want {
+	if want := repoDir + "/checkout"; dir != want {
 		t.Errorf("Setup() = %q, want %q", dir, want)
 	}
 }
 
 func TestSetup_ReusesAnExistingWorkspaceWithoutRunningJJ(t *testing.T) {
-	runner := onBranch("main")
-	existing := t.TempDir()
+	for _, verbose := range []bool{false, true} {
+		host := onBranch("main").AddDir(target)
 
-	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: existing}, t.TempDir(), true)
-	if err != nil {
-		t.Fatalf("Setup() error = %v", err)
-	}
-	if dir != existing {
-		t.Errorf("Setup() = %q, want the existing directory %q", dir, existing)
-	}
-	if len(runner.streamed) != 0 {
-		t.Errorf("Setup() ran %v, want nothing for an existing workspace", runner.streamed)
+		dir, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, verbose)
+
+		if err != nil {
+			t.Fatalf("Setup() error = %v", err)
+		}
+		if dir != target {
+			t.Errorf("Setup() = %q, want the existing directory %q", dir, target)
+		}
+		if len(host.Calls) != 0 {
+			t.Errorf("Setup() ran %v, want nothing for an existing workspace", host.Calls)
+		}
 	}
 }
 
 func TestSetup_PrefersAnExplicitSourceBranch(t *testing.T) {
-	runner := onBranch("main")
-	target := filepath.Join(t.TempDir(), "workspace")
+	host := onBranch("main")
+	host.Outcomes[addLine(target, "release")] = systemtest.Outcome{}
 
-	if _, err := New(runner, testLog).Setup(
-		wsshared.Config{Dir: target, SourceBranch: "release"}, t.TempDir(), false,
-	); err != nil {
+	if _, err := New(host, testLog).Setup(wsshared.Config{Dir: target, SourceBranch: "release"}, repoDir, false); err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
-	if !strings.HasSuffix(runner.streamed[0], "--revision release") {
-		t.Errorf("Setup() ran %v, want the explicit source branch", runner.streamed)
+	if got := streamed(host); !slices.Equal(got, []string{addLine(target, "release")}) {
+		t.Errorf("Setup() ran %v, want the explicit source branch", got)
 	}
 }
 
 func TestSetup_RequiresJJOnPath(t *testing.T) {
-	runner := onBranch("main")
-	runner.absent = map[string]bool{"jj": true}
+	host := onBranch("main")
+	host.Env["PATH"] = "/opt/bin"
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
-	)
+	_, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, false)
+
 	if err == nil || !strings.Contains(err.Error(), "not installed") {
 		t.Errorf("Setup() error = %v, want an unavailable-jj error", err)
 	}
@@ -120,33 +114,31 @@ func TestSetup_RequiresJJOnPath(t *testing.T) {
 func TestSetup_RequiresASourceRevision(t *testing.T) {
 	// A detached HEAD names no branch, so there is nothing to branch the
 	// workspace from.
-	runner := onBranch("HEAD")
+	host := onBranch("HEAD")
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
-	)
+	_, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, false)
+
 	if err == nil || !strings.Contains(err.Error(), "source revision") {
 		t.Errorf("Setup() error = %v, want a missing-source-revision error", err)
 	}
 }
 
 func TestSetup_ReportsAFailedWorkspaceAdd(t *testing.T) {
-	runner := onBranch("main")
-	runner.streamErr = errors.New("exit status 1")
+	host := onBranch("main")
+	host.Outcomes[addLine(target, "main")] = systemtest.Outcome{Err: errors.New("exit status 1")}
 
-	_, err := New(runner, testLog).Setup(
-		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
-	)
+	_, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, false)
+
 	if err == nil || !strings.Contains(err.Error(), "jj workspace add failed") {
 		t.Errorf("Setup() error = %v, want a wrapped workspace-add failure", err)
 	}
 }
 
 func TestAvailable(t *testing.T) {
-	if !New(&fakeRunner{}, testLog).Available() {
+	if !New(onBranch("main"), testLog).Available() {
 		t.Error("Available() must be true when jj resolves on PATH")
 	}
-	if New(&fakeRunner{absent: map[string]bool{"jj": true}}, testLog).Available() {
+	if New(systemtest.New(), testLog).Available() {
 		t.Error("Available() must be false when jj is absent")
 	}
 }

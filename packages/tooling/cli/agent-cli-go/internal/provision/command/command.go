@@ -4,6 +4,7 @@ package command
 
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
@@ -20,3 +21,9 @@ func (Provisioner) Contribute(in provshared.Input) (provision.Contribution, erro
 
 // Pinned reports false: an init-command list is not a pinned source.
 func (Provisioner) Pinned() bool { return false }
+
+// CheckAgent reports true: the init commands run inside the sandbox and may
+// install the agent, so no check before the launch can decide it.
+func (Provisioner) CheckAgent(provision.Contribution, *types.AgentConfig) (bool, error) {
+	return true, nil
+}

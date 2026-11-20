@@ -1,10 +1,8 @@
 package nix
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"sort"
 	"strings"
 
@@ -19,12 +17,12 @@ import (
 // The committed lock is enforced at resolve time (--no-write-lock-file): a
 // dirty or missing lock makes nix error rather than silently re-pin, so the pin
 // is a real guarantee, not a doc note (fail closed).
-func ResolveClosure(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
+func (p *Provisioner) ResolveClosure(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
 	switch src.Kind {
 	case sharednix.NixSourcePackages:
-		return resolvePackages(src)
+		return p.resolvePackages(src)
 	case sharednix.NixSourceProjectFlake:
-		return resolveFlake(src)
+		return p.resolveFlake(src)
 	default:
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("unknown nix source kind %q", src.Kind)
 	}
@@ -32,7 +30,7 @@ func ResolveClosure(src sharednix.NixSource) (sharednix.ClosureDescriptor, error
 
 // resolvePackages realizes a rev-pinned package set to its store paths. The rev
 // in the flake URL is the pin; --no-write-lock-file keeps resolution frozen.
-func resolvePackages(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
+func (p *Provisioner) resolvePackages(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
 	if src.Rev == "" {
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("nix packages source requires a pinned --nix-rev")
 	}
@@ -42,10 +40,10 @@ func resolvePackages(src sharednix.NixSource) (sharednix.ClosureDescriptor, erro
 	}
 
 	args := []string{"build", "--no-link", "--print-out-paths", "--no-write-lock-file"}
-	for _, p := range pkgs {
-		args = append(args, fmt.Sprintf("github:NixOS/nixpkgs/%s#%s", src.Rev, p))
+	for _, pkg := range pkgs {
+		args = append(args, fmt.Sprintf("github:NixOS/nixpkgs/%s#%s", src.Rev, pkg))
 	}
-	out, err := runNix(args...)
+	out, err := p.runNix(args...)
 	if err != nil {
 		return sharednix.ClosureDescriptor{}, err
 	}
@@ -55,10 +53,10 @@ func resolvePackages(src sharednix.NixSource) (sharednix.ClosureDescriptor, erro
 	}
 
 	pathEntries := make([]string, len(storePaths))
-	for i, p := range storePaths {
-		pathEntries[i] = p + "/bin"
+	for i, storePath := range storePaths {
+		pathEntries[i] = storePath + "/bin"
 	}
-	requisites, err := pathInfoRequisites(storePaths)
+	requisites, err := p.pathInfoRequisites(storePaths)
 	if err != nil {
 		return sharednix.ClosureDescriptor{}, err
 	}
@@ -68,12 +66,12 @@ func resolvePackages(src sharednix.NixSource) (sharednix.ClosureDescriptor, erro
 // resolveFlake resolves the project's devShell to its tool closure. It reads the
 // resolved PATH from `nix print-dev-env --json` and derives the bound store paths
 // from it (the devShell's buildInputs land on PATH).
-func resolveFlake(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
+func (p *Provisioner) resolveFlake(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) {
 	if src.FlakeRef == "" {
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("nix flake source requires a flake reference")
 	}
 	installable := fmt.Sprintf("%s#%s", src.FlakeRef, src.Shell)
-	out, err := runNix("print-dev-env", "--json", "--no-write-lock-file", installable)
+	out, err := p.runNix("print-dev-env", "--json", "--no-write-lock-file", installable)
 	if err != nil {
 		return sharednix.ClosureDescriptor{}, err
 	}
@@ -98,7 +96,7 @@ func resolveFlake(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) 
 		return sharednix.ClosureDescriptor{}, fmt.Errorf("devShell %q PATH has no /nix/store entries", installable)
 	}
 	storePaths := storeRoots(pathEntries)
-	requisites, err := pathInfoRequisites(storePaths)
+	requisites, err := p.pathInfoRequisites(storePaths)
 	if err != nil {
 		return sharednix.ClosureDescriptor{}, err
 	}
@@ -108,11 +106,11 @@ func resolveFlake(src sharednix.NixSource) (sharednix.ClosureDescriptor, error) 
 // pathInfoRequisites enumerates the transitive closure of the given store paths
 // (`nix path-info -r`). This is the exact set the isolator binds read-only —
 // never the whole world-readable /nix/store.
-func pathInfoRequisites(storePaths []string) ([]string, error) {
+func (p *Provisioner) pathInfoRequisites(storePaths []string) ([]string, error) {
 	if len(storePaths) == 0 {
 		return nil, nil
 	}
-	out, err := runNix(append([]string{"path-info", "-r", "--no-write-lock-file"}, storePaths...)...)
+	out, err := p.runNix(append([]string{"path-info", "-r", "--no-write-lock-file"}, storePaths...)...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,20 +120,8 @@ func pathInfoRequisites(storePaths []string) ([]string, error) {
 }
 
 // runNix runs the host nix CLI and returns stdout, wrapping stderr on failure.
-func runNix(args ...string) (string, error) {
-	return runCmd("nix", args...)
-}
-
-// runCmd runs bin with args and returns stdout, wrapping stderr on failure.
-func runCmd(bin string, args ...string) (string, error) {
-	cmd := exec.Command(bin, args...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("%s %s: %w: %s", bin, strings.Join(args, " "), err, strings.TrimSpace(stderr.String()))
-	}
-	return stdout.String(), nil
+func (p *Provisioner) runNix(args ...string) (string, error) {
+	return p.host.Capture("nix", args, "")
 }
 
 // storePathEntries returns the /nix/store/.../bin (and friends) entries of a PATH.

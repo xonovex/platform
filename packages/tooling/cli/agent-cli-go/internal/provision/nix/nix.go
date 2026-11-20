@@ -7,75 +7,34 @@ package nix
 
 import (
 	"fmt"
-	"os"
+	"io/fs"
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
-// defaultFlakeShell is the devShell attribute used when none is requested.
-const defaultFlakeShell = "default"
-
-// Options is the nix variant's immutable configuration: the resolved source.
-type Options struct {
-	Source sharednix.NixSource
+// Host is the port the nix provisioner consumes: the host nix CLI, the
+// directory that holds its GC-roots, and the closure files it inspects.
+type Host interface {
+	// Capture runs name in dir and returns its trimmed standard output.
+	Capture(name string, args []string, dir string) (string, error)
+	UserHomeDir() (string, error)
+	MkdirAll(path string, perm fs.FileMode) error
+	Stat(path string) (fs.FileInfo, error)
 }
-
-// SourceFromFlags builds a NixSource from the CLI's nix flags. The user-facing
-// source values are "packages" and "flake"; the latter maps to the
-// NixSourceProjectFlake kind, defaulting the flake ref to repoDir then workDir.
-func SourceFromFlags(kind, rev string, packages []string, shell, flakeRef, repoDir, workDir string) (sharednix.NixSource, error) {
-	var source sharednix.NixSource
-	switch kind {
-	case "", "packages":
-		source = sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: rev, Packages: packages}
-	case "flake":
-		ref := flakeRef
-		if ref == "" {
-			ref = repoDir
-		}
-		if ref == "" {
-			ref = workDir
-		}
-		if shell == "" {
-			shell = defaultFlakeShell
-		}
-		source = sharednix.NixSource{Kind: sharednix.NixSourceProjectFlake, FlakeRef: ref, Shell: shell}
-	default:
-		return sharednix.NixSource{}, fmt.Errorf("unknown nix source %q; valid: packages, flake", kind)
-	}
-	if err := sharednix.ValidateSource(source); err != nil {
-		return sharednix.NixSource{}, err
-	}
-	return source, nil
-}
-
-// agentNixDir is the base directory for agent-nix runtime data (GC-roots).
-func agentNixDir() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("resolve user home directory: %w", err)
-	}
-	return filepath.Join(home, ".local", "share", "agent-nix"), nil
-}
-
-// resolveFunc resolves a source to a closure; rootFunc registers a GC-root over
-// it. Both are injected so the Contribution mapping is testable without host nix.
-type resolveFunc func(sharednix.NixSource) (sharednix.ClosureDescriptor, error)
-type rootFunc func(sharednix.NixSource, sharednix.ClosureDescriptor) error
 
 // Provisioner resolves a NixSource to a content-pinned closure on the host,
 // GC-roots it, and contributes read-only binds of ONLY the closure's requisites.
 type Provisioner struct {
-	resolve resolveFunc
-	root    rootFunc
+	host Host
 }
 
-// New creates a nix provisioner backed by the host nix CLI.
-func New() *Provisioner {
-	return &Provisioner{resolve: ResolveClosure, root: registerGCRoot}
+// New creates a nix provisioner backed by the nix CLI of host.
+func New(host Host) *Provisioner {
+	return &Provisioner{host: host}
 }
 
 // Pinned reports true: a nix closure resolves from a flake.lock/rev-pinned source.
@@ -91,13 +50,13 @@ func (p *Provisioner) Contribute(in provshared.Input) (provision.Contribution, e
 		return provision.Contribution{}, err
 	}
 
-	closure, err := p.resolve(src)
+	closure, err := p.ResolveClosure(src)
 	if err != nil {
 		return provision.Contribution{}, fmt.Errorf("resolve nix closure: %w", err)
 	}
 	// GC-root the full closure BEFORE handing it off, so a concurrent
 	// nix-collect-garbage cannot evict the tools mid-run.
-	if err := p.root(src, closure); err != nil {
+	if err := p.registerGCRoot(src, closure); err != nil {
 		return provision.Contribution{}, fmt.Errorf("register gc-root: %w", err)
 	}
 
@@ -108,20 +67,32 @@ func (p *Provisioner) Contribute(in provshared.Input) (provision.Contribution, e
 	}, nil
 }
 
+// CheckAgent requires the agent executable in one of the PATH entries of the
+// closure, because a nix sandbox binds no other tool.
+func (p *Provisioner) CheckAgent(c provision.Contribution, agent *types.AgentConfig) (bool, error) {
+	for _, directory := range c.PathEntries {
+		info, err := p.host.Stat(filepath.Join(directory, agent.Binary))
+		if err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 {
+			return true, nil
+		}
+	}
+	return false, fmt.Errorf("nix provision did not supply agent executable %q; include package %q or select a flake shell that provides it", agent.Binary, agent.NixPackage)
+}
+
 // gcRootDir is the per-source GC-root directory, keyed by the content hash so the
 // same source reuses one root set across runs.
-func gcRootDir(src sharednix.NixSource) (string, error) {
-	base, err := agentNixDir()
+func (p *Provisioner) gcRootDir(src sharednix.NixSource) (string, error) {
+	home, err := p.host.UserHomeDir()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("resolve user home directory: %w", err)
 	}
-	return filepath.Join(base, "gcroots", sharednix.ComputeEnvID(src)), nil
+	return filepath.Join(home, ".local", "share", "agent-nix", "gcroots", sharednix.ComputeEnvID(src)), nil
 }
 
 // registerGCRoot roots the full dev closure. Rooting each top-level store path
 // keeps its entire runtime closure (the requisites) reachable from a GC-root, so
 // `nix-collect-garbage -d` cannot reap the tools while a sandbox holds them.
-func registerGCRoot(src sharednix.NixSource, closure sharednix.ClosureDescriptor) error {
+func (p *Provisioner) registerGCRoot(src sharednix.NixSource, closure sharednix.ClosureDescriptor) error {
 	roots := closure.StorePaths
 	if len(roots) == 0 {
 		roots = closure.Requisites
@@ -130,18 +101,18 @@ func registerGCRoot(src sharednix.NixSource, closure sharednix.ClosureDescriptor
 		return fmt.Errorf("closure has no store paths to root")
 	}
 
-	dir, err := gcRootDir(src)
+	dir, err := p.gcRootDir(src)
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := p.host.MkdirAll(dir, 0o755); err != nil {
 		return err
 	}
-	for _, p := range roots {
-		link := filepath.Join(dir, filepath.Base(p))
+	for _, root := range roots {
+		link := filepath.Join(dir, filepath.Base(root))
 		// An indirect root registers <link> under /nix/var/nix/gcroots/auto, making
-		// <link> (and the closure reachable from <p>) a permanent GC-root.
-		if _, err := runCmd("nix-store", "--realise", p, "--add-root", link, "--indirect"); err != nil {
+		// <link> (and the closure reachable from <root>) a permanent GC-root.
+		if _, err := p.host.Capture("nix-store", []string{"--realise", root, "--add-root", link, "--indirect"}, ""); err != nil {
 			return err
 		}
 	}

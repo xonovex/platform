@@ -8,10 +8,11 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 func TestDefaultRegistry(t *testing.T) {
-	reg := DefaultRegistry(testLog)
+	reg := DefaultRegistry(systemtest.New(), testLog)
 
 	for _, m := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker} {
 		if _, err := reg.Isolator(m); err != nil {
@@ -32,6 +33,14 @@ func TestDefaultRegistry(t *testing.T) {
 	nonep, _ := reg.Provisioner(provision.ProvisionNone)
 	if nonep.Pinned() {
 		t.Error("none provisioner must report Pinned()=false")
+	}
+
+	// Only isolation=none shares the host network.
+	for m, confines := range map[isolation.IsolationMethod]bool{isolation.IsolationNone: false, isolation.IsolationBwrap: true, isolation.IsolationDocker: true} {
+		iso, _ := reg.Isolator(m)
+		if iso.ConfinesNetwork() != confines {
+			t.Errorf("isolator %q ConfinesNetwork() = %v, want %v", m, !confines, confines)
+		}
 	}
 
 	// A real cell selects, and the pinned guarantee is satisfied by the nix plugin's

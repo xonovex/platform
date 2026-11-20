@@ -1,34 +1,43 @@
 package shared
 
 import (
-	"os"
-	"path/filepath"
+	"bytes"
+	"errors"
+	"io"
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
-func TestSpawnSandboxInDirUsesDirectoryAndEnvironment(t *testing.T) {
-	workDir := t.TempDir()
-	outputPath := filepath.Join(t.TempDir(), "result")
-	command := []string{"-c", "printf '%s:%s' \"$PWD\" \"$SANDBOX_VALUE\" > \"$1\"", "sh", outputPath}
+var testLog = logging.New(io.Discard, io.Discard, false, false)
 
-	exitCode, err := SpawnSandboxInDir(testLog, "sh", command, append(os.Environ(), "SANDBOX_VALUE=ready"), workDir, "spawn test")
+func TestSpawnSandboxRunsInDirectoryWithEnvironment(t *testing.T) {
+	host := systemtest.New()
+	host.Outcomes["sh -c true"] = systemtest.Outcome{}
+	env := []string{"SANDBOX_VALUE=ready"}
+
+	exitCode, err := SpawnSandbox(host, testLog, "sh", []string{"-c", "true"}, env, "/work", "spawn test")
 
 	if err != nil || exitCode != 0 {
-		t.Fatalf("SpawnSandboxInDir() exitCode = %d, error = %v", exitCode, err)
+		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v", exitCode, err)
 	}
-	result, err := os.ReadFile(outputPath)
-	if err != nil {
-		t.Fatalf("read command output: %v", err)
+	if len(host.Calls) != 1 {
+		t.Fatalf("calls = %+v, want one run", host.Calls)
 	}
-	if string(result) != workDir+":ready" {
-		t.Fatalf("command output = %q, want %q", result, workDir+":ready")
+	call := host.Calls[0]
+	if call.Kind != "run" || call.Dir != "/work" || !slices.Equal(call.Env, env) {
+		t.Errorf("call = %+v, want a run in /work with the sandbox environment", call)
 	}
 }
 
 func TestSpawnSandboxReturnsChildExitCode(t *testing.T) {
-	exitCode, err := SpawnSandbox(testLog, "sh", []string{"-c", "exit 7"}, os.Environ(), "spawn test")
+	host := systemtest.New()
+	host.Outcomes["sh -c exit 7"] = systemtest.Outcome{ExitCode: 7}
+
+	exitCode, err := SpawnSandbox(host, testLog, "sh", []string{"-c", "exit 7"}, nil, "", "spawn test")
 
 	if err != nil || exitCode != 7 {
 		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v, want 7, nil", exitCode, err)
@@ -36,10 +45,26 @@ func TestSpawnSandboxReturnsChildExitCode(t *testing.T) {
 }
 
 func TestSpawnSandboxReportsStartFailure(t *testing.T) {
-	exitCode, err := SpawnSandbox(testLog, "/missing/xonovex-command", nil, os.Environ(), "start sandbox")
+	host := systemtest.New()
+	host.Outcomes["/missing/command"] = systemtest.Outcome{Err: errors.New("no such file")}
 
-	if exitCode != 1 || err == nil || !strings.Contains(err.Error(), "start sandbox") {
-		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v, want prefixed start error", exitCode, err)
+	exitCode, err := SpawnSandbox(host, testLog, "/missing/command", nil, nil, "", "start sandbox")
+
+	if exitCode != 1 || err == nil || err.Error() != "start sandbox: no such file" {
+		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v, want 1 and the prefixed start error", exitCode, err)
+	}
+}
+
+func TestSpawnSandboxLogsTheCommandAtDebugLevel(t *testing.T) {
+	var debug bytes.Buffer
+	host := systemtest.New()
+	host.Outcomes["bwrap --die-with-parent"] = systemtest.Outcome{}
+
+	if _, err := SpawnSandbox(host, logging.New(io.Discard, &debug, true, false), "bwrap", []string{"--die-with-parent"}, nil, "", "spawn test"); err != nil {
+		t.Fatalf("SpawnSandbox() error = %v", err)
+	}
+	if !strings.Contains(debug.String(), "Executing: bwrap --die-with-parent") {
+		t.Errorf("debug output = %q, want the command line", debug.String())
 	}
 }
 

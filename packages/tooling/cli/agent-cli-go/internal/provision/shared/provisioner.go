@@ -7,6 +7,7 @@ package shared
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
 // Input is the neutral per-run carrier handed to Contribute. Each provisioner
@@ -25,4 +26,9 @@ type Provisioner interface {
 	// Pinned reports whether provisioning comes from a pinned source (so
 	// RequirePinnedProvision can be honored).
 	Pinned() bool
+	// CheckAgent reports whether the provisioner accounts for the agent
+	// executable. A provisioner that supplies no tools returns false so that the
+	// isolator checks its own base; one that must supply the agent and did not
+	// returns an error.
+	CheckAgent(c provision.Contribution, agent *types.AgentConfig) (bool, error)
 }

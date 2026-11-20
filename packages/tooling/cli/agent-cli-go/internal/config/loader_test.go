@@ -1,22 +1,20 @@
 package config
 
 import (
-	"os"
-	"path/filepath"
+	"errors"
 	"reflect"
+	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
-func TestLoadConfigFileLoadsLaunchFields(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "config.yaml")
-	content := []byte("provider: gemini\nhomeDir: /tmp/home\nbindPaths:\n  - ./rw\nroBindPaths:\n  - ./ro\ncustomEnv:\n  - FEATURE=true\n")
-	if err := os.WriteFile(path, content, 0o600); err != nil {
-		t.Fatalf("WriteFile() error = %v", err)
-	}
+func TestLoadReadsLaunchFields(t *testing.T) {
+	files := systemtest.New().AddFile("/etc/agent/config.yaml", "provider: gemini\nhomeDir: /tmp/home\nbindPaths:\n  - ./rw\nroBindPaths:\n  - ./ro\ncustomEnv:\n  - FEATURE=true\n", 0o600)
 
-	config, err := LoadConfigFile(path)
+	config, err := Load(files, "/etc/agent/config.yaml")
 	if err != nil {
-		t.Fatalf("LoadConfigFile() error = %v", err)
+		t.Fatalf("Load() error = %v", err)
 	}
 
 	if config.Provider != "gemini" || config.HomeDir != "/tmp/home" {
@@ -30,13 +28,38 @@ func TestLoadConfigFileLoadsLaunchFields(t *testing.T) {
 	}
 }
 
-func TestLoadConfigFileRejectsMissingExplicitPath(t *testing.T) {
-	if _, err := LoadConfigFile(filepath.Join(t.TempDir(), "missing.yaml")); err == nil {
-		t.Error("LoadConfigFile() error = nil, want explicit missing-file error")
+func TestLoadReadsTheDefaultPathUnderHome(t *testing.T) {
+	files := systemtest.New().AddFile(DefaultPath("/home/user"), "provider=glm\n", 0o600)
+
+	config, err := Load(files, "")
+	if err != nil || config.Provider != "glm" {
+		t.Fatalf("Load(default) = (%#v, %v), want provider glm", config, err)
 	}
 }
 
-func TestLoadConfigFileRejectsUnknownStructuredFields(t *testing.T) {
+func TestLoadReturnsAnEmptyConfigWithoutTheDefaultFile(t *testing.T) {
+	config, err := Load(systemtest.New(), "")
+	if err != nil || !reflect.DeepEqual(config, FileConfig{}) {
+		t.Fatalf("Load(absent default) = (%#v, %v), want an empty config", config, err)
+	}
+}
+
+func TestLoadFailsWithoutAHomeForTheDefaultPath(t *testing.T) {
+	files := systemtest.New()
+	files.HomeErr = errors.New("no home")
+
+	if _, err := Load(files, ""); err == nil || !strings.Contains(err.Error(), "resolve user home directory") {
+		t.Fatalf("Load() error = %v, want home lookup error", err)
+	}
+}
+
+func TestLoadRejectsMissingExplicitPath(t *testing.T) {
+	if _, err := Load(systemtest.New(), "/etc/agent/missing.yaml"); err == nil {
+		t.Error("Load() error = nil, want explicit missing-file error")
+	}
+}
+
+func TestParseRejectsUnknownStructuredFields(t *testing.T) {
 	tests := []struct {
 		name    string
 		content string
@@ -48,14 +71,33 @@ func TestLoadConfigFileRejectsUnknownStructuredFields(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			path := filepath.Join(t.TempDir(), "config"+test.ext)
-			if err := os.WriteFile(path, []byte(test.content), 0o600); err != nil {
-				t.Fatalf("WriteFile() error = %v", err)
-			}
-			if _, err := LoadConfigFile(path); err == nil {
-				t.Error("LoadConfigFile() error = nil, want unknown-field error")
+			if _, err := Parse([]byte(test.content), test.ext); err == nil {
+				t.Error("Parse() error = nil, want unknown-field error")
 			}
 		})
+	}
+}
+
+func TestParseFallsBackFromYAMLToTOMLToKeyValue(t *testing.T) {
+	tests := []struct {
+		name    string
+		content string
+	}{
+		{name: "yaml", content: "provider: gemini\n"},
+		{name: "toml", content: "provider = \"gemini\"\n"},
+		{name: "key value", content: "provider=gemini\n"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			config, err := Parse([]byte(test.content), "")
+			if err != nil || config.Provider != "gemini" {
+				t.Errorf("Parse() = (%#v, %v), want provider gemini", config, err)
+			}
+		})
+	}
+	if _, err := Parse([]byte("not a config"), ""); err == nil {
+		t.Error("Parse(invalid) error = nil, want an error")
 	}
 }
 
@@ -67,6 +109,7 @@ func TestParseKeyValueConfigRejectsInvalidInput(t *testing.T) {
 		{name: "malformed", content: "provider"},
 		{name: "unknown", content: "providre=gemini"},
 		{name: "duplicate", content: "provider=gemini\nprovider=glm"},
+		{name: "empty key", content: "=gemini"},
 	}
 
 	for _, test := range tests {
@@ -79,7 +122,7 @@ func TestParseKeyValueConfigRejectsInvalidInput(t *testing.T) {
 }
 
 func TestParseKeyValueConfigLoadsSupportedKeys(t *testing.T) {
-	config, err := parseKeyValueConfig("provider=gemini\nhomeDir=/tmp/home\n")
+	config, err := parseKeyValueConfig("# comment\n\nprovider=gemini\nSANDBOXHOMEDIR=/tmp/home\n")
 	if err != nil {
 		t.Fatalf("parseKeyValueConfig() error = %v", err)
 	}

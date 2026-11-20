@@ -1,8 +1,6 @@
 package bwrap
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -23,11 +21,10 @@ func envValue(env []string, key string) (string, bool) {
 // processEnv is the environment bwrap itself is launched with, so it carries the
 // host environment merged with the sandbox allowlist.
 func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T) {
-	t.Setenv("XONOVEX_PROCESS_ENV_PROBE", "host-value")
-	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
-	homeDir := canonicalPath(t, cfg.HomeDir)
+	host := newHost()
+	host.Env["XONOVEX_PROCESS_ENV_PROBE"] = "host-value"
 
-	env, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{})
+	env, err := NewIsolator(host, testLog).processEnv(claudeCfg(netshared.ModeNone, false), provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("processEnv() error = %v", err)
@@ -35,30 +32,39 @@ func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T
 	if got, ok := envValue(env, "XONOVEX_PROCESS_ENV_PROBE"); !ok || got != "host-value" {
 		t.Errorf("host variable = %q (present %v), want it carried through", got, ok)
 	}
-	if got, _ := envValue(env, "HOME"); got != homeDir {
-		t.Errorf("HOME = %q, want the resolved sandbox home %q", got, homeDir)
+	if got, _ := envValue(env, "HOME"); got != "/home/user" {
+		t.Errorf("HOME = %q, want the resolved sandbox home /home/user", got)
 	}
 	if got, _ := envValue(env, "TMPDIR"); got != "/tmp" {
 		t.Errorf("TMPDIR = %q, want %q", got, "/tmp")
 	}
 }
 
-func TestProcessEnv_ReportsAnUnresolvableWorkDir(t *testing.T) {
-	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
-	cfg.HomeDir = filepath.Join(t.TempDir(), "absent")
+func TestProcessEnv_ReportsAnUnresolvableHomeDir(t *testing.T) {
+	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg.HomeDir = "/home/absent"
 
-	if _, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail when the home directory cannot be resolved")
+	}
+}
+
+func TestProcessEnv_ReportsAMalformedCustomEnvironment(t *testing.T) {
+	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg.CustomEnv = []string{"MISSING_EQUALS"}
+
+	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
+		t.Fatal("processEnv() must fail on a malformed custom environment")
 	}
 }
 
 // TerminalCommand hands a terminal wrapper both the command and the environment
 // it must be launched with, so the two must stay consistent.
 func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
-	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
-	homeDir := canonicalPath(t, cfg.HomeDir)
+	host := newHost()
+	cfg := claudeCfg(netshared.ModeNone, false)
 
-	command, env, err := NewIsolator(testLog).TerminalCommand(cfg, provision.Contribution{})
+	command, env, err := NewIsolator(host, testLog).TerminalCommand(cfg, provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("TerminalCommand() error = %v", err)
@@ -66,21 +72,20 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 	if len(command) == 0 || command[0] != "bwrap" {
 		t.Fatalf("command = %v, want it to start with bwrap", command)
 	}
-	expected := bwrapCommand(t, cfg, provision.Contribution{})
+	expected := bwrapCommand(t, host, cfg, provision.Contribution{})
 	if strings.Join(command, " ") != strings.Join(expected, " ") {
 		t.Errorf("command = %v, want the same command Command() returns", command)
 	}
-	if got, _ := envValue(env, "HOME"); got != homeDir {
-		t.Errorf("HOME = %q, want the resolved sandbox home %q", got, homeDir)
+	if got, _ := envValue(env, "HOME"); got != "/home/user" {
+		t.Errorf("HOME = %q, want the resolved sandbox home /home/user", got)
 	}
 }
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
-	cfg := claudeCfg(t, netshared.ModeNone, false, filepath.Join(t.TempDir(), "absent"))
+	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg.WorkDir = "/work/absent"
 
-	if _, _, err := NewIsolator(testLog).TerminalCommand(
-		cfg, provision.Contribution{},
-	); err == nil {
+	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("TerminalCommand() must fail when the work directory cannot be resolved")
 	}
 }
@@ -88,7 +93,7 @@ func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
 // bwrap contributes no tools of its own, so immutability is exactly the
 // provisioner's.
 func TestPinnedProvision_MirrorsTheProvisioner(t *testing.T) {
-	isolator := NewIsolator(testLog)
+	isolator := NewIsolator(newHost(), testLog)
 	for _, pinned := range []bool{true, false} {
 		if got := isolator.PinnedProvision(provision.ProvisionNix, pinned, ""); got != pinned {
 			t.Errorf("PinnedProvision(pinned=%v) = %v, want %v", pinned, got, pinned)
@@ -97,24 +102,18 @@ func TestPinnedProvision_MirrorsTheProvisioner(t *testing.T) {
 }
 
 func TestAvailable_TracksTheBwrapBinaryOnPath(t *testing.T) {
-	isolator := NewIsolator(testLog)
+	host := newHost()
+	isolator := NewIsolator(host, testLog)
 
-	t.Setenv("PATH", t.TempDir())
 	absent, err := isolator.Available()
 	if err != nil {
 		t.Fatalf("Available() error = %v", err)
 	}
 	if absent {
-		t.Error("Available() = true with an empty PATH, want false")
+		t.Error("Available() = true without bwrap on PATH, want false")
 	}
 
-	binDir := t.TempDir()
-	if err := os.WriteFile(
-		filepath.Join(binDir, "bwrap"), []byte("#!/bin/sh\n"), 0o755,
-	); err != nil {
-		t.Fatalf("write bwrap stub: %v", err)
-	}
-	t.Setenv("PATH", binDir)
+	host.AddExecutable("/usr/bin/bwrap")
 	present, err := isolator.Available()
 	if err != nil {
 		t.Fatalf("Available() error = %v", err)

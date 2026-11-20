@@ -12,6 +12,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
@@ -30,7 +31,7 @@ func installFakeJJ(t *testing.T, body string) {
 func TestSetup_ReusesExistingWorkspace(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "test-branch", Dir: tmpDir}, t.TempDir(), true)
+	result, err := New(realHost(), testLog).Setup(wsshared.Config{Branch: "test-branch", Dir: tmpDir}, t.TempDir(), true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -53,7 +54,7 @@ func TestSetup_CreatesWorkspace(t *testing.T) {
 	repoDir := t.TempDir()
 	target := "workspace"
 
-	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{SourceBranch: "main", Dir: target}, repoDir, true)
+	result, err := New(realHost(), testLog).Setup(wsshared.Config{SourceBranch: "main", Dir: target}, repoDir, true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -73,7 +74,7 @@ func TestSetup_CreatesWorkspace(t *testing.T) {
 func TestSetup_ReportsWorkspaceCommandFailure(t *testing.T) {
 	installFakeJJ(t, "exit 7")
 
-	_, err := New(wsshared.NewExecRunner(), testLog).Setup(
+	_, err := New(realHost(), testLog).Setup(
 		wsshared.Config{SourceBranch: "main", Dir: "workspace"},
 		t.TempDir(),
 		false,
@@ -86,7 +87,7 @@ func TestSetup_ReportsWorkspaceCommandFailure(t *testing.T) {
 func TestSetup_RequiresJJ(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 
-	_, err := New(wsshared.NewExecRunner(), testLog).Setup(
+	_, err := New(realHost(), testLog).Setup(
 		wsshared.Config{SourceBranch: "main", Dir: "workspace"},
 		t.TempDir(),
 		false,
@@ -99,7 +100,7 @@ func TestSetup_RequiresJJ(t *testing.T) {
 func TestSetup_RequiresSourceRevision(t *testing.T) {
 	installFakeJJ(t, "exit 0")
 
-	_, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Dir: "workspace"}, t.TempDir(), false)
+	_, err := New(realHost(), testLog).Setup(wsshared.Config{Dir: "workspace"}, t.TempDir(), false)
 	if err == nil || !strings.Contains(err.Error(), "failed to determine source revision") {
 		t.Fatalf("Setup() error = %v, want source-revision error", err)
 	}
@@ -107,12 +108,16 @@ func TestSetup_RequiresSourceRevision(t *testing.T) {
 
 func TestAvailable_ResolvesTheRealJJOnPath(t *testing.T) {
 	installFakeJJ(t, "exit 0")
-	if !New(wsshared.NewExecRunner(), testLog).Available() {
+	if !New(realHost(), testLog).Available() {
 		t.Error("Available() = false, want true")
 	}
 
 	t.Setenv("PATH", t.TempDir())
-	if New(wsshared.NewExecRunner(), testLog).Available() {
+	if New(realHost(), testLog).Available() {
 		t.Error("Available() = true without jj, want false")
 	}
 }
+
+// realHost is the operating-system adapter, so these cases run the real git and
+// jj binaries.
+func realHost() system.System { return system.New(os.Stdin, os.Stdout, os.Stderr) }

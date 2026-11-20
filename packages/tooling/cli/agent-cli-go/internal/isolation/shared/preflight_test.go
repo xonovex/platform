@@ -1,37 +1,29 @@
 package shared
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 func TestResolveContainedOptionalPathReturnsContainedConfig(t *testing.T) {
-	home := t.TempDir()
-	config := filepath.Join(home, ".claude")
-	if err := os.Mkdir(config, 0700); err != nil {
-		t.Fatalf("Mkdir() error = %v", err)
-	}
+	fsys := systemtest.New().AddDir("/home/user/.claude")
 
-	resolved, exists, err := ResolveContainedOptionalPath(home, ".claude", "user config path")
+	resolved, exists, err := ResolveContainedOptionalPath(fsys, "/home/user", ".claude", "user config path")
 
 	if err != nil {
 		t.Fatalf("ResolveContainedOptionalPath() error = %v", err)
 	}
-	if !exists || resolved != config {
-		t.Fatalf("resolved = %q, exists = %v, want %q, true", resolved, exists, config)
+	if !exists || resolved != "/home/user/.claude" {
+		t.Fatalf("resolved = %q, exists = %v, want /home/user/.claude, true", resolved, exists)
 	}
 }
 
 func TestResolveContainedOptionalPathRejectsEscapingSymlink(t *testing.T) {
-	home := t.TempDir()
-	outside := t.TempDir()
-	if err := os.Symlink(outside, filepath.Join(home, ".claude")); err != nil {
-		t.Fatalf("Symlink() error = %v", err)
-	}
+	fsys := systemtest.New().AddDir("/home/user").AddDir("/outside").AddLink("/home/user/.claude", "/outside")
 
-	_, _, err := ResolveContainedOptionalPath(home, ".claude", "user config path")
+	_, _, err := ResolveContainedOptionalPath(fsys, "/home/user", ".claude", "user config path")
 
 	if err == nil || !strings.Contains(err.Error(), "outside home") {
 		t.Fatalf("ResolveContainedOptionalPath() error = %v, want containment error", err)
@@ -39,48 +31,92 @@ func TestResolveContainedOptionalPathRejectsEscapingSymlink(t *testing.T) {
 }
 
 func TestResolveContainedOptionalPathReportsMissingConfig(t *testing.T) {
-	home := t.TempDir()
+	fsys := systemtest.New().AddDir("/home/user")
 
-	resolved, exists, err := ResolveContainedOptionalPath(home, ".claude", "user config path")
+	resolved, exists, err := ResolveContainedOptionalPath(fsys, "/home/user", ".claude", "user config path")
 
 	if err != nil || exists || resolved != "" {
 		t.Fatalf("resolved = %q, exists = %v, error = %v, want empty, false, nil", resolved, exists, err)
 	}
 }
 
-func TestResolveHomeDirUsesExplicitDirectory(t *testing.T) {
-	home := t.TempDir()
-
-	resolved, err := ResolveHomeDir(home)
-
-	if err != nil || resolved != home {
-		t.Fatalf("ResolveHomeDir() = %q, %v, want %q, nil", resolved, err, home)
+func TestResolveContainedOptionalPathRejectsInvalidRelativePaths(t *testing.T) {
+	fsys := systemtest.New().AddDir("/home/user")
+	tests := []struct {
+		name     string
+		relative string
+		phrase   string
+	}{
+		{"absolute", "/etc/passwd", "must be relative"},
+		{"parent", "..", "escapes the home directory"},
+		{"traversal", "../other", "escapes the home directory"},
+		{"home itself", ".", "escapes the home directory"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, _, err := ResolveContainedOptionalPath(fsys, "/home/user", test.relative, "user config path")
+			if err == nil || !strings.Contains(err.Error(), test.phrase) {
+				t.Fatalf("ResolveContainedOptionalPath(%q) error = %v, want %q", test.relative, err, test.phrase)
+			}
+		})
 	}
 }
 
-func TestResolveDirectoryRejectsFile(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "file")
-	if err := os.WriteFile(path, []byte("content"), 0o600); err != nil {
-		t.Fatalf("write fixture: %v", err)
+func TestResolveContainedOptionalPathRequiresTheHomeDirectory(t *testing.T) {
+	if _, _, err := ResolveContainedOptionalPath(systemtest.New(), "/home/missing", ".claude", "user config path"); err == nil {
+		t.Fatal("ResolveContainedOptionalPath() error = nil, want missing home error")
 	}
+}
 
-	if _, err := ResolveDirectory(path, "fixture"); err == nil {
-		t.Fatal("ResolveDirectory() error = nil, want file rejection")
+func TestResolveContainedOptionalPathReportsBrokenResolution(t *testing.T) {
+	fsys := systemtest.New().AddFile("/home/user/file", "x", 0o600).AddLink("/home/user/.claude", "file/inside")
+
+	_, _, err := ResolveContainedOptionalPath(fsys, "/home/user", ".claude", "user config path")
+
+	if err == nil || !strings.Contains(err.Error(), "resolve user config path") {
+		t.Fatalf("ResolveContainedOptionalPath() error = %v, want resolution error", err)
+	}
+}
+
+func TestResolveDirectoryResolvesSymlinks(t *testing.T) {
+	fsys := systemtest.New().AddDir("/data/real").AddLink("/work", "/data/real")
+
+	resolved, err := ResolveDirectory(fsys, "/work/", "work directory")
+
+	if err != nil || resolved != "/data/real" {
+		t.Fatalf("ResolveDirectory() = %q, %v, want /data/real, nil", resolved, err)
+	}
+}
+
+func TestResolveDirectoryRejectsFileMissingAndRelativePaths(t *testing.T) {
+	fsys := systemtest.New().AddFile("/work/file", "content", 0o600)
+	tests := []struct {
+		path   string
+		phrase string
+	}{
+		{"/work/file", "is not a directory"},
+		{"/work/missing", "inspect fixture"},
+		{"work", "must be an absolute path"},
+	}
+	for _, test := range tests {
+		if _, err := ResolveDirectory(fsys, test.path, "fixture"); err == nil || !strings.Contains(err.Error(), test.phrase) {
+			t.Errorf("ResolveDirectory(%q) error = %v, want %q", test.path, err, test.phrase)
+		}
 	}
 }
 
 func TestResolveExistingPath(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "file")
-	if err := os.WriteFile(path, []byte("content"), 0o600); err != nil {
-		t.Fatalf("write fixture: %v", err)
-	}
+	fsys := systemtest.New().AddFile("/work/file", "content", 0o600)
 
-	resolved, err := ResolveExistingPath(path, "fixture")
+	resolved, err := ResolveExistingPath(fsys, "/work/./file", "fixture")
 
-	if err != nil || resolved != path {
-		t.Fatalf("ResolveExistingPath() = %q, %v, want %q, nil", resolved, err, path)
+	if err != nil || resolved != "/work/file" {
+		t.Fatalf("ResolveExistingPath() = %q, %v, want /work/file, nil", resolved, err)
 	}
-	if _, err := ResolveExistingPath(path+"-missing", "fixture"); err == nil {
+	if _, err := ResolveExistingPath(fsys, "/work/file-missing", "fixture"); err == nil {
 		t.Fatal("ResolveExistingPath() missing error = nil, want error")
+	}
+	if _, err := ResolveExistingPath(fsys, "file", "fixture"); err == nil || !strings.Contains(err.Error(), "absolute") {
+		t.Fatalf("ResolveExistingPath(relative) error = %v, want absolute path error", err)
 	}
 }

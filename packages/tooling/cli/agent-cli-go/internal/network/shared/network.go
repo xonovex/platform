@@ -26,6 +26,10 @@ const (
 // EgressIsRestricted reports whether the mode enforceably restricts egress.
 func EgressIsRestricted(m Mode) bool { return netenum.EgressIsRestricted(m) }
 
+// NeedsConfinement reports whether the mode differs from the unrestricted host
+// network, so that only an isolator with a network namespace can apply it.
+func NeedsConfinement(m Mode) bool { return m != ModeHost }
+
 // ParseMode validates s and returns the corresponding Mode.
 func ParseMode(s string) (Mode, error) {
 	switch Mode(s) {

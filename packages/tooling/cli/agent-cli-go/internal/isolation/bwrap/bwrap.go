@@ -2,8 +2,7 @@
 package bwrap
 
 import (
-	"os"
-	"os/exec"
+	"fmt"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -29,14 +28,19 @@ import (
 //
 // bwrap and default runc are attack-surface reduction, not a kernel trust
 // boundary (see KernelIsolated); no-new-privs and cap-drop are bwrap defaults.
-type Isolator struct{ log logging.Logger }
+type Isolator struct {
+	host isoshared.Host
+	log  logging.Logger
+}
 
-// NewIsolator creates a bwrap isolator.
-func NewIsolator(log logging.Logger) *Isolator { return &Isolator{log: log} }
+// NewIsolator creates a bwrap isolator over host, writing through log.
+func NewIsolator(host isoshared.Host, log logging.Logger) *Isolator {
+	return &Isolator{host: host, log: log}
+}
 
 // Available reports whether bwrap is installed.
 func (i *Isolator) Available() (bool, error) {
-	_, err := exec.LookPath("bwrap")
+	_, err := i.host.LookPath("bwrap")
 	return err == nil, nil
 }
 
@@ -54,6 +58,21 @@ func (i *Isolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinne
 // trust boundary.
 func (i *Isolator) KernelIsolated(_ string) bool { return false }
 
+// ConfinesNetwork reports true: bwrap unshares the network namespace.
+func (i *Isolator) ConfinesNetwork() bool { return true }
+
+// CheckAgent requires host passthrough, because deny-default bwrap exposes no
+// host tool, and then the agent executable on the PATH it passes through.
+func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
+	if !cfg.HostPassthrough {
+		return fmt.Errorf("bwrap with provision=none cannot supply agent executable %q while host passthrough is disabled; use provision=nix or enable --isolation-bwrap-passthrough", cfg.Agent.Binary)
+	}
+	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {
+		return fmt.Errorf("agent executable %q is not available on passthrough PATH: %w", cfg.Agent.Binary, err)
+	}
+	return nil
+}
+
 // Run executes the agent in the bubblewrap sandbox.
 func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, error) {
 	args, err := i.buildArgs(cfg, c)
@@ -64,7 +83,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.log, "bwrap", args, env, "Bubblewrap sandbox")
+	return isoshared.SpawnSandbox(i.host, i.log, "bwrap", args, env, "", "Bubblewrap sandbox")
 }
 
 // Command returns the full bwrap command (for display / terminal wrappers).
@@ -87,17 +106,17 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
 	if err != nil {
 		return nil, err
 	}
 	repoDir := ""
 	if cfg.RepoDir != "" {
-		repoDir, err = isoshared.ResolveDirectory(cfg.RepoDir, "repository directory")
+		repoDir, err = isoshared.ResolveDirectory(i.host, cfg.RepoDir, "repository directory")
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +139,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		"--proc", "/proc",
 		"--tmpfs", "/tmp",
 	}
-	inherited := envutil.ParseEnv(os.Environ())
+	inherited := envutil.ParseEnv(i.host.Environ())
 	unset := make([]string, 0, len(inherited))
 	for key := range inherited {
 		if _, allowed := sandboxEnv[key]; !allowed {
@@ -143,7 +162,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// the curated config paths bound back read-only.
 	args = append(args, "--tmpfs", homeDir)
 	for _, configPath := range isolation.UserConfigPaths(cfg.Agent.Type) {
-		src, exists, err := isoshared.ResolveContainedOptionalPath(homeDir, configPath, "user config path")
+		src, exists, err := isoshared.ResolveContainedOptionalPath(i.host, homeDir, configPath, "user config path")
 		if err != nil {
 			return nil, err
 		}
@@ -161,7 +180,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// HostPassthrough: restore host tool reachability (leaky mode).
 	if cfg.HostPassthrough {
 		for _, dir := range []string{"/usr", "/lib", "/lib64", "/bin", "/etc"} {
-			if _, err := os.Stat(dir); err == nil {
+			if _, err := i.host.Stat(dir); err == nil {
 				args = append(args, "--ro-bind", dir, dir)
 			}
 		}
@@ -169,7 +188,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Contribution: read-only binds of the provisioned closure's requisites.
 	for _, p := range c.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(p, "provisioned read-only bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, p, "provisioned read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -178,14 +197,14 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Caller-supplied extra binds.
 	for _, path := range cfg.BindPaths {
-		resolved, err := isoshared.ResolveExistingPath(path, "read-write bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-write bind")
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, "--bind", resolved, resolved)
 	}
 	for _, path := range cfg.RoBindPaths {
-		resolved, err := isoshared.ResolveExistingPath(path, "read-only bind")
+		resolved, err := isoshared.ResolveExistingPath(i.host, path, "read-only bind")
 		if err != nil {
 			return nil, err
 		}
@@ -206,7 +225,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 }
 
 func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
-	homeDir, err := isoshared.ResolveHomeDir(cfg.HomeDir)
+	homeDir, err := isoshared.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +233,7 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 	if err != nil {
 		return nil, err
 	}
-	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(os.Environ()), sandboxEnv)), nil
+	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(i.host.Environ()), sandboxEnv)), nil
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:
@@ -232,14 +251,14 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	pathEntries := append([]string{}, c.PathEntries...)
 	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
 	if cfg.HostPassthrough {
-		if hostPath := os.Getenv("PATH"); hostPath != "" {
+		if hostPath := i.host.Getenv("PATH"); hostPath != "" {
 			pathEntries = append(pathEntries, hostPath)
 		}
 	}
 	env["PATH"] = strings.Join(pathEntries, ":")
 
 	// Provider tokens + contribution env + custom env.
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, os.Getenv)
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
 	if err != nil {
 		return nil, err
 	}

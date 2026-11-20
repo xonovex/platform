@@ -67,34 +67,36 @@ tasks:
   go-package-coverage:
     script: |
       set -euo pipefail
-      # Every package the module builds is named here. cmd/agent-cli is process
-      # wiring covered by go-integration against the real binary; the shared
-      # packages declare interfaces and hold no statements. The workspace variants
-      # run their commands through the shared Runner port, so the default tier
-      # covers the logic with recorded output; what is left uncovered in
-      # workspace/shared is the exec plumbing itself, which only the integration
-      # tier can reach.
+      # Every package the module builds is named here. cmd/agent-cli is the
+      # composition root and internal/system the operating-system adapter; both
+      # are covered by go-integration, because a unit test may not start a
+      # process or touch a file. The shared packages of provision and terminal
+      # declare interfaces and hold no statements. Every other package reaches
+      # the machine through a port, so the unit tier covers it with
+      # internal/system/systemtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
-        ./internal/cmd=70 \
-        ./internal/config=65 \
-        ./internal/network/shared=80 \
+        ./internal/cmd=93 \
+        ./internal/config=100 \
+        ./internal/launch=99 \
+        ./internal/network/shared=85 \
         ./internal/provision/command=100 \
-        ./internal/provision/nix=85 \
+        ./internal/provision/nix=99 \
         ./internal/provision/none=100 \
         ./internal/provision/shared=exempt \
-        ./internal/isolation/bwrap=80 \
-        ./internal/isolation/docker=78 \
-        ./internal/isolation/none=85 \
-        ./internal/isolation/shared=80 \
-        ./internal/sandbox=95 \
+        ./internal/isolation/bwrap=98 \
+        ./internal/isolation/docker=98 \
+        ./internal/isolation/none=100 \
+        ./internal/isolation/shared=96 \
+        ./internal/sandbox=97 \
         ./internal/sandbox/plugins=100 \
-        ./internal/terminal=100 \
+        ./internal/system=exempt \
+        ./internal/system/systemtest=99 \
         ./internal/terminal/shared=exempt \
-        ./internal/terminal/tmux=75 \
-        ./internal/workspace/git=87 \
-        ./internal/workspace/jj=91 \
-        ./internal/workspace/shared=66
+        ./internal/terminal/tmux=100 \
+        ./internal/workspace/git=98 \
+        ./internal/workspace/jj=100 \
+        ./internal/workspace/shared=100
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"

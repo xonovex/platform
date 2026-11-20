@@ -7,6 +7,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
@@ -18,6 +19,9 @@ type fakeIsolator struct {
 	available bool
 	hidesHost bool
 	kernelIso bool
+	// sharesNetwork makes the double unable to confine the network; the zero
+	// value confines it.
+	sharesNetwork bool
 }
 
 func (f fakeIsolator) Available() (bool, error)                                     { return f.available, nil }
@@ -33,6 +37,10 @@ func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPi
 }
 func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
 func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
+func (f fakeIsolator) ConfinesNetwork() bool           { return !f.sharesNetwork }
+func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error {
+	return nil
+}
 
 type fakeProvisioner struct{ pinned bool }
 
@@ -40,6 +48,9 @@ func (f fakeProvisioner) Contribute(provshared.Input) (provision.Contribution, e
 	return provision.Contribution{}, nil
 }
 func (f fakeProvisioner) Pinned() bool { return f.pinned }
+func (f fakeProvisioner) CheckAgent(provision.Contribution, *types.AgentConfig) (bool, error) {
+	return false, nil
+}
 
 func testRegistry(iso fakeIsolator, prov fakeProvisioner) *Registry {
 	return NewRegistry().
@@ -112,6 +123,20 @@ func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
 
 	if !errors.Is(err, policy.ErrHostToolsReachable) {
 		t.Fatalf("Select() error = %v, want %v", err, policy.ErrHostToolsReachable)
+	}
+}
+
+func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
+	reg := testRegistry(fakeIsolator{sharesNetwork: true}, fakeProvisioner{})
+
+	if _, _, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{}); err == nil {
+		t.Fatal("Select(network none, shared network) error = nil, want a confinement error")
+	}
+
+	req := bwrapNixReq()
+	req.Network = netshared.ModeHost
+	if _, _, err := Select(reg, req, policy.SandboxPolicy{}); err != nil {
+		t.Fatalf("Select(network host, shared network) error = %v, want nil", err)
 	}
 }
 

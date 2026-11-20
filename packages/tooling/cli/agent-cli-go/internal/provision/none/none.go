@@ -4,6 +4,7 @@ package none
 
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
@@ -20,3 +21,8 @@ func (Provisioner) Contribute(provshared.Input) (provision.Contribution, error) 
 
 // Pinned reports false: no provisioning source.
 func (Provisioner) Pinned() bool { return false }
+
+// CheckAgent reports false: the isolator's base must supply the agent.
+func (Provisioner) CheckAgent(provision.Contribution, *types.AgentConfig) (bool, error) {
+	return false, nil
+}

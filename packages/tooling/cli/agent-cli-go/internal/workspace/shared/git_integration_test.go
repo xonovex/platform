@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 )
 
 func runGit(t *testing.T, cwd string, args ...string) string {
@@ -45,7 +47,7 @@ func initializeRepository(t *testing.T) string {
 func TestExecGit_ReturnsTrimmedStdout(t *testing.T) {
 	repoDir := initializeRepository(t)
 
-	output, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, repoDir)
+	output, err := ExecGit(realHost(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, repoDir)
 
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
@@ -61,11 +63,11 @@ func TestExecGit_RunsInTheGivenDirectory(t *testing.T) {
 	second := initializeRepository(t)
 	runGit(t, second, "checkout", "-b", "other")
 
-	firstBranch, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, first)
+	firstBranch, err := ExecGit(realHost(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, first)
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
 	}
-	secondBranch, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, second)
+	secondBranch, err := ExecGit(realHost(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, second)
 	if err != nil {
 		t.Fatalf("ExecGit() error = %v", err)
 	}
@@ -79,7 +81,7 @@ func TestExecGit_RunsInTheGivenDirectory(t *testing.T) {
 func TestExecGit_ReportsAFailedCommand(t *testing.T) {
 	repoDir := initializeRepository(t)
 
-	output, err := ExecGit(NewExecRunner(), []string{"rev-parse", "--verify", "absent-branch"}, repoDir)
+	output, err := ExecGit(realHost(), []string{"rev-parse", "--verify", "absent-branch"}, repoDir)
 
 	if err == nil {
 		t.Fatal("ExecGit() must return an error for a failing git command")
@@ -91,7 +93,7 @@ func TestExecGit_ReportsAFailedCommand(t *testing.T) {
 
 func TestExecGit_ReportsANonRepositoryDirectory(t *testing.T) {
 	if _, err := ExecGit(
-		NewExecRunner(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, t.TempDir(),
+		realHost(), []string{"rev-parse", "--abbrev-ref", "HEAD"}, t.TempDir(),
 	); err == nil {
 		t.Fatal("ExecGit() must return an error outside a git repository")
 	}
@@ -101,8 +103,8 @@ func TestGetCurrentBranchSync_ReturnsTheCheckedOutBranch(t *testing.T) {
 	repoDir := initializeRepository(t)
 	runGit(t, repoDir, "checkout", "-b", "feature/x")
 
-	if got := GetCurrentBranchSync(NewExecRunner(), repoDir); got != "feature/x" {
-		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want %q", got, "feature/x")
+	if got := GetCurrentBranchSync(realHost(), repoDir); got != "feature/x" {
+		t.Errorf("GetCurrentBranchSync() = %q, want %q", got, "feature/x")
 	}
 }
 
@@ -112,13 +114,17 @@ func TestGetCurrentBranchSync_ReturnsEmptyWhenDetachedInARealRepository(t *testi
 	head := runGit(t, repoDir, "rev-parse", "HEAD")
 	runGit(t, repoDir, "checkout", "--detach", head)
 
-	if got := GetCurrentBranchSync(NewExecRunner(), repoDir); got != "" {
-		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want empty for a detached HEAD", got)
+	if got := GetCurrentBranchSync(realHost(), repoDir); got != "" {
+		t.Errorf("GetCurrentBranchSync() = %q, want empty for a detached HEAD", got)
 	}
 }
 
 func TestGetCurrentBranchSync_ReturnsEmptyOutsideARepository(t *testing.T) {
-	if got := GetCurrentBranchSync(NewExecRunner(), t.TempDir()); got != "" {
-		t.Errorf("GetCurrentBranchSync(NewExecRunner(), ) = %q, want empty outside a repository", got)
+	if got := GetCurrentBranchSync(realHost(), t.TempDir()); got != "" {
+		t.Errorf("GetCurrentBranchSync() = %q, want empty outside a repository", got)
 	}
 }
+
+// realHost is the operating-system adapter, so these cases run the real git and
+// jj binaries.
+func realHost() system.System { return system.New(os.Stdin, os.Stdout, os.Stderr) }

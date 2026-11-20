@@ -1,14 +1,11 @@
-// Package shared is the workspace axis core: the VCS port plus the git-repo
-// plumbing both variants (git worktrees, jj workspaces layered on a git repo)
-// build on. The leaves (git, jj) implement the port; this core names no leaf. The
-// composition root (cmd) selects a leaf by the shared pkg/workspace VCSType.
+// Package shared is the workspace axis core: the VCS port, the Host port the
+// variants consume, and the git-repo plumbing both variants (git worktrees, jj
+// workspaces layered on a git repo) build on. The leaves (git, jj) implement
+// the VCS port; this core names no leaf. The composition root keys each leaf by
+// the shared pkg/workspace VCSType.
 package shared
 
-import (
-	"os"
-	"os/exec"
-	"strings"
-)
+import "io/fs"
 
 // Config holds the checkout request shared by every VCS variant.
 type Config struct {
@@ -24,57 +21,30 @@ type VCS interface {
 	Available() bool
 }
 
-// Runner is the process port for this axis. Every command the workspace variants
-// launch goes through it, so a test supplies recorded output instead of a real
-// repository and a real git or jj binary.
-type Runner interface {
+// Host is the workspace axis port to the machine: the git and jj commands the
+// variants run, and the checkout files they inspect. A test supplies recorded
+// output and an in-memory file tree instead of a real repository.
+type Host interface {
 	// Capture runs name with args in cwd and returns trimmed stdout.
 	Capture(name string, args []string, cwd string) (string, error)
-	// Stream runs name with args in cwd, wiring the child to this process's
-	// stdout and stderr, which the worktree and workspace creation commands need.
+	// Stream runs name with args in cwd with its output on the terminal of the
+	// CLI, which the worktree and workspace creation commands need.
 	Stream(name string, args []string, cwd string) error
-	// Available reports whether name resolves on PATH.
-	Available(name string) bool
-}
-
-type execRunner struct{}
-
-// NewExecRunner returns the Runner that actually launches processes. It is the
-// only implementation that does; the composition root supplies it.
-func NewExecRunner() Runner { return execRunner{} }
-
-func (execRunner) Capture(name string, args []string, cwd string) (string, error) {
-	cmd := exec.Command(name, args...)
-	cmd.Dir = cwd
-	output, err := cmd.Output()
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(string(output)), nil
-}
-
-func (execRunner) Stream(name string, args []string, cwd string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Dir = cwd
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func (execRunner) Available(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
+	LookPath(file string) (string, error)
+	Stat(path string) (fs.FileInfo, error)
+	ReadFile(path string) ([]byte, error)
+	EvalSymlinks(path string) (string, error)
 }
 
 // ExecGit runs a git command in cwd and returns trimmed stdout.
-func ExecGit(runner Runner, args []string, cwd string) (string, error) {
-	return runner.Capture("git", args, cwd)
+func ExecGit(host Host, args []string, cwd string) (string, error) {
+	return host.Capture("git", args, cwd)
 }
 
 // GetCurrentBranchSync returns the current git branch name, or "" if detached or
 // on error. Both the git and jj variants use it to resolve a source revision.
-func GetCurrentBranchSync(runner Runner, cwd string) string {
-	result, err := ExecGit(runner, []string{"rev-parse", "--abbrev-ref", "HEAD"}, cwd)
+func GetCurrentBranchSync(host Host, cwd string) string {
+	result, err := ExecGit(host, []string{"rev-parse", "--abbrev-ref", "HEAD"}, cwd)
 	if err != nil || result == "HEAD" {
 		return ""
 	}

@@ -3,7 +3,6 @@ package jj
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
@@ -12,18 +11,20 @@ import (
 
 // Workspace is the jj VCS variant: it creates or reuses a jj workspace.
 type Workspace struct {
-	runner wsshared.Runner
-	log    logging.Logger
+	host wsshared.Host
+	log  logging.Logger
 }
 
-// New creates the jj workspace variant over the given process runner, writing
-// through log.
-func New(runner wsshared.Runner, log logging.Logger) *Workspace {
-	return &Workspace{runner: runner, log: log}
+// New creates the jj workspace variant over host, writing through log.
+func New(host wsshared.Host, log logging.Logger) *Workspace {
+	return &Workspace{host: host, log: log}
 }
 
 // Available reports whether the jj binary is on PATH.
-func (w Workspace) Available() bool { return w.runner.Available("jj") }
+func (w Workspace) Available() bool {
+	_, err := w.host.LookPath("jj")
+	return err == nil
+}
 
 // Setup creates or reuses a jj workspace at config.Dir, branching from the source
 // revision (defaulting to the repo's current git branch).
@@ -34,7 +35,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	}
 
 	// Reuse an existing workspace directory.
-	if _, err := os.Stat(resolvedDir); err == nil {
+	if _, err := w.host.Stat(resolvedDir); err == nil {
 		if verbose {
 			w.log.Info(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
 		}
@@ -47,7 +48,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 
 	sourceBranch := config.SourceBranch
 	if sourceBranch == "" {
-		sourceBranch = wsshared.GetCurrentBranchSync(w.runner, repoDir)
+		sourceBranch = wsshared.GetCurrentBranchSync(w.host, repoDir)
 		if sourceBranch == "" {
 			return "", fmt.Errorf("failed to determine source revision")
 		}
@@ -57,7 +58,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 		w.log.Info(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
 	}
 
-	if err := w.runner.Stream("jj", []string{"workspace", "add", resolvedDir, "--revision", sourceBranch}, repoDir); err != nil {
+	if err := w.host.Stream("jj", []string{"workspace", "add", resolvedDir, "--revision", sourceBranch}, repoDir); err != nil {
 		return "", fmt.Errorf("jj workspace add failed: %w", err)
 	}
 

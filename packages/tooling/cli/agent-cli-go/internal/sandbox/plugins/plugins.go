@@ -21,14 +21,20 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 )
 
+// Host is the union of the ports the built-in plugins consume.
+type Host interface {
+	docker.Host
+	provnix.Host
+}
+
 // DefaultRegistry returns a Registry with the built-in isolators and
-// provisioners, each writing through log.
-func DefaultRegistry(log logging.Logger) *sandbox.Registry {
+// provisioners over host, each writing through log.
+func DefaultRegistry(host Host, log logging.Logger) *sandbox.Registry {
 	return sandbox.NewRegistry().
-		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return isonone.NewIsolator(log) }).
-		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return bwrap.NewIsolator(log) }).
-		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return docker.NewIsolator(log) }).
+		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return isonone.NewIsolator(host, log) }).
+		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return bwrap.NewIsolator(host, log) }).
+		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return docker.NewIsolator(host, log) }).
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return provnone.New() }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return command.New() }).
-		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return provnix.New() })
+		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return provnix.New(host) })
 }

@@ -1,9 +1,11 @@
 package shared
 
 import (
+	"errors"
 	"testing"
 
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 func TestSanitizeBranchName(t *testing.T) {
@@ -52,5 +54,49 @@ func TestVCSType_ConsumedFromShared(t *testing.T) {
 		if got := tt.vcs.IsValid(); got != tt.valid {
 			t.Errorf("VCSType(%q).IsValid() = %v, want %v", tt.vcs, got, tt.valid)
 		}
+	}
+}
+
+func TestExecGit_ReturnsCapturedStdoutFromTheDirectory(t *testing.T) {
+	host := systemtest.New()
+	host.Outcomes[systemtest.InDir("/repo", "git rev-parse HEAD")] = systemtest.Outcome{Stdout: "abc123\n"}
+
+	got, err := ExecGit(host, []string{"rev-parse", "HEAD"}, "/repo")
+	if err != nil {
+		t.Fatalf("ExecGit() error = %v", err)
+	}
+	if got != "abc123" {
+		t.Errorf("ExecGit() = %q, want %q", got, "abc123")
+	}
+}
+
+func TestExecGit_PropagatesTheCommandError(t *testing.T) {
+	host := systemtest.New()
+	host.Outcomes["git rev-parse HEAD"] = systemtest.Outcome{Err: errors.New("boom")}
+
+	if _, err := ExecGit(host, []string{"rev-parse", "HEAD"}, "/repo"); err == nil {
+		t.Fatal("ExecGit() must surface the command error")
+	}
+}
+
+func TestGetCurrentBranchSync(t *testing.T) {
+	tests := []struct {
+		name    string
+		outcome systemtest.Outcome
+		want    string
+	}{
+		{"branch", systemtest.Outcome{Stdout: "feature/x\n"}, "feature/x"},
+		// A detached HEAD makes git echo the literal "HEAD", which is not a branch.
+		{"detached", systemtest.Outcome{Stdout: "HEAD\n"}, ""},
+		{"outside a repository", systemtest.Outcome{Err: errors.New("not a repository")}, ""},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			host := systemtest.New()
+			host.Outcomes["git rev-parse --abbrev-ref HEAD"] = tt.outcome
+			if got := GetCurrentBranchSync(host, "/repo"); got != tt.want {
+				t.Errorf("GetCurrentBranchSync() = %q, want %q", got, tt.want)
+			}
+		})
 	}
 }

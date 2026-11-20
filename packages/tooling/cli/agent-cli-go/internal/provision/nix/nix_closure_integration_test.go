@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 )
 
 // TestNixprov_Integration resolves a rev-pinned package on the host, GC-roots the
@@ -27,8 +28,9 @@ func TestNixprov_Integration(t *testing.T) {
 		t.Skip("set NIXPROV_INTEGRATION=1 and NIXPROV_INTEGRATION_REV=<nixpkgs rev> to run")
 	}
 
+	p := New(system.New(os.Stdin, os.Stdout, os.Stderr))
 	src := sharednix.NixSource{Kind: sharednix.NixSourcePackages, Rev: rev, Packages: []string{"hello"}}
-	closure, err := ResolveClosure(src)
+	closure, err := p.ResolveClosure(src)
 	if err != nil {
 		t.Fatalf("ResolveClosure: %v", err)
 	}
@@ -41,10 +43,10 @@ func TestNixprov_Integration(t *testing.T) {
 		}
 	}
 
-	if err := registerGCRoot(src, closure); err != nil {
+	if err := p.registerGCRoot(src, closure); err != nil {
 		t.Fatalf("registerGCRoot: %v", err)
 	}
-	rootDir, err := gcRootDir(src)
+	rootDir, err := p.gcRootDir(src)
 	if err != nil {
 		t.Fatalf("gcRootDir: %v", err)
 	}
