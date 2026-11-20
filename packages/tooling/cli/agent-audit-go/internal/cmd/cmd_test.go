@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/configtest"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
@@ -46,6 +47,7 @@ func newHarness(t *testing.T, files map[string]string) *harness {
 	h.git = processtest.Script()
 	h.deps = cmd.Dependencies{
 		FS: fsys, Runner: h.git,
+		ConfigFiles: configtest.NewFiles(nil), Places: configtest.Places{User: "/home/u/.config/agentic", Wd: "/w"},
 		Transports: plugins.DefaultRegistry(plugins.Ports{FS: fsys, Runner: h.git, Web: h.web}),
 		Validator:  validator, LoaderFor: wiring.NewSourcesLoader,
 		Now: func() time.Time { return today }, Out: h.out, Err: h.err,
@@ -355,5 +357,49 @@ func TestCompletionAndVersion(t *testing.T) {
 func TestExitErrorMessage(t *testing.T) {
 	if got := (cmd.ExitError{Code: 1}).Error(); got != "exit status 1" {
 		t.Errorf("Error() = %q", got)
+	}
+}
+
+// configured is a harness whose working directory /w holds the project file.
+func configured(t *testing.T, catalog, project string) *harness {
+	t.Helper()
+	h := newHarness(t, files(catalog))
+	h.deps.ConfigFiles = configtest.NewFiles(map[string]string{"/w/.git/HEAD": "", "/w/agentic.json": project})
+	return h
+}
+
+func TestTheAuditSectionSetsTheDefaultsAndAFlagWins(t *testing.T) {
+	const wide = `{"version":1,"audit":{"maxAge":9999,"versionMaxAge":9999}}`
+	if code, _ := configured(t, stale, wide).run(t, "sources", "skill"); code != 0 {
+		t.Fatalf("the section widens the window: code = %d", code)
+	}
+	if code, _ := configured(t, stale, wide).run(t, "sources", "skill", "--max-age", "1"); code != 1 {
+		t.Fatalf("a flag overrides the section: code = %d", code)
+	}
+	noCover := `{"version":1,"audit":{"coverDir":""}}`
+	h := configured(t, current, noCover)
+	h.fs.WriteFile("skill/references/b.md", []byte("# B\n"))
+	if code, _ := h.run(t, "sources", "skill"); code != 0 {
+		t.Fatalf("an empty coverDir turns the cover check off: code = %d\n%s", code, h.out)
+	}
+	if code, _ := h.run(t, "sources", "skill", "--cover-dir", "references"); code != 1 {
+		t.Fatalf("the flag turns it back on: code = %d", code)
+	}
+	if code, err := configured(t, current, `{"version":1,"audit":{"maxAge":0}}`).run(t, "sources", "skill"); code != 2 || err == nil || !strings.Contains(err.Error(), "invalid audit section") {
+		t.Fatalf("an invalid section is a usage error: %d %v", code, err)
+	}
+}
+
+func TestConfigShow(t *testing.T) {
+	h := configured(t, current, `{"version":1,"audit":{"maxAge":30}}`)
+	if code, err := h.run(t, "config", "show"); code != 0 || err != nil || h.out.String() != "{\n  \"maxAge\": 30\n}\n" {
+		t.Fatalf("%d %v %q", code, err, h.out)
+	}
+	h.out.Reset()
+	if code, err := h.run(t, "config", "show", "--sources"); code != 0 || err != nil || !strings.Contains(h.out.String(), "audit.maxAge = 30  (project /w/agentic.json)") {
+		t.Fatalf("%d %v %q", code, err, h.out)
+	}
+	if code, err := h.run(t, "config", "show", "--project", "none.json"); code != 2 || err == nil {
+		t.Fatalf("a missing named project file: %d %v", code, err)
 	}
 }

@@ -32,6 +32,9 @@ func run(t *testing.T, dir string, args ...string) result {
 	t.Helper()
 	command := exec.CommandContext(context.Background(), binary(t), args...)
 	command.Dir = dir
+	// An empty user configuration keeps the agentic.json of the developer out
+	// of the run.
+	command.Env = append(os.Environ(), "XDG_CONFIG_HOME="+t.TempDir())
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	err := command.Run()

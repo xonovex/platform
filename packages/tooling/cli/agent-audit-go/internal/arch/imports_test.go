@@ -70,12 +70,15 @@ const library = "github.com/xonovex/platform/packages/library/"
 // new edge into a library is a decision in this file.
 var libraries = map[string][]string{
 	"cmd/agent-audit": {
+		"shared-config-go/pkg/osfiles",
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
 		"shared-core-go/pkg/process/osexec",
 	},
 	"internal/audit":    {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
 	"internal/catalogs": {"shared-contract-go/pkg/discovery", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
 	"internal/cmd": {
+		"shared-config-go/pkg/discover", "shared-config-go/pkg/explain", "shared-config-go/pkg/merge",
+		"shared-config-go/pkg/resolve", "shared-config-go/pkg/section/audit", "shared-config-go/pkg/spec",
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
 		"shared-contract-go/pkg/report", "shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources",
 		"shared-core-go/pkg/process",
@@ -99,7 +102,7 @@ var libraries = map[string][]string{
 
 // hostLibraries are the library leaves that touch the host. Only the
 // composition root imports them, and no unit test does.
-var hostLibraries = []string{"shared-contract-go/pkg/fs/osfs", "shared-core-go/pkg/process/osexec"}
+var hostLibraries = []string{"shared-config-go/pkg/osfiles", "shared-contract-go/pkg/fs/osfs", "shared-core-go/pkg/process/osexec"}
 
 // concrete lists the packages that bind a port to a technology or name a
 // concrete transport, with the one package that may import each from non-test

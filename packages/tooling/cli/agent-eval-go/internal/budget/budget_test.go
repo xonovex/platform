@@ -1,6 +1,8 @@
 package budget_test
 
 import (
+	evalsection "github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/eval"
+
 	"errors"
 	"testing"
 
@@ -10,7 +12,7 @@ import (
 
 func TestDefaults(t *testing.T) {
 	l := budget.Limits{}.Resolve()
-	if l.MaxModelRuns != budget.DefaultMaxModelRuns || l.MaxCostUSD != budget.DefaultMaxCostUSD {
+	if l.MaxModelRuns != evalsection.DefaultMaxModelRuns || l.MaxCostUSD != evalsection.DefaultMaxCostUSD {
 		t.Fatalf("%+v", l)
 	}
 	kept := budget.Limits{MaxModelRuns: 3, MaxCostUSD: 0.5}.Resolve()

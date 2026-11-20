@@ -16,12 +16,14 @@ npm install -g @xonovex/agent-audit-go
 | --- | --- |
 | `agent-audit sources [path...]` | Audits every catalog below each path, the current directory by default |
 | `agent-audit convert <skill-directory \| SOURCES.md>` | Writes `sources.json` beside a `SOURCES.md` without losing a word |
+| `agent-audit config show [--sources]` | Prints the merged audit section, and with `--sources` the layer and the file of each value |
 | `agent-audit completion <shell>` | Prints a shell completion script |
 
 ### Audit options
 
 | Option | Effect |
 | --- | --- |
+| `--project FILE` | Project `agentic.json`, by default the nearest one from the working directory up to the repository root |
 | `--max-age DAYS` | Days after which a review is overdue, 180 by default |
 | `--version-max-age DAYS` | The window for a source that pins a version, 90 by default |
 | `--fetch` | Reads the documents of web and http sources |
@@ -33,6 +35,8 @@ npm install -g @xonovex/agent-audit-go
 | `--strict` | Fails on a warning as well |
 
 The exit status is 0 when nothing reaches the failing level, 1 when a finding does, and 2 when the run could not complete.
+
+The `maxAge`, `versionMaxAge` and `coverDir` keys of the `audit` section of `agentic.json` set the defaults of `--max-age`, `--version-max-age` and `--cover-dir`. `shared-config-go` merges the managed, user and project files, and a flag wins over every file. The audit only reads files, so the section needs no digest approval.
 
 ## Findings
 

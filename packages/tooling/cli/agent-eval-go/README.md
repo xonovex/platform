@@ -22,19 +22,21 @@ npm install -g @xonovex/agent-eval-go
 | `agent-eval baseline record\|compare <results.json>` | Records the pass rate of each case, and fails a later run that dropped by more than the tolerance |
 | `agent-eval cost` | Sums what the recorded runs cost |
 | `agent-eval migrate <path>...` | Converts `evals.json` and `eval-queries.json` into `eval-output.json` and `eval-trigger.json` |
+| `agent-eval config show [--sources]` | Prints the merged eval section, and with `--sources` the layer and the file of each value |
 | `agent-eval completion <shell>` | Prints a shell completion script |
 
 ### Run options
 
 | Option | Effect |
 | --- | --- |
-| `--project FILE` | Project file, `agentic.eval.json` in the working directory by default |
-| `--profile NAME` | Profile of the project file |
+| `--project FILE` | Project `agentic.json`, by default the nearest one from the working directory up to the repository root |
+| `--approve-config-digest DIGEST` | Approves the eval section of the project `agentic.json` with this digest |
+| `--profile NAME` | Profile of the eval section |
 | `--harness claude\|codex` | Agent harness, from `SKILL_EVAL_HARNESS` or the profile by default |
 | `--model`, `--judge-model` | Models that answer and that grade. Without them, a profile model or the variables `CLAUDE_MODEL`, `JUDGE_MODEL`, `CODEX_MODEL` and `CODEX_JUDGE_MODEL`, the run names no model and the harness uses its own default; the report and the results say `harness default` |
 | `--runs N` | Runs per query or arm, at most 3 |
 | `--concurrency N` | Parallel model runs, at most 2 |
-| `--max-model-runs N`, `--max-cost-usd USD` | Budget of one invocation, 24 runs and 2 US dollars by default |
+| `--max-model-runs N`, `--max-cost-usd USD` | Budget of one invocation, up to the managed cap; the eval section, else 24 runs and 2 US dollars, by default |
 | `--batch-size N` | Most units to run in one invocation |
 | `--resume` | Continues the incomplete run with the same inputs |
 | `--dry-run` | Plans the work and runs no model |
@@ -43,6 +45,25 @@ npm install -g @xonovex/agent-eval-go
 | `--format text\|json` | Output format |
 
 The exit status is 0 on a pass, 1 on a fail, 2 when the input is invalid or an infrastructure fault voided the run, and 3 when a budget stopped the run with work left.
+
+## Configuration
+
+The `eval` section of `agentic.json` holds the plugin directories, the profiles, the protocol settings and the budgets. `shared-config-go` merges the managed, user and project files with the budget flags. A relative plugin directory resolves against the directory of the file that set it.
+
+```json
+{
+  "$schema": "https://schemas.xonovex.com/agent/agentic.schema.json",
+  "version": 1,
+  "eval": {
+    "pluginDirs": ["packages/runtime/plugin"],
+    "defaultProfile": "ci",
+    "profiles": { "ci": { "harness": "claude", "model": "claude-sonnet" } },
+    "budgets": { "maxModelRuns": 12, "maxCostUsd": 1 }
+  }
+}
+```
+
+The eval section of a project file takes effect only after the user approves the digest of the file: at the terminal prompt, or with `--approve-config-digest`. The approval is kept in `$XDG_STATE_HOME/agentic/trust.json`, and a changed file needs a new approval. Without an approval the run stops with exit status 2. The budgets are caps: a user or managed file sets them, a project file may only lower them, and a flag may raise them up to the managed cap.
 
 ## Layout
 

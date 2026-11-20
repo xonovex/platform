@@ -27,7 +27,7 @@ tasks:
       - .claude-plugin/plugin.json
       - .codex-plugin/plugin.json
       - skills/*/SKILL.md
-      - /agentic.validate.json
+      - /agentic.json
     options:
       cache: false
   format:

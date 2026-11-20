@@ -34,6 +34,7 @@ type sourcesFlags struct {
 	base                  string
 	coverDir              string
 	format                string
+	project               string
 	json                  bool
 	strict                bool
 }
@@ -51,6 +52,9 @@ gone from the source, pins that no longer match the upstream, and reference
 files that no source backs. The network and git checkouts are read only when
 --fetch asks for the network or a source names a checkout.
 
+The maxAge, versionMaxAge and coverDir keys of the audit section of
+agentic.json set the defaults of --max-age, --version-max-age and --cover-dir.
+
 With --base REF the audit also compares each catalog with the catalog at REF
 and reports pins or claims that changed without a new review.
 
@@ -58,10 +62,16 @@ Exit status: 0 when nothing reaches the failing level, 1 when a finding does,
 2 when the run could not complete.`,
 		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			merged, err := loadSettings(deps, flags.project, flags.configFlags(cmd))
+			if err != nil {
+				return err
+			}
+			flags.maxAge, flags.versionMaxAge, flags.coverDir = merged.MaxAge, merged.VersionMaxAge, merged.CoverDir
 			return runSources(cmd.Context(), deps, flags, args)
 		},
 	}
 	f := command.Flags()
+	bindProject(command, &flags.project)
 	f.IntVar(&flags.maxAge, "max-age", defaultMaxAge, "days after which a review is overdue")
 	f.IntVar(&flags.versionMaxAge, "version-max-age", defaultVersionMaxAge, "days after which the review of a versioned source is overdue")
 	f.BoolVar(&flags.fetch, "fetch", false, "read the documents of web and http sources")

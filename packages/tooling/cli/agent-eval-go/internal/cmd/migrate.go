@@ -27,7 +27,7 @@ func newMigrateCommand(deps Dependencies) *cobra.Command {
 			var lines strings.Builder
 			total := 0
 			for _, arg := range args {
-				dirs, err := skillDirs(deps.FS, resolve(deps.Dir, arg), 0)
+				dirs, err := skillDirs(deps.FS, resolvePath(deps.Dir, arg), 0)
 				if err != nil {
 					return err
 				}

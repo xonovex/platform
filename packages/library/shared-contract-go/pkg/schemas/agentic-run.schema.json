@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/agentic-run.schema.json",
+  "title": "Run section",
+  "description": "The run section of an agentic.json file: the agent and provider of a sandboxed run, its isolation, provision and network axes, what the sandbox may reach, and the guarantees the run requires.",
+  "type": "object",
+  "properties": {
+    "agent": {"$ref": "common.schema.json#/$defs/identifier"},
+    "provider": {"$ref": "common.schema.json#/$defs/identifier"},
+    "models": {
+      "description": "Model slot overrides of the provider, as slot=id.",
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*=\\S+$"}
+    },
+    "isolation": {
+      "enum": [
+        "none",
+        "bwrap",
+        "docker",
+        "seatbelt",
+        "docker-sandboxes",
+        "openshell"
+      ]
+    },
+    "provision": {"enum": ["none", "nix", "command"]},
+    "network": {"enum": ["host", "none", "managed"]},
+    "homeDir": {"$ref": "common.schema.json#/$defs/text"},
+    "bindPaths": {"$ref": "#/$defs/texts"},
+    "roBindPaths": {"$ref": "#/$defs/texts"},
+    "customEnv": {
+      "description": "Environment variables of the sandbox, as KEY=VALUE.",
+      "type": "array",
+      "items": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*="}
+    },
+    "allowHosts": {"$ref": "#/$defs/texts"},
+    "credentials": {
+      "description": "Credential bindings, as NAME=scheme:locator. A file holds where a credential is, never its value.",
+      "$ref": "#/$defs/texts"
+    },
+    "requirePinnedProvision": {"type": "boolean"},
+    "requireHostToolsUnreachable": {"type": "boolean"},
+    "requireEgressRestricted": {"type": "boolean"},
+    "requireKernelIsolation": {"type": "boolean"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "texts": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/text"}
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/agentic.schema.json",
+  "version": 1,
+  "validate": {
+    "checks": {
+      "skill": {
+        "options": {
+          "vendorAdapters": ["configuring-claude-code"]
+        }
+      },
+      "sources": {
+        "options": {
+          "required": true
+        }
+      },
+      "text": {
+        "options": {
+          "exclude": ["**/CHANGELOG.md"]
+        }
+      }
+    }
+  }
+}

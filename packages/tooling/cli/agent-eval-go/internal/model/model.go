@@ -23,9 +23,6 @@ const (
 	OutputFile  = "eval-output.json"
 )
 
-// ProjectFile is the default name of the eval project file.
-const ProjectFile = "agentic.eval.json"
-
 // Protocol names the kind of eval a document or a result belongs to.
 type Protocol string
 

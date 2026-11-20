@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/osfiles"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
@@ -29,14 +30,16 @@ func run() int {
 	fsys := osfs.New()
 	runner := osexec.New()
 	deps := cmd.Dependencies{
-		FS:         fsys,
-		Runner:     runner,
-		Transports: plugins.DefaultRegistry(plugins.Ports{FS: fsys, Runner: runner, Web: nethttp.New()}),
-		Validator:  validator,
-		LoaderFor:  wiring.NewSourcesLoader,
-		Now:        time.Now,
-		Out:        os.Stdout,
-		Err:        os.Stderr,
+		FS:          fsys,
+		ConfigFiles: osfiles.Files{},
+		Places:      osfiles.Places{},
+		Runner:      runner,
+		Transports:  plugins.DefaultRegistry(plugins.Ports{FS: fsys, Runner: runner, Web: nethttp.New()}),
+		Validator:   validator,
+		LoaderFor:   wiring.NewSourcesLoader,
+		Now:         time.Now,
+		Out:         os.Stdout,
+		Err:         os.Stderr,
 	}
 
 	err = cmd.NewRootCommand(deps).Execute()

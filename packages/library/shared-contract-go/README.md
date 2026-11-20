@@ -33,11 +33,15 @@ Each schema has an `$id` under `https://schemas.xonovex.com/agent/`.
 | `eval-output.schema.json` | Cases that compare a run with and without a skill |
 | `eval-instruction.schema.json` | Cases that run an instruction present, absent or ablated |
 | `eval-orchestration.schema.json` | Flows of steps across several agents |
-| `eval-project.schema.json` | Profiles, protocol settings, plugin directories and budgets |
 | `results.schema.json` | One eval run, resumable while it is incomplete |
 | `baseline.schema.json` | Pass rates that a later run is compared with |
 | `cost-history.schema.json` | Model cost of each eval run |
-| `validate-project.schema.json` | The `agentic.validate.json` project file: skipped directories and the paths, options and level cap of each check |
+| `agentic.schema.json` | One layer of `agentic.json`: the version and one section for each tool |
+| `agentic-run.schema.json` | The `run` section: agent, provider, sandbox axes, reachable paths and hosts, required guarantees |
+| `agentic-providers.schema.json` | The `providers` section: provider routes by name |
+| `agentic-validate.schema.json` | The `validate` section: skipped directories and the paths, options and level cap of each check |
+| `agentic-audit.schema.json` | The `audit` section: review ages and the directory that needs sources |
+| `agentic-eval.schema.json` | The `eval` section: profiles, protocol settings, plugin directories and budgets |
 | `kit.schema.json` | A Docker Sandbox kit v2 specification |
 | `predicate.schema.json` | Filesystem, session and model checks on a run |
 | `common.schema.json` | Definitions that the other schemas share |

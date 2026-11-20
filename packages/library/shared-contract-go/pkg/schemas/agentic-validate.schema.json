@@ -1,12 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.xonovex.com/agent/validate-project.schema.json",
-  "title": "Validate project file",
-  "description": "The agentic.validate.json file of a repository: which checks run, where each one looks, and how severe its findings are.",
+  "$id": "https://schemas.xonovex.com/agent/agentic-validate.schema.json",
+  "title": "Validate section",
+  "description": "The validate section of an agentic.json file: which checks agent-validate runs, where each one looks, and how severe their findings are.",
   "type": "object",
   "properties": {
-    "$schema": {"type": "string"},
-    "version": {"$ref": "common.schema.json#/$defs/version"},
     "skip": {
       "description": "Directory names that no check descends into, in addition to the default skip list.",
       "type": "array",
@@ -19,7 +17,6 @@
       "additionalProperties": {"$ref": "#/$defs/check"}
     }
   },
-  "required": ["version"],
   "additionalProperties": false,
   "$defs": {
     "check": {

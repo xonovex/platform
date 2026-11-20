@@ -45,6 +45,9 @@ func run(t *testing.T, dir string, args ...string) result {
 	t.Helper()
 	command := exec.Command(binary(t), args...)
 	command.Dir = dir
+	// An empty user configuration keeps the agentic.json of the developer out
+	// of the run.
+	command.Env = append(os.Environ(), "XDG_CONFIG_HOME="+t.TempDir(), "XDG_STATE_HOME="+t.TempDir())
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	err := command.Run()
@@ -134,7 +137,7 @@ func TestProjectFileCapsAndSkips(t *testing.T) {
 	root := t.TempDir()
 	write(t, root, "docs/a.md", "A dash \u2014 here.\n")
 	write(t, root, "vendor/b.md", "A dash \u2014 there.\n")
-	write(t, root, "agentic.validate.json", `{"version": 1, "skip": ["vendor"], "checks": {"text": {"level": "warn"}}}`)
+	write(t, root, "agentic.json", `{"version": 1, "validate": {"skip": ["vendor"], "checks": {"text": {"level": "warn"}}}}`)
 	res := run(t, root, "text")
 	if res.code != 0 || !strings.Contains(res.stdout, "docs/a.md") || strings.Contains(res.stdout, "vendor") {
 		t.Fatalf("exit %d\n%s%s", res.code, res.stdout, res.stderr)
@@ -197,8 +200,8 @@ func TestUsageErrorsExitTwo(t *testing.T) {
 			t.Errorf("%s: exit %d stderr %q", name, res.code, res.stderr)
 		}
 	}
-	write(t, root, "agentic.validate.json", `{"version": 9}`)
-	if res := run(t, root); res.code != 2 || !strings.Contains(res.stderr, "invalid project file") {
+	write(t, root, "agentic.json", `{"version": 1, "validate": {"skip": 9}}`)
+	if res := run(t, root); res.code != 2 || !strings.Contains(res.stderr, "invalid validate section") {
 		t.Errorf("a broken project file: exit %d stderr %q", res.code, res.stderr)
 	}
 	res := run(t, root, "--format", "sarif", "nope")

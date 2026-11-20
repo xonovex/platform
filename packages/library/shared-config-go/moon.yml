@@ -1,0 +1,90 @@
+$schema: https://moonrepo.dev/schemas/v2/project.json
+tags:
+  - go
+  - shared
+language: go
+layer: library
+dependsOn:
+  - shared-contract-go
+tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "93"
+  go-package-coverage:
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. pkg/osfiles is the only
+      # package that touches the host, so go-test-integration covers it.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./pkg/configtest=100 \
+        ./pkg/discover=100 \
+        ./pkg/explain=100 \
+        ./pkg/layer=100 \
+        ./pkg/merge=100 \
+        ./pkg/osfiles=exempt \
+        ./pkg/resolve=100 \
+        ./pkg/section/audit=100 \
+        ./pkg/section/eval=100 \
+        ./pkg/section/providers=100 \
+        ./pkg/section/run=100 \
+        ./pkg/section/validate=100 \
+        ./pkg/spec=100 \
+        ./pkg/trust=100
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
+    options:
+      cache: true
+      runInCI: true
+  coverage:
+    deps:
+      - go-package-coverage
+  # The architecture tests read the source tree, so they carry the arch build
+  # tag and run here instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
+    options:
+      cache: false
+      mergeDeps: replace
+  # go-test-integration reads and writes a real temporary directory and the
+  # standard input, so it is an integration tier rather than a ci-check gate.
+  go-test-integration:
+    command:
+      - go
+      - test
+      - -tags=integration
+      - -v
+      - ./pkg/osfiles/
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  ci-integration:
+    command: noop
+    deps:
+      - go-test-integration
+    options:
+      cache: false
+      runInCI: false

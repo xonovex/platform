@@ -25,7 +25,7 @@ func newBaselineCommand(deps Dependencies) *cobra.Command {
 		Short: "Record the pass rate of each case of a finished run as the baseline",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
-			results, err := deps.reader().Results(resolve(deps.Dir, args[0]))
+			results, err := deps.reader().Results(resolvePath(deps.Dir, args[0]))
 			if err != nil {
 				return err
 			}
@@ -33,7 +33,7 @@ func newBaselineCommand(deps Dependencies) *cobra.Command {
 				return fmt.Errorf("run %s is %s: only a complete run makes a baseline", results.RunID, results.Status)
 			}
 			b := baseline.Record(results, tolerance, deps.Now().UTC().Format(time.RFC3339))
-			target := resolve(deps.Dir, file)
+			target := resolvePath(deps.Dir, file)
 			if err := (baseline.Store{FS: deps.FS, Reader: deps.reader()}).Save(target, b); err != nil {
 				return err
 			}
@@ -47,14 +47,14 @@ func newBaselineCommand(deps Dependencies) *cobra.Command {
 		Short: "Compare a finished run with the baseline; exit 1 on a regression",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(c *cobra.Command, args []string) error {
-			results, err := deps.reader().Results(resolve(deps.Dir, args[0]))
+			results, err := deps.reader().Results(resolvePath(deps.Dir, args[0]))
 			if err != nil {
 				return err
 			}
 			if results.Status != model.Complete {
 				return fmt.Errorf("run %s is %s: only a complete run can be compared", results.RunID, results.Status)
 			}
-			base, found, err := (baseline.Store{FS: deps.FS, Reader: deps.reader()}).Load(resolve(deps.Dir, file))
+			base, found, err := (baseline.Store{FS: deps.FS, Reader: deps.reader()}).Load(resolvePath(deps.Dir, file))
 			if err != nil {
 				return err
 			}

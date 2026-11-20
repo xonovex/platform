@@ -50,21 +50,20 @@ type ProtocolSettings struct {
 	Orchestration *OrchestrationSettings `json:"orchestration,omitempty"`
 }
 
-// Budgets bound the model work of one run.
+// Budgets bound the model work of one run. A zero member means the default.
 type Budgets struct {
 	MaxModelRuns int     `json:"maxModelRuns,omitempty"`
 	MaxCostUSD   float64 `json:"maxCostUsd,omitempty"`
 }
 
-// Project is the eval project file: where the plugins and instructions live,
-// the profiles that run them, the protocol settings and the budgets.
+// Project is the merged eval section of agentic.json: where the plugins and
+// instructions live, the profiles that run them, the protocol settings and the
+// budgets.
 type Project struct {
-	Schema           string             `json:"$schema,omitempty"`
-	Version          int                `json:"version"`
 	PluginDirs       []string           `json:"pluginDirs,omitempty"`
 	InstructionRoots []string           `json:"instructionRoots,omitempty"`
 	DefaultProfile   string             `json:"defaultProfile,omitempty"`
 	Profiles         map[string]Profile `json:"profiles"`
 	Protocols        ProtocolSettings   `json:"protocols,omitempty"`
-	Budgets          *Budgets           `json:"budgets,omitempty"`
+	Budgets          Budgets            `json:"budgets"`
 }

@@ -31,7 +31,7 @@ func TestPrecedenceFlagEnvProjectDefault(t *testing.T) {
 		DefaultProfile: "ci",
 		Profiles:       map[string]model.Profile{"ci": {Harness: "codex", Model: "from-project", Effort: "low", TimeoutSeconds: 90}},
 		Protocols:      model.ProtocolSettings{Trigger: &model.TriggerSettings{Runs: 2, BatchSize: 5, Threshold: f(0.7)}},
-		Budgets:        &model.Budgets{MaxModelRuns: 10, MaxCostUSD: 1},
+		Budgets:        model.Budgets{MaxModelRuns: 10, MaxCostUSD: 1},
 	}
 	s, err := settings.Resolve(project, settings.Flags{}, nil, model.Trigger)
 	if err != nil || s.Harness != "codex" || s.Model != "from-project" || s.JudgeModel != "" ||
@@ -46,11 +46,11 @@ func TestPrecedenceFlagEnvProjectDefault(t *testing.T) {
 	}
 	s, err = settings.Resolve(project, settings.Flags{
 		Harness: "claude", Model: "flag", JudgeModel: "flag-judge", Runs: 1, Threshold: f(0.9), BatchSize: 4,
-		Concurrency: 1, MaxCostUSD: 0.5, MaxModelRuns: 6, Split: "validation",
+		Concurrency: 1, Split: "validation",
 	}, env, model.Trigger)
 	if err != nil || s.Harness != "claude" || s.Model != "flag" || s.JudgeModel != "flag-judge" || s.Runs != 1 ||
-		s.Threshold != 0.9 || s.BatchSize != 4 || s.Concurrency != 1 || s.Limits.MaxCostUSD != 0.5 ||
-		s.Limits.MaxModelRuns != 6 || s.Split != model.Validation {
+		s.Threshold != 0.9 || s.BatchSize != 4 || s.Concurrency != 1 || s.Limits.MaxCostUSD != 1 ||
+		s.Limits.MaxModelRuns != 10 || s.Split != model.Validation {
 		t.Fatalf("%v %+v", err, s)
 	}
 	viaEnv, _ := settings.Resolve(model.Project{}, settings.Flags{}, map[string]string{"SKILL_EVAL_HARNESS": "codex"}, model.Output)

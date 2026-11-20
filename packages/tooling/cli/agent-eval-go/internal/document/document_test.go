@@ -211,25 +211,6 @@ func TestOrderKeepsDocumentOrderAmongIndependentSteps(t *testing.T) {
 	}
 }
 
-const project = `{"version":1,"defaultProfile":"cheap","profiles":{"cheap":{"harness":"claude"}}}`
-
-func TestProject(t *testing.T) {
-	doc, err := reader(t, map[string]string{"p.json": project}).Project("p.json")
-	if err != nil || doc.Profiles["cheap"].Harness != "claude" {
-		t.Fatalf("%v %+v", err, doc)
-	}
-	bad := strings.Replace(project, `"defaultProfile":"cheap"`, `"defaultProfile":"none"`, 1)
-	if e := invalidOf(t, func() error {
-		_, err := reader(t, map[string]string{"p.json": bad}).Project("p.json")
-		return err
-	}()); !strings.Contains(e.Error(), "names no profile") {
-		t.Fatal(e)
-	}
-	if _, err := reader(t, map[string]string{"p.json": `{"version":1}`}).Project("p.json"); err == nil {
-		t.Fatal("schema violation")
-	}
-}
-
 func TestResultsBaselineCostHistoryAndValidate(t *testing.T) {
 	digest := "sha256:" + strings.Repeat("0", 64)
 	r := reader(t, map[string]string{

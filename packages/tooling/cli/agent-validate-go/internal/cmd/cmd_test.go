@@ -13,6 +13,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/configtest"
+
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/checktest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/cmd"
@@ -71,7 +73,15 @@ func (h *harness) run(t *testing.T, args ...string) (string, error) {
 	if h.brokenOut {
 		sink = failingWriter{}
 	}
+	// The working directory /w is the root of a repository, and the files of the
+	// harness sit in it, so the project search finds /w/agentic.json.
+	config := map[string]string{"/w/.git/HEAD": ""}
+	for name, content := range h.files {
+		config["/w/"+name] = content
+	}
 	deps := cmd.Dependencies{
+		ConfigFiles: configtest.NewFiles(config),
+		Places:      configtest.Places{User: "/home/u/.config/agentic", Wd: "/w"},
 		Open: func(root string) (cmd.Environment, error) {
 			h.root = root
 			if h.openErr != nil {
@@ -145,8 +155,10 @@ func TestUsageAndInfrastructureFaults(t *testing.T) {
 		"open":          {&harness{openErr: boom}, nil, "boom"},
 		"unknown check": {&harness{checks: []check.Check{stub{name: "alpha"}}}, []string{"beta"}, "unknown check"},
 		"check error":   {&harness{checks: []check.Check{stub{name: "alpha", err: boom}}}, nil, "alpha: boom"},
-		"project file":  {&harness{files: map[string]string{"agentic.validate.json": `{"version": 3}`}}, nil, "invalid project file"},
-		"project named": {&harness{}, []string{"--project", "missing.json"}, "does not exist"},
+		"project file":  {&harness{files: map[string]string{"agentic.json": `{"version": 1, "validate": {"skip": 3}}`}}, nil, "invalid validate section"},
+		"envelope":      {&harness{files: map[string]string{"agentic.json": `{"version": 3}`}}, nil, "version is 3"},
+		"project named": {&harness{}, []string{"--project", "missing.json"}, "project configuration /w/missing.json"},
+		"config show":   {&harness{files: map[string]string{"agentic.json": `{"version": 3}`}}, []string{"config", "show"}, "version is 3"},
 		"list args":     {&harness{}, []string{"list", "x"}, "unknown command"},
 	}
 	for name, tc := range cases {
@@ -181,9 +193,9 @@ func TestSARIF(t *testing.T) {
 func TestProjectFile(t *testing.T) {
 	var paths []string
 	var opts string
-	files := map[string]string{"agentic.validate.json": `{"version": 1, "skip": ["vendor"], "checks": {
+	files := map[string]string{"agentic.json": `{"version": 1, "validate": {"skip": ["vendor"], "checks": {
 		"alpha": {"paths": ["from-project"], "level": "warn", "options": {"k": 1}},
-		"beta": {"enabled": false}}}`}
+		"beta": {"enabled": false}}}}`}
 	h := &harness{files: files, checks: []check.Check{
 		stub{name: "alpha", level: findings.Fail, paths: &paths, opts: &opts},
 		stub{name: "beta", level: findings.Fail},
@@ -192,7 +204,7 @@ func TestProjectFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("the cap lowers a failure to a warning, and beta is off: %v\n%s", err, out)
 	}
-	if strings.Join(paths, ",") != "from-project" || opts != `{"k": 1}` {
+	if strings.Join(paths, ",") != "from-project" || opts != `{"k":1}` {
 		t.Fatalf("paths = %v opts = %s", paths, opts)
 	}
 	if !strings.Contains(out, "warn alpha.code") || strings.Contains(out, "beta") {
@@ -205,7 +217,7 @@ func TestProjectFile(t *testing.T) {
 	if _, err := h.run(t, "--path", "cli-path"); err != nil || strings.Join(paths, ",") != "cli-path" {
 		t.Fatalf("paths = %v err = %v", paths, err)
 	}
-	h.files = map[string]string{"custom.json": `{"version": 1, "checks": {"gamma": {}}}`}
+	h.files = map[string]string{"custom.json": `{"version": 1, "validate": {"checks": {"gamma": {}}}}`}
 	if _, err := h.run(t, "--project", "custom.json"); code(err) != 2 || !strings.Contains(err.Error(), "unknown check") {
 		t.Fatalf("an unknown check in the project file is a usage error: %v", err)
 	}
@@ -298,5 +310,19 @@ func TestSeedBudgetsReportsAReadFaultAndAClosedOutput(t *testing.T) {
 	}
 	if _, err := (&harness{files: files, brokenOut: true}).run(t, "seed-budgets"); code(err) != 2 || !strings.Contains(err.Error(), "closed") {
 		t.Fatalf("output: %v", err)
+	}
+}
+
+func TestConfigShow(t *testing.T) {
+	h := &harness{files: map[string]string{"agentic.json": `{"version": 1, "validate": {"skip": ["vendor"], "checks": {"alpha": {"level": "warn"}}}}`}}
+	out, err := h.run(t, "config", "show")
+	want := "{\n  \"checks\": {\n    \"alpha\": {\n      \"level\": \"warn\"\n    }\n  },\n  \"skip\": [\n    \"vendor\"\n  ]\n}\n"
+	if err != nil || out != want {
+		t.Fatalf("out = %q err = %v", out, err)
+	}
+	out, err = h.run(t, "config", "show", "--sources")
+	want = "validate.skip = [\"vendor\"]  (project /w/agentic.json)\nvalidate.checks.alpha = {\"level\":\"warn\"}  (project /w/agentic.json)\n"
+	if err != nil || out != want {
+		t.Fatalf("out = %q err = %v", out, err)
 	}
 }

@@ -165,6 +165,45 @@ func TestDependencySources(t *testing.T) {
 	}
 }
 
+func TestGoDependencies(t *testing.T) {
+	const prefix = "github.com/x/"
+	files := map[string]string{
+		"packages/core/moon.yml":              "tags: [go]\n",
+		"packages/core/go.mod":                "module " + prefix + "core\n\ngo 1.27.0\n",
+		"packages/contract/moon.yml":          "tags: [go]\n",
+		"packages/contract/go.mod":            "module " + prefix + "contract\n\nrequire github.com/other/mod v1.0.0\n",
+		"packages/config/moon.yml":            "tags: [go]\ndependsOn: [contract]\n",
+		"packages/config/go.mod":              "module " + prefix + "config\n\nrequire " + prefix + "contract v0.0.0 // local\n",
+		"packages/tool/moon.yml":              "tags: [go]\ndependsOn: [config, {id: core}, eslint-config]\n",
+		"packages/tool/go.mod":                "module " + prefix + "tool\n\nrequire (\n\t" + prefix + "config v0.0.0\n\t" + prefix + "contract v0.0.0 // indirect\n\n\tgithub.com/other/mod v1.0.0\n)\n",
+		"packages/eslint-config/package.json": `{"name":"@x/eslint-config"}`,
+		"packages/broken/moon.yml":            "dependsOn: 3\n",
+		"packages/broken/go.mod":              "module " + prefix + "broken\n",
+		"packages/ts/moon.yml":                "tags: [typescript]\ndependsOn: [core]\n",
+	}
+	got := run(t, files, nil, rules("go-dependencies"))
+	codes := map[string][]string{}
+	for _, f := range got {
+		codes[f.Path] = append(codes[f.Path], f.Code)
+	}
+	if want := []string{"workspace.go-dependencies-missing", "workspace.go-dependencies-extra"}; strings.Join(codes["packages/tool/moon.yml"], ",") != strings.Join(want, ",") {
+		t.Fatalf("tool: %v (%v)", codes["packages/tool/moon.yml"], got)
+	}
+	missing, _ := checktest.Find(got, "workspace.go-dependencies-missing")
+	extra, _ := checktest.Find(got, "workspace.go-dependencies-extra")
+	if !strings.Contains(missing.Message, "requires contract,") || !strings.Contains(extra.Message, "names core,") {
+		t.Fatalf("messages = %q, %q", missing.Message, extra.Message)
+	}
+	for _, clean := range []string{"packages/core/moon.yml", "packages/contract/moon.yml", "packages/config/moon.yml", "packages/ts/moon.yml"} {
+		if len(codes[clean]) != 0 {
+			t.Errorf("%s: %v", clean, codes[clean])
+		}
+	}
+	if !checktest.Has(got, "workspace.go-dependencies-shape") {
+		t.Fatalf("codes = %v", checktest.Codes(got))
+	}
+}
+
 const workspaceFile = "hasher:\n  walkStrategy: glob\n  ignorePatterns:\n    - '**/node_modules/**/*'\n    - '**/coverage/**/*'\n    - '**/*.log'\n    - packages/*/skip.txt\n"
 
 func TestHasher(t *testing.T) {

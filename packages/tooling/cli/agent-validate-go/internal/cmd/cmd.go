@@ -4,6 +4,8 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +17,13 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
+
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/discover"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/explain"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/resolve"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/validate"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/spec"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/project"
@@ -34,11 +43,14 @@ type Opener func(root string) (Environment, error)
 
 // Dependencies are the ports of the command tree.
 type Dependencies struct {
-	Open      Opener
-	Validator jsonschema.Validator
-	Checks    []check.Check
-	Out       io.Writer
-	Version   string
+	Open Opener
+	// ConfigFiles and Places reach the layers of agentic.json.
+	ConfigFiles discover.Files
+	Places      discover.Places
+	Validator   jsonschema.Validator
+	Checks      []check.Check
+	Out         io.Writer
+	Version     string
 }
 
 // ExitError carries the exit code of the process. Err is empty when the
@@ -91,7 +103,7 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 	root := &cobra.Command{
 		Use:   toolName + " [check...]",
 		Short: "Validate skills, plugins, instructions and repository files",
-		Long: "Run the checks of the project file, or the named checks, and report what they find.\n\n" +
+		Long: "Run the checks of the validate section of agentic.json, or the named checks, and report what they find.\n\n" +
 			"Exit codes: 0 when nothing fails, 1 when a check finds a failure or drift (or a warning with --strict), 2 on a usage error or an infrastructure fault.",
 		Args:          cobra.ArbitraryArgs,
 		Version:       d.Version,
@@ -104,12 +116,13 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 	root.SetOut(d.Out)
 	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error { return ExitError{Code: findings.ExitUsage, Err: err} })
 	root.PersistentFlags().StringVar(&f.root, "root", ".", "repository root to validate")
-	root.Flags().StringVar(&f.project, "project", project.File, "project file, relative to the root")
+	root.PersistentFlags().StringVar(&f.project, "project", "", "project agentic.json, relative to the root (default the nearest agentic.json from the root up to the repository root)")
 	root.Flags().StringVar(&f.format, "format", string(contractreport.Text), "output format: "+contractreport.Names(report.Formats()...))
 	root.Flags().BoolVar(&f.strict, "strict", false, "fail on warnings too")
-	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the project file, repeatable")
+	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the validate section, repeatable")
 	root.AddCommand(listCommand(d))
 	root.AddCommand(seedCommand(d, &f.root))
+	root.AddCommand(configCommand(d, &f))
 	return root
 }
 
@@ -131,7 +144,11 @@ func run(cmd *cobra.Command, d Dependencies, f flags, names []string) error {
 	if err != nil {
 		return fail(err)
 	}
-	proj, err := project.Load(env.Tree, f.project, d.Validator, cmd.Flags().Changed("project"))
+	resolved, err := resolveConfig(d, f)
+	if err != nil {
+		return fail(err)
+	}
+	proj, err := project.Decode(resolved.Section(validate.Name))
 	if err != nil {
 		return fail(err)
 	}
@@ -159,6 +176,41 @@ func run(cmd *cobra.Command, d Dependencies, f flags, names []string) error {
 		return ExitError{Code: code}
 	}
 	return nil
+}
+
+// resolveConfig merges the validate section of every layer. The section is not
+// gated, so the resolution needs no approval port.
+func resolveConfig(d Dependencies, f flags) (merge.Resolved, error) {
+	env := resolve.Env{Files: d.ConfigFiles, Places: d.Places, Validator: d.Validator}
+	return resolve.Resolve(env, resolve.Request{Sections: []spec.Section{validate.Section()}, Start: f.root, Project: f.project})
+}
+
+func configCommand(d Dependencies, f *flags) *cobra.Command {
+	config := &cobra.Command{Use: "config", Short: "Inspect the agentic.json configuration", Args: cobra.NoArgs}
+	var sources bool
+	show := &cobra.Command{
+		Use:   "show",
+		Short: "Print the merged validate section",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			resolved, err := resolveConfig(d, *f)
+			if err != nil {
+				return usage(err)
+			}
+			if sources {
+				return explain.Render(cmd.OutOrStdout(), resolved)
+			}
+			var out bytes.Buffer
+			// The merged section is valid JSON, which always indents.
+			_ = json.Indent(&out, resolved.Section(validate.Name), "", "  ")
+			out.WriteByte('\n')
+			_, err = out.WriteTo(cmd.OutOrStdout())
+			return err
+		},
+	}
+	show.Flags().BoolVar(&sources, "sources", false, "name the layer and the file of each value")
+	config.AddCommand(show)
+	return config
 }
 
 func listCommand(d Dependencies) *cobra.Command {

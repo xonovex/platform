@@ -18,7 +18,7 @@ func newCostCommand(deps Dependencies) *cobra.Command {
 		Short: "Show what the eval runs cost",
 		Args:  cobra.NoArgs,
 		RunE: func(c *cobra.Command, _ []string) error {
-			history, err := (cost.Store{FS: deps.FS, Reader: deps.reader()}).Load(resolve(deps.Dir, file))
+			history, err := (cost.Store{FS: deps.FS, Reader: deps.reader()}).Load(resolvePath(deps.Dir, file))
 			if err != nil {
 				return err
 			}

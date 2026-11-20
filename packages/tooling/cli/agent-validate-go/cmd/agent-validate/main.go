@@ -1,5 +1,6 @@
 // Command agent-validate is the composition root of the validator: it binds the
-// file system, the schema validator and git to the ports of the command tree.
+// file system, the configuration layers, the schema validator and git to the
+// ports of the command tree.
 package main
 
 import (
@@ -12,6 +13,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/osfiles"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/gitrepo"
@@ -29,11 +32,13 @@ func main() {
 		os.Exit(findings.ExitUsage)
 	}
 	deps := cmd.Dependencies{
-		Open:      open,
-		Validator: validator,
-		Checks:    registry.All(),
-		Out:       os.Stdout,
-		Version:   version,
+		Open:        open,
+		ConfigFiles: osfiles.Files{},
+		Places:      osfiles.Places{},
+		Validator:   validator,
+		Checks:      registry.All(),
+		Out:         os.Stdout,
+		Version:     version,
 	}
 	err = cmd.NewRootCommand(deps).Execute()
 	if err == nil {

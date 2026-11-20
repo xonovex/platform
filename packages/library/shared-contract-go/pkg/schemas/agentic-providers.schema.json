@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/agentic-providers.schema.json",
+  "title": "Providers section",
+  "description": "The providers section of an agentic.json file: the model provider routes a run may select, by name. Each value is one provider route.",
+  "type": "object",
+  "patternProperties": {
+    "^[a-z0-9][a-z0-9-]*$": {"type": "object"}
+  },
+  "additionalProperties": false
+}

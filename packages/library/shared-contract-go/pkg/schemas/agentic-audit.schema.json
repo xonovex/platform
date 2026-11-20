@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/agentic-audit.schema.json",
+  "title": "Audit section",
+  "description": "The audit section of an agentic.json file: when agent-audit reports the review of a source as overdue, and the directory whose Markdown files each need a source.",
+  "type": "object",
+  "properties": {
+    "maxAge": {
+      "description": "Days after which a review is overdue.",
+      "$ref": "common.schema.json#/$defs/positiveCount"
+    },
+    "versionMaxAge": {
+      "description": "Days after which the review of a versioned source is overdue.",
+      "$ref": "common.schema.json#/$defs/positiveCount"
+    },
+    "coverDir": {
+      "description": "The directory whose Markdown files each need a source. An empty value turns the check off.",
+      "anyOf": [
+        {"const": ""},
+        {"$ref": "common.schema.json#/$defs/relativePath"}
+      ]
+    }
+  },
+  "additionalProperties": false
+}

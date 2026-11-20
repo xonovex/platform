@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/agentic.schema.json",
+  "title": "Agentic configuration",
+  "description": "One layer of the agentic configuration: the managed file, the user file or the agentic.json of a project. Each section belongs to one tool, and its section schema defines its keys.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "run": {"$ref": "agentic-run.schema.json"},
+    "providers": {"$ref": "agentic-providers.schema.json"},
+    "validate": {"$ref": "agentic-validate.schema.json"},
+    "audit": {"$ref": "agentic-audit.schema.json"},
+    "eval": {"$ref": "agentic-eval.schema.json"}
+  },
+  "required": ["version"],
+  "additionalProperties": false
+}

@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/discover"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
@@ -27,6 +28,9 @@ var version = "dev"
 // Dependencies are the ports and adapters the command tree runs on.
 type Dependencies struct {
 	FS fs.FileSystem
+	// ConfigFiles and Places reach the layers of agentic.json.
+	ConfigFiles discover.Files
+	Places      discover.Places
 	// Runner runs git for the comparison against a base ref.
 	Runner process.Runner
 	// Transports reads the current state of each source.
@@ -61,6 +65,6 @@ func NewRootCommand(deps Dependencies) *cobra.Command {
 	}
 	root.SetOut(deps.Out)
 	root.SetErr(deps.Err)
-	root.AddCommand(newSourcesCommand(deps), newConvertCommand(deps), newCompletionCommand())
+	root.AddCommand(newSourcesCommand(deps), newConvertCommand(deps), newConfigCommand(deps), newCompletionCommand())
 	return root
 }

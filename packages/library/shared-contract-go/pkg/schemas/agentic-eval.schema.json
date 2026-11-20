@@ -1,12 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.xonovex.com/agent/eval-project.schema.json",
-  "title": "Eval project",
-  "description": "The configuration of one eval project: where its plugins and instructions live, the profiles that run them, the protocol settings and the budgets.",
+  "$id": "https://schemas.xonovex.com/agent/agentic-eval.schema.json",
+  "title": "Eval section",
+  "description": "The eval section of an agentic.json file: where the plugins and instructions of agent-eval live, the profiles that run them, the protocol settings and the budgets.",
   "type": "object",
   "properties": {
-    "$schema": {"type": "string"},
-    "version": {"$ref": "common.schema.json#/$defs/version"},
     "pluginDirs": {
       "type": "array",
       "items": {"$ref": "common.schema.json#/$defs/relativePath"},
@@ -23,13 +21,11 @@
       "patternProperties": {
         "^[a-z0-9]+(-[a-z0-9]+)*$": {"$ref": "#/$defs/profile"}
       },
-      "additionalProperties": false,
-      "minProperties": 1
+      "additionalProperties": false
     },
     "protocols": {"$ref": "#/$defs/protocols"},
     "budgets": {"$ref": "#/$defs/budgets"}
   },
-  "required": ["version", "profiles"],
   "additionalProperties": false,
   "$defs": {
     "profile": {
@@ -91,6 +87,7 @@
       "additionalProperties": false
     },
     "budgets": {
+      "description": "The ceilings of one invocation. A user or managed file sets them, and a project file may only lower them.",
       "type": "object",
       "properties": {
         "maxModelRuns": {"$ref": "common.schema.json#/$defs/positiveCount"},

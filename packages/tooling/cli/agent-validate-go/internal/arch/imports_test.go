@@ -64,8 +64,19 @@ var thirdParty = map[string][]string{
 	"internal/document":        {"gopkg.in/yaml.v3"},
 	"internal/check/kit":       {"gopkg.in/yaml.v3"},
 	"internal/check/workspace": {"gopkg.in/yaml.v3"},
-	"internal/cmd":             {"github.com/spf13/cobra"},
+	"internal/cmd": {
+		"github.com/spf13/cobra",
+		configLibrary + "pkg/discover", configLibrary + "pkg/explain", configLibrary + "pkg/merge",
+		configLibrary + "pkg/resolve", configLibrary + "pkg/section/validate", configLibrary + "pkg/spec",
+		configLibrary + "pkg/configtest",
+	},
+	// The composition root binds the configuration ports to the disk.
+	"cmd/agent-validate": {configLibrary + "pkg/osfiles"},
 }
+
+// configLibrary reads the layered agentic.json. Only the command tree reads it,
+// and only the composition root binds its host adapter.
+const configLibrary = "github.com/xonovex/platform/packages/library/shared-config-go/"
 
 // contractAdapters bind a contract port to a technology. The composition root
 // binds the real ones; a test double binds the memory one.

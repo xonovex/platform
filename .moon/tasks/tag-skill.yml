@@ -71,7 +71,7 @@ tasks:
       - "**/*.md.template"
       - "**/*.json"
       - "**/*.json.template"
-      - /agentic.validate.json
+      - /agentic.json
     options:
       cache: false
   # The limits are longer than the defaults of the tool (180 and 90 days). A

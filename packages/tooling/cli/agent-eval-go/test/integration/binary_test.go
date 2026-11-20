@@ -7,6 +7,8 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -35,9 +37,10 @@ type result struct {
 
 // workspace is a temporary project with a fake claude program ahead on PATH.
 type workspace struct {
-	root string
-	bin  string
-	log  string
+	root   string
+	digest string
+	bin    string
+	log    string
 }
 
 // fakeClaude answers like claude's stream-json output. A prompt that contains
@@ -66,6 +69,8 @@ const triggerDoc = `{"version":1,"skill":"alpha","queries":[
  {"id":"yes","prompt":"please load it","shouldTrigger":true,"split":"validation"},
  {"id":"no","prompt":"leave it alone","shouldTrigger":false,"split":"train"}]}`
 
+const projectFile = `{"version":1,"eval":{"pluginDirs":["plugins"],"profiles":{"ci":{"harness":"claude","model":"fake"}},"defaultProfile":"ci"}}`
+
 func newWorkspace(t *testing.T) *workspace {
 	t.Helper()
 	w := &workspace{root: t.TempDir()}
@@ -75,7 +80,12 @@ func newWorkspace(t *testing.T) *workspace {
 	if err := os.Chmod(filepath.Join(w.bin, "claude"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	w.write(t, "work/agentic.eval.json", `{"version":1,"pluginDirs":["plugins"],"profiles":{"ci":{"harness":"claude","model":"fake"}},"defaultProfile":"ci"}`)
+	w.write(t, "work/agentic.json", projectFile)
+	sum := sha256.Sum256([]byte(projectFile))
+	w.digest = "sha256:" + hex.EncodeToString(sum[:])
+	// The state directory approves the project file, so a test that is not
+	// about the trust gate runs past it.
+	w.write(t, "state/agentic/trust.json", `{"version":1,"approvals":[{"digest":"`+w.digest+`","path":"`+filepath.Join(w.root, "work", "agentic.json")+`"}]}`)
 	w.write(t, "work/plugins/core/.claude-plugin/plugin.json", `{"name":"core","skills":"./skills/"}`)
 	w.write(t, "work/plugins/core/skills/alpha/SKILL.md", "---\nname: alpha\ndescription: x\n---\n")
 	w.write(t, "work/plugins/core/skills/alpha/eval-trigger.json", triggerDoc)
@@ -99,7 +109,8 @@ func (w *workspace) run(t *testing.T, args ...string) result {
 	defer cancel()
 	command := exec.CommandContext(ctx, binary(t), args...)
 	command.Dir = filepath.Join(w.root, "work")
-	command.Env = append(os.Environ(), "PATH="+w.bin+string(os.PathListSeparator)+os.Getenv("PATH"), "FAKE_CLAUDE_LOG="+w.log)
+	command.Env = append(os.Environ(), "PATH="+w.bin+string(os.PathListSeparator)+os.Getenv("PATH"), "FAKE_CLAUDE_LOG="+w.log,
+		"XDG_CONFIG_HOME="+filepath.Join(w.root, "config"), "XDG_STATE_HOME="+filepath.Join(w.root, "state"))
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	err := command.Run()
@@ -263,5 +274,22 @@ func copyTree(t *testing.T, src, dst string) {
 	})
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestAnUnapprovedProjectFileStopsTheRunUntilTheFlagApprovesIt(t *testing.T) {
+	w := newWorkspace(t)
+	if err := os.Remove(filepath.Join(w.root, "state", "agentic", "trust.json")); err != nil {
+		t.Fatal(err)
+	}
+	got := w.run(t, "trigger", "alpha", "--dry-run")
+	if got.code != 2 || !strings.Contains(got.stderr, "--approve-config-digest "+w.digest) {
+		t.Fatalf("exit %d\n%s", got.code, got.stderr)
+	}
+	if got := w.run(t, "trigger", "alpha", "--dry-run", "--approve-config-digest", w.digest); got.code != 0 {
+		t.Fatalf("exit %d\n%s", got.code, got.stderr)
+	}
+	if got := w.run(t, "config", "show", "--sources"); got.code != 0 || !strings.Contains(got.stdout, "eval.defaultProfile") {
+		t.Fatalf("the approval is kept: exit %d\n%s%s", got.code, got.stdout, got.stderr)
 	}
 }

@@ -39,7 +39,7 @@ func TestRules(t *testing.T) {
 		"other/d.json":  `{"version": 2}`,
 		"conf/notes.md": "x",
 	}
-	rules := map[string]any{"rules": []map[string]any{{"schema": "validate-project", "files": []string{"conf/*.json"}}}}
+	rules := map[string]any{"rules": []map[string]any{{"schema": "agentic", "files": []string{"conf/*.json"}}}}
 	got := run(t, files, rules)
 	paths := map[string]string{}
 	for _, f := range got {
@@ -49,8 +49,8 @@ func TestRules(t *testing.T) {
 		t.Fatalf("findings = %v", got)
 	}
 	byID := map[string]any{"rules": []map[string]any{
-		{"schema": schemas.ValidateProject, "files": []string{"conf/b.json"}},
-		{"schema": "validate-project", "files": []string{"conf/b.json"}},
+		{"schema": schemas.Agentic, "files": []string{"conf/b.json"}},
+		{"schema": "agentic", "files": []string{"conf/b.json"}},
 	}}
 	if got := run(t, map[string]string{"conf/b.json": `{"version": 2}`}, byID); len(got) != 1 {
 		t.Fatalf("one rule per schema validates once: %v", got)
@@ -72,8 +72,8 @@ func TestOptionErrors(t *testing.T) {
 func TestDetection(t *testing.T) {
 	declared := func(id, rest string) string { return `{"$schema": "` + id + `", ` + rest + `}` }
 	files := map[string]string{
-		"a.json": declared(schemas.ValidateProject, `"version": 2`),
-		"b.json": declared("validate-project", `"version": 1`),
+		"a.json": declared(schemas.Agentic, `"version": 2`),
+		"b.json": declared("agentic", `"version": 1`),
 		"c.json": declared(schemas.Sources, `"version": 2`),
 		"d.json": `{"$schema": "https://example.com/other.json"}`,
 		"e.json": `[1]`,

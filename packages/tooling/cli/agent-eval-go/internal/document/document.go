@@ -251,22 +251,6 @@ func Order(steps []model.Step) ([]model.Step, error) {
 	return out, nil
 }
 
-// Project reads the eval project file and checks that its default profile
-// exists.
-func (r Reader) Project(file string) (model.Project, error) {
-	var doc model.Project
-	if err := r.read(schemas.EvalProject, file, &doc); err != nil {
-		return doc, err
-	}
-	var problems []string
-	if doc.DefaultProfile != "" {
-		if _, ok := doc.Profiles[doc.DefaultProfile]; !ok {
-			problems = append(problems, "defaultProfile "+doc.DefaultProfile+" names no profile")
-		}
-	}
-	return doc, invalid(file, problems)
-}
-
 // Results reads a results document.
 func (r Reader) Results(file string) (model.Results, error) {
 	var doc model.Results

@@ -56,18 +56,68 @@ func contracts() map[string]contract {
 				{"extra field", `{"version":1,"sources":[],"extra":1}`, ""},
 			},
 		},
-		schemas.ValidateProject: {
+		schemas.AgenticValidate: {
 			valid: []string{
-				`{"version":1}`,
-				`{"$schema":"x","version":1,"skip":["vendor"],"checks":{"skill":{"enabled":true,"paths":["packages/plugin"],"level":"warn","options":{"a":1}},"text":{"enabled":false}}}`,
+				`{}`,
+				`{"skip":["vendor"],"checks":{"skill":{"enabled":true,"paths":["packages/plugin"],"level":"warn","options":{"a":1}},"text":{"enabled":false}}}`,
 			},
 			invalid: []invalid{
-				{"no version", `{"checks":{}}`, ""},
-				{"unknown level", `{"version":1,"checks":{"skill":{"level":"pass"}}}`, "/checks/skill/level"},
-				{"empty paths", `{"version":1,"checks":{"skill":{"paths":[]}}}`, "/checks/skill/paths"},
-				{"parent path", `{"version":1,"checks":{"skill":{"paths":["../x"]}}}`, "/checks/skill/paths/0"},
-				{"unknown field", `{"version":1,"checks":{"skill":{"other":1}}}`, "/checks/skill"},
-				{"repeated skip", `{"version":1,"skip":["a","a"]}`, "/skip"},
+				{"version inside the section", `{"version":1}`, ""},
+				{"unknown level", `{"checks":{"skill":{"level":"pass"}}}`, "/checks/skill/level"},
+				{"empty paths", `{"checks":{"skill":{"paths":[]}}}`, "/checks/skill/paths"},
+				{"parent path", `{"checks":{"skill":{"paths":["../x"]}}}`, "/checks/skill/paths/0"},
+				{"unknown field", `{"checks":{"skill":{"other":1}}}`, "/checks/skill"},
+				{"repeated skip", `{"skip":["a","a"]}`, "/skip"},
+			},
+		},
+		schemas.Agentic: {
+			valid: []string{
+				`{"version":1}`,
+				`{"$schema":"x","version":1,"run":{"agent":"claude","isolation":"bwrap","requireEgressRestricted":true},"providers":{"local":{"agent":"claude"}},
+				  "validate":{"checks":{"skill":{"level":"warn"}}},"audit":{"maxAge":200},"eval":{"budgets":{"maxModelRuns":10}}}`,
+			},
+			invalid: []invalid{
+				{"no version", `{"validate":{}}`, ""},
+				{"wrong version", `{"version":2}`, "/version"},
+				{"unknown section", `{"version":1,"lint":{}}`, ""},
+				{"section breaks its schema", `{"version":1,"audit":{"maxAge":0}}`, "/audit/maxAge"},
+			},
+		},
+		schemas.AgenticRun: {
+			valid: []string{
+				`{}`,
+				`{"agent":"claude","provider":"local","models":["main=m-1"],"isolation":"docker","provision":"nix","network":"managed","homeDir":"/home/agent",
+				  "bindPaths":["/a"],"roBindPaths":["/b"],"customEnv":["A=1"],"allowHosts":["*.example.com:443"],"credentials":["TOKEN=env:TOKEN"],
+				  "requirePinnedProvision":true,"requireHostToolsUnreachable":false,"requireEgressRestricted":true,"requireKernelIsolation":false}`,
+			},
+			invalid: []invalid{
+				{"unknown isolation", `{"isolation":"chroot"}`, "/isolation"},
+				{"unknown network", `{"network":"proxy"}`, "/network"},
+				{"model without slot", `{"models":["m-1"]}`, "/models/0"},
+				{"variable without name", `{"customEnv":["=1"]}`, "/customEnv/0"},
+				{"unknown key", `{"image":"x"}`, ""},
+			},
+		},
+		schemas.AgenticProviders: {
+			valid: []string{
+				`{}`,
+				`{"local":{"agent":"claude"},"cloud-2":{"agent":"codex","extends":"cloud"}}`,
+			},
+			invalid: []invalid{
+				{"name not a slug", `{"Local":{}}`, ""},
+				{"route not an object", `{"local":"claude"}`, "/local"},
+			},
+		},
+		schemas.AgenticAudit: {
+			valid: []string{
+				`{}`,
+				`{"maxAge":200,"versionMaxAge":120,"coverDir":"references"}`,
+				`{"coverDir":""}`,
+			},
+			invalid: []invalid{
+				{"zero age", `{"maxAge":0}`, "/maxAge"},
+				{"absolute cover directory", `{"coverDir":"/references"}`, "/coverDir"},
+				{"unknown key", `{"fetch":true}`, ""},
 			},
 		},
 		schemas.Kit: {
@@ -137,19 +187,21 @@ func contracts() map[string]contract {
 				{"zero cost cap", `{"version":1,"id":"f","agents":[{"id":"a","harness":"pi"}],"steps":[{"id":"s","agent":"a","prompt":"p"}],"budget":{"maxCostUsd":0}}`, "/budget/maxCostUsd"},
 			},
 		},
-		schemas.EvalProject: {
+		schemas.AgenticEval: {
 			valid: []string{
-				`{"version":1,"pluginDirs":["packages/runtime/plugin"],"instructionRoots":["."],"defaultProfile":"cheap",
+				`{}`,
+				`{"pluginDirs":["packages/runtime/plugin"],"instructionRoots":["."],"defaultProfile":"cheap",
 				  "profiles":{"cheap":{"harness":"claude","model":"haiku","effort":"low","timeoutSeconds":120}},
 				  "protocols":{"trigger":{"runs":3,"batchSize":8,"threshold":0.8},"routing":{"runs":1},"output":{"minimumWinRate":0.6},"instruction":{"minimumLift":0.2},"orchestration":{"runs":2}},
 				  "budgets":{"maxModelRuns":200,"maxCostUsd":25}}`,
 			},
 			invalid: []invalid{
-				{"no profiles", `{"version":1,"profiles":{}}`, "/profiles"},
-				{"batch over the cap", `{"version":1,"profiles":{"p":{"harness":"claude"}},"protocols":{"trigger":{"batchSize":25}}}`, "/protocols/trigger/batchSize"},
-				{"profile without harness", `{"version":1,"profiles":{"p":{"model":"m"}}}`, "/profiles/p"},
-				{"unknown effort", `{"version":1,"profiles":{"p":{"harness":"claude","effort":"extreme"}}}`, "/profiles/p/effort"},
-				{"profile name not a slug", `{"version":1,"profiles":{"Not A Slug":{"harness":"claude"}}}`, "/profiles"},
+				{"version inside the section", `{"version":1}`, ""},
+				{"batch over the cap", `{"protocols":{"trigger":{"batchSize":25}}}`, "/protocols/trigger/batchSize"},
+				{"profile without harness", `{"profiles":{"p":{"model":"m"}}}`, "/profiles/p"},
+				{"unknown effort", `{"profiles":{"p":{"harness":"claude","effort":"extreme"}}}`, "/profiles/p/effort"},
+				{"profile name not a slug", `{"profiles":{"Not A Slug":{"harness":"claude"}}}`, "/profiles"},
+				{"zero spend", `{"budgets":{"maxCostUsd":0}}`, "/budgets/maxCostUsd"},
 			},
 		},
 		schemas.Results: {

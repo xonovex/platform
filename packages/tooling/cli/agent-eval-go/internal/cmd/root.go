@@ -11,6 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/discover"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
@@ -24,10 +26,21 @@ const Name = "agent-eval"
 // version is set at link time through -ldflags -X.
 var version = "dev"
 
+// ConfigFiles reads the layers of agentic.json and keeps the approval ledger.
+type ConfigFiles interface {
+	discover.Files
+	trust.Store
+}
+
 // Dependencies are the ports and adapters the command tree runs on.
 type Dependencies struct {
 	FS        fs.FileSystem
 	Validator jsonschema.Validator
+	// ConfigFiles, Places and Prompter reach the layers of agentic.json and
+	// ask the user to approve a project file.
+	ConfigFiles ConfigFiles
+	Places      discover.Places
+	Prompter    trust.Prompter
 	// Protocols holds the eval protocols by name.
 	Protocols *protocol.Registry
 	// Exec runs one model request.
@@ -66,6 +79,6 @@ func NewRootCommand(deps Dependencies) *cobra.Command {
 	root.SetOut(deps.Out)
 	root.SetErr(deps.Err)
 	root.AddCommand(newProtocolCommands(deps)...)
-	root.AddCommand(newBaselineCommand(deps), newCostCommand(deps), newMigrateCommand(deps), newCompletionCommand())
+	root.AddCommand(newBaselineCommand(deps), newCostCommand(deps), newMigrateCommand(deps), newConfigCommand(deps), newCompletionCommand())
 	return root
 }

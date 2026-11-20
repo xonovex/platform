@@ -63,17 +63,15 @@ const HarnessVariable = "SKILL_EVAL_HARNESS"
 
 // Flags are the values a command line sets. A zero value means unset.
 type Flags struct {
-	Profile      string
-	Harness      string
-	Model        string
-	JudgeModel   string
-	Runs         int
-	Threshold    *float64
-	BatchSize    int
-	Concurrency  int
-	MaxCostUSD   float64
-	MaxModelRuns int
-	Split        string
+	Profile     string
+	Harness     string
+	Model       string
+	JudgeModel  string
+	Runs        int
+	Threshold   *float64
+	BatchSize   int
+	Concurrency int
+	Split       string
 }
 
 // Settings are the resolved values of one invocation of one protocol.
@@ -136,7 +134,8 @@ func Resolve(project model.Project, flags Flags, env map[string]string, protocol
 	if flags.BatchSize > 0 {
 		s.BatchSize = flags.BatchSize
 	}
-	s.Limits = limits(project.Budgets, flags)
+	// The merge of agentic.json has already applied the budget flags and caps.
+	s.Limits = budget.Limits{MaxModelRuns: project.Budgets.MaxModelRuns, MaxCostUSD: project.Budgets.MaxCostUSD}
 	if s.Runs < 1 || s.Runs > MaxRuns {
 		return Settings{}, fmt.Errorf("runs must be between 1 and %d, got %d", MaxRuns, s.Runs)
 	}
@@ -189,20 +188,6 @@ func (s *Settings) protocol(p model.ProtocolSettings, protocol model.Protocol, f
 	if flags.Threshold != nil {
 		s.Threshold = *flags.Threshold
 	}
-}
-
-func limits(project *model.Budgets, flags Flags) budget.Limits {
-	var l budget.Limits
-	if project != nil {
-		l = budget.Limits{MaxModelRuns: project.MaxModelRuns, MaxCostUSD: project.MaxCostUSD}
-	}
-	if flags.MaxModelRuns > 0 {
-		l.MaxModelRuns = flags.MaxModelRuns
-	}
-	if flags.MaxCostUSD > 0 {
-		l.MaxCostUSD = flags.MaxCostUSD
-	}
-	return l
 }
 
 func first(values ...string) string {

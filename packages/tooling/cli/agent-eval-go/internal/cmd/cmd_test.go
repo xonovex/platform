@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/configtest"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
@@ -23,11 +25,17 @@ const triggerDoc = `{"version":1,"skill":"alpha","queries":[
  {"id":"yes","prompt":"load it","shouldTrigger":true,"split":"validation"},
  {"id":"no","prompt":"leave it","shouldTrigger":false,"split":"train"}]}`
 
-const project = `{"version":1,"pluginDirs":["plugins"],"defaultProfile":"ci","profiles":{"ci":{"harness":"claude","model":"m"}}}`
+const project = `{"version":1,"eval":{"pluginDirs":["plugins"],"defaultProfile":"ci","profiles":{"ci":{"harness":"claude","model":"m"}}}}`
+
+// projectFile is the project agentic.json in the working directory.
+const projectFile = "/w/agentic.json"
+
+// stateDir holds the approval ledger of the fixture.
+const stateDir = "/home/u/.local/state/agentic"
 
 func baseFiles() map[string]string {
 	return map[string]string{
-		"/w/agentic.eval.json":                           project,
+		projectFile: project,
 		"/w/plugins/core/.claude-plugin/plugin.json":     `{"name":"core","skills":"./skills/"}`,
 		"/w/plugins/core/skills/alpha/SKILL.md":          "a",
 		"/w/plugins/core/skills/alpha/eval-trigger.json": triggerDoc,
@@ -56,11 +64,25 @@ func newFixture(t *testing.T, files map[string]string, exec *protocoltest.Exec) 
 	}
 	f := &fixture{out: &bytes.Buffer{}, fs: fsys, exec: exec}
 	f.deps = cmd.Dependencies{
-		FS: fsys, Validator: validator, Protocols: registry.Protocols(), Exec: exec,
+		FS: fsys, Validator: validator, ConfigFiles: approved(files), Prompter: &configtest.Prompter{},
+		Places: configtest.Places{User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}, Protocols: registry.Protocols(), Exec: exec,
 		Predicates: registry.Predicates(exec), Env: map[string]string{}, Dir: "/w",
 		Now: func() time.Time { return today }, Out: f.out, Err: &bytes.Buffer{},
 	}
 	return f
+}
+
+// approved holds the files and a ledger that approves the project file, so a
+// test that is not about the trust gate runs past it.
+func approved(files map[string]string) *configtest.Files {
+	config := map[string]string{}
+	for name, content := range files {
+		config[name] = content
+	}
+	if content, ok := files[projectFile]; ok {
+		config[stateDir+"/trust.json"] = `{"version":1,"approvals":[{"digest":"` + layer.Digest([]byte(content)) + `","path":"` + projectFile + `"}]}`
+	}
+	return configtest.NewFiles(config)
 }
 
 // run executes the command and returns the exit status as the binary maps it.
@@ -206,7 +228,7 @@ func TestUsageErrors(t *testing.T) {
 
 func TestWithoutAProjectFileTheWorkingDirectoryIsTheCatalog(t *testing.T) {
 	files := baseFiles()
-	delete(files, "/w/agentic.eval.json")
+	delete(files, projectFile)
 	f := newFixture(t, files, selects(good))
 	if code, err := f.run("trigger", "alpha", "--runs", "1", "--plugin-dir", "plugins"); err != nil || code != 0 {
 		t.Fatalf("%d %v\n%s", code, err, f.out)
@@ -342,7 +364,7 @@ func TestMigrateDoesNotSearchBelowTheWalkDepth(t *testing.T) {
 
 func TestAnUnreadableProjectFileIsAUsageError(t *testing.T) {
 	files := baseFiles()
-	files["/w/agentic.eval.json"] = `{"version":1,"profiles":3}`
+	files[projectFile] = `{"version":1,"eval":{"profiles":3}}`
 	f := newFixture(t, files, selects(good))
 	if code, err := f.run("trigger", "alpha"); code != 2 || err == nil {
 		t.Fatalf("%d %v", code, err)
@@ -352,7 +374,7 @@ func TestAnUnreadableProjectFileIsAUsageError(t *testing.T) {
 // modelless is a project whose profile names no model.
 func modelless() map[string]string {
 	files := baseFiles()
-	files["/w/agentic.eval.json"] = `{"version":1,"pluginDirs":["plugins"],"defaultProfile":"ci","profiles":{"ci":{"harness":"claude"}}}`
+	files[projectFile] = `{"version":1,"eval":{"pluginDirs":["plugins"],"defaultProfile":"ci","profiles":{"ci":{"harness":"claude"}}}}`
 	return files
 }
 
@@ -399,4 +421,86 @@ func TestADryRunNamesTheModelsItWouldUse(t *testing.T) {
 	if code, err := f.run("trigger", "alpha", "--dry-run", "--format", "json"); err != nil || code != 0 || !strings.Contains(f.out.String(), `"model": "chosen"`) || !strings.Contains(f.out.String(), `"judgeModel": "judge-chosen"`) {
 		t.Fatalf("%d %v\n%s", code, err, f.out)
 	}
+}
+
+func TestAnUnapprovedProjectFileFailsClosedAndTheFlagApprovesIt(t *testing.T) {
+	files := baseFiles()
+	f := newFixture(t, files, selects(good))
+	f.deps.ConfigFiles = configtest.NewFiles(files)
+	digest := layer.Digest([]byte(project))
+	if _, err := f.run("trigger", "alpha", "--runs", "1"); err == nil || !strings.Contains(err.Error(), "--approve-config-digest "+digest) {
+		t.Fatalf("an unapproved project file must stop the run: %v", err)
+	}
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--approve-config-digest", digest); err != nil || code != 0 {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--dry-run"); err != nil || code != 0 {
+		t.Fatalf("the approval is kept: %d %v", code, err)
+	}
+}
+
+func TestTheBudgetsMergeTheLayersAndTheFlags(t *testing.T) {
+	files := baseFiles()
+	files["/home/u/.config/agentic/agentic.json"] = `{"version":1,"eval":{"budgets":{"maxModelRuns":1}}}`
+	f := newFixture(t, files, selects(good))
+	if code, err := f.run("trigger", "alpha", "--runs", "1"); err != nil || code != 3 {
+		t.Fatalf("the user cap of one run stops the run: %d %v", code, err)
+	}
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--max-model-runs", "2", "--max-cost-usd", "0.5"); err != nil || code != 0 {
+		t.Fatalf("a flag sets the limit: %d %v\n%s", code, err, f.out)
+	}
+	files["/etc/agentic/agentic.json"] = `{"version":1,"eval":{"budgets":{"maxModelRuns":1}}}`
+	f = newFixture(t, files, selects(good))
+	f.deps.Places = configtest.Places{Managed: "/etc/agentic", User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}
+	if _, err := f.run("trigger", "alpha", "--max-model-runs", "2"); err == nil || !strings.Contains(err.Error(), "maxModelRuns") {
+		t.Fatalf("a flag above the managed cap is an error: %v", err)
+	}
+}
+
+func TestPluginDirsResolveAgainstTheFileThatSetThem(t *testing.T) {
+	files := map[string]string{"/w/sub/agentic.json": `{"version":1,"eval":{"pluginDirs":["plugins"],"profiles":{}}}`}
+	for name, content := range baseFiles() {
+		if rest, ok := strings.CutPrefix(name, "/w/plugins/"); ok {
+			files["/w/sub/plugins/"+rest] = content
+		}
+	}
+	f := newFixture(t, files, selects(good))
+	f.deps.ConfigFiles = approvedAt(files, "/w/sub/agentic.json")
+	if code, err := f.run("trigger", "alpha", "--runs", "1", "--project", "sub/agentic.json"); err != nil || code != 0 {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+}
+
+func TestADefaultProfileThatNamesNoProfileIsAUsageError(t *testing.T) {
+	files := baseFiles()
+	files[projectFile] = `{"version":1,"eval":{"defaultProfile":"none","profiles":{}}}`
+	f := newFixture(t, files, selects(good))
+	if _, err := f.run("trigger", "alpha"); err == nil || !strings.Contains(err.Error(), "defaultProfile none names no profile") {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestConfigShow(t *testing.T) {
+	f := newFixture(t, baseFiles(), selects(good))
+	if code, err := f.run("config", "show"); err != nil || code != 0 || !strings.Contains(f.out.String(), "\"defaultProfile\": \"ci\"") || !strings.Contains(f.out.String(), "\"maxModelRuns\": 24") {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+	if code, err := f.run("config", "show", "--sources"); err != nil || code != 0 ||
+		!strings.Contains(f.out.String(), "eval.defaultProfile = \"ci\"  (project /w/agentic.json)") ||
+		!strings.Contains(f.out.String(), "eval.budgets.maxCostUsd = 2  (default)") {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+	f.deps.ConfigFiles = configtest.NewFiles(baseFiles())
+	if _, err := f.run("config", "show"); err == nil || !strings.Contains(err.Error(), "approve-config-digest") {
+		t.Fatalf("an unapproved project file is not shown: %v", err)
+	}
+}
+
+// approvedAt holds the files and a ledger that approves the file at path.
+func approvedAt(files map[string]string, path string) *configtest.Files {
+	config := map[string]string{stateDir + "/trust.json": `{"version":1,"approvals":[{"digest":"` + layer.Digest([]byte(files[path])) + `","path":"` + path + `"}]}`}
+	for name, content := range files {
+		config[name] = content
+	}
+	return configtest.NewFiles(config)
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/checktest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/project"
 )
 
@@ -23,30 +22,13 @@ func (s stub) Run(check.Context) ([]findings.Finding, error) {
 
 var registered = []check.Check{stub{"b"}, stub{"a"}}
 
-func TestLoad(t *testing.T) {
-	ctx := checktest.Context(t, map[string]string{
-		"ok/agentic.validate.json":      `{"version":1,"checks":{"a":{"enabled":false,"paths":["x"],"level":"warn","options":{"k":1}}}}`,
-		"broken/agentic.validate.json":  `{"version":2,"checks":{"a":{"level":"pass"}}}`,
-		"garbage/agentic.validate.json": `{`,
-	})
-	got, err := project.Load(ctx.Tree, "ok/agentic.validate.json", ctx.Validator, true)
-	if err != nil || got.Checks["a"].Level != "warn" || *got.Checks["a"].Enabled || string(got.Checks["a"].Options) != `{"k":1}` {
+func TestDecode(t *testing.T) {
+	got, err := project.Decode([]byte(`{"skip":["v"],"checks":{"a":{"enabled":false,"paths":["x"],"level":"warn","options":{"k":1}}}}`))
+	if err != nil || got.Skip[0] != "v" || got.Checks["a"].Level != "warn" || *got.Checks["a"].Enabled || string(got.Checks["a"].Options) != `{"k":1}` {
 		t.Fatalf("project = %+v, %v", got, err)
 	}
-	if _, err := project.Load(ctx.Tree, "missing.json", ctx.Validator, false); err != nil {
-		t.Fatalf("an optional file may be missing: %v", err)
-	}
-	if _, err := project.Load(ctx.Tree, "missing.json", ctx.Validator, true); err == nil {
-		t.Fatal("a required file must exist")
-	}
-	if _, err := project.Load(ctx.Tree, "broken/agentic.validate.json", ctx.Validator, false); err == nil || !strings.Contains(err.Error(), "/version") {
+	if _, err := project.Decode([]byte(`{"checks":[]}`)); err == nil || !strings.Contains(err.Error(), "validate section") {
 		t.Fatalf("err = %v", err)
-	}
-	if _, err := project.Load(ctx.Tree, "garbage/agentic.validate.json", ctx.Validator, false); err == nil {
-		t.Fatal("malformed JSON is an error")
-	}
-	if _, err := project.Load(ctx.Tree, "ok", ctx.Validator, false); err == nil {
-		t.Fatal("a directory cannot be read as a file")
 	}
 }
 

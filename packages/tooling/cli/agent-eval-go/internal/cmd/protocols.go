@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	evalsection "github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/eval"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	contractreport "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/report"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/budget"
@@ -44,18 +45,19 @@ var specs = []protocolSpec{
 
 // options are the flags every protocol command takes.
 type options struct {
-	project, profile, harness, model, judgeModel, split string
-	runs, batchSize, concurrency, maxModelRuns          int
-	threshold, maxCostUSD                               float64
-	resultsDir, format                                  string
-	resume, dryRun                                      bool
-	pluginDirs                                          []string
+	project, approveDigest, profile, harness, model string
+	judgeModel, split                               string
+	runs, batchSize, concurrency, maxModelRuns      int
+	threshold, maxCostUSD                           float64
+	resultsDir, format                              string
+	resume, dryRun                                  bool
+	pluginDirs                                      []string
 }
 
 func (o *options) bind(c *cobra.Command) {
 	f := c.Flags()
-	f.StringVar(&o.project, "project", "", "eval project file (default agentic.eval.json in the working directory)")
-	f.StringVar(&o.profile, "profile", "", "profile of the project file to run with")
+	bindConfig(c, &o.project, &o.approveDigest)
+	f.StringVar(&o.profile, "profile", "", "profile of the eval section to run with")
 	f.StringVar(&o.harness, "harness", "", "agent harness: claude or codex (env SKILL_EVAL_HARNESS)")
 	f.StringVar(&o.model, "model", "", "model that answers the prompts")
 	f.StringVar(&o.judgeModel, "judge-model", "", "model that grades the answers")
@@ -63,9 +65,9 @@ func (o *options) bind(c *cobra.Command) {
 	f.IntVar(&o.runs, "runs", 0, fmt.Sprintf("runs per query or arm, at most %d", settings.MaxRuns))
 	f.IntVar(&o.batchSize, "batch-size", 0, "most units to run in one invocation")
 	f.IntVar(&o.concurrency, "concurrency", 0, fmt.Sprintf("parallel model runs, at most %d", settings.MaxConcurrency))
-	f.IntVar(&o.maxModelRuns, "max-model-runs", 0, fmt.Sprintf("model runs the invocation may start (default %d)", budget.DefaultMaxModelRuns))
+	f.IntVar(&o.maxModelRuns, "max-model-runs", 0, fmt.Sprintf("model runs the invocation may start, at most the managed cap (default the eval section, else %d)", evalsection.DefaultMaxModelRuns))
 	f.Float64Var(&o.threshold, "threshold", 0, "share of runs that must load the skill for a query to count as triggered")
-	f.Float64Var(&o.maxCostUSD, "max-cost-usd", 0, fmt.Sprintf("spend the invocation may reach in US dollars (default %.2f)", budget.DefaultMaxCostUSD))
+	f.Float64Var(&o.maxCostUSD, "max-cost-usd", 0, fmt.Sprintf("spend the invocation may reach in US dollars, at most the managed cap (default the eval section, else %.2f)", evalsection.DefaultMaxCostUSD))
 	f.StringVar(&o.resultsDir, "results-dir", DefaultResultsDir, "directory for run checkpoints")
 	f.StringVar(&o.format, "format", string(contractreport.Text), "output format: "+contractreport.Names(report.Formats()...))
 	f.BoolVar(&o.resume, "resume", false, "continue the incomplete run with the same inputs")
@@ -76,13 +78,25 @@ func (o *options) bind(c *cobra.Command) {
 func (o *options) flags(c *cobra.Command) settings.Flags {
 	f := settings.Flags{
 		Profile: o.profile, Harness: o.harness, Model: o.model, JudgeModel: o.judgeModel, Runs: o.runs,
-		BatchSize: o.batchSize, Concurrency: o.concurrency, MaxCostUSD: o.maxCostUSD,
-		MaxModelRuns: o.maxModelRuns, Split: o.split,
+		BatchSize: o.batchSize, Concurrency: o.concurrency, Split: o.split,
 	}
 	if c.Flags().Changed("threshold") {
 		f.Threshold = &o.threshold
 	}
 	return f
+}
+
+// config names what the command reads of agentic.json. A budget flag joins the
+// merge only when the user sets it.
+func (o *options) config(c *cobra.Command) configRequest {
+	r := configRequest{project: o.project, approveDigest: o.approveDigest}
+	if c.Flags().Changed("max-model-runs") {
+		r.maxModelRuns = &o.maxModelRuns
+	}
+	if c.Flags().Changed("max-cost-usd") {
+		r.maxCostUSD = &o.maxCostUSD
+	}
+	return r
 }
 
 func newProtocolCommands(deps Dependencies) []*cobra.Command {
@@ -104,7 +118,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if err != nil {
 		return err
 	}
-	project, projectDir, err := deps.loadProject(o.project)
+	project, projectDir, err := deps.loadProject(o.config(c))
 	if err != nil {
 		return err
 	}
@@ -126,7 +140,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if len(args) > 0 {
 		target = args[0]
 		if !spec.catalog {
-			target = resolve(deps.Dir, target)
+			target = resolvePath(deps.Dir, target)
 		}
 	}
 	plan, err := proto.Plan(protocol.Input{Target: target, Settings: resolved, Env: env})
@@ -134,7 +148,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 		return err
 	}
 	guard := budget.New(resolved.Limits)
-	resultsDir := resolve(deps.Dir, o.resultsDir)
+	resultsDir := resolvePath(deps.Dir, o.resultsDir)
 	st := store.Store{FS: deps.FS, Reader: deps.reader(), Dir: resultsDir}
 	rep, err := run.Execute(context.Background(), plan, run.Options{
 		Protocol: spec.name, Profile: resolved.ProfileName, Model: resolved.ModelLabel(), JudgeModel: resolved.JudgeModelLabel(),

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/osfiles"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
@@ -44,7 +45,8 @@ func run() int {
 		Pause: func(attempt int) { time.Sleep(time.Duration(attempt) * retryPause) },
 	}
 	deps := cmd.Dependencies{
-		FS: fsys, Validator: validator, Protocols: registry.Protocols(), Exec: exec,
+		FS: fsys, Validator: validator, ConfigFiles: osfiles.Files{}, Places: osfiles.Places{},
+		Prompter: osfiles.NewPrompter(), Protocols: registry.Protocols(), Exec: exec,
 		Predicates: registry.Predicates(exec), Env: environment(), Dir: dir,
 		Now: time.Now, Out: os.Stdout, Err: os.Stderr,
 	}

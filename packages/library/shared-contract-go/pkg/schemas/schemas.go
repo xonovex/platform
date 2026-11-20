@@ -23,12 +23,20 @@ const (
 	EvalOutput        = Namespace + "eval-output.schema.json"
 	EvalInstruction   = Namespace + "eval-instruction.schema.json"
 	EvalOrchestration = Namespace + "eval-orchestration.schema.json"
-	EvalProject       = Namespace + "eval-project.schema.json"
 	Results           = Namespace + "results.schema.json"
 	Baseline          = Namespace + "baseline.schema.json"
 	CostHistory       = Namespace + "cost-history.schema.json"
-	ValidateProject   = Namespace + "validate-project.schema.json"
 	Kit               = Namespace + "kit.schema.json"
+)
+
+// Ids of the agentic.json schemas: the file and the section of each tool.
+const (
+	Agentic          = Namespace + "agentic.schema.json"
+	AgenticRun       = Namespace + "agentic-run.schema.json"
+	AgenticProviders = Namespace + "agentic-providers.schema.json"
+	AgenticValidate  = Namespace + "agentic-validate.schema.json"
+	AgenticAudit     = Namespace + "agentic-audit.schema.json"
+	AgenticEval      = Namespace + "agentic-eval.schema.json"
 )
 
 //go:embed *.schema.json
@@ -38,8 +46,8 @@ var files embed.FS
 func IDs() []string {
 	ids := []string{
 		Common, Predicate, Sources, EvalTrigger, EvalOutput, EvalInstruction,
-		EvalOrchestration, EvalProject, Results, Baseline, CostHistory, ValidateProject,
-		Kit,
+		EvalOrchestration, Results, Baseline, CostHistory, Kit,
+		Agentic, AgenticRun, AgenticProviders, AgenticValidate, AgenticAudit, AgenticEval,
 	}
 	sort.Strings(ids)
 	return ids

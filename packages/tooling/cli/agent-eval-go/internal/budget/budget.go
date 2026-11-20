@@ -8,14 +8,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
-)
+	evalsection "github.com/xonovex/platform/packages/library/shared-config-go/pkg/section/eval"
 
-// Default limits apply when neither the project nor a flag sets one. They keep
-// an unattended invocation small: a larger run is resumed in further batches.
-const (
-	DefaultMaxModelRuns = 24
-	DefaultMaxCostUSD   = 2.0
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 )
 
 // ErrExceeded reports that the next model runs would pass a limit.
@@ -27,13 +22,13 @@ type Limits struct {
 	MaxCostUSD   float64
 }
 
-// Resolve fills the zero members with the defaults.
+// Resolve fills the zero members with the ceilings of the eval section.
 func (l Limits) Resolve() Limits {
 	if l.MaxModelRuns <= 0 {
-		l.MaxModelRuns = DefaultMaxModelRuns
+		l.MaxModelRuns = evalsection.DefaultMaxModelRuns
 	}
 	if l.MaxCostUSD <= 0 {
-		l.MaxCostUSD = DefaultMaxCostUSD
+		l.MaxCostUSD = evalsection.DefaultMaxCostUSD
 	}
 	return l
 }
