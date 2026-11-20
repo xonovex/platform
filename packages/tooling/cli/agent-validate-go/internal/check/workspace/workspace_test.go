@@ -308,3 +308,96 @@ func TestProjectsInPluginSkillDirectories(t *testing.T) {
 		t.Fatalf("findings = %v", got)
 	}
 }
+
+func TestGoCoverageFloors(t *testing.T) {
+	const goMod = "module example.com/m\n"
+	moon := func(env string) string {
+		return "language: go\ntasks:\n  go-test-coverage:\n    env:\n" + env
+	}
+	floors := func(lines ...string) string {
+		return "      GO_PACKAGE_FLOORS: |\n        " + strings.Join(lines, "\n        ") + "\n"
+	}
+	files := map[string]string{
+		// Every package is named; a test-only package, an exempt package and a
+		// numeric module floor are fine, and skipped directories hold no package.
+		"packages/ok/go.mod":                     goMod,
+		"packages/ok/moon.yml":                   moon("      GO_COVERAGE_MIN: 90\n" + floors(".=100", "./pkg/a=80.5", "./pkg/b=exempt", "./pkg/arch=exempt")),
+		"packages/ok/main.go":                    "package main\n",
+		"packages/ok/pkg/a/a.go":                 "package a\n",
+		"packages/ok/pkg/b/b.go":                 "package b\n",
+		"packages/ok/pkg/arch/arch_test.go":      "package arch\n",
+		"packages/ok/pkg/a/testdata/t.go":        "package t\n",
+		"packages/ok/_tools/tools.go":            "package tools\n",
+		"packages/ok/.hidden/h.go":               "package h\n",
+		"packages/ok/vendor/v/v.go":              "package v\n",
+		"packages/ok/node_modules/n/n.go":        "package n\n",
+		"packages/ok/nested/go.mod":              "module example.com/nested\n",
+		"packages/ok/nested/n.go":                "package nested\n",
+		"packages/ok/pkg/a/README.md":            "text\n",
+		"packages/none/go.mod":                   goMod,
+		"packages/none/moon.yml":                 "language: go\n",
+		"packages/nomin/go.mod":                  goMod,
+		"packages/nomin/moon.yml":                moon(floors(".=100")),
+		"packages/nomin/main.go":                 "package main\n",
+		"packages/invalid/go.mod":                goMod,
+		"packages/invalid/moon.yml":              moon("      GO_COVERAGE_MIN: high\n" + floors(".=100", "pkg/a=80", "./pkg/b", "./pkg/c=lots", "=50", "./pkg/d=")),
+		"packages/invalid/main.go":               "package main\n",
+		"packages/stale/go.mod":                  goMod,
+		"packages/stale/moon.yml":                moon("      GO_COVERAGE_MIN: '90'\n" + floors(".=100", "./pkg/gone=exempt", "./pkg/a/=80", "./pkg/a/testdata=80")),
+		"packages/stale/main.go":                 "package main\n",
+		"packages/stale/pkg/a/a.go":              "package a\n",
+		"packages/stale/pkg/a/testdata/t.go":     "package t\n",
+		"packages/missed/go.mod":                 goMod,
+		"packages/missed/moon.yml":               moon("      GO_COVERAGE_MIN: 90\n" + floors("./pkg/a=80")),
+		"packages/missed/main.go":                "package main\n",
+		"packages/missed/pkg/a/a.go":             "package a\n",
+		"packages/missed/pkg/z/z.go":             "package z\n",
+		"packages/missed/pkg/onlytest/x_test.go": "package onlytest\n",
+		"packages/typescript/go.mod":             goMod,
+		"packages/typescript/moon.yml":           "language: typescript\n",
+		"packages/nomod/moon.yml":                "language: go\n",
+		"packages/broken/go.mod":                 goMod,
+		"packages/broken/moon.yml":               "tasks: 3\n",
+		"packages/syntax/go.mod":                 goMod,
+		"packages/syntax/moon.yml":               "tasks: [",
+	}
+	got := run(t, files, nil, rules("go-coverage-floors"))
+	codes := map[string][]string{}
+	messages := map[string][]string{}
+	for _, f := range got {
+		codes[f.Path] = append(codes[f.Path], f.Code)
+		messages[f.Path] = append(messages[f.Path], f.Message)
+	}
+	want := map[string]string{
+		"packages/none/moon.yml":    "workspace.go-coverage-floor",
+		"packages/nomin/moon.yml":   "workspace.go-coverage-floor",
+		"packages/invalid/moon.yml": strings.Repeat("workspace.go-coverage-invalid,", 6),
+		"packages/stale/moon.yml":   "workspace.go-coverage-unknown,workspace.go-coverage-undeclared",
+		"packages/missed/moon.yml":  "workspace.go-coverage-undeclared",
+		"packages/broken/moon.yml":  "workspace.go-coverage-shape",
+		"packages/syntax/moon.yml":  "workspace.go-coverage-yaml",
+	}
+	for file, codeList := range want {
+		if got := strings.Join(codes[file], ","); got != strings.TrimSuffix(codeList, ",") {
+			t.Errorf("%s: %s, want %s (%v)", file, got, codeList, messages[file])
+		}
+	}
+	if len(codes) != len(want) {
+		t.Errorf("findings = %v", codes)
+	}
+	checks := map[string][]string{
+		"packages/none/moon.yml":    {"GO_COVERAGE_MIN, GO_PACKAGE_FLOORS"},
+		"packages/nomin/moon.yml":   {"sets no GO_COVERAGE_MIN:"},
+		"packages/invalid/moon.yml": {`"high"`, `"pkg/a=80"`, `"./pkg/b"`, `"./pkg/c=lots"`, `"=50"`, `"./pkg/d="`},
+		"packages/stale/moon.yml":   {"names ./pkg/gone, ./pkg/a/,", "misses ./pkg/a,"},
+		"packages/missed/moon.yml":  {"misses ., ./pkg/z,"},
+	}
+	for file, parts := range checks {
+		text := strings.Join(messages[file], "\n")
+		for _, part := range parts {
+			if !strings.Contains(text, part) {
+				t.Errorf("%s: messages %q, want %q", file, text, part)
+			}
+		}
+	}
+}

@@ -55,7 +55,7 @@ Exit status 0 means the run is clean. Exit status 1 means a check reported a fai
 | `llms` | `llms.txt` indexes whose Markdown targets exist |
 | `schema` | JSON documents against the contract schemas, by rule or by their `$schema` member |
 | `repository` | `AGENTS.md` and `CLAUDE.md` pairs, README claims and release workflow safety |
-| `workspace` | Moon task inheritance, coverage floors, dependency sources, Go dependencies, hasher ignores and bin targets |
+| `workspace` | Moon task inheritance, coverage floors, dependency sources, Go dependencies, Go coverage floors (`GO_COVERAGE_MIN` and a `GO_PACKAGE_FLOORS` entry for every package with Go code and for no other path), hasher ignores and bin targets |
 | `text` | Typographic punctuation in prose files and hard-wrapped Markdown |
 
 ## Configuration
