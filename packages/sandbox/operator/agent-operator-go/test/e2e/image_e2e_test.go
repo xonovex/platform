@@ -116,7 +116,7 @@ func TestE2E_ImageDeployment(t *testing.T) {
 						Image:           "agent-operator:latest",
 						ImagePullPolicy: corev1.PullNever,
 						Command:         []string{"/operator"},
-						Args:            []string{"--health-probe-bind-address=:8081"},
+						Args:            []string{"--health-probe-bind-address=:8081", "--workspace-init-image=" + testutil.WorkspaceInitImage},
 						Ports: []corev1.ContainerPort{{
 							ContainerPort: 8081,
 							Name:          "health",
