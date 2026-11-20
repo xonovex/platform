@@ -16,14 +16,13 @@ tasks:
       set -euo pipefail
       # Every package the module builds is named here. cmd/operator parses flags
       # and starts the manager, which go-test-integration covers under envtest,
-      # test/testutil is test support, and config, internal/arch and the shared
-      # packages declare interfaces and embedded manifests with no statements.
+      # test/testutil is test support, and config and the shared packages
+      # declare interfaces and embedded manifests with no statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./api/v1alpha1=100 \
         ./cmd/e2e-summary=87 \
         ./cmd/operator=exempt \
         ./config=exempt \
-        ./internal/arch=exempt \
         ./internal/controller=95 \
         ./internal/harness/claude=85 \
         ./internal/harness/opencode=80 \
@@ -55,6 +54,28 @@ tasks:
     deps:
       - go-test-coverage
       - go-package-coverage
+    options:
+      cache: false
+      mergeDeps: replace
+  # The architecture tests read the source trees of the operator and the CLI,
+  # so they carry the arch build tag and run here instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - /packages/tooling/cli/agent-cli-go/internal/**/*
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
     options:
       cache: false
       mergeDeps: replace

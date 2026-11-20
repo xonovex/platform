@@ -1,30 +1,24 @@
-// Package arch holds cross-module architecture fitness tests for the agent
-// consumers (CLI + operator).
+//go:build arch
+
 package arch
 
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 )
 
-// sharedAxes are the orthogonal axes both consumers realize. They must exist as a
-// top-level internal/ directory in BOTH agent-cli-go and agent-operator-go — that
-// name-level intersection is the symmetry the reorg guarantees.
+// sharedAxes are the orthogonal axes that the operator and the CLI both
+// realize, each as a top-level internal directory.
 var sharedAxes = []string{"isolation", "network", "provision", "workspace"}
 
-// consumerOnlyAxes documents the deliberate asymmetries (axis present in one
-// consumer only), so an unexpected divergence still fails while the agreed ones
-// don't:
-//   - harness, provider: operator-only. The CLI consumes harness commands and
-//     provider env from the shared module (pkg/agents, pkg/providers) rather than
-//     as CLI-internal axes.
-//   - terminal: CLI-only. The operator has no terminal-output axis (pods, not TTYs).
+// consumerOnlyAxes are the deliberate asymmetries and the consumer that owns
+// each. The CLI takes harness commands and provider environments from the
+// shared agent library, and the operator runs pods, not terminals.
 var consumerOnlyAxes = map[string]string{
-	"harness":  "operator-only (CLI uses shared pkg/agents)",
-	"provider": "operator-only (CLI uses shared pkg/providers)",
-	"terminal": "cli-only (operator runs pods, not terminals)",
+	"harness":  "operator",
+	"provider": "operator",
+	"terminal": "cli",
 }
 
 func hasDir(base, name string) bool {
@@ -33,38 +27,28 @@ func hasDir(base, name string) bool {
 }
 
 func TestAxisSymmetry(t *testing.T) {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("runtime.Caller failed")
+	operatorRoot := moduleRoot(t)
+	packagesRoot := filepath.Dir(filepath.Dir(filepath.Dir(operatorRoot)))
+	internal := map[string]string{
+		"operator": filepath.Join(operatorRoot, "internal"),
+		"cli":      filepath.Join(packagesRoot, "tooling", "cli", "agent-cli-go", "internal"),
 	}
-	// file = .../agent-operator-go/internal/arch/symmetry_test.go
-	opInternal := filepath.Dir(filepath.Dir(file))
-	opRoot := filepath.Dir(opInternal)
-	cliInternal := filepath.Join(filepath.Dir(opRoot), "agent-cli-go", "internal")
-
-	if _, err := os.Stat(cliInternal); err != nil {
-		t.Skipf("CLI module not found at %s (isolated checkout); skipping cross-module symmetry", cliInternal)
+	if !hasDir(internal["cli"], "") {
+		t.Fatalf("CLI module not found at %s", internal["cli"])
 	}
 
 	for _, axis := range sharedAxes {
-		if !hasDir(opInternal, axis) {
-			t.Errorf("axis %q missing from operator internal/", axis)
+		for consumer, dir := range internal {
+			if !hasDir(dir, axis) {
+				t.Errorf("axis %q is missing from the %s", axis, consumer)
+			}
 		}
-		if !hasDir(cliInternal, axis) {
-			t.Errorf("axis %q missing from CLI internal/", axis)
+	}
+	for axis, owner := range consumerOnlyAxes {
+		for consumer, dir := range internal {
+			if present := hasDir(dir, axis); present != (consumer == owner) {
+				t.Errorf("axis %q in the %s: present %v, want it only in the %s", axis, consumer, present, owner)
+			}
 		}
 	}
-
-	// A consumer-only axis must not silently appear in the other consumer without a
-	// documented reason — that would be an undocumented asymmetry.
-	if hasDir(cliInternal, "harness") {
-		t.Errorf("harness is documented operator-only but exists in CLI internal/")
-	}
-	if hasDir(cliInternal, "provider") {
-		t.Errorf("provider is documented operator-only but exists in CLI internal/")
-	}
-	if hasDir(opInternal, "terminal") {
-		t.Errorf("terminal is documented cli-only but exists in operator internal/")
-	}
-	_ = consumerOnlyAxes // documentation map (asserted individually above)
 }
