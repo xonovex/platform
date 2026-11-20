@@ -91,8 +91,14 @@ func TestCheck(t *testing.T) {
 			level:   findings.Fail,
 		},
 		{
-			name:    "claim without anchor warns",
-			sources: []sources.Source{{ID: "a", Claims: []sources.Claim{{ID: "c"}}}},
+			name:    "a source with no anchored claim opts out of anchor auditing",
+			sources: []sources.Source{{ID: "a", Claims: []sources.Claim{{ID: "c"}, {ID: "d"}}}},
+			want:    []string{sources.CodeOK},
+			level:   findings.Pass,
+		},
+		{
+			name:    "a claim without an anchor beside an anchored one warns",
+			sources: []sources.Source{{ID: "a", Claims: []sources.Claim{{ID: "c"}, {ID: "d", Anchor: "x"}}}},
 			want:    []string{sources.CodeClaimUnanchored},
 			level:   findings.Warn,
 		},

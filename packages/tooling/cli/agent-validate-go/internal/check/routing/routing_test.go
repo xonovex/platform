@@ -2,6 +2,7 @@ package routing_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
@@ -15,15 +16,20 @@ func skillMD(name string) string {
 }
 
 func entry(query string, should bool, split, rationale string) string {
-	return fmt.Sprintf(`{"query":%q,"should_trigger":%t,"split":%q,"rationale":%q}`, query, should, split, rationale)
+	return fmt.Sprintf(`{"id":"q","prompt":%q,"shouldTrigger":%t,"split":%q,"rationale":%q}`, query, should, split, rationale)
+}
+
+// queries wraps entries in a trigger eval document.
+func queries(entries ...string) string {
+	return `{"version":1,"skill":"x","queries":[` + strings.Join(entries, ",") + `]}`
 }
 
 func pair() map[string]string {
 	return map[string]string{
 		"c/a/skills/using-a/SKILL.md":          skillMD("using-a"),
-		"c/a/skills/using-a/eval-queries.json": "[" + entry("alpha", true, "validation", "") + "," + entry("beta", false, "validation", "") + "]",
+		"c/a/skills/using-a/eval-trigger.json": queries(entry("alpha", true, "validation", ""), entry("beta", false, "validation", "")),
 		"c/b/skills/using-b/SKILL.md":          skillMD("using-b"),
-		"c/b/skills/using-b/eval-queries.json": "[" + entry("beta", true, "validation", "") + "," + entry("alpha", false, "validation", "") + "]",
+		"c/b/skills/using-b/eval-trigger.json": queries(entry("beta", true, "validation", ""), entry("alpha", false, "validation", "")),
 	}
 }
 
@@ -48,7 +54,7 @@ func TestPairedOwnersAreClean(t *testing.T) {
 
 func TestSkillWithoutValidationScenario(t *testing.T) {
 	files := pair()
-	files["c/b/skills/using-b/eval-queries.json"] = "[" + entry("beta", true, "train", "") + "," + entry("alpha", false, "validation", "") + "]"
+	files["c/b/skills/using-b/eval-trigger.json"] = queries(entry("beta", true, "train", ""), entry("alpha", false, "validation", ""))
 	got := run(t, files)
 	if !checktest.Has(got, "routing.no-owner") {
 		t.Fatalf("codes = %v", checktest.Codes(got))
@@ -57,7 +63,7 @@ func TestSkillWithoutValidationScenario(t *testing.T) {
 
 func TestConflictingOwners(t *testing.T) {
 	files := pair()
-	files["c/b/skills/using-b/eval-queries.json"] = "[" + entry("Alpha.", true, "validation", "") + "," + entry("beta", true, "validation", "") + "]"
+	files["c/b/skills/using-b/eval-trigger.json"] = queries(entry("Alpha.", true, "validation", ""), entry("beta", true, "validation", ""))
 	got := run(t, files)
 	f, ok := checktest.Find(got, "routing.conflict")
 	if !ok || f.Message == "" {
@@ -67,7 +73,7 @@ func TestConflictingOwners(t *testing.T) {
 
 func TestUnresolvedOperation(t *testing.T) {
 	files := pair()
-	files["c/a/skills/using-a/eval-queries.json"] = "[" + entry("alpha", true, "validation", "uses the `retired-op` operation and the `known` operation and a plain-compound operation") + "," + entry("beta", false, "validation", "") + "]"
+	files["c/a/skills/using-a/eval-trigger.json"] = queries(entry("alpha", true, "validation", "uses the `retired-op` operation and the `known` operation and a plain-compound operation"), entry("beta", false, "validation", ""))
 	files["c/b/skills/using-b/references/known.md"] = "# k\n"
 	files["c/b/skills/using-b/references/sub/x.md"] = "# nested\n"
 	got := run(t, files)
@@ -86,7 +92,7 @@ func TestSkillsWithoutQueriesAreIgnoredAndBrokenQueriesReported(t *testing.T) {
 	files := pair()
 	files["c/c/skills/using-c/SKILL.md"] = skillMD("using-c")
 	files["c/d/skills/using-d/SKILL.md"] = skillMD("using-d")
-	files["c/d/skills/using-d/eval-queries.json"] = "{"
+	files["c/d/skills/using-d/eval-trigger.json"] = "{"
 	got := run(t, files)
 	if !checktest.Has(got, "routing.queries-invalid") || len(checktest.Codes(got)) != 1 {
 		t.Fatalf("codes = %v", checktest.Codes(got))
@@ -96,7 +102,7 @@ func TestSkillsWithoutQueriesAreIgnoredAndBrokenQueriesReported(t *testing.T) {
 func TestMissingSkillName(t *testing.T) {
 	files := pair()
 	files["c/e/skills/using-e/SKILL.md"] = "# no frontmatter\n"
-	files["c/e/skills/using-e/eval-queries.json"] = "[" + entry("q", true, "train", "") + "]"
+	files["c/e/skills/using-e/eval-trigger.json"] = queries(entry("q", true, "train", ""))
 	if got := run(t, files); !checktest.Has(got, "routing.name-missing") {
 		t.Fatalf("codes = %v", checktest.Codes(got))
 	}

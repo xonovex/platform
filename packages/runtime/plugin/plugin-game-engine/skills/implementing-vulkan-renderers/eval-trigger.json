@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "skill": "implementing-vulkan-renderers",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: concrete VkImageMemoryBarrier2 masks + layout transition + vkCmdPipelineBarrier2"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "we're calling vkAllocateMemory once per VkImage and hit maxMemoryAllocationCount on big levels. How do I pick memory types from VkPhysicalDeviceMemoryProperties and sub-allocate from a few large VkDeviceMemory blocks honoring VkMemoryRequirements alignment",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: Vulkan device-memory types/heaps, allocation cap, sub-allocation, alignment"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "I want one giant sampler2D array the shader indexes by an integer. How do I set up VkDescriptorSetLayout with update-after-bind and descriptor indexing and use nonuniformEXT",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: Vulkan bindless via descriptor indexing / UPDATE_AFTER_BIND + nonuniformEXT"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "replace our binary VkSemaphores between the graphics and async-compute queues with a single timeline VkSemaphore we can also wait on from the CPU with vkWaitSemaphores",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: Vulkan timeline VkSemaphore for queue handoff + host wait"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "upload a static vertex buffer to DEVICE_LOCAL memory through a HOST_VISIBLE staging buffer with vkCmdCopyBuffer, then barrier transfer-write to vertex-read before the draw",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: Vulkan staging upload + vkCmdCopyBuffer + transfer->read barrier"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "switch our renderer from VkRenderPass/VkFramebuffer objects to VK_KHR_dynamic_rendering with vkCmdBeginRendering, and persist a VkPipelineCache to disk to kill first-draw stalls",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: Vulkan dynamic rendering + VkPipelineCache persistence"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "how should I lay out VkCommandPool per worker thread per frame and reset with vkResetCommandPool, and wire vkAcquireNextImageKHR / vkQueueSubmit2 / vkQueuePresentKHR with a VkFence per frame",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "direct: Vulkan command pools, swapchain acquire/present, fence per frame"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "our renderer hand-writes a barrier before and after every pass and it breaks when we reorder. I want passes to just declare what they read and write and have ordering and transitions derived, conceptually",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: API-agnostic render-graph architecture -> designing-gpu-renderers, no Vk* how-to"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "what's the general model for grouping bindings by update frequency and why does bindless help, no specific API, just the architecture",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: agnostic binding-model concept -> designing-gpu-renderers"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "set up the D3D12 resource barriers and root signature for my deferred renderer",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: another explicit API (D3D12), not Vulkan"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "set up a three.js scene with orbit controls and a glTF model and postprocessing",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: high-level web 3D -> using-threejs"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "what oldLayout/newLayout and queue-family ownership transfer do I need to move a VkImage written on the dedicated transfer queue to be sampled on the graphics queue",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: Vulkan layout transition + queue-family ownership transfer barrier"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "build a graphics VkPipeline with VkPipelineRenderingCreateInfo and dynamic viewport/scissor state, sharing one VkPipelineCache across vkCreateGraphicsPipelines calls",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: Vulkan pipeline + dynamic state + pipeline cache + dynamic rendering formats"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "explain the conceptual difference between device-local and host-visible GPU memory tiers and when to stage uploads: keep it API-neutral",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "validation negative: agnostic gpu-memory-strategy -> designing-gpu-renderers, no Vk* specifics"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "tune my WebGL draw-call batching and instancing in the browser to keep the framerate up",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: high-level web 3D, not Vulkan"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-gpu-renderers"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by managing-memory"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by designing-gpu-renderers"
+    }
+  ]
+}

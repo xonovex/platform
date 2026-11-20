@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "preamble": "Product-specific facts are pinned to the documentation snapshot below. The local runtime probe for this implementation returned `not-installed`; documentation conformance is not runtime conformance.",
+  "sources": [
+    {
+      "id": "pi-extensions",
+      "kind": "web",
+      "title": "Pi extensions",
+      "urls": ["https://pi.dev/docs/latest/extensions"],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Events, event ordering, tool blocking and mutation, result middleware, context injection, compaction, custom tools, output limits, session behavior, and full-process extension authority."
+        }
+      ]
+    },
+    {
+      "id": "pi-packages-settings-skills-and-security",
+      "kind": "web",
+      "title": "Pi packages, settings, skills, and security",
+      "urls": [
+        "https://pi.dev/docs/latest/packages",
+        "https://pi.dev/docs/latest/settings",
+        "https://pi.dev/docs/latest/skills",
+        "https://pi.dev/docs/latest/security"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Package sources and pins, install/update/remove, user/project scopes, filters, project trust, skill discovery, full system access, and absence of a built-in sandbox."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh workflow",
+      "text": "1. Re-fetch the official pages above and compare event, handler, configuration, trust, and lifecycle behavior.\n2. Run the documented version probe and replace `not-installed` only with the observed version.\n3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.\n4. Update the matrix version and review date when behavior changes.",
+      "after": "pi-packages-settings-skills-and-security"
+    }
+  ]
+}

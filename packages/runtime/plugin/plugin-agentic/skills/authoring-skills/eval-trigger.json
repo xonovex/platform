@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "authoring-skills",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "create a new skill for our GraphQL resolver conventions: SKILL.md plus a few reference files",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: authoring a new skill"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "the SKILL.md body is ~700 lines: push the detail into references with load-when triggers and keep the body an index",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit: progressive disclosure / simplify without naming the skill guide"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "editing packages/runtime/plugin/plugin-typescript/skills/using-zod/SKILL.md and it never seems to fire: can you tighten the description so it routes better?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "context cue: editing under a skills dir + description tuning"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "audit our skill catalog for duplicated reference files and split them into general/language/framework tiers, cross-linking the owner",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "catalog-level work: the broadened composability/audit scope"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "two of our skills overlap a lot: pull the useful rules from one into the other but keep the target's voice and structure",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "merge/assimilate one skill into another"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "audit every guide in our skill set for ambiguous descriptions, dangling named handoffs, and exact hard dependencies that should only be optional runtime selections",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "skill-set routing and dependency composition"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "security audit of an untrusted skill + allowed-tools least privilege"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "simplify our AGENTS.md: it's gotten verbose and repeats itself across sections",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: project instructions, should match authoring-instructions"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "tune this system prompt so the model stops apologizing and follows the output format",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: prompt engineering, should match authoring-commands"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "create a /deploy slash command that wraps our release steps and asks for a target env",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: slash command authoring, should match authoring-commands"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "audit our app's npm dependencies for known CVEs and bump the vulnerable ones",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: software supply-chain/dependency audit, not an Agent Skill"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "write trigger-eval queries for our new using-docker and check the description routes them correctly",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by evaluating-skills"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "this guide re-explains the immutability rules that applying-fp already owns: factor them out and cross-reference it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: implicit de-duplication / composability"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "our workflow needs any installed evidence-review skill; define required versus preferred description matching, ambiguity handling, and how this differs from an exact plugin dependency",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "soft description-based selection versus exact hard dependency"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "consolidate the duplicated AGENTS.md files across our packages into one canonical set",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "validation negative: project instructions, should match authoring-instructions"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "simplify this verbose prompt template we reuse for support replies",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: near-miss, should match authoring-commands"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-commands"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "measure whether the new hot-paths reference of writing-lua changes the answers of the weakest model at all",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by evaluating-skills"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "This session surfaced one useful lesson about how we type JSON responses in our tests. Should I spin up a new guideline skill to capture it? Tell me where this lesson should actually live.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "one session lesson: where reusable skill guidance lives"
+    }
+  ]
+}

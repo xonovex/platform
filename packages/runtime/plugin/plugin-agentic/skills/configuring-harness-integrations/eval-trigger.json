@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "configuring-harness-integrations",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "compare how Claude Code, Codex and Pi can each block a protected-path write",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "cross-harness capability comparison"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "write the capability matrix identity fields for a new agent harness",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "capability matrix shape"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "preview, apply and roll back a guardrail hook across harnesses with explicit authorization",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "transactional onboarding"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "what is the guarantee boundary of a hook and what must be enforced independently",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "guarantee boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "choose deterministic hook versus model evaluator versus specialist agent for a stop check",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "executor classes"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "disable and roll back a guardrail plugin I added to an agent harness, touching only what I added",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "owned-entry disable and rollback"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "which Codex hooks.json event runs before a shell command, and what is its exact JSON shape",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-codex"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "write a Pi extension tool_call handler that blocks rm -rf",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-pi"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "set allowManagedHooksOnly in Claude Code managed settings",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-claude-code"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "write a Python function that retries a request with backoff",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "unrelated coding task"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "explain ports and adapters for a payment service",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-hexagonal-architecture"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "detect configuration drift of a hook after a harness release across any harness",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "drift detection"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "map semantic intents like tool before use to native events for several harnesses",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "semantic intents"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "create a Kiro hook file under .kiro/hooks that runs a command on file save",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-kiro"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "add an OpenCode plugin that mutates shell environment",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-opencode"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "set up GitHub Copilot cloud agent hook files",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-copilot"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "shorten my AGENTS.md rules",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    }
+  ]
+}

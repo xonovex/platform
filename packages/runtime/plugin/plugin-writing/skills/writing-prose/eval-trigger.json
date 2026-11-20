@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "writing-prose",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Make this paragraph clearer and shorter without changing its meaning or tone.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "general prose clarity"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Remove filler and repeated conclusions from this internal update.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "general concision"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "These sentences use customer, client, and account holder for the same person. Make the terminology consistent.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "stable terminology"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Rewrite this note so every pronoun has a clear referent and each sentence makes one point.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "sentence and referent clarity"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Tighten this recommendation and keep each measurement beside the claim it supports.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "claim and evidence alignment"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Can you turn this wordy message into plain, direct prose while preserving every fact?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "plain writing request"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Fix the ambiguous comparisons in this short report and state which baseline each percentage uses.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "precise comparison context"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Edit this memo so it uses active subjects, concrete verbs, and no setup narration.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "plain prose mechanics"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Write a destination guide for Lisbon with current prices, opening hours, and multilingual frontmatter.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "travel writing workflow"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Add three bilingual news posts about this week's battery announcements.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "news writing workflow"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Rewrite this engineering incident report so impact and current status come before the timeline.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "technical writing structure"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Make this lifestyle article sound less robotic and give it a warmer editorial voice.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "editorial writing specialization"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Fix the type errors in this TypeScript module and run its unit tests.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "code implementation"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Create a pull request description with testing and rollout sections.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "pull request artifact"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Translate this paragraph from English to Dutch without editing it.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "translation only"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Split this product request into user stories with acceptance criteria.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "user story authoring"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "Humanize this venue description, remove travel cliches, and preserve all verified details.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-editorials"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "Our project README rambles. Cut it to about half its length but keep every install command and config option.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "shortening a README is concision"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "restructure the incident report so the outcome and the action come first, then the evidence",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-technical-docs"
+    }
+  ]
+}

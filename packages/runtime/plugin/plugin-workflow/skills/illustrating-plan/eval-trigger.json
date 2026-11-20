@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "illustrating-plan",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "draw the settled stuff for plans/notify-v2 - checkout-api, the kafka topic, the mailer. just the lead picture, svg next to the puml",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "lead diagram of the settled state"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "retry decision is still open: either payment-gateway retries itself or a retry-worker polls the outbox. can you sketch both so the reviewers see who calls who",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "one option diagram for a decision that changes the topology"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "we flipped the auth decision to the token-exchange service yesterday, so diagrams/auth-option.puml is stale now. redraw them",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "redraw after a decision changed"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "render the .puml files under plans/search-index/diagrams to svg. no plantuml on this box but podman is there",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "render with a container runtime"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "which of the open decisions in plans/billing-sync actually need a picture? some are just field lists",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "choosing which decisions deserve a diagram"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "confluence won't show svg, give me png renders of the invoice-feed diagrams and the embed lines",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "PNG on request"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "sequence diagram for order-router comes out cut off on the right at 4096px, fix the layout and re-render",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "wide diagram cropped by the renderer"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "one structurizr model for the fulfillment change please, so the lead and both option views come from the same system model",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "system model feeding several views"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "need a picture of where rate limiting sits today vs the two options for the edge-proxy change before tomorrow's review",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "lead and option diagrams of a change, no workflow vocabulary"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "plans/reminders has the decisions done, make the diagrams for it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "diagrams for a change directory"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "embed diagrams/notify-lead.svg in plan.md under the objective and fold in the FIXME notes I left",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "plot p95 latency per endpoint from this csv as a line chart for the ops dashboard",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: a chart of measured data, which this skill does not draw"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "write the plan for the billing-sync change from the research and the settled decisions",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "before we approve the edge-proxy plan, poke holes in it: what breaks if the cache is cold",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "ask me the open questions on the retry design one by one and write down what I pick",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "add an architecture section with a component diagram to the README of order-router",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-technical-docs"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "look at the diff on feat/retry-worker and tell me if the polling loop can double-send",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "figure out how search-index is fed today across the crawler and the two apps before we choose anything",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by researching-change"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "we kept redrawing pictures by hand this session, turn that lesson into a rule in AGENTS.md",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "turn the way we picked which decisions get a diagram today into a reusable skill",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    }
+  ]
+}

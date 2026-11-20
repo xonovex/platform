@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "skill": "preparing-delivery",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "retry-from-settings-7k2f is finished in ../shop-app-wt, write me the commit message with the decisions it follows and the link to the plan",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "commit message for a finished work item"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "need a PR description for the saved-searches item, only tick the criteria if the verdict still matches what's in the worktree now",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "description with verdict matching"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "we ship straight to main here so just the commit message for invoice-rounding, put why we picked banker's rounding in the body",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "trunk mode, commit message only"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "write the commit msg and PR text for feature/checkout-cleanup plus a reviewer comment on the module split in src/checkout/index.ts",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "all three delivery files"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "i changed src/cache/warm.ts after validation ran, redo the PR description so it doesn't claim the criteria pass",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "stale verdict handled"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "add a comment for the reviewer on line 42 of src/ledger/post.ts explaining why we round before summing, and make it so a rerun updates it instead of adding a second one",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "inline comment with a marker"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "describe this change for the reviewers of the loyalty ledger work: what it does, which decisions it follows, how it was tested. keep it under what the host accepts",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "short description within the limit"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "the implementer's test output is in the notes for profile-sync, write the PR text and show which checks are self-checks and which were validated independently",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "self-check labelling"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "prep the delivery for work/points-balance-endpoint-3m4q: commit message, description, anything the reviewer needs to know",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "all delivery files for one work item"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "before i open the PR for feature/sso-timeout, write the description from the work file and the verdict. don't push or commit anything yet",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "description only, nothing applied"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "delivery files look good, commit it, push feature/retry-from-settings-7k2f and open the PR on github",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "squash my last 4 commits on feature/ledger-rounding into one and force push with lease",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "write a PR description for my hotfix branch fix/session-cookie, no work file or anything, just go from the diff",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "post these two review comments on MR 214 in our gitlab project for src/billing/invoice.ts",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "turn what we learned in this session about the retry settings into rules for AGENTS.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "post this comment on line 30 of src/retry.ts in the open github PR #88",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "review the diff in src/billing/invoice.ts for bugs and leave comments i can paste",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn the lessons from this session into a new skill so the next agent doesn't repeat the cache-key mistake",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "check if the points-balance-endpoint item really meets its criteria and give me a verdict for the worktree",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "git commit the staged changes in the shop-app worktree with a conventional message for the fix in src/cart.ts",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "build work/points-balance-endpoint-3m4q in its own worktree and run whatever checks its criteria list",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by implementing-work-item"
+    }
+  ]
+}

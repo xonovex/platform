@@ -64,6 +64,12 @@ func SkillDirs(t tree.Tree, paths []string) ([]string, error) {
 	return out, nil
 }
 
+// TriggerFile and OutputFile name the eval documents of a skill.
+const (
+	TriggerFile = "eval-trigger.json"
+	OutputFile  = "eval-output.json"
+)
+
 // Query is one routing query of a skill.
 type Query struct {
 	Text          string
@@ -72,46 +78,19 @@ type Query struct {
 	Rationale     string
 }
 
-// ReadQueries reads the eval-queries.json of a skill. It accepts the list form
-// and the versioned object form, and reports whether the file exists. A file
-// that holds no valid query list is an error.
+// ReadQueries reads the trigger eval document of a skill and reports whether
+// the file exists. A file that holds no valid query list is an error.
 func ReadQueries(t tree.Tree, skillDir string) ([]Query, bool, error) {
-	file := path.Join(skillDir, "eval-queries.json")
+	file := path.Join(skillDir, TriggerFile)
 	text, ok, err := t.Optional(file)
 	if err != nil || !ok {
 		return nil, false, err
 	}
-	var raw any
+	var raw map[string]any
 	if err := json.Unmarshal([]byte(text), &raw); err != nil {
 		return nil, true, fmt.Errorf("invalid JSON in %s: %w", file, err)
 	}
-	if object, isObject := raw.(map[string]any); isObject {
-		return readObjectQueries(t, skillDir, file, object)
-	}
-	list, isList := raw.([]any)
-	if !isList || len(list) == 0 {
-		return nil, true, fmt.Errorf("invalid queries in %s: must contain at least one query", file)
-	}
-	queries := make([]Query, 0, len(list))
-	for i, item := range list {
-		entry, isEntry := item.(map[string]any)
-		query, hasQuery := entry["query"].(string)
-		should, hasShould := entry["should_trigger"].(bool)
-		if !isEntry || !hasQuery || query == "" || !hasShould {
-			return nil, true, fmt.Errorf("invalid queries in %s: entry %d needs a query and should_trigger", file, i+1)
-		}
-		rationale, _ := entry["rationale"].(string)
-		split, _ := entry["split"].(string)
-		if split != "" && split != "train" && split != "validation" {
-			return nil, true, fmt.Errorf("invalid queries in %s: entry %d has the split %q", file, i+1, split)
-		}
-		queries = append(queries, Query{Text: query, ShouldTrigger: should, Split: split, Rationale: rationale})
-	}
-	return queries, true, nil
-}
-
-func readObjectQueries(t tree.Tree, skillDir, file string, object map[string]any) ([]Query, bool, error) {
-	list, _ := object["queries"].([]any)
+	list, _ := raw["queries"].([]any)
 	if len(list) == 0 {
 		return nil, true, fmt.Errorf("invalid queries in %s: must contain at least one query", file)
 	}
@@ -119,20 +98,20 @@ func readObjectQueries(t tree.Tree, skillDir, file string, object map[string]any
 	for i, item := range list {
 		entry, isEntry := item.(map[string]any)
 		should, hasShould := entry["shouldTrigger"].(bool)
-		text, _ := entry["prompt"].(string)
-		if promptFile, ok := entry["promptFile"].(string); ok && text == "" {
+		prompt, _ := entry["prompt"].(string)
+		if promptFile, ok := entry["promptFile"].(string); ok && prompt == "" {
 			read, err := t.Read(path.Join(skillDir, promptFile))
 			if err != nil {
 				return nil, true, fmt.Errorf("invalid queries in %s: entry %d: %w", file, i+1, err)
 			}
-			text = strings.TrimSpace(read)
+			prompt = strings.TrimSpace(read)
 		}
-		if !isEntry || text == "" || !hasShould {
+		if !isEntry || prompt == "" || !hasShould {
 			return nil, true, fmt.Errorf("invalid queries in %s: entry %d needs a prompt and shouldTrigger", file, i+1)
 		}
 		split, _ := entry["split"].(string)
 		rationale, _ := entry["rationale"].(string)
-		queries = append(queries, Query{Text: text, ShouldTrigger: should, Split: split, Rationale: rationale})
+		queries = append(queries, Query{Text: prompt, ShouldTrigger: should, Split: split, Rationale: rationale})
 	}
 	return queries, true, nil
 }

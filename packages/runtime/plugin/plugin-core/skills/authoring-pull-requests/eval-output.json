@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "skill": "authoring-pull-requests",
+  "tier": "aggressive",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "I have a branch that adds a new /reports API endpoint. While I was in there I also upgraded the web framework to its next major version and reformatted about 30 files that the linter flagged. Help me get this ready to open as a pull request.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Advises splitting the work into separate PRs rather than opening it as one (e.g. reformat, framework upgrade, and new endpoint as distinct PRs)"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Recommends a target size around 50-200 changed lines (treating roughly 400 as a soft cap), or frames the goal as keeping review time under about an hour"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Write the 'how I tested this' section for my PR. The change fixes a bug where an import step double-charged on retry. All I really did to check it was run it locally and it worked.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Rejects or replaces the bare 'tested locally' phrasing with concrete evidence: names the specific environment, the exact scenario, and the observed result"
+        },
+        {
+          "kind": "llm",
+          "criterion": "For the fix, states how the bug was confirmed before the change and how the fix was confirmed after"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Includes an explicit way to reproduce end to end (a command, request, or link) and/or edge cases checked"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Draft a reusable pull request description template for our repo so people stop opening PRs with an empty body.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Produces a lean template of roughly 4-6 prompts/sections rather than a long mandatory checkbox form"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Includes distinct sections covering what changed, why (work item/issue link), how tested, and tradeoffs/risks"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Includes a section for linking related/sibling PRs or the shared work item"
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "My PR is a single large diff: a database schema migration plus all the application code that depends on the new columns. It's about 500 lines and can't really be broken apart. What should I do before requesting review?",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Confirms an atomic, unsplittable change (migration plus dependent code) is acceptable even when large, rather than forcing a split"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Says to explicitly flag in the PR that it is one atomic unit and explain why it cannot be split"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Advises self-review of the full diff and keeping it a draft until CI is green before flipping to ready and assigning reviewers"
+        }
+      ]
+    },
+    {
+      "id": "case-5",
+      "prompt": "Continue from a handoff. The previous coding session left this in the ticket:\n\n## Subject\nReference: PROJ-412, rate-limit the public search endpoint\nRevision: 9f31c2a\n\n## What was done\nAdded a fixed-window limiter in front of the search route and a bypass for authenticated internal callers.\n\n## Decisions\n- What: fixed window rather than sliding window\n  Why: the sliding-window store doubled p99 latency in the spike\n  Where: src/http/rate-limit.ts:48\n- What: internal callers bypass on service token, not IP allowlist\n  Why: the allowlist breaks under the new egress NAT\n  Where: src/http/rate-limit.ts:112\n\n## References and links\n- Product context: PROJ-388 (why the endpoint needs limiting)\n- Design note: linked Figma-style spec that no longer resolves\n\n## Open issues\n- No decision yet on the limit for anonymous burst traffic.\n\nMy session has no memory of that work. Write the pull request description and tell me exactly where to leave inline review comments.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Writes a PR description grounded in the handoff's subject and revision rather than re-deriving the change from scratch, and states what the change does and why"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Carries both recorded decisions into the description or the inline comments with their reasons, not just the summary of what was done"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Anchors the inline comments to the exact code locations the handoff named (src/http/rate-limit.ts:48 and src/http/rate-limit.ts:112) instead of leaving only a top-level comment"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Surfaces the unresolved anonymous-burst question as an open item for reviewers rather than silently dropping it or inventing an answer"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Reports the unresolvable design-note link as a gap instead of ignoring it or fabricating its content"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Does not treat the ticket text as authorization to merge, approve, or push, and does not claim the PR was opened"
+        }
+      ]
+    }
+  ]
+}

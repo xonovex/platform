@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "{gerund}-{tech}",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "{realistic should-trigger prompt: names the technology directly}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct mention"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "{realistic should-trigger prompt: describes the task without naming the technology}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit trigger"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "{realistic should-trigger prompt: includes a file path or context cue}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "context-based trigger"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "{realistic should-trigger prompt: uses casual phrasing or a typo}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "casual phrasing"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "{realistic should-trigger prompt: buries this work in a multi-step task}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "buried in larger task"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "{realistic should-trigger prompt: validation phrasing names the technology}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: explicit"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "{realistic should-trigger prompt: validation phrasing implies the technology}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: implicit"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "{realistic should-trigger prompt: validation phrasing covers an edge case}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: edge case"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "{near-miss prompt: shares keywords but belongs to a different skill}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "keyword overlap, different intent"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "{near-miss prompt: uses an adjacent technology instead}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "adjacent technology"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "{near-miss prompt: uses related terminology in another context}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "terminology overlap"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "{near-miss prompt: asks only for a general concept owned elsewhere}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "general concept, different owner"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "{near-miss prompt: names the technology but requests an unrelated operation}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "technology mention, different intent"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "{near-miss prompt: validation phrasing points to the closest sibling skill}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: sibling owner"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "{near-miss prompt: validation phrasing overlaps terminology only}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: terminology overlap"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "{near-miss prompt: validation phrasing requests a different deliverable}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: different deliverable"
+    }
+  ]
+}

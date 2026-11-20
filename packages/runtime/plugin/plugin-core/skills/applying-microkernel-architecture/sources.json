@@ -1,0 +1,104 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "microkernel-plug-in-architecture-pattern",
+      "kind": "web",
+      "title": "Microkernel / plug-in architecture pattern",
+      "citation": "\"Software Architecture Patterns\": microkernel architecture (Mark Richards, O'Reilly)",
+      "urls": [
+        "https://www.oreilly.com/library/view/software-architecture-patterns/9781098134280/ch04.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/core-plugins-registry.md", "references/wiring.md"],
+      "usage": ["`SKILL.md` → Essentials, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Minimal core + plug-in components + registry (name, data contract, connection); plug-ins isolated via standard contracts; adapter for non-conforming plug-ins → `references/core-plugins-registry.md`, `references/wiring.md`"
+        }
+      ]
+    },
+    {
+      "id": "secure-by-default",
+      "kind": "web",
+      "title": "Secure-by-default",
+      "citation": "\"The Protection of Information in Computer Systems\" (Saltzer & Schroeder, 1975); capability-based security",
+      "urls": [
+        "https://www.cs.virginia.edu/~evans/cs551/saltzer/",
+        "https://en.wikipedia.org/wiki/Capability-based_security"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/capabilities-fail-closed.md"],
+      "usage": ["`references/capabilities-fail-closed.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Fail-safe defaults, principle of least authority, complete mediation, ambient authority"
+        }
+      ]
+    },
+    {
+      "id": "binding-time-software-product-lines",
+      "kind": "web",
+      "title": "Binding time (software product lines)",
+      "citation": "Feature-binding analysis / SPLE (Lee & Kang; Pohl, Böckle & van der Linden)",
+      "urls": ["https://link.springer.com/book/10.1007/3-540-28901-1"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/binding-time.md"],
+      "usage": ["`references/binding-time.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Compile/load/run-time binding spectrum; binding unit/technique/time; compositional vs annotative variability"
+        }
+      ]
+    },
+    {
+      "id": "wiring-anti-patterns",
+      "kind": "web",
+      "title": "Wiring anti-patterns",
+      "citation": "\"Service Locator is an Anti-Pattern\" (Mark Seemann)",
+      "urls": [
+        "https://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/wiring.md"],
+      "usage": ["`references/wiring.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Dependency injection vs service locator; resolve at the composition root, inject the dependency"
+        }
+      ]
+    },
+    {
+      "id": "metapatterns-lens-one-author-synthesis-non-canonical",
+      "kind": "web",
+      "title": "Metapatterns lens (one-author synthesis, non-canonical)",
+      "citation": "\"Architectural Metapatterns\" / \"Introduction to Software Architecture With Actors\" (Denys Poltorak)",
+      "urls": [
+        "https://github.com/denyspoltorak/metapatterns",
+        "https://metapatterns.io/"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/metapatterns-lens.md"],
+      "usage": ["`references/metapatterns-lens.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The \"microkernel regarded as multiple ports-and-adapters cores sharing a common middleware\", \"middleware-gateway\", and \"distributed microkernel relates to mesh\" framings: recorded explicitly as one author's non-canonical synthesis, with caveats (OS-vs-pattern conflation; gateway is a sub-type of middleware; a service mesh is a networking data plane and does not virtualize system resources). Single-author, self-published CC catalogue, not standard CS doctrine."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed**",
+      "after": "metapatterns-lens-one-author-synthesis-non-canonical"
+    }
+  ]
+}

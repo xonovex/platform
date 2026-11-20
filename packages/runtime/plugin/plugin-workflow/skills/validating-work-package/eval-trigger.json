@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "skill": "validating-work-package",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "all 4 work items of the fare-capping package are done, close it out. which criteria are actually met, gated or still open? re-run the checks, don't trust the notes",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "close out a delivered package"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "is the plan done? check each success criterion in plans/fare-capping/plan.md against what is on main right now",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "is the plan done"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "handing the billing-export stuff to Sara's team tomorrow, write up what's finished, what's blocked and by whom, and what's left",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "handover record"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "both verdicts pass but i don't trust it. check that pricing-service and shop-app actually work together, capped_total vs cappedTotal and so on",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "integration between items"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "what's left after this package? one seed per chunk of remaining work, with the current state evidenced and what gates it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "follow-up seeds for remaining work"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "we paused the cert-rotation work until the bank signs off. record where it stands and classify what blocks it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "paused package with a gate"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "wrap up the search-migration package: list the decisions nobody made, with options, and the points we dropped on the way",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "register of unsettled decisions"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "every item in the checkout package says done. do the success criteria agree? check from scratch today with someone who didn't build it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "independent check of the whole package"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "the app-total delivery is prepared but nobody committed it. tell me what the package really achieved given that",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "delivery prepared and not applied"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "close-out for plans/loyalty-points please, fresh reviewer, no taking the implementer's word for anything",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "close-out in a fresh context"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "check the retry-backoff item against its 3 acceptance criteria and write the verdict with the tree hash of the worktree",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "did the receipt-export item pass its criteria? run the checks on feat/receipt-export in a fresh context, i don't want the implementer's word",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "review my diff on fix/token-refresh for bugs and style problems, give me comments i can paste into the review",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "write the commit message and the PR description for the app-total change on feat/fare-cap",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by preparing-delivery"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "the close-out says we need a new success criterion. update plan.md and the work files and record what changed",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "nobody decided who owns the retry budget. take me through that question and record my answer as a decision",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "red-team plans/fare-capping/plan.md before i approve it and rank what could go wrong",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn what we learned in this session about the flaky ci-shard failures into rules for AGENTS.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "make a skill out of how we triaged the flaky ci-shard failures today so the next person can reuse it",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "write user stories for the family-ticket checkout from the parent's point of view, with acceptance criteria",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "i built the receipt export item myself so dont take my word for it, get an independent verdict on work/receipt-export-9d1c",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-item"
+    }
+  ]
+}

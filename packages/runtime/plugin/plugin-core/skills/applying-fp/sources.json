@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "xonovex-functional-style-conventions",
+      "kind": "original",
+      "title": "Xonovex functional-style conventions",
+      "provenance": "Repository-original coding conventions shared by Xonovex projects",
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` guidance on pure functions, immutable data, explicit context, module-level functions, composition, and avoiding shared mutable state."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The skill is a deliberately small house-style overlay; language-specific functional APIs remain owned by their language guides."
+        }
+      ]
+    }
+  ]
+}

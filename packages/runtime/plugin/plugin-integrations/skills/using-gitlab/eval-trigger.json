@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "skill": "using-gitlab",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "open a merge request against main with glab on this GitLab repo",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "create MR via glab: core op"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "I pushed my branch, now create an MR on gitlab.com and add reviewers",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "create MR with reviewers/labels"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "post an inline review comment anchored to line 42 of a file on a GitLab merge request",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "position-anchored discussion via POST /discussions"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "my inline MR comment came back as a plain note instead of attaching to the diff. What's wrong with the position SHAs?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "DiffNote downgrade / three-SHA position model"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "resolve the discussion thread on my GitLab merge request and reply in it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "resolve thread via PUT discussions?resolved=true"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "block this MR from merging until my feedback is addressed without the Premium request-changes feature",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "withhold approval / unresolved threads gating"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "what token scope does glab need to create a merge request and post comments: is read_api enough?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "api vs read_api scope question"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "set up glab against our self-managed GitLab instance and verify access",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "auth login --hostname / onboarding / read verify"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "approve a merge request from the command line on GitLab",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "glab mr approve verdict"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "why does a second glab mr create on the same branch fail with 409?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "one-open-MR-per-branch idempotency"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "onboard a SHA-pinned GitLab CI/CD component with typed inputs and enforce it through a group pipeline execution policy",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "GitLab-native reusable CI and centrally injected policy enforcement"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "create a GitLab issue with assignees labels milestone due date and task type",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GitLab-native ticket creation and metadata"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "move issue 42 from Ready to Doing on a GitLab issue board without dropping unrelated labels",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GitLab label-list board semantics"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "publish versioned decision context to this GitLab issue and merge request for a later agent session",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "durable GitLab issue and merge-request notes"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "use GitLab work item Status when supported and fall back to a configured label board on older Free instances",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "version and tier aware kanban status"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "how do GitLab pipeline execution policy job suffix conflicts and project versus group policy merge order work",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "GitLab-native policy precedence and naming behavior"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "open a pull request and request reviewers on a GitHub-hosted repo with gh",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: GitHub host, not GitLab"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "rebase my feature branch onto origin/main and force-push before opening the MR",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: local git rebase/push, use using-git"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "how should I label my review feedback blocking vs non-blocking and structure the summary?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: review comment craft, use reviewing-code"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "what should I write in the pull request description and how do I split a large change?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: PR description craft, use authoring-pull-requests"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "how should I mark a review comment so the author knows it must be fixed before merge?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "ship this",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "help me write a good pull request description for this change",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "open a pull request against main with reviewers and a label using the gh CLI",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-github"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "writing-typescript",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: TS file + typing intent"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "this is throwing 'Cannot find module' on `import { foo } from './bar'`. What's the ESM dance for relative imports",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "ESM import question"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "convert this Promise.all-with-side-effects mess to a clean async function in src/jobs/sync.ts",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "async/await refactor in TS"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "drop the barrel export in shared/index.ts and import directly from each module",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "anti-barrel guidance"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "tighten this `any` in src/utils/parseDate.ts to something usable",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "strict typing intent"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "make PORT a typed env var with a default of 3000 instead of the loose process.env.PORT we have now",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "env handling"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "fix the inferred return type on this generic helper. It widens to `unknown` and the callers all have to assert",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "type inference"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "build a Hono route that returns a typed JSON response and validates the body",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match using-hono"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "spec out the validation schema with z.object for the contact form payload",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match using-zod"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "write a Vitest test for parseDate covering DST edges",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match using-vitest"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "translate the Dutch and German strings in the app's i18n bundle",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "i18n, not TS work"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "we're stuck on Node 14 and can't move to ESM right now: leave this CommonJS",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "CommonJS-only context, skill skips this"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "the strict-mode flag is off in this package's tsconfig: turn it on and fix what falls out",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "strict mode"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "TS idioms"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "the discriminated union in src/events/Event.ts isn't narrowing in the switch: what's wrong",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "type narrowing"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "convert these callback-style filesystem helpers to async/await:\nfs.readFile(p, 'utf8', (e, d) => e ? cb(e) : cb(null, JSON.parse(d)))",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "async refactor"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "the readonly modifier isn't propagating through the array-of-record return type, can you fix the types in src/cache/Store.ts",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "readonly typing"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "add bodyLimit middleware to all routes in our Hono app",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: should match using-hono"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "set up the Dockerfile for production deploys with multi-stage builds",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: should match using-docker"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "fix the failing assertion in user.spec.ts: it expects 200 but we return 204",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: test work, should match using-vitest"
+    }
+  ]
+}

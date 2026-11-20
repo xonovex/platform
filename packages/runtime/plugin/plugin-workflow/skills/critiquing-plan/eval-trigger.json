@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "skill": "critiquing-plan",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "plans/fare-capping/plan.md is done, red-team it before alex signs off",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "red-team review of a written plan"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "pre-mortem on the checkout-v2 rollout doc: assume it blew up in six months, what went wrong?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "pre-mortem lens without the word plan"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "poke holes in the orders-db migration approach before we approve it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "adversarial review before approval without the word plan"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "what could go wrong with the plan for moving search onto opensearch? don't change it, just give me the risks graded by severity",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "graded findings without revising"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "get a fresh agent that didn't write it to review plans/rate-limits/plan.md, blind first and then with the decisions",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "independent two-pass review"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "steelman the weakest section of the invoice-feed plan, what's the smallest change that would make it hold up",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "steelman lens"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "I wrote plans/saved-searches myself so I'm biased. can something independent stress-test its assumptions before sign-off?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "independent stress test of assumptions"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "try to falsify the success criteria in the notifications rollout, can anyone actually observe them?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "falsify lens without the word plan"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "the plan got revised yesterday after the last review, critique the new version from scratch",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "a new critique of a revised plan"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "which inputs or orderings does the cache-layer proposal miss? grade each one",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "missed inputs and sequences without the word plan"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "apply the critique findings to plans/fare-capping/plan.md and tighten the success criteria",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "I left FIXME notes all over plans/invoice-feed, fold them into the plan and the work files",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "the review raised three open questions about retention, go through them with me one at a time",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "interview me about the unresolved choices for the payout schedule before anything gets written",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "review the diff on my pricing-service branch for bugs before I open the PR",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "look over the changes to src/cap.kt for race conditions and missing error handling",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "check that the daily-cap-api work item meets its acceptance criteria in its worktree",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "all items of the loyalty package are merged, did we actually hit the success criteria? write the close-out",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by validating-work-package"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "research and decisions for invoice-feed are in, write plan.md and outline the work",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "this session kept going wrong the same way, turn those lessons into rules in our AGENTS.md",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "review the description of my new SKILL.md, I think it triggers on too many prompts",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "I want a fourth option for the cache question: keep it in redis but one per region. check that against cache-gateway before you recommend anything",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "reporting module cleanup: quality research is done and the decisions are recorded. write up the objective, in and out of scope and measurable success criteria, plus draft work files for each team",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "critique of the import plan is done. go through the findings, apply what the evidence backs and tell me why you skipped the rest",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    }
+  ]
+}

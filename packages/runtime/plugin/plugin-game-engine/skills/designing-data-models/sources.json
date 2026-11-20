@@ -1,0 +1,159 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/object-model.md",
+        "references/references-and-ownership.md",
+        "references/snapshots-and-threading.md",
+        "references/serialization.md",
+        "references/prototypes.md",
+        "references/undo-redo.md",
+        "references/change-notification.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Object model, References & ownership, Prototypes & overrides, Mutation, Persistence",
+        "The central typed object/property \"object database\" framing for tools and editors"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"The Story behind The Truth: Designing a Data Model\": typed objects, property kinds, data-driven types, ids, and the strong sub-object ownership vs weak reference (delete-to-null) model → `references/object-model.md`, `references/references-and-ownership.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Referencing Objects: Names vs GUIDs\": id/GUID references, GUID-as-identity vs name/path-as-role, default-to-GUID hybrid, resolve-once-at-spawn, rename/auto-patch pitfalls → `references/references-and-ownership.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "\"Multi-Threading the Truth\": immutable snapshots, copy-on-write versions, atomic publish, per-frame read snapshot → `references/snapshots-and-threading.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "\"One-Click Save Game System (Parts 1–3)\": member-level change tracking (deltas vs snapshots), POD default serializer, asset-reference re-spawn for smaller saves and forward compatibility, declarative persistence opt-in → `references/serialization.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "\"API Versioning\": semantic-versioned API structs, ABI-safe evolution (append at end, leading `size` field, reserved-byte reuse), exact-major / higher-minor matching → `references/serialization.md`"
+        },
+        {
+          "id": "claim-6",
+          "statement": "\"Prototypes in the engine\": any object can be a prototype of another of the same type; per-property override bitmask with read-through resolution up the prototype chain; sub-object sets tracked as inherited / instantiated (local child prototype) / removed; serialize only overrides; deliberately no computed-property expressions; reference-redirect when an overridden sub-object changes id → `references/prototypes.md`"
+        },
+        {
+          "id": "claim-7",
+          "statement": "\"The Document Model and the engine\": per-asset vs project-wide save/revert and undo-stack scope trade-offs, runtime-resolved inter-document relationships → `references/undo-redo.md`"
+        },
+        {
+          "id": "claim-8",
+          "statement": "Change tracking, dirty flags, transaction-batched notification → `references/change-notification.md`"
+        },
+        {
+          "id": "claim-9",
+          "statement": "Versioned serialization, migration of old files, references serialized by id → `references/serialization.md`"
+        }
+      ]
+    },
+    {
+      "id": "editor-daw-dcc-architecture-write-ups-command-pattern-and",
+      "kind": "web",
+      "title": "Editor / DAW / DCC architecture write-ups (command pattern and document models)",
+      "urls": ["https://gameprogrammingpatterns.com/command.html"],
+      "urlNotes": [
+        "Gang of Four, \"Design Patterns\": Command and Memento patterns (undo)"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/undo-redo.md"],
+      "usage": [
+        "`SKILL.md` → Mutation",
+        "Transactional edits, inverse operations vs before/after snapshots, undo/redo stacks"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Command/Memento → inverse operations and before/after snapshots → `references/undo-redo.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Grouping edits into one user-visible transaction, redo-stack invalidation → `references/undo-redo.md`"
+        }
+      ]
+    },
+    {
+      "id": "copy-on-write-and-persistent-data-structures",
+      "kind": "web",
+      "title": "Copy-on-write and persistent data structures",
+      "urls": [
+        "https://www.kernel.org/doc/html/latest/RCU/whatisRCU.html",
+        "https://en.wikipedia.org/wiki/Persistent_data_structure"
+      ],
+      "urlNotes": [
+        "Read-copy-update (RCU): https://www.kernel.org/doc/html/latest/RCU/whatisRCU.html",
+        "Persistent data structures (structural sharing): https://en.wikipedia.org/wiki/Persistent_data_structure"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/snapshots-and-threading.md"],
+      "usage": [
+        "`SKILL.md` → Persistence, Gotchas",
+        "Lock-free immutable snapshots, structural sharing, version reclamation"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Atomic publish + acquire/release, deferred reclamation of old versions → `references/snapshots-and-threading.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Structural sharing so a small edit copies only touched nodes → `references/snapshots-and-threading.md`"
+        }
+      ]
+    },
+    {
+      "id": "serialization-schema-versioning-and-migration",
+      "kind": "web",
+      "title": "Serialization, schema versioning, and migration",
+      "urls": [
+        "https://martinfowler.com/articles/evodb.html",
+        "https://protobuf.dev/programming-guides/proto3/"
+      ],
+      "urlNotes": [
+        "https://martinfowler.com/articles/evodb.html (evolutionary schema, migration sequencing)",
+        "Protocol/format evolution guidance on unknown-field tolerance: https://protobuf.dev/programming-guides/proto3/"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/serialization.md"],
+      "usage": [
+        "`SKILL.md` → Persistence, Gotchas",
+        "Stable on-disk schema, ordered forward migrations, tolerating unknown fields, deterministic output for diffing"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Format versioning + ordered migration steps → `references/serialization.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Skip/preserve unknown fields for forward/backward compatibility → `references/serialization.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Deterministic, stably-ordered output for version control → `references/serialization.md`"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "serialization-schema-versioning-and-migration"
+    }
+  ]
+}

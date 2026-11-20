@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "skill": "designing-game-networking",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "I'm starting a multiplayer game and need to decide whether the server owns all the gameplay objects or if peers can each own their own, and how to keep that flexible if I switch to peer-to-peer later",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: topology + per-object authority, topology-as-config -> topology-and-authority.md"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Each participant runs its own copy of the world bound to an address and they talk to each other. How should I structure who accepts connections and who simulates what?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit: node-graph model, node behavior (accept/simulate/replicate) -> topology-and-authority.md"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "When a player's position changes on the host, how do I get only the changed objects out to the other machines instead of broadcasting the whole world every frame?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: per-frame deltas, relevancy, owner-watches-changes -> state-replication.md / delta-and-snapshots.md"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "How do I mark which entities and which of their components actually get sent over the wire? Right now I think I'm syncing everything by accident.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: two-level opt-in (component capability + per-object flag) -> state-replication.md"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "My replicated structs send the whole blob even when one float changed. How do I get it to only transmit the members that actually changed?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: whole-blob default vs per-field layout description -> state-replication.md"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "A new client just connected mid-match and its world is garbage: I'm only sending the per-frame changes. What am I missing?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: delta needs a baseline; new connection needs a full snapshot first -> delta-and-snapshots.md"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Can I reuse my save-game serialization to send and apply state updates over the connection, or do I need a separate path?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit: replication reuses the save/load dump+apply path -> delta-and-snapshots.md"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "I built everything on UDP and now some critical messages get dropped while others I don't care about clog the line. How should I decide reliability per message?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: per-packet-type delivery guarantee, head-of-line tradeoff -> transport-and-channels.md"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "My connection setup opens a second channel every time the response gets lost and the client retries. How should the handshake behave?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: idempotent request/accept handshake, pipe ids -> transport-and-channels.md"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "I want to run a server and a client in the same process to debug, then deploy them to separate machines without changing code. How do I make local talk behave like remote?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "direct: virtual networking / in-process short-circuit -> dev-iteration-and-observability.md"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "How can I fake 150ms of lag and a bandwidth cap in the editor so I can reproduce a desync bug without a real bad network?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "direct: injected latency/bandwidth + packet inspection -> dev-iteration-and-observability.md"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "I need to fire a remote event at a specific entity on the other side and sometimes the order of these events matters and sometimes it doesn't. How should I send them?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "implicit: replicate event by id, ordered vs unordered delivery -> state-replication.md / transport-and-channels.md"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Both my host and a client think they own the same crate and they keep snapping it back and forth. How do I resolve this?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "direct: singular authority per object -> topology-and-authority.md"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "I want one project that ships as single-player but can also run multiplayer by having one process play all the roles. How do I branch on that?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "implicit: topology-switch catch-all path runs all branches -> dev-iteration-and-observability.md"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Restructure this CPU particle array from array-of-structs to struct-of-arrays so the update loop stops missing cache",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: in-engine memory layout -> applying-data-oriented-design, not networking"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Should an entity be able to hold two of the same component, like two colliders, or model it differently in my ECS?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: component model design -> designing-ecs, not networking"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "How do I give every asset and object a stable GUID so references survive save/load and renaming?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: typed object/id model -> designing-data-models, not networking (networking only reuses those ids)"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "I need to insert the right resource barriers between my render passes and alias transient targets on the GPU",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: GPU frame graph -> designing-gpu-renderers, not networking"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by designing-data-models"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-ecs"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-data-oriented-design"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "I want artists to build effects by dragging boxes onto a canvas and connecting their inputs and outputs with wires instead of writing code. How should I structure the thing they're editing",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-node-graphs"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "how should rendering components hook into the engine so I can cull lots of meshes per camera and feed several shadow views in one pass?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by designing-ecs"
+    }
+  ]
+}

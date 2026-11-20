@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "open-knowledge-format-version-0-2",
+      "kind": "web",
+      "title": "Open Knowledge Format version 0.2",
+      "urls": ["https://github.com/GoogleCloudPlatform/open-knowledge-format"],
+      "reviewedAt": "2026-10-27",
+      "feeds": [
+        "references/layout.md",
+        "references/frontmatter.md",
+        "references/generated-files.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Gotchas",
+        "`references/layout.md` → the bundle and its reserved names",
+        "`references/frontmatter.md` → concept IDs, actors, `verified`, timestamps, unknown keys, sources and footnotes, status",
+        "`references/generated-files.md` → indexes without frontmatter, grouped entries, the date-grouped log",
+        "`assets/templates/decision.md` → the `verified` entry"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A change is a bundle; `index.md` and `log.md` are reserved and hold no concept → layout"
+        },
+        {
+          "id": "claim-2",
+          "statement": "The concept ID is the path without `.md` → frontmatter, Essentials"
+        },
+        {
+          "id": "claim-3",
+          "statement": "The `human:` prefix is reserved for content a person wrote or confirmed → frontmatter, Essentials"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Timestamps carry an explicit UTC offset; unknown keys survive every edit; a superseded document is deprecated, never deleted → frontmatter, Gotchas"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Indexes group entries under headings; the log is grouped by date, newest first → generated files"
+        }
+      ]
+    },
+    {
+      "id": "xonovex-change-workflow-conventions",
+      "kind": "original",
+      "title": "Xonovex change-workflow conventions",
+      "provenance": "Repository-original contract of the change directory shared by the workflow steps: names and suffixes, write rules, the entry step, the project settings, the family level, the shared schemas and templates, and the validator",
+      "reviewedAt": "2026-11-19",
+      "feeds": [
+        "references/entry-step.md",
+        "references/ids-and-write-rules.md",
+        "references/settings.md",
+        "references/validator.md",
+        "references/layout.md",
+        "references/generated-files.md",
+        "references/frontmatter.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The entry step, the slug-suffix names, append-only versus edited-in-place files, the skills map with its defaults, the family level, the shared schemas and the three validation layers are conventions of this workflow."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "documenting-architecture-decisions",
+      "kind": "web",
+      "title": "Documenting Architecture Decisions",
+      "urls": [
+        "https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions"
+      ],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/applying.md"],
+      "usage": [
+        "`SKILL.md` → Essentials, Gotchas",
+        "`references/applying.md` → decision files"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A reversed decision is kept and marked as superseded, so a changed decision is a new file and the old one gets only its deprecation and a pointer to its successor → applying, Gotchas"
+        }
+      ]
+    },
+    {
+      "id": "open-knowledge-format-version-0-2",
+      "kind": "web",
+      "title": "Open Knowledge Format version 0.2",
+      "urls": ["https://github.com/GoogleCloudPlatform/open-knowledge-format"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/propagation.md"],
+      "usage": ["`references/propagation.md` → regenerate"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Index files and log files are generated, so the run regenerates them by script after its edits and never edits them by hand → propagation"
+        }
+      ]
+    },
+    {
+      "id": "xonovex-plan-revision-conventions",
+      "kind": "original",
+      "title": "Xonovex plan-revision conventions",
+      "provenance": "Repository-original procedure for folding `FIXME` notes, critique findings and research corrections into the plan and the work files of a change",
+      "reviewedAt": "2026-11-19",
+      "feeds": [
+        "references/inputs.md",
+        "references/dispositions.md",
+        "references/applying.md",
+        "references/work-and-plan.md",
+        "references/propagation.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The three inputs and how each is marked as processed, the four dispositions with a rationale, the operator's answer that settles a decision and the evidence that only reopens one, the order of work, the readiness rules of work files, the plan edited outside its generated block, and the dispositions table in the log entry are conventions of this workflow. Decision files follow the shared template and write rules of recording-handoff."
+        }
+      ]
+    }
+  ]
+}

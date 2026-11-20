@@ -60,4 +60,4 @@ The exit status is 0 when nothing reaches the failing level, 1 when a finding do
 | Task | Runs |
 | --- | --- |
 | `npx moon run agent-audit-go:ci-check` | Build, lint, vet, unit and architecture tests, coverage floors, format check |
-| `npx moon run agent-audit-go:ci-integration` | The built binary against a real git repository and `httptest`, and the conversion of every `SOURCES.md` |
+| `npx moon run agent-audit-go:ci-integration` | The built binary against a real git repository and `httptest`, and the validation of every `sources.json` of the plugins |

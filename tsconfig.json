@@ -27,9 +27,6 @@
       "path": "./packages/tooling/cli/agent-cli-go"
     },
     {
-      "path": "./packages/tooling/script/script-moon-plugin-validate"
-    },
-    {
       "path": "./packages/tooling/script/script-moon-common"
     },
     {
@@ -43,36 +40,6 @@
     },
     {
       "path": "./packages/tooling/script/script-moon-release-validate"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-audit-sources"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-catalog-common"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-eval-common"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-eval-outputs"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-eval-routing"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-eval-triggers"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-validate-drift"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-validate-links"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-validate-routing"
-    },
-    {
-      "path": "./packages/tooling/script/script-moon-skill-validate-spec"
     },
     {
       "path": "./packages/tooling/script/script-moon-version-bump"

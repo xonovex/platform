@@ -76,9 +76,25 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
+  # The skill and plugin tasks of the repository run this binary, so moon builds
+  # it once, caches it with its output, and restores it before a dependent task.
+  binary:
+    script: |
+      set -euo pipefail
+      go build -o "$projectRoot/dist/agent-audit" ./cmd/agent-audit
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - go.mod
+      - go.sum
+    outputs:
+      - dist/agent-audit
+    options:
+      cache: true
   # go-integration builds the real binary, runs it against a temporary
   # directory, a real git repository and an httptest server, and converts every
-  # SOURCES.md of the plugins, so it is an integration tier rather than a
+  # sources.json of the plugins, so it is an integration tier rather than a
   # ci-check gate.
   go-integration:
     script: |
@@ -91,7 +107,7 @@ tasks:
       - "@globs(tests)"
       - go.mod
       - go.sum
-      - /packages/runtime/plugin/**/SOURCES.md
+      - /packages/runtime/plugin/**/sources.json
     options:
       cache: false
       runInCI: false

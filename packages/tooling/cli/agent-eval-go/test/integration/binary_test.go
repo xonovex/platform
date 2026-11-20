@@ -199,33 +199,33 @@ func TestTheTriggerRunStopsAHarnessThatKeepsTheStreamOpen(t *testing.T) {
 	}
 }
 
-func TestMigrateConvertsEveryLegacyFileOfThePlugins(t *testing.T) {
+func TestMigrateFindsNothingLeftToConvertInThePlugins(t *testing.T) {
 	_, file, _, _ := runtime.Caller(0)
-	plugins := filepath.Join(filepath.Dir(file), "../../../../runtime/plugin")
+	plugins := filepath.Join(filepath.Dir(file), "../../../../../runtime/plugin")
 	if _, err := os.Stat(plugins); err != nil {
 		t.Skip("the plugin tree is not part of this checkout")
 	}
 	w := newWorkspace(t)
-	copyTree(t, plugins, filepath.Join(w.root, "work/legacy"))
-	got := w.run(t, "migrate", "legacy")
+	copyTree(t, plugins, filepath.Join(w.root, "work/catalog"))
+	got := w.run(t, "migrate", "catalog", "--remove-legacy")
 	if got.code != 0 {
 		t.Fatalf("%d\n%s\n%s", got.code, tail(got.stdout), got.stderr)
 	}
-	var written int
-	_ = filepath.WalkDir(filepath.Join(w.root, "work/legacy"), func(path string, d fs.DirEntry, err error) error {
-		if err == nil && (d.Name() == "eval-trigger.json" || d.Name() == "eval-output.json") {
-			written++
+	var legacy, current int
+	_ = filepath.WalkDir(filepath.Join(w.root, "work/catalog"), func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		switch d.Name() {
+		case "evals.json", "eval-queries.json":
+			legacy++
+		case "eval-trigger.json", "eval-output.json":
+			current++
 		}
 		return nil
 	})
-	if written == 0 {
-		t.Fatalf("no document written\n%s", tail(got.stdout))
-	}
-	if again := w.run(t, "migrate", "legacy", "--remove-legacy"); again.code != 0 {
-		t.Fatalf("a second run with --remove-legacy: %d\n%s", again.code, tail(again.stderr))
-	}
-	if left, _ := filepath.Glob(filepath.Join(w.root, "work/legacy/*/skills/*/evals.json")); len(left) != 0 {
-		t.Fatalf("legacy files left: %v", left)
+	if legacy != 0 || current == 0 {
+		t.Fatalf("legacy eval files = %d, current eval files = %d\n%s", legacy, current, tail(got.stdout))
 	}
 }
 

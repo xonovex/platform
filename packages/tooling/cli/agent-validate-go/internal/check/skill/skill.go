@@ -29,7 +29,7 @@ type Options struct {
 	BodyWarnLines int `json:"bodyWarnLines"`
 	// VendorAdapters are skill names that carry a vendor name by design.
 	VendorAdapters []string `json:"vendorAdapters"`
-	// RequireEvals makes a missing evals.json or eval-queries.json a failure.
+	// RequireEvals makes a missing eval-output.json or eval-trigger.json a failure.
 	RequireEvals bool `json:"requireEvals"`
 	// ForbiddenExtensions are the file extensions a skill must not ship as
 	// implementation files.

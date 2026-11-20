@@ -48,8 +48,41 @@ tasks:
       cache: false
       runFromWorkspaceRoot: true
       runInCI: false
+  # The checks that compare files with each other read the whole repository:
+  # routing across skills, duplicated rules, links, budgets, the marketplaces,
+  # instruction files and the Moon workspace. The per-skill and per-plugin tasks
+  # run the checks that read one package.
+  workspace-validate:
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-validate-go/dist/agent-validate"
+      --strict --root "$workspaceRoot"
+    deps:
+      - agent-validate-go:binary
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+  # The model evals spend money, so they are explicit tasks. Name a plugin in
+  # SKILL_ROUTING_PLUGIN to limit the run to its skills.
+  ci-skill-eval-routing:
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-eval-go/dist/agent-eval"
+      routing ${SKILL_ROUTING_PLUGIN:-}
+      --split "${SKILL_ROUTING_SPLIT:-validation}"
+      --runs "${SKILL_ROUTING_RUNS:-3}"
+      --threshold 0.5
+      --batch-size 8
+      --max-cost-usd 0.05
+      --harness "${SKILL_EVAL_HARNESS:-claude}"
+      --results-dir "$workspaceRoot/.agent-eval/results"
+      --plugin-dir packages/runtime/plugin
+    deps:
+      - agent-eval-go:binary
+    options:
+      cache: false
+      runFromWorkspaceRoot: true
+      runInCI: false
   ci-check:
     command: noop
-    deps: [format-check]
+    deps: [format-check, workspace-validate]
     options:
       cache: false

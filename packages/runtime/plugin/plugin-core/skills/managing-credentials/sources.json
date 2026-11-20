@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "owasp-secrets-management",
+      "kind": "web",
+      "title": "OWASP Secrets Management",
+      "urls": [
+        "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+        "https://cheatsheetseries.owasp.org/cheatsheets/CI_CD_Security_Cheat_Sheet.html"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/credential-selection.md",
+        "references/automation-and-response.md"
+      ],
+      "usage": [
+        "`SKILL.md`, `references/credential-selection.md`, `references/automation-and-response.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Secret lifecycle, least privilege, CI/CD isolation, dynamic creation, rotation, revocation, auditing, and exposure response."
+        }
+      ]
+    },
+    {
+      "id": "platform-secret-stores-and-ci-federation",
+      "kind": "web",
+      "title": "Platform secret stores and CI federation",
+      "urls": [
+        "https://specifications.freedesktop.org/secret-service/latest/",
+        "https://learn.microsoft.com/en-us/powershell/utility-modules/secretmanagement/get-started/using-secretstore?view=ps-modules",
+        "https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets",
+        "https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-with-reusable-workflows"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/local-storage.md",
+        "references/automation-and-response.md"
+      ],
+      "usage": [
+        "`references/local-storage.md`, `references/automation-and-response.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Secret Service storage, PowerShell vault behavior, CI secret injection, OIDC job identity, and trust-claim constraints."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original provider-neutral lifecycle and ownership synthesis based on the sources above",
+      "reviewedAt": "2026-07-22",
+      "coversAllReferences": true,
+      "usage": ["all"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Decision order, provider ownership boundary, retrieval discipline, rotation sequence, and containment-first incident workflow."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "skill": "revising-plan",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Team Payments answered on the retry limit, I pasted it as a FIXME in plans/retry-policy/plan.md. Fold it in and release whatever work was waiting on that decision.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "operator notes folded into the plan"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "I dropped 11 FIXME notes into plan.md. Go through them and tell me for each one: applied, partly, not applied or handed on, and keep what each note said",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "operator notes with a disposition each"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "critique of the import plan is done. go through the findings, apply what the evidence backs and tell me why you skipped the rest",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "critique findings processed"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "new research says the cap applies before discounts, not after. figure out which parts of the plan and work files leaned on the old claim and fix them",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "research correction reaches the plan"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "research/gateway-limits-r6t3 says the gateway sheds load after 2 requests, not 4. reopen the retry decision as a new one and put the work that used it back to waiting",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "a research correction reopens a decision"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "a few of my FIXMEs are questions like 'is this a regression?'. answer them from the code, only touch the plan if the answer changes a decision, and give me a table of what happened to each",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "notes that are questions answered"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "we dropped the phased rollout on the billing-api. take it out of the objective, the success criteria and the work files, and keep what my notes about it said",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "a rejected design removed everywhere"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "the review showed the storage decision rests on a wrong assumption. stop stating it as settled and park the work that depends on it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "a critique finding reopens a decision and puts work back to waiting"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "apply my notes in plans/export-service/plan.md and the work files, then tell me what changed for each note",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "apply operator notes"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "the research file has six open questions. walk me through them one by one and write down each answer I give",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "all decisions are recorded. write the plan for the ledger migration with objective, scope and success criteria",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "draw how payment, gateway and ledger talk to each other and render it next to the plan",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by illustrating-plan"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "be a skeptic on the finished plan: what could fail, what is missing? write the findings down but leave the plan alone",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "poke holes in the loyalty-service plan before the owners sign it off. which success criteria could pass while it is still broken?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "the plan is agreed and the first work item is ready. implement it on feature/retry-policy and run its tests",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by implementing-work-item"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "before we change anything, find out what export-service does today when the profile endpoint returns a 404",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by researching-change"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "what we hit this session taught us a few things, turn those lessons into rules for AGENTS.md",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn what we learned in this session about the release checklist into a reusable skill",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "write the plan for cache-layer from research/cache-facts-c3d4.md and the cache-store decision, only the settled picture please, none of the rejected stuff",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "try to falsify the success criteria in the notifications rollout, can anyone actually observe them?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "what's left after this package? one seed per chunk of remaining work, with the current state evidenced and what gates it",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-package"
+    }
+  ]
+}

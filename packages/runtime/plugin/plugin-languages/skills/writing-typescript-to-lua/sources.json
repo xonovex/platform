@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "typescripttolua-documentation",
+      "kind": "web",
+      "title": "TypeScriptToLua documentation",
+      "urls": [
+        "https://typescripttolua.github.io/docs/getting-started/",
+        "https://typescripttolua.github.io/docs/advanced/language-extensions/"
+      ],
+      "version": "1.24.0",
+      "contentSha256": "sha256:653fc80f4959fdf3d26793f9153e2ab04383711df070554e9c9689c18acbd654",
+      "reviewedAt": "2026-07-22",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; compiler configuration, Lua targets, language extensions, `LuaMultiReturn`, raw tables, `this` behavior, interop, and source maps."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "TSTL compiler options and documented TypeScript-to-Lua lowering/extension semantics. Stable-layout performance preferences are Xonovex conventions."
+        }
+      ]
+    }
+  ]
+}

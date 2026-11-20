@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skill": "writing-python",
+  "tier": "aggressive",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Runs the independent requests concurrently using asyncio.gather (or asyncio.TaskGroup), not a sequential 'await' inside a for-loop"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Does not call a blocking synchronous client such as requests.get directly inside the async function"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Define a Python data model for a paginated API response: it holds a list of items whose element type varies per endpoint, a total count, and an optional next-page cursor string.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Declares the generic using PEP 695 class syntax (e.g. class Page[T]:) rather than typing.Generic[T] with a separate TypeVar"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Types the optional cursor as 'str | None' rather than Optional[str]"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Uses @dataclass with field(default_factory=...) for any mutable-collection default instead of a bare list/dict literal default"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "I have a pure, deterministic function that is expensive and gets called repeatedly with the same arguments. Show me how to memoize it two ways: one that keeps every result, and one that caps memory by keeping only the most recently used results.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Uses functools.cache (@cache) for the unbounded/keep-every-result variant"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Uses functools.lru_cache with an explicit maxsize argument for the bounded/most-recently-used variant"
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "Write a reusable Python helper that wraps a block of database work in a transaction so callers can use it with a 'with' statement, committing when the block succeeds.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Implements it with the @contextmanager decorator and a single yield of the connection/resource"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Commits after the yield on success and, in an except block, rolls back and then re-raises the exception"
+        }
+      ]
+    }
+  ]
+}

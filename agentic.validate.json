@@ -9,12 +9,12 @@
     },
     "sources": {
       "options": {
-        "required": false
+        "required": true
       }
     },
     "text": {
       "options": {
-        "exclude": ["**/CHANGELOG.md", "**/SOURCES.md"]
+        "exclude": ["**/CHANGELOG.md"]
       }
     }
   }

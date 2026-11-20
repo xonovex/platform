@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "using-terraform",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Set up the remote state backend for our production environment's Terraform root module. We're on AWS. Show the backend configuration and explain the key decisions.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Someone changed our infrastructure manually in the cloud console. I want to see what has drifted from our Terraform state before I decide whether to reconcile it. What command should I run and why?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Add a Terraform variable named database_config that is a structured object with instance_class (string), engine_version (string), and a backup_retention number that callers may omit and should default to 7. We're on Terraform 1.12.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Restructure this Terraform repository into reusable modules and environment root modules without sharing mutable local state files.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Replace loosely typed Terraform map(any) inputs with optional object attributes and validation that reports invalid combinations early.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Compose a production root module with aliased providers, remote state, explicit module versions, and environment-specific values outside the reusable module.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-docker"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-kubernetes"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "compose GitHub Actions workflows from reusable workflows and pin every action to a commit SHA",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-cmake"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-docker"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-kubernetes"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "is this GitLab CI job failing from a runner outage or a real test failure?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-cmake"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "recover a plan decision and its evidence references from the plan document after restart",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by implementing-work-item"
+    }
+  ]
+}

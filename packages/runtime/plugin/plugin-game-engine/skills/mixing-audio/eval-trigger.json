@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "skill": "mixing-audio",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "my sound randomly cuts out with a little pop when the frame rate dips: the mixing happens in a callback that sometimes grabs a mutex",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "audio underrun from a lock on the callback path -> audio-callback-thread.md"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "how big should I make the playback buffer? smaller feels more responsive but I keep getting dropouts on a usb headset",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "latency vs buffer size, queue-ahead vs starvation -> audio-callback-thread.md"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "when I change a sound's volume there's an audible click: I just set the new value each frame",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "gain must be ramped, not snapped -> mixing-and-buffers.md"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "I'm summing a bunch of 16-bit sounds into one output and it crackles and distorts when several are loud at once",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "integer overflow on mix; accumulate in float and scale to fit -> mixing-and-buffers.md"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "I have a 22 kHz wav and my mixer runs at 44.1 kHz. How do I play it back at the right speed, and can I also pitch it up an octave?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "sample-rate conversion + pitch via step -> resampling-and-dsp.md"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "what's a good way to limit how many sounds play at once and pick which one to drop when I run out?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "fixed voice pool and voice stealing -> voice-management.md"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "my game thread sets a playing sound's position directly while the mixer reads it and I get garbage. How should the two threads communicate?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "command handoff, value messages, audio thread owns state -> command-handoff.md"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "I pitch a looping clip up and it glitches at the loop point now",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "read cursor advances faster under pitch; couple to loop/length -> resampling-and-dsp.md"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "give me a generic single-producer single-consumer ring buffer with the right acquire/release ordering",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: the queue internals are owned by writing-lock-free-code"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "design a preallocated fixed-size pool allocator so I never call malloc at runtime",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: generic no-realtime-allocation pool -> managing-memory"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "convert my array-of-structs particle data to struct-of-arrays for cache locality",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: data layout -> applying-data-oriented-design"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "the render thread needs to feed the device exactly one fixed block each time without ever allocating. What work is safe to do in there?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "real-time callback contract, bounded work -> audio-callback-thread.md"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "panning and 3d positioning a voice: is there one structure that covers volume and channel routing together?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "per-voice gain matrix m[ic][oc] -> mixing-and-buffers.md"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "I want each sound effect to have its own playback speed without affecting the others",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "per-voice fractional step / pitch -> resampling-and-dsp.md"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "stopping a sound instantly clicks; how do I retire a voice cleanly and reuse its slot?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "ramp-to-zero before freeing the slot -> voice-management.md / mixing-and-buffers.md"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "wire up a thread pool with an async job API so I can await results from worker threads",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: high-level async/pool usage, not real-time audio"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by managing-memory"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "our particle simulator stalls when we have 50k particles. The update loop reads position and velocity out of a fat 96-byte struct, can you restructure it for cache efficiency",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-data-oriented-design"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "what memory_order should I use on the store and load when one thread fills a buffer and flips a ready flag the other thread waits on?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-lock-free-code"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "Import authored glTF meshes at build time and emit runtime-ready assets with a stable content hash.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-asset-pipelines"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "is plain volatile enough to share this flag between two threads, or do I actually need something else?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by writing-lock-free-code"
+    }
+  ]
+}

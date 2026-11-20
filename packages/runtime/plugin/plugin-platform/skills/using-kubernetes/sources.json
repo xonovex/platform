@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "kubernetes-documentation",
+      "kind": "web",
+      "title": "Kubernetes documentation",
+      "urls": [
+        "https://kubernetes.io/docs/home/",
+        "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/"
+      ],
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; workload resources, probes, security contexts, configuration, secrets, resources, Kustomize, and GitOps-oriented manifest structure."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Kubernetes resource schemas and controller behavior, probe semantics, security-context fields, and current Kustomize fields."
+        }
+      ]
+    }
+  ]
+}

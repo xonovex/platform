@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "vitest-documentation",
+      "kind": "web",
+      "title": "Vitest documentation",
+      "urls": [
+        "https://vitest.dev/guide/",
+        "https://vitest.dev/guide/mocking",
+        "https://vitest.dev/config/"
+      ],
+      "version": "3.0.0",
+      "contentSha256": "sha256:d2402124b5e5af1ed3723bdfbfae8751871893ecddad598c5b14470fa65945fb",
+      "reviewedAt": "2026-07-22",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; test configuration, mocking, assertions, type safety, setup, snapshots, timestamps, and HTTP tests."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Vitest 3+ runner, mock, assertion, lifecycle, and configuration APIs. Test-structure principles remain owned by authoring-tests."
+        }
+      ]
+    }
+  ]
+}

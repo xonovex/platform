@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "writing-shell-scripts",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Write a shell script that ensures the line `export PATH=\"$PATH:/opt/tool/bin\"` is present in the user's ~/.profile, and regenerates a config file at /etc/app/config from a template. A provisioning system runs it repeatedly, so re-running must not duplicate the line and must not corrupt the config if the script is interrupted mid-write.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Write a shell script that reads a list of file paths from an input file, one path per line where paths may contain spaces, tabs, or backslashes, and processes each path. It also needs a temporary working directory that is always removed, even if the script exits early or is interrupted.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Write a bash script with a helper for fatal errors and meaningful exit statuses. It requires the docker command to be present and takes exactly one argument, an image name. A caller should be able to distinguish a usage error from a missing-command error purely by the script's exit code.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Make this deployment helper run under POSIX sh by removing Bash arrays, process substitution, and [[ tests without changing its interface.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Fix this shell loop so filenames with spaces, glob characters, and newlines are handled without word splitting or command injection.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Refactor repeated shell steps into functions with explicit arguments, local variables in Bash, and meaningful exit statuses.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-typescript"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Write an async Python function fetch_all(urls) that retrieves the body of each URL over HTTP and returns them as a list. The URLs are independent of one another and there may be dozens of them.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-python"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-cmake"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-moon"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-typescript"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Tighten src/ingest/config.py until pyright strict passes without Any, ignored errors, or casts that hide an invalid state. It loads JSON into a dict and reads roughly fifteen fields off it, each typed Any.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-python"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-cmake"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-moon"
+    }
+  ]
+}

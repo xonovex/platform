@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "skill": "configuring-kiro",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "map a mandatory protected-path control to Kiro and tell me whether it can actually block",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "native capability and guarantee mapping"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "preview onboarding a project-provided Kiro executable module without applying it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "advisory transactional onboarding"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "what version and trust probes should I run before relying on this Kiro hook or extension?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "versioned matrix and executable trust"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Can a Kiro PreToolUse hook block this exact tool operation? Validate the installed surface and its coverage.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Advise onboarding a repository-provided Kiro hook, plugin, extension, or package. Do not mutate yet.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Provide deterministic, model-evaluator, and specialist-agent patterns for Kiro.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Configure Kiro steering, hooks, and agent permissions so specs can drive repository edits but release commands still require user approval.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Write Kiro onboarding that explains steering-file precedence, spec workflow, hook setup, and a quick verification task.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "map a mandatory protected-path control to Claude Code and tell me whether it can actually block",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-claude-code"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "map a mandatory protected-path control to Codex and tell me whether it can actually block",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-codex"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "map a mandatory protected-path control to GitHub Copilot and tell me whether it can actually block",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-copilot"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "map a mandatory protected-path control to OpenCode and tell me whether it can actually block",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-opencode"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "map a mandatory protected-path control to Pi and tell me whether it can actually block",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by configuring-pi"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Provide deterministic, model-evaluator, and specialist-agent patterns for Claude Code.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-claude-code"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Provide deterministic, model-evaluator, and specialist-agent patterns for Codex.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-codex"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Provide deterministic, model-evaluator, and specialist-agent patterns for GitHub Copilot.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-copilot"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "detect configuration drift of a hook after a harness release across any harness",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-harness-integrations"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "map semantic intents like tool before use to native events for several harnesses",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-harness-integrations"
+    }
+  ]
+}

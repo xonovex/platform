@@ -1,0 +1,260 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "the-pragmatic-programmer-orthogonality",
+      "kind": "web",
+      "title": "The Pragmatic Programmer: orthogonality",
+      "urls": [
+        "https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/finding-axes.md"],
+      "usage": ["`SKILL.md` → Essentials (factor into orthogonal axes)"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Orthogonality, decoupling, the cross-product design space → `references/finding-axes.md`"
+        }
+      ]
+    },
+    {
+      "id": "solid-clean-architecture-single-responsibility-as-an-axis-of",
+      "kind": "web",
+      "title": "SOLID / Clean Architecture: single responsibility as an axis of change, screaming architecture",
+      "urls": [
+        "https://blog.cleancoder.com/uncle-bob/2011/09/30/Screaming-Architecture.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/finding-axes.md",
+        "references/applying-the-layout.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials (structure mirrors the model), Gotchas (package by layer hides axes)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The \"axis of change\" reading of SRP → `references/finding-axes.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Package-by-axis/feature vs package-by-layer (screaming architecture) → `references/applying-the-layout.md`"
+        }
+      ]
+    },
+    {
+      "id": "software-product-lines-commonality-variability-analysis",
+      "kind": "web",
+      "title": "Software product lines: commonality / variability analysis",
+      "urls": [
+        "https://www.sei.cmu.edu/library/software-product-lines-collection/"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/commonality-variability.md",
+        "references/variation-point-bridges.md"
+      ],
+      "usage": ["`SKILL.md` → Essentials (shared-core + per-variant leaves)"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Commonality vs variability, variation points, the shared kernel → `references/commonality-variability.md`, `references/variation-point-bridges.md`"
+        }
+      ]
+    },
+    {
+      "id": "design-patterns-strategy-and-bridge",
+      "kind": "web",
+      "title": "Design Patterns: Strategy and Bridge",
+      "urls": ["https://en.wikipedia.org/wiki/Bridge_pattern"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/commonality-variability.md",
+        "references/variation-point-bridges.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials (Strategy per axis, Bridge for cross-axis glue)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "One interchangeable family per axis (Strategy) → `references/commonality-variability.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Decoupling an abstraction from its implementation so both vary independently (Bridge) → `references/variation-point-bridges.md`"
+        }
+      ]
+    },
+    {
+      "id": "information-hiding-module-decomposition",
+      "kind": "web",
+      "title": "Information hiding & module decomposition",
+      "citation": "\"On the Criteria To Be Used in Decomposing Systems into Modules\" (D.L. Parnas, 1972)",
+      "urls": ["https://dl.acm.org/doi/10.1145/361598.361623"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/finding-axes.md",
+        "references/variation-point-bridges.md"
+      ],
+      "usage": ["`SKILL.md` → Essentials, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Decompose around design decisions likely to change; information hiding; temporal decomposition → `references/finding-axes.md`, `references/variation-point-bridges.md`"
+        }
+      ]
+    },
+    {
+      "id": "module-depth-complexity",
+      "kind": "web",
+      "title": "Module depth & complexity",
+      "citation": "\"A Philosophy of Software Design\" (John Ousterhout)",
+      "urls": ["https://web.stanford.edu/~ouster/cgi-bin/aposd.php"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/commonality-variability.md",
+        "references/finding-axes.md"
+      ],
+      "usage": ["`SKILL.md` → Gotchas (over-factoring)"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Deep vs shallow modules (benefit = functionality, cost = interface); information leakage → `references/commonality-variability.md`, `references/finding-axes.md`"
+        }
+      ]
+    },
+    {
+      "id": "component-package-principles",
+      "kind": "web",
+      "title": "Component (package) principles",
+      "citation": "\"Clean Architecture\" / component principles (Robert C. Martin)",
+      "urls": ["https://en.wikipedia.org/wiki/Package_principles"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/commonality-variability.md",
+        "references/variation-point-bridges.md"
+      ],
+      "usage": ["`SKILL.md` → Gotchas (Zone of Pain)"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Shared/variant cohesion and dependency direction → `references/commonality-variability.md`, `references/variation-point-bridges.md`"
+        }
+      ]
+    },
+    {
+      "id": "software-product-lines-variability",
+      "kind": "web",
+      "title": "Software product lines & variability",
+      "citation": "\"Software Product Line Engineering\" + Orthogonal Variability Model (Pohl, Böckle & van der Linden); \"Feature-Oriented Domain Analysis (FODA)\" (Kang et al.)",
+      "urls": [
+        "https://link.springer.com/book/10.1007/3-540-28901-1",
+        "https://resources.sei.cmu.edu/library/asset-view.cfm?assetid=11231"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/finding-axes.md",
+        "references/commonality-variability.md",
+        "references/variation-point-bridges.md"
+      ],
+      "usage": ["`SKILL.md` → framing, Essentials"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Commonality/variability analysis, variation point, variant → `references/finding-axes.md`, `references/commonality-variability.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Feature models, cross-tree constraints (requires/excludes), orthogonal variability model → `references/variation-point-bridges.md`"
+        }
+      ]
+    },
+    {
+      "id": "separation-of-concerns-cross-cutting-concerns",
+      "kind": "web",
+      "title": "Separation of concerns & cross-cutting concerns",
+      "citation": "\"On the role of scientific thought\" (EWD447, Dijkstra); \"Aspect-Oriented Programming\" (Kiczales et al., 1997)",
+      "urls": [
+        "https://www.cs.utexas.edu/users/EWD/transcriptions/EWD04xx/EWD447.html",
+        "https://en.wikipedia.org/wiki/Aspect-oriented_programming"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/cross-cutting-concerns.md"],
+      "usage": ["`SKILL.md` → framing, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Separation of concerns; cross-cutting concern, tangling, scattering, weaving; homogeneous vs heterogeneous → `references/cross-cutting-concerns.md`"
+        }
+      ]
+    },
+    {
+      "id": "abstraction-discipline",
+      "kind": "web",
+      "title": "Abstraction discipline",
+      "citation": "\"The Wrong Abstraction\" (Sandi Metz); \"Yagni\" (Martin Fowler); speculative generality (refactoring smell)",
+      "urls": [
+        "https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction",
+        "https://martinfowler.com/bliki/Yagni.html",
+        "https://refactoring.guru/smells/speculative-generality"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/finding-axes.md",
+        "references/commonality-variability.md"
+      ],
+      "usage": ["`SKILL.md` → Gotchas (over-factoring)"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Duplication is cheaper than the wrong abstraction; rule of three; YAGNI; speculative generality → `references/finding-axes.md`, `references/commonality-variability.md`"
+        }
+      ]
+    },
+    {
+      "id": "boundary-forces",
+      "kind": "web",
+      "title": "Boundary forces",
+      "citation": "\"How Do Committees Invent?\" (Conway's Law, Melvin Conway); \"Domain-Driven Design\" bounded context & ubiquitous language (Eric Evans)",
+      "urls": [
+        "https://www.melconway.com/Home/Committees_Paper.html",
+        "https://martinfowler.com/bliki/BoundedContext.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/boundary-alignment.md",
+        "references/applying-the-layout.md"
+      ],
+      "usage": ["`references/boundary-alignment.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Structure mirrors team communication; single owner per axis; bounded-context and domain-seam alignment → `references/boundary-alignment.md`, `references/applying-the-layout.md`"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/boundary-alignment.md",
+        "references/naming-symmetry.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "guide-level-synthesis"
+    }
+  ]
+}

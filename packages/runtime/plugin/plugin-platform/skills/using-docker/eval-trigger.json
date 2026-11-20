@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "using-docker",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Write a production Dockerfile for a Node.js 22 web service that builds TypeScript with `npm run build` and serves on port 3000. Keep the final image as small and secure as reasonably possible.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Our Docker builds re-run `npm ci` on almost every commit even when only application source changed, and installing system packages with apt-get bloats the image. Show the Dockerfile layer ordering and the apt-get command you would use to fix both problems.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Add a database password to a containerized Node app without baking the secret into the image, and make sure the build context does not leak local files. Provide the relevant Dockerfile/compose lines and any supporting file.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Add a container health check to a Node.js image so a Kubernetes/Compose orchestrator can detect when the app stops responding. Show the Dockerfile instruction.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Turn this single-stage Node Dockerfile into a multi-stage build that keeps dev dependencies and source maps out of the production image.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Harden this production container: run as a non-root numeric user, pin the base image, avoid copying secrets, and make the filesystem read-only where possible.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "The container starts with npm run dev and includes test tooling. Produce a production entrypoint, health check, signal-safe process model, and minimal runtime contents.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Define a Compose setup for an API and PostgreSQL with a health-gated dependency, named volume, internal network, and secrets that are not baked into images.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "In a GitOps repo I have a base/ directory with a Deployment and Service. Write a Kustomize base kustomization.yaml plus a production overlay kustomization.yaml that changes the namespace to production, applies a replica-count patch file, and sets shared labels on all resources. Use current Kustomize v5 syntax.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-kubernetes"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-terraform"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "compose GitHub Actions workflows from reusable workflows and pin every action to a commit SHA",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-moon"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Move non-secret settings to a ConfigMap and credentials to a Secret, then mount both without checking decoded secret values into Git.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-kubernetes"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-terraform"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "is this GitLab CI job failing from a runner outage or a real test failure?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "A project-local moon.yml task override erased flags inherited from .moon/tasks. Fix the inheritance so the shared strict check remains active.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-moon"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "authoring-pull-requests",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "help me write a good pull request description for this change",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct mention"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "this PR is getting huge, what should I do about it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit trigger, size"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "what should I put in the description before I open this MR",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit trigger, content"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "draft a pr description, what why how",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "casual phrasing"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "I finished the feature, get it ready for review",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "buried in larger task, self-review"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "review this pull request and tell me if the logic is correct",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "reviewer side, use reviewing-code"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "rebase my branch onto main and resolve the conflicts",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "git mechanics, use using-git"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "post an inline review comment on this PR",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "keyword overlap, reviewer side"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "how big should a pull request be",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "size guidance"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "split this large change into smaller reviewable pieces",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "atomicity, splitting"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "set this merge request to auto-merge once the GitLab pipeline succeeds",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "host mechanics, out of scope"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "run gh pr create to open the PR on GitHub",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "host mechanics, out of scope"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "write unit tests for this function",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "unrelated"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "I have a branch that adds a new /reports API endpoint. While I was in there I also upgraded the web framework to its next major version and reformatted about 30 files that the linter flagged. Help me get this ready to open as a pull request.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "how should I mark a review comment so the author knows it must be fixed before merge?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "ship this",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "describe this change for the reviewers of the loyalty ledger work: what it does, which decisions it follows, how it was tested. keep it under what the host accepts",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by preparing-delivery"
+    }
+  ]
+}

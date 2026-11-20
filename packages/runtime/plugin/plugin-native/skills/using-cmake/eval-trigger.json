@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "using-cmake",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "In a CMakeLists.txt for an executable target named `app`, add the fmt formatting library as a source dependency fetched from https://github.com/fmtlib/fmt.git at version 10.1.1, and link it to `app`. Show the CMake code.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "I have a CMake library target `core`. Make it require C++20, and add `-Wall -Wextra -pedantic` warnings on GCC/Clang and `/W4` on MSVC, without affecting other targets in the build. Write the CMake commands.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "I have a library target `mylib` with public headers in `include/`. Write the CMake install rules so that a downstream project can consume it with find_package and get a properly namespaced imported target.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Set up CTest for a project. Register a test executable `unit_tests` as a test, tag it so it can be run selectively as a group, and give it a 30-second timeout. Show the CMake code.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Split this CMake project into a static library, a CLI executable, and a test executable with explicit target dependencies and no directory-wide flags.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Apply strict warnings to our own CMake targets without leaking them into third-party dependencies or downstream consumers.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "A library's public header includes fmt but its CMake target links fmt privately. Correct the PUBLIC, PRIVATE, and INTERFACE usage requirements.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Replace a hard-coded library path with find_package and an imported target, including a clear configure-time error when the dependency is absent.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "our codebase has #ifdef _WIN32 / #ifdef __linux__ branches in basically every source file and adding macOS means touching all of them. How do we restructure so the platform stuff lives in one place",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-cross-platform-code"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Write a portable shell script that must run under dash and busybox sh, not just bash. It should verify that jq is installed, take a filename as its first argument, and abort early on any error or unset variable.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-shell-scripts"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "I have a Terraform config that creates private subnets, one per availability zone, from a variable list of AZs. Right now removing a single AZ from the middle of the list forces Terraform to recreate several unrelated subnets. Write the resource and any supporting locals so this stops happening.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-terraform"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "publish this package to npm",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by publishing-npm-packages"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "I need to find connected gamepads on Linux and read their button presses. How do I enumerate /dev/input and tell a controller apart from a keyboard",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-cross-platform-code"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Add safe shell error handling to this script, accounting for commands where set -e is suppressed and cleanup that must always run.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-shell-scripts"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Define a Terraform module with a narrow input contract, validated variables, useful outputs, and no provider configuration inside the child module.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-terraform"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "ship this package to the registry and skip it if already published",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by publishing-npm-packages"
+    }
+  ]
+}

@@ -92,8 +92,24 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
+  # The skill and plugin tasks of the repository run this binary, so moon builds
+  # it once, caches it with its output, and restores it before a dependent task.
+  binary:
+    script: |
+      set -euo pipefail
+      go build -o "$projectRoot/dist/agent-eval" ./cmd/agent-eval
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - go.mod
+      - go.sum
+    outputs:
+      - dist/agent-eval
+    options:
+      cache: true
   # go-integration builds the real binary and runs it against a temporary
-  # directory and a fake claude program on PATH, and converts every legacy eval
+  # directory and a fake claude program on PATH, and reads every eval
   # file of the plugins, so it is an integration tier rather than a ci-check
   # gate. It starts real processes and spends no model budget.
   go-integration:
@@ -107,8 +123,8 @@ tasks:
       - "@globs(tests)"
       - go.mod
       - go.sum
-      - /packages/runtime/plugin/**/evals.json
-      - /packages/runtime/plugin/**/eval-queries.json
+      - /packages/runtime/plugin/**/eval-trigger.json
+      - /packages/runtime/plugin/**/eval-output.json
     options:
       cache: false
       runInCI: false

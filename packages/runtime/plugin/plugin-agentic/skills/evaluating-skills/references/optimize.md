@@ -40,17 +40,17 @@ If a trim surfaces a genuine defect (a rule that as written would mislead), fix 
 
 ## Gate, then Ablate
 
-1. **Gate**: the validator of **authoring-skills** (`scripts/validate.py <skill-dir>`) must PASS (frontmatter, refs resolve, Gotchas present, Progressive Disclosure Load-when triggers).
+1. **Gate**: the validator of **authoring-skills** (`agent-validate skill sources text --path <skill-dir>`) must PASS (frontmatter, refs resolve, Gotchas present, Progressive Disclosure Load-when triggers).
 2. **Ablate**: verify the trim kept its value with an **ablation against the weakest model you deploy**. A stronger model hides value loss:
    - Diff the removed content (`git diff <pre-trim-ref> HEAD -- <skill>`); from the `-` lines list genuine knowledge-at-risk items (non-obvious facts, exact identifiers): ignore filler.
-   - For each, an eval whose correct answer needs that fact: the `evals.json` seed + `eval-outputs.py` runner in [evaluating-outputs.md](evaluating-outputs.md).
-   - Measure the **with-skill** arm against the _repo_ content, not an installed release: pass the local plugin directory to `moon-skill-eval-outputs` so uncommitted `SKILL.md` and `references/` edits are what get tested.
+   - For each, an eval whose correct answer needs that fact: the `eval-output.json` seed + `agent-eval output` runner in [evaluating-outputs.md](evaluating-outputs.md).
+   - Measure the **with-skill** arm against the _repo_ content, not an installed release: pass the local plugin directory to `agent-eval output --plugin-dir` so uncommitted `SKILL.md` and `references/` edits are what get tested.
    - Run with-skill vs without-skill on the weakest model: `without-skill` correct → already known, cut was safe; `with-skill` correct only → essential and kept; `with-skill` **wrong** → the trim removed a fact the skill no longer conveys → restore the exact text.
    - Restore only the flagged facts, then re-validate.
 
 ## At catalog scale
 
-Run the full loop per skill, in parallel (independent dirs, no conflicts): **Baseline**: run the skill's `evals.json` prompts on the weakest model with the skill absent; **Scope**: an eval it already passes marks that content known (cut), one it fails marks the fact essential (keep); **Excise**: cut the known, keep the delta and everything no eval covers; **Gate**: `scripts/validate.py`; **Ablate**: re-run the essential (baseline-failed) evals with the trimmed skill injected and restore any it no longer conveys. Persist the per-skill `evals.json` so re-verifying against a newly added model is one pass per skill.
+Run the full loop per skill, in parallel (independent dirs, no conflicts): **Baseline**: run the skill's `eval-output.json` prompts on the weakest model with the skill absent; **Scope**: an eval it already passes marks that content known (cut), one it fails marks the fact essential (keep); **Excise**: cut the known, keep the delta and everything no eval covers; **Gate**: `agent-validate`; **Ablate**: re-run the essential (baseline-failed) evals with the trimmed skill injected and restore any it no longer conveys. Persist the per-skill `eval-output.json` so re-verifying against a newly added model is one pass per skill.
 
 ## Example
 

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "hexagonal-architecture-ports-and-adapters",
+      "kind": "web",
+      "title": "Hexagonal architecture (ports and adapters)",
+      "citation": "\"Hexagonal Architecture\" (Alistair Cockburn)",
+      "urls": ["https://alistair.cockburn.us/hexagonal-architecture/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/ports-and-adapters.md"],
+      "usage": ["`SKILL.md` → Essentials, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Ports owned by the core; driving (primary) vs driven (secondary) adapters; the hexagon metaphor → `references/ports-and-adapters.md`"
+        }
+      ]
+    },
+    {
+      "id": "clean-onion-architecture-and-the-dependency-rule",
+      "kind": "web",
+      "title": "Clean / Onion architecture and the dependency rule",
+      "citation": "\"Clean Architecture\" / \"The Clean Architecture\" (Robert C. Martin); Onion Architecture (Jeffrey Palermo)",
+      "urls": [
+        "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/dependency-inversion.md",
+        "references/composition-root.md"
+      ],
+      "usage": ["`SKILL.md` → Essentials (dependency rule), composition root"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Dependencies point inward toward stable abstractions; dependency inversion → `references/dependency-inversion.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "The composition root as the one place that names concretes → `references/composition-root.md`"
+        }
+      ]
+    },
+    {
+      "id": "component-principles-stability",
+      "kind": "web",
+      "title": "Component principles (stability)",
+      "citation": "Component coupling principles (Robert C. Martin)",
+      "urls": ["https://en.wikipedia.org/wiki/Package_principles"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/dependency-inversion.md"],
+      "usage": ["`references/dependency-inversion.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Stable-dependencies / stable-abstractions, instability, Zone of Pain → `references/dependency-inversion.md`"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/testability.md"]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed**",
+      "after": "guide-level-synthesis"
+    }
+  ]
+}

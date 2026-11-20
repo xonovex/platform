@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "reviewing-code",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "how should I mark a review comment so the author knows it must be fixed before merge?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "blocking decoration / Conventional Comments"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "what label do I use for a trivial preference-level nitpick in a code review?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "label taxonomy"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "structure my PR review with a summary and inline comments",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "review structure"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "my summary comment says 'see comment 3' but that is unclear, what is better?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "cross-link instead of ordinal reference"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "is this a blocking issue or just a suggestion, and how do I make that explicit?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "blocking vs non-blocking decorations"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "write clear actionable review feedback that leads with what is good",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "tone and structure"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "should I order my review comments by file or by priority?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "priority ordering in the summary"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "label this comment that proposes renaming a variable for clarity",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "suggestion label"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "post an inline comment anchored to a line on a Bitbucket pull request",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: host-specific posting mechanics, out of scope"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "post an inline review comment anchored to a line on a GitHub pull request",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: host-specific posting mechanics, out of scope"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "authenticate to the Bitbucket REST API with an HTTP access token",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: host-skill auth, out of scope"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "authenticate to the GitHub REST API with a personal access token",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: host-skill auth, out of scope"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "find bugs and race conditions in this concurrency code",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "reviewing existing code that is not a change for defects"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "review src/billing/proration.ts for me, it is not part of any PR, it has been on main for a year and I suspect it mishandles mid-cycle downgrades",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "review this module: existing code that is not a change, reviewed for defects"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "configure required reviewers and branch protection on the repository",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: repo settings, not review-comment craft"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "open a pull request against main with reviewers and a label using the gh CLI",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "open a merge request against main with glab on this GitLab repo",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "Inventory and group the TODO and FIXME comments under packages/tooling/cli so we can decide what belongs in a cleanup plan.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by auditing-code-quality"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "I wrote plans/saved-searches myself so I'm biased. can something independent stress-test its assumptions before sign-off?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "my PR for the rate limiter is ready, write the description with how I tested it and what reviewers should look at first",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-pull-requests"
+    }
+  ]
+}

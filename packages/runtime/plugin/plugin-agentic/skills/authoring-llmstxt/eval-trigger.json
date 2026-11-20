@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "authoring-llmstxt",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Our TypeScript HTTP framework docs site at https://acme.dev has getting-started, API reference, routing, and middleware pages, plus a changelog and a migration guide that are only occasionally relevant. Write the llms.txt file we should serve.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "We're generating the `.md` mirror URLs that our llms.txt will link to. Give the correct mirror URL for each of these pages: (a) https://site.com/docs/intro.html  (b) https://site.com/docs/guide  (c) https://site.com/docs/guide/  (d) https://site.com/ (the root).",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "We already host an llms.txt with linked .md mirrors. How do we produce the single-file expanded context bundles the spec describes, and what should each output file be named?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Review this llms.txt draft and tell me what's wrong with it:\n\n# DataPipe\n\n> Streaming ETL library for Python.\n\nDataPipe moves data between sources and sinks.\n\n### Key concepts\n\nPipelines are composed of stages.\n\n## Docs\n\n- [Quickstart](https://datapipe.io/docs/quickstart.html)\n- [API](https://datapipe.io/docs/api.md)",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Create an llms.txt for this documentation site with the required heading, a concise summary, and curated Markdown links grouped by task.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Generate per-page Markdown mirrors for an llms.txt index while preserving canonical URLs, headings, code fences, and link targets.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Show a compliant llms.txt example that separates essential API docs from optional background material without turning it into a sitemap dump.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Design a deterministic build step that emits llms.txt and Markdown mirrors from site content, then checks for broken or non-canonical links.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "I have a Claude Code slash command at `.claude/commands/changelog.md`. Its body uses `$ARGUMENTS` for the user input and embeds git output inline with `` !`git log --oneline -20` ``. I want to port this same command to the Gemini CLI. Tell me exactly what to change and where the file goes.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-commands"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "this packages/auth dir doesn't have an AGENTS.md yet: set one up",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "create a new skill for our GraphQL resolver conventions: SKILL.md plus a few reference files",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Rewrite this so it reads like a person wrote it, not an AI: 'Our platform offers a seamless, intuitive experience that empowers teams to unlock their full potential. Experts agree it's a game-changer, and studies show productivity has never been better.'",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-editorials"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-commands"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "the new microservice doesn't have project instructions yet: generate one based on what's in src/",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Rewrite this destination article so it sounds locally informed and specific, removes generic travel clichés, and preserves every verified fact.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-editorials"
+    }
+  ]
+}

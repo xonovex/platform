@@ -5,14 +5,13 @@ package drift
 import (
 	"encoding/json"
 	"math"
-	"path"
 	"regexp"
 	"sort"
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/catalog"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/budget"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/check"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-validate-go/internal/markdown"
 )
@@ -61,29 +60,15 @@ func (Check) Summary() string {
 // DefaultPaths returns the catalog root.
 func (Check) DefaultPaths() []string { return []string{"packages/runtime/plugin"} }
 
-type file struct {
-	path string
-	kind string
-	text string
-}
-
 // Run measures every skill file below the paths.
 func (Check) Run(ctx check.Context) ([]findings.Finding, error) {
 	options := defaults()
 	if err := check.DecodeOptions(ctx.Options, &options); err != nil {
 		return nil, err
 	}
-	dirs, err := catalog.SkillDirs(ctx.Tree, ctx.Paths)
+	files, err := budget.Collect(ctx.Tree, ctx.Paths)
 	if err != nil {
 		return nil, err
-	}
-	var files []file
-	for _, dir := range dirs {
-		collected, err := collect(ctx, dir)
-		if err != nil {
-			return nil, err
-		}
-		files = append(files, collected...)
 	}
 	report := check.NewReporter(Name)
 	budgets, ok := readBudgets(ctx, report, options.BudgetFile)
@@ -92,32 +77,6 @@ func (Check) Run(ctx check.Context) ([]findings.Finding, error) {
 	}
 	checkDuplication(report, options, files)
 	return report.Findings(), nil
-}
-
-func collect(ctx check.Context, dir string) ([]file, error) {
-	var out []file
-	skill := path.Join(dir, catalog.SkillFile)
-	if text, found, err := ctx.Tree.Optional(skill); err != nil {
-		return nil, err
-	} else if found {
-		out = append(out, file{path: skill, kind: "skill", text: text})
-	}
-	entries, err := ctx.Tree.List(path.Join(dir, "references"))
-	if err != nil {
-		return nil, err
-	}
-	for _, entry := range entries {
-		if entry.IsDir || !strings.HasSuffix(entry.Name, ".md") {
-			continue
-		}
-		p := path.Join(dir, "references", entry.Name)
-		text, err := ctx.Tree.Read(p)
-		if err != nil {
-			return nil, err
-		}
-		out = append(out, file{path: p, kind: "reference", text: text})
-	}
-	return out, nil
 }
 
 // readBudgets reads the manifest. A missing manifest is an empty one; a broken
@@ -150,21 +109,21 @@ func readBudgets(ctx check.Context, report *check.Reporter, name string) (map[st
 
 // A file in the manifest may not exceed its recorded budget, and an unlisted
 // file may not exceed the ceiling of its kind.
-func checkBudgets(report *check.Reporter, options Options, files []file, budgets map[string]int) {
+func checkBudgets(report *check.Reporter, options Options, files []budget.File, budgets map[string]int) {
 	for _, f := range files {
-		words := markdown.ProseWords(f.text)
-		if budget, listed := budgets[f.path]; listed {
-			if words > budget {
-				report.Drift("drift.budget", f.path, 1, "budget: %s is %d words, over its %d-word budget; bump the budget in the same change", f.path, words, budget)
+		words := f.Words()
+		if recorded, listed := budgets[f.Path]; listed {
+			if words > recorded {
+				report.Drift("drift.budget", f.Path, 1, "budget: %s is %d words, over its %d-word budget; bump the budget in the same change", f.Path, words, recorded)
 			}
 			continue
 		}
 		cap := options.ReferenceCap
-		if f.kind == "skill" {
+		if f.Kind == budget.KindSkill {
 			cap = options.SkillCap
 		}
 		if words > cap {
-			report.Drift("drift.budget", f.path, 1, "budget: %s is %d words, over the %d-word cap for a new %s file", f.path, words, cap, f.kind)
+			report.Drift("drift.budget", f.Path, 1, "budget: %s is %d words, over the %d-word cap for a new %s file", f.Path, words, cap, f.Kind)
 		}
 	}
 }
@@ -259,10 +218,10 @@ type cluster struct {
 	grams map[string]struct{}
 }
 
-func checkDuplication(report *check.Reporter, options Options, files []file) {
+func checkDuplication(report *check.Reporter, options Options, files []budget.File) {
 	var clusters []*cluster
 	for _, f := range files {
-		for _, sentence := range normativeSentences(f.text) {
+		for _, sentence := range normativeSentences(f.Text) {
 			grams := bigrams(normalizeWords(sentence))
 			var found *cluster
 			for _, c := range clusters {
@@ -272,10 +231,10 @@ func checkDuplication(report *check.Reporter, options Options, files []file) {
 				}
 			}
 			if found == nil {
-				clusters = append(clusters, &cluster{paths: map[string]bool{f.path: true}, grams: grams})
+				clusters = append(clusters, &cluster{paths: map[string]bool{f.Path: true}, grams: grams})
 				continue
 			}
-			found.paths[f.path] = true
+			found.paths[f.Path] = true
 		}
 	}
 	for _, c := range clusters {

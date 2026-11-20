@@ -1,0 +1,207 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "plantuml-command-line",
+      "kind": "web",
+      "title": "PlantUML command line",
+      "urls": ["https://plantuml.com/command-line"],
+      "reviewedAt": "2026-10-27",
+      "feeds": [
+        "references/rendering.md",
+        "references/linux.md",
+        "references/macos.md",
+        "references/windows.md"
+      ],
+      "usage": [
+        "`references/rendering.md` → The render command",
+        "`references/linux.md`, `references/macos.md`, `references/windows.md` → the local and container render commands",
+        "`assets/templates/lead-diagram.puml`, `assets/templates/option-diagram.puml` → the render comment"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`-o <directory>` writes the images into a directory → rendering"
+        },
+        {
+          "id": "claim-2",
+          "statement": "`--svg` and `--png` choose the output format → rendering, templates"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`-failfast2` runs a checking pass and generates nothing when any diagram has an error → rendering"
+        }
+      ]
+    },
+    {
+      "id": "plantuml-faq",
+      "kind": "web",
+      "title": "PlantUML FAQ",
+      "urls": ["https://plantuml.com/faq"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/drawing.md", "references/checking.md"],
+      "usage": [
+        "`SKILL.md` → Gotchas",
+        "`references/drawing.md` → Layout",
+        "`references/checking.md` → Check the images"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The renderer limits image width and height to 4096 pixels and crops a wider image → Gotchas, layout"
+        }
+      ]
+    },
+    {
+      "id": "plantuml-installation-faq",
+      "kind": "web",
+      "title": "PlantUML installation FAQ",
+      "urls": ["https://plantuml.com/faq-install"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/macos.md", "references/windows.md"],
+      "usage": [
+        "`references/macos.md`, `references/windows.md` → Local renderer"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Sequence diagrams render without Graphviz, and `-testdot` checks Graphviz → macOS, Windows"
+        }
+      ]
+    },
+    {
+      "id": "structurizr-export",
+      "kind": "web",
+      "title": "Structurizr export",
+      "urls": ["https://docs.structurizr.com/export"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/rendering.md"],
+      "usage": ["`references/rendering.md` → The Structurizr export"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The `plantuml` format is the same as `plantuml/structurizr` and exports each view as standard PlantUML → rendering"
+        }
+      ]
+    },
+    {
+      "id": "structurizr-dsl-expressions",
+      "kind": "web",
+      "title": "Structurizr DSL expressions",
+      "urls": ["https://docs.structurizr.com/dsl/expressions"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/drawing.md"],
+      "usage": [
+        "`references/drawing.md` → The system model",
+        "`assets/templates/system-model.dsl` → the settled view"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A view excludes every element with a tag through an element tag expression, so the settled view leaves the open elements out → drawing, template"
+        }
+      ]
+    },
+    {
+      "id": "structurizr-binaries",
+      "kind": "web",
+      "title": "Structurizr binaries",
+      "urls": ["https://docs.structurizr.com/binaries"],
+      "reviewedAt": "2026-10-27",
+      "feeds": [
+        "references/rendering.md",
+        "references/macos.md",
+        "references/linux.md",
+        "references/windows.md"
+      ],
+      "usage": [
+        "`references/rendering.md` → The Structurizr export",
+        "`references/macos.md`, `references/linux.md`, `references/windows.md` → Structurizr"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The Structurizr image runs a command against a directory mounted at `/usr/local/structurizr` → rendering, operating-system references"
+        }
+      ]
+    },
+    {
+      "id": "podman-run",
+      "kind": "web",
+      "title": "podman run",
+      "urls": ["https://docs.podman.io/en/latest/markdown/podman-run.1.html"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/linux.md"],
+      "usage": ["`references/linux.md` → podman"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`--userns=keep-id` maps the current user and group to the same ids in the container → Linux"
+        },
+        {
+          "id": "claim-2",
+          "statement": "The `Z` volume suffix relabels the mounted content privately for SELinux → Linux"
+        }
+      ]
+    },
+    {
+      "id": "homebrew-formula-for-plantuml",
+      "kind": "web",
+      "title": "Homebrew formula for plantuml",
+      "urls": ["https://formulae.brew.sh/api/formula/plantuml.json"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/macos.md"],
+      "usage": ["`references/macos.md` → Local renderer"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The formula installs the `plantuml` command with Graphviz and OpenJDK as dependencies → macOS"
+        }
+      ]
+    },
+    {
+      "id": "debian-plantuml-package",
+      "kind": "web",
+      "title": "Debian plantuml package",
+      "urls": ["https://packages.debian.org/stable/plantuml"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/linux.md", "references/rendering.md"],
+      "usage": [
+        "`references/linux.md` → Local renderer",
+        "`references/rendering.md` → Choose the route"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Debian stable ships a 2020 release that only recommends Graphviz, so the packaged renderer can predate the switches → Linux, rendering"
+        }
+      ]
+    },
+    {
+      "id": "xonovex-diagram-conventions",
+      "kind": "original",
+      "title": "Xonovex diagram conventions",
+      "provenance": "Repository-original rules for the diagrams of a change: which decisions get a picture, the lead and option diagrams, the state marks, the file names, participant names, SVG by default with PNG only on request, the render route, the image check, the log entry and the hand-off of link lines to the owner of the plan",
+      "reviewedAt": "2026-11-19",
+      "feeds": [
+        "references/selection.md",
+        "references/drawing.md",
+        "references/labels.md",
+        "references/rendering.md",
+        "references/checking.md",
+        "references/hand-off.md",
+        "references/linux.md",
+        "references/macos.md",
+        "references/windows.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Drawing only where options change who calls whom, a lead diagram of settled elements only, one option diagram for each open decision, state marks in color and in text, `<topic>-<kind>` names, SVG images unless the user asks for PNG, a local renderer before a container runtime, opening every changed image, and handing the link lines to **writing-plan** and **revising-plan** are conventions of this workflow. The entry step, the log entry and the bundle layout come from **recording-handoff**."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "assuring-accessibility",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "assess this exact web release against WCAG 2.2 AA and publish reviewable evidence",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "versioned accessibility assurance"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "decide which WCAG criteria apply to our authenticated dashboard and document the gaps",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "applicability and gap analysis"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "combine automated accessibility scans with keyboard and screen-reader testing",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "layered verification"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "design an expiring accessibility exception with owner, remediation, and reassessment",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "accessibility governance"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "make accessibility a release profile without claiming the scanner proves compliance",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "profile and evidence boundaries"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "retest focus, zoom, errors, and dynamic status after this UI revision",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "exact-revision assessment"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "retire an obsolete accessibility waiver after verifying the replacement",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "operational lifecycle"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "memoize this React icon button so it stops re-rendering with the parent list",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: React implementation owner"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "implement an aria-live React component",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: framework implementation"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "write a generic unit test for a parser",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: testing owner"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "pick a color palette for a poster",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: visual design without assurance intent"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "configure a security policy engine",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: security governance"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Assess release candidate sha256:abc against WCAG 2.2 AA. We have an automated scanner report; tell me what evidence is still missing and what result to publish.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "convert this React class component to hooks and memoize the expensive list render",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-react"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "build a threat-informed security assurance plan with exact control and evidence ownership",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "security planning rather than accessibility work"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "classify our AI-system role and applicable obligations before selecting a regulated profile",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "AI regulatory classification rather than accessibility work"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "write a Vitest test that mocks the payment service and asserts the retry backoff timing",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss: a Vitest API question"
+    }
+  ]
+}

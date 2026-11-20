@@ -9,9 +9,9 @@ An **output-artifact hybrid**: a guideline skill that also prescribes a structur
 A ready-to-scaffold template lives under `assets/guideline-skill-template/`:
 
 - [`SKILL.md.template`](../assets/guideline-skill-template/SKILL.md.template): frontmatter, Essentials, Gotchas, Example, Progressive Disclosure (`## Requirements` is language/framework-only, delete it for general / pattern / process skills)
-- [`SOURCES.md`](../assets/guideline-skill-template/SOURCES.md): source tracking with a **docs-URL** form and an authored **`Title:`** form for cited books/papers/articles
-- [`evals.json`](../assets/guideline-skill-template/evals.json): three output-quality seeds with observable assertions
-- [`eval-queries.json`](../assets/guideline-skill-template/eval-queries.json): 16 trigger-eval queries (8 positive + 8 negative with train/validation splits)
+- [`sources.json.template`](../assets/guideline-skill-template/sources.json.template): source tracking with a docs-URL entry and a `citation` entry for cited books/papers/articles
+- [`eval-output.json.template`](../assets/guideline-skill-template/eval-output.json.template): three output-quality seeds with observable expectations
+- [`eval-trigger.json.template`](../assets/guideline-skill-template/eval-trigger.json.template): 16 trigger-eval queries (8 positive + 8 negative with train/validation splits)
 - [`references/{topic}.md`](../assets/guideline-skill-template/references/{topic}.md), reference template (`## sub-headers`, one per facet: statement / rationale / bad→good example; `## Contents` once >200 lines)
 
 To scaffold a new guideline skill: copy the directory, rename `{topic}.md` files, and fill in `{placeholders}`.
@@ -30,7 +30,7 @@ A general or architectural-**pattern** skill (anything not tied to one language 
 
 - **Pick one neutral running example and reuse it across the skill**: e.g. an order service + a repository, notifications with email/sms/push channels, a storage backend, shapes, documents. A reader who has never seen your repo must be able to follow every snippet.
 - **Map the motivating project onto the neutral domain; never name its types or dirs**: if a real refactor inspired the skill, translate it. `Isolator` / `nixprov` / `internal/sandbox` becomes `Repository` / `s3` / `internal/store`; "our agent sandbox" becomes "a data-export tool". The principle is the subject, not the project.
-- **No in-repo provenance in the body**: drop phrases like "in this repo", "our service", and any `## Motivating in-repo example` SOURCES entry; they bind the skill to one project. (Language/framework skills are the exception: their specifics _are_ the subject.)
+- **No in-repo provenance in the body**: drop phrases like "in this repo", "our service", and any in-repo motivating example in `sources.json`; they bind the skill to one project. (Language/framework skills are the exception: their specifics _are_ the subject.)
 - **Test:** hand the skill to someone who has never seen your codebase. If an example only parses with your project's vocabulary, it is not yet project-agnostic.
 
 ## Source Parsing Patterns

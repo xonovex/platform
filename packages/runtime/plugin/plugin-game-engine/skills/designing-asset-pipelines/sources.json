@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/raw-vs-runtime-formats.md",
+        "references/import-and-compile.md",
+        "references/dependency-tracking.md",
+        "references/content-hash-and-cache.md",
+        "references/hot-reloading-content.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Import and compile, Caching and incrementality, Live iteration, Gotchas",
+        "A worked instance of a two-representation asset pipeline: faithful intermediate on import, deterministic per-type compile, validity-hash caching, hash-propagation invalidation, and the same transform framework reused offline and at runtime"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"the engine Asset Pipeline\": importers behind one extension-keyed interface running async into a faithful intermediate; doing minimal massaging on import to stay close to the source; a generic intermediate as least-common-denominator with a typed extension slot for format-specific data; per-type compile steps (textures: mips/compression, meshes: vertex-cache optimization/quantization, materials: shader/material graph) splitting one source into multiple runtime resources; keeping the structural hierarchy immutable and confining edits to overrides on instances so reimport stays unambiguous about authority → `references/raw-vs-runtime-formats.md`, `references/import-and-compile.md`, `references/dependency-tracking.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Creation Graphs\": each output computes a validity hash from its local settings plus the validity hashes of its inputs, used to skip redundant computation; selective caching of heavy operations only; the same transform pipeline runs offline (long compiles acceptable) or at runtime (efficiency-critical), enabling hot iteration; hash propagation forms the implicit dependency graph that invalidates exactly the affected outputs → `references/content-hash-and-cache.md`, `references/dependency-tracking.md`, `references/hot-reloading-content.md`, `references/import-and-compile.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "\"Referencing Objects: Names vs GUIDs\": stable GUID/object identity as the default for references so they survive rename and move (vs fragile path/name references that break on reorg); content-hash identity where the same content always maps to the same identifier (the Git principle); using stable identity for dependency edges → `references/dependency-tracking.md`, `references/content-hash-and-cache.md`"
+        }
+      ]
+    },
+    {
+      "id": "general-build-cache-incremental-build-prior-art",
+      "kind": "web",
+      "title": "General build-cache / incremental-build prior art",
+      "urls": [
+        "https://bazel.build/remote/caching",
+        "https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"
+      ],
+      "urlNotes": [
+        "Bazel: content-addressed remote build cache and action determinism, https://bazel.build/remote/caching",
+        "Git: content-addressed object model (same content → same hash), https://git-scm.com/book/en/v2/Git-Internals-Git-Objects"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/import-and-compile.md",
+        "references/content-hash-and-cache.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Caching and incrementality; reference grounding for content-addressed, shareable caches",
+        "Confirmation that hashing canonical inputs (excluding paths/timestamps/host) to key a content-addressed cache and share it across machines is general build-system practice, not engine-specific"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Action determinism + hermetic inputs as the precondition for a shareable cache; remote cache hits turning a cold build into a download → `references/import-and-compile.md`, `references/content-hash-and-cache.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Content-addressed identity (hash of content is the key) and the danger of leaking location/time into the key → `references/content-hash-and-cache.md`"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above (the three archived posts and the build-cache references)\n2. Diff against the prior pull (or scan for newly added sections / revisions)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "general-build-cache-incremental-build-prior-art"
+    }
+  ]
+}

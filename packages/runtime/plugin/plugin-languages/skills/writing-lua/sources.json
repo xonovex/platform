@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "lua-5-4-reference-manual",
+      "kind": "web",
+      "title": "Lua 5.4 reference manual",
+      "urls": ["https://www.lua.org/manual/5.4/"],
+      "version": "5.4.0",
+      "contentSha256": "sha256:75886da92d130cc217c6f79a02e80223bdc03de61a5823333fa57eafdfd73bdb",
+      "reviewedAt": "2026-07-22",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; modules, local scope, tables, metatables, coroutines, error handling, iteration, and standard-library behavior."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Lua 5.4 syntax and runtime semantics, including `table.unpack`, metatable behavior, iterator protocols, and coroutine APIs."
+        }
+      ]
+    },
+    {
+      "id": "luajit-extensions-and-xonovex-hot-path-conventions",
+      "kind": "web",
+      "title": "LuaJIT extensions and Xonovex hot-path conventions",
+      "urls": [
+        "https://luajit.org/extensions.html",
+        "https://luajit.org/running.html"
+      ],
+      "provenance": "Performance policy and data-layout recommendations are repository-original conventions validated against maintained Lua/LuaJIT workloads",
+      "reviewedAt": "2026-07-19",
+      "feeds": ["references/hot-paths.md"],
+      "usage": [
+        "`references/hot-paths.md`; local lookup caching, stable table shapes, allocation control, trace-friendly loops, and profiling before tuning."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "LuaJIT runtime/extension boundaries come from upstream; exact hot-path preferences are Xonovex conventions."
+        }
+      ]
+    }
+  ]
+}

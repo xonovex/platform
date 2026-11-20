@@ -123,7 +123,9 @@ func checkClaims(c Catalog) []findings.Finding {
 				unanchored++
 			}
 		}
-		if unanchored > 0 {
+		// A source whose claims carry no anchor at all opts out of anchor
+		// auditing; a mix of both is an unfinished catalog.
+		if unanchored > 0 && unanchored < len(s.Claims) {
 			out = append(out, finding(findings.Warn, CodeClaimUnanchored, s.File,
 				fmt.Sprintf("%d of %d claims of source %q have no anchor", unanchored, len(s.Claims), s.ID)))
 		}

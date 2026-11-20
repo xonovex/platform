@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "skill": "settling-questions",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "ok the research for the broker move is in plans/order-events-broker and it left 6 open questions. go through them with me one by one",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "walking the questions a research file lists"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "grill me on the offline cart design for shop-app, one question at a time, and recommend something each time",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "discovering questions by questioning"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "I can't answer the retry thing until we know if web-client ever retried POST /orders. park it until then, Lena from checkout finds out",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "pausing a question until a named fact is known"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "payments got back to us: refunds go through ledger-svc, not billing-api. record that against the open refund-routing decision",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "an owner's answer that settles an open decision file"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "the token expiry question is really two, access tokens vs refresh tokens. split it and ask me the first one",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "splitting a question in the queue"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "half the questions on saved-searches are done and the rest belong to other teams. wrap up and tell me who owes what",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "consolidating the walk with the owners' list"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "I want a fourth option for the cache question: keep it in redis but one per region. check that against cache-gateway before you recommend anything",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "an operator alternative checked against the code"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "let's pick up where we stopped on the notifications questions yesterday, next one please",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "resuming a walk of open questions"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "decide with me whether rate limits live in api-gateway or in each service, and write down what we pick as a testable rule",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "recording an answer as one testable claim"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "what's still undecided for fare-capping? take me through it, I'll tell you when something needs the pricing team to sign off",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "leaving a question open for its owner"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "red-team plans/order-events-broker/plan.md before I sign it off. what breaks first?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "review my diff on feature/retry-webhook for bugs before I merge it",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "the critique of saved-searches has 4 findings, fold them into plan.md and the work files",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "write the PR description for fix/cart-totals and say what I tested",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "we redo the same broker cutover steps every session. capture them as a reusable skill",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "every decision for invoice-feed is settled now, write plan.md and say what can start today",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "pre-mortem on the fare-capping plan: assume it shipped and failed, tell me why",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn the checkout epic into user stories with acceptance criteria",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "from what went wrong today, add a rule to AGENTS.md that agents run the migration check before they touch db/",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "before we decide anything, find out what order-publisher sends today and what the new broker accepts",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by researching-change"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "quick one: map or slice for about ten items in this Go helper?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss: a one-off design choice inside one repository needs no decision record"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "new project: a loyalty service, no code yet. gather what retail and finance need and what similar systems do, and save it with the open questions",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by researching-change"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "the plan got revised yesterday after the last review, critique the new version from scratch",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    }
+  ]
+}

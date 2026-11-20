@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "managing-credentials",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "which gh CLI flags call a GitHub REST endpoint directly, and how do I page through the results?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "provider request mechanics belong to using-github"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Where should our developers keep API tokens on macOS, Linux, Windows, and WSL, and how should scripts retrieve them?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "provider-neutral local credential storage and retrieval"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Replace this long-lived CI cloud secret with OIDC and make sure forked pull requests cannot assume the role.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "workload identity and CI trust boundaries"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Design a rotation runbook for a PAT used by five services, including overlap, verification, and revocation.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "multi-consumer credential rotation lifecycle"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "A token appeared in CI logs yesterday. What do we revoke first, what evidence do we preserve, and when do we rewrite git history?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "credential exposure response"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Is a gitignored .env file good enough for local secrets, or should this CLI use the OS keychain?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "local plaintext fallback versus secret store"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Create a lifecycle inventory for client secrets with owners, consumers, expiry, audit source, and revocation path.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "credential lifecycle governance"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Our service reads one API token from a cloud secret manager. Define least-privilege access, version adoption, and rollback during rotation.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "production secret-manager consumption"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Review this pipeline for accidental secret exposure through command arguments, shell tracing, child processes, and unreliable masking.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "secret delivery and log exposure"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Which fine-grained GitHub PAT permissions are required to resolve a pull-request review thread?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "exact token scopes belong to using-github"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Why does glab target gitlab.com instead of our self-managed host, and which environment variables should I set?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "GitLab host and token variables belong to using-gitlab"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Show the header and cheapest GitLab API endpoint for verifying that my personal access token works.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "provider request mechanics belong to using-gitlab"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Configure a Kubernetes ServiceAccount and RBAC so one pod can read a single decrypted secret.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "cluster RBAC and secret wiring belong to using-kubernetes"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Encrypt application fields in PostgreSQL and design envelope encryption with a KMS-backed data key.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "application cryptography is outside machine credential lifecycle"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "list this repository open pull requests with gh and filter them by review state",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "provider CLI mechanics belong to using-github"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "define a GitLab CI job that runs only on protected branches and publishes a build artifact",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "provider pipeline mechanics belong to using-gitlab"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "Choose Argon2 parameters and password-reset rules for end-user account passwords.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "human password authentication is outside machine credential management"
+    }
+  ]
+}

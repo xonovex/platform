@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "repository-travel-guide-conventions",
+      "kind": "original",
+      "title": "Repository travel guide conventions",
+      "provenance": "Repository-original multilingual travel and venue guide workflow distilled from maintained content projects",
+      "reviewedAt": "2026-08-29",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Current practical research, guide structure, itineraries by traveler need, source-language drafting before translation, CEFR readability, structured frontmatter, research dates, accessibility verification, and slug collision checks."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Review corrections and evaluations involving destination research, practical facts, accessibility, itineraries, translations, frontmatter, and filenames.\n2. Update the smallest owning section.\n3. Re-run trigger, routing, and output evaluations.\n4. Update the review date after the guidance and evaluations agree.",
+      "after": "repository-travel-guide-conventions"
+    }
+  ]
+}

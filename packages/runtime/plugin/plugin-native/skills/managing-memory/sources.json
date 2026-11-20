@@ -1,0 +1,122 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "region-based-arena-memory-management",
+      "kind": "web",
+      "title": "Region-based / arena memory management",
+      "urls": ["https://en.wikipedia.org/wiki/Region-based_memory_management"],
+      "urlNotes": [
+        "https://en.wikipedia.org/wiki/Region-based_memory_management and Tofte & Talpin, \"Region-Based Memory Management\" (Information and Computation, 1997)"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/arenas-and-pools.md"],
+      "usage": [
+        "`SKILL.md` → Allocation strategy, Ownership",
+        "Lifetime-by-reset and arena semantics"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Arena/bump/linear allocators, lifetime reset, scratch arenas → `references/arenas-and-pools.md`"
+        }
+      ]
+    },
+    {
+      "id": "custom-allocators-pools-freelists-bump",
+      "kind": "original",
+      "title": "Custom allocators (pools, freelists, bump)",
+      "urlNotes": [
+        "Game Engine Architecture (J. Gregory), Memory Management chapter; Andrei Alexandrescu, \"std::allocator Is to Allocation what std::vector Is to Vexation\" (CppCon 2015)"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/arenas-and-pools.md",
+        "references/caller-owns-memory.md"
+      ],
+      "usage": ["`SKILL.md` → Allocation strategy"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Object pools, free lists, fragmentation, per-allocation overhead → `references/arenas-and-pools.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Caller-provided storage / non-allocating APIs → `references/caller-owns-memory.md`"
+        }
+      ]
+    },
+    {
+      "id": "virtual-memory-reserve-commit",
+      "kind": "original",
+      "title": "Virtual memory reserve/commit",
+      "urlNotes": [
+        "OS virtual-memory APIs: `mmap`/`mprotect` (POSIX), `VirtualAlloc` (Windows); reserve-then-commit growable-array technique"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/arenas-and-pools.md"],
+      "usage": ["`SKILL.md` → Allocation strategy"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Reserve large / commit on demand, stable-address growable arrays → `references/arenas-and-pools.md`"
+        }
+      ]
+    },
+    {
+      "id": "ownership-lifetimes",
+      "kind": "web",
+      "title": "Ownership & lifetimes",
+      "urls": [
+        "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html"
+      ],
+      "urlNotes": [
+        "Ownership models as in RAII (C++) and the Rust ownership/borrow model: https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/ownership-and-lifetimes.md"],
+      "usage": ["`SKILL.md` → Ownership, Essentials"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Single-owner/borrow, lifetime-by-scope, leak/double-free/use-after-free avoidance, refcount as exception → `references/ownership-and-lifetimes.md`"
+        }
+      ]
+    },
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/virtual-memory.md"],
+      "usage": [
+        "`SKILL.md` → Allocation strategy",
+        "Practical virtual-memory techniques built on address-space reservation"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Virtual Memory Tricks\": reserve cheap address space vs commit physical, cap-free never-moving arrays, page-aligned growth to cut fragmentation, gapless ring buffer via double-mapping, end-of-page bounds-checking allocator → `references/virtual-memory.md`"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/caller-owns-memory.md"]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "guide-level-synthesis"
+    }
+  ]
+}

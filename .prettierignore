@@ -114,7 +114,7 @@ docs/_build/
 
 # Skill eval run artifacts
 *-workspace/
-.skill-eval-results/
+.agent-eval/
 
 # The generated index.md and log.md of the workflow example bundle use the * list marker that the bundle format defines.
 packages/runtime/plugin/plugin-workflow/examples/saved-searches/

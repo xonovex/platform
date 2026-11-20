@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "skill": "configuring-harness-integrations",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "Compare how three coding-agent harnesses can enforce a protected-path rule, and tell me which can actually block it.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Maps the requested behavior to one semantic intent and compares each harness row by row through its versioned capability matrix, not by event-name similarity."
+        },
+        {
+          "kind": "llm",
+          "criterion": "States the guarantee boundary: which operations each native event covers, and enforces independently what it cannot cover."
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Plan adding a hook to an agent harness without applying it yet.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Runs discover first: version probe with not-installed on absence, every configuration layer and source, and each behavior resolved against the matrix."
+        },
+        {
+          "kind": "llm",
+          "criterion": "Shows an exact merge preview with scope, digest, permissions, data flow, probes, disable and rollback, and requires explicit authorization before apply."
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Choose between a deterministic hook, a model evaluator, and a specialist agent for a completion check.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Declares the executor class of each option and does not call a command that runs a model deterministic."
+        },
+        {
+          "kind": "llm",
+          "criterion": "Bounds model and agent execution with a closed output schema and time, cost, depth and authority limits, and states what leaves the process."
+        }
+      ]
+    }
+  ]
+}

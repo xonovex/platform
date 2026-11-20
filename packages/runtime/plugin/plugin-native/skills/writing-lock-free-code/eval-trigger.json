@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "writing-lock-free-code",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "what memory_order should I use on the store and load when one thread fills a buffer and flips a ready flag the other thread waits on?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: acquire/release publish-consume ordering"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "my pop() in this CAS stack occasionally reads garbage from a node: is this the ABA thing?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Treiber stack + ABA / use-after-free without naming lock-free"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "I have 8 worker threads each bumping its slot in a counters[] array and it's somehow slower than a single global atomic: why?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "false sharing, described by symptom"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "need a bounded queue where several producers and several consumers hand off jobs without a mutex",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "MPMC bounded queue, doesn't say lock-free"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "the audio thread can't take a lock: build me a single-producer single-consumer ring for samples",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "SPSC ring buffer"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "when is it safe to free a node after I unlink it from a list that other threads are still traversing?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "safe memory reclamation, hazard pointers/epoch"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "this spinlock pegs all cores under contention. How do I make threads back off or use a scalable queue lock?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "backoff + MCS/CLH locks"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "convert this array-of-structs particle system to struct-of-arrays for cache locality",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: single-threaded data layout, use applying-data-oriented-design"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "wire up a thread pool with an async job API so I can await results from a higher-level worker",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: high-level async/pool usage, no shared-memory synchronization"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "review my .c file for const-correctness and designated-initializer style in this systems lib",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: C99 style, use writing-c99-opinionated"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "I think I need a compare-exchange loop to atomically clamp a shared max value: show the weak vs strong choice",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "CAS loop, weak vs strong"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "is plain volatile enough to share this flag between two threads, or do I actually need something else?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "memory model: volatile is not atomic"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "many threads log into one collector thread: what queue avoids producer-side CAS contention?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "MPSC Vyukov queue, implicit"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "give me a wait-free counter and explain how that differs from just lock-free here",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "progress guarantees"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "pad these hot fields so two cores writing them don't keep invalidating each other's cache line",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "false sharing, alignment to cache line"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "tune this LuaJIT hot loop with stable table shapes and preallocated arrays",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: language-specific perf, use writing-lua"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "align my vec4 struct to 16 bytes so the SIMD loads don't fault",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: single-threaded SIMD alignment, not concurrency"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-c99-opinionated"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "our exporter crashes opening the second project but the first one is fine, where do I even start",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by debugging-native-code"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "my sound randomly cuts out with a little pop when the frame rate dips: the mixing happens in a callback that sometimes grabs a mutex",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by mixing-audio"
+    }
+  ]
+}

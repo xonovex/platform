@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "skill": "{gerund}-{tech}",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "{Realistic request that requires the skill's default guidance}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition that distinguishes a correct result}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Second specific condition covering the important constraint}"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "{Realistic request covering a non-obvious edge case}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the edge case is handled}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition preventing the common failure mode}"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "{Realistic review or diagnosis request where the skill should change the answer}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the relevant issue is identified}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the recommendation is actionable}"
+        }
+      ]
+    }
+  ]
+}

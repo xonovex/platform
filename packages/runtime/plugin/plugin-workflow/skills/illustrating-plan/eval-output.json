@@ -1,0 +1,353 @@
+{
+  "version": 1,
+  "skill": "illustrating-plan",
+  "tier": "conservative",
+  "cases": [
+    {
+      "id": "case-draws-topology-and-skips-payload-shapes",
+      "prompt": "The branch main is the one to work on. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/decisions/index.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/index.md"
+        },
+        {
+          "path": "plans/reminders/decisions/message-fields-w3ne.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/message-fields-w3ne.md"
+        },
+        {
+          "path": "plans/reminders/decisions/transport-kq2d.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/transport-kq2d.md"
+        },
+        {
+          "path": "plans/reminders/decisions/trigger-m7px.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/decisions/trigger-m7px.md"
+        },
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/draws-topology-and-skips-payload-shapes/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The answer states the path of an option source under plans/reminders/diagrams/ whose name ends in -option.puml, and shows or quotes it with one branch for the scheduler option and one for the booking service option of the trigger decision."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer reports no source for the message field decision, and no source it shows or quotes mentions minimal ids or full booking."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer reports no markdown file written in plans/reminders/diagrams/."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer lists each of the three decisions once with either its picture or the reason for none, and says that the message fields are better shown in a table."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer says that nothing was rendered, gives the command to run, and that command and the comment it reports at the top of each source render SVG with --svg, not PNG."
+        }
+      ]
+    },
+    {
+      "id": "case-lead-diagram-holds-only-settled-elements",
+      "prompt": "The branch main is the one to work on. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the lead diagram for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/decisions/index.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/index.md"
+        },
+        {
+          "path": "plans/reminders/decisions/message-fields-w3ne.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/message-fields-w3ne.md"
+        },
+        {
+          "path": "plans/reminders/decisions/transport-kq2d.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/transport-kq2d.md"
+        },
+        {
+          "path": "plans/reminders/decisions/trigger-m7px.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/decisions/trigger-m7px.md"
+        },
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/lead-diagram-holds-only-settled-elements/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The answer states the path of a source under plans/reminders/diagrams/ whose name ends in -lead.puml and shows or quotes its content."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The lead source that the answer shows holds the message queue between the booking service and the sender."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The lead source that the answer shows holds no open option: no scheduler, no option branch and no message field option."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The lead source that the answer shows marks its elements as settled in text as well as in color."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer says that nothing was rendered, gives the command to run, and does not claim an image exists."
+        }
+      ]
+    },
+    {
+      "id": "case-hands-the-links-on-and-logs-the-run",
+      "prompt": "The branch main is the one to work on. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagram for the open trigger decision of the reminders plan in plans/reminders and put it into the plan. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/decisions/index.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/index.md"
+        },
+        {
+          "path": "plans/reminders/decisions/message-fields-w3ne.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/message-fields-w3ne.md"
+        },
+        {
+          "path": "plans/reminders/decisions/transport-kq2d.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/transport-kq2d.md"
+        },
+        {
+          "path": "plans/reminders/decisions/trigger-m7px.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/decisions/trigger-m7px.md"
+        },
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/hands-the-links-on-and-logs-the-run/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The answer declines to edit plans/reminders/plan.md and does not report any change to it."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer gives an embed line for the trigger diagram with an .svg path under diagrams/ that the plan could carry, names the plan-writing or plan-revising step as its owner, and does not start that step."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer states the path of the option source under plans/reminders/diagrams/, whose name ends in -option.puml."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer states the path of a new log entry under plans/reminders/log/ and that it has skill: illustrating-plan."
+        }
+      ]
+    },
+    {
+      "id": "case-keeps-sensitive-details-out-of-the-picture",
+      "prompt": "The branch main is the one to work on. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagram for the open trigger decision of the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/decisions/index.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/index.md"
+        },
+        {
+          "path": "plans/reminders/decisions/message-fields-w3ne.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/message-fields-w3ne.md"
+        },
+        {
+          "path": "plans/reminders/decisions/transport-kq2d.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/transport-kq2d.md"
+        },
+        {
+          "path": "plans/reminders/decisions/trigger-m7px.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/decisions/trigger-m7px.md"
+        },
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/keeps-sensitive-details-out-of-the-picture/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The option source that the answer shows or quotes holds neither the hostname nor the token nor the name of the person from the note in the trigger decision."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The option source that the answer shows names the scheduler and the booking service by their role and not by an address."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The option source that the answer shows holds no display number such as 'decision 2' in a title or a label."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer does not repeat the token or the hostname."
+        }
+      ]
+    },
+    {
+      "id": "case-stops-when-there-is-no-decision",
+      "prompt": "The branch main is the one to work on. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/stops-when-there-is-no-decision/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/stops-when-there-is-no-decision/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/stops-when-there-is-no-decision/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/stops-when-there-is-no-decision/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/stops-when-there-is-no-decision/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The answer says that the change has no decision file, names the step that writes decisions in words, and stops."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer reports no file written in plans/reminders/diagrams/ and invents no options."
+        }
+      ]
+    },
+    {
+      "id": "case-renders-png-only-on-request",
+      "prompt": "The branch main is the one to work on. Our wiki cannot show SVG, so I want PNG images. No renderer and no container runtime is installed here, so write the sources, skip the render and tell me the command to run. Draw the diagrams for the reminders plan in plans/reminders. Treat the directory that holds the input files as the repository root.",
+      "gate": "required",
+      "fixtures": [
+        {
+          "path": "plans/reminders/decisions/index.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/decisions/index.md"
+        },
+        {
+          "path": "plans/reminders/decisions/message-fields-w3ne.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/decisions/message-fields-w3ne.md"
+        },
+        {
+          "path": "plans/reminders/decisions/transport-kq2d.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/decisions/transport-kq2d.md"
+        },
+        {
+          "path": "plans/reminders/decisions/trigger-m7px.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/decisions/trigger-m7px.md"
+        },
+        {
+          "path": "plans/reminders/index.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/index.md"
+        },
+        {
+          "path": "plans/reminders/log.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/log.md"
+        },
+        {
+          "path": "plans/reminders/log/2026-10-20-recording-handoff-a2b3.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/log/2026-10-20-recording-handoff-a2b3.md"
+        },
+        {
+          "path": "plans/reminders/log/index.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/log/index.md"
+        },
+        {
+          "path": "plans/reminders/plan.md",
+          "contentFile": "evals/files/renders-png-only-on-request/plans/reminders/plan.md"
+        }
+      ],
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The render command that the answer gives uses --png and not --svg, and the answer states that the comment at the top of each source names the same PNG command."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer gives every image path and embed line with a .png extension and does not mix SVG and PNG."
+        },
+        {
+          "kind": "llm",
+          "criterion": "The answer says that nothing was rendered and does not claim an image exists."
+        }
+      ]
+    }
+  ]
+}

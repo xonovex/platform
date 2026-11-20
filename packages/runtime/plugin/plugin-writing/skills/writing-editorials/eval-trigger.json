@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "writing-editorials",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Rewrite this article so it sounds like a person wrote it, not an AI.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "editorial humanization"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "This blog post is full of generic filler and marketing puffery. Give it a natural voice without changing the facts.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "editorial voice and fact preservation"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Copy-edit this review for rhythm, register, and a more specific point of view.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "editorial copy editing"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Adapt this English article to B1 readability and keep the Dutch version aligned on every fact.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "multilingual editorial consistency"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Remove repetitive AI writing patterns from this lifestyle piece but keep the publication's casual tone.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "AI pattern removal"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Edit this feature article so its voice fits a specialist audience without becoming stiff.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "audience and register fit"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Humanize this venue description, remove travel cliches, and preserve all verified details.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "natural editorial prose"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Review this newsletter draft for voice, pacing, filler, and an ending that does not repeat the opening.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "editorial revision"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Research and add two bilingual news posts about recent electric vehicle developments.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "news writing workflow"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Create a complete Porto travel guide with current hours, prices, itineraries, and frontmatter.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "travel writing workflow"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Rewrite this incident report so impact, status, and required action come first.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "technical writing structure"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Make this internal note shorter and resolve its ambiguous pronouns.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "general writing mechanics"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Translate this paragraph from Dutch to English without changing its style.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "translation only"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Write acceptance criteria for this checkout user story.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "user story authoring"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Review this pull request and write blocking inline comments.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "code review"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Fix this React component and add a loading state.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "code implementation"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "Can you turn this wordy message into plain, direct prose while preserving every fact?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-prose"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "Our editor needs a publishable update on today's rail strike with sources, summary metadata, and a hero image.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-news"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "Publish a B1 visitor guide for the Louvre with practical logistics and a recorded research date.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-travel-guides"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "Make this technical documentation section answer the reader's question in its opening sentence and put detail in descending importance.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "exact routing near miss owned by writing-technical-docs"
+    }
+  ]
+}

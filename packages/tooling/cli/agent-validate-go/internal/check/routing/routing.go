@@ -70,7 +70,7 @@ func (Check) Run(ctx check.Context) ([]findings.Finding, error) {
 
 func read(ctx check.Context, report *check.Reporter, dir string) (candidate, bool, error) {
 	queries, exists, err := catalog.ReadQueries(ctx.Tree, dir)
-	queriesFile := path.Join(dir, "eval-queries.json")
+	queriesFile := path.Join(dir, catalog.TriggerFile)
 	if !exists {
 		return candidate{}, false, nil
 	}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "{repository-original-workflow-name}",
+      "kind": "original",
+      "title": "{Repository-original workflow name}",
+      "provenance": "{Repository-original procedure distilled from maintained project practice}",
+      "reviewedAt": "{YYYY-MM-DD}",
+      "coversAllReferences": true,
+      "claims": [{ "id": "claim-1", "statement": "{the practice this workflow records}" }]
+    }
+  ]
+}

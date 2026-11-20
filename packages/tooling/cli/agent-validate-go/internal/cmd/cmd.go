@@ -108,6 +108,7 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 	root.Flags().BoolVar(&f.strict, "strict", false, "fail on warnings too")
 	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the project file, repeatable")
 	root.AddCommand(listCommand(d))
+	root.AddCommand(seedCommand(d, &f.root))
 	return root
 }
 

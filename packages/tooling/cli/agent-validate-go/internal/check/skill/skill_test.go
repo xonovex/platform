@@ -27,20 +27,28 @@ func queries() string {
 	for i := 0; i < 8; i++ {
 		for _, split := range []string{"train", "validation"} {
 			parts = append(parts,
-				fmt.Sprintf(`{"query":"positive %s %d","should_trigger":true,"split":"%s","rationale":"r"}`, split, i, split),
-				fmt.Sprintf(`{"query":"negative %s %d","should_trigger":false,"split":"%s","rationale":"near miss owned by owner-%d"}`, split, i, split, i%4))
+				fmt.Sprintf(`{"id":"p-%s-%d","prompt":"positive %s %d","shouldTrigger":true,"split":"%s","rationale":"r"}`, split, i, split, i, split),
+				fmt.Sprintf(`{"id":"n-%s-%d","prompt":"negative %s %d","shouldTrigger":false,"split":"%s","rationale":"near miss owned by owner-%d"}`, split, i, split, i, split, i%4))
 		}
 	}
-	return "[" + strings.Join(parts, ",") + "]"
+	return triggerDoc(strings.Join(parts, ","))
 }
 
-const goodEvals = `{"skill_name":"using-git","tier":"moderate","evals":[{"prompt":"a","assertions":["x"]},{"prompt":"b","assertions":["y"]},{"prompt":"c","assertions":["z"]}]}`
+func triggerDoc(queries string) string {
+	return `{"version":1,"skill":"using-git","queries":[` + queries + `]}`
+}
+
+func outputCase(id string) string {
+	return `{"id":"` + id + `","prompt":"p","gate":"required","expect":[{"kind":"llm","criterion":"x"}]}`
+}
+
+var goodEvals = `{"version":1,"skill":"using-git","tier":"moderate","cases":[` + outputCase("a") + "," + outputCase("b") + "," + outputCase("c") + `]}`
 
 func base() map[string]string {
 	return map[string]string{
 		dir + "/SKILL.md":          skillFile(goodDescription, goodBody),
-		dir + "/evals.json":        goodEvals,
-		dir + "/eval-queries.json": queries(),
+		dir + "/eval-output.json":  goodEvals,
+		dir + "/eval-trigger.json": queries(),
 	}
 }
 
@@ -115,8 +123,8 @@ func TestFrontmatterNameRules(t *testing.T) {
 	}
 	vendor := with(base(), map[string]string{
 		"plugin/skills/configuring-claude-code/SKILL.md":          strings.Replace(skillFile(goodDescription, goodBody), "using-git", "configuring-claude-code", 1),
-		"plugin/skills/configuring-claude-code/evals.json":        strings.Replace(goodEvals, "using-git", "configuring-claude-code", 1),
-		"plugin/skills/configuring-claude-code/eval-queries.json": queries(),
+		"plugin/skills/configuring-claude-code/eval-output.json":  strings.Replace(goodEvals, "using-git", "configuring-claude-code", 1),
+		"plugin/skills/configuring-claude-code/eval-trigger.json": strings.Replace(queries(), "using-git", "configuring-claude-code", 1),
 	})
 	if got := run(t, vendor, nil); !checktest.Has(got, "skill.name-reserved") {
 		t.Fatal("a vendor name is reserved unless the option exempts it")
@@ -324,82 +332,61 @@ func TestOutputEvals(t *testing.T) {
 		code string
 	}{
 		"not json": {`{`, "skill.evals-json"},
-		"array":    {`[]`, "skill.evals-shape"},
-		"name":     {`{"skill_name":"x","tier":"moderate","evals":[]}`, "skill.evals-name"},
-		"tier":     {`{"skill_name":"using-git","tier":"bold","evals":[]}`, "skill.evals-tier"},
-		"count":    {`{"skill_name":"using-git","tier":"moderate","evals":[{}]}`, "skill.evals-count"},
-		"entry":    {`{"skill_name":"using-git","tier":"moderate","evals":[1,2,3]}`, "skill.evals-entry"},
-		"prompt":   {`{"skill_name":"using-git","tier":"moderate","evals":[{"prompt":" ","assertions":["a"]},{},{}]}`, "skill.evals-prompt"},
-		"assert":   {`{"skill_name":"using-git","tier":"moderate","evals":[{"prompt":"a","assertions":[""]},{},{}]}`, "skill.evals-assertions"},
+		"array":    {`[]`, "skill.evals-schema"},
+		"no cases": {`{"version":1,"skill":"using-git","cases":[]}`, "skill.evals-schema"},
+		"tier":     {`{"version":1,"skill":"using-git","tier":"bold","cases":[` + outputCase("a") + `]}`, "skill.evals-schema"},
+		"name":     {`{"version":1,"skill":"other-thing","cases":[` + outputCase("a") + "," + outputCase("b") + "," + outputCase("c") + `]}`, "skill.evals-name"},
+		"count":    {`{"version":1,"skill":"using-git","cases":[` + outputCase("a") + `]}`, "skill.evals-count"},
 	}
 	for name, tc := range cases {
-		got := run(t, with(base(), map[string]string{dir + "/evals.json": tc.body}), nil)
+		got := run(t, with(base(), map[string]string{dir + "/eval-output.json": tc.body}), nil)
 		if !checktest.Has(got, tc.code) {
 			t.Errorf("%s: want %s, got %v", name, tc.code, checktest.Codes(got))
 		}
 	}
-	expect(t, run(t, with(base(), map[string]string{dir + "/evals.json": "\x00"}), nil), "skill.evals-missing")
-	if got := run(t, with(base(), map[string]string{dir + "/evals.json": "\x00"}), map[string]any{"requireEvals": false}); checktest.Has(got, "skill.evals-missing") {
+	missing := base()
+	delete(missing, dir+"/eval-output.json")
+	expect(t, run(t, missing, nil), "skill.evals-missing")
+	if got := run(t, missing, map[string]any{"requireEvals": false}); checktest.Has(got, "skill.evals-missing") {
 		t.Fatal("evals are optional when not required")
 	}
 }
 
-func TestOutputEvalsVersioned(t *testing.T) {
-	good := `{"version":1,"skill":"using-git","cases":[` + strings.Repeat(`{"id":"a","prompt":"p","gate":"required","expect":[{"type":"contains","value":"x"}]},`, 3) + `{"id":"b","prompt":"p","gate":"advisory","expect":[{"type":"contains","value":"x"}]}]}`
-	_ = good
-	invalid := run(t, with(base(), map[string]string{dir + "/evals.json": `{"version":1,"skill":"using-git","cases":[]}`}), nil)
-	expect(t, invalid, "skill.evals-schema")
-	wrongName := run(t, with(base(), map[string]string{dir + "/evals.json": `{"version":1,"skill":"other-thing","cases":[{"id":"a","prompt":"p","gate":"required","expect":[{"type":"contains","value":"x"}]}]}`}), nil)
-	if !checktest.Has(wrongName, "skill.evals-name") && !checktest.Has(wrongName, "skill.evals-schema") {
-		t.Fatalf("codes = %v", checktest.Codes(wrongName))
-	}
-}
-
 func TestTriggerEvals(t *testing.T) {
+	entry := func(id, prompt string, should bool, split, rationale string) string {
+		out := fmt.Sprintf(`{"id":%q,"prompt":%q,"shouldTrigger":%t,"split":%q`, id, prompt, should, split)
+		if rationale != "" {
+			out += fmt.Sprintf(`,"rationale":%q`, rationale)
+		}
+		return out + "}"
+	}
 	cases := map[string]struct {
 		body string
 		code string
 	}{
 		"not json":  {`{`, "skill.evals-json"},
-		"scalar":    {`3`, "skill.evals-shape"},
-		"entry":     {`["x"]`, "skill.evals-entry"},
-		"query":     {`[{"query":"","should_trigger":true,"split":"train"}]`, "skill.evals-query"},
-		"should":    {`[{"query":"a","split":"train"}]`, "skill.evals-should-trigger"},
-		"split":     {`[{"query":"a","should_trigger":true}]`, "skill.evals-split"},
-		"minimum":   {`[{"query":"a","should_trigger":true,"split":"train"}]`, "skill.evals-minimum"},
-		"splitmin":  {`[{"query":"a","should_trigger":true,"split":"train"}]`, "skill.evals-split-minimum"},
-		"generic":   {`[{"query":"quick pre-merge sanity check: after the build","should_trigger":true,"split":"train"}]`, "skill.evals-generic"},
-		"duplicate": {`[{"query":"A","should_trigger":true,"split":"train"},{"query":" a ","should_trigger":true,"split":"train"}]`, "skill.evals-duplicate"},
-		"owners":    {`[{"query":"a","should_trigger":false,"split":"train","rationale":"near miss owned by one"},{"query":"b","should_trigger":false,"split":"train","rationale":"near miss owned by one"},{"query":"c","should_trigger":false,"split":"train","rationale":"near miss owned by one"}]`, "skill.evals-owners"},
+		"scalar":    {`3`, "skill.evals-schema"},
+		"no query":  {triggerDoc(``), "skill.evals-schema"},
+		"minimum":   {triggerDoc(entry("a", "a", true, "train", "")), "skill.evals-minimum"},
+		"splitmin":  {triggerDoc(entry("a", "a", true, "train", "")), "skill.evals-split-minimum"},
+		"generic":   {triggerDoc(entry("a", "quick pre-merge sanity check: after the build", true, "train", "")), "skill.evals-generic"},
+		"duplicate": {triggerDoc(entry("a", "A", true, "train", "") + "," + entry("b", " a ", true, "train", "")), "skill.evals-duplicate"},
+		"owners": {triggerDoc(entry("a", "a", false, "train", "near miss owned by one") + "," + entry("b", "b", false, "train", "near miss owned by one") +
+			"," + entry("c", "c", false, "train", "near miss owned by one")), "skill.evals-owners"},
+		"unreadable": {triggerDoc(`{"id":"a","promptFile":"gone.md","shouldTrigger":true,"split":"train"}`), "skill.evals-queries"},
 	}
 	for name, tc := range cases {
-		got := run(t, with(base(), map[string]string{dir + "/eval-queries.json": tc.body}), nil)
+		got := run(t, with(base(), map[string]string{dir + "/eval-trigger.json": tc.body}), nil)
 		if !checktest.Has(got, tc.code) {
 			t.Errorf("%s: want %s, got %v", name, tc.code, checktest.Codes(got))
 		}
 	}
-	expect(t, run(t, with(base(), map[string]string{dir + "/eval-queries.json": "\x00"}), nil), "skill.evals-missing")
-}
-
-func TestTriggerEvalsVersioned(t *testing.T) {
-	var parts []string
-	for i := 0; i < 8; i++ {
-		for _, split := range []string{"train", "validation"} {
-			parts = append(parts,
-				fmt.Sprintf(`{"id":"p-%s-%d","prompt":"positive %s %d","shouldTrigger":true,"split":"%s"}`, split, i, split, i, split),
-				fmt.Sprintf(`{"id":"n-%s-%d","prompt":"negative %s %d","shouldTrigger":false,"split":"%s"}`, split, i, split, i, split))
-		}
-	}
-	doc := `{"version":1,"skill":"using-git","queries":[` + strings.Join(parts, ",") + `]}`
-	if got := run(t, with(base(), map[string]string{dir + "/eval-queries.json": doc}), nil); len(got) != 0 {
+	missing := base()
+	delete(missing, dir+"/eval-trigger.json")
+	expect(t, run(t, missing, nil), "skill.evals-missing")
+	if got := run(t, base(), nil); len(got) != 0 {
 		t.Fatalf("findings = %v", got)
 	}
-	short := `{"version":1,"skill":"using-git","queries":[{"id":"a","prompt":"x","shouldTrigger":true,"split":"train"}]}`
-	expect(t, run(t, with(base(), map[string]string{dir + "/eval-queries.json": short}), nil), "skill.evals-minimum")
-	invalid := `{"version":1,"skill":"using-git","queries":[]}`
-	expect(t, run(t, with(base(), map[string]string{dir + "/eval-queries.json": invalid}), nil), "skill.evals-schema")
-	unreadable := `{"version":1,"skill":"using-git","queries":[{"id":"a","promptFile":"gone.md","shouldTrigger":true,"split":"train"}]}`
-	expect(t, run(t, with(base(), map[string]string{dir + "/eval-queries.json": unreadable}), nil), "skill.evals-queries")
 }
 
 func TestUnusedCheckImport(t *testing.T) {

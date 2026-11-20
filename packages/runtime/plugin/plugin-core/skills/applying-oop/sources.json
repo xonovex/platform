@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "bad-smells-in-code",
+      "kind": "web",
+      "title": "Bad smells in code",
+      "citation": "\"Refactoring: Improving the Design of Existing Code\" (Martin Fowler & Kent Beck), Ch. 3 \"Bad Smells in Code\"",
+      "urls": ["https://martinfowler.com/books/refactoring.html"],
+      "reviewedAt": "2026-06-27",
+      "coversAllReferences": true,
+      "usage": ["`SKILL.md` → Design smells"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "God Object / Large Class, Refused Bequest, Divergent Change, Parallel Inheritance Hierarchies, Alternative Classes with Different Interfaces, Temporary Field"
+        }
+      ]
+    },
+    {
+      "id": "liskov-substitution-principle",
+      "kind": "web",
+      "title": "Liskov Substitution Principle",
+      "citation": "Liskov & Wing, \"A Behavioral Notion of Subtyping\" (ACM TOPLAS, 1994); Barbara Liskov, OOPSLA 1987 keynote",
+      "urls": ["https://dl.acm.org/doi/10.1145/197320.197383"],
+      "reviewedAt": "2026-06-27",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` → Design smells (Refused Bequest, Downcasting), Gotchas (Liskov)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Behavioral subtyping; substitutability as the contract refused bequest and downcasting violate"
+        }
+      ]
+    },
+    {
+      "id": "solid-principles",
+      "kind": "web",
+      "title": "SOLID principles",
+      "urls": ["https://en.wikipedia.org/wiki/SOLID"],
+      "reviewedAt": "2026-06-27",
+      "coversAllReferences": true,
+      "usage": ["`SKILL.md` → Best practices, Design smells"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Single responsibility (god object, divergent change), open/closed, Liskov, interface segregation, dependency inversion"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull\n3. Update the corresponding section\n4. Bump **Last reviewed**",
+      "after": "solid-principles"
+    }
+  ]
+}

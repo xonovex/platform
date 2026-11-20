@@ -1,0 +1,127 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "preamble": "This skill is an **overlay on writing-c99**: generic C99 idioms remain there, while\n**managing-memory** owns allocation, ownership, and lifetime theory and\n**applying-data-oriented-design** owns stable-handle layout and iteration tradeoffs. This\nguide retains only the C99-specific boundary validations and style decisions. The\narchitecture references below are distilled from the engine blog archive.",
+  "sources": [
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/physical-design.md",
+        "references/plugin-architecture.md",
+        "references/composability.md",
+        "references/hot-reload.md",
+        "references/cross-language-api.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Architecture, Gotchas",
+        "The plain-C plugin/interface model, header-include discipline, hot-reload contract, modular composition, and cross-language binding surface"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Physical Design of the engine\": the machine-checkable rule that headers may not include headers (bar a tiny allowlist), one header per system, folders as system boundaries, opaque handle types (`{uint64_t opaque;}`), forward declarations + pointer interfaces, isolating templates/generics, and the resulting acyclic graph + fast incremental builds → `references/physical-design.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Little Machines Working Together (Parts 1–2)\": the string-keyed interface/API registry (`add`/`remove`/`first`/`next`), capabilities as plain-C structs of function pointers under a unique id, runtime discovery with zero compile-time coupling, multiple implementations of one interface as the extension-point mechanism, plain C for ABI stability, lean core → `references/plugin-architecture.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "\"The Anti-Feature Dream\": decomposing tools into small reusable building blocks assembled by the user instead of monolithic features (the modular/composable design bias) → `references/plugin-architecture.md`, `references/composability.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "\"DLL Hot Reloading in Theory and Practice\": reloadable native modules behind a function-pointer API table with all persistent state host-owned, re-fetch the table after each reload, reload at a safe point → `references/hot-reload.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "\"Creating Cross-Language APIs\": the C ABI as the universal FFI surface, restricting the API to a portable subset (no untagged unions/variadics/globals), flat data over pointer graphs, call-scoped pointer lifetimes, and generating idiomatic per-language bindings from a machine-readable API spec → `references/cross-language-api.md`"
+        }
+      ]
+    },
+    {
+      "id": "c-abi-ffi-and-large-api-binding-prior-art",
+      "kind": "web",
+      "title": "C ABI / FFI and large-API binding prior art",
+      "urls": [
+        "https://gitlab.com/x86-psABIs/x86-64-ABI",
+        "https://github.com/KhronosGroup/Vulkan-Docs"
+      ],
+      "urlNotes": [
+        "System V AMD64 ABI: https://gitlab.com/x86-psABIs/x86-64-ABI",
+        "Vulkan XML registry (spec-driven header + binding generation): https://github.com/KhronosGroup/Vulkan-Docs"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/cross-language-api.md"],
+      "usage": [
+        "`SKILL.md` → Architecture",
+        "Corroborating the C-ABI-as-lingua-franca and spec-generated-bindings approach"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Stable C calling convention vs unstable C++ ABI; spec → C header + per-language bindings → `references/cross-language-api.md`"
+        }
+      ]
+    },
+    {
+      "id": "modern-c-data-oriented-c-conference-talks",
+      "kind": "original",
+      "title": "Modern C / data-oriented C conference talks",
+      "provenance": "Locally reviewed recordings and transcripts about modern C and data-oriented implementation",
+      "reviewedAt": "2026-06-13",
+      "feeds": [
+        "references/safety-validations.md",
+        "references/build-warnings-policy.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Architecture (Handles & indices), Safety (Strings), Gotchas",
+        "The data-oriented decisions that distinguish this style from generic C99"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Reference objects via array indexes, not raw pointers\": the general handle model is owned by **applying-data-oriented-design**; the C99-specific bounds-before-generation check and scoped-pointer rule feed `references/safety-validations.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "The caller-owned storage constraint for the string-view and bounded-builder pattern owned by **writing-c99**"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Address/UndefinedBehavior sanitizers as the runtime net for hand-carved arena/caller-owned memory → `references/build-warnings-policy.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Memory arenas / aggregate \"free the whole lifetime at once\" allocation reinforce the existing caller-owns-memory direction; the general allocator theory stays in **managing-memory**"
+        }
+      ],
+      "remarks": "The C11 `_Generic` overloading and macro-heavy metaprogramming (defer macros, stb_ds-style\nmeta-header dynamic arrays) from the same talks are intentionally **excluded** from this skill."
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-06-13",
+      "feeds": [
+        "references/alignment.md",
+        "references/file-naming.md",
+        "references/implementation-variants.md",
+        "references/testing-patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "guide-level-synthesis"
+    }
+  ]
+}

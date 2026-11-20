@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "preamble": "Product-specific facts are pinned to the documentation snapshot below. The local runtime probe for this implementation returned `not-installed`; documentation conformance is not runtime conformance.",
+  "sources": [
+    {
+      "id": "copilot-hooks",
+      "kind": "web",
+      "title": "Copilot hooks",
+      "urls": [
+        "https://docs.github.com/en/copilot/reference/hooks-reference",
+        "https://docs.github.com/en/copilot/concepts/agents/hooks",
+        "https://docs.github.com/en/copilot/tutorials/copilot-cli-hooks"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "CLI/cloud events, scopes, policy hooks, command/HTTP/prompt handlers, decision output, exit behavior, cloud sandbox and firewall, disable behavior, and security guidance."
+        }
+      ]
+    },
+    {
+      "id": "copilot-plugins-and-skills",
+      "kind": "web",
+      "title": "Copilot plugins and skills",
+      "urls": [
+        "https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference",
+        "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating",
+        "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills",
+        "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": ["references/onboarding.md", "references/patterns.md"],
+      "usage": ["`onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Plugin manifests, packaged hooks/skills/agents/extensions, load precedence, install/update/remove commands, skill locations, scripts, allowed tools, and trust warnings."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh workflow",
+      "text": "1. Re-fetch the official pages above and compare event, handler, configuration, trust, and lifecycle behavior.\n2. Run the documented version probe and replace `not-installed` only with the observed version.\n3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.\n4. Update the matrix version and review date when behavior changes.",
+      "after": "copilot-plugins-and-skills"
+    }
+  ]
+}

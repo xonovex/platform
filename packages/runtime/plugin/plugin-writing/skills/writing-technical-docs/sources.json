@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "repository-technical-writing-conventions",
+      "kind": "original",
+      "title": "Repository technical-writing conventions",
+      "provenance": "Repository-original guidance for outcome-first technical explanations, reports, documentation, status updates, and operational handoffs",
+      "reviewedAt": "2026-08-29",
+      "feeds": [
+        "references/outcome-first.md",
+        "references/technical-precision.md"
+      ],
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md`, `references/outcome-first.md`, `references/technical-precision.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Lead with the main message, decision, action, answer, or status; add evidence in descending importance; keep decisive caveats near the lead; preserve exact technical identifiers, conditions, comparisons, and constraints; do not display a BLUF label or invent missing facts."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Review corrections and evaluations involving technical prose order, uncertainty, caveat placement, terminology, and evidence.\n2. Update the smallest owning reference.\n3. Re-run trigger, routing, and output evaluations.\n4. Update the review date after the guidance and evaluations agree.",
+      "after": "repository-technical-writing-conventions"
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "skill": "using-github",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "open a pull request against main with reviewers and a label using the gh CLI",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "gh pr create with reviewers/labels"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "post an inline review comment anchored to a specific line on a GitHub pull request",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "inline anchor inside the reviews API object"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "submit a REQUEST_CHANGES review with a summary and inline comments in one gh api call",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "atomic reviews object via gh api"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "resolve a review thread on a GitHub PR from the terminal",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GraphQL-only resolveReviewThread"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "what token scope do I need so gh can push commits and open a PR",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Contents: write to push, Pull requests: write to open PR"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "gh pr review won't let me add inline comments, how do I post them",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "gh pr review has no inline support; drop to gh api reviews"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "set GH_ENTERPRISE_TOKEN to authenticate gh against our GitHub Enterprise Server",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GHES env var split vs GH_TOKEN"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "my Closes #123 didn't close the issue when the PR merged, why",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "closing keyword auto-closes only on merge into default branch"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "reply in the review thread on PR #482 and mark it resolved so the PR can merge",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "addPullRequestReviewThreadReply + resolveReviewThread + conversation-resolution gate"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "the github remote is private and the API returns 404, what permission is missing",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "404-hides-existence; read X-Accepted-GitHub-Permissions"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "onboard a SHA-pinned reusable GitHub Actions workflow as a required ruleset check with a protected production environment",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "GitHub-native reusable CI, repository, and deployment enforcement"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "why can this GitHub ruleset be bypassed and how do matching rulesets and required checks combine",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "GitHub-native ruleset layering and bypass behavior"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "publish a durable implementation-decision comment on this GitHub PR and reconcile the same marked comment on retry without touching my unrelated latest comment",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "provider-native pull-request context comment with append-only retry reconciliation"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "create a GitHub issue with assignees labels milestone and a blocked-by relationship",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GitHub-native ticket creation and metadata"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "add issue 482 to organization Project 7 and set its Status field to In progress without duplicating the item",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "GitHub Projects v2 item and kanban field operation"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "publish versioned decision context to this GitHub issue for the next agent session",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "durable issue context comment"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "open a merge request on a GitLab-hosted repo with glab and request reviewers",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: GitLab host (glab), not GitHub"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "rebase my feature branch onto origin/main and force-push before opening the PR",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: local git push/rebase, use using-git"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "how should I label review feedback as blocking vs nit and structure the summary",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: review content/labels craft, use reviewing-code"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "what should I write in the PR description and how do I split a large change",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: PR description craft, use authoring-pull-requests"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "how should I mark a review comment so the author knows it must be fixed before merge?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "ship this",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "help me write a good pull request description for this change",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "open a merge request against main with glab on this GitLab repo",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "Create a lifecycle inventory for client secrets with owners, consumers, expiry, audit source, and revocation path.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by managing-credentials"
+    },
+    {
+      "id": "query-0026",
+      "prompt": "commit what i have so far with a wip message",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by using-git"
+    },
+    {
+      "id": "query-0027",
+      "prompt": "the verdict on work/ledger-export-7k2m passed, write the PR body and the commit message into its deliveries folder. I'll open the PR on GitHub myself",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by preparing-delivery"
+    }
+  ]
+}

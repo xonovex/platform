@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "hono-full-documentation-llm-friendly-distillation",
+      "kind": "web",
+      "title": "Hono: Full Documentation (LLM-friendly distillation)",
+      "urls": ["https://hono.dev/llms-full.txt"],
+      "reviewedAt": "2026-05-13",
+      "feeds": [
+        "references/body-limit.md",
+        "references/controllers.md",
+        "references/openapi-router-hierarchy.md",
+        "references/openapi-spec-generation.md",
+        "references/router-selection.md"
+      ],
+      "usage": [
+        "`SKILL.md` → all sections",
+        "All files under `references/` (the opinionated overlay only)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Body size limits → `references/body-limit.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Controller patterns (this opinionated variant's split-out approach) → `references/controllers.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "OpenAPI: router hierarchy / nesting → `references/openapi-router-hierarchy.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "OpenAPI: spec generation → `references/openapi-spec-generation.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Router selection (RegExpRouter, SmartRouter, TrieRouter, PatternRouter) → `references/router-selection.md`"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Notes on the \"Opinionated\" Variant",
+      "text": "This skill is an overlay on `using-hono` and covers only the opinionated decisions (OpenAPI-first via inline handlers, explicit status codes, controller-style splits, preferred router choice, body limits). Generic Hono concepts: app structure, validation, middleware, errors, cookies, security, WebSockets, context storage, runtimes. Are owned by `using-hono`, and their provenance lives in that skill's `SOURCES.md`. When refreshing from `llms-full.txt`, preserve the opinionated decisions here, only update upstream-derived content (API surface, available middleware, runtime support).",
+      "after": "hono-full-documentation-llm-friendly-distillation"
+    }
+  ]
+}

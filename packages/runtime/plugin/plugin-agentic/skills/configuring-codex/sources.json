@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "preamble": "Product-specific facts are pinned to the documentation snapshot below. The local runtime probe for this implementation returned `not-installed`; documentation conformance is not runtime conformance.",
+  "sources": [
+    {
+      "id": "codex-hooks",
+      "kind": "web",
+      "title": "Codex hooks",
+      "urls": ["https://learn.chatgpt.com/docs/hooks"],
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Hook locations, config shapes, trust review, managed requirements, plugin hooks, concurrency, executing command handlers, skipped prompt/agent/async handlers, events, output schemas, and guardrail coverage."
+        }
+      ]
+    },
+    {
+      "id": "codex-plugins-and-skills",
+      "kind": "web",
+      "title": "Codex plugins and skills",
+      "urls": [
+        "https://learn.chatgpt.com/docs/plugins",
+        "https://learn.chatgpt.com/docs/skills-and-plugins"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": ["references/onboarding.md", "references/patterns.md"],
+      "usage": ["`onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Plugin installation, bundled skills and hooks, new-session activation, and the distinction between instructions and enforcement."
+        }
+      ]
+    },
+    {
+      "id": "codex-managed-configuration",
+      "kind": "web",
+      "title": "Codex managed configuration",
+      "urls": [
+        "https://learn.chatgpt.com/docs/enterprise/managed-configuration"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": ["references/capabilities.md", "references/onboarding.md"],
+      "usage": ["`capabilities.md`, `onboarding.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Managed configuration and organizational control layers; native behavior remains subject to the hook release reference and runtime probes."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh workflow",
+      "text": "1. Re-fetch the official pages above and compare event, handler, configuration, trust, and lifecycle behavior.\n2. Run the documented version probe and replace `not-installed` only with the observed version.\n3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.\n4. Update the matrix version and review date when behavior changes.",
+      "after": "codex-managed-configuration"
+    }
+  ]
+}

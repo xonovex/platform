@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "managing-versions",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "bump this package to a minor release",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct mention of a level bump"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "cut a new patch release and update the changelog",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "release + changelog without naming semver"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "set this package to 2.0.0 and update everything that depends on it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "exact version + dependent propagation"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "make a beta prerelease of the api package",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "prerelease / preid trigger"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "which packages changed version since main",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "version-detect, phrased as a question"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "write a conventional commit message for these staged changes",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "keyword overlap, owned by using-git (commit authoring)"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "publish these packages to the npm registry",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "adjacent release step, owned by publishing-npm-packages"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "show me which files changed in the last commit",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "'changed' overlap but read-only git, not version detection"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "release 1.4.0 and add the changelog entries",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: exact release + changelog"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "tag the next version after these feat and fix commits",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: bump inferred from commits"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "open a pull request for the release branch",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "validation negative: owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "fix the merge conflict in two package.json files",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "validation negative: conflict resolution, owned by using-git"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "A package's package.json currently reads \"version\": \"1.2.3-beta.4\". The beta cycle is over and we're ready to ship the stable release. Tell me the exact version string it should become and explain briefly why.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "publish this package to npm",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by publishing-npm-packages"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "help me write a good pull request description for this change",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "ship this",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    }
+  ]
+}

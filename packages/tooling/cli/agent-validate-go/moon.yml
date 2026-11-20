@@ -27,7 +27,8 @@ tasks:
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-validate=exempt \
         ./internal/arch=exempt \
-        ./internal/catalog=95 \
+        ./internal/budget=100 \
+        ./internal/catalog=100 \
         ./internal/check=100 \
         ./internal/check/agent=91 \
         ./internal/check/command=96 \
@@ -92,6 +93,22 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
+  # The skill and plugin tasks of the repository run this binary, so moon builds
+  # it once, caches it with its output, and restores it before a dependent task.
+  binary:
+    script: |
+      set -euo pipefail
+      go build -o "$projectRoot/dist/agent-validate" ./cmd/agent-validate
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - go.mod
+      - go.sum
+    outputs:
+      - dist/agent-validate
+    options:
+      cache: true
   # go-integration builds the real binary and runs it over this repository and
   # over temporary repositories, so it is an integration tier rather than a
   # ci-check gate.

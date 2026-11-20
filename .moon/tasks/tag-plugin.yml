@@ -13,20 +13,21 @@ tasks:
     script: npx prettier --check . --ignore-path "$workspaceRoot/.prettierignore"
     inputs: ["**/*.md", "**/*.json", "**/*.yml"]
   plugin-validate:
-    command:
-      - npx
-      - moon-plugin-validate
-      - .
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-validate-go/dist/agent-validate"
+      plugin --strict --root "$workspaceRoot" --path "$projectSource"
     deps:
       - target: ~:build
         optional: true
-      - script-moon-plugin-validate:build
+      - agent-validate-go:binary
     inputs:
       - README.md
       - docs/**/*.md
       - package.json
       - .claude-plugin/plugin.json
+      - .codex-plugin/plugin.json
       - skills/*/SKILL.md
+      - /agentic.validate.json
     options:
       cache: false
   format:

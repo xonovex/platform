@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "npm-publish-cli-v11",
+      "kind": "web",
+      "title": "npm publish (CLI v11)",
+      "urls": ["https://docs.npmjs.com/cli/v11/commands/npm-publish"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish.md"],
+      "usage": ["`references/publish.md`", "`SKILL.md` → Core Principles"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Pack/upload behavior, `--access` / `--provenance` / `--dry-run` / `--tag` flags, default `latest` dist-tag"
+        }
+      ]
+    },
+    {
+      "id": "npm-view-cli-v11",
+      "kind": "web",
+      "title": "npm view (CLI v11)",
+      "urls": ["https://docs.npmjs.com/cli/v11/commands/npm-view"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish.md"],
+      "usage": [
+        "`references/publish.md` → Core Workflow (registry probe)",
+        "`SKILL.md` → Core Principles (publish idempotently)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Reading a field for an explicit `name@version`; a missing package/version yields E404 (non-zero exit) while a present version exits 0 with output; the bare-name / `@latest` empty-output edge case that motivates probing the explicit version"
+        }
+      ]
+    },
+    {
+      "id": "npm-package-json-reference-cli-v11",
+      "kind": "web",
+      "title": "npm package.json reference (CLI v11)",
+      "urls": ["https://docs.npmjs.com/cli/v11/configuring-npm/package-json/"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish-check.md", "references/publish.md"],
+      "usage": [
+        "`references/publish-check.md`",
+        "`references/publish.md` → Platform-Specific Packages"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Required (`name`/`version`) vs recommended fields, `repository` object/shorthand forms, `files` allowlist and always-included files, `publishConfig`, `private`, `os`/`cpu`/`libc`"
+        }
+      ]
+    },
+    {
+      "id": "generating-provenance-statements",
+      "kind": "web",
+      "title": "Generating provenance statements",
+      "urls": ["https://docs.npmjs.com/generating-provenance-statements"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish.md"],
+      "usage": ["`references/publish.md` → Access / Provenance / Dist-tag"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Provenance prerequisites: supported CI with OIDC, `id-token: write`, public registry, matching `repository`, npm ≥ 9.5.0"
+        }
+      ]
+    },
+    {
+      "id": "npm-scope-and-access-cli-v11",
+      "kind": "web",
+      "title": "npm scope and access (CLI v11)",
+      "urls": ["https://docs.npmjs.com/cli/v11/using-npm/scope/"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish.md", "references/publish-check.md"],
+      "usage": [
+        "`references/publish.md` → Access / Provenance / Dist-tag",
+        "`references/publish-check.md` → access check"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Scoped packages default to restricted; unscoped packages are always public and cannot be restricted"
+        }
+      ]
+    },
+    {
+      "id": "trusted-publishers-oidc",
+      "kind": "web",
+      "title": "Trusted publishers (OIDC)",
+      "urls": ["https://docs.npmjs.com/trusted-publishers"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/publish.md"],
+      "usage": ["`references/publish.md` → Provenance"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Automatic provenance via OIDC trusted publishing and its version prerequisites (npm ≥ 11.5.1, Node ≥ 22.14.0)"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-fetch the sources above\n2. Diff against the prior pull (or scan for newly added sections)\n3. Update the corresponding `references/*.md`\n4. Bump the **Last reviewed** dates above",
+      "after": "trusted-publishers-oidc"
+    }
+  ]
+}

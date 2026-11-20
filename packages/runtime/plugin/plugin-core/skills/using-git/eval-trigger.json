@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "skill": "using-git",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "ship this",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "shortest possible ship intent"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "commit and push",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "ok we're done: save the changes",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "colloquial save-the-work"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "wrap up this work in a commit",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "wrap up"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "looks good: push it up",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "casual push"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "make a commit with a proper message and push",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "explicit commit + push"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "lets get this on main",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "colloquial ship; relies on commit-and-push"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "i've got a merge conflict in package-lock.json: help me resolve it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "merge-conflict diagnosis and resolution"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "rebase my feature branch onto main and squash",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "explicit rebase and history rewrite"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "create a worktree for the new auth feature",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Git worktree creation"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "merge the worktree back into main",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Git worktree integration"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "show me the diff between my branch and main",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "read-only Git repository inspection"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "commit what i have so far with a wip message",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "wip commit"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "save and push these changes: feat for the new endpoint",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "explicit with type"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "alright, finalize this branch with a commit",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "finalize"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "good to go, commit it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "short approval-then-commit"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "package this up and ship to origin",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "colloquial commit + push"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "what's the convention for naming feature branches here",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "Git branch convention question"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "revert the last 3 commits",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "Git history mutation"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "stash my changes so i can switch branches",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "Git worktree-state operation"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "open a merge request against main with glab on this GitLab repo",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "open a pull request against main with reviewers and a label using the gh CLI",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "help me write a good pull request description for this change",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "bump this package to a minor release",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by managing-versions"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "approve a merge request from the command line on GitLab",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-gitlab"
+    },
+    {
+      "id": "query-0026",
+      "prompt": "reply in the review thread on PR #482 and mark it resolved so the PR can merge",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0027",
+      "prompt": "how big should a pull request be",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0028",
+      "prompt": "release 1.4.0 and add the changelog entries",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by managing-versions"
+    },
+    {
+      "id": "query-0029",
+      "prompt": "worktree for work/points-balance-endpoint-3m4q is already set up, now build the item there and save the implementation notes",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by implementing-work-item"
+    }
+  ]
+}

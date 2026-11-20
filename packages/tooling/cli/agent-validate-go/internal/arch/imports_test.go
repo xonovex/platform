@@ -30,7 +30,7 @@ const checkPrefix = "internal/check/"
 // support is what a check may import: the port, the readers of the file types a
 // check parses, and the shared helpers. Never another check.
 var support = []string{
-	"internal/catalog", "internal/check", "internal/component", "internal/document",
+	"internal/budget", "internal/catalog", "internal/check", "internal/component", "internal/document",
 	"internal/glob", "internal/markdown", "internal/tree",
 }
 
@@ -41,10 +41,11 @@ var support = []string{
 var core = map[string][]string{
 	"internal/arch":      {},
 	"cmd/agent-validate": {"internal/cmd", "internal/gitrepo", "internal/registry", "internal/tree"},
+	"internal/budget":    {"internal/catalog", "internal/markdown", "internal/tree"},
 	"internal/catalog":   {"internal/tree"},
 	"internal/check":     {"internal/tree"},
 	"internal/checktest": {"internal/check", "internal/tree"},
-	"internal/cmd":       {"internal/check", "internal/project", "internal/report", "internal/runner", "internal/tree"},
+	"internal/cmd":       {"internal/budget", "internal/check", "internal/project", "internal/report", "internal/runner", "internal/tree"},
 	"internal/component": {"internal/check", "internal/document", "internal/tree"},
 	"internal/document":  {},
 	"internal/gitrepo":   {},

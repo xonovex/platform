@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "skill": "writing-plan",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "research and decisions for plans/invoice-feed are in. write plan.md and outline who can start what",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "a plan from research and decisions"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "ok all the decisions for the login-session refactor are recorded, turn them into the actual plan doc. link the decisions, don't paste them in",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "links decisions instead of copying"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "we're done deciding on the parcel-tracking service. write up the objective, scope and success criteria, and a first cut of work files per team",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "plan sections and work outline without the word plan"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "mobile and web behave differently offline. need the change doc with a table of the differences and which decision settles each row, research is in research/offline-facts-e5f6.md",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "variants table without the word plan"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "address-lookup migration: research done, two decisions still open for the payments team. draft plan.md and mark which work waits on which of them",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "waiting rows name their open decisions"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "billing nightly export to event feed: everything is researched and the delivery method is settled. what can billing start monday and what waits on finance? write down the objective and the first work outline",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "ready and waiting split without the word plan"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "write the plan for cache-layer from research/cache-facts-c3d4.md and the cache-store decision, only the settled picture please, none of the rejected stuff",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "settled state only"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "reporting module cleanup: quality research is done and the decisions are recorded. write up the objective, in and out of scope and measurable success criteria, plus draft work files for each team",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "code-quality change without the word plan"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "plans/search-ranking has research and decisions but no plan.md yet, go write it. the research mentions a leaked key, keep that out of the files",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "sensitive finding kept out of a new plan"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "turn plans/checkout-v2 into a plan with ready vs waiting work rows, one per owning team",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "first work outline per team"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "plan.md for invoice-feed has three FIXME notes from sara, fold them in and tell me what you did with each",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "the critique of the cache-layer plan came back with two high findings, update plan.md and the work files to address them",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "research for checkout-v2 lists five open questions, go through them with me one at a time",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "before we plan anything: what does order-publisher actually emit today? check the repo and the docs",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by researching-change"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "plan for search-ranking is done, poke holes in it before thursday's approval",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "the outline in plans/parcel-tracking/work is there, give each ready item full acceptance criteria, a repo and its dependencies",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by defining-work-items"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "write user stories for saved searches, one per persona, with given/when/then acceptance criteria",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "write an ADR on why notifications use a queue instead of polling, with the options we dropped",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-technical-docs"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "this session we kept writing success criteria nobody could check. turn that lesson into a rule in our AGENTS.md",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "we wrote three change plans this week the same way, extract that pattern into a new skill under skills/",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "draw the lead diagram for plans/invoice-feed and render it to svg",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by illustrating-plan"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "sequence diagram for order-router comes out cut off on the right at 4096px, fix the layout and re-render",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by illustrating-plan"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "a few of my FIXMEs are questions like 'is this a regression?'. answer them from the code, only touch the plan if the answer changes a decision, and give me a table of what happened to each",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "add testable criteria to the search-ranking work files, only the ranking team's rows, dont touch data team",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by defining-work-items"
+    }
+  ]
+}

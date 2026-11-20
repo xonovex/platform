@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "skill": "writing-user-stories",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "is this user story good? \"As a rider I want to pay for my trip\": does it pass INVEST?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "core INVEST evaluation of a user story"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "this story is too big for a sprint, how do I split it into smaller stories?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "story splitting: SPIDR / flowchart territory"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "what does SPIDR stand for and when do I use a spike to split a story?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "SPIDR splitting techniques owned here"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "help me write acceptance criteria for the checkout story covering edge cases and errors",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "acceptance criteria coverage is owned by user-stories"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "explain the 3 Cs: card, conversation, confirmation, for our stories",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "the 3 Cs model is owned here"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "what's a walking skeleton and how do I slice this feature vertically instead of by layer?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "vertical slicing / walking skeleton owned by user-stories"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "our backlog refinement is a mess. When is a story actually ready and who sizes it?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "backlog refinement and readiness owned here"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "the story template is owned by user-stories"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "break these tasks down so each one is SMART: \"improve checkout performance\", \"clean up the payment module\", \"add better logging\".",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "SMART tasks are the task-level companion owned here"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "write the Given-When-Then scenarios in a Cucumber feature file for this behaviour",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: Gherkin notation and feature files are owned by applying-bdd"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "should I use a mock or a stub for the payment gateway in this test?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: test-double choice is owned by authoring-tests"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "define the bounded contexts and ubiquitous language for our payments domain",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: domain modelling and ubiquitous language are owned by applying-ddd"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "break this epic into a parent plan and child plans with explicit parallel groups",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: plan decomposition is owned by defining-work-items"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "these two stories keep breaking each other: analyse the coupling between the modules",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: coupling theory behind Independent is owned by analyzing-connascence"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-bdd"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "we're adopting DDD. What are the tactical building blocks and which of them are aggregates?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-ddd"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss: a Vitest API question"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by defining-work-items"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "cut the address-lookup migration by outcome not by platform, hang the items under work/address-lookup-rollout-k3ne. propose first",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by defining-work-items"
+    }
+  ]
+}

@@ -1,0 +1,405 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "claude-code-slash-commands",
+      "kind": "web",
+      "title": "Claude Code: Slash Commands",
+      "urls": ["https://code.claude.com/docs/en/slash-commands"],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Claude Code matrix row, Argument syntax axis, Frontmatter fields axis, Migration Notes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.claude/commands/<name>.md` (legacy) and `.claude/skills/<name>/SKILL.md` (recommended) locations"
+        },
+        {
+          "id": "claim-2",
+          "statement": "YAML frontmatter fields: `description`, `allowed-tools`, `argument-hint`, `model`, `disable-model-invocation`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`$ARGUMENTS`, `$1`, `$2` argument substitution"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`` !`cmd` `` inline shell execution"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Skill / command merger in v2.1.101: skill wins on name collision"
+        }
+      ]
+    },
+    {
+      "id": "codex-plugins-skills-and-custom-prompts",
+      "kind": "web",
+      "title": "Codex: Plugins, Skills, and Custom Prompts",
+      "urls": [
+        "https://developers.openai.com/codex/plugins",
+        "https://developers.openai.com/codex/skills",
+        "https://developers.openai.com/codex/custom-prompts"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": ["references/harness-formats.md", "references/distill.md"],
+      "usage": [
+        "`references/harness-formats.md` → Codex matrix row, Claude Code → Codex migration note, custom-prompt gotcha; `references/distill.md` → Codex skill distribution boundary"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Plugin manifests distribute Agent Skills through the `skills` component"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Repository and user skill discovery locations"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Explicit `$skill-name` invocation"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Custom prompts under `~/.codex/prompts/` are deprecated and user-local"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Claude command packages should become directly distributed skills for Codex"
+        }
+      ]
+    },
+    {
+      "id": "cursor-rules",
+      "kind": "web",
+      "title": "Cursor: Rules",
+      "urls": ["https://cursor.com/docs/rules"],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Cursor matrix row, Activation modes axis, Structure axis, Reload axis"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.cursor/rules/<name>.mdc` and v2.2+ `<name>/RULE.md` directory format"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Frontmatter fields: `description`, `globs`, `alwaysApply`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Four activation modes (Always Apply, Auto Attached, Agent Requested, Manual)"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Team / Project / User precedence hierarchy"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Hot-reload behavior"
+        }
+      ]
+    },
+    {
+      "id": "github-copilot-prompt-files",
+      "kind": "web",
+      "title": "GitHub Copilot: Prompt Files",
+      "urls": [
+        "https://docs.github.com/en/copilot/tutorials/customization-library/prompt-files",
+        "https://code.visualstudio.com/docs/copilot/customization/prompt-files"
+      ],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Copilot matrix row, Argument syntax axis, Frontmatter fields axis"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.github/prompts/<name>.prompt.md` (workspace) and user-scope location (`~/.config/Code/User/prompts/`)"
+        },
+        {
+          "id": "claim-2",
+          "statement": "YAML frontmatter: `agent`, `model`, `tools`, `description`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`${input:name}` and `${input:name:placeholder}` variable syntax"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`#tool:name` tool references in body"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Distinct from `.github/copilot-instructions.md` (repo-wide always-applied)"
+        },
+        {
+          "id": "claim-6",
+          "statement": "IDE support: VS Code, Visual Studio 17.10+, JetBrains"
+        }
+      ]
+    },
+    {
+      "id": "gemini-cli-custom-slash-commands",
+      "kind": "web",
+      "title": "Gemini CLI: Custom Slash Commands",
+      "urls": [
+        "https://cloud.google.com/blog/topics/developers-practitioners/gemini-cli-custom-slash-commands",
+        "https://geminicli.com/docs/cli/custom-commands/"
+      ],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Gemini CLI matrix row, Body language axis, Namespacing axis, Inline shell axis, Migration Notes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.gemini/commands/<name>.toml` (project) and `~/.gemini/commands/` (user) locations"
+        },
+        {
+          "id": "claim-2",
+          "statement": "**TOML schema** (outlier, all other harnesses use Markdown + YAML frontmatter): required `prompt` (multiline triple-quoted string), optional `description`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`{{args}}` substitution"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`!{cmd}` inline shell execution"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Subdirectory → colon namespace (`git/commit.toml` → `/git:commit`)"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Built-in `/commands` (list / reload) management"
+        }
+      ]
+    },
+    {
+      "id": "continue-dev-slash-commands",
+      "kind": "web",
+      "title": "Continue Dev: Slash Commands",
+      "urls": [
+        "https://docs.continue.dev/customize/slash-commands",
+        "https://docs.continue.dev/customize/deep-dives/prompts",
+        "https://docs.continue.dev/reference/yaml-migration"
+      ],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Continue Dev matrix row, Argument syntax axis, Migration Notes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Legacy `config.json` `slashCommands` (built-in commit/share/cmd/issue/onboard/http) and `customCommands`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Current `config.yaml` `prompts:` field with `invokable: true`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Handlebars `{{{ input }}}` substitution"
+        },
+        {
+          "id": "claim-4",
+          "statement": "MCP-based slash commands (experimental)"
+        },
+        {
+          "id": "claim-5",
+          "statement": "YAML migration path from legacy JSON"
+        }
+      ]
+    },
+    {
+      "id": "aider-yaml-config",
+      "kind": "web",
+      "title": "Aider: YAML Config",
+      "urls": [
+        "https://aider.chat/docs/config/aider_conf.html",
+        "https://aider.chat/docs/usage/conventions.html"
+      ],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": ["`references/harness-formats.md` → Aider matrix row"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.aider.conf.yml` location (home or repo root)"
+        },
+        {
+          "id": "claim-2",
+          "statement": "`read:` field to preload conventions / context files"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`--load <file>` to execute a file of `/commands` on launch"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Model `alias:` shortcuts"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Aider does NOT support user-defined `/<name>` slash commands: confirmed gap"
+        }
+      ]
+    },
+    {
+      "id": "cline-rules-workflows",
+      "kind": "web",
+      "title": "Cline: Rules / Workflows",
+      "urls": ["https://github.com/cline/clinerules"],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": ["`references/harness-formats.md` → Cline matrix row"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.clinerules` (single file fallback) and `.clinerules/` (directory) layouts"
+        },
+        {
+          "id": "claim-2",
+          "statement": "`workflows/` directory for workflows"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Kebab-case filenames"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`/newrule` creation command"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Toggleable rules popover (v3.13+)"
+        }
+      ]
+    },
+    {
+      "id": "roo-code-custom-instructions",
+      "kind": "web",
+      "title": "Roo Code: Custom Instructions",
+      "urls": ["https://docs.roocode.com/features/custom-instructions"],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": ["`references/harness-formats.md` → Roo Code matrix row"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.roo/rules/` recursive directory (alphabetical load order)"
+        },
+        {
+          "id": "claim-2",
+          "statement": "`.roo/rules-<mode>/` mode-scoped overrides"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Custom Modes with scoped tool permissions"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Fallback to `.roorules` / `.clinerules`"
+        }
+      ]
+    },
+    {
+      "id": "opencode-sst-commands",
+      "kind": "web",
+      "title": "OpenCode (sst): Commands",
+      "urls": ["https://opencode.ai/docs/commands/"],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → OpenCode matrix row, Argument syntax axis, Inline file references axis, Namespacing axis, Migration Notes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.opencode/commands/<name>.md` (project) and `~/.config/opencode/commands/` (user) locations"
+        },
+        {
+          "id": "claim-2",
+          "statement": "YAML frontmatter: `description`, `agent`, `model`, `subtask`, `allowed-tools`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`$ARGUMENTS` substitution (mirrors Claude Code)"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`@filename` for inlining file contents"
+        },
+        {
+          "id": "claim-5",
+          "statement": "`` !`cmd` `` for inline shell"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Subdirectory → colon namespace (`frontend/component.md` → `/project:frontend:component`)"
+        }
+      ]
+    },
+    {
+      "id": "pi-pi-mono-prompt-templates",
+      "kind": "web",
+      "title": "Pi (pi-mono): Prompt Templates",
+      "urls": [
+        "https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/prompt-templates.md",
+        "https://pi.dev/docs/latest/prompt-templates"
+      ],
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/harness-formats.md"],
+      "usage": [
+        "`references/harness-formats.md` → Pi matrix row, Argument syntax axis, Frontmatter fields axis, Migration Notes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "`.pi/prompts/<name>.md` (project) and `~/.pi/agent/prompts/` (user) locations"
+        },
+        {
+          "id": "claim-2",
+          "statement": "YAML frontmatter: optional `description` (falls back to first non-empty line), `argument-hint` with `<required>` / `[optional]` syntax"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`$@` (all args) and `{{name}}` (named placeholders) substitution"
+        },
+        {
+          "id": "claim-4",
+          "statement": "`/name` invocation; skills separate via `/skill:name`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "`--no-prompt-templates` disable flag"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-24",
+      "feeds": [
+        "references/create.md",
+        "references/distill.md",
+        "references/merge.md",
+        "references/simplify.md"
+      ]
+    }
+  ]
+}

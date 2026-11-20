@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"strings"
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 
@@ -51,6 +53,11 @@ type harness struct {
 	checks  []check.Check
 	openErr error
 	root    string
+	disk    *memfs.FileSystem
+	// brokenDir fails the listing of the directories that end with it.
+	brokenDir string
+	// brokenOut makes the output writer fail.
+	brokenOut bool
 }
 
 func (h *harness) run(t *testing.T, args ...string) (string, error) {
@@ -60,21 +67,31 @@ func (h *harness) run(t *testing.T, args ...string) (string, error) {
 		t.Fatal(err)
 	}
 	var out bytes.Buffer
+	var sink io.Writer = &out
+	if h.brokenOut {
+		sink = failingWriter{}
+	}
 	deps := cmd.Dependencies{
 		Open: func(root string) (cmd.Environment, error) {
 			h.root = root
 			if h.openErr != nil {
 				return cmd.Environment{}, h.openErr
 			}
-			return cmd.Environment{Tree: tree.Tree{FS: memfs.New(h.files), Root: "."}, Repository: checktest.Repo{}}, nil
+			h.disk = memfs.New(h.files)
+			var disk fs.FileSystem = h.disk
+			if h.brokenDir != "" {
+				disk = brokenDir{FileSystem: h.disk, suffix: h.brokenDir}
+			}
+			return cmd.Environment{Tree: tree.Tree{FS: disk, Root: "."}, Repository: checktest.Repo{}}, nil
 		},
 		Validator: validator,
 		Checks:    h.checks,
-		Out:       &out,
+		Out:       sink,
 		Version:   "1.2.3",
 	}
 	root := cmd.NewRootCommand(deps)
 	root.SetArgs(args)
+	root.SetOut(sink)
 	root.SetErr(&out)
 	err = root.Execute()
 	return out.String(), err
@@ -221,5 +238,65 @@ func TestExitErrorMessage(t *testing.T) {
 	e := cmd.ExitError{Code: 2, Err: cause}
 	if e.Error() != "cause" || !errors.Is(e, cause) {
 		t.Fatal("an exit error wraps its cause")
+	}
+}
+
+func TestSeedBudgetsRecordsTheCurrentWordCounts(t *testing.T) {
+	h := &harness{files: map[string]string{
+		"packages/runtime/plugin/p/skills/using-a/SKILL.md":        "one two three\n",
+		"packages/runtime/plugin/p/skills/using-a/references/b.md": "four five\n",
+	}}
+	out, err := h.run(t, "seed-budgets")
+	if err != nil || out != "recorded 2 budgets in budgets.json\n" {
+		t.Fatalf("out = %q err = %v", out, err)
+	}
+	data, err := h.disk.ReadFile("budgets.json")
+	if err != nil || !strings.Contains(string(data), `"packages/runtime/plugin/p/skills/using-a/SKILL.md": 3`) {
+		t.Fatalf("manifest = %q, %v", data, err)
+	}
+	if _, err := h.run(t, "seed-budgets", "--path", "elsewhere", "--file", "out/b.json"); err != nil {
+		t.Fatal(err)
+	}
+	if data, err := h.disk.ReadFile("out/b.json"); err != nil || string(data) != "{}\n" {
+		t.Fatalf("empty manifest = %q, %v", data, err)
+	}
+}
+
+func TestSeedBudgetsFaults(t *testing.T) {
+	boom := errors.New("boom")
+	if _, err := (&harness{openErr: boom}).run(t, "seed-budgets"); code(err) != 2 || !strings.Contains(err.Error(), "boom") {
+		t.Fatalf("open: %v", err)
+	}
+	if _, err := (&harness{}).run(t, "seed-budgets", "extra"); code(err) != 2 {
+		t.Fatalf("args: %v", err)
+	}
+	if _, err := (&harness{}).run(t, "seed-budgets", "--file", ""); code(err) != 2 {
+		t.Fatalf("write: %v", err)
+	}
+}
+
+type brokenDir struct {
+	fs.FileSystem
+	suffix string
+}
+
+func (b brokenDir) ReadDir(path string) ([]fs.Entry, error) {
+	if strings.HasSuffix(path, b.suffix) {
+		return nil, errors.New("disk fault")
+	}
+	return b.FileSystem.ReadDir(path)
+}
+
+type failingWriter struct{}
+
+func (failingWriter) Write([]byte) (int, error) { return 0, errors.New("closed") }
+
+func TestSeedBudgetsReportsAReadFaultAndAClosedOutput(t *testing.T) {
+	files := map[string]string{"packages/runtime/plugin/p/skills/a/SKILL.md": "one\n"}
+	if _, err := (&harness{files: files, brokenDir: "packages/runtime/plugin"}).run(t, "seed-budgets"); code(err) != 2 || !strings.Contains(err.Error(), "disk fault") {
+		t.Fatalf("read: %v", err)
+	}
+	if _, err := (&harness{files: files, brokenOut: true}).run(t, "seed-budgets"); code(err) != 2 || !strings.Contains(err.Error(), "closed") {
+		t.Fatalf("output: %v", err)
 	}
 }

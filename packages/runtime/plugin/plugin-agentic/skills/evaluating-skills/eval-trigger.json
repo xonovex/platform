@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "evaluating-skills",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "run the trigger evals for using-zod three times each and tell me which near-miss queries still fire it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: trigger-rate run"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "our writing-python skill needs an eval-output.json: three prompts with binary assertions, then compare the pass rate with and without the skill",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: output evals with matched arms"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "the benchmark.json of iteration 2 shows the with-skill arm losing to the baseline on two assertions; find out why from the transcripts",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit: benchmark analysis"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "trim using-hono to only what the weakest model doesn't already know and prove with an ablation run that nothing essential got lost",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: trim by delta with ablation"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "split these 20 trigger queries into train and validation and run the description optimization loop on the train half only",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: train/validation optimization loop"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "the routing eval for applying-tdd hits 1 of 3 runs on two validation queries; rerun just those with codex as the harness",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "context cue: rerun with another harness"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "write trigger-eval queries for our new using-docker and check the description routes them correctly",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: evaluating trigger rate"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "these output-eval assertions say things like 'the answer is good'; rewrite them so a grader can check each one with evidence",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "implicit: assertion quality"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "measure whether the new hot-paths reference of writing-lua changes the answers of the weakest model at all",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "implicit: ablation of one reference"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "create a new skill for our Terraform module conventions with a SKILL.md and two reference files",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "the SKILL.md of using-react has grown to 600 lines; move the detail into references with load-when lines",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "run the vitest suite of the api package and fix the two failing snapshot tests",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-vitest"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "load-test our HTTP server and compare the p99 latency before and after the change",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: performance benchmarking, not a skill eval"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "write an LLM-as-judge rubric that grades the answers of our support chatbot in production",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: product prompt grading, not a skill eval"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down allowed-tools",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "rewrite the description of using-zod so that it starts with Use when and names its triggers",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "add a unit test that checks our CLI exits non-zero when its config file is missing",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-tests"
+    }
+  ]
+}

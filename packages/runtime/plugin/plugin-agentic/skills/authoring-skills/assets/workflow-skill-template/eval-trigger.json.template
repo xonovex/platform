@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "{gerund}-{topic}",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "{realistic should-trigger prompt: names the workflow directly}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct workflow mention"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "{realistic should-trigger prompt: describes the goal without naming the workflow}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit workflow trigger"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "{realistic should-trigger prompt: names a specific operation}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "operation-level trigger"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "{realistic should-trigger prompt: uses casual phrasing or a typo}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "casual phrasing"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "{realistic should-trigger prompt: buries an operation in a larger task}",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "buried in larger task"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "{realistic should-trigger prompt: validation phrasing names the workflow}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: explicit"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "{realistic should-trigger prompt: validation phrasing implies an operation}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: implicit"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "{realistic should-trigger prompt: validation phrasing covers a failure path}",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: failure path"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "{near-miss prompt: shares keywords but belongs to another workflow}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "keyword overlap, different owner"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "{near-miss prompt: requests an adjacent operation owned elsewhere}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "adjacent operation"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "{near-miss prompt: uses related terminology outside this workflow}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "terminology overlap"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "{near-miss prompt: asks for guidance but not execution of the workflow}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "different intent"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "{near-miss prompt: requests the same artifact through a different owner}",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "same artifact, different workflow"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "{near-miss prompt: validation phrasing points to the closest sibling workflow}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: sibling owner"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "{near-miss prompt: validation phrasing overlaps operation terminology only}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: terminology overlap"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "{near-miss prompt: validation phrasing requests a different result}",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation negative: different result"
+    }
+  ]
+}

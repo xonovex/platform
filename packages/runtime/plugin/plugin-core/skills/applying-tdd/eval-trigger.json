@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "skill": "applying-tdd",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "walk me through red-green-refactor on this shopping-cart total function",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "core owned concept: the TDD cycle"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "write the test first, then the code: drive this feature test-first",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "test-first discipline is the owned rhythm"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "should I fake it with a constant or triangulate here to get the test green?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "green-bar strategy choice: fake it / obvious / triangulation"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "help me build a test list and work it one item at a time without writing them all up front",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "test list / to-do list, owned by tdd"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "is mockist (London) or classical (Detroit) TDD better for growing this design?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "classical vs mockist as a TDD design-style choice, owned by tdd"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "I want clean code that works: let the tests grow the API instead of designing it up front",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "letting tests drive design + the clean-code-that-works goal"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "my green bar never refactors: is that still TDD?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "refactor-step discipline, an owned gotcha"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "what's the difference between a mock and a stub, and which should I use?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: test-double taxonomy and state-vs-behaviour verification -> authoring-tests"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "structure this test with Arrange-Act-Assert and make it follow FIRST",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: anatomy of a single test (AAA / FIRST / naming) -> authoring-tests"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "write Given-When-Then acceptance scenarios with the three amigos before we code",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: acceptance-first / example-led specification -> applying-bdd"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "this class has low cohesion and too many responsibilities. How should I redesign it?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: the design bar the refactor aims at -> applying-oop / analyzing-connascence"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "set up Vitest config and mock this module with vi.mock for my test suite",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: test framework API mechanics"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Implement a `discountedTotal(items, rate)` function test-first, where each item has a `price`. Show the ordered sequence of failing tests and the exact code change you make to pass each one, step by step.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "what's the difference between a mock, a stub, a fake, and a spy?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-tests"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-oop"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by analyzing-connascence"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by applying-bdd"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "name this test and split it: it verifies five things at once",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by authoring-tests"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "should I grow this design with classical or mockist TDD as my development style?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "classical vs mockist is a TDD development style"
+    }
+  ]
+}

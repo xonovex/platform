@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "skill": "validating-work-item",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "feature/retry-from-settings is done in its worktree. check work/retry-from-settings-7k2f against its criteria and dont read the implementation notes first",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "blind first assessment of a work item"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "run every acceptance check of work/points-balance-endpoint-3m4q from a fresh agent and give me pass, fail or blocked per criterion with the command output",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "per-criterion verdict from a fresh reader"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "i built the receipt export item myself so dont take my word for it, get an independent verdict on work/receipt-export-9d1c",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "independent evidence instead of the implementer's word"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "re-validate work/invoice-rounding-5h8e, i pushed a fix to src/round.ts after the last verdict so the old one shouldnt count",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "rerun after the worktree changed"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "need the tree hash of the worktree stored with the verdict so the pr only shows met marks for this exact content, item is work/offline-till-sync-2c6v",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "verdict bound to the worktree tree hash"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "did work/saved-searches-4t7p meet its criteria? only look at the diff and run the checks, report failures but dont touch src/search.ts",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "report a failure and fix nothing"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "loyalty ledger item is finished in ../ledger-wt. which criteria are blocked because the staging db isnt reachable and what would unblock them",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "blocked results with what would unblock them"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "can you tell me for each criterion of the cart-merge item if its a pass, and what the npm test run in the worktree really asserts",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "reads what a passing test asserts"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "validate work/retry-from-settings-7k2f in plans/shop-retry from a fresh context, no fixes",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "independent check of one work item in a change directory"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "independent verdict on the cart-merge item before we deliver it, put the verdict file in plans/cart-merge, no commits",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "verdict file saved in the change directory"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "all work items of the checkout package have verdicts, now check the whole package against the success criteria in plans/checkout-v2",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by validating-work-package"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "every item of the loyalty package says done, does it all work together end to end against what the plan promised",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-package"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "review my diff on feature/till-sync for bugs and naming problems, src/sync/queue.ts especially",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "look over the invoice rounding change and tell me if the null handling in src/round.ts is wrong",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "implement work/cache-warmup-8f2a in its worktree and make the criteria pass in src/warmup.ts",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by implementing-work-item"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "criterion c2 of the work item failed, fix the timeout in src/retry.js and rerun its tests",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by implementing-work-item"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "we spent the whole session on the flaky ci cache, turn what we learned into rules for AGENTS.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn what we learned this session about rebasing the release branch into a reusable skill",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "the item is validated and every criterion passed, write the commit message and the pr text for feature/loyalty-ledger",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by preparing-delivery"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "red-team the written plan for the shop migration before we approve it and rank what you find",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "write the user story for the receipt export as a cashier, with acceptance criteria",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "split the approved plan into work items, each with criteria and how it is verified",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by defining-work-items"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "no subagents here, so do the saved-searches work item yourself step by step and write the implementation notes",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by implementing-work-item"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "the implementer's test output is in the notes for profile-sync, write the PR text and show which checks are self-checks and which were validated independently",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by preparing-delivery"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "is the plan done? check each success criterion in plans/fare-capping/plan.md against what is on main right now",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-package"
+    }
+  ]
+}

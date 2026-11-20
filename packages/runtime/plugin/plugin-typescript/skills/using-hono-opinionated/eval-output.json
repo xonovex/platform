@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "skill": "using-hono-opinionated",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "I'm deploying a Hono API to a serverless edge runtime where cold-start latency is the dominant cost. Show me how to construct the Hono application instance, choosing the most appropriate router for this deployment, and briefly explain why.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Constructs the app by passing an explicit router to the Hono constructor, e.g. new Hono({router: new LinearRouter()})"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Selects LinearRouter (imported from \"hono/router/linear-router\") and justifies it by fastest init / no build step for cold start"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Using @hono/zod-openapi, add a GET /items/{id} endpoint that returns the item as JSON or a 404 problem-details response when it isn't found. Wire it into an OpenAPIHono router with a createRoute schema.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The handler is registered inline inside router.openapi(route, (c) => {...}) rather than extracted into a separate controller function"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Every c.json() call passes an explicit literal status code (e.g. c.json(item, 200) and c.json(problem, 404)), never relying on an implicit 200"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Protect my Hono API so clients can't send huge request bodies and exhaust memory. I want a small global cap on all routes but a much larger allowance on the /upload route.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Uses the bodyLimit middleware imported from \"hono/body-limit\""
+        },
+        {
+          "kind": "llm",
+          "criterion": "Sets maxSize as a byte value with a low global limit and a larger per-route maxSize applied specifically to the upload route"
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "I have a root Hono app, a /api/v1 router, and an /items leaf router mounted with .route(). The generated OpenAPI spec is missing all the /items routes. What is wrong and how do I fix the router composition?",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Identifies that every router in the chain (root, intermediate, and leaf) must be OpenAPIHono, not plain Hono"
+        },
+        {
+          "kind": "llm",
+          "criterion": "States that a single plain Hono anywhere in the path drops its children's routes from the generated spec"
+        }
+      ]
+    }
+  ]
+}

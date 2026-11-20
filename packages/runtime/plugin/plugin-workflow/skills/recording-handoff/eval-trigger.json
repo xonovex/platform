@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "recording-handoff",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "before we start: which branch are shop-api and pricing-svc on, anything uncommitted? and check plans/fare-capping validates",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "the entry step at the start of a workflow step"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "I dropped a new decision into the fare-capping folder by hand, regenerate index.md and log.md so they're not stale",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "generated indexes and the log, without the word plan"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "plan-bundle.py validate says 'relation key holds a file name' on work/daily-cap-api-m5nq.md, what's wrong with it?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "reading a validator finding about a relation key"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "the retention decision says 90 days, it should be 30. just edit decisions/retention-period-k3m7.md",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "a request to edit an append-only decision; the skill routes it to a superseding decision"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "what goes on the end of a new decision filename? can I just number them 001, 002?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "file names and suffixes, without the word plan"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "put saved-searches under the agentic family folder next to roadmap.md, first log entry, then validate it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "starting a change in a family directory, without the word plan"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "new change: loyalty-points. set up the folder and the first log entry, nothing else yet",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "starting a new change, without the word plan"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "add the Workflow section to AGENTS.md: plans dir, shop-api and shop-web repos, delivery mode pull-request",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "project Workflow settings"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "the rate limiter work item has to wait on the open token-expiry decision, how do I set readiness and depends_on in its frontmatter?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "work item frontmatter with readiness and relation keys"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "can I write human:jdoe in verified on a decision the agent drafted and nobody looked at yet?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "actor prefixes and trust in frontmatter"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "write an ADR in docs/adr for picking Postgres over DynamoDB for the orders service, with the rejected options",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-technical-docs"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "commit what's in plans/fare-capping with a conventional commit message",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "make me a worktree for feature/daily-cap off main so I can keep my current checkout",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "my SKILL.md frontmatter fails validation, the description has to start with 'Use when' and the name must match the folder",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "we fought the bundle validator all session, turn what we learned into a rule in CLAUDE.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "the checkout story is way too big, split it into INVEST stories with acceptance criteria",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "write the PR description for feature/daily-cap, what changed and how I tested it",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "add our build, test and lint commands to AGENTS.md so new people find them",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "write a README for shop-api with install, usage and contributing sections",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-technical-docs"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "push feature/fare-capping and open the PR on GitHub with the reviewers from CODEOWNERS",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-github"
+    }
+  ]
+}

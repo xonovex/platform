@@ -1,0 +1,185 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "mike-acton-data-oriented-design-and-c-cppcon-2014",
+      "kind": "web",
+      "title": "Mike Acton, \"Data-Oriented Design and C++\" (CppCon 2014)",
+      "urls": ["https://www.youtube.com/watch?v=rX0ItVEVjHc"],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/cache-behavior.md",
+        "references/data-as-transforms.md",
+        "references/existence-based-processing.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Processing",
+        "The \"where there is one, there are many\", transforms, and \"the problem is data movement\" framing"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The memory wall / latency premise → `references/cache-behavior.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Data as bulk transforms, design from the data → `references/data-as-transforms.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Existence-based processing, branches→loops → `references/existence-based-processing.md`"
+        }
+      ]
+    },
+    {
+      "id": "richard-fabian-data-oriented-design-book",
+      "kind": "web",
+      "title": "Richard Fabian, \"Data-Oriented Design\" (book)",
+      "urls": ["https://www.dataorienteddesign.com/dodbook/"],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/soa-aos-aosoa.md",
+        "references/existence-based-processing.md",
+        "references/data-as-transforms.md",
+        "references/handles-and-indices.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Layout, Memory",
+        "Tables/streams mental model, existence-based processing, \"the absence of a thing is a thing\""
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "AoS / SoA / AoSoA layouts → `references/soa-aos-aosoa.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Existence-based processing, condition tables → `references/existence-based-processing.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Tables, streams, schemas → `references/data-as-transforms.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Handles / relational references → `references/handles-and-indices.md`"
+        }
+      ]
+    },
+    {
+      "id": "noel-llopis-data-oriented-design-or-why-you-might-be-shooting",
+      "kind": "web",
+      "title": "Noel Llopis, \"Data-Oriented Design (Or Why You Might Be Shooting Yourself in the Foot With OOP)\" and related articles",
+      "urls": ["https://gamesfromwithin.com/data-oriented-design"],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/cache-behavior.md", "references/soa-aos-aosoa.md"],
+      "usage": [
+        "`SKILL.md` → Essentials, Layout",
+        "The practical OOP-vs-DOD contrast and cache-locality motivation"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Cache lines, locality, miss types → `references/cache-behavior.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "SoA for hot loops, layout selection → `references/soa-aos-aosoa.md`"
+        }
+      ]
+    },
+    {
+      "id": "supporting-hardware-technique-references",
+      "kind": "web",
+      "title": "Supporting hardware / technique references",
+      "urls": [
+        "https://people.freebsd.org/~lstewart/articles/cpumemory.pdf",
+        "https://www.agner.org/optimize/"
+      ],
+      "urlNotes": [
+        "Ulrich Drepper, \"What Every Programmer Should Know About Memory\": https://people.freebsd.org/~lstewart/articles/cpumemory.pdf",
+        "Agner Fog, optimization manuals: https://www.agner.org/optimize/"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/cache-behavior.md",
+        "references/access-patterns.md",
+        "references/simd-friendly-layout.md",
+        "references/measurement-and-profiling.md",
+        "references/handles-and-indices.md"
+      ],
+      "usage": ["`SKILL.md` → Memory, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Cache hierarchy latencies, prefetching, miss taxonomy → `references/cache-behavior.md`, `references/access-patterns.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Alignment, SIMD loads, AoSoA → `references/simd-friendly-layout.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Profiling, hardware counters, microbenchmarking → `references/measurement-and-profiling.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Indices/handles, swap-remove, free lists → `references/handles-and-indices.md`"
+        }
+      ]
+    },
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/handles-and-indices.md",
+        "references/nested-arrays.md",
+        "references/zero-as-default.md",
+        "references/data-as-transforms.md",
+        "references/statistics-recording.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Layout, Memory",
+        "Practical engine DOD storage, allocator, and low-overhead telemetry techniques"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Data Structures Part 1–2: Bulk Data / Indices\": bulk-data store + handle↔index indirection (stable handles AND dense data) → `references/handles-and-indices.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Data Structures Part 3: Arrays of arrays\": variable-length child lists in bulk arrays + cache-line-sized chunks, capped fixed arrays, linked siblings, string interning → `references/nested-arrays.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "\"Defaulting to Zero\": all-zero as a valid default, 0 as none/not-found/neutral, nil enum entry and reserved index-0 → `references/zero-as-default.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "\"It's All About The Data\": data-first framing → `references/data-as-transforms.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "\"Minimalist container library in C\": contiguous growable containers (noted in c99-opinionated)"
+        },
+        {
+          "id": "claim-6",
+          "statement": "\"Recording Statistics: An Exercise in Minimalism\": per-frame accumulating counters, API evolution from string-hash lookup → cached index → returned accumulator pointer (one store, no lookup/branch/lock), `{name, history ring, frame_value}` layout, lazy history allocation for viewed counters only, graph-vs-table readout → `references/statistics-recording.md`"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-watch/re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "game-engine-development-blog-archive"
+    }
+  ]
+}

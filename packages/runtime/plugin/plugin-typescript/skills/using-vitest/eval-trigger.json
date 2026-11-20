@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "using-vitest",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Write a Vitest test for an async updateUser(id) function. The test should create a record, update it, and verify that the record's updatedAt timestamp is strictly newer than the original createdAt.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "In a Vitest test file I have `import { db } from '../src/db'` and I want to mock the entire '../src/db' module so its exported `query` function returns a fixed row object. Show the mock setup.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Write a Vitest mock for an async `getUser(id)` dependency that resolves to `{ id: '123', email: 'test@example.com' }`, then call it and assert it was invoked with '123'.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Write a Vitest test whose mocked dependency remains type-safe and fails compilation when the production function signature changes.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Make this timestamp-sensitive Vitest deterministic with fake timers and an explicit system time, then restore timer state after each test.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Configure Vitest and TypeScript so test globals, setup files, aliases, and source types resolve without leaking test types into the production build.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Explain when to use a stub versus a spy versus a fake, independent of any test framework.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-tests"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "add proper types to the response shape in src/api/users.ts so the consumer doesn't have to cast",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-typescript"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-zod"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-hono"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Drive this pricing rule test-first: write the failing test, go green with a fake, then refactor.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-tdd"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "rewrite this string concat with template literals and pull out the magic numbers as named consts:\n\nconst label = name + ' (' + (qty * 1.21).toFixed(2) + ')';\nif (retries > 3) { throw new Error('too many'); }",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-typescript"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Migrate these Zod 3 string and error-customization schemas to Zod 4 without changing accepted inputs or issue paths.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-zod"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-hono"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "fix the failing assertion in user.spec.ts: it expects 200 but we return 204",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "fixing a failing Vitest assertion"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "skill": "designing-data-models",
+  "tier": "conservative",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "I'm designing the in-memory object store for a scene editor. Objects link to each other (a light targets a mesh, a constraint targets two bones). Storage compacts and grows, and users can delete an object that others still point at. How should I represent those inter-object links, and what happens to a link when its target is deleted?",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Recommends referencing objects by a stable id (or GUID/handle) resolved through a lookup/indirection table rather than storing raw pointers"
+        },
+        {
+          "kind": "llm",
+          "criterion": "States that a reference to a deleted target must resolve to null (a safe miss), not dangle or read freed memory"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Recommends a generation/version counter paired with the id (or never reusing ids) so a stale reference to a recycled slot is detected instead of silently aliasing a different object"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "I want a prefab/template system in my editor: designers author a template object, drop many instances of it, and tweak individual properties on some instances. Editing the template should update the instances, except where an instance deliberately changed a value. How should instances store their data, and what should get written to disk?",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Instances store only their overrides and read all other properties through to the prototype (per-property override flag/bitmask tracking local-vs-inherited)"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Serialization persists only the prototype reference plus the overridden deltas, reconstructing inherited values from the prototype on load"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Overrides are kept as concrete values, not computed expressions derived from the prototype's value"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Our tool's save files need to keep opening as we keep changing the schema (properties get added, split, renamed) across releases, and the project files are checked into git. Design the save/load approach.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Tags the file with a format version and runs ordered migration steps to bring older files forward to the current schema on load"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Unrecognized/unknown properties are skipped (and ideally preserved on resave) rather than rejected, so newer files still open in older code"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Emits deterministic output (stable ordering, no embedded timestamps/hash-ordered maps, normalized floats) so files diff cleanly under version control"
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "In my editor's data model, one user action (like nudging five selected nodes) writes many properties, and views/derived caches need to update when data changes. I also need Ctrl+Z. How should mutations flow through the model so notifications, undo, and derived recompute stay consistent?",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Changes are batched within a transaction and delivered/flushed once at commit rather than notifying synchronously inside each setter"
+        },
+        {
+          "kind": "llm",
+          "criterion": "One user action is grouped into a single transaction so it is one undo step, and undo entries capture stable object ids plus values (not pointers or array indices)"
+        },
+        {
+          "kind": "llm",
+          "criterion": "A new edit clears the redo stack"
+        }
+      ]
+    }
+  ]
+}

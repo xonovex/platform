@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "writing-travel-guides",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Write a multilingual travel guide for visitors to Porto with current practical information.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "city travel guide"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Create a museum visitor guide with verified hours, prices, transport, and accessibility details.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "venue guide research"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Build English and Dutch destination pages with matching frontmatter and locale files.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "multilingual destination content"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "Research a family, budget, and premium itinerary for three days in Prague.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "travel itinerary strategies"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Refresh this attraction guide because its ticket prices and opening hours may be stale.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "time-sensitive travel refresh"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Publish a B1 visitor guide for the Louvre with practical logistics and a recorded research date.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "publishable venue guide"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Write a locally informed destination guide without inventing insider tips or accessibility claims.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "travel fact discipline"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Create a half-day and full-day plan for Rotterdam and save one Markdown file per language.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "travel itinerary and files"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Add two verified news posts about this week's airline announcements.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "news writing"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Humanize this existing hotel review without researching new facts.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "editorial revision"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Rewrite this deployment handoff so the blocker appears first.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "technical writing"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Make this paragraph shorter and resolve its ambiguous pronouns.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "general writing"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Book a hotel in Porto for next weekend.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "travel booking"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Summarize this supplied destination article in five bullets.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "simple summarization"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Translate these attraction names into Dutch.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "translation only"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Create a Kubernetes deployment for the travel site.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "infrastructure implementation"
+    }
+  ]
+}

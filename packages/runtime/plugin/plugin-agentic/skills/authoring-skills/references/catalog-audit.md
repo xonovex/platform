@@ -28,7 +28,7 @@ The repeatable method for auditing an existing catalog and refactoring it onto t
 2. **Keep** the canonical reference in the owner; **delete** the duplicate from the other skill.
 3. In the de-duplicated skill, **replace** the removed bullet/reference with a by-name cross-reference in the `SKILL.md` bullet and any `references/` "Related" lines; tighten the description's trigger words so the concept routes to the owner.
 4. **Fix links**: repoint anything that pointed at the removed file; confirm no dangling links.
-5. **Move provenance** to the owner's `SOURCES.md`; re-scan prose for leaked attributions.
+5. **Move provenance** to the owner's `sources.json`; re-scan prose for leaked attributions.
 6. **Update routing and dependencies**: move ownership handoffs with the concept, tighten descriptions, and remove hard dependencies that no longer represent an indispensable implementation.
 7. **Validate**: JSON valid, links and named skills resolve, manifests match, formatter clean; spot-check trigger evals (positives for the skill, a negative pointing at the now-cross-linked sibling).
 8. Do **one cluster per commit** so each refactor is reviewable and revertible.

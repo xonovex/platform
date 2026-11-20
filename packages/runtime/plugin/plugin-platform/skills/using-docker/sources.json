@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "docker-documentation",
+      "kind": "web",
+      "title": "Docker documentation",
+      "urls": [
+        "https://docs.docker.com/build/building/best-practices/",
+        "https://docs.docker.com/build/building/multi-stage/",
+        "https://docs.docker.com/build/building/secrets/"
+      ],
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; layer caching, multi-stage images, non-root runtime users, BuildKit secrets, health checks, Compose, and `.dockerignore`."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Official build-cache ordering, stage-copy behavior, secret mounts, image minimization, and runtime hardening guidance."
+        }
+      ]
+    }
+  ]
+}

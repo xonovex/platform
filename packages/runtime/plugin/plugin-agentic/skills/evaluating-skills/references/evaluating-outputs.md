@@ -22,33 +22,33 @@ This is about **whether the outputs are good once the skill activates**, not abo
 - **Assertions**: specific, binary PASS/FAIL checks the judge grades against
 - **Files** (optional): input artifacts the skill needs
 
-Store the seed as `evals.json` at the skill root (next to `SKILL.md`); optional input artifacts go in `evals/files/`. `skill_name` and `tier` are required inputs to the repository runner:
+Store the seed as `eval-output.json` at the skill root (next to `SKILL.md`); optional input artifacts go in fixtures that a case names. `skill` and `tier` are required inputs to the runner:
 
 ```json
 {
-  "skill_name": "{name}",
+  "version": 1,
+  "skill": "{name}",
   "tier": "aggressive | moderate | conservative",
-  "evals": [
+  "cases": [
     {
-      "id": 1,
+      "id": "case-1",
       "prompt": "{realistic prompt}",
-      "expected_output": "{plain-language success reference: optional}",
-      "assertions": ["{verifiable check}", "{another check}"],
-      "files": ["evals/files/{input}"]
+      "gate": "required",
+      "expect": [{"kind": "llm", "criterion": "{verifiable check}"}]
     }
   ]
 }
 ```
 
-`assertions` are the binary source of truth; `expected_output` is an optional plain-language reference the judge uses to recognise success (and a fallback if `assertions` is omitted). `files` is optional too.
+Each `expect` entry is a binary PASS/FAIL check; an `llm` entry holds the criterion the judge grades. A case may also name `fixtures` that are placed in the workspace before the run, and a `gate` of `advisory` reports a case without failing the run.
 
-Keep this seed committed per skill. "What the model already knows" is model-specific, so the **weakest model you deploy is the gate**: run any model with `eval-outputs.py --model <m>`. **Which facts are essential is measured, not declared:** an eval the model fails **without** the skill is one the skill genuinely carries; if that same eval also fails **with** the skill, a trim removed the fact. Restore it. When a model is added, re-run the seed against it: a high without-skill pass rate means the content is now redundant (trim-further candidate); a with-skill-only pass means it stays essential.
+Keep this seed committed per skill. "What the model already knows" is model-specific, so the **weakest model you deploy is the gate**: run any model with `agent-eval output --model <m>`. **Which facts are essential is measured, not declared:** an eval the model fails **without** the skill is one the skill genuinely carries; if that same eval also fails **with** the skill, a trim removed the fact. Restore it. When a model is added, re-run the seed against it: a high without-skill pass rate means the content is now redundant (trim-further candidate); a with-skill-only pass means it stays essential.
 
 ## Automated Runner
 
-The repository runner `npx moon-skill-eval-outputs <evals.json> <skill-name> --harness claude|codex` runs the loop below. Each eval gets repeated activated and baseline arms. Claude defaults to pinned `claude-haiku-5-5` generation and `claude-sonnet-5-5` judging; Codex defaults to `gpt-5.3-codex` for both. Explicit CLI options or harness environment variables override those defaults, and `benchmark.json` records the resolved generation and judge identifiers. Claude uses isolated plugin loading and blocks the Skill tool in the baseline. Codex uses separate ephemeral homes, stages only the target skill in the activated home, and runs generation plus judging in a read-only sandbox with inherited configuration and rules ignored. Outputs are graded by a reference-guided judge in the same harness (binary per assertion, evidence required); failed generations are not judged, and a hard 24-model-call ceiling requires bounded batches. Results land in the workspace layout and `benchmark.json`. The bundled `scripts/eval-outputs.py` remains the portable Claude reference implementation. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
+The runner `agent-eval output <skill> --harness claude|codex` runs the loop below. Each eval gets repeated activated and baseline arms. Claude defaults to pinned `claude-haiku-5-5` generation and `claude-sonnet-5-5` judging; Codex defaults to `gpt-5.3-codex` for both. Explicit CLI options or harness environment variables override those defaults, and the results record the resolved generation and judge identifiers. Claude uses isolated plugin loading and blocks the Skill tool in the baseline. Codex uses separate ephemeral homes, stages only the target skill in the activated home, and runs generation plus judging in a read-only sandbox with inherited configuration and rules ignored. Outputs are graded by a reference-guided judge in the same harness (binary per assertion, evidence required); failed generations are not judged, and a hard 24-model-call ceiling requires bounded batches. Results land in the results directory. Do the manual loop when you need human grading or file-producing skills the runner doesn't capture.
 
-The runner refuses to publish a benchmark when any generation/judge call times out, exhausts its budget, exits unsuccessfully, returns unparseable grading, or fails to expose the target in an activated arm. It removes a stale `benchmark.json`, writes `invalid-run.json`, and exits `2`. Valid evidence exits `0` only when the declared tier's absolute with-skill rate, minimum delta, and full activation gates pass; otherwise it exits `1`. Aggressive and moderate tiers require at least 0.75/0.80 absolute pass rate and 0.05 delta; conservative requires 0.90 and 0.10.
+The runner refuses to publish a verdict when any generation/judge call times out, exhausts its budget, exits unsuccessfully, returns unparseable grading, or fails to expose the target in an activated arm. It records the run as invalid and exits `2`; a budget stop with work left exits `3`, and `--resume` finishes the run. Valid evidence exits `0` only when the declared tier's absolute with-skill rate, minimum delta, and full activation gates pass; otherwise it exits `1`. Aggressive and moderate tiers require at least 0.75/0.80 absolute pass rate and 0.05 delta; conservative requires 0.90 and 0.10.
 
 ## Designing Prompts
 

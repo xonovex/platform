@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "xonovex-game-runtime-conventions",
+      "kind": "original",
+      "title": "Xonovex game-runtime conventions",
+      "provenance": "Repository-original opinionated overlay distilled from Xonovex C99 engine practice; general C rules remain owned by writing-c99 and managing-memory",
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/` covering caller-owned mesh generation, SoA math/physics data, tagged shapes, inverse mass, and builder-style APIs."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The exact data layouts, ownership contracts, and builder conventions are house style rather than claims about the C standard."
+        }
+      ]
+    }
+  ]
+}

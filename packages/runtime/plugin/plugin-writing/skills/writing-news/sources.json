@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "repository-news-conventions",
+      "kind": "original",
+      "title": "Repository news conventions",
+      "provenance": "Repository-original multilingual news workflow distilled from maintained content projects",
+      "reviewedAt": "2026-08-29",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Date-bounded research, three-source triangulation, source-language drafting before translation, CEFR readability, structured frontmatter, locale filenames, slug collision checks, and schema validation."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Review corrections and evaluations involving news freshness, sourcing, translations, frontmatter, filenames, and publication checks.\n2. Update the smallest owning section.\n3. Re-run trigger, routing, and output evaluations.\n4. Update the review date after the guidance and evaluations agree.",
+      "after": "repository-news-conventions"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "skill": "writing-news",
+  "tier": "conservative",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "Add two short news posts about recent electric vehicle developments to our content site. We publish in English and Dutch, and each post is a Markdown file with frontmatter.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Each story has separate English and Dutch Markdown files"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Filenames use the slug.lang.md pattern"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Each file has lang, slug, title, summary, and created_at frontmatter"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Research one news article about a battery announcement from the last seven days. Draft only after you can verify the central claim through at least three credible sources. Record what should happen if only one source supports it.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The workflow requires at least three credible sources before drafting"
+        },
+        {
+          "kind": "llm",
+          "criterion": "The response rejects, defers, or clearly withholds a story supported by only one source"
+        },
+        {
+          "kind": "llm",
+          "criterion": "The response applies a seven-day lookback to the research"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Prepare English and Dutch versions of the same news post. Use one verified source-language draft, keep all dates and numbers aligned, and validate the frontmatter against the site's schema.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "The workflow creates and verifies one source-language draft before translation"
+        },
+        {
+          "kind": "llm",
+          "criterion": "The translated version preserves the same dates, numbers, and claims"
+        },
+        {
+          "kind": "llm",
+          "criterion": "The final workflow validates frontmatter against the available content schema"
+        }
+      ]
+    }
+  ]
+}

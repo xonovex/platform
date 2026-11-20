@@ -36,25 +36,9 @@
       "types": "./src/adapters/output-node.ts",
       "default": "./dist/src/adapters/output-node.js"
     },
-    "./batches": {
-      "types": "./src/batches.ts",
-      "default": "./dist/src/batches.js"
-    },
-    "./claude-plugin": {
-      "types": "./src/claude-plugin.ts",
-      "default": "./dist/src/claude-plugin.js"
-    },
     "./cli-args": {
       "types": "./src/cli-args.ts",
       "default": "./dist/src/cli-args.js"
-    },
-    "./direct-execution": {
-      "types": "./src/direct-execution.ts",
-      "default": "./dist/src/direct-execution.js"
-    },
-    "./drift-budgets": {
-      "types": "./src/drift-budgets.ts",
-      "default": "./dist/src/drift-budgets.js"
     },
     "./executable": {
       "types": "./src/executable.ts",
@@ -63,10 +47,6 @@
     "./file-system": {
       "types": "./src/file-system.ts",
       "default": "./dist/src/file-system.js"
-    },
-    "./frontmatter": {
-      "types": "./src/frontmatter.ts",
-      "default": "./dist/src/frontmatter.js"
     },
     "./git": {
       "types": "./src/git.ts",
@@ -96,21 +76,9 @@
       "types": "./src/platform-meta.ts",
       "default": "./dist/src/platform-meta.js"
     },
-    "./prose-punctuation": {
-      "types": "./src/prose-punctuation.ts",
-      "default": "./dist/src/prose-punctuation.js"
-    },
     "./records": {
       "types": "./src/records.ts",
       "default": "./dist/src/records.js"
-    },
-    "./skill-directory": {
-      "types": "./src/skill-directory.ts",
-      "default": "./dist/src/skill-directory.js"
-    },
-    "./skill-eval-models": {
-      "types": "./src/skill-eval-models.ts",
-      "default": "./dist/src/skill-eval-models.js"
     },
     "./skill-handoffs": {
       "types": "./src/skill-handoffs.ts",

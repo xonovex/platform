@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "repository-writing-conventions",
+      "kind": "original",
+      "title": "Repository writing conventions",
+      "provenance": "Repository-original guidance for clear, concise, and verifiable prose",
+      "reviewedAt": "2026-08-29",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "One idea per sentence, active voice, stable terminology, unambiguous references, evidence beside claims, explicit uncertainty, comparison context, reader-appropriate detail, and removal of filler or duplicate summaries."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Review corrections and evaluations involving sentence clarity, terminology, evidence, certainty, and concision.\n2. Update the smallest owning section.\n3. Re-run trigger, routing, and output evaluations.\n4. Update the review date after the guidance and evaluations agree.",
+      "after": "repository-writing-conventions"
+    }
+  ]
+}

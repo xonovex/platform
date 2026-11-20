@@ -1,0 +1,105 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "how-we-built-our-multi-agent-research-system",
+      "kind": "web",
+      "title": "How we built our multi-agent research system",
+      "urls": [
+        "https://www.anthropic.com/engineering/multi-agent-research-system"
+      ],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/delegation.md", "references/tasks.md"],
+      "usage": [
+        "`references/delegation.md` → Delegating a task",
+        "`references/tasks.md` → Ordering the tasks",
+        "`assets/templates/task-brief.md` → the brief"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A worker brief states the task, the files it reads and may change, the rules that apply, the checks and the required return, because vague briefs make parallel workers duplicate or miss work → delegation, task-brief"
+        },
+        {
+          "id": "claim-2",
+          "statement": "A lead agent starts workers in parallel and scales their number to the work, within a bound → tasks, delegation"
+        }
+      ]
+    },
+    {
+      "id": "building-effective-agents",
+      "kind": "web",
+      "title": "Building effective agents",
+      "urls": [
+        "https://www.anthropic.com/engineering/building-effective-agents"
+      ],
+      "reviewedAt": "2026-10-27",
+      "feeds": [
+        "references/tasks.md",
+        "references/delegation.md",
+        "references/verification.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials",
+        "`references/tasks.md` → Ordering the tasks",
+        "`references/delegation.md` → Delegating a task",
+        "`references/verification.md` → What to run"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Sectioning runs independent subtasks at the same time → tasks"
+        },
+        {
+          "id": "claim-2",
+          "statement": "An orchestrator splits a task, delegates the subtasks to workers and synthesizes their results instead of doing them itself → delegation"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Progress is judged on ground truth from the environment, such as test runs, not on an agent's own report → verification, Essentials"
+        }
+      ]
+    },
+    {
+      "id": "git-worktree-documentation",
+      "kind": "web",
+      "title": "git-worktree documentation",
+      "urls": ["https://git-scm.com/docs/git-worktree"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/worktree-and-branch.md"],
+      "usage": [
+        "`references/worktree-and-branch.md` → Finding or creating the worktree"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A repository can have several branches checked out at once, each in its own linked worktree, so one work item's changes stay apart from the main clone and from other items → worktree-and-branch"
+        }
+      ]
+    },
+    {
+      "id": "xonovex-work-item-implementation-conventions",
+      "kind": "original",
+      "title": "Xonovex work-item implementation conventions",
+      "provenance": "Repository-original procedure for building one ready work item, built on the contract of **recording-handoff** and the worktree procedure of **using-git**: the preconditions, the worktree and its branch, the split into tasks, delegation and its fallback, the self-check and the implementation notes",
+      "reviewedAt": "2026-11-19",
+      "feeds": [
+        "references/preconditions.md",
+        "references/worktree-and-branch.md",
+        "references/tasks.md",
+        "references/delegation.md",
+        "references/verification.md",
+        "references/notes-file.md",
+        "references/closing-the-run.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The run executes the entry step of **recording-handoff** first and loads knowledge skills from the skills map of the `implementing-work-item` phase; a dependency counts as done only with a passing verdict or the invoker's word; the notes and the log entry go to the main checkout's bundle and never to the worktree's copy of `plans/`; a decision note names one `path:line`; everything the run concludes is a self-check; nothing is committed, staged or pushed."
+        }
+      ]
+    }
+  ]
+}

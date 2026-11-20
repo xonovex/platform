@@ -1,0 +1,159 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "agent-skills-optimizing-skill-descriptions",
+      "kind": "web",
+      "title": "Agent Skills: Optimizing Skill Descriptions",
+      "urls": [
+        "https://agentskills.io/skill-creation/optimizing-descriptions.md"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/evaluating-triggers.md"],
+      "usage": ["`references/evaluating-triggers.md` → entire file"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Trigger eval set design (~20 queries, 8-10 positive + 8-10 negative) → `evaluating-triggers.md` Trigger Eval Set"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Near-miss negative queries → Strongest should-not-trigger queries"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Realistic query content (file paths, personal context, casual language) → Making Eval Queries Realistic"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Multi-run trigger rate measurement → Measuring Trigger Rate"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Train / validation split methodology → Train / Validation Split"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Optimization loop (5 iterations, pick best validation pass rate) → Optimization Loop"
+        }
+      ]
+    },
+    {
+      "id": "agent-skills-evaluating-skill-output-quality",
+      "kind": "web",
+      "title": "Agent Skills: Evaluating Skill Output Quality",
+      "urls": ["https://agentskills.io/skill-creation/evaluating-skills.md"],
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/evaluating-outputs.md"],
+      "usage": [
+        "`references/evaluating-outputs.md` → entire file (incl. Automated Runner section)",
+        "`scripts/eval-outputs.py` → with-skill/without-skill arms, LLM-as-judge grading, `benchmark.json`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Test case shape (prompt, expected output, optional input files) → Test Case Shape"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Reference-guided binary LLM-as-judge with evidence; with-skill vs without-skill arms in isolated runs → `scripts/eval-outputs.py` (method also informed by public SkillsBench / skill-creator output-eval practice)"
+        },
+        {
+          "id": "claim-3",
+          "statement": "`evals/evals.json` storage convention"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Workspace layout (`iteration-N/`, `with_skill/`, `without_skill/`) → Workspace Layout"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Run pair (with skill + baseline) → Running Eval Pairs"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Fresh context per run → Workflow"
+        },
+        {
+          "id": "claim-7",
+          "statement": "Timing capture (`total_tokens`, `duration_ms`) → Running Eval Pairs"
+        },
+        {
+          "id": "claim-8",
+          "statement": "Good vs weak assertions, evidence requirement → Writing Assertions"
+        },
+        {
+          "id": "claim-9",
+          "statement": "Grading via script for mechanical checks, LLM for the rest → Grading"
+        },
+        {
+          "id": "claim-10",
+          "statement": "`benchmark.json` aggregation → Aggregating"
+        },
+        {
+          "id": "claim-11",
+          "statement": "Pattern analysis: always-pass, always-fail, with-vs-without delta, variance → Pattern Analysis"
+        },
+        {
+          "id": "claim-12",
+          "statement": "Human review + actionable feedback → Human Review"
+        },
+        {
+          "id": "claim-13",
+          "statement": "Iteration signals (failed assertions, feedback, transcripts) → Iteration Signals"
+        },
+        {
+          "id": "claim-14",
+          "statement": "\"Stay lean, explain why, bundle repeated work\" iteration principles"
+        }
+      ]
+    },
+    {
+      "id": "openai-codex-skills-and-non-interactive-mode",
+      "kind": "web",
+      "title": "OpenAI Codex skills and non-interactive mode",
+      "urls": [
+        "https://learn.chatgpt.com/docs/build-skills.md",
+        "https://learn.chatgpt.com/docs/non-interactive-mode.md"
+      ],
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/evaluating-triggers.md",
+        "references/evaluating-outputs.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Codex skill discovery and progressive disclosure; implicit routing from skill descriptions; repository/user skill locations; explicit `$skill-name` invocation; ephemeral JSONL `codex exec`; ignored user configuration and execution rules; read-only sandbox selection."
+        }
+      ]
+    },
+    {
+      "id": "xonovex-skill-evaluation-policy",
+      "kind": "original",
+      "title": "Xonovex skill-evaluation policy",
+      "provenance": "Repository-original catalog routing, evidence-health, repetition, and tier-gate policy maintained with the evaluator implementations",
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/evaluating-triggers.md",
+        "references/evaluating-outputs.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Competitive multi-skill routing scenarios, two-run CI evidence, full activation, absolute pass-rate floors, and minimum quality deltas are repository conventions."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; this reference combines multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/optimize.md"]
+    }
+  ]
+}

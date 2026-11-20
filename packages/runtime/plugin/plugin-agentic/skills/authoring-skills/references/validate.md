@@ -8,7 +8,7 @@ Audit the skill metadata, instructions, references, and bundled resources; repor
 
 Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
 
-The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exits non-zero on errors or authoring warnings. A portable reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python).
+The catalog validator runs as `agent-validate --strict skill sources text --path <skill-dir>` and exits non-zero on errors or authoring warnings.
 
 ## Core Workflow
 
@@ -77,7 +77,7 @@ The workspace-level composition check validates only durable, exact structure:
 - Every hard dependency and named ownership handoff resolves to an existing registered skill.
 - Hard dependencies are dependency-first and acyclic.
 - Optional selection remains in runtime prose and relies on installed skill names and routing descriptions, not a second metadata graph.
-- `SOURCES.md` records content provenance independently of package versions.
+- `sources.json` records content provenance independently of package versions.
 
 ## Output
 

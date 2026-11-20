@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "skill": "assuring-accessibility",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "Assess release candidate sha256:abc against WCAG 2.2 AA. We have an automated scanner report; tell me what evidence is still missing and what result to publish.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Pins WCAG 2.2, level AA, the exact subject revision, applicable criteria, assessor origin, tools, environments, and limitations"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Treats automation as partial evidence and requires representative keyboard, zoom/reflow, assistive-technology, error, focus, and dynamic-status testing where applicable"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Publishes criterion-level pass, fail, not-applicable, and not-tested outcomes with findings, severity, evidence references, gaps, and reassessment conditions"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "A critical checkout flow fails one accessibility criterion. Product wants a permanent waiver because remediation is expensive. Define the safe workflow.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Rejects a permanent default waiver and records exact scope, owner, authorized approver, affected users, rationale, compensating access, remediation owner, evidence, start, expiry, and review"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Requires qualified accessibility and affected-user review appropriate to impact and never represents the exception as conformance"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Blocks or fails visibly when the selected profile makes the criterion mandatory and no adequate enforcement or authorized unexpired exception exists"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "Create an organization accessibility profile that works for web and native applications without inventing one universal scanner.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Keeps the profile semantic and selects pinned standards, levels, applicable criteria, evidence, actors, freshness, and failure behavior independently of tools"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Uses platform-specific implementation and test adapters while preserving comparable criterion-level outcomes and native evidence references"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Includes design, implementation, automated checks, human and assistive-technology verification, release gating, monitoring, exceptions, drift, and retirement"
+        }
+      ]
+    }
+  ]
+}

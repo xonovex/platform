@@ -31,7 +31,6 @@ export default {
       files: "**/*.md",
       excludeFiles: [
         "**/CHANGELOG.md",
-        "**/SOURCES.md",
         "**/plans/**",
         "**/test/**",
         "**/testdata/**",

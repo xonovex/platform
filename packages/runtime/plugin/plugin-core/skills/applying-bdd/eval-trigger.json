@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "skill": "applying-bdd",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "discovery + Gherkin formulation before coding: core bdd"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "how do I structure a feature file with Background and a Scenario Outline for the coupon rules?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Gherkin keyword structure owned by bdd"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "we want to do example mapping on this story. What do the yellow, blue, green and red cards mean?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "example mapping card colours owned by bdd discovery"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "set up acceptance-test-driven development so the specs become living documentation the business can read",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "ATDD = specification by example = living documentation, all bdd"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "is Cucumber a testing tool, and should I drive these scenarios through the browser?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "framing/gotcha owned by bdd: collaboration tool, stub externals not UI-drive"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "how many scenarios per business rule should we keep, versus pushing cases into unit tests?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "2-5 scenarios per rule, push exhaustive cases down: bdd boundary guidance"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "what's the red-green-refactor cycle and how do I write a failing test first for this pricing function?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: inner test-first rhythm -> applying-tdd, not the acceptance layer"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "what's the difference between a mock and a stub, and how do I stub the payment gateway in my step definitions?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: test-double taxonomy and stubbing mechanics -> authoring-tests"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "help me write a good user story with INVEST and acceptance criteria for the wishlist feature",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: the story container and INVEST -> writing-user-stories"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "define the bounded context and ubiquitous language for our billing domain",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: the vocabulary scenarios are written in -> applying-ddd"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "configure vi.mock and the vitest matchers for these HTTP assertions",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: a test framework API question"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "audit this module for dead code and duplication without changing anything",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: read-only smell audit -> auditing-code-quality"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Write a Gherkin feature file for an order checkout where applying a valid percentage-off coupon reduces the order total. The cart totals 50.00 EUR; cover a 10 percent coupon (new total 45.00) and a 25 percent coupon (new total 37.50).",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Our team is about to run an example mapping session for a user story. Explain what each of the four card colours used in example mapping represents.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "walk me through red-green-refactor on this shopping-cart total function",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-tdd"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "is this user story good? \"As a rider I want to pay for my trip\": does it pass INVEST?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "I want clean code that works: let the tests grow the API instead of designing it up front",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by applying-tdd"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "Write Given-When-Then scenarios for the refund policy with the product owner.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "Given-When-Then scenarios written with the business are this skill's core"
+    }
+  ]
+}

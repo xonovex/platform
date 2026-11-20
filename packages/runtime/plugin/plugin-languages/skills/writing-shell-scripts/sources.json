@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "bash-and-posix-shell-references",
+      "kind": "web",
+      "title": "Bash and POSIX shell references",
+      "urls": [
+        "https://www.gnu.org/software/bash/manual/bash.html",
+        "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html"
+      ],
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; shell syntax, expansion, quoting, exit behavior, traps, functions, argument parsing, portability, and redirection."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Bash-specific behavior and POSIX shell requirements. Strict-mode, shellcheck, shfmt, and defensive defaults are Xonovex conventions."
+        }
+      ]
+    }
+  ]
+}

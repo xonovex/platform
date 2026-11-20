@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "typescript-documentation",
+      "kind": "web",
+      "title": "TypeScript documentation",
+      "urls": [
+        "https://www.typescriptlang.org/docs/",
+        "https://www.typescriptlang.org/tsconfig/"
+      ],
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; strict typing, inference, ESM modules, async functions, configuration, narrowing, and compiler behavior."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "TypeScript language/compiler semantics and `tsconfig` options. ESLint-backed style rules are Xonovex conventions."
+        }
+      ]
+    }
+  ]
+}

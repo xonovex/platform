@@ -1,0 +1,191 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "dmitry-vyukov-1024cores",
+      "kind": "web",
+      "title": "Dmitry Vyukov: 1024cores",
+      "urls": ["https://www.1024cores.net/"],
+      "urlNotes": [
+        "https://www.1024cores.net/ (canonical home of the lock-free/wait-free articles; the older `sites.google.com/site/1024cores/home` mirror is superseded)"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/progress-guarantees.md",
+        "references/mpsc-queue.md",
+        "references/mpmc-bounded-queue.md",
+        "references/false-sharing.md",
+        "references/testing-and-verification.md",
+        "references/scalable-architecture.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Building blocks, Data structures, Reclamation & scaling",
+        "The queue/stack algorithms and the Relacy verification guidance under `references/`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Lock-free vs wait-free vs obstruction-free taxonomy → `references/progress-guarantees.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "MPSC intrusive queue → `references/mpsc-queue.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Bounded MPMC queue (per-cell sequence numbers) → `references/mpmc-bounded-queue.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Cache-line / false-sharing guidance → `references/false-sharing.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Relacy Race Detector → `references/testing-and-verification.md`"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Scalability / \"the fastest synchronization is none\" → `references/scalable-architecture.md`"
+        }
+      ]
+    },
+    {
+      "id": "c11-c-11-memory-model",
+      "kind": "web",
+      "title": "C11 / C++11 Memory Model",
+      "urls": [
+        "https://en.cppreference.com/w/c/atomic",
+        "https://en.cppreference.com/w/c/atomic/memory_order"
+      ],
+      "urlNotes": [
+        "https://en.cppreference.com/w/c/atomic and https://en.cppreference.com/w/c/atomic/memory_order"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/memory-model.md",
+        "references/memory-ordering.md",
+        "references/atomics-and-cas.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Memory model section",
+        "All `<stdatomic.h>` usage in `references/`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Data race = UB, happens-before, synchronizes-with, modification order → `references/memory-model.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "`memory_order_*` semantics and fences → `references/memory-ordering.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Atomic load/store/RMW, `compare_exchange_weak`/`_strong`, spurious failure → `references/atomics-and-cas.md`"
+        }
+      ]
+    },
+    {
+      "id": "maurice-herlihy-nir-shavit-the-art-of-multiprocessor-programming",
+      "kind": "web",
+      "title": "Maurice Herlihy & Nir Shavit: The Art of Multiprocessor Programming",
+      "urls": [
+        "https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-1"
+      ],
+      "urlNotes": [
+        "https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-1 (2nd ed.)"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/progress-guarantees.md",
+        "references/lock-free-stack.md",
+        "references/aba-problem.md",
+        "references/locks-and-backoff.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Memory model, Data structures, Reclamation & scaling"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Progress conditions, wait-free/lock-free hierarchy → `references/progress-guarantees.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Treiber stack and the ABA problem → `references/lock-free-stack.md`, `references/aba-problem.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Spinlocks, TTAS, exponential backoff, MCS/CLH queue locks → `references/locks-and-backoff.md`"
+        }
+      ]
+    },
+    {
+      "id": "paul-e-mckenney-is-parallel-programming-hard-and-if-so-what-can",
+      "kind": "web",
+      "title": "Paul E. McKenney: Is Parallel Programming Hard, And, If So, What Can You Do About It?",
+      "urls": [
+        "https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html"
+      ],
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/safe-memory-reclamation.md",
+        "references/scalable-architecture.md",
+        "references/locks-and-backoff.md"
+      ],
+      "usage": ["`SKILL.md` → Reclamation & scaling"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "RCU, QSBR, hazard pointers, reference counting trade-offs → `references/safe-memory-reclamation.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Seqlock, per-CPU/per-thread sharding, partitioning, NUMA → `references/scalable-architecture.md`, `references/locks-and-backoff.md`"
+        }
+      ]
+    },
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/scalable-architecture.md",
+        "references/safe-memory-reclamation.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Reclamation & scaling",
+        "Practical engine concurrency patterns"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Fiber based job system\": fibers yield instead of blocking a worker → `references/scalable-architecture.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Multi-Threading The Truth\": immutable snapshots / atomic version swap for read-mostly data → `references/safe-memory-reclamation.md`"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-05-27",
+      "feeds": ["references/spsc-ring-buffer.md"]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-fetch the upstream source(s)\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "guide-level-synthesis"
+    }
+  ]
+}

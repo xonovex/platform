@@ -11,6 +11,7 @@ agent-validate text --path docs      # one check over one path
 agent-validate --format sarif        # SARIF 2.1.0 on standard output
 agent-validate --strict              # a warning fails the run too
 agent-validate list                  # the checks and what each one does
+agent-validate seed-budgets          # record each skill file's word count in budgets.json
 ```
 
 | Flag | Description |
@@ -20,6 +21,8 @@ agent-validate list                  # the checks and what each one does
 | `--format` | `text` or `sarif` |
 | `--strict` | Fail on warnings as well as on failures and drift |
 | `--path` | Path to check instead of the paths of the project file, repeatable |
+
+`seed-budgets` takes `--path` (default `packages/runtime/plugin`) and `--file` (default `budgets.json`) and rewrites the manifest with the current prose word count of every `SKILL.md` and reference file. Review the diff: a lower count tightens a budget, and a higher count is a budget bump that a reviewer should see.
 
 Exit status 0 means the run is clean. Exit status 1 means a check reported a failure or drift, or a warning under `--strict`. Exit status 2 means a usage error or a fault of the run, such as a file that cannot be read.
 

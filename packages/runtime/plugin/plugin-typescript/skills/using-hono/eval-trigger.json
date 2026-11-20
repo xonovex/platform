@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "using-hono",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "In a Hono API running on Node with @hono/node-server, add a WebSocket endpoint at /ws/chat that echoes each incoming message back to the sender. Show both the server bootstrap code and the route definition.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "Write a reusable helper for our Hono API that turns a Zod validation failure into a standardized structured JSON error response for a 400. Show the exact response body shape it produces.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "Our Hono app must read a DATABASE_URL environment variable inside a route handler, and the same code has to run correctly whether deployed on Node or on Cloudflare Workers. Write the handler.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "In a Hono handler, set a secure session cookie that JavaScript cannot read, is only transmitted over HTTPS, and uses the __Host- name prefix. Write the cookie-setting code.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Organize this Hono API into typed route modules and services while preserving one composed app type for the RPC client.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Validate a Hono JSON request with Zod, expose the inferred type to the handler, and return a consistent 422 response for invalid input.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Compose request IDs, structured logging, CORS, and error handling in Hono without applying body parsing or authentication twice.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Combine two Hono middleware functions so both context variables remain typed and execution order is explicit.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "curated domain-specific routing scenario"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Using Zod 4, write a TypeScript schema named UserSchema for a user object with these fields: an id that is a UUID, an email address, a createdAt that is an ISO datetime string, and a name string between 1 and 100 characters. Also export the inferred TypeScript type.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-zod"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "I'm deploying a Hono API to a serverless edge runtime where cold-start latency is the dominant cost. Show me how to construct the Hono application instance, choosing the most appropriate router for this deployment, and briefly explain why.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-hono-opinionated"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Write a typed Result wrapper and an exhaustive switch over our domain error union in a Node ESM library module.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-typescript"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-vitest"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Migrate these Zod 3 string and error-customization schemas to Zod 4 without changing accepted inputs or issue paths.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-zod"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Choose LinearRouter or RegExpRouter for an API with only static paths and explain how the OpenAPI sub-app changes the router hierarchy.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-hono-opinionated"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Write the SQL migration and supporting indexes for the users table these API routes read from.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-sql-postgresql"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Test a Hono or Express HTTP endpoint with Vitest, including JSON validation, status, headers, and a CORS preflight request.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-vitest"
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "skill": "authoring-instructions",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "this packages/auth dir doesn't have an AGENTS.md yet: set one up",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct init"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "bootstrap a CLAUDE.md for the new services/notifications package i just scaffolded",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct bootstrap"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "i want claude to know what's in apps/admin: write the agent docs from scratch",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "from-scratch intent"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "no AGENTS.md anywhere in this repo, can you create one for the root",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "init at repo root"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "document this directory for an AI agent: first time",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "first-time doc"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "scaffold an AGENTS.md for libs/shared/ that covers the conventions",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "scaffold = init"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "we just split out the analytics package: can you create instructions for it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "new package needs init"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "the existing AGENTS.md in packages/core is out of date: refresh it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct sync"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "the AGENTS.md in apps/web is way too verbose: trim it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct simplify"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "merge the patterns from project-a/AGENTS.md into project-b/AGENTS.md",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct merge"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "we have AGENTS.md scattered all over the monorepo: clean them up and dedupe",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct consolidate"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "write a README.md for the new service",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "different doc type"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "add a CLAUDE.md to the new monorepo workspace at packages/billing",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct init"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "the new microservice doesn't have project instructions yet: generate one based on what's in src/",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "init intent without saying 'AGENTS'"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "write up a fresh AGENTS file for tools/cli-runner, just analyze what's there",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "fresh + analyze = init"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "kick off project instructions for this new repo",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "kick off = init"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "no claude.md in services/payments: analyze the code and write one",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "init from analysis"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "generate API docs for our public endpoints",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "different doc type"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "add a comment to the user model explaining the soft-delete column",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "code comment, not AGENTS.md"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "create a release notes document for v2.0",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "different doc type"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "write a SKILL.md that packages our deploy procedure so any agent can reuse it",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "skill authoring has a separate owner"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "add a PreToolUse hook to the harness settings that blocks force pushes",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "harness configuration has a separate owner"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "publish an llms.txt index for the documentation site",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "llms.txt authoring has a separate owner"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "rewrite the onboarding guide for new engineers so it leads with the setup result",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "human documentation, not agent instructions"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "We just wrapped a debugging session where I made a couple of mistakes and had to correct course. Capture the development lessons from this session and save each one as its own file so a future agent can reuse it. Show me exactly what one of those files should contain.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0026",
+      "prompt": "Fold the lessons from this session into our project's AGENTS.md instructions. Explain how the reflect tooling does this by default before you run it.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0027",
+      "prompt": "When I extract insights from a session, I usually just tag every one with applies_to: [\"general\"] to keep it simple. Is that a good idea for how these get integrated later?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0028",
+      "prompt": "A policy denial and an incident both suggest a new organization-wide blocking rule. Extract the lesson and promote it automatically to every agent configuration.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0029",
+      "prompt": "Review these session notes and promote only evidence-backed recurring lessons into durable project instructions with an owner and validation rule.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0030",
+      "prompt": "Extract the mistakes, successful tactics, and unresolved risks from this completed debugging session without retelling the transcript.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0031",
+      "prompt": "Integrate one reusable lesson into AGENTS.md in present tense, remove the superseded rule, and keep invocation-specific details out.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "session lessons folded into AGENTS.md"
+    },
+    {
+      "id": "query-0032",
+      "prompt": "Set up the Workflow section in our project instructions: where the plans live, the two repositories, how work is delivered, and which skills each phase should load.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by recording-handoff"
+    },
+    {
+      "id": "query-0033",
+      "prompt": "new change: loyalty-points. set up the folder and the first log entry, nothing else yet",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by recording-handoff"
+    },
+    {
+      "id": "query-0034",
+      "prompt": "before we install this third-party skill, audit its scripts and the URLs it fetches and lock down what tools it's allowed to use",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0035",
+      "prompt": "Merge two prompt commands that both prepare releases while preserving their distinct validation branches and removing duplicated instructions.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-commands"
+    }
+  ]
+}

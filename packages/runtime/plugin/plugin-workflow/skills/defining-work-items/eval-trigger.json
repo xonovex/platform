@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "skill": "defining-work-items",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "ok the outline for invoice-feed is in, i'm billing. fill in criteria for our ready rows in work/ and show me the cut before touching anything",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "complete outline rows after a cut proposal"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "work/ has 5 draft files for the login refactor, all vague. give each one real acceptance criteria + how to check it, repo and depends_on",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "criteria, dependencies and a repository"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "cut the address-lookup migration by outcome not by platform, hang the items under work/address-lookup-rollout-k3ne. propose first",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "outcome cut and an existing package"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "reporting-module rows are ready except the retention one, leave that at outline and define the rest for my team",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "waiting row stays at its outline"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "add testable criteria to the search-ranking work files, only the ranking team's rows, dont touch data team",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "criteria for one team only"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "group the parcel-tracking items into a work package, depends_on only for real blockers, show me the graph before you write",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "dependencies and a package"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "outline has ios-offline-sync, android-offline-sync and web-offline-sync all in app-client. how would you cut these? wait for my ok",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "the cut by outcome instead of by platform"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "decisions are all settled, outline's done. flesh out the platform team's ready items so we can start building, and mark them stable once i've read them",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "definitions then confirmation"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "one ready billing row left in work/, publish-invoice-events-m2qd. no package needed, just define it and tell me why there's no package",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "a cut with no package"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "i confirmed the cut but the files still say draft, i'm human:jdoe. mark work/publish-invoice-events-m2qd stable now that i've seen it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "confirmation after the files are shown"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "go through the open questions in research.md with me one by one and log what we decide",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "write the plan for the cache invalidation change from the research and the decisions, with a first outline of work files per team",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "we settled the retention question, fold it into plan.md and flip the rows that were waiting on it",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by revising-plan"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "start on work/publish-invoice-events-m2qd in its worktree and run the checks from its criteria",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by implementing-work-item"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "write a user story with acceptance criteria for password reset on the mobile app, no change directory, just the backlog entry",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "tear apart plan.md before we sign off, what are the weak spots and how bad is each",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "commit the work files we just defined, conventional message, on the feature/invoice-feed branch",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "that session taught us to always pin the node version in ci. turn that into a rule in AGENTS.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "we keep redoing the same release checklist by hand. turn what we just did into a reusable skill",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "write the pull request description for feature/invoice-feed, summary and test notes, for billing-service",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-pull-requests"
+    }
+  ]
+}

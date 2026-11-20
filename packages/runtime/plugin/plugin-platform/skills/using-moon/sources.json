@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "moonrepo-documentation",
+      "kind": "web",
+      "title": "moonrepo documentation",
+      "urls": [
+        "https://moonrepo.dev/docs",
+        "https://moonrepo.dev/docs/config/project",
+        "https://moonrepo.dev/docs/config/tasks",
+        "https://moonrepo.dev/docs/migrate/2.0"
+      ],
+      "reviewedAt": "2026-07-19",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; task definitions, inheritance, project constraints, query syntax, tags, toolchains, and migration guidance."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Current project/task schemas, dependency and input/output semantics, task inheritance/merge behavior, and query/tag configuration."
+        }
+      ]
+    }
+  ]
+}

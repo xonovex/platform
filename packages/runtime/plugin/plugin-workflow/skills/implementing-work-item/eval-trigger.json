@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "skill": "implementing-work-item",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "implement work/capped-total-api-7k2f, tell me what runs in parallel before you start, and leave everything uncommitted",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implement one ready work item, with a stated task split"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "grab the next ready item for loyalty-service and build it, make sure what it depends on is finished first",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "pick up the next ready item and check blockers"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "build work/points-balance-endpoint-3m4q in its own worktree and run whatever checks its criteria list",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "build a work file in its worktree and run its named checks"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "split the capped-total item into tasks, cap.py is shared so those go in order and export.py can run alongside",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "sequence tasks that share a file"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "no subagents here, so do the saved-searches work item yourself step by step and write the implementation notes",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "in-order work when no worker can start, with notes"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "build the receipt export story from its work file, run the acceptance checks and say which criteria you could not check",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "build and self-check against criteria"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "implement work/night-fare-cap-5r6s on branch pricing-service/feature/night-fare-cap, no commits please",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "implement a work item on its own branch uncommitted"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "the work item says round down per decision 4h2k, so build it and note where in src/cap.py that decision shows up",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "decision notes with locations"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "pick up the ready item for the offline till sync, brief a worker per part with a model and effort each and recheck what they send back yourself",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "delegate per concern and verify the result"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "carry on with work/fare-rules-model-3m4q, it is the ready one, and write the notes when it is done",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "carry out a ready work file and record notes"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "make a worktree for pricing-service/feature/capped-total-api-7k2f off main so I can start on it",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "the night-fare-cap branch is merged, remove its old worktree and delete the branch",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-git"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "I built work/capped-total-api-7k2f, check it against its criteria from a fresh context and give me a verdict",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "did the capped-total change really meet c1 to c3? re-run the tests on your own and write down the verdict",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-item"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "turn the three rows in the loyalty outline into full work files with criteria, repository and dependencies",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by defining-work-items"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "that session taught us a few things about the cap rounding, add them as rules to AGENTS.md",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "turn what we learned building the cap logic into a reusable skill with a SKILL.md",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "work is done and checked, give me the commit message and command for pricing-service",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by preparing-delivery"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "push pricing-service/feature/capped-total-api-7k2f to GitHub and open the pull request",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by using-github"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "write a user story for riders who want to see a daily capped total, with acceptance criteria",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "review the diff on pricing-service/feature/capped-total-api-7k2f for bugs and list what you find",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "did work/saved-searches-4t7p meet its criteria? only look at the diff and run the checks, report failures but dont touch src/search.ts",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by validating-work-item"
+    }
+  ]
+}

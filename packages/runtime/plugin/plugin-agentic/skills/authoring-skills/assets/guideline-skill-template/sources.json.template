@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "{tech-documentation-type}",
+      "kind": "web",
+      "title": "{Tech} {Documentation type, for example Full Documentation or API Reference}",
+      "urls": ["{https://example.com/llms-full.txt}"],
+      "version": "{optional: the release the feeds were written against}",
+      "contentSha256": "{optional: sha256:<hex digest of the fetched documents>}",
+      "reviewedAt": "{YYYY-MM-DD}",
+      "coversAllReferences": true,
+      "feeds": ["references/{topic-1}.md", "references/{topic-2}.md"],
+      "claims": [
+        { "id": "topic-1", "statement": "{Topic 1}", "anchor": "{optional: text that the source still contains}" }
+      ]
+    },
+    {
+      "id": "{cited-book-paper-or-article}",
+      "kind": "web",
+      "title": "{Concept or source name}",
+      "citation": "{Author(s), Work Title (publisher or venue, year)}",
+      "urls": ["{https://example.com}"],
+      "reviewedAt": "{YYYY-MM-DD}",
+      "feeds": ["references/{topic}.md"],
+      "claims": [{ "id": "claim-1", "statement": "{the specific claim or pattern this source backs}" }]
+    }
+  ]
+}

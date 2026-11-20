@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "analyzing-connascence",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: grade the seam (connascence + coupling ladder) and weaken it"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "is a chained call like order.getCustomer().getAddress().getCity() a problem, and what do I do about it?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Law of Demeter / train wreck = content coupling"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "should this function take positional arguments or a named options object: which couples callers less?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "connascence of position vs name; rule of degree"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "this helper module is just a grab-bag of unrelated init steps that run at startup: is that bad cohesion?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "temporal/coincidental cohesion vs functional"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "I pass a boolean flag into this shared method that switches its behavior: code smell?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "control coupling on the ladder"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "design a plugin registry so new backends register themselves without editing the core",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: extensibility/registry -> applying-microkernel-architecture"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "isolate my domain logic from Postgres behind an interface so I can swap the database",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: ports-and-adapters isolation -> applying-hexagonal-architecture"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "which module should own the email-template rendering code. It feels misfiled",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: where a boundary goes -> applying-orthogonality"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()`. Is that the same problem?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-orthogonality"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-ddd"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "harden the user-service module: it's full of `any` and swallowed errors, just tell me what to fix",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by auditing-code-quality"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "what's the difference between a mock, a stub, a fake, and a spy?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-tests"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "a shared helpers package at the repo root has become a dumping ground: notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-orthogonality"
+    }
+  ]
+}

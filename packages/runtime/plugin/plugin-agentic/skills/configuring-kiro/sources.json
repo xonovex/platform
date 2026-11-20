@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "preamble": "Product-specific facts are pinned to the documentation snapshot below. The local runtime probe for this implementation returned `not-installed`; documentation conformance is not runtime conformance.",
+  "sources": [
+    {
+      "id": "kiro-hooks",
+      "kind": "web",
+      "title": "Kiro hooks",
+      "urls": [
+        "https://kiro.dev/docs/hooks/",
+        "https://kiro.dev/docs/hooks/types/",
+        "https://kiro.dev/docs/hooks/actions/",
+        "https://kiro.dev/docs/hooks/management/",
+        "https://kiro.dev/docs/hooks/best-practices/",
+        "https://kiro.dev/docs/hooks/troubleshooting/"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "v1 JSON format, triggers, command and agent actions, blocking exit codes, workspace scope, generated-hook review, testing, diagnostics, enable/disable, and deletion."
+        }
+      ]
+    },
+    {
+      "id": "kiro-cli-v3-and-workspaces",
+      "kind": "web",
+      "title": "Kiro CLI v3 and workspaces",
+      "urls": [
+        "https://kiro.dev/docs/cli/v3/",
+        "https://kiro.dev/docs/editor/multi-root-workspaces/"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": ["references/capabilities.md", "references/onboarding.md"],
+      "usage": ["`capabilities.md`, `onboarding.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "CLI v3 standalone hook alignment, diagnostics, early-access gaps, and multi-root ownership and file-event scope."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh workflow",
+      "text": "1. Re-fetch the official pages above and compare event, handler, configuration, trust, and lifecycle behavior.\n2. Run the documented version probe and replace `not-installed` only with the observed version.\n3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.\n4. Update the matrix version and review date when behavior changes.",
+      "after": "kiro-cli-v3-and-workspaces"
+    }
+  ]
+}

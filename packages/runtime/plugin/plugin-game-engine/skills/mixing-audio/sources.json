@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "game-engine-development-blog-archive",
+      "kind": "original",
+      "title": "Game-engine development blog (archive)",
+      "provenance": "Locally archived game-engine development articles",
+      "reviewedAt": "2026-05-27",
+      "feeds": [
+        "references/audio-callback-thread.md",
+        "references/mixing-and-buffers.md",
+        "references/resampling-and-dsp.md",
+        "references/voice-management.md",
+        "references/command-handoff.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, The render path, Mixing and signal, Voices and control, Gotchas",
+        "The whole architecture of a software audio mixer: real-time render thread, float mixing, resampling/pitch, voice handling, and game→audio thread handoff"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"Writing a low-level sound system\": dedicated high-priority render thread, render quantum (257\\*8 samples ~46 ms), queue-ahead vs starvation, waveOut/WASAPI buffer feeding, main-thread-vs-dedicated-thread latency, no-lock/no-alloc real-time discipline, page-fault avoidance, big-VM-allocation pointer bump → `references/audio-callback-thread.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Writing a low-level sound system\": internal deinterleaved 32-bit float format at 44.1 kHz, per-voice gain matrix `m[ic][oc]`, AVX fused-multiply-add `mul_add` with `restrict` + ping-pong accumulator, gain ramping (1/3072 per sample ~70 ms) to kill clicks/pops, ramping a stopping voice to zero, scaling the mix to fit the output range / clipping → `references/mixing-and-buffers.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "\"Writing a low-level sound system\": sampler callback contract `(ud, offset, buffer, num_samples, sample_frequency)`, linear interpolation between WAV samples, pitch via sample-frequency / step scaling (octave-up at 2x), Hermite as a future higher-quality option → `references/resampling-and-dsp.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "\"Writing a low-level sound system\": software-mixing many sources, bounded per-block cost from a fixed source set, per-voice state, graceful stop via gain ramp before retiring a source → `references/voice-management.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "\"Writing a low-level sound system\": double-buffering all shared data with a single lock to swap so the main and render threads never touch the same data simultaneously (generalized here to a lock-free SPSC command handoff) → `references/command-handoff.md`"
+        }
+      ],
+      "remarks": "- **Provenance:** Archived engine-development source material retained from the original skill distillation; no stable upstream URL was recorded"
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (or scan for newly added sections)\n3. For each changed area, update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "game-engine-development-blog-archive"
+    }
+  ]
+}

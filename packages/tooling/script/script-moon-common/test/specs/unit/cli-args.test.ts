@@ -60,7 +60,30 @@ describe("parseCliArgs", () => {
   });
 });
 
+describe("a spec with no options", () => {
+  const bare: CliSpec = {name: "bare-cli"};
+
+  it("should parse positionals without options", () => {
+    const result = parsed(parseCliArgs(bare, ["one"]));
+    expect(result.positionals).toEqual(["one"]);
+  });
+
+  it("should format help with no description and no option", () => {
+    expect(formatHelp(bare)).toBe(
+      "Usage: bare-cli [options]\n\nOptions:\n  -h, --help  Show this help message",
+    );
+  });
+});
+
 describe("formatHelp", () => {
+  it("should pad an option with no short flag and no description", () => {
+    const help = formatHelp({
+      name: "plain-cli",
+      options: {flag: {type: "boolean"}},
+    });
+    expect(help).toContain("      --flag  ");
+  });
+
   it("should include spec name and description", () => {
     const help = formatHelp(spec);
     expect(help).toContain("test-cli");

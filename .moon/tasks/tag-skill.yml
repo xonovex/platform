@@ -1,7 +1,7 @@
 $schema: https://moonrepo.dev/schemas/v2/tasks.json
 implicitInputs:
-  # These tasks run prettier and the moon-skill-* binaries from the workspace
-  # install, so a tool upgrade must invalidate their cached results.
+  # These tasks run prettier from the workspace install, so a tool upgrade
+  # must invalidate their cached results.
   - /package-lock.json
 tasks:
   skill-format:
@@ -54,107 +54,118 @@ tasks:
       # Replacing args keeps the command single when a project inherits two
       # templates that both own ci-check.
       mergeArgs: replace
+  # The checks that read one skill run per skill. The checks that compare
+  # skills with each other (routing, duplicated rules, links, budgets) read the
+  # whole catalog, so the workspace-validate task of the root project runs them.
   skill-validate:
-    command:
-      - node
-      - $workspaceRoot/packages/tooling/script/script-moon-skill-validate-spec/bin.js
-      - --strict
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-validate-go/dist/agent-validate"
+      skill sources text --strict
+      --root "$workspaceRoot" --path "$projectSource"
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-validate-routing:routing-check
-      - script-moon-skill-validate-spec:build
-    env:
-      XONOVEX_LINT_MODE: enforce
+      - agent-validate-go:binary
     inputs:
       - "**/*.md"
       - "**/*.md.template"
       - "**/*.json"
-      - "**/*.py"
-      - /budgets.json
+      - "**/*.json.template"
+      - /agentic.validate.json
     options:
       cache: false
   # The limits are longer than the defaults of the tool (180 and 90 days). A
   # review of 2026-05-13, or of 2026-07-22 for a source with a version, stays
-  # valid through 2027-02-28 and is stale on 2027-03-01.
+  # valid through 2027-02-28 and is stale on 2027-03-01. The audit makes no
+  # network request: the fetching audit is the explicit skill-audit-sources-fetch
+  # task.
   skill-audit-sources:
-    command:
-      - node
-      - $workspaceRoot/packages/tooling/script/script-moon-skill-audit-sources/bin.js
-      - --max-age
-      - "291"
-      - --version-max-age
-      - "221"
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-audit-go/dist/agent-audit"
+      sources --max-age 291 --version-max-age 221 --strict .
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-audit-sources:build
+      - agent-audit-go:binary
+    inputs:
+      - sources.json
+      - sources.d/**/*.json
+      - references/*.md
     options:
       cache: false
+  skill-audit-sources-fetch:
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-audit-go/dist/agent-audit"
+      sources --max-age 291 --version-max-age 221 --fetch --strict .
+    deps:
+      - agent-audit-go:binary
+    options:
+      cache: false
+      runInCI: false
   skill-eval-triggers:
-    command:
-      - node
-      - $workspaceRoot/packages/tooling/script/script-moon-skill-eval-triggers/bin.js
-      - --batch-size
-      - "8"
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-eval-go/dist/agent-eval"
+      trigger "$(basename "$projectRoot")"
+      --batch-size 8
+      --results-dir "$workspaceRoot/.agent-eval/results"
+      --plugin-dir ../..
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-triggers:build
+      - agent-eval-go:binary
     options:
       cache: false
       runInCI: false
   skill-eval-outputs:
-    command:
-      - node
-      - $workspaceRoot/packages/tooling/script/script-moon-skill-eval-outputs/bin.js
-      - --plugin-dir
-      - ../..
+    script: >-
+      "$workspaceRoot/packages/tooling/cli/agent-eval-go/dist/agent-eval"
+      output "$(basename "$projectRoot")"
+      --results-dir "$workspaceRoot/.agent-eval/results"
+      --plugin-dir ../..
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-outputs:build
+      - agent-eval-go:binary
     options:
       cache: false
       runInCI: false
   ci-skill-eval-trigger:
     script: >-
-      node "$workspaceRoot/packages/tooling/script/script-moon-skill-eval-triggers/bin.js"
+      "$workspaceRoot/packages/tooling/cli/agent-eval-go/dist/agent-eval"
+      trigger "$(basename "$projectRoot")"
       --split validation
       --runs 3
-      --max-budget-usd 0.05
+      --max-cost-usd 0.05
       --batch-size 8
-      --workspace ".skill-eval-results/trigger/${SKILL_EVAL_HARNESS:-claude}"
+      --harness "${SKILL_EVAL_HARNESS:-claude}"
+      --results-dir "$workspaceRoot/.agent-eval/results"
       --plugin-dir ../..
-      --catalog-root "$workspaceRoot/packages/runtime/plugin"
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-triggers:build
+      - agent-eval-go:binary
     inputs:
       - /packages/runtime/plugin/AGENTS.md
-      - /packages/runtime/plugin/plugin-agentic/skills/evaluating-skills/scripts/**/*
     options:
       cache: false
       runInCI: false
   ci-skill-eval-output:
     script: >-
-      node "$workspaceRoot/packages/tooling/script/script-moon-skill-eval-outputs/bin.js"
+      "$workspaceRoot/packages/tooling/cli/agent-eval-go/dist/agent-eval"
+      output "$(basename "$projectRoot")"
       --runs 2
       --concurrency 2
-      --max-budget-usd 0.10
-      --judge-max-budget-usd 0.10
+      --max-cost-usd 0.20
       --batch-size 3
-      --workspace ".skill-eval-results/output/${SKILL_EVAL_HARNESS:-claude}"
+      --harness "${SKILL_EVAL_HARNESS:-claude}"
+      --results-dir "$workspaceRoot/.agent-eval/results"
       --plugin-dir ../..
-      --eval-cwd "$workspaceRoot"
     deps:
       - target: ~:build
         optional: true
-      - script-moon-skill-eval-outputs:build
+      - agent-eval-go:binary
     inputs:
       - /packages/runtime/plugin/AGENTS.md
-      - /packages/runtime/plugin/plugin-agentic/skills/evaluating-skills/scripts/**/*
     options:
       cache: false
       runInCI: false

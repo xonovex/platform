@@ -1,0 +1,137 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "semantic-versioning-2-0-0",
+      "kind": "web",
+      "title": "Semantic Versioning 2.0.0",
+      "urls": ["https://semver.org/spec/v2.0.0.html"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/semver.md", "references/version-bump.md"],
+      "usage": [
+        "`references/semver.md`",
+        "`references/version-bump.md` → Choosing the Next Version",
+        "`SKILL.md` → Core Principles (Semantic Versioning)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Increment/reset rules, pre-release grammar and precedence, no-leading-zero and `[0-9A-Za-z-]` identifier constraints, build-metadata precedence exclusion"
+        }
+      ]
+    },
+    {
+      "id": "conventional-commits-1-0-0",
+      "kind": "web",
+      "title": "Conventional Commits 1.0.0",
+      "urls": ["https://www.conventionalcommits.org/en/v1.0.0/"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/changelog.md"],
+      "usage": [
+        "`references/changelog.md` → Deriving Entries From Commits",
+        "`SKILL.md` → Core Principles (Conventional commits drive the bump)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Commit grammar, breaking-change signals (`!` and `BREAKING CHANGE:` footer), `feat`→minor / `fix`→patch / breaking→major mapping"
+        }
+      ]
+    },
+    {
+      "id": "keep-a-changelog-1-1-0",
+      "kind": "web",
+      "title": "Keep a Changelog 1.1.0",
+      "urls": ["https://keepachangelog.com/en/1.1.0/"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/changelog.md"],
+      "usage": ["`references/changelog.md` → Pick One Convention"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Six change-type headings, `[x.y.z] - YYYY-MM-DD` / Unreleased format, \"don't dump git logs\""
+        }
+      ]
+    },
+    {
+      "id": "changesets-config-options",
+      "kind": "web",
+      "title": "Changesets: config options",
+      "urls": [
+        "https://github.com/changesets/changesets/blob/main/docs/config-file-options.md"
+      ],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/version-bump.md"],
+      "usage": ["`references/version-bump.md` → Propagating to Dependents"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Internal-dependency range-update rule (`updateInternalDependencies` patch/minor; out-of-range default vs the experimental `updateInternalDependents: always`), `bumpVersionsWithWorkspaceProtocolOnly`, `linked` / `fixed` groups"
+        }
+      ]
+    },
+    {
+      "id": "changesets-changelog-github-format",
+      "kind": "web",
+      "title": "Changesets: changelog-github format",
+      "urls": [
+        "https://github.com/changesets/changesets/tree/main/packages/changelog-github"
+      ],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/changelog.md"],
+      "usage": ["`references/changelog.md` → Bullet Format"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The `- [#PR](<repo>/pull/PR) [\\`hash\\`](<repo>/commit/hash) Thanks [@login](https://github.com/login)! - <description>` bullet, attributing the PR-author login rather than the git commit author name"
+        }
+      ]
+    },
+    {
+      "id": "changesets-changelog-grouping",
+      "kind": "web",
+      "title": "Changesets: changelog grouping",
+      "urls": [
+        "https://github.com/changesets/changesets/blob/main/docs/detailed-explanation.md"
+      ],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/changelog.md"],
+      "usage": [
+        "`references/changelog.md` → Pick One Convention (Changesets-style)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Per-change bump levels rendered as `### Major Changes` / `### Minor Changes` / `### Patch Changes` groups, newest-first, sourced from intent files"
+        }
+      ]
+    },
+    {
+      "id": "npm-workspaces",
+      "kind": "web",
+      "title": "npm workspaces",
+      "urls": ["https://docs.npmjs.com/cli/v11/using-npm/workspaces/"],
+      "reviewedAt": "2026-06-28",
+      "feeds": ["references/version-bump.md", "references/version-detect.md"],
+      "usage": [
+        "`references/version-bump.md` → Propagating to Dependents",
+        "`references/version-detect.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Range-satisfaction symlinking, the `workspace:` protocol, absence of native sibling-range propagation"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-fetch the sources above\n2. Diff against the prior pull (or scan for newly added sections)\n3. Update the corresponding `references/*.md`\n4. Bump the **Last reviewed** dates above",
+      "after": "npm-workspaces"
+    }
+  ]
+}

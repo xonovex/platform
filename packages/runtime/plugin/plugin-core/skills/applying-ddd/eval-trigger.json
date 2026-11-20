@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "applying-ddd",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "ubiquitous language grounded in model and code: owned by applying-ddd"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "where should I draw the bounded contexts for an online shop where 'customer' means different things in ordering, shipping and billing?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "bounded context + polysemy + context map: core applying-ddd strategic design"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "we call an upstream payment API directly and its concepts are leaking into our model. How do I isolate it?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "anti-corruption layer protecting a model: owned by applying-ddd"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "is an Order with its line items one aggregate, and should other things reference it by id or by object?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "aggregate + root, reference-by-identity rules: applying-ddd tactical blocks"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "should money be an entity or a value object, and what makes the difference?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "entity vs value object distinction: owned by applying-ddd"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "my entities are just getters and setters with all the logic in services: is that proper domain modelling?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "anemic-domain-model anti-pattern: owned by applying-ddd"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "what's the difference between strategic and tactical design, and is a repository just an ORM wrapper?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "strategic vs tactical split + repository definition: applying-ddd"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "should I emit a domain event when an order is placed so shipping can react?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "domain event as a building block: owned by applying-ddd"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "measure the connascence between these two modules and tell me which coupling form is strongest",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: code-level coupling metrics -> analyzing-connascence, not domain boundaries"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "should this class use inheritance or composition, and is it violating the Liskov substitution principle?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: general OO class/inheritance mechanics -> applying-oop"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "design an in-memory object database with stable GUIDs, change notification and undo/redo for my editor",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: in-memory object/property model with undo/serialization -> designing-data-models, not a DDD repository"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "write the Given-When-Then acceptance scenarios for placing an order with a discount",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: eliciting behaviour as agreed examples -> applying-bdd"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "split this big user story into thin vertical slices and write INVEST acceptance criteria",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: story container and slicing -> writing-user-stories"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "audit this module for code smells like dead code and swallowed errors",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: read-only quality smell audit -> auditing-code-quality, not domain modelling"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "I have a Rectangle class with mutable width and height and setWidth/setHeight methods. I now need a Square type in the same system. What's the cleanest way to model Square given I already have Rectangle?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-oop"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "I'm building the core document store for our level editor: objects of different kinds each with a set of named properties, and I want to add new object types at runtime without recompiling. How should the type/property schema work?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-data-models"
+    }
+  ]
+}

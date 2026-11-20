@@ -1,0 +1,133 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "test-double-taxonomy-four-phase-test-and-test-smells",
+      "kind": "web",
+      "title": "Test-double taxonomy, Four-Phase Test, and test smells",
+      "citation": "Gerard Meszaros, \"xUnit Test Patterns: Refactoring Test Code\" (Addison-Wesley, 2007) / xunitpatterns.com",
+      "urls": [
+        "http://xunitpatterns.com/Mocks,%20Fakes,%20Stubs%20and%20Dummies.html",
+        "https://www.informit.com/articles/article.aspx?p=1398624",
+        "http://xunitpatterns.com/Four%20Phase%20Test.html",
+        "http://xunitpatterns.com/Obscure%20Test.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/test-double-taxonomy.md",
+        "references/state-vs-behaviour-and-what-to-mock.md",
+        "references/test-structure-and-first.md",
+        "references/test-smells-and-fixtures.md"
+      ],
+      "usage": [
+        "`references/test-double-taxonomy.md`",
+        "`references/state-vs-behaviour-and-what-to-mock.md`",
+        "`references/test-structure-and-first.md`",
+        "`references/test-smells-and-fixtures.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The Test Double umbrella term and the five kinds (Dummy / Stub / Spy / Mock / Fake) and the continuum caveat"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Responder vs Saboteur stubs; indirect input (Stub) vs indirect output (Spy / Mock); Fake as an alternative implementation"
+        },
+        {
+          "id": "claim-3",
+          "statement": "The Four-Phase Test (Setup / Exercise / Verify / Teardown), its relationship to Arrange-Act-Assert, and teardown usually being unnecessary for unit tests"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Test smells: Obscure Test, Mystery Guest, Eager Test, Fragile Test (Sensitive Equality, Indirect Testing), Erratic Test, and how smells cause other smells"
+        }
+      ]
+    },
+    {
+      "id": "definitions-of-the-doubles-and-state-vs-behaviour-verification",
+      "kind": "web",
+      "title": "Definitions of the doubles and state vs behaviour verification",
+      "citation": "Martin Fowler, \"Mocks Aren't Stubs\"",
+      "urls": ["https://martinfowler.com/articles/mocksArentStubs.html"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/test-double-taxonomy.md",
+        "references/state-vs-behaviour-and-what-to-mock.md"
+      ],
+      "usage": [
+        "`references/test-double-taxonomy.md`",
+        "`references/state-vs-behaviour-and-what-to-mock.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Concise definitions of Dummy / Stub / Spy / Mock / Fake"
+        },
+        {
+          "id": "claim-2",
+          "statement": "State vs behaviour verification; \"only mocks insist on behaviour verification\"; a stub answers queries while a mock verifies commands; the loose-usage problem with the word \"mock\""
+        }
+      ]
+    },
+    {
+      "id": "arrange-act-assert",
+      "kind": "web",
+      "title": "Arrange-Act-Assert",
+      "citation": "Bill Wake, \"3A: Arrange, Act, Assert\" (xp123)",
+      "urls": ["https://xp123.com/articles/3a-arrange-act-assert/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/test-structure-and-first.md"],
+      "usage": ["`references/test-structure-and-first.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Origin and naming of Arrange-Act-Assert; the single-action-per-test framing"
+        }
+      ]
+    },
+    {
+      "id": "the-first-qualities",
+      "kind": "web",
+      "title": "The FIRST qualities",
+      "citation": "Tim Ottinger & Brett Schuchert, \"FIRST\" (in Robert C. Martin (ed.), \"Clean Code\", ch. 9, p. 132)",
+      "urls": [
+        "https://medium.com/pragmatic-programmers/unit-tests-are-first-fast-isolated-repeatable-self-verifying-and-timely-a83e8070698e"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/test-structure-and-first.md"],
+      "usage": ["`references/test-structure-and-first.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The five FIRST qualities (Fast, Independent, Repeatable, Self-validating, Timely); the Independent-vs-Isolated \"I\" and Self-validating-vs-Self-verifying \"S\" ambiguity"
+        }
+      ]
+    },
+    {
+      "id": "fixture-creation-patterns",
+      "kind": "web",
+      "title": "Fixture-creation patterns",
+      "citation": "Nat Pryce, \"Test Data Builders: an alternative to the Object Mother pattern\" (2007)",
+      "urls": ["http://www.natpryce.com/articles/000714.html"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/test-smells-and-fixtures.md"],
+      "usage": ["`references/test-smells-and-fixtures.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The Test Data Builder pattern and why it beats the Object Mother (every variation needs a new method, violating single responsibility); fluent specify-only-what-matters fixtures"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull captured in the reference files\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "fixture-creation-patterns"
+    }
+  ]
+}

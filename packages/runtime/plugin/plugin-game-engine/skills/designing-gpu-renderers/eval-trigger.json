@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "skill": "designing-gpu-renderers",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "our renderer hand-writes a barrier before and after every pass and it breaks every time we reorder passes. I want passes to just declare what they read and write and have ordering and transitions figured out for us",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: render/frame graph deriving order + barriers from declared reads/writes, API-neutral"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "we have a g-buffer, an SSAO target, and a bloom mip chain all alive at once and VRAM is tight: can we reuse the same memory for targets that aren't used at the same time",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "implicit: transient render-target aliasing by disjoint lifetime, no API named"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "every time we use a new material the frame hitches for a few ms; I think it's compiling the graphics state on first draw. How do we get rid of the stall",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "architecture: precompiled + cached pipeline-state objects, warm the cache, API-neutral"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "we're calling the allocator once per texture and once per mesh and it falls over on big levels: restructure how we hand out GPU memory",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "gpu-memory-strategy: sub-allocate from few large blocks, allocation-count cap, strategy not API calls"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "the CPU and GPU keep stalling on each other each frame; we have one set of uniform buffers and one command pool shared across frames: fix the frame pacing",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "frames-in-flight: per-frame resource sets + fence so CPU doesn't outrun GPU"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "we want one big array of all our textures that the shader indexes by an integer instead of binding a group per draw",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "bindless binding model indexed by handle, frequency grouping; concept not one API"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "how should I think about the stage and access scopes plus a layout transition needed to read a render target right after writing it as a color attachment. What's the general model",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "synchronization model: producer/consumer barrier scopes + image-layout transition, conceptual"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "we have 40 feature combinations for our lit shader and build times exploded; should we compile a variant per combo or branch in one ubershader, and how do we recompile on save without restarting",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "shader-system: permutations vs ubershader + specialization constants, hot-reload"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and the VkImageLayout transition and the vkCmdPipelineBarrier2 call for a color-attachment-to-sampled read",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: concrete Vulkan Vk*/vkCmd* how-to -> implementing-vulkan-renderers, not the agnostic model"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "set up a three.js scene with orbit controls and a glTF model and some postprocessing passes",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: high-level web 3D -> using-threejs, no explicit-API architecture concerns"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "restructure this CPU particle array from AoS to SoA so the update loop stops missing cache",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: CPU-only data layout -> applying-data-oriented-design"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "how do I architect uploads of static GPU-resident data versus dynamic per-frame data: staging into a device-local tier for one, a persistent-mapped ring for the other",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "validation positive: gpu-memory-strategy tiers + staging + ring buffer, API-neutral"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "I want to record draw calls from several worker threads at once and then submit them in order. How should I structure per-thread per-frame recording contexts",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "validation positive: per-thread contexts, primary/secondary, multi-threaded recording, conceptual"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "explain the model for replacing a pile of binary cross-queue waits between graphics and async-compute with a single monotonic timeline value we can also wait on from the CPU",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "validation positive: timeline value generalizing cross-queue waits + CPU waits, concept"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "walk me through the concrete vkCreateSwapchainKHR + vkAcquireNextImageKHR + vkQueuePresentKHR calls and the VkFence per frame for my Vulkan loop",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "validation negative: concrete Vulkan swapchain how-to -> implementing-vulkan-renderers"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "I want my vertex shader to read positions straight out of a big storage buffer instead of binding a vertex layout, so I can support quantized formats and morph targets from one shader",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "vertex-assembly-skinning: programmable vertex pull behind a loader, custom packing, morph targets"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "our characters animate but the bone count per vertex varies a lot and a fixed 4-bone vertex format wastes memory. How should I store skin influences and do the blend on the GPU",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "vertex-assembly-skinning: indirected influence list (count+offset), in-shader linear blend skinning"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "we have a million particles and uploading them every frame and reading results back is killing us. I want the whole simulation to live on the GPU and drive its own draw count",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "gpu-compute-simulation: GPU-resident state, compute update, indirect draw from GPU-tracked count"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "how do I structure a compute-based particle system so spawning and updating are separate dispatches over GPU-resident ring buffers without CPU readback stalls",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: gpu-compute-simulation event-triggered stages, ring buffer, no readback"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "I'm adding HDR10 output: which swapchain color space and format do I pick, and where do I apply the Rec.2020 conversion and PQ curve relative to tone mapping and UI?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "hdr-output: PQ/Rec.2020 swapchain, linear pipeline, own final color-space + transfer encode"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "my HDR image looks washed out and dim and the UI text blends wrong: I think I'm double-applying a transfer function with an sRGB backbuffer",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "validation positive: hdr-output encode-once, paper-white scaling, no auto-sRGB backbuffer for HDR"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "tune my CPU SoA particle update loop to stop missing cache, no GPU involved",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: CPU-only data layout -> applying-data-oriented-design, not GPU simulation"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "give me the exact VkImageMemoryBarrier2 with srcStageMask/srcAccessMask and dstStageMask/dstAccessMask plus the oldLayout/newLayout for reading a color attachment as a sampled texture, and the vkCmdPipelineBarrier2 call",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by implementing-vulkan-renderers"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "make our particle system stop calling malloc per particle: hand it a buffer it just fills",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by managing-memory"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "I'm building an ECS and can't decide how to store components: should each entity own its components or should I group entities by which components they have?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by designing-ecs"
+    },
+    {
+      "id": "query-0026",
+      "prompt": "how should I lay out VkCommandPool per worker thread per frame and reset with vkResetCommandPool, and wire vkAcquireNextImageKHR / vkQueueSubmit2 / vkQueuePresentKHR with a VkFence per frame",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by implementing-vulkan-renderers"
+    }
+  ]
+}

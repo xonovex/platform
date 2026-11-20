@@ -1,0 +1,178 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "origin-of-bdd-and-given-when-then",
+      "kind": "web",
+      "title": "Origin of BDD and Given-When-Then",
+      "citation": "Dan North, \"Introducing BDD\"",
+      "urls": ["https://dannorth.net/introducing-bdd/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/appendix-discovery.md"],
+      "usage": [
+        "`references/appendix-discovery.md`",
+        "`SKILL.md` → Essentials"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The origin of BDD; \"should\" test naming; JBehave and removing the word \"test\"; the Given-When-Then template; \"a ubiquitous language for the analysis process\"; the behaviour-not-testing reframing"
+        }
+      ]
+    },
+    {
+      "id": "gherkin-notation",
+      "kind": "web",
+      "title": "Gherkin notation",
+      "citation": "Cucumber, \"Gherkin Reference\"",
+      "urls": ["https://cucumber.io/docs/gherkin/reference/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/gherkin-reference.md"],
+      "usage": ["`references/gherkin-reference.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Authoritative keyword definitions: Feature, Rule, Scenario/Example, Scenario Outline/Template, Examples/Scenarios, Background, Given/When/Then/And/But; Then = assertion"
+        }
+      ]
+    },
+    {
+      "id": "the-three-bdd-practices-and-living-documentation",
+      "kind": "web",
+      "title": "The three BDD practices and living documentation",
+      "citation": "Cucumber, \"BDD\"",
+      "urls": ["https://cucumber.io/docs/bdd/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/specification-by-example.md",
+        "references/appendix-discovery.md"
+      ],
+      "usage": [
+        "`references/specification-by-example.md`",
+        "`references/appendix-discovery.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The three practices (discovery / formulation / automation); examples as guide-rails; living documentation; \"the code reflects the documentation, and the documentation reflects the team's shared understanding\""
+        }
+      ]
+    },
+    {
+      "id": "the-three-practices-model-and-formulation-techniques",
+      "kind": "web",
+      "title": "The three-practices model and formulation techniques",
+      "citation": "Seb Rose & Gaspar Nagy, \"The BDD Books: Discovery\" and \"The BDD Books: Formulation\"",
+      "urls": [
+        "https://leanpub.com/bddbooks-discovery",
+        "https://leanpub.com/bddbooks-formulation"
+      ],
+      "reviewedAt": "2026-07-12",
+      "feeds": [
+        "references/specification-by-example.md",
+        "references/appendix-discovery.md"
+      ],
+      "usage": [
+        "`references/specification-by-example.md`",
+        "`references/appendix-discovery.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The three-practices model (Discovery / Formulation / Automation) as the primary treatment; the formulation techniques for turning discovered examples into readable, declarative Gherkin scenarios"
+        }
+      ]
+    },
+    {
+      "id": "example-mapping",
+      "kind": "web",
+      "title": "Example Mapping",
+      "citation": "Matt Wynne, \"Introducing Example Mapping\" (Cucumber blog)",
+      "urls": ["https://cucumber.io/blog/bdd/example-mapping-introduction/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/discovery-three-amigos.md"],
+      "usage": ["`references/discovery-three-amigos.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The four card colours (yellow story / blue rules / green examples / red questions); the ~25-minute session; the thumb vote; the story-split signals; the minimum amigo group"
+        }
+      ]
+    },
+    {
+      "id": "the-collaboration-tool-framing-appendix-a",
+      "kind": "web",
+      "title": "The collaboration-tool framing (Appendix A)",
+      "citation": "Aslak Hellesøy (creator of Cucumber), comment on the \"Cucumber: Behaviour-Driven Development\" thread (Hacker News, item 10194242), corroborated by \"The World's Most Misunderstood Collaboration Tool\" (Cucumber blog)",
+      "urls": [
+        "https://news.ycombinator.com/item?id=10194242",
+        "https://cucumber.io/blog/collaboration/the-worlds-most-misunderstood-collaboration-tool/"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/appendix-discovery.md"],
+      "usage": ["`references/appendix-discovery.md`", "`SKILL.md` → Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Cucumber tests people's understanding of how yet-to-be-written software should behave, not the software; most rework comes from misunderstandings"
+        },
+        {
+          "id": "claim-2",
+          "statement": "The ~20-minute Discovery Workshop with business + IT; concrete plain-language examples (\"the one with five taxis in range\"); the thumbs-up/down vote to accept or split a story"
+        },
+        {
+          "id": "claim-3",
+          "statement": "A developer fleshes out 2-5 Gherkin scenarios, the business confirms them, then regular TDD drives the core domain logic with external services / message queues / databases stubbed out (no UI / Selenium)"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Far more low-level unit tests than Cucumber scenarios; \"Cucumber makes sure you write the right code; unit tests make sure you write the code right\"; the output is executable, living documentation"
+        }
+      ]
+    },
+    {
+      "id": "specification-by-example",
+      "kind": "web",
+      "title": "Specification by Example",
+      "citation": "Gojko Adzic, \"Specification by Example: How Successful Teams Deliver the Right Software\" (Manning, 2011)",
+      "urls": ["https://www.manning.com/books/specification-by-example"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/specification-by-example.md"],
+      "usage": ["`references/specification-by-example.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The seven key process patterns; collaborative specification; specs-as-tests; trustworthy living documentation; Specification by Example as equivalent to ATDD (the term was coined by Martin Fowler in 2002 and systematised with seven patterns and 50+ case studies in this book; pattern lists verified against Part 2)"
+        }
+      ]
+    },
+    {
+      "id": "atdd-and-the-three-amigos",
+      "kind": "web",
+      "title": "ATDD and the three amigos",
+      "citation": "Agile Alliance Glossary, \"ATDD\"",
+      "urls": ["https://agilealliance.org/glossary/atdd/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/discovery-three-amigos.md"],
+      "usage": [
+        "`references/discovery-three-amigos.md`",
+        "`SKILL.md` → the ATDD-and-BDD-are-one-practice framing"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The ATDD definition; the three amigos as three perspectives (business / development / testing); ATDD documented as synonymous with Specification by Example, Story-Test-Driven Development, and BDD"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "atdd-and-the-three-amigos"
+    }
+  ]
+}

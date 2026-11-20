@@ -72,85 +72,23 @@ func validateSchema(ctx check.Context, report *check.Reporter, schema, file stri
 	return len(violations) == 0, nil
 }
 
-func isVersioned(value any) bool {
-	object, ok := value.(map[string]any)
-	if !ok {
-		return false
-	}
-	_, versioned := object["version"]
-	return versioned
-}
-
-func nonEmptyString(value any) bool {
-	text, ok := value.(string)
-	return ok && strings.TrimSpace(text) != ""
-}
-
 func checkOutputEvals(ctx check.Context, report *check.Reporter, options Options, dir, skillName string) error {
-	raw, file, ok, err := readJSON(ctx, report, options.RequireEvals, dir, "evals.json")
+	raw, file, ok, err := readJSON(ctx, report, options.RequireEvals, dir, catalog.OutputFile)
 	if err != nil || !ok {
 		return err
 	}
-	if isVersioned(raw) {
-		valid, err := validateSchema(ctx, report, schemas.EvalOutput, file)
-		if err != nil || !valid {
-			return err
-		}
-		object := raw.(map[string]any)
-		if object["skill"] != skillName {
-			report.Fail("skill.evals-name", file, 1, "catalog: evals.json skill '%v' does not match '%s'", object["skill"], skillName)
-		}
-		if cases, _ := object["cases"].([]any); len(cases) < 3 {
-			report.Fail("skill.evals-count", file, 1, "catalog: evals.json must contain at least 3 output evals")
-		}
-		return nil
+	valid, err := validateSchema(ctx, report, schemas.EvalOutput, file)
+	if err != nil || !valid {
+		return err
 	}
-	object, isObject := raw.(map[string]any)
-	if !isObject {
-		report.Fail("skill.evals-shape", file, 1, "catalog: evals.json must be an object")
-		return nil
+	object, _ := raw.(map[string]any)
+	if object["skill"] != skillName {
+		report.Fail("skill.evals-name", file, 1, "catalog: %s skill '%v' does not match '%s'", catalog.OutputFile, object["skill"], skillName)
 	}
-	if object["skill_name"] != skillName {
-		report.Fail("skill.evals-name", file, 1, "catalog: evals.json skill_name '%v' does not match '%s'", object["skill_name"], skillName)
-	}
-	switch object["tier"] {
-	case "aggressive", "moderate", "conservative":
-	default:
-		report.Fail("skill.evals-tier", file, 1, "catalog: evals.json tier must be aggressive, moderate, or conservative")
-	}
-	evals, _ := object["evals"].([]any)
-	if len(evals) < 3 {
-		report.Fail("skill.evals-count", file, 1, "catalog: evals.json must contain at least 3 output evals")
-		return nil
-	}
-	for i, item := range evals {
-		position := i + 1
-		entry, isEntry := item.(map[string]any)
-		if !isEntry {
-			report.Fail("skill.evals-entry", file, 1, "catalog: evals.json entry %d must be an object", position)
-			continue
-		}
-		if !nonEmptyString(entry["prompt"]) {
-			report.Fail("skill.evals-prompt", file, 1, "catalog: evals.json entry %d needs a non-empty prompt", position)
-		}
-		if !nonEmptyStrings(entry["assertions"]) {
-			report.Fail("skill.evals-assertions", file, 1, "catalog: evals.json entry %d needs non-empty string assertions", position)
-		}
+	if cases, _ := object["cases"].([]any); len(cases) < 3 {
+		report.Fail("skill.evals-count", file, 1, "catalog: %s must contain at least 3 output evals", catalog.OutputFile)
 	}
 	return nil
-}
-
-func nonEmptyStrings(value any) bool {
-	list, ok := value.([]any)
-	if !ok || len(list) == 0 {
-		return false
-	}
-	for _, item := range list {
-		if !nonEmptyString(item) {
-			return false
-		}
-	}
-	return true
 }
 
 // triggerEntry is a routing query reduced to what the rules read.
@@ -161,73 +99,27 @@ type triggerEntry struct {
 }
 
 func checkTriggerEvals(ctx check.Context, report *check.Reporter, options Options, dir string) error {
-	raw, file, ok, err := readJSON(ctx, report, options.RequireEvals, dir, "eval-queries.json")
+	_, file, ok, err := readJSON(ctx, report, options.RequireEvals, dir, catalog.TriggerFile)
 	if err != nil || !ok {
 		return err
 	}
-	var entries []triggerEntry
-	switch {
-	case isVersioned(raw):
-		valid, err := validateSchema(ctx, report, schemas.EvalTrigger, file)
-		if err != nil || !valid {
-			return err
-		}
-		queries, _, err := catalog.ReadQueries(ctx.Tree, dir)
-		if err != nil {
-			report.Fail("skill.evals-queries", file, 1, "catalog: %v", err)
-			return nil
-		}
-		seen := map[string]bool{}
-		for _, q := range queries {
-			entries = append(entries, queryEntry(report, file, q.Text, q.ShouldTrigger, q.Split, q.Rationale, seen))
-		}
-	default:
-		list, isList := raw.([]any)
-		if !isList {
-			report.Fail("skill.evals-shape", file, 1, "catalog: eval-queries.json must be an array")
-			return nil
-		}
-		seen := map[string]bool{}
-		for i, item := range list {
-			if entry, valid := legacyEntry(report, file, i, item, seen); valid {
-				entries = append(entries, entry)
-			}
-		}
+	valid, err := validateSchema(ctx, report, schemas.EvalTrigger, file)
+	if err != nil || !valid {
+		return err
+	}
+	queries, _, err := catalog.ReadQueries(ctx.Tree, dir)
+	if err != nil {
+		report.Fail("skill.evals-queries", file, 1, "catalog: %v", err)
+		return nil
+	}
+	seen := map[string]bool{}
+	entries := make([]triggerEntry, 0, len(queries))
+	for _, q := range queries {
+		duplicateOrGeneric(report, file, q.Text, seen)
+		entries = append(entries, triggerEntry{positive: q.ShouldTrigger, split: q.Split, owner: ownerOf(q.ShouldTrigger, q.Rationale)})
 	}
 	checkTriggerMinimums(report, file, entries)
 	return nil
-}
-
-func legacyEntry(report *check.Reporter, file string, index int, item any, seen map[string]bool) (triggerEntry, bool) {
-	position := index + 1
-	object, isObject := item.(map[string]any)
-	if !isObject {
-		report.Fail("skill.evals-entry", file, 1, "catalog: eval-queries.json entry %d must be an object", position)
-		return triggerEntry{}, false
-	}
-	query, _ := object["query"].(string)
-	should, hasShould := object["should_trigger"].(bool)
-	rationale, _ := object["rationale"].(string)
-	split, _ := object["split"].(string)
-	if !nonEmptyString(object["query"]) {
-		report.Fail("skill.evals-query", file, 1, "catalog: eval-queries.json entry %d needs a non-empty query", position)
-	} else {
-		duplicateOrGeneric(report, file, query, seen)
-	}
-	if !hasShould {
-		report.Fail("skill.evals-should-trigger", file, 1, "catalog: eval-queries.json entry %d needs boolean should_trigger", position)
-		return triggerEntry{}, false
-	}
-	if split != "train" && split != "validation" {
-		report.Fail("skill.evals-split", file, 1, "catalog: eval-queries.json entry %d needs split train or validation", position)
-		split = ""
-	}
-	return triggerEntry{positive: should, split: split, owner: ownerOf(should, rationale)}, true
-}
-
-func queryEntry(report *check.Reporter, file string, query string, should bool, split, rationale string, seen map[string]bool) triggerEntry {
-	duplicateOrGeneric(report, file, query, seen)
-	return triggerEntry{positive: should, split: split, owner: ownerOf(should, rationale)}
 }
 
 func ownerOf(should bool, rationale string) string {

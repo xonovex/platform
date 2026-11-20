@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "connascence",
+      "kind": "web",
+      "title": "Connascence",
+      "citation": "\"What Every Programmer Should Know About Object-Oriented Design\" (Meilir Page-Jones, 1995); \"Comparing Techniques by Means of Encapsulation and Connascence\" (1992)",
+      "urls": ["https://en.wikipedia.org/wiki/Connascence"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/connascence.md"],
+      "usage": ["`SKILL.md` → Essentials, Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Static/dynamic forms; strength/locality/degree; rules of degree and locality; connascence of position → `references/connascence.md`"
+        }
+      ]
+    },
+    {
+      "id": "coupling-cohesion-taxonomy",
+      "kind": "web",
+      "title": "Coupling & cohesion taxonomy",
+      "citation": "\"Structured Design\" (Stevens, Myers & Constantine, IBM Systems Journal, 1974)",
+      "urls": [
+        "https://en.wikipedia.org/wiki/Coupling_(computer_programming)",
+        "https://en.wikipedia.org/wiki/Cohesion_(computer_science)"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/coupling-ladder.md",
+        "references/cohesion-ladder.md"
+      ],
+      "usage": ["`SKILL.md` → Essentials"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Content/common/control/stamp/data coupling ladder → `references/coupling-ladder.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Coincidental→functional cohesion ladder; temporal cohesion → `references/cohesion-ladder.md`"
+        }
+      ]
+    },
+    {
+      "id": "law-of-demeter",
+      "kind": "web",
+      "title": "Law of Demeter",
+      "urls": ["https://en.wikipedia.org/wiki/Law_of_Demeter"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/law-of-demeter.md"],
+      "usage": ["`references/law-of-demeter.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Principle of least knowledge; permitted call targets; train-wreck detection"
+        }
+      ]
+    },
+    {
+      "id": "bad-smells-in-code",
+      "kind": "web",
+      "title": "Bad smells in code",
+      "citation": "\"Refactoring: Improving the Design of Existing Code\" (Martin Fowler & Kent Beck), Ch. 3 \"Bad Smells in Code\"",
+      "urls": ["https://martinfowler.com/books/refactoring.html"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/connascence.md"],
+      "usage": [
+        "`references/connascence.md` → Named smells that are connascence"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Data Clump, Feature Envy, Shotgun Surgery as named coupling smells mapped onto connascence forms"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed**",
+      "after": "bad-smells-in-code"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "skill": "researching-change",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "before we touch anything, find out how order-publisher sends notices today and what the new delivery-service actually accepts. we want to move all the notice traffic over",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "migration of one system's traffic onto another"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "we're switching search from the old elastic cluster to the opensearch service next quarter. dig through search-api, the indexer and both apps and tell me what breaks",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "migration of one system's behavior onto another across repositories and apps"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "checkout-web sometimes double charges and nobody knows why. look into it across checkout-web and payments-svc and write down what you find before we pick a fix",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "investigation of a problem before a decision"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "we want saved carts in shop-app. what does the cart code do now and what would that touch? don't change anything yet",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "new feature in existing software, facts first"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "docs/pricing.md says the cap runs after discounts but I don't trust it. check pricing-service and tell me which pages are wrong",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "which pages disagree with the code"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "research the auth token refresh mess in mobile-app and gateway so we have facts before the team argues about it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "research before deciding, without the word plan"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "new project: a loyalty service, no code yet. gather what retail and finance need and what similar systems do, and save it with the open questions",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "new project research"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "move webhook delivery off the legacy relay onto events-gateway. which consumers depend on the relay's payload and which of them are on old app versions?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "migration with consumers and versions"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "before I write a plan for cleaning up the billing module, map what the duplicated tax code paths do today and who calls them",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "code-quality improvement that needs facts before planning"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "the research in plans/fare-capping got the discount order wrong, cap.kt shows otherwise. record the correction",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "a correction to a saved research file is a new research file"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "what does parseFare in src/cap.kt return when the zone is empty?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss: a single-file lookup needs no research step"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "the research for saved-searches is done. walk me through its open questions one by one so we can settle them",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by settling-questions"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "research and decisions for invoice-feed are in. write plan.md and outline what can start now",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by writing-plan"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "audit the billing module for duplication, dead code and magic numbers and grade what you find",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by auditing-code-quality"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "renderer segfaults in release builds after the last merge, here's the dump, help me bisect it",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by debugging-native-code"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "poke holes in the migration plan for order-notices before we sign it off",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by critiquing-plan"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "review my diff on feature/cart-merge for bugs before I open the PR",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by reviewing-code"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "turn what we learned in this session about checking repo commits into a new skill",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-skills"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "add a rule to AGENTS.md from today's lesson: always read the design doc before the code",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by authoring-instructions"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "write user stories with acceptance criteria for saved carts in shop-app",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by writing-user-stories"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "let's pick up where we stopped on the notifications questions yesterday, next one please",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by settling-questions"
+    }
+  ]
+}

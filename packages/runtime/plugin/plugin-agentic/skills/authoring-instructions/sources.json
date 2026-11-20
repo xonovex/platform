@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "agents-md-open-standard",
+      "kind": "web",
+      "title": "AGENTS.md Open Standard",
+      "urls": ["https://agents.md/"],
+      "reviewedAt": "2026-05-13",
+      "feeds": [
+        "references/init.md",
+        "references/consolidate.md",
+        "references/sync.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Core Principles, Gotchas",
+        "`references/init.md` → Output Format Include/Exclude lists, Gotchas",
+        "`references/consolidate.md` → Implementation, Gotchas",
+        "`references/sync.md` → Sync Strategy, Gotchas"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "\"README for agents\" framing: AGENTS.md is operational detail; README.md is human-onboarding → Core Principles role split"
+        },
+        {
+          "id": "claim-2",
+          "statement": "\"Anything you'd tell a new teammate\" heuristic → Core Principles + `init.md` Include list framing"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Nested precedence rule (\"closest AGENTS.md to the edited file wins\") → Core Principles, `consolidate.md` Implementation + Gotchas, `sync.md` Sync Strategy + Gotchas"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Programmatic checks: agents auto-execute listed commands → Core Principles, `init.md` Gotchas, `sync.md` Sync Strategy + Gotchas"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Cross-harness compatibility (Codex, Jules, Cursor, VS Code, Copilot, Roo, Cline, OpenCode, Pi, etc.) → \"Open standard\" Core Principle"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Living-documentation principle → Core Principles"
+        },
+        {
+          "id": "claim-7",
+          "statement": "Content categories to include: build/test commands, setup, code style, testing procedures, security, commit/PR formatting, dev env tips, deployment, dataset handling → `init.md` Include list"
+        },
+        {
+          "id": "claim-8",
+          "statement": "What to exclude (README-style human-onboarding content) → `init.md` Exclude list"
+        },
+        {
+          "id": "claim-9",
+          "statement": "\"Standard Markdown, flexible headings, no required fields\": informed the loose-format approach but project convention prefers a stricter bullet-list format"
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-05-13",
+      "feeds": ["references/merge.md", "references/simplify.md"]
+    },
+    {
+      "id": "xonovex-reflection-workflow",
+      "kind": "original",
+      "title": "Xonovex reflection workflow",
+      "provenance": "Repository-original session-reflection and governed-promotion conventions",
+      "reviewedAt": "2026-11-19",
+      "feeds": ["references/from-a-session.md"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The stored lesson format, the `applied` lifecycle, the promotion thresholds and the routing of a lesson to one owner are Xonovex contracts."
+        }
+      ]
+    }
+  ]
+}

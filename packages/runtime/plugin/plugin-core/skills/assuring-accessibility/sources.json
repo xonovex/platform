@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "web-content-accessibility-guidelines-2-2",
+      "kind": "web",
+      "title": "Web Content Accessibility Guidelines 2.2",
+      "urls": ["https://www.w3.org/TR/WCAG22/"],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/design-and-implementation.md",
+        "references/assessment-and-evidence.md",
+        "references/governance-and-operations.md"
+      ],
+      "usage": [
+        "`SKILL.md`, `references/design-and-implementation.md`, `references/assessment-and-evidence.md`, `references/governance-and-operations.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Versioned conformance target, principles, testable criteria, complete-process scope, accessibility-supported use, and criterion-level applicability. Cross-platform evidence composition, profile semantics, exceptions, and operational controls are Xonovex synthesis."
+        }
+      ]
+    },
+    {
+      "id": "accessible-rich-internet-applications-1-2",
+      "kind": "web",
+      "title": "Accessible Rich Internet Applications 1.2",
+      "urls": ["https://www.w3.org/TR/wai-aria-1.2/"],
+      "reviewedAt": "2026-07-16",
+      "feeds": [
+        "references/design-and-implementation.md",
+        "references/assessment-and-evidence.md"
+      ],
+      "usage": [
+        "`references/design-and-implementation.md`, `references/assessment-and-evidence.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Programmatic role, state, property, and accessibility-tree semantics. Platform-specific implementation remains with the owning platform skill."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-check the current WCAG Recommendation, errata, conformance requirements, and supported-technique guidance.\n2. Re-run exact-revision, known-pass, known-fail, unsupported-content, stale-evidence, exception, and outage assessment cases.\n3. Keep accessibility assurance separate from certification and legal-compliance claims and update **Last reviewed**.",
+      "after": "accessible-rich-internet-applications-1-2"
+    }
+  ]
+}

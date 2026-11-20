@@ -1,0 +1,79 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "how-we-built-our-multi-agent-research-system-anthropic",
+      "kind": "web",
+      "title": "How we built our multi-agent research system, Anthropic engineering",
+      "urls": [
+        "https://www.anthropic.com/engineering/multi-agent-research-system"
+      ],
+      "reviewedAt": "2026-10-27",
+      "feeds": [
+        "references/explorer-roles.md",
+        "references/migration.md",
+        "references/migration-role-briefs.md"
+      ],
+      "usage": [
+        "`SKILL.md` → Essentials, Gotchas",
+        "`references/explorer-roles.md` → writing a brief, fan-out limits",
+        "`references/migration.md` → one read-only explorer for each role",
+        "`references/migration-role-briefs.md` → the bounded brief of each role",
+        "`assets/templates/explorer-brief.md`, `assets/templates/producer-brief.md`, `assets/templates/target-brief.md`, `assets/templates/consumer-brief.md` → the required output and the boundary"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A brief states an objective, an output format, the sources to read and a clear task boundary, because vague briefs make parallel explorers duplicate each other's work → explorer roles, briefs, Gotchas"
+        },
+        {
+          "id": "claim-2",
+          "statement": "A lead agent runs explorers in parallel and scales their number to the question, so the number stays bounded and the lead can read every report → fan-out limits, Essentials"
+        }
+      ]
+    },
+    {
+      "id": "open-knowledge-format-version-0-2",
+      "kind": "web",
+      "title": "Open Knowledge Format version 0.2",
+      "urls": ["https://github.com/GoogleCloudPlatform/open-knowledge-format"],
+      "reviewedAt": "2026-10-27",
+      "feeds": ["references/evidence.md"],
+      "usage": [
+        "`references/evidence.md` → sources and footnotes",
+        "`assets/templates/research.md` → the `sources` list and the footnotes"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "A body attributes a claim with a footnote whose label is a source id, so the attribution survives reordering → evidence, research template"
+        }
+      ]
+    },
+    {
+      "id": "xonovex-research-conventions",
+      "kind": "original",
+      "title": "Xonovex research conventions",
+      "provenance": "Repository-original procedure of the research step and of migration research: the intent check, the evidence rules, the research file and its write rules, and the producer, target and consumer roles with their report sections and failure modes",
+      "reviewedAt": "2026-11-19",
+      "feeds": [
+        "references/intent-check.md",
+        "references/evidence.md",
+        "references/explorer-roles.md",
+        "references/research-file.md",
+        "references/migration.md",
+        "references/migration-role-briefs.md",
+        "references/migration-report-sections.md",
+        "references/migration-failure-modes.md"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The research runs the entry step of recording-handoff first and loads skills from its project settings; a research file is append-only and a correction is a new file that lists the old one in `corrects`; a migration adds no document type and writes a research file with `kind: migration`; observed and inferred facts stay apart; the gap table, the producer changes and the five failure modes are conventions of this workflow."
+        }
+      ]
+    }
+  ]
+}

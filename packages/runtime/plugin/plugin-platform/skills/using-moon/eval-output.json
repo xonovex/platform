@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skill": "using-moon",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "We're on moonrepo 2.0. I want to enable and configure one of Moon's built-in extensions in our workspace. Which config file does the extension configuration go in, and show me a minimal example of the config block.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "States the extension configuration belongs in the file `.moon/extensions.yml`"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Does NOT place the extension config in `.moon/workspace.yml` or `.moon/toolchains.yml`"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "Write a multi-stage Dockerfile that uses `moon docker scaffold` and `moon docker prune` to build our Node service `my-service`, with a final runtime stage based on `gcr.io/distroless/nodejs22-debian12:nonroot`. Make sure the app can actually read its files at runtime.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Every COPY into the distroless nonroot runtime stage uses `--chown=65532:65532`"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Copies the scaffolded `.moon/docker/workspace` before `npm ci` and `.moon/docker/sources` after, and calls `moon docker prune` after the build"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "In a Moon 2.0 `.moon/tasks/*.yml` task, I need a build step that runs `mkdir -p bin && go build -o bin/app ./cmd/...` and also sets an OUTPUT_DIR env var that should default to `bin` when it is not already set in the environment. Write the task definition.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Uses `script:` (not `command:`) for the shell-chained `mkdir ... && go build ...` command"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Uses the `${OUTPUT_DIR:-bin}` default-value syntax rather than a bare `$OUTPUT_DIR`"
+        }
+      ]
+    },
+    {
+      "id": "case-4",
+      "prompt": "Migrate this moon v1 project config to moon 2.0:\n\n```yaml\ntype: library\nplatform: node\ntasks:\n  dev:\n    command: 'npm run dev'\n    local: true\n```\n\nAlso tell me what MQL field replaces `projectType` when I later query these projects.",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "Renames `type: library` to `layer: library` and `platform: node` to `toolchains: [node]`"
+        },
+        {
+          "kind": "llm",
+          "criterion": "Replaces `local: true` with `preset: 'server'`"
+        },
+        {
+          "kind": "llm",
+          "criterion": "States that `projectType` is replaced by `projectLayer` in MQL queries"
+        }
+      ]
+    }
+  ]
+}

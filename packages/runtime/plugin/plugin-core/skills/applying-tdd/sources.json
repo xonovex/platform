@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "test-first-cycle-the-two-rules-the-test-list-green-bar",
+      "kind": "web",
+      "title": "Test-first cycle, the two rules, the test list, green-bar strategies",
+      "citation": "Kent Beck, \"Test-Driven Development by Example\" (Addison-Wesley, 2002)",
+      "urls": [
+        "https://www2.cs.uh.edu/~rsingh/documents/software_design/TDD.pdf"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": [
+        "references/red-green-refactor.md",
+        "references/green-bar-strategies.md",
+        "references/test-list-and-design.md"
+      ],
+      "usage": [
+        "`references/red-green-refactor.md`",
+        "`references/green-bar-strategies.md`",
+        "`references/test-list-and-design.md`",
+        "`SKILL.md` → Essentials / Gotchas / Example"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The red-green-refactor mantra and the two rules (write production code only to pass a failing test; eliminate duplication); the \"clean code that works\" goal"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Green-bar strategies: Fake It, Obvious Implementation, Triangulation: and refactoring driven by removing the duplication created to go green"
+        },
+        {
+          "id": "claim-3",
+          "statement": "The test list / to-do list worked one item at a time"
+        }
+      ]
+    },
+    {
+      "id": "triangulation-as-a-fallback-not-the-default",
+      "kind": "web",
+      "title": "Triangulation as a fallback, not the default",
+      "citation": "\"Notes on Test-Driven Development by Example\" (study notes on Beck)",
+      "urls": [
+        "https://stanislaw.github.io/2016-01-25-notes-on-test-driven-development-by-example-by-kent-beck.html"
+      ],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/green-bar-strategies.md"],
+      "usage": ["`references/green-bar-strategies.md`", "`SKILL.md` → Gotchas"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Triangulation is reserved for when the generalization is not yet visible; otherwise write the general solution directly"
+        }
+      ]
+    },
+    {
+      "id": "classical-vs-mockist-tdd-as-a-design-style",
+      "kind": "web",
+      "title": "Classical vs mockist TDD as a design style",
+      "citation": "Martin Fowler, \"Mocks Aren't Stubs\"",
+      "urls": ["https://martinfowler.com/articles/mocksArentStubs.html"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/test-list-and-design.md"],
+      "usage": [
+        "`references/test-list-and-design.md` (design-pressure section)"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Classical uses real collaborators where practical; mockist mocks any collaborator with interesting behaviour"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Mockist tests couple to implementation (expected calls asserted) while classical tests focus on the result; the style choice drives different designs"
+        },
+        {
+          "id": "claim-3",
+          "statement": "The verification mechanism (state vs behaviour, what to mock, the double taxonomy) is owned by **authoring-tests**, which cites this same source for that angle"
+        }
+      ]
+    },
+    {
+      "id": "arrange-act-assert-the-shape-of-the-test-the-cycle-produces",
+      "kind": "web",
+      "title": "Arrange-Act-Assert (the shape of the test the cycle produces)",
+      "citation": "Bill Wake, \"3A: Arrange, Act, Assert\" (xp123)",
+      "urls": ["https://xp123.com/articles/3a-arrange-act-assert/"],
+      "reviewedAt": "2026-06-27",
+      "feeds": ["references/test-list-and-design.md"],
+      "usage": ["`references/test-list-and-design.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Origin and naming of the AAA structure of the single-action test each red step produces; the AAA structure itself is owned by **authoring-tests**"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh Workflow",
+      "text": "1. Re-read the upstream source(s) above\n2. Diff against the prior pull (mantra wording, the two rules, the three green-bar strategies, Triangulation's status, the classical/mockist coupling tradeoff)\n3. Update the corresponding `references/<topic>.md`\n4. Bump **Last reviewed** date above",
+      "after": "arrange-act-assert-the-shape-of-the-test-the-cycle-produces"
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "version": 1,
+  "skill": "writing-c99-opinionated",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "I need to add a SIMD variant of my vec3_dot in lib/math/vec3.c: the rest of the project uses _sse4 and _avx2 suffixes",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct: SIMD variant + naming convention in systems lib"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "convert this AoS particle list to SoA for cache locality",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "data-oriented design intent without naming opinionated style"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "in firmware/sensor/sensor_read.c can you change the read function so the caller passes the buffer instead of malloc'ing one",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "caller-owns-memory in embedded"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "stub out the alignment-aware allocator for our DSP target",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "embedded alignment work"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "rename modules to follow our snake_case_subsystem.c convention: there's a few stragglers in src/net/",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "strict file naming"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "in lib/io/ ring_buffer should expose iter functions that don't allocate",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "non-allocating API in systems lib"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "we're seeing alignment faults on the M4 build, can you audit the struct layouts in firmware/",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "embedded layout audit, doesn't say 'C'"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "I'm writing a Defold game in C: physics/collision needs vectors and quaternions",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match writing-c99-game-opinionated"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "throwing together a quick C99 hello-world for a workshop, what's a clean main() pattern",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: generic C99, should match writing-c99"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "fix the std::vector copy constructor in src/render/material.cpp",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: C++, all C99 skills should skip"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "open this CMakeLists.txt: the C standard isn't being set right",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: CMake config, should match using-cmake"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "i need a SIMD-friendly matrix multiply for my game's skinning pipeline",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: game engine, should match writing-c99-game-opinionated"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "add bounds-checked variants to the matrix ops in src/dsp/",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "systems DSP"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "make our pixel buffer struct hot-friendly: split the metadata fields out",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "DOD intent without naming it"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "the embedded build complains about VLAs: can you switch the parser to fixed-size?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "embedded constraint"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "I'm porting our DSP routines to a STM32. What's our convention for buffer ownership?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "caller-owns-memory in embedded port"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "review the file naming under src/comms/: looks inconsistent with the rest",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "strict file naming, generic phrasing"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "show me how to write a basic linked list in C99 for my CS homework",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: generic C99, should match writing-c99"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "convert my Python sensor-read script to TypeScript for the new dashboard",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "wrong language pair"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "review my Cargo.toml: is this idiomatic Rust 2024?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "wrong language"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "editing one header in our C engine triggers a near-full rebuild and compiles are crawling. How should I restructure headers and includes to fix incremental build times?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "physical-design: no header-includes-header rule, one header per system, opaque handles, acyclic deps"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "I want my C engine to be a set of DLLs that register capabilities and discover each other at runtime by name instead of linking against each other. How do I structure the interfaces?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "plugin-architecture: string-keyed registry of plain-C function-pointer interfaces, runtime discovery"
+    },
+    {
+      "id": "query-0023",
+      "prompt": "we need to call our C library from Lua and C#. How should I shape the C API so it's easy to bind and generate wrappers for, and what should I avoid?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "cross-language-api: portable C subset, flat data, call-scoped pointers, spec-generated bindings"
+    },
+    {
+      "id": "query-0024",
+      "prompt": "our entity structs in sim/ store node_t* pointers to each other and it breaks when the pool array grows, and we can't serialize the graph. how should we reference between them?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "handles-and-indices: index/generational-handle references over raw pointers for relocatable, serializable structures"
+    },
+    {
+      "id": "query-0025",
+      "prompt": "the parser in src/cfg/ calls strlen and strtok all over a big buffer and load time is terrible. How should I restructure string handling?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "cross-skill string routing: writing-c99 owns length-carrying views and bounded builders; this overlay adds caller-owned storage"
+    }
+  ]
+}

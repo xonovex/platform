@@ -1,0 +1,86 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Claude Code Sources",
+  "preamble": "Product-specific facts are pinned to the documentation snapshot below. Rows describe documented capabilities unless a separate deployment records runtime evidence.",
+  "sources": [
+    {
+      "id": "hooks",
+      "kind": "web",
+      "title": "Hooks",
+      "urls": [
+        "https://code.claude.com/docs/en/hooks",
+        "https://code.claude.com/docs/en/hooks-guide"
+      ],
+      "reviewedAt": "2026-07-19",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ],
+      "usage": ["`capabilities.md`, `onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Events, matchers, command/prompt/agent/HTTP/MCP-tool handlers, output and exit behavior, context injection, parallel matching, diagnostics, and experimental agent hooks."
+        }
+      ]
+    },
+    {
+      "id": "settings-and-managed-configuration",
+      "kind": "web",
+      "title": "Settings and managed configuration",
+      "urls": [
+        "https://code.claude.com/docs/en/configuration",
+        "https://code.claude.com/docs/en/server-managed-settings",
+        "https://code.claude.com/docs/en/debug-your-config"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": ["references/capabilities.md", "references/onboarding.md"],
+      "usage": ["`capabilities.md`, `onboarding.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Settings scopes and precedence, managed hook restrictions, source diagnostics, security approval, fail-closed startup option, and configuration troubleshooting."
+        }
+      ]
+    },
+    {
+      "id": "plugin-packaging",
+      "kind": "web",
+      "title": "Plugin packaging",
+      "urls": [
+        "https://code.claude.com/docs/en/plugins",
+        "https://code.claude.com/docs/en/plugins-reference"
+      ],
+      "reviewedAt": "2026-07-16",
+      "feeds": ["references/onboarding.md", "references/patterns.md"],
+      "usage": ["`onboarding.md`, `patterns.md`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Plugin hook layout, root/data placeholders, copied installation cache, executable packaging, and testing."
+        }
+      ]
+    },
+    {
+      "id": "guide-level-synthesis",
+      "kind": "original",
+      "title": "Guide-level synthesis",
+      "provenance": "Repository-original integration of the source blocks above; these references combine multiple inputs or maintained conventions rather than one exclusive upstream",
+      "reviewedAt": "2026-07-19",
+      "feeds": [
+        "references/capabilities.md",
+        "references/onboarding.md",
+        "references/patterns.md"
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh workflow",
+      "text": "1. Re-fetch the official pages above and compare event, handler, configuration, trust, and lifecycle behavior.\n2. Run the documented version probe and record only the observed version.\n3. Execute every named deterministic probe on the observed surface; keep unsupported and experimental results explicit.\n4. Update the matrix version and review date when behavior changes.",
+      "after": "plugin-packaging"
+    }
+  ]
+}

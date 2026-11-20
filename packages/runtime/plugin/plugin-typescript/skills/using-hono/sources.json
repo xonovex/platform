@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "rfc-9457-problem-details-for-http-apis",
+      "kind": "web",
+      "title": "RFC 9457: Problem Details for HTTP APIs",
+      "urls": ["https://www.rfc-editor.org/rfc/rfc9457.html"],
+      "reviewedAt": "2026-07-22",
+      "feeds": ["references/error-handling.md"],
+      "usage": [
+        "`SKILL.md` → Problem Details version and media type",
+        "`references/error-handling.md`"
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Canonical problem-detail members, extension members, problem-type URIs, and the `application/problem+json` media type"
+        }
+      ]
+    },
+    {
+      "id": "hono-full-documentation-llm-friendly-distillation",
+      "kind": "web",
+      "title": "Hono: Full Documentation (LLM-friendly distillation)",
+      "urls": ["https://hono.dev/llms-full.txt"],
+      "version": "4.0.0",
+      "contentSha256": "sha256:8df37b8acbf053d00a810f9bfcb1ae9cfddf2d68a984a2a111c6638d15a80d96",
+      "reviewedAt": "2026-07-22",
+      "feeds": [
+        "references/application-structure.md",
+        "references/context-storage.md",
+        "references/cookie-handling.md",
+        "references/error-handling.md",
+        "references/middleware-combine.md",
+        "references/middleware-patterns.md",
+        "references/platform-runtime.md",
+        "references/security-middleware.md",
+        "references/validation-type-safety.md",
+        "references/websocket-support.md"
+      ],
+      "usage": ["`SKILL.md` → all sections", "All files under `references/`"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Application structure / app composition → `references/application-structure.md`"
+        },
+        {
+          "id": "claim-2",
+          "statement": "Context storage and request-scoped state → `references/context-storage.md`"
+        },
+        {
+          "id": "claim-3",
+          "statement": "Cookie handling → `references/cookie-handling.md`"
+        },
+        {
+          "id": "claim-4",
+          "statement": "Error handling patterns → `references/error-handling.md`"
+        },
+        {
+          "id": "claim-5",
+          "statement": "Middleware combination (`every` / `some` / `except`) → `references/middleware-combine.md`"
+        },
+        {
+          "id": "claim-6",
+          "statement": "Middleware authoring patterns → `references/middleware-patterns.md`"
+        },
+        {
+          "id": "claim-7",
+          "statement": "Platform / runtime adapters (Cloudflare Workers, Bun, Deno, Node, etc.) → `references/platform-runtime.md`"
+        },
+        {
+          "id": "claim-8",
+          "statement": "Security middleware (CORS, CSRF, secure headers, etc.) → `references/security-middleware.md`"
+        },
+        {
+          "id": "claim-9",
+          "statement": "Validation and end-to-end type safety (Zod, Valibot integrations, `c.req.valid`) → `references/validation-type-safety.md`"
+        },
+        {
+          "id": "claim-10",
+          "statement": "WebSocket / upgrade support → `references/websocket-support.md`"
+        }
+      ]
+    }
+  ]
+}

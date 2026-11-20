@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "postgresql-15-documentation",
+      "kind": "web",
+      "title": "PostgreSQL 15 documentation",
+      "urls": [
+        "https://www.postgresql.org/docs/15/",
+        "https://www.postgresql.org/docs/15/queries-with.html",
+        "https://www.postgresql.org/docs/15/indexes.html",
+        "https://www.postgresql.org/docs/15/ddl-default.html",
+        "https://www.postgresql.org/docs/15/datatype-numeric.html#DATATYPE-SERIAL",
+        "https://www.postgresql.org/docs/15/sql-createtable.html"
+      ],
+      "version": "15.0.0",
+      "contentSha256": "sha256:a0aafaf2c091c76a780e9d7863ff873d32caf1efa90eac02be6d5e41b068bc8c",
+      "reviewedAt": "2026-07-22",
+      "coversAllReferences": true,
+      "usage": [
+        "`SKILL.md` and all `references/`; query construction, CTEs, indexing, transactions, JSONB, row-level security, migrations, and `EXPLAIN`."
+      ],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "PostgreSQL 15 SQL syntax, planner/index behavior, transaction semantics, data types, and security features."
+        }
+      ]
+    }
+  ]
+}

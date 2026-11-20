@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "skill": "{gerund}-{topic}",
+  "tier": "moderate",
+  "cases": [
+    {
+      "id": "case-1",
+      "prompt": "{Realistic request to perform the workflow's primary operation}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the requested operation completed}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the required output shape was followed}"
+        }
+      ]
+    },
+    {
+      "id": "case-2",
+      "prompt": "{Realistic request covering an error or safety boundary in the workflow}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the boundary is handled safely}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the failure is reported clearly}"
+        }
+      ]
+    },
+    {
+      "id": "case-3",
+      "prompt": "{Realistic multi-step request that embeds one of the workflow's operations}",
+      "gate": "required",
+      "expect": [
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the correct operation is selected}"
+        },
+        {
+          "kind": "llm",
+          "criterion": "{Observable condition proving the result is validated before completion}"
+        }
+      ]
+    }
+  ]
+}

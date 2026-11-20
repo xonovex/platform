@@ -33,7 +33,7 @@ image.env
 # Auto-Generated Files
 *.gen.*
 auto-imports.d.ts
-.skill-eval-results/
+.agent-eval/
 *-workspace/
 
 # Testing and Coverage

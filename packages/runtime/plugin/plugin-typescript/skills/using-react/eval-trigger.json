@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "skill": "using-react",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "make this client component server-rendered if possible. It's just fetching the user's recent orders",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "RSC migration, doesn't say 'React'"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "add a useActionState hook for the contact form so we can show pending state",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct React 19 hook"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "the streaming Suspense boundary on /dashboard isn't cutting at the right spot, can you adjust where the fallback shows",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Suspense streaming"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "convert the old forwardRef pattern in Button.tsx to ref-as-prop",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "React 19 idiom, no name"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Form submission in checkout/page.tsx is double-firing: can you wire up useFormStatus properly",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "Form Actions"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "fetch the user's posts inside a use() call instead of useEffect: we want it to suspend",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "use() hook intent"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "the search filter in components/Filters.tsx re-renders on every keystroke even though the parent doesn't change: fix it",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "perf / memoization, doesn't say 'React'"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "add a fade-in when the testimonial card scrolls into view",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match a motion skill"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "build this marketing page as static Astro islands with minimal client JavaScript",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: should match using-astro"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "build a React Native screen for the mobile checkout",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: RN, not web React"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "configure Vite's rollup output for a non-React Hono SSR build",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: Vite config but no React work"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "in this Next.js API route, validate the body with Zod",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: backend handler, should match using-zod"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "i think the React Compiler is over-memoizing this list, can you check src/feed/Feed.tsx",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "direct React 19 Compiler"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "this 'use client' boundary in profile/edit shouldn't extend to the avatar picker: split it",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "RSC client/server boundary"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "wire up an optimistic update on the like button so the count flips immediately",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "useOptimistic intent"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "page transition feels janky: i think the Suspense fallback is showing too much",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "Suspense, casual phrasing"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "we just upgraded to 19. What does our memo wrapper look like with the compiler enabled",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "React 19 + Compiler"
+    },
+    {
+      "id": "query-0018",
+      "prompt": "explain the difference between Vue 3 Composition API and Options API",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "wrong framework"
+    },
+    {
+      "id": "query-0019",
+      "prompt": "the legacy class components in old/ don't have lifecycle types, just leave them, I'm deleting them next sprint",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: legacy with no modernization intent"
+    },
+    {
+      "id": "query-0020",
+      "prompt": "render this MDX content into HTML for the static-site build",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near-miss: Astro/MDX, not React component work"
+    },
+    {
+      "id": "query-0021",
+      "prompt": "I need to translate all the text in my immediate-mode tool UI into other languages without maintaining a giant table of string IDs. What's a good approach?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "validation near miss owned by designing-imgui"
+    },
+    {
+      "id": "query-0022",
+      "prompt": "retest focus, zoom, errors, and dynamic status after this UI revision",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by assuring-accessibility"
+    }
+  ]
+}

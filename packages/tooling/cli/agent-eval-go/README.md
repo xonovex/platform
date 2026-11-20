@@ -57,4 +57,4 @@ The exit status is 0 on a pass, 1 on a fail, 2 when the input is invalid or an i
 | Task | Runs |
 | --- | --- |
 | `npx moon run agent-eval-go:ci-check` | Unit tests, `arch` tests, per-package coverage, lint, vet and build |
-| `npx moon run agent-eval-go:ci-integration` | The built binary against a fake `claude` and the legacy eval files; no model runs |
+| `npx moon run agent-eval-go:ci-integration` | The built binary against a fake `claude` and the eval files of the plugins; no model runs |

@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skill": "applying-hexagonal-architecture",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "decouple my domain logic from Postgres so I can swap the database without rewriting business rules",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "ports-and-adapters: driven adapter behind a core-owned port"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "where should the repository interface live, in the core or in the database layer?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "the port belongs to the core (dependency rule)"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "my service class imports the ORM and the HTTP framework directly. How do I keep the domain clean?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "dependencies must point inward; adapters on the outside"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "I want to unit-test the domain without spinning up a real database",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "testability via fakes for driven adapters"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "set up ports and adapters / clean architecture for this checkout service",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "explicit hexagonal/clean architecture request"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "design a plugin system so third parties can add new payment backends without editing our core",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: open registered plug-in set -> applying-microkernel-architecture"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "grade how tightly these two modules are coupled and how to loosen it",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: coupling vocabulary -> analyzing-connascence"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "which axis should own the SMS delivery code in this tree?",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near-miss: where a boundary goes -> applying-orthogonality"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "I have a Go OrderService that directly calls a Postgres client to save orders. Refactor it so the business logic no longer depends on Postgres and I could swap in another database later. Show which package each type goes in and how the pieces depend on one another.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Review this hexagonal design: my domain's PlaceOrder inbound port takes the raw *http.Request from the web handler, and my repository outbound port returns the ORM's gorm row struct straight to the service. Is anything wrong with that, and if so how should I fix it?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Show me how to wire together my HTTP handler, order service, and repository at application startup, where a config value selects between a Postgres store and an in-memory store. I want it done cleanly.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "output-eval task also exercises this skill's routing boundary"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "design a plugin registry so new storage backends register themselves and the core never imports them",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-microkernel-architecture"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "near miss owned by applying-orthogonality"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-ddd"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "I have a log file with about 20 million lines already loaded as an array of strings in JavaScript. Write a function that keeps only the ERROR lines, extracts the timestamp from each, and returns the first 10. Explain any performance concerns.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-fp"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "We have a notification service in Go that currently sends messages over email, SMS, and push. We keep having to touch the sending code every time a new channel is added. Sketch a design that lets us add new channels later without rewriting the sender, and show the sending function's signature.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by applying-microkernel-architecture"
+    },
+    {
+      "id": "query-0017",
+      "prompt": "the core package imports the concrete email and SMS adapters directly; invert it so the core depends only on interfaces",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "dependency inversion at the core boundary"
+    }
+  ]
+}

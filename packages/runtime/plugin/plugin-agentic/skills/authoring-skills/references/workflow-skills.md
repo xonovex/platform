@@ -22,9 +22,9 @@ Scaffold from `assets/workflow-skill-template/`:
 
 - [`SKILL.md.template`](../assets/workflow-skill-template/SKILL.md.template): Core Principles, Operations, Gotchas, Progressive Disclosure
 - [`references/{operation}.md`](../assets/workflow-skill-template/references/{operation}.md), operation template (Goal + Core Workflow, then the operation-specific sections it needs; common optional closers: Output / Error Handling / Gotchas)
-- [`evals.json`](../assets/workflow-skill-template/evals.json): three output-quality seeds with observable assertions
-- [`eval-queries.json`](../assets/workflow-skill-template/eval-queries.json): 16 trigger-eval queries (8 positive + 8 negative with train/validation splits)
-- [`SOURCES.md`](../assets/workflow-skill-template/SOURCES.md): required catalog provenance; cite external sources or declare repository-original provenance
+- [`eval-output.json.template`](../assets/workflow-skill-template/eval-output.json.template): three output-quality seeds with observable expectations
+- [`eval-trigger.json.template`](../assets/workflow-skill-template/eval-trigger.json.template): 16 trigger-eval queries (8 positive + 8 negative with train/validation splits)
+- [`sources.json.template`](../assets/workflow-skill-template/sources.json.template): required catalog provenance; declares repository-original provenance, or copy a web entry from the guideline template to cite external sources
 
 To scaffold: copy the directory, rename `{operation}.md` files, and fill in `{placeholders}`.
 
