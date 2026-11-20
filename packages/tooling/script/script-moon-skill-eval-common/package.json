@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./adapters/evaluator-ports-node": {
+      "types": "./src/adapters/evaluator-ports-node.ts",
+      "default": "./dist/src/adapters/evaluator-ports-node.js"
+    },
     "./adapters/process-runner-memory": {
       "types": "./src/adapters/process-runner-memory.ts",
       "default": "./dist/src/adapters/process-runner-memory.js"
@@ -19,6 +23,10 @@
     "./adapters/scratch-node": {
       "types": "./src/adapters/scratch-node.ts",
       "default": "./dist/src/adapters/scratch-node.js"
+    },
+    "./batch-plan": {
+      "types": "./src/batch-plan.ts",
+      "default": "./dist/src/batch-plan.js"
     },
     "./claude/args": {
       "types": "./src/claude/args.ts",
@@ -40,13 +48,33 @@
       "types": "./src/environment.ts",
       "default": "./dist/src/environment.js"
     },
+    "./evidence": {
+      "types": "./src/evidence.ts",
+      "default": "./dist/src/evidence.js"
+    },
+    "./harness-config": {
+      "types": "./src/harness-config.ts",
+      "default": "./dist/src/harness-config.js"
+    },
     "./harness-ports": {
       "types": "./src/harness-ports.ts",
       "default": "./dist/src/harness-ports.js"
     },
+    "./option-schemas": {
+      "types": "./src/option-schemas.ts",
+      "default": "./dist/src/option-schemas.js"
+    },
     "./process-runner": {
       "types": "./src/process-runner.ts",
       "default": "./dist/src/process-runner.js"
+    },
+    "./report": {
+      "types": "./src/report.ts",
+      "default": "./dist/src/report.js"
+    },
+    "./retry": {
+      "types": "./src/retry.ts",
+      "default": "./dist/src/retry.js"
     },
     "./routing-catalog": {
       "types": "./src/routing-catalog.ts",
