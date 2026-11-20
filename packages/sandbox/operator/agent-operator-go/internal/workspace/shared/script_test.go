@@ -5,13 +5,22 @@ import (
 	"testing"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/git"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/jj"
 )
+
+// stubStrategy is an in-memory VCSStrategy whose post-clone step is fixed.
+type stubStrategy struct{ postClone string }
+
+func (s stubStrategy) PostCloneScript() string { return s.postClone }
+
+func (stubStrategy) WorktreeScript(path, branch, sourceBranch string) string {
+	return "worktree " + path + " " + branch + " " + sourceBranch + "\n"
+}
+
+func (stubStrategy) InitContainerName() string { return "stub-worktree" }
 
 func TestCloneScript_Basic(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"}
-	script := CloneScript(repo, &git.Strategy{})
+	script := CloneScript(repo, stubStrategy{})
 
 	if !strings.Contains(script, "set -e") {
 		t.Error("script missing 'set -e'")
@@ -32,7 +41,7 @@ func TestCloneScript_Basic(t *testing.T) {
 
 func TestCloneScript_WithBranch(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Branch: "develop"}
-	script := CloneScript(repo, &git.Strategy{})
+	script := CloneScript(repo, stubStrategy{})
 	if !strings.Contains(script, "--branch 'develop'") {
 		t.Errorf("script missing '--branch 'develop'', got:\n%s", script)
 	}
@@ -44,7 +53,7 @@ func TestCloneScript_UsesMountedCredentialStore(t *testing.T) {
 		CredentialsSecretRef: &agentv1alpha1.SecretKeyRef{Name: "repo-auth", Key: "credentials"},
 	}
 
-	script := CloneScript(repo, &git.Strategy{})
+	script := CloneScript(repo, stubStrategy{})
 
 	if !strings.Contains(script, "credential.helper=store --file="+RepositoryCredentialsFile) {
 		t.Fatalf("clone script does not use the mounted credential store:\n%s", script)
@@ -60,7 +69,7 @@ func TestCloneScript_InjectionQuoted(t *testing.T) {
 		Branch: "main; rm -rf /",
 		Commit: "abc1234",
 	}
-	script := CloneScript(repo, &git.Strategy{})
+	script := CloneScript(repo, stubStrategy{})
 
 	if !strings.Contains(script, "'main; rm -rf /'") {
 		t.Errorf("branch not properly quoted in script:\n%s", script)
@@ -75,7 +84,7 @@ func TestCloneScript_InjectionQuoted(t *testing.T) {
 
 func TestCloneScript_WithCommit(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Commit: "abc123"}
-	script := CloneScript(repo, &git.Strategy{})
+	script := CloneScript(repo, stubStrategy{})
 	if !strings.Contains(script, "git fetch origin 'abc123'") {
 		t.Errorf("script missing quoted commit in fetch, got:\n%s", script)
 	}
@@ -84,21 +93,42 @@ func TestCloneScript_WithCommit(t *testing.T) {
 	}
 }
 
-func TestCloneScript_WithJujutsu(t *testing.T) {
+func TestCloneScript_AppendsThePostCloneStep(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git", Branch: "main"}
-	script := CloneScript(repo, &jj.Strategy{})
+	script := CloneScript(repo, stubStrategy{postClone: "post-clone-step\n"})
 	if !strings.Contains(script, "git clone") {
-		t.Error("jj script should still use git clone")
+		t.Error("script should clone with git before the post-clone step")
 	}
-	if !strings.Contains(script, "jj git init --colocate") {
-		t.Error("jj script missing 'jj git init --colocate'")
+	if !strings.HasSuffix(script, "post-clone-step\n") {
+		t.Errorf("script does not end with the post-clone step:\n%s", script)
 	}
 }
 
-func TestCloneScript_GitNoJJInit(t *testing.T) {
+func TestCloneScript_WithoutAStrategyAddsNoPostCloneStep(t *testing.T) {
 	repo := agentv1alpha1.RepositorySpec{URL: "https://github.com/example/repo.git"}
-	script := CloneScript(repo, &git.Strategy{})
-	if strings.Contains(script, "jj") {
-		t.Error("git-only script should not contain 'jj'")
+	if got, want := CloneScript(repo, nil), CloneScript(repo, stubStrategy{}); got != want {
+		t.Errorf("CloneScript(nil) = %q, want %q", got, want)
+	}
+}
+
+func TestWorktreeScriptAndName_UsesTheStrategy(t *testing.T) {
+	script, name := WorktreeScriptAndName(stubStrategy{}, WorktreePath("run"), "feature", "")
+
+	if name != "stub-worktree" {
+		t.Errorf("name = %q, want stub-worktree", name)
+	}
+	if !strings.HasSuffix(script, "worktree /workspace-wt/run feature HEAD\n") {
+		t.Errorf("script does not default the source branch to HEAD:\n%s", script)
+	}
+}
+
+func TestWorktreeScriptAndName_DefaultsWithoutAStrategy(t *testing.T) {
+	script, name := WorktreeScriptAndName(nil, WorktreePath("run"), "feature", "main")
+
+	if name != "git-worktree" {
+		t.Errorf("name = %q, want git-worktree", name)
+	}
+	if script != "set -e\ncd /workspace\n" {
+		t.Errorf("script = %q, want only the preamble", script)
 	}
 }

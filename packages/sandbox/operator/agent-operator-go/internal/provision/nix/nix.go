@@ -5,10 +5,13 @@ package nix
 
 import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	provisionshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provision/shared"
 )
 
 // Toolchain provisions via a pre-built, digest-pinned nix OCI image.
 type Toolchain struct{ nix *agentv1alpha1.NixSpec }
+
+var _ provisionshared.Toolchain = Toolchain{}
 
 // New creates a nix toolchain from its spec.
 func New(spec *agentv1alpha1.NixSpec) Toolchain { return Toolchain{nix: spec} }

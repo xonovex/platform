@@ -36,3 +36,15 @@ func TestCommandBuilderOmitsEmptyPrompt(t *testing.T) {
 		t.Errorf("args = %v, want no prompt", args)
 	}
 }
+
+func TestCommandBuilderBypassesPermissionsInTheSandbox(t *testing.T) {
+	_, args, err := CommandBuilder{}.Command(&agentv1alpha1.AgentRun{}, nil)
+
+	if err != nil {
+		t.Fatalf("Command() error = %v", err)
+	}
+	index := slices.Index(args, "--permission-mode")
+	if index < 0 || index+1 >= len(args) || args[index+1] != "bypassPermissions" {
+		t.Errorf("args = %v, want --permission-mode bypassPermissions", args)
+	}
+}

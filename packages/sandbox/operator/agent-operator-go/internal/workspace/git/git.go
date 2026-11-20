@@ -5,10 +5,13 @@ import (
 	"fmt"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
+	workspaceshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
 // Strategy implements the workspace VCS strategy for git.
 type Strategy struct{}
+
+var _ workspaceshared.VCSStrategy = (*Strategy)(nil)
 
 // PostCloneScript returns the script to run after cloning (none for git).
 func (g *Strategy) PostCloneScript() string { return "" }

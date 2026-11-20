@@ -5,10 +5,13 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 )
 
 // CommandBuilder builds command/args for Claude Code.
 type CommandBuilder struct{}
+
+var _ harnessshared.CommandBuilder = CommandBuilder{}
 
 // Command returns the binary and args for an AgentRun.
 func (CommandBuilder) Command(run *agentv1alpha1.AgentRun, _ []string) ([]string, []string, error) {

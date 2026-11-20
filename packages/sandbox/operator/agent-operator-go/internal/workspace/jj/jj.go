@@ -5,10 +5,13 @@ import (
 	"fmt"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
+	workspaceshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
 // Strategy implements the workspace VCS strategy for Jujutsu (jj).
 type Strategy struct{}
+
+var _ workspaceshared.VCSStrategy = (*Strategy)(nil)
 
 // PostCloneScript colocates a jj repo onto the cloned git repo.
 func (j *Strategy) PostCloneScript() string { return "jj git init --colocate\n" }
