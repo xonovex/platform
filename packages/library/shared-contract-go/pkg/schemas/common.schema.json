@@ -61,6 +61,30 @@
       "description": "The agent harness that runs a prompt.",
       "enum": ["claude", "codex", "copilot", "kiro", "opencode", "pi"]
     },
+    "isolation": {
+      "description": "The isolation axis of a confined run.",
+      "enum": [
+        "none",
+        "bwrap",
+        "docker",
+        "seatbelt",
+        "docker-sandboxes",
+        "openshell"
+      ]
+    },
+    "provision": {
+      "description": "The provision axis of a confined run: where its tools come from.",
+      "enum": ["none", "nix", "command"]
+    },
+    "network": {
+      "description": "The network egress axis of a confined run.",
+      "enum": ["host", "none", "managed"]
+    },
+    "environmentEntry": {
+      "description": "An environment variable of a confined run, as KEY=VALUE.",
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*="
+    },
     "condition": {
       "description": "The state of an instruction during a run.",
       "enum": ["present", "absent", "ablated"]

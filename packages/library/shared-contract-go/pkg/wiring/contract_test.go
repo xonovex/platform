@@ -260,6 +260,10 @@ func contracts() map[string]contract {
 				  "profiles":{"cheap":{"harness":"claude","model":"haiku","effort":"low","timeoutSeconds":120}},
 				  "protocols":{"trigger":{"runs":3,"batchSize":8,"threshold":0.8},"routing":{"runs":1},"output":{"minimumWinRate":0.6},"instruction":{"minimumLift":0.2},"orchestration":{"runs":2}},
 				  "budgets":{"maxModelRuns":200,"maxCostUsd":25}}`,
+				`{"sandbox":{"isolation":"docker","provision":"nix","network":"managed","image":"registry.example/eval@sha256:0123","runtime":"runsc",
+				  "hostPassthrough":false,"initCommands":["true"],"nixPackages":["git"],"nixRev":"0123abc","allowHosts":["api.example.com"],
+				  "credentials":["API_KEY=env:API_KEY"],"customEnv":["MODE=ci"],"requirePinnedProvision":true,"requireHostToolsUnreachable":true,
+				  "requireEgressRestricted":true,"requireKernelIsolation":true}}`,
 			},
 			invalid: []invalid{
 				{"version inside the section", `{"version":1}`, ""},
@@ -268,6 +272,9 @@ func contracts() map[string]contract {
 				{"unknown effort", `{"profiles":{"p":{"harness":"claude","effort":"extreme"}}}`, "/profiles/p/effort"},
 				{"profile name not a slug", `{"profiles":{"Not A Slug":{"harness":"claude"}}}`, "/profiles"},
 				{"zero spend", `{"budgets":{"maxCostUsd":0}}`, "/budgets/maxCostUsd"},
+				{"unknown isolation", `{"sandbox":{"isolation":"vm"}}`, "/sandbox/isolation"},
+				{"unknown sandbox member", `{"sandbox":{"bindPaths":["/"]}}`, "/sandbox"},
+				{"environment without a name", `{"sandbox":{"customEnv":["=x"]}}`, "/sandbox/customEnv/0"},
 			},
 		},
 		schemas.Results: {

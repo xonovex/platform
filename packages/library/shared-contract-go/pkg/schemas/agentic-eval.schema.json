@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.xonovex.com/agent/agentic-eval.schema.json",
   "title": "Eval section",
-  "description": "The eval section of an agentic.json file: where the plugins and instructions of agent-eval live, the profiles that run them, the protocol settings and the budgets.",
+  "description": "The eval section of an agentic.json file: where the plugins and instructions of agent-eval live, the profiles that run them, the protocol settings, the budgets and the sandbox the harness runs in.",
   "type": "object",
   "properties": {
     "pluginDirs": {
@@ -24,7 +24,8 @@
       "additionalProperties": false
     },
     "protocols": {"$ref": "#/$defs/protocols"},
-    "budgets": {"$ref": "#/$defs/budgets"}
+    "budgets": {"$ref": "#/$defs/budgets"},
+    "sandbox": {"$ref": "#/$defs/sandbox"}
   },
   "additionalProperties": false,
   "$defs": {
@@ -94,6 +95,61 @@
         "maxCostUsd": {"type": "number", "exclusiveMinimum": 0}
       },
       "additionalProperties": false
+    },
+    "sandbox": {
+      "description": "The confinement every harness run starts in. With no member set, the harness runs on the host as it would without agent-eval. A user or managed file chooses the confinement and what it may reach; a project file may only demand a guarantee.",
+      "type": "object",
+      "properties": {
+        "isolation": {"$ref": "common.schema.json#/$defs/isolation"},
+        "provision": {"$ref": "common.schema.json#/$defs/provision"},
+        "network": {"$ref": "common.schema.json#/$defs/network"},
+        "image": {
+          "description": "The container image of a docker run, which holds the harness program unless the provision supplies it.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "runtime": {
+          "description": "The container runtime of a docker run, such as runsc for a kernel boundary.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "hostPassthrough": {
+          "description": "Exposes the host tools to a bwrap run, which forfeits the host-tools-unreachable guarantee.",
+          "type": "boolean"
+        },
+        "initCommands": {
+          "description": "Commands a run with provision command executes before the harness.",
+          "$ref": "#/$defs/texts"
+        },
+        "nixPackages": {
+          "description": "Packages a run with provision nix adds beside the package of the harness.",
+          "$ref": "#/$defs/texts"
+        },
+        "nixRev": {
+          "description": "The pinned nixpkgs revision of a run with provision nix.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "allowHosts": {
+          "description": "Hosts a run with network managed may reach.",
+          "$ref": "#/$defs/texts"
+        },
+        "credentials": {
+          "description": "Credential bindings of the harness, as NAME=scheme:locator. A file holds where a credential is, never its value.",
+          "$ref": "#/$defs/texts"
+        },
+        "customEnv": {
+          "description": "Environment variables of the harness, as KEY=VALUE.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/environmentEntry"}
+        },
+        "requirePinnedProvision": {"type": "boolean"},
+        "requireHostToolsUnreachable": {"type": "boolean"},
+        "requireEgressRestricted": {"type": "boolean"},
+        "requireKernelIsolation": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "texts": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/text"}
     }
   }
 }

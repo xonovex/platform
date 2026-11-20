@@ -12,25 +12,16 @@
       "type": "array",
       "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*=\\S+$"}
     },
-    "isolation": {
-      "enum": [
-        "none",
-        "bwrap",
-        "docker",
-        "seatbelt",
-        "docker-sandboxes",
-        "openshell"
-      ]
-    },
-    "provision": {"enum": ["none", "nix", "command"]},
-    "network": {"enum": ["host", "none", "managed"]},
+    "isolation": {"$ref": "common.schema.json#/$defs/isolation"},
+    "provision": {"$ref": "common.schema.json#/$defs/provision"},
+    "network": {"$ref": "common.schema.json#/$defs/network"},
     "homeDir": {"$ref": "common.schema.json#/$defs/text"},
     "bindPaths": {"$ref": "#/$defs/texts"},
     "roBindPaths": {"$ref": "#/$defs/texts"},
     "customEnv": {
       "description": "Environment variables of the sandbox, as KEY=VALUE.",
       "type": "array",
-      "items": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*="}
+      "items": {"$ref": "common.schema.json#/$defs/environmentEntry"}
     },
     "allowHosts": {"$ref": "#/$defs/texts"},
     "credentials": {
