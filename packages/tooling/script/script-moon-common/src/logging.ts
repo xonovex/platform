@@ -10,6 +10,19 @@ const C = {
   NC: "\u001B[0m",
 } as const;
 
+/** A log line for the Output port, the same text the matching log helper prints. */
+export const infoLine = (message: string): string =>
+  `${C.BLUE}[INFO]${C.NC} ${message}`;
+
+export const successLine = (message: string): string =>
+  `${C.GREEN}[SUCCESS]${C.NC} ${message}`;
+
+export const warningLine = (message: string): string =>
+  `${C.YELLOW}[WARNING]${C.NC} ${message}`;
+
+export const errorLine = (message: string): string =>
+  `${C.RED}[ERROR]${C.NC} ${message}`;
+
 export const logInfo = (...args: unknown[]): void => {
   console.log(`${C.BLUE}[INFO]${C.NC}`, ...args);
 };

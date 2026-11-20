@@ -1,3 +1,4 @@
+import {format} from "node:util";
 import {
   afterEach,
   beforeEach,
@@ -8,10 +9,14 @@ import {
   type MockInstance,
 } from "vitest";
 import {
+  errorLine,
+  infoLine,
   logError,
   logInfo,
   logSuccess,
   logWarning,
+  successLine,
+  warningLine,
 } from "../../../src/logging.js";
 
 describe("logging", () => {
@@ -76,5 +81,22 @@ describe("logging", () => {
         "failure",
       );
     });
+  });
+
+  describe("log lines", () => {
+    it.each([
+      [infoLine, logInfo, "log"],
+      [successLine, logSuccess, "log"],
+      [warningLine, logWarning, "log"],
+      [errorLine, logError, "error"],
+    ] as const)(
+      "matches the text its log helper prints",
+      (line, log, stream) => {
+        log("100% done");
+        const spy = stream === "log" ? consoleLogSpy : consoleErrorSpy;
+
+        expect(line("100% done")).toBe(format(...(spy.mock.calls[0] ?? [])));
+      },
+    );
   });
 });
