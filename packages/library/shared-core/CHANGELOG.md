@@ -1,5 +1,12 @@
 # @xonovex/core
 
+## 0.3.0
+
+### Minor Changes
+
+- [`9404fb4`](https://github.com/xonovex/platform/commit/9404fb4078adcd42a4008630fa82c778b90ba4b4) [@Deorder](https://github.com/Deorder)! - write log lines through an injected sink
+- [`891a19f`](https://github.com/xonovex/platform/commit/891a19f05bbcc348716d573a86fe7d3b07f554c7) [@Deorder](https://github.com/Deorder)! - organize packages and group agent plugins
+
 ## 0.2.0
 
 ### Minor Changes
