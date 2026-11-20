@@ -13,7 +13,6 @@ Import the package that owns the required agent concern.
 | `pkg/config` | Configuration loading and validation |
 | `pkg/nix` | Nix package sets, defaults, pins, and expansion |
 | `pkg/providers` | Model provider files, catalog with `extends` and model slot overrides, and environment building; ships no provider and no model id |
-| `pkg/approval` | Approval check and ledger of digests the user approved |
 | `pkg/types` | Shared type definitions |
 | `pkg/validation` | Repository URL, branch, and commit validation |
 | `pkg/worktree` | Worktree naming and VCS type constants (git, jj) |

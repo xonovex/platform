@@ -23,7 +23,6 @@ tasks:
       # pkg/types declare shared types and hold no statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./pkg/agentcmd=100 \
-        ./pkg/approval=100 \
         ./pkg/agents=100 \
         ./pkg/egress=100 \
         ./pkg/artifact=100 \

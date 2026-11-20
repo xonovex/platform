@@ -98,7 +98,7 @@ func installHello(t *testing.T, b Builder) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.Commit(fetched, fetched.Digest, nil); err != nil {
+	if _, err := service.Commit(fetched, nil); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -214,7 +214,7 @@ func TestThePluginStoreFollowsTheRequestAndTheEnvironment(t *testing.T) {
 	dir, _ := plugin.NewStore(fake, "/data/agent-cli/plugins")
 	service := plugin.Service{Store: dir, Files: fake, Origins: b.Origins}
 	fetched, _ := service.Fetch("/src/hello")
-	if _, err := service.Commit(fetched, fetched.Digest, nil); err != nil {
+	if _, err := service.Commit(fetched, nil); err != nil {
 		t.Fatal(err)
 	}
 	req := request(t, types.AgentClaude)

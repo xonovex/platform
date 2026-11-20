@@ -5,7 +5,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/approval"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
 	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
@@ -143,14 +142,11 @@ func describe(tree artifact.Tree, checkout origin.Checkout, marketplace string) 
 	}, nil
 }
 
-// Commit installs a fetched plugin. It fails closed unless the user approved the
-// exact digest (checked first, so a preview names the digest at once), granted every capability the plugin carries, and installed every
-// dependency before. A plugin of the same name is replaced, and the files of the
+// Commit installs a fetched plugin whose digest the user approved through the
+// trust gate. It fails closed unless the user granted every capability the
+// plugin carries and installed every dependency before. A plugin of the same name is replaced, and the files of the
 // old version are removed when no other plugin uses them.
-func (s Service) Commit(fetched Fetched, approved string, allow []plugin.Capability) (plugin.Locked, error) {
-	if err := approval.Check(fetched.Digest, approved, "--approve-digest"); err != nil {
-		return plugin.Locked{}, err
-	}
+func (s Service) Commit(fetched Fetched, allow []plugin.Capability) (plugin.Locked, error) {
 	if err := plugin.Authorize(fetched.Capabilities, allow); err != nil {
 		return plugin.Locked{}, err
 	}

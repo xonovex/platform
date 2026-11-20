@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
 const (
@@ -33,7 +33,7 @@ func (r *testRoot) digest(t *testing.T, source string) string {
 	if err == nil {
 		t.Fatal("an install without an approval passed")
 	}
-	_, after, found := strings.Cut(err.Error(), "--approve-digest ")
+	_, after, found := strings.Cut(err.Error(), "--approve-config-digest ")
 	if !found {
 		t.Fatalf("the error names no digest: %v", err)
 	}
@@ -43,7 +43,7 @@ func (r *testRoot) digest(t *testing.T, source string) string {
 func TestPluginInstallPreviewsThenInstallsTheApprovedDigest(t *testing.T) {
 	r := pluginRoot()
 	digest := r.digest(t, "/src/hello")
-	if !strings.Contains(r.out.String(), "Plugin: hello 1.0.0") || !strings.Contains(r.out.String(), "Digest: "+digest) || !strings.Contains(r.out.String(), "Files: 2") {
+	if !strings.Contains(r.out.String(), "Plugin: hello 1.0.0") || !strings.Contains(r.out.String(), "Files: 2") || !strings.HasPrefix(digest, "sha256:") {
 		t.Errorf("preview = %q", r.out.String())
 	}
 	if r.host.Exists(defaultStore + "/lock.json") {
@@ -51,7 +51,7 @@ func TestPluginInstallPreviewsThenInstallsTheApprovedDigest(t *testing.T) {
 	}
 
 	r.out.Reset()
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest); err != nil {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(r.out.String(), "Installed hello 1.0.0 ("+digest+")") {
@@ -80,8 +80,8 @@ func TestPluginInstallFailsClosed(t *testing.T) {
 		t.Errorf("preview = %q", r.out.String())
 	}
 	cases := map[string][]string{
-		"no grant":      {"plugin", "install", "/src/hooked", "--approve-digest", digest},
-		"wrong digest":  {"plugin", "install", "/src/hello", "--approve-digest", digest},
+		"no grant":      {"plugin", "install", "/src/hooked", "--approve-config-digest", digest},
+		"wrong digest":  {"plugin", "install", "/src/hello", "--approve-config-digest", digest},
 		"bad grant":     {"plugin", "install", "/src/hooked", "--allow", "root"},
 		"no source":     {"plugin", "install", "/nowhere"},
 		"no argument":   {"plugin", "install"},
@@ -92,7 +92,7 @@ func TestPluginInstallFailsClosed(t *testing.T) {
 			t.Errorf("%s: error = nil", name)
 		}
 	}
-	if err := r.execute("plugin", "install", "/src/hooked", "--approve-digest", digest, "--allow", "hooks"); err != nil {
+	if err := r.execute("plugin", "install", "/src/hooked", "--approve-config-digest", digest, "--allow", "hooks"); err != nil {
 		t.Errorf("a granted install failed: %v", err)
 	}
 }
@@ -131,7 +131,7 @@ func TestMarketplaceCommands(t *testing.T) {
 	}
 
 	digest := r.digest(t, "hello@main")
-	if err := r.execute("plugin", "install", "hello@main", "--approve-digest", digest); err != nil {
+	if err := r.execute("plugin", "install", "hello@main", "--approve-config-digest", digest); err != nil {
 		t.Fatal(err)
 	}
 	r.out.Reset()
@@ -156,14 +156,14 @@ func TestMarketplaceCommands(t *testing.T) {
 func TestTheStoreFlagAndTheEnvironmentChooseTheStore(t *testing.T) {
 	r := pluginRoot()
 	digest := r.digest(t, "/src/hello")
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest, "--store", "relative/store"); err != nil {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest, "--store", "relative/store"); err != nil {
 		t.Fatal(err)
 	}
 	if !r.host.Exists("/work/relative/store/lock.json") {
 		t.Error("a relative store is not resolved against the working directory")
 	}
 	r.host.Env["XDG_DATA_HOME"] = "/data"
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest); err != nil || !r.host.Exists("/data/agent-cli/plugins/lock.json") {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil || !r.host.Exists("/data/agent-cli/plugins/lock.json") {
 		t.Errorf("the environment store: %v", err)
 	}
 	if err := r.execute("plugin", "list", "--store", "/abs/../x"); err != nil {
@@ -231,13 +231,13 @@ func (failingWriter) Write([]byte) (int, error) { return 0, errors.New("closed")
 func TestAFailedWriteToTheOutputIsAnError(t *testing.T) {
 	r := pluginRoot()
 	digest := r.digest(t, "/src/hello")
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest); err != nil {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil {
 		t.Fatal(err)
 	}
 	r.ports.Out = failingWriter{}
 	_ = r.execute("marketplace", "add", "/market") // registered while the output works
 	for _, args := range [][]string{
-		{"plugin", "install", "/src/hello", "--approve-digest", digest},
+		{"plugin", "install", "/src/hello", "--approve-config-digest", digest},
 		{"plugin", "list"}, {"plugin", "remove", "hello"},
 		{"marketplace", "add", "/market"}, {"marketplace", "list"}, {"marketplace", "list", "main"}, {"marketplace", "remove", "main"},
 	} {
@@ -283,7 +283,7 @@ func TestPluginInstallAsksOnATerminalAndInstallsOnYes(t *testing.T) {
 			t.Fatalf("answer %q: %v", answer, err)
 		}
 		out := r.out.String()
-		if !strings.Contains(out, "Digest: sha256:") || !strings.Contains(out, "Approve this digest? [y/N] ") || !strings.Contains(out, "Installed hello 1.0.0") {
+		if !strings.Contains(out, "The plugin hello from /src/hello is installed only after you approve its digest.\n\nDigest: sha256:") || !strings.Contains(out, "Approve this digest? [y/N] ") || !strings.Contains(out, "Installed hello 1.0.0") {
 			t.Errorf("answer %q: output = %q", answer, out)
 		}
 		if !r.host.Exists(defaultStore + "/lock.json") {
@@ -295,12 +295,32 @@ func TestPluginInstallAsksOnATerminalAndInstallsOnYes(t *testing.T) {
 	}
 }
 
+func TestPluginInstallKeepsTheApprovalInTheLedger(t *testing.T) {
+	r := terminalRoot("y")
+	if err := r.execute("plugin", "install", "/src/hello"); err != nil {
+		t.Fatal(err)
+	}
+	r.out.Reset()
+	if err := r.execute("plugin", "install", "/src/hello"); err != nil || strings.Contains(r.out.String(), "Approve this digest?") {
+		t.Errorf("a second install = %v, output %q, want no question", err, r.out.String())
+	}
+	if !r.host.Exists(ledgerFile) {
+		t.Error("the approval is not in the ledger")
+	}
+
+	r = pluginRoot()
+	r.host.AddFile(ledgerFile, "{", 0o600)
+	if err := r.execute("plugin", "install", "/src/hello"); err == nil || r.host.Exists(defaultStore+"/lock.json") {
+		t.Errorf("an install with a corrupt ledger = %v", err)
+	}
+}
+
 func TestPluginInstallDeclinesOtherAnswers(t *testing.T) {
 	for _, answer := range []string{"", "n", "no", "yess", "ok", "y es"} {
 		r := terminalRoot(answer)
 		err := r.execute("plugin", "install", "/src/hello")
-		if !errors.Is(err, trust.ErrDeclined) {
-			t.Errorf("answer %q: error = %v, want trust.ErrDeclined", answer, err)
+		if !errors.Is(err, trust.ErrNotApproved) {
+			t.Errorf("answer %q: error = %v, want trust.ErrNotApproved", answer, err)
 		}
 		if r.host.Exists(defaultStore + "/lock.json") {
 			t.Errorf("answer %q: a declined install changed the store", answer)
@@ -310,8 +330,8 @@ func TestPluginInstallDeclinesOtherAnswers(t *testing.T) {
 
 func TestPluginInstallDeclinesAtTheEndOfTheInput(t *testing.T) {
 	r := terminalRoot()
-	if err := r.execute("plugin", "install", "/src/hello"); !errors.Is(err, trust.ErrDeclined) {
-		t.Errorf("error = %v, want trust.ErrDeclined", err)
+	if err := r.execute("plugin", "install", "/src/hello"); !errors.Is(err, trust.ErrNotApproved) {
+		t.Errorf("error = %v, want trust.ErrNotApproved", err)
 	}
 	if r.host.Exists(defaultStore + "/lock.json") {
 		t.Error("an unanswered install changed the store")
@@ -325,7 +345,7 @@ func TestPluginInstallStopsWhenTheAnswerCannotBeRead(t *testing.T) {
 	r := terminalRoot()
 	r.host.InputErr = errors.New("interrupted")
 	err := r.execute("plugin", "install", "/src/hello")
-	if err == nil || errors.Is(err, trust.ErrDeclined) || !strings.Contains(err.Error(), "interrupted") {
+	if err == nil || errors.Is(err, trust.ErrNotApproved) || !strings.Contains(err.Error(), "interrupted") {
 		t.Errorf("error = %v, want the read failure", err)
 	}
 	if r.host.Exists(defaultStore + "/lock.json") {
@@ -337,8 +357,8 @@ func TestPluginInstallWithoutATerminalOnlyPreviews(t *testing.T) {
 	r := pluginRoot()
 	r.host.Input = []string{"yes"}
 	err := r.execute("plugin", "install", "/src/hello")
-	if err == nil || !strings.Contains(err.Error(), "--approve-digest ") {
-		t.Fatalf("error = %v, want instructions naming --approve-digest", err)
+	if err == nil || !strings.Contains(err.Error(), "--approve-config-digest ") {
+		t.Fatalf("error = %v, want instructions naming --approve-config-digest", err)
 	}
 	if strings.Contains(r.out.String(), "Approve this digest?") {
 		t.Errorf("output = %q, a question was asked without a terminal", r.out.String())
@@ -357,7 +377,7 @@ func TestPluginInstallWithADigestNeverAsks(t *testing.T) {
 		probe := pluginRoot()
 		return probe.digest(t, "/src/hello")
 	}()
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-digest", digest); err != nil {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil {
 		t.Fatal(err)
 	}
 	if strings.Contains(r.out.String(), "Approve this digest?") || len(r.host.Input) != 1 {
@@ -365,7 +385,7 @@ func TestPluginInstallWithADigestNeverAsks(t *testing.T) {
 	}
 
 	mismatch := terminalRoot("yes")
-	if err := mismatch.execute("plugin", "install", "/src/hello", "--approve-digest", "sha256:"+strings.Repeat("0", 64)); err == nil {
+	if err := mismatch.execute("plugin", "install", "/src/hello", "--approve-config-digest", "sha256:"+strings.Repeat("0", 64)); err == nil {
 		t.Error("a mismatching digest installed")
 	}
 	if strings.Contains(mismatch.out.String(), "Approve this digest?") || len(mismatch.host.Input) != 1 || mismatch.host.Exists(defaultStore+"/lock.json") {

@@ -87,7 +87,6 @@ tasks:
         ./internal/overlay=100 \
         ./internal/plugin=100 \
         ./internal/runconfig=100 \
-        ./internal/trust=100 \
         ./internal/sandbox/plugins=100 \
         ./internal/schematest=92 \
         ./internal/terminal/herdr=100 \

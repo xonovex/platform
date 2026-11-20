@@ -233,6 +233,19 @@ func TestDecideShowsTheReviewOfAnySubject(t *testing.T) {
 	}
 }
 
+func TestDecideLeavesOutAnEmptyReview(t *testing.T) {
+	digest := "sha256:" + strings.Repeat("d", 64)
+	subject := trust.Subject{Digest: digest, Path: "plugin hello", Notice: "plugin hello is installed only after you approve its digest"}
+	l, _ := ledger(nil)
+	var out strings.Builder
+	if err := trust.Decide(subject, "", l, &configtest.Prompter{Terminal: true, Answers: []string{"y"}}, &out); err != nil {
+		t.Fatal(err)
+	}
+	if want := "plugin hello is installed only after you approve its digest.\n\nDigest: " + digest + "\nApprove this digest? [y/N] "; out.String() != want {
+		t.Fatalf("shown = %q", out.String())
+	}
+}
+
 func TestRevokeRemovesOnlyTheDigest(t *testing.T) {
 	a, b := "sha256:"+strings.Repeat("a", 64), "sha256:"+strings.Repeat("b", 64)
 	l, _ := ledger(nil)

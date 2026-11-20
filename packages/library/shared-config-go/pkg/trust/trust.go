@@ -54,7 +54,8 @@ type Subject struct {
 	// Notice says what the content does and that it waits for the approval, as
 	// one sentence without its full stop.
 	Notice string
-	// Review is the text a person reads before answering.
+	// Review is the text a person reads before answering. It is empty when
+	// the caller shows the content itself before the gate.
 	Review string
 }
 
@@ -74,7 +75,7 @@ func Decide(subject Subject, flag string, approvals Approvals, prompter Prompter
 		}
 		return approvals.Approve(approval)
 	case prompter.IsTerminal():
-		if _, err := fmt.Fprintf(out, "%s.\n\n%s\n\nDigest: %s\n", subject.Notice, strings.TrimRight(subject.Review, "\n"), subject.Digest); err != nil {
+		if _, err := fmt.Fprint(out, prompt(subject)); err != nil {
 			return err
 		}
 		yes, err := ask(prompter, out)
@@ -90,6 +91,16 @@ func Decide(subject Subject, flag string, approvals Approvals, prompter Prompter
 	default:
 		return fmt.Errorf("%w: %s: review it, then run again with --%s %s", ErrNotApproved, subject.Notice, ApproveFlag, subject.Digest)
 	}
+}
+
+// prompt is what a person reads before the question: the notice, the review
+// when the subject has one, and the digest.
+func prompt(subject Subject) string {
+	text := subject.Notice + ".\n\n"
+	if review := strings.TrimRight(subject.Review, "\n"); review != "" {
+		text += review + "\n\n"
+	}
+	return text + "Digest: " + subject.Digest + "\n"
 }
 
 // Request is one gate check of a project file.

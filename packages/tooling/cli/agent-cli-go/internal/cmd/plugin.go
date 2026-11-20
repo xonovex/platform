@@ -9,22 +9,17 @@ import (
 	"github.com/spf13/cobra"
 
 	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
+	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/trust"
 	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
 // PluginHost is the machine the plugin and marketplace commands consult.
 type PluginHost interface {
 	plugin.Files
-	Getenv(key string) string
-	Getwd() (string, error)
-	UserHomeDir() (string, error)
-	// IsTerminal reports whether a person can answer a question on the input
-	// and the output.
-	IsTerminal() bool
-	// ReadLine reads one line of the input without its line ending.
-	ReadLine() (string, error)
+	// Host reaches the approval ledger and the terminal of the trust gate.
+	runconfig.Host
 }
 
 // PluginPorts are the ports of the plugin and marketplace commands.
@@ -82,7 +77,7 @@ server or settings file the plugin carries.`,
 }
 
 func newPluginInstallCommand(ports PluginPorts, store *string) *cobra.Command {
-	var approved string
+	var approveDigest string
 	var allow []string
 	command := &cobra.Command{
 		Use:   "install <source>",
@@ -91,8 +86,9 @@ func newPluginInstallCommand(ports PluginPorts, store *string) *cobra.Command {
 #branch-or-tag, or name@marketplace for a plugin of a registered marketplace.
 The command prints the plugin and its digest. On a terminal it then asks you to
 approve that digest and installs only on y or yes. Without a terminal it stops;
-review the files, then repeat the command with --approve-digest <digest>. A
-grant for a hook, MCP server, language server or settings file is never given by
+review the files, then repeat the command with --approve-config-digest <digest>.
+The approval ledger keeps an approved digest, so the same content installs again
+without a question. A grant for a hook, MCP server, language server or settings file is never given by
 the answer: pass --allow for each.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
@@ -113,11 +109,15 @@ the answer: pass --allow for each.`,
 				return err
 			}
 			printPreview(ports.Out, fetched)
-			approved, err = trust.Decide(ports.Host, ports.Out, fetched.Digest, approved)
-			if err != nil {
+			subject := trust.Subject{
+				Digest: fetched.Digest,
+				Path:   fetched.Source,
+				Notice: fmt.Sprintf("The plugin %s from %s is installed only after you approve its digest", fetched.Manifest.Name, fetched.Source),
+			}
+			if err := trust.Decide(subject, approveDigest, runconfig.Ledger(ports.Host), ports.Host, ports.Out); err != nil {
 				return err
 			}
-			record, err := service.Commit(fetched, approved, capabilities)
+			record, err := service.Commit(fetched, capabilities)
 			if err != nil {
 				return err
 			}
@@ -125,7 +125,7 @@ the answer: pass --allow for each.`,
 			return err
 		},
 	}
-	command.Flags().StringVar(&approved, "approve-digest", "", "Digest of the reviewed plugin files (sha256:...); approves without a question")
+	command.Flags().StringVar(&approveDigest, trust.ApproveFlag, "", "Digest of the reviewed plugin files (sha256:...); approves without a question")
 	command.Flags().StringSliceVar(&allow, "allow", nil, "Grant a capability the plugin carries: "+strings.Join(capabilityNames(), ", ")+" (repeatable)")
 	_ = command.RegisterFlagCompletionFunc("allow", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 		return capabilityNames(), cobra.ShellCompDirectiveNoFileComp
@@ -278,7 +278,8 @@ func printListing(out io.Writer, service plugin.Service, name string) error {
 	return nil
 }
 
-// printPreview shows what the user is asked to approve.
+// printPreview shows what the user is asked to approve. The trust gate shows
+// the digest after it.
 func printPreview(out io.Writer, fetched plugin.Fetched) {
 	lines := []string{
 		fmt.Sprintf("Plugin: %s %s", fetched.Manifest.Name, fetched.Manifest.Version),
@@ -290,7 +291,7 @@ func printPreview(out io.Writer, fetched plugin.Fetched) {
 	if fetched.Marketplace != "" {
 		lines = append(lines, "Marketplace: "+fetched.Marketplace)
 	}
-	lines = append(lines, fmt.Sprintf("Files: %d", fetched.FileCount), "Digest: "+fetched.Digest)
+	lines = append(lines, fmt.Sprintf("Files: %d", fetched.FileCount))
 	if len(fetched.Manifest.Dependencies) > 0 {
 		lines = append(lines, "Depends on: "+strings.Join(fetched.Manifest.Dependencies, ", "))
 	}

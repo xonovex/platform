@@ -16,14 +16,14 @@ func install(t *testing.T, f fixture, spec string, allow ...libplugin.Capability
 	if err != nil {
 		t.Fatalf("Fetch(%s): %v", spec, err)
 	}
-	record, err := f.service.Commit(fetched, fetched.Digest, allow)
+	record, err := f.service.Commit(fetched, allow)
 	if err != nil {
 		t.Fatalf("Commit(%s): %v", spec, err)
 	}
 	return record
 }
 
-func TestInstallNeedsTheApprovalOfTheExactDigest(t *testing.T) {
+func TestFetchDescribesThePluginAndCommitInstallsIt(t *testing.T) {
 	f := newFixture(t, nil)
 	fetched, err := f.service.Fetch("/src/hello")
 	if err != nil {
@@ -33,17 +33,11 @@ func TestInstallNeedsTheApprovalOfTheExactDigest(t *testing.T) {
 		t.Errorf("fetched = %+v", fetched)
 	}
 
-	if _, err := f.service.Commit(fetched, "", nil); err == nil || !strings.Contains(err.Error(), "--approve-digest "+fetched.Digest) {
-		t.Errorf("preview: %v", err)
-	}
-	if _, err := f.service.Commit(fetched, "sha256:"+strings.Repeat("0", 64), nil); err == nil || !strings.Contains(err.Error(), "differs") {
-		t.Errorf("wrong digest: %v", err)
-	}
 	if f.host.Exists(storeDir) {
-		t.Error("a refused install wrote into the store")
+		t.Error("a fetch wrote into the store")
 	}
 
-	record, err := f.service.Commit(fetched, fetched.Digest, nil)
+	record, err := f.service.Commit(fetched, nil)
 	if err != nil || record.Name != "hello" || record.Digest != fetched.Digest || record.Source != "/src/hello" {
 		t.Fatalf("Commit = %+v, %v", record, err)
 	}
@@ -88,10 +82,10 @@ func TestACapabilityNeedsAGrantAtInstallAndAtLoad(t *testing.T) {
 	if err != nil || len(fetched.Capabilities) != 1 || fetched.Capabilities[0] != libplugin.CapabilityHooks {
 		t.Fatalf("Fetch = %+v, %v", fetched, err)
 	}
-	if _, err := f.service.Commit(fetched, fetched.Digest, nil); err == nil || !strings.Contains(err.Error(), "hooks") {
+	if _, err := f.service.Commit(fetched, nil); err == nil || !strings.Contains(err.Error(), "hooks") {
 		t.Errorf("an ungranted capability passed: %v", err)
 	}
-	record, err := f.service.Commit(fetched, fetched.Digest, hooks())
+	record, err := f.service.Commit(fetched, hooks())
 	if err != nil || len(record.Grants) != 1 {
 		t.Fatalf("Commit = %+v, %v", record, err)
 	}
@@ -160,11 +154,11 @@ func TestADependencyMustBeInstalledFirstAndCannotBeRemovedWhileUsed(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := f.service.Commit(app, app.Digest, nil); err == nil || !strings.Contains(err.Error(), "install it first") {
+	if _, err := f.service.Commit(app, nil); err == nil || !strings.Contains(err.Error(), "install it first") {
 		t.Errorf("missing dependency: %v", err)
 	}
 	install(t, f, "/src/hello")
-	if _, err := f.service.Commit(app, app.Digest, nil); err != nil {
+	if _, err := f.service.Commit(app, nil); err != nil {
 		t.Fatal(err)
 	}
 	set, err := f.service.Load([]string{"app"})
@@ -253,7 +247,7 @@ func TestMarketplaceLifecycle(t *testing.T) {
 	if err != nil || fetched.Marketplace != "main" || fetched.Source != "/market" || fetched.FileCount != 2 {
 		t.Fatalf("Fetch = %+v, %v", fetched, err)
 	}
-	record, err := f.service.Commit(fetched, fetched.Digest, nil)
+	record, err := f.service.Commit(fetched, nil)
 	if err != nil || record.Marketplace != "main" {
 		t.Fatalf("Commit = %+v, %v", record, err)
 	}
@@ -340,7 +334,7 @@ func TestAPluginFromAnotherOriginRecordsTheResolvedRevision(t *testing.T) {
 	if err != nil || fetched.Resolved != "abc123" || fetched.Source != "stub:x#main" {
 		t.Fatalf("Fetch = %+v, %v", fetched, err)
 	}
-	record, err := f.service.Commit(fetched, fetched.Digest, nil)
+	record, err := f.service.Commit(fetched, nil)
 	if err != nil || record.Resolved != "abc123" {
 		t.Errorf("Commit = %+v, %v", record, err)
 	}
@@ -360,7 +354,7 @@ func TestEveryFailureOfTheMachineStopsTheCommand(t *testing.T) {
 			if err != nil {
 				return err
 			}
-			_, err = f.service.Commit(fetched, fetched.Digest, nil)
+			_, err = f.service.Commit(fetched, nil)
 			return err
 		},
 		"add marketplace": func(f fixture) error { _, _, err := f.service.AddMarketplace("/market"); return err },
@@ -384,7 +378,7 @@ func TestCorruptStoreFilesStopEveryCommand(t *testing.T) {
 	f.host.AddFile(storeDir+"/lock.json", "{", 0o600).AddFile(storeDir+"/marketplaces.json", "{", 0o600)
 	fetched, _ := f.service.Fetch("/src/hello")
 	checks := map[string]error{
-		"Commit":            func() error { _, err := f.service.Commit(fetched, fetched.Digest, nil); return err }(),
+		"Commit":            func() error { _, err := f.service.Commit(fetched, nil); return err }(),
 		"List":              func() error { _, err := f.service.List(); return err }(),
 		"Remove":            f.service.Remove("hello"),
 		"Load":              func() error { _, err := f.service.Load([]string{"hello"}); return err }(),
@@ -449,7 +443,7 @@ func TestFailuresOfASingleStepStopTheCommand(t *testing.T) {
 		}}
 	})
 	fetched, _ := h.service.Fetch("/src/hello")
-	if _, err := h.service.Commit(fetched, fetched.Digest, nil); !errors.Is(err, errInjected) {
+	if _, err := h.service.Commit(fetched, nil); !errors.Is(err, errInjected) {
 		t.Errorf("Commit: %v", err)
 	}
 	// A stored plugin whose lock record outlives the files of its manifest.

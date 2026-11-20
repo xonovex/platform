@@ -53,7 +53,7 @@ func makePlugin(t *testing.T) string {
 
 func digestOf(t *testing.T, output string) string {
 	t.Helper()
-	_, after, found := strings.Cut(output, "--approve-digest ")
+	_, after, found := strings.Cut(output, "--approve-config-digest ")
 	if !found {
 		t.Fatalf("no digest in %q", output)
 	}
@@ -73,7 +73,7 @@ func TestPluginLifecycleOnADisk(t *testing.T) {
 		t.Error("the preview installed the plugin")
 	}
 
-	if output, err := env.run("plugin", "install", plugin, "--store", env.store, "--approve-digest", digest); err != nil {
+	if output, err := env.run("plugin", "install", plugin, "--store", env.store, "--approve-config-digest", digest); err != nil {
 		t.Fatalf("install: %v\n%s", err, output)
 	}
 	if output, err := env.run("plugin", "list", "--store", env.store); err != nil || !strings.Contains(output, "hello 1.0.0 "+digest) {
@@ -135,7 +135,7 @@ func TestPluginFromAGitRepositoryAndAMarketplace(t *testing.T) {
 		t.Fatalf("preview: %v\n%s", err, output)
 	}
 	digest := digestOf(t, output)
-	if output, err := env.run("plugin", "install", "hello@main", "--store", env.store, "--approve-digest", digest); err != nil {
+	if output, err := env.run("plugin", "install", "hello@main", "--store", env.store, "--approve-config-digest", digest); err != nil {
 		t.Fatalf("install: %v\n%s", err, output)
 	}
 	if output, err := env.run("marketplace", "remove", "main", "--store", env.store); err == nil {
@@ -154,8 +154,8 @@ func TestPluginInstallDoesNotTreatPipedInputAsApproval(t *testing.T) {
 	if err == nil {
 		t.Fatalf("a piped yes installed a plugin: %s", output)
 	}
-	if strings.Contains(string(output), "Approve this digest?") || !strings.Contains(string(output), "--approve-digest ") {
-		t.Errorf("output = %q, want the preview and the --approve-digest instructions only", output)
+	if strings.Contains(string(output), "Approve this digest?") || !strings.Contains(string(output), "--approve-config-digest ") {
+		t.Errorf("output = %q, want the preview and the --approve-config-digest instructions only", output)
 	}
 	if _, err := os.Stat(filepath.Join(env.store, "lock.json")); err == nil {
 		t.Error("a piped yes changed the store")
