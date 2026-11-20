@@ -4,21 +4,35 @@ package arch
 
 import (
 	"os"
+	"path"
 	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 )
 
-// sharedAxes are the orthogonal axes that the operator and the CLI both
-// realize, each as a top-level internal directory.
-var sharedAxes = []string{"isolation", "network", "provision", "workspace"}
+// sharedAxes are the orthogonal axes that the operator realizes, each as a
+// top-level internal directory, and the shared port or type that declares the
+// axis for every consumer.
+var sharedAxes = map[string]reflect.Type{
+	"isolation": reflect.TypeFor[isolation.Confinement](),
+	"provision": reflect.TypeFor[provision.Provisioner](),
+	"network":   reflect.TypeFor[network.NetworkMethod](),
+	"workspace": reflect.TypeFor[workspace.VCSType](),
+}
 
-// consumerOnlyAxes are the deliberate asymmetries and the consumer that owns
-// each. The CLI takes harness commands and provider environments from the
-// shared agent library, and the operator runs pods, not terminals.
-var consumerOnlyAxes = map[string]string{
-	"harness":  "operator",
-	"provider": "operator",
-	"terminal": "cli",
+// operatorOnlyAxes are the deliberate asymmetries: true for an axis only the
+// operator realizes, false for one it must not have. The operator renders the
+// harness command and the provider environment into a Job itself, and it runs
+// pods, not terminals.
+var operatorOnlyAxes = map[string]bool{
+	"harness":  true,
+	"provider": true,
+	"terminal": false,
 }
 
 func hasDir(base, name string) bool {
@@ -27,28 +41,18 @@ func hasDir(base, name string) bool {
 }
 
 func TestAxisSymmetry(t *testing.T) {
-	operatorRoot := moduleRoot(t)
-	packagesRoot := filepath.Dir(filepath.Dir(filepath.Dir(operatorRoot)))
-	internal := map[string]string{
-		"operator": filepath.Join(operatorRoot, "internal"),
-		"cli":      filepath.Join(packagesRoot, "tooling", "cli", "agent-cli-go", "internal"),
-	}
-	if !hasDir(internal["cli"], "") {
-		t.Fatalf("CLI module not found at %s", internal["cli"])
-	}
-
-	for _, axis := range sharedAxes {
-		for consumer, dir := range internal {
-			if !hasDir(dir, axis) {
-				t.Errorf("axis %q is missing from the %s", axis, consumer)
-			}
+	internal := filepath.Join(moduleRoot(t), "internal")
+	for axis, declaration := range sharedAxes {
+		if declared := path.Base(declaration.PkgPath()); declared != axis {
+			t.Errorf("axis %q is declared by the shared package %q; the operator directory and the shared package share one name", axis, declared)
+		}
+		if !hasDir(internal, axis) {
+			t.Errorf("axis %q is missing from the operator", axis)
 		}
 	}
-	for axis, owner := range consumerOnlyAxes {
-		for consumer, dir := range internal {
-			if present := hasDir(dir, axis); present != (consumer == owner) {
-				t.Errorf("axis %q in the %s: present %v, want it only in the %s", axis, consumer, present, owner)
-			}
+	for axis, want := range operatorOnlyAxes {
+		if present := hasDir(internal, axis); present != want {
+			t.Errorf("axis %q in the operator: present %v, want %v", axis, present, want)
 		}
 	}
 }

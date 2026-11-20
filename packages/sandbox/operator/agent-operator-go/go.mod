@@ -5,6 +5,7 @@ go 1.27.0
 require (
 	github.com/xonovex/platform/packages/library/shared-agent-go v0.0.0-20260613164631-f8286f3d1667
 	github.com/xonovex/platform/packages/library/shared-core-go v0.0.0-20260613164631-f8286f3d1667
+	github.com/xonovex/platform/packages/library/shared-launch-go v0.0.0-00010101000000-000000000000
 	k8s.io/api v0.37.2
 	k8s.io/apimachinery v0.37.2
 	k8s.io/client-go v0.37.2
@@ -80,3 +81,5 @@ replace (
 )
 
 replace github.com/xonovex/platform/packages/library/shared-contract-go => ../../../library/shared-contract-go
+
+replace github.com/xonovex/platform/packages/library/shared-launch-go => ../../../library/shared-launch-go

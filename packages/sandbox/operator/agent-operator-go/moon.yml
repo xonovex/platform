@@ -8,6 +8,7 @@ dependsOn:
   - shared-core-go
   - shared-agent-go
   - shared-contract-go
+  - shared-launch-go
 tasks:
   go-test-coverage:
     env:
@@ -58,8 +59,9 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
-  # The architecture tests read the source trees of the operator and the CLI,
-  # so they carry the arch build tag and run here instead of in go-test.
+  # The architecture tests read the source tree of the operator and compile
+  # against the shared libraries, so they carry the arch build tag and run here
+  # instead of in go-test.
   go-test-arch:
     command:
       - go
@@ -68,7 +70,7 @@ tasks:
       - ./internal/arch/
     inputs:
       - "@globs(sources)"
-      - /packages/tooling/cli/agent-cli-go/internal/**/*
+      - /packages/library/*-go/**/*.go
     outputs: []
     options:
       cache: true

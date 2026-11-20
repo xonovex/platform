@@ -156,3 +156,28 @@ func TestOnlyTheAdaptersImportControllerRuntime(t *testing.T) {
 		}
 	}
 }
+
+// launchLibrary is the module path of the shared run kernel.
+const launchLibrary = "github.com/xonovex/platform/packages/library/shared-launch-go"
+
+// launchCore are the packages of the shared run kernel that start nothing on a
+// machine. The operator runs an agent as a Job, so it never reaches a launcher
+// leaf or the operating-system adapter of the library.
+var launchCore = map[string]bool{
+	"pkg/credential": true,
+	"pkg/isolation":  true,
+	"pkg/launch":     true,
+	"pkg/provision":  true,
+	"pkg/record":     true,
+	"pkg/sandbox":    true,
+}
+
+func TestOnlyTheLaunchCoreIsImported(t *testing.T) {
+	for _, file := range moduleFiles(t) {
+		for _, imported := range file.imports {
+			if pkg, inside := strings.CutPrefix(imported, launchLibrary+"/"); inside && !launchCore[pkg] {
+				t.Errorf("%s imports %s; the operator imports only the launch core", file.path, imported)
+			}
+		}
+	}
+}
