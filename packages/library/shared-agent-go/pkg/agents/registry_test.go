@@ -125,16 +125,19 @@ func TestBuildArgsOrdersLaunchSandboxProviderThenCaller(t *testing.T) {
 	agent := &types.AgentConfig{
 		LaunchArgs: []string{"chat"}, SandboxArgs: []string{"--open"}, ProviderArgs: true,
 	}
-	got := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{Sandbox: true, ProviderCliArgs: []string{"--model", "m"}})
+	got := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{SandboxArgs: agent.SandboxArgs, ProviderCliArgs: []string{"--model", "m"}})
 	want := []string{"chat", "--open", "--model", "m", "go"}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("BuildArgs() = %v, want %v", got, want)
 	}
 }
 
+// TestBuildArgsSkipsWhatTheLaunchDoesNotUse also proves that BuildArgs never
+// adds the declared sandbox arguments on its own: whether they apply is the
+// decision of the launch.
 func TestBuildArgsSkipsWhatTheLaunchDoesNotUse(t *testing.T) {
 	agent := &types.AgentConfig{SandboxArgs: []string{"--open"}, ProviderArgs: false}
-	got := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{Sandbox: false, ProviderCliArgs: []string{"--model", "m"}})
+	got := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{ProviderCliArgs: []string{"--model", "m"}})
 	if want := []string{"go"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("BuildArgs() = %v, want %v", got, want)
 	}
@@ -149,7 +152,8 @@ func TestBuildArgsDoesNotMutateLaunchArgs(t *testing.T) {
 }
 
 func TestBuildClaudeArgsTurnOffThePromptsInsideAnIsolation(t *testing.T) {
-	got := BuildArgs(agentOf(t, types.AgentClaude), []string{"review"}, types.AgentExecOptions{Sandbox: true, ProviderCliArgs: []string{"ignored"}})
+	agent := agentOf(t, types.AgentClaude)
+	got := BuildArgs(agent, []string{"review"}, types.AgentExecOptions{SandboxArgs: agent.SandboxArgs, ProviderCliArgs: []string{"ignored"}})
 	want := []string{"--permission-mode", "bypassPermissions", "review"}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("BuildArgs() = %v, want %v", got, want)
@@ -166,7 +170,7 @@ func TestBuildOpencodeArgsTakeTheProviderArguments(t *testing.T) {
 
 func TestBuildCodexArgsTurnOffTheCommandSandboxInsideAnIsolation(t *testing.T) {
 	agent := agentOf(t, types.AgentCodex)
-	inside := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{Sandbox: true})
+	inside := BuildArgs(agent, []string{"go"}, types.AgentExecOptions{SandboxArgs: agent.SandboxArgs})
 	if want := []string{"--sandbox", "danger-full-access", "go"}; !reflect.DeepEqual(inside, want) {
 		t.Fatalf("BuildArgs() inside = %v, want %v", inside, want)
 	}

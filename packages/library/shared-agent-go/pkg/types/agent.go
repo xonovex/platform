@@ -55,7 +55,7 @@ type AgentConfig struct {
 	ProviderArgs bool `json:"providerArgs,omitempty"`
 	// LaunchArgs are the arguments every launch passes first, such as a subcommand.
 	LaunchArgs []string `json:"launchArgs,omitempty"`
-	// SandboxArgs are the arguments a launch inside an isolation adds, such as
+	// SandboxArgs are the arguments a launch inside a boundary adds, such as
 	// the one that turns off the command sandbox or the permission prompts of the
 	// agent.
 	SandboxArgs []string `json:"sandboxArgs,omitempty"`
@@ -117,8 +117,11 @@ const (
 	PromptPlaceholder = "{prompt}"
 )
 
-// AgentExecOptions provides options for agent execution
+// AgentExecOptions are the arguments one launch adds to the declared facts of
+// the agent.
 type AgentExecOptions struct {
-	Sandbox         bool
+	// SandboxArgs are the sandbox arguments of the agent when the launch decided
+	// they apply, and none otherwise.
+	SandboxArgs     []string
 	ProviderCliArgs []string
 }

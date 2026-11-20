@@ -8,13 +8,11 @@ import (
 )
 
 // BuildArgs builds the arguments of an agent from its declared facts: the launch
-// arguments, the sandbox arguments when the launch runs inside an isolation, the
-// provider arguments when the agent takes them, then the caller's arguments.
+// arguments, the sandbox arguments the caller decided apply, the provider
+// arguments when the agent takes them, then the caller's arguments.
 func BuildArgs(agent *types.AgentConfig, baseArgs []string, options types.AgentExecOptions) []string {
 	args := slices.Clone(agent.LaunchArgs)
-	if options.Sandbox {
-		args = append(args, agent.SandboxArgs...)
-	}
+	args = append(args, options.SandboxArgs...)
 	if agent.ProviderArgs {
 		args = append(args, options.ProviderCliArgs...)
 	}

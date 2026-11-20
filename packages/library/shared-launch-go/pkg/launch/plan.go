@@ -165,7 +165,7 @@ func PlanSpec[I isoshared.Confinement](request Request, agent *types.AgentConfig
 			HomeDir: absolute(cwd, homeDir),
 			RepoDir: sourceDir,
 			Process: isoshared.Process{
-				Argv: agentArgv(agent, provider, confinement.Bounded(), request.AgentArgs),
+				Argv: agentArgv(agent, provider, sandboxArgs(agent, confinement), request.AgentArgs),
 				Env:  envutil.EnvMapToSlice(customEnv),
 				Dir:  sourceDir,
 			},
@@ -183,15 +183,27 @@ func PlanSpec[I isoshared.Confinement](request Request, agent *types.AgentConfig
 	}, selected.choice, nil
 }
 
+// sandboxArgs is the one place that decides whether the agent drops its own
+// guard: the sandbox arguments its facts declare, such as the one that turns
+// off its permission prompts or its command sandbox, apply only inside a
+// confinement that is a boundary. Without a boundary the guard of the agent is
+// the only one around it, so the agent keeps it.
+func sandboxArgs(agent *types.AgentConfig, confinement isoshared.Confinement) []string {
+	if !confinement.Bounded() {
+		return nil
+	}
+	return agent.SandboxArgs
+}
+
 // agentArgv is the argument vector that starts the agent: its executable, its
-// launch arguments, its sandbox arguments when a boundary surrounds it, the
-// arguments of the provider route, and then args, which always come last.
-func agentArgv(agent *types.AgentConfig, provider *types.ModelProvider, bounded bool, args []string) []string {
+// launch arguments, the sandbox arguments sandboxArgs decided, the arguments of
+// the provider route, and then args, which always come last.
+func agentArgv(agent *types.AgentConfig, provider *types.ModelProvider, sandbox []string, args []string) []string {
 	var providerArgs []string
 	if provider != nil {
 		providerArgs = providers.GetProviderCliArgs(provider)
 	}
-	built := agents.BuildArgs(agent, args, types.AgentExecOptions{Sandbox: bounded, ProviderCliArgs: providerArgs})
+	built := agents.BuildArgs(agent, args, types.AgentExecOptions{SandboxArgs: sandbox, ProviderCliArgs: providerArgs})
 	return append([]string{agent.Binary}, built...)
 }
 

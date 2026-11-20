@@ -178,24 +178,78 @@ func TestAgentArgvFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
 	for _, test := range tests {
 		t.Run(string(test.agent), func(t *testing.T) {
 			agent := registeredAgent(t, test.agent)
-			if got := agentArgv(agent, nil, true, []string{"go"}); !slices.Equal(got, test.bounded) {
+			if got := agentArgv(agent, nil, sandboxArgs(agent, confinement{}), []string{"go"}); !slices.Equal(got, test.bounded) {
 				t.Errorf("bounded argv = %v, want %v", got, test.bounded)
 			}
-			if got := agentArgv(agent, nil, false, []string{"go"}); !slices.Equal(got, test.unbounded) {
+			if got := agentArgv(agent, nil, sandboxArgs(agent, confinement{unbounded: true}), []string{"go"}); !slices.Equal(got, test.unbounded) {
 				t.Errorf("unbounded argv = %v, want %v", got, test.unbounded)
 			}
 		})
 	}
 }
 
+// TestPlanSpecAddsTheSandboxArgumentsOnlyInsideABoundary proves the one
+// decision of sandboxArgs through the planner, for every harness the shipped
+// facts declare and for each class of isolation: none, a bounded isolation, and
+// an isolation that confines without being a boundary.
+func TestPlanSpecAddsTheSandboxArgumentsOnlyInsideABoundary(t *testing.T) {
+	classes := []struct {
+		name      string
+		isolation string
+		bounded   bool
+	}{
+		{"none", "none", false},
+		{"bounded", "bwrap", true},
+		{"not bounded", "seatbelt", false},
+	}
+	// The registry of the other planner tests plus seatbelt as an isolation
+	// that confines the network and is not a boundary.
+	reg := registry().RegisterIsolator(isolation.IsolationSeatbelt, func() isoshared.Confinement { return confinement{unbounded: true} })
+	harnesses := agents.Embedded()
+	declaring := 0
+	for _, agentType := range harnesses.Types() {
+		facts, err := harnesses.Get(agentType)
+		if err != nil {
+			t.Fatalf("Get(%s) error = %v", agentType, err)
+		}
+		if len(facts.SandboxArgs) > 0 {
+			declaring++
+		}
+		for _, class := range classes {
+			t.Run(string(agentType)+"/"+class.name, func(t *testing.T) {
+				request := Request{Agent: string(agentType), Harnesses: harnesses, Isolation: class.isolation, AgentArgs: []string{"go"}}
+				agent, provider, err := ResolveAgent(request)
+				if err != nil {
+					t.Fatalf("ResolveAgent() error = %v", err)
+				}
+				spec, _, err := PlanSpec(request, agent, provider, "/work/repo", "/work", "/home/user", reg, true)
+				if err != nil {
+					t.Fatalf("PlanSpec() error = %v", err)
+				}
+				want := append([]string{facts.Binary}, facts.LaunchArgs...)
+				if class.bounded {
+					want = append(want, facts.SandboxArgs...)
+				}
+				want = append(want, "go")
+				if !slices.Equal(spec.Run.Process.Argv, want) {
+					t.Errorf("argv = %v, want %v", spec.Run.Process.Argv, want)
+				}
+			})
+		}
+	}
+	if declaring == 0 {
+		t.Error("no harness declares sandbox arguments, so the table proves nothing")
+	}
+}
+
 func TestAgentArgvPlacesTheProviderArgumentsBeforeTheUserArguments(t *testing.T) {
 	provider := &types.ModelProvider{CliArgs: []string{"--model", "m"}}
 
-	codex := agentArgv(registeredAgent(t, types.AgentCodex), provider, false, []string{"go"})
+	codex := agentArgv(registeredAgent(t, types.AgentCodex), provider, nil, []string{"go"})
 	if !slices.Equal(codex, []string{"codex", "--model", "m", "go"}) {
 		t.Errorf("codex argv = %v, want the provider arguments before go", codex)
 	}
-	claude := agentArgv(registeredAgent(t, types.AgentClaude), provider, false, []string{"go"})
+	claude := agentArgv(registeredAgent(t, types.AgentClaude), provider, nil, []string{"go"})
 	if !slices.Equal(claude, []string{"claude", "go"}) {
 		t.Errorf("claude argv = %v, want no provider arguments for an agent that reads none", claude)
 	}
