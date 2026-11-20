@@ -35,12 +35,13 @@ func (d Dependencies) reader() document.Reader {
 }
 
 // configRequest names what the eval reads of agentic.json: the eval section,
-// from the project file the flag names or the nearest one, with the budget
-// flags as the flags layer.
+// from the project file the flag names or the nearest one, with the budget and
+// sandbox flags as the flags layer.
 type configRequest struct {
 	project, approveDigest string
 	maxModelRuns           *int
 	maxCostUSD             *float64
+	sandbox                []merge.Flag
 }
 
 // resolveConfig merges the eval section of every layer. A project file that
@@ -53,6 +54,7 @@ func (d Dependencies) resolveConfig(r configRequest) (merge.Resolved, error) {
 	if r.maxCostUSD != nil {
 		flags = append(flags, merge.Flag{Section: evalsection.Name, Pointer: "/budgets/maxCostUsd", Value: json.RawMessage(strconv.FormatFloat(*r.maxCostUSD, 'f', -1, 64))})
 	}
+	flags = append(flags, r.sandbox...)
 	env := resolve.Env{
 		Files: d.ConfigFiles, Places: d.Places, Validator: d.Validator,
 		Approvals: d.approvals(), Prompter: d.Prompter, Out: d.Err,

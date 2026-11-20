@@ -43,12 +43,16 @@ npm install -g @xonovex/agent-eval-go
 | `--plugin-dir DIR` | Plugin package, or directory of plugins, to search for skills (repeatable) |
 | `--results-dir DIR` | Checkpoints and cost history, `.agent-eval/results` by default |
 | `--format text\|json` | Output format |
+| `--sandbox none\|bwrap\|docker\|seatbelt` | Isolation of every harness run, `none` by default |
+| `--sandbox-provision`, `--sandbox-network`, `--sandbox-image`, `--sandbox-runtime`, `--sandbox-nix-rev`, `--sandbox-passthrough` | The other settings of the sandbox; each replaces the value of the files |
+| `--sandbox-init-command`, `--sandbox-nix-package`, `--sandbox-allow-host`, `--sandbox-credential`, `--sandbox-env` | Items the sandbox adds to the lists of the files (repeatable) |
+| `--sandbox-require pinned-provision\|host-tools-unreachable\|egress-restricted\|kernel-isolation` | Guarantee the sandbox must give, or the run stops (repeatable) |
 
 The exit status is 0 on a pass, 1 on a fail, 2 when the input is invalid or an infrastructure fault voided the run, and 3 when a budget stopped the run with work left.
 
 ## Configuration
 
-The `eval` section of `agentic.json` holds the plugin directories, the profiles, the protocol settings, the budgets and the sandbox. `shared-config-go` merges the managed, user and project files with the budget flags. A relative plugin directory resolves against the directory of the file that set it.
+The `eval` section of `agentic.json` holds the plugin directories, the profiles, the protocol settings, the budgets and the sandbox. `shared-config-go` merges the managed, user and project files with the budget and sandbox flags. A relative plugin directory resolves against the directory of the file that set it.
 
 ```json
 {
@@ -69,7 +73,7 @@ The program, the flags and the file layout of each harness come from the harness
 
 ### Sandbox
 
-By default the harness runs on the host, as it runs without agent-eval. The `sandbox` member of the eval section runs every harness process inside the isolator of agent-cli instead. It has the axes and the guarantees of the run section of agent-cli: `isolation` (`none`, `bwrap`, `docker` or `seatbelt`), `provision` (`none`, `nix` or `command`), `network` (`host`, `none` or `managed`) and the four `require*` guarantees. A sandbox that cannot give a guarantee stops the run with exit status 2. Only a user or managed file chooses the sandbox and what it may reach; a project file may only demand a guarantee. `docker-sandboxes` and `openshell` keep a sandbox alive apart from one command, so agent-eval does not offer them.
+By default the harness runs on the host, as it runs without agent-eval. The `sandbox` member of the eval section, or the `--sandbox` flags, runs every harness process inside the isolator of agent-cli instead. It has the axes and the guarantees of the run section of agent-cli: `isolation` (`none`, `bwrap`, `docker` or `seatbelt`), `provision` (`none`, `nix` or `command`), `network` (`host`, `none` or `managed`) and the four `require*` guarantees. A sandbox that cannot give a guarantee stops the run with exit status 2. Only a user or managed file, or a flag, chooses the sandbox and what it may reach; a project file may only demand a guarantee. `docker-sandboxes` and `openshell` keep a sandbox alive apart from one command, so agent-eval does not offer them.
 
 ```json
 {

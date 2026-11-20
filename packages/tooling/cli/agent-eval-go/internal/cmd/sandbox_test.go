@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -35,12 +36,27 @@ func TestTheHarnessRunsUnconfinedByDefault(t *testing.T) {
 	}
 }
 
-func TestTheUserChoosesTheSandbox(t *testing.T) {
+func TestTheUserChoosesTheSandboxAndAFlagOverridesIt(t *testing.T) {
 	files := baseFiles()
 	files[userFile] = `{"version":1,"eval":{"sandbox":{"isolation":"docker","image":"registry.example/eval:1","customEnv":["A=1"]}}}`
 	got, err := sandboxOf(t, files)
 	if err != nil || got.Isolation != "docker" || got.Image != "registry.example/eval:1" {
 		t.Fatalf("the user file chooses the sandbox: %v %+v", err, got)
+	}
+	got, err = sandboxOf(t, files,
+		"--sandbox", "bwrap", "--sandbox-provision", "nix", "--sandbox-network", "managed", "--sandbox-runtime", "runsc",
+		"--sandbox-nix-rev", "0123", "--sandbox-env", "B=2", "--sandbox-init-command", "true", "--sandbox-nix-package", "git",
+		"--sandbox-allow-host", "api.example.com", "--sandbox-credential", "KEY=env:KEY", "--sandbox-passthrough",
+		"--sandbox-require", "kernel-isolation", "--sandbox-require", "pinned-provision",
+		"--sandbox-require", "egress-restricted", "--sandbox-require", "host-tools-unreachable")
+	want := model.Sandbox{
+		Isolation: "bwrap", Provision: "nix", Network: "managed", Image: "registry.example/eval:1", Runtime: "runsc",
+		HostPassthrough: true, InitCommands: []string{"true"}, NixPackages: []string{"git"}, NixRev: "0123",
+		AllowHosts: []string{"api.example.com"}, Credentials: []string{"KEY=env:KEY"}, CustomEnv: []string{"A=1", "B=2"},
+		RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true,
+	}
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Fatalf("a flag replaces a text and adds to a list:\n got  %+v\n want %+v\n%v", got, want, err)
 	}
 }
 
@@ -56,6 +72,12 @@ func TestAProjectFileMayOnlyDemandAGuarantee(t *testing.T) {
 		if _, err := sandboxOf(t, files); err == nil || !strings.Contains(err.Error(), "eval.sandbox.") {
 			t.Errorf("%s: a project file may not choose the confinement: %v", member, err)
 		}
+	}
+}
+
+func TestAnUnknownGuaranteeIsAUsageError(t *testing.T) {
+	if _, err := sandboxOf(t, baseFiles(), "--sandbox-require", "vibes"); err == nil || !strings.Contains(err.Error(), "valid guarantees: egress-restricted") {
+		t.Fatalf("err = %v", err)
 	}
 }
 

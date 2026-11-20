@@ -52,6 +52,7 @@ type options struct {
 	resultsDir, format                              string
 	resume, dryRun                                  bool
 	pluginDirs                                      []string
+	sandbox                                         sandboxOptions
 }
 
 func (o *options) bind(c *cobra.Command) {
@@ -73,6 +74,7 @@ func (o *options) bind(c *cobra.Command) {
 	f.BoolVar(&o.resume, "resume", false, "continue the incomplete run with the same inputs")
 	f.BoolVar(&o.dryRun, "dry-run", false, "plan the work and run no model")
 	f.StringArrayVar(&o.pluginDirs, "plugin-dir", nil, "plugin package directory, or a directory of plugins (repeatable)")
+	o.sandbox.bind(c)
 }
 
 func (o *options) flags(c *cobra.Command) settings.Flags {
@@ -86,9 +88,9 @@ func (o *options) flags(c *cobra.Command) settings.Flags {
 	return f
 }
 
-// config names what the command reads of agentic.json. A budget flag joins the
-// merge only when the user sets it.
-func (o *options) config(c *cobra.Command) configRequest {
+// config names what the command reads of agentic.json. A budget or sandbox
+// flag joins the merge only when the user sets it.
+func (o *options) config(c *cobra.Command) (configRequest, error) {
 	r := configRequest{project: o.project, approveDigest: o.approveDigest}
 	if c.Flags().Changed("max-model-runs") {
 		r.maxModelRuns = &o.maxModelRuns
@@ -96,7 +98,9 @@ func (o *options) config(c *cobra.Command) configRequest {
 	if c.Flags().Changed("max-cost-usd") {
 		r.maxCostUSD = &o.maxCostUSD
 	}
-	return r
+	var err error
+	r.sandbox, err = o.sandbox.layer(c)
+	return r, err
 }
 
 func newProtocolCommands(deps Dependencies) []*cobra.Command {
@@ -118,7 +122,11 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if err != nil {
 		return err
 	}
-	project, projectDir, err := deps.loadProject(o.config(c))
+	request, err := o.config(c)
+	if err != nil {
+		return err
+	}
+	project, projectDir, err := deps.loadProject(request)
 	if err != nil {
 		return err
 	}
@@ -130,7 +138,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if err != nil {
 		return err
 	}
-	facts, err := deps.loadHarnesses(o.config(c))
+	facts, err := deps.loadHarnesses(request)
 	if err != nil {
 		return err
 	}
