@@ -4,6 +4,7 @@
 package wiring
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -21,8 +22,9 @@ import (
 // eventSource names the operator as the reporting controller of its events.
 const eventSource = "agent-operator"
 
-// Config holds the operator settings that the command line selects. An empty
-// WorkspaceInitImage selects controller.DefaultWorkspaceInitImage.
+// Config holds the operator settings that the command line selects.
+// WorkspaceInitImage has no default: the operator ships no image, so the
+// deployment names the image of the workspace init Job.
 type Config struct {
 	WorkspaceInitImage string
 	JobPolicy          isoshared.JobPolicy
@@ -31,10 +33,14 @@ type Config struct {
 	Presets providers.Catalog
 }
 
+// ErrNoWorkspaceInitImage reports a configuration without the image of the
+// workspace init Job.
+var ErrNoWorkspaceInitImage = errors.New("the workspace init image is not set; pass --workspace-init-image with a digest-pinned image")
+
 // DefaultConfig returns the settings the operator uses when no flag overrides
-// them.
+// them. It names no workspace init image.
 func DefaultConfig() Config {
-	return Config{WorkspaceInitImage: controller.DefaultWorkspaceInitImage, JobPolicy: isoshared.DefaultJobPolicy()}
+	return Config{JobPolicy: isoshared.DefaultJobPolicy()}
 }
 
 // LoadPresets reads the provider files of dir into the catalog a presetRef
@@ -52,8 +58,12 @@ type systemClock struct{}
 func (systemClock) Now() time.Time { return time.Now() }
 
 // SetupControllers registers the AgentRun, AgentProvider and AgentWorkspace
-// reconcilers with the manager.
+// reconcilers with the manager. It fails closed on a configuration without a
+// workspace init image.
 func SetupControllers(mgr ctrl.Manager, config Config) error {
+	if config.WorkspaceInitImage == "" {
+		return ErrNoWorkspaceInitImage
+	}
 	store := kube.NewStore(mgr.GetClient())
 	events := kube.NewEventRecorder(mgr.GetEventRecorder(eventSource))
 	registry := plugins.New(agents.Embedded())

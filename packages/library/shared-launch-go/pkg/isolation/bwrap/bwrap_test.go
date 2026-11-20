@@ -362,6 +362,9 @@ func TestBwrap_Capabilities(t *testing.T) {
 	if !i.ConfinesNetwork() {
 		t.Error("bwrap unshares the network namespace")
 	}
+	if i.RequiresImage() {
+		t.Error("bwrap confines the host file system and takes no image")
+	}
 	if !i.AcceptsHostBinds() {
 		t.Error("bwrap binds a host path into the sandbox")
 	}

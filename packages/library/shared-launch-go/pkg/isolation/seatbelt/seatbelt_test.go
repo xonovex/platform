@@ -163,6 +163,9 @@ func TestCommandRefusals(t *testing.T) {
 
 func TestCapabilities(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
+	if i.RequiresImage() {
+		t.Error("seatbelt confines the host file system and takes no image")
+	}
 	if !i.AcceptsHostBinds() {
 		t.Error("the seatbelt profile grants access to a host path")
 	}

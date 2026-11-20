@@ -103,11 +103,14 @@ func (i *Isolator) Bounded() bool { return true }
 // the work directory is uploaded instead.
 func (i *Isolator) AcceptsHostBinds() bool { return false }
 
+// RequiresImage reports true: the sandbox starts from an image.
+func (i *Isolator) RequiresImage() bool { return true }
+
 // CheckAgent requires an image, because the sandbox starts from it and the agent
 // must be in it.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if cfg.Image == "" {
-		return fmt.Errorf("%w: pass --image with an image that contains agent executable %q", ErrUnsupported, cfg.Agent.Binary)
+		return fmt.Errorf("openshell: %w", isoshared.ErrNoImage)
 	}
 	return nil
 }
@@ -217,7 +220,7 @@ func (i *Isolator) freeName() (string, error) {
 func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name string) (plan, error) {
 	switch {
 	case cfg.Image == "":
-		return plan{}, fmt.Errorf("%w: the sandbox starts from an image; pass --image", ErrUnsupported)
+		return plan{}, fmt.Errorf("openshell: %w", isoshared.ErrNoImage)
 	case len(cfg.Secrets) > 0:
 		return plan{}, fmt.Errorf("%w: a credential would appear in an argument of the exec command", ErrUnsupported)
 	case cfg.Provider != nil:

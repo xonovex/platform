@@ -7,6 +7,10 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
+// WorkspaceInitImage is the digest-pinned image of the workspace init Job that
+// the integration and end-to-end suites configure the operator with.
+const WorkspaceInitImage = "docker.io/alpine/git:2.54.1@sha256:2306e2b05ee0ef99f5d25b0779f645b24ae9f91ba187107503592fcdfe78da3a"
+
 // AgentRunOption configures an AgentRun.
 type AgentRunOption func(*agentv1alpha1.AgentRun)
 

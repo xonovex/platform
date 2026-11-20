@@ -26,7 +26,7 @@ func main() {
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
-	flag.StringVar(&config.WorkspaceInitImage, "workspace-init-image", config.WorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
+	flag.StringVar(&config.WorkspaceInitImage, "workspace-init-image", "", "Digest-pinned image used to initialize shared workspaces; required.")
 	flag.DurationVar(&config.JobPolicy.WorkspaceInitTimeout, "workspace-init-timeout", config.JobPolicy.WorkspaceInitTimeout, "Active deadline of a workspace init Job.")
 	flag.StringVar(&providersDir, "providers-dir", "", "Directory of provider files, <name>.json, that a presetRef may name; empty defines none.")
 	ttl := flag.Int("job-ttl-seconds", int(config.JobPolicy.DefaultTTLSecondsAfterFinished), "Seconds a finished Job is kept when its run sets no TTL.")
@@ -40,6 +40,10 @@ func main() {
 	scheme, err := newScheme()
 	if err != nil {
 		setupLog.Error(err, "unable to register Kubernetes API schemes")
+		os.Exit(1)
+	}
+	if config.WorkspaceInitImage == "" {
+		setupLog.Error(wiring.ErrNoWorkspaceInitImage, "invalid workspace init image")
 		os.Exit(1)
 	}
 	if err := validator.ValidatePinnedImageReference(config.WorkspaceInitImage); err != nil {

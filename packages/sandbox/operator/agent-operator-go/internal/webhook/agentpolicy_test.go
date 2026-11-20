@@ -445,10 +445,13 @@ func TestAgentRunWebhook_RequiresNamespacePolicy(t *testing.T) {
 
 func TestEnforcePolicy_RejectsEmptyImageWhenAllowlistIsConfigured(t *testing.T) {
 	run := baseRun()
-	run.Spec.Image = ""
 	policy := basePolicy()
+	// The planner refuses a pod without an image, so the outcomes come from the
+	// run with its image, and the allowlist check sees the run without one.
+	planned := outcomes(t, run, policy)
+	run.Spec.Image = ""
 
-	if err := enforce(t, run, policy); err == nil {
+	if err := enforcePolicy(run, policy, planned); err == nil {
 		t.Error("enforcePolicy() expected error for an image that cannot be checked against the allowlist")
 	}
 }

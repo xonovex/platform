@@ -102,6 +102,19 @@ func (w *workspace) approve(t *testing.T, project string) {
 	w.write(t, "state/agentic/trust.json", `{"version":1,"approvals":[{"digest":"`+digest+`","path":"`+filepath.Join(w.root, "work", "agentic.json")+`"}]}`)
 }
 
+func TestADockerSandboxWithoutAnImageStopsBeforeTheHarnessStarts(t *testing.T) {
+	w := newWorkspace(t)
+	w.write(t, "config/agentic/agentic.json", `{"version":1,"eval":{"sandbox":{"isolation":"docker","network":"none"}}}`)
+
+	got := w.run(t, "trigger", "alpha", "--runs", "1")
+	if got.code != 2 || !strings.Contains(got.stdout+got.stderr, "set eval.sandbox.image in the user or managed agentic.json, or pass --sandbox-image") {
+		t.Fatalf("a docker sandbox without an image is a fault that names the setting: %d\n%s\n%s", got.code, got.stdout, got.stderr)
+	}
+	if calls := w.calls(t); len(calls) != 0 {
+		t.Errorf("the harness ran without a sandbox: %v", calls)
+	}
+}
+
 func TestADockerSandboxRunsTheHarnessAndLeavesNoContainer(t *testing.T) {
 	w := newWorkspace(t)
 	image := harnessImage(t, w)

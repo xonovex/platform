@@ -25,7 +25,7 @@ agent-cli run -a kiro
 
 # Run with the three sandbox axes: isolation, provision, and network
 agent-cli run --isolation bwrap --provision command --isolation-bwrap-passthrough --init-command 'command -v claude'
-agent-cli run --isolation docker --provision nix --nix-source packages --nix-rev <rev> --network none
+agent-cli run --isolation docker --image <digest-pinned image> --provision nix --nix-source packages --nix-rev <rev> --network none
 agent-cli run --isolation bwrap --provision nix --nix-source packages --nix-rev <rev> --nix-packages ripgrep
 agent-cli run --isolation bwrap --provision nix --nix-source flake --nix-shell default
 
@@ -79,7 +79,7 @@ Options:
   --network <method>           Network egress: host, none, managed (default: host)
   --allow-host <host>          Host a managed run may reach: host, host:port or *.domain (repeatable; all others are denied)
   --credential <binding>       Inject NAME=scheme:locator as an environment variable (repeatable)
-  --image <image>              Container image for docker and openshell
+  --image <image>              Container image for docker and openshell (required by both; none ships)
   --isolation-bwrap-passthrough
                                Expose host tools to bwrap (forfeits host-tools-unreachable)
   --init-command <cmd>         Init command for --provision command (repeatable)
@@ -109,10 +109,12 @@ Each isolation declares what it can guarantee, and `--require-*` stops a run tha
 | --- | --- | --- | --- | --- |
 | `none` | nothing | no | no | Runs on the host. |
 | `bwrap` | Linux namespaces | yes | unix socket | Attack-surface reduction, not a kernel boundary. |
-| `docker` | container | yes | unix socket | `--isolation-docker-runtime runsc` adds a kernel boundary. |
+| `docker` | container | yes | unix socket | Needs an image. `--isolation-docker-runtime runsc` adds a kernel boundary. |
 | `seatbelt` | macOS `sandbox-exec` profile | yes | loopback port | macOS only. Denies file writes outside the workspace and hides the home directory. |
 | `docker-sandboxes` | `sbx` sandbox | no | no | Runs the agent in its own sandbox image. Fails closed for `none` and `managed`, because `sbx` has deny rules only. |
-| `openshell` | OpenShell gateway sandbox | yes | policy | Needs `--image`. Uploads the work directory, downloads it after the run, and refuses credentials and binds. |
+| `openshell` | OpenShell gateway sandbox | yes | policy | Needs an image. Uploads the work directory, downloads it after the run, and refuses credentials and binds. |
+
+`docker` and `openshell` start the agent from a container image, and agent-cli ships no image: the image is your setting. Set `image` in the `run` section of a user or managed `agentic.json` (`run.image`), or pass `--image`. A run on either isolation without an image stops before it starts. The image must hold the agent unless a `nix` or `command` provision supplies it, and only a digest-pinned image (`name@sha256:<digest>`) counts toward `--require-pinned-provision` and `--require-host-tools-unreachable`.
 
 ### Managed network egress
 
@@ -376,7 +378,7 @@ Put reusable run defaults in the `run` section of an `agentic.json` file. The CL
 
 Each key has one merge rule, listed by `agent-cli schema agentic-run`:
 
-- `replace` (`agent`, `provider`, `isolation`, `provision`, `network`, `homeDir`): the managed value wins, then the flag, then the project, then the user. A flag that contradicts a managed value is an error.
+- `replace` (`agent`, `provider`, `isolation`, `provision`, `network`, `image`, `homeDir`): the managed value wins, then the flag, then the project, then the user. A flag that contradicts a managed value is an error.
 - `append` (`models`, `bindPaths`, `roBindPaths`, `customEnv`, `allowHosts`, `credentials`): the items of every layer join, user first and managed last, without duplicates.
 - `require` (`requirePinnedProvision`, `requireHostToolsUnreachable`, `requireEgressRestricted`, `requireKernelIsolation`): a guarantee that any layer demands stays demanded.
 
@@ -390,6 +392,7 @@ Each key has one merge rule, listed by `agent-cli schema agentic-run`:
     "models": ["sonnet=<model-id>"],
     "isolation": "bwrap",
     "network": "managed",
+    "image": "registry.example/agent@sha256:<digest>",
     "homeDir": "/home/user",
     "bindPaths": ["/home/user/projects"],
     "roBindPaths": ["/home/user/reference"],

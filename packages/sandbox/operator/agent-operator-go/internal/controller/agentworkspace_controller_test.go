@@ -79,8 +79,8 @@ func TestAgentWorkspaceReconcile_ProvisionsTheInitialResources(t *testing.T) {
 	if owner := metav1.GetControllerOf(job); owner == nil || owner.UID != "repo-uid" || owner.Kind != agentWorkspaceKind {
 		t.Errorf("init Job controller = %+v, want the workspace", owner)
 	}
-	if job.Spec.Template.Spec.Containers[0].Image != DefaultWorkspaceInitImage {
-		t.Errorf("init image = %q, want the default", job.Spec.Template.Spec.Containers[0].Image)
+	if job.Spec.Template.Spec.Containers[0].Image != workspaceInitImage {
+		t.Errorf("init image = %q, want the configured image", job.Spec.Template.Spec.Containers[0].Image)
 	}
 	if result.RequeueAfter != pendingRequeue {
 		t.Errorf("RequeueAfter = %v, want %v", result.RequeueAfter, pendingRequeue)

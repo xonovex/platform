@@ -88,7 +88,7 @@ By default the harness runs on the host, as it runs without agent-eval. The `san
 }
 ```
 
-The sandbox binds only the private workspace of the run, read-write, and gets no terminal. The harness program must come from the sandbox, and the image is user data: agent-eval names no image. A docker sandbox needs an `image` that holds the harness program in `/usr/local/bin`, `/usr/bin` or `/bin`, or a `nix` provision with a pinned `nixRev`, which mounts the closure of the harness package. Without an `image`, docker falls back to the base image of agent-cli, which holds no harness program, so only a `nix` provision can run there. A docker run starts with `--rm` and the name `agent-eval-<hash of the workspace>`, and when a timeout or a stopped run ends the docker client first, agent-eval removes the container with `docker rm --force`. A container that cannot be removed is an infrastructure fault.
+The sandbox binds only the private workspace of the run, read-write, and gets no terminal. The harness program must come from the sandbox, and the image is user data: agent-eval names no image. A docker sandbox always needs an image: set `eval.sandbox.image` in a user or managed `agentic.json`, or pass `--sandbox-image`. A docker sandbox without an image stops the run with exit status 2 before a container starts. The image holds the harness program in `/usr/local/bin`, `/usr/bin` or `/bin`, or a `nix` provision with a pinned `nixRev` mounts the closure of the harness package into it. A docker run starts with `--rm` and the name `agent-eval-<hash of the workspace>`, and when a timeout or a stopped run ends the docker client first, agent-eval removes the container with `docker rm --force`. A container that cannot be removed is an infrastructure fault.
 
 ## Layout
 

@@ -71,6 +71,9 @@ func (i *Isolator) Bounded() bool { return true }
 // AcceptsHostBinds reports true: bwrap binds a host path into the sandbox.
 func (i *Isolator) AcceptsHostBinds() bool { return true }
 
+// RequiresImage reports false: bwrap confines the host file system.
+func (i *Isolator) RequiresImage() bool { return false }
+
 // CheckAgent requires host passthrough, because deny-default bwrap exposes no
 // host tool, and then the agent executable on the PATH it passes through.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {

@@ -57,6 +57,9 @@ func (i *Isolator) Bounded() bool { return false }
 // every host path already.
 func (i *Isolator) AcceptsHostBinds() bool { return true }
 
+// RequiresImage reports false: the agent runs on the host.
+func (i *Isolator) RequiresImage() bool { return false }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {

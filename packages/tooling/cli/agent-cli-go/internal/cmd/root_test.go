@@ -59,6 +59,7 @@ func (r *recordingIsolator) EgressTransport() network.EgressTransport {
 func (r *recordingIsolator) ConfinesNetwork() bool                { return true }
 func (r *recordingIsolator) Bounded() bool                        { return true }
 func (r *recordingIsolator) AcceptsHostBinds() bool               { return true }
+func (r *recordingIsolator) RequiresImage() bool                  { return false }
 func (r *recordingIsolator) CheckAgent(isoshared.RunConfig) error { return nil }
 
 type recordingProvisioner struct{ input provshared.Input }

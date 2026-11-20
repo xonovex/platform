@@ -336,7 +336,7 @@ Deploy the controller and admission webhook from the default Kustomize overlay.
 kubectl apply -k https://github.com/xonovex/platform//packages/sandbox/operator/agent-operator-go/config/default
 ```
 
-The default overlay deploys the admission service and uses cert-manager to issue its serving certificate and inject the certificate authority bundle into the webhook configurations. The manager deployment uses the digest-pinned image declared in `config/manager/manager.yaml`.
+The default overlay deploys the admission service and uses cert-manager to issue its serving certificate and inject the certificate authority bundle into the webhook configurations. The manager deployment uses the digest-pinned image declared in `config/manager/manager.yaml`, and passes the digest-pinned image of the workspace init Job with `--workspace-init-image`. The operator ships no image: it refuses to start without that flag.
 
 Build a local image only when developing the operator image.
 
@@ -355,7 +355,7 @@ kubectl apply -k config/crd/
 # Run the operator against your current kubeconfig
 go run ./cmd/operator/ \
   --health-probe-bind-address=:8081 \
-  --metrics-bind-address=:8080
+  --workspace-init-image=<digest-pinned image with git>
 ```
 
 ## Usage

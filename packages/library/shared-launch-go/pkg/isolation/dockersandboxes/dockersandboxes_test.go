@@ -227,6 +227,9 @@ func TestMountable(t *testing.T) {
 
 func TestCapabilitiesFailClosed(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
+	if i.RequiresImage() {
+		t.Error("a Docker Sandboxes sandbox brings its own image")
+	}
 	if !i.AcceptsHostBinds() {
 		t.Error("docker-sandboxes mounts a host path as a workspace")
 	}

@@ -59,8 +59,8 @@ tasks:
   coverage:
     deps:
       - go-package-coverage
-  # The architecture test reads the source of every module that ships a binary or
-  # a library the binaries use, so it carries the arch build tag and runs here
+  # The architecture tests read the source of every library module and of every
+  # module that ships a binary, so they carry the arch build tag and run here
   # instead of in go-test.
   go-test-arch:
     command:
@@ -71,7 +71,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
-      - /packages/library/shared-launch-go/**/*.go
+      - /packages/library/*-go/**/*.go
       - /packages/tooling/cli/agent-cli-go/**/*.go
       - /packages/tooling/cli/agent-eval-go/**/*.go
       - /packages/tooling/cli/agent-validate-go/**/*.go

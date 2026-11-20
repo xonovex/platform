@@ -78,6 +78,9 @@ func (i *Isolator) Bounded() bool { return true }
 // workspace.
 func (i *Isolator) AcceptsHostBinds() bool { return true }
 
+// RequiresImage reports false: the sandbox brings its own agent image.
+func (i *Isolator) RequiresImage() bool { return false }
+
 // CheckAgent has nothing to check: the agent binary lives in the sandbox image.
 func (i *Isolator) CheckAgent(isoshared.RunConfig) error { return nil }
 

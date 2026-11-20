@@ -15,6 +15,7 @@ import (
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/spec"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
@@ -485,6 +486,30 @@ func TestNewPlanPrefersTheFileHomeAndMakesItAbsolute(t *testing.T) {
 	}
 	if p := mustPlan(t, baseOptions(), `{"homeDir":"sandbox-home"}`); p.Run.HomeDir != "/work/repo/sandbox-home" {
 		t.Errorf("HomeDir = %q, want /work/repo/sandbox-home", p.Run.HomeDir)
+	}
+}
+
+func TestNewPlanTakesTheImageFromTheRunSection(t *testing.T) {
+	const fileImage, flagImage = "registry.example/file@sha256:1111", "registry.example/flag@sha256:2222"
+	options := baseOptions()
+	options.Isolation = "openshell"
+
+	if p := mustPlan(t, options, `{"image":"`+fileImage+`"}`); p.Run.Image != fileImage {
+		t.Errorf("Image = %q, want the image of the file", p.Run.Image)
+	}
+	options.Image = flagImage
+	if p := mustPlan(t, options, `{"image":"`+fileImage+`"}`); p.Run.Image != flagImage {
+		t.Errorf("Image = %q, want the image of the command line", p.Run.Image)
+	}
+}
+
+func TestNewPlanNamesTheImageSettingOfAnImageIsolationWithoutAnImage(t *testing.T) {
+	options := baseOptions()
+	options.Isolation = "openshell"
+
+	_, err := plan(t, options, "")
+	if !errors.Is(err, isoshared.ErrNoImage) || !strings.Contains(err.Error(), "set run.image in the user or managed agentic.json, or pass --image") {
+		t.Fatalf("NewPlan() error = %v, want ErrNoImage naming run.image and --image", err)
 	}
 }
 

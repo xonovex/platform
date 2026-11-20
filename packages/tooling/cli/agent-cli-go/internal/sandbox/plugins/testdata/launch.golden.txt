@@ -13,6 +13,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## none / plain / run
 run: claude review --depth 2
@@ -42,6 +43,7 @@ log: [INFO]     provider: route (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     customEnv: CUSTOM=1 (flags command line)
 log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
 
@@ -74,6 +76,7 @@ log: [INFO]     models: main=model-override (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## none / provider arguments / run
 run: codex --model model-override review --depth 2
@@ -101,6 +104,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
 
 ## none / credential / run
@@ -130,6 +134,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## none / overlay / run
 run: claude --plugin-dir /tmp/overlay/plugins review --depth 2
@@ -156,6 +161,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: command (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## none / initialization commands / run
 run: sh -c echo ready && touch /tmp/marker && exec 'claude' 'review' '--depth' '2'
@@ -182,6 +188,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     bindPaths: /etc (flags command line)
 log: [INFO]     roBindPaths: /lib (flags command line)
 
@@ -210,6 +217,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: none (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## none / checkout / run
 run: claude review --depth 2
@@ -258,6 +266,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / plain / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
@@ -287,6 +296,7 @@ log: [INFO]     provider: route (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     customEnv: CUSTOM=1 (flags command line)
 log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
 
@@ -319,6 +329,7 @@ log: [INFO]     models: main=model-override (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / provider arguments / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- codex --sandbox danger-full-access --model model-override review --depth 2
@@ -346,6 +357,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
 
 ## bwrap / credential / run
@@ -375,6 +387,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / overlay / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --ro-bind /tmp/overlay /tmp/overlay --chdir /work/repo -- claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
@@ -401,6 +414,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: command (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / initialization commands / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
@@ -427,6 +441,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     bindPaths: /etc (flags command line)
 log: [INFO]     roBindPaths: /lib (flags command line)
 
@@ -455,6 +470,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / checkout / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/checkout /work/checkout --ro-bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/checkout -- claude --permission-mode bypassPermissions review --depth 2
@@ -481,6 +497,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: none (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## bwrap / network none / run
 run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
@@ -509,6 +526,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: bwrap (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: managed (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     allowHosts: api.example.com (flags command line)
 
 ## bwrap / network managed / run
@@ -536,6 +554,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / plain / run
@@ -568,6 +587,7 @@ log: [INFO]     provider: route (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     customEnv: CUSTOM=1 (flags command line)
 log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
 capture: docker info
@@ -603,6 +623,7 @@ log: [INFO]     models: main=model-override (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / provider arguments / run
@@ -633,6 +654,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
 capture: docker info
 
@@ -665,6 +687,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / overlay / run
@@ -694,6 +717,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: command (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / initialization commands / run
@@ -723,6 +747,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     bindPaths: /etc (flags command line)
 log: [INFO]     roBindPaths: /lib (flags command line)
 capture: docker info
@@ -754,6 +779,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / checkout / run
@@ -783,6 +809,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: none (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 capture: docker info
 
 ## docker / network none / run
@@ -814,6 +841,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: managed (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     allowHosts: api.example.com (flags command line)
 capture: docker info
 
@@ -851,6 +879,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / plain / run
 run: sandbox-exec -p (version 1)
@@ -901,6 +930,7 @@ log: [INFO]     provider: route (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     customEnv: CUSTOM=1 (flags command line)
 log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
 
@@ -954,6 +984,7 @@ log: [INFO]     models: main=model-override (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / provider arguments / run
 run: sandbox-exec -p (version 1)
@@ -1002,6 +1033,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
 
 ## seatbelt / credential / run
@@ -1052,6 +1084,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / overlay / run
 run: sandbox-exec -p (version 1)
@@ -1099,6 +1132,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: command (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / initialization commands / run
 run: sandbox-exec -p (version 1)
@@ -1146,6 +1180,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     bindPaths: /etc (flags command line)
 log: [INFO]     roBindPaths: /lib (flags command line)
 
@@ -1195,6 +1230,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / checkout / run
 run: sandbox-exec -p (version 1)
@@ -1243,6 +1279,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: none (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## seatbelt / network none / run
 run: sandbox-exec -p (version 1)
@@ -1296,6 +1333,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: seatbelt (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: managed (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     allowHosts: api.example.com (flags command line)
 
 ## seatbelt / network managed / run
@@ -1341,6 +1379,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## docker-sandboxes / plain / run
 capture: sbx ls -q
@@ -1372,6 +1411,7 @@ log: [INFO]     provider: route (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     customEnv: CUSTOM=1 (flags command line)
 log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
 
@@ -1406,6 +1446,7 @@ log: [INFO]     models: main=model-override (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## docker-sandboxes / provider arguments / run
 capture: sbx ls -q
@@ -1435,6 +1476,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
 
 ## docker-sandboxes / credential / run
@@ -1466,6 +1508,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## docker-sandboxes / overlay / run
 capture: sbx ls -q
@@ -1505,6 +1548,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     bindPaths: /etc (flags command line)
 log: [INFO]     roBindPaths: /lib (flags command line)
 
@@ -1535,6 +1579,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: docker-sandboxes (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: host (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## docker-sandboxes / checkout / run
 capture: sbx ls -q
@@ -1673,6 +1718,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: openshell (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: none (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 
 ## openshell / network none / run
 capture: openshell sandbox list --names
@@ -1704,6 +1750,7 @@ log: [INFO]     agent: claude (flags command line)
 log: [INFO]     isolation: openshell (flags command line)
 log: [INFO]     provision: none (flags command line)
 log: [INFO]     network: managed (flags command line)
+log: [INFO]     image: registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef (flags command line)
 log: [INFO]     allowHosts: api.example.com (flags command line)
 
 ## openshell / network managed / run

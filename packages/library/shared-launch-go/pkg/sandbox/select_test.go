@@ -29,6 +29,8 @@ type fakeConfinement struct {
 	noTransport bool
 	// noBinds makes the double refuse host binds; the zero value accepts them.
 	noBinds bool
+	// needsImage makes the double start the agent from a container image.
+	needsImage bool
 }
 
 func (f fakeConfinement) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
@@ -45,6 +47,7 @@ func (f fakeConfinement) EgressTransport() network.EgressTransport {
 func (f fakeConfinement) ConfinesNetwork() bool  { return !f.sharesNetwork }
 func (f fakeConfinement) Bounded() bool          { return true }
 func (f fakeConfinement) AcceptsHostBinds() bool { return !f.noBinds }
+func (f fakeConfinement) RequiresImage() bool    { return f.needsImage }
 
 // fakeIsolator adds a Launcher to the confinement, for the availability probe.
 type fakeIsolator struct {
@@ -174,6 +177,22 @@ func TestEvaluate_RejectsBindPathsForAnIsolationWithoutHostBinds(t *testing.T) {
 	req.HasCustomBinds = true
 	if _, err := Evaluate(reg, req); err == nil || !strings.Contains(err.Error(), "cannot bind a host path") {
 		t.Fatalf("Evaluate(bind paths) error = %v, want the refused bind", err)
+	}
+}
+
+func TestEvaluate_RefusesARequestWithoutAnImageForAnImageIsolation(t *testing.T) {
+	reg := testRegistry(fakeConfinement{needsImage: true}, fakeProvisioner{})
+	req := bwrapNixReq()
+
+	if _, err := Evaluate(reg, req); !errors.Is(err, isoshared.ErrNoImage) {
+		t.Fatalf("Evaluate(no image) error = %v, want ErrNoImage", err)
+	}
+	req.Image = "registry.example/agent:1"
+	if _, err := Evaluate(reg, req); err != nil {
+		t.Fatalf("Evaluate(image) error = %v, want nil", err)
+	}
+	if _, err := Evaluate(testRegistry(fakeConfinement{}, fakeProvisioner{}), bwrapNixReq()); err != nil {
+		t.Fatalf("Evaluate(no image, no image needed) error = %v, want nil", err)
 	}
 }
 

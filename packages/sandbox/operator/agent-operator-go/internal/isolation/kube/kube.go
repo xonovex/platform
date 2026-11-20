@@ -62,3 +62,6 @@ func (Confinement) Bounded() bool { return true }
 
 // AcceptsHostBinds reports false: a pod reaches only its volumes.
 func (Confinement) AcceptsHostBinds() bool { return false }
+
+// RequiresImage reports true: a pod starts from its image.
+func (Confinement) RequiresImage() bool { return true }

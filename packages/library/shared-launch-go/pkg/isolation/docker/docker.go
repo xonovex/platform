@@ -65,17 +65,17 @@ func (i *Isolator) Available() (bool, error) {
 }
 
 // HidesHost reports whether host tools are unreachable. The host filesystem is
-// never mounted, so the actual host is always hidden; an image-less container,
-// however, resolves host-equivalent tools, so a pinned image is required.
+// never mounted, so the actual host is always hidden; the tools of the
+// container come from the image, so only a digest-pinned image fixes them.
 func (i *Isolator) HidesHost(_ bool, image string) bool {
-	return isolation.IsDigestPinnedImage(resolveImage(image))
+	return isolation.IsDigestPinnedImage(image)
 }
 
 // PinnedProvision requires the container image itself to be digest-pinned. A
 // separate provisioner must also be pinned unless the image is the only source
 // of tools.
 func (i *Isolator) PinnedProvision(method provision.ProvisionMethod, provisionerPinned bool, image string) bool {
-	if !isolation.IsDigestPinnedImage(resolveImage(image)) {
+	if !isolation.IsDigestPinnedImage(image) {
 		return false
 	}
 	return method == provision.ProvisionNone || provisionerPinned
@@ -101,11 +101,13 @@ func (i *Isolator) Bounded() bool { return true }
 // AcceptsHostBinds reports true: docker mounts a host path into the container.
 func (i *Isolator) AcceptsHostBinds() bool { return true }
 
-// CheckAgent rejects the default image, which does not contain an agent; a
-// caller-supplied image is trusted to contain it.
+// RequiresImage reports true: the container starts from an image.
+func (i *Isolator) RequiresImage() bool { return true }
+
+// CheckAgent requires an image, which the caller trusts to contain the agent.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
-	if cfg.Image == "" || cfg.Image == isolation.DefaultContainerImage {
-		return fmt.Errorf("the default docker image does not contain agent executable %q; use provision=nix or a digest-pinned --image that contains it", cfg.Agent.Binary)
+	if cfg.Image == "" {
+		return fmt.Errorf("docker: %w", isoshared.ErrNoImage)
 	}
 	return nil
 }
@@ -153,6 +155,9 @@ func (i *Isolator) StopCommand(cfg isoshared.RunConfig) []string {
 }
 
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
+	if err := i.CheckAgent(cfg); err != nil {
+		return nil, err
+	}
 	homeDir, err := hostlaunch.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
 		return nil, err
@@ -270,8 +275,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		args = append(args, "-e", key)
 	}
 
-	// Image (pinned by the caller; falls back to the shared default).
-	args = append(args, resolveImage(cfg.Image))
+	args = append(args, cfg.Image)
 
 	// Agent process, wrapped with the provisioner's init commands.
 	command := hostlaunch.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
@@ -289,13 +293,6 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 		return nil, err
 	}
 	return envutil.EnvMapToSlice(envutil.MergeEnvMaps(envutil.ParseEnv(i.host.Environ()), containerEnv)), nil
-}
-
-func resolveImage(image string) string {
-	if image == "" {
-		return isolation.DefaultContainerImage
-	}
-	return image
 }
 
 // containerEnv builds the container environment: HOME/TMPDIR/SHELL/PATH, the

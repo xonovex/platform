@@ -107,10 +107,27 @@ func TestEveryWorkspaceGetsItsOwnName(t *testing.T) {
 	}
 }
 
-func TestADockerSandboxNeedsAnImageThatHoldsTheHarness(t *testing.T) {
-	_, err := launch.New(dockerPorts(host()), model.Sandbox{Isolation: "docker"}).Confine(harnessRun())
-	if err == nil || !strings.Contains(err.Error(), "default docker image") {
-		t.Fatalf("err = %v", err)
+func TestADockerSandboxWithoutAnImageNamesTheImageSetting(t *testing.T) {
+	const hint = "set eval.sandbox.image in the user or managed agentic.json, or pass --sandbox-image"
+	confiner := launch.New(dockerPorts(host()), model.Sandbox{Isolation: "docker"})
+	if err := confiner.Check(); !errors.Is(err, isoshared.ErrNoImage) || !strings.Contains(err.Error(), hint) {
+		t.Errorf("Check() = %v, want ErrNoImage naming eval.sandbox.image and --sandbox-image", err)
+	}
+	if _, err := confiner.Confine(harnessRun()); !errors.Is(err, isoshared.ErrNoImage) || !strings.Contains(err.Error(), hint) {
+		t.Errorf("Confine() = %v, want ErrNoImage naming eval.sandbox.image and --sandbox-image", err)
+	}
+}
+
+func TestASandboxThatCanStartPassesTheCheck(t *testing.T) {
+	for _, box := range []model.Sandbox{
+		{Isolation: "docker", Image: image},
+		{Isolation: "bwrap"},
+		{RequirePinnedProvision: true},
+		{Isolation: "chroot"},
+	} {
+		if err := launch.New(dockerPorts(host()), box).Check(); err != nil {
+			t.Errorf("Check(%+v) = %v, want nil: Confine reports what remains", box, err)
+		}
 	}
 }
 
@@ -144,6 +161,8 @@ type fakeIsolator struct {
 	terminalErr error
 	transport   network.EgressTransport
 	runs        []isoshared.RunConfig
+	// needsImage makes the double start the harness from a container image.
+	needsImage bool
 }
 
 func (f *fakeIsolator) PinnedProvision(provision.ProvisionMethod, bool, string) bool { return true }
@@ -153,6 +172,7 @@ func (f *fakeIsolator) ConfinesNetwork() bool                                   
 func (f *fakeIsolator) EgressTransport() network.EgressTransport                     { return f.transport }
 func (f *fakeIsolator) Bounded() bool                                                { return true }
 func (f *fakeIsolator) AcceptsHostBinds() bool                                       { return true }
+func (f *fakeIsolator) RequiresImage() bool                                          { return f.needsImage }
 func (f *fakeIsolator) Available() (bool, error)                                     { f.asked++; return f.available, nil }
 func (f *fakeIsolator) CheckAgent(isoshared.RunConfig) error                         { return f.checkErr }
 func (f *fakeIsolator) Run(isoshared.RunConfig, provision.Contribution) (int, error) {

@@ -8,7 +8,7 @@ The library holds a core of ports and planning, and the leaves that implement th
 
 | Package | Description |
 | --- | --- |
-| `pkg/isolation` | The isolation ports: `Confinement` declares a sandbox and its guarantees, `Launcher` starts it on one machine, `Isolator` is both; `RunConfig`, `Process`, the `EgressRoute` of a run and the bridge and proxy environment of that route |
+| `pkg/isolation` | The isolation ports: `Confinement` declares a sandbox, its guarantees and whether it starts from a container image, which the platform never supplies (`ErrNoImage`), `Launcher` starts it on one machine, `Isolator` is both; `RunConfig`, `Process`, the `EgressRoute` of a run and the bridge and proxy environment of that route |
 | `pkg/provision` | The provisioning port and its `Input` |
 | `pkg/credential` | `Secret`, `Binding`, the `Store` port and `Resolve` of the credentials of a run |
 | `pkg/sandbox` | The `Registry` of lazy isolator and provisioner factories, `Evaluate` and `Select` of an isolation, and `EnforcePolicy` over the declared capabilities |

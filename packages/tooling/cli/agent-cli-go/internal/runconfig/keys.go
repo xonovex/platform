@@ -21,6 +21,7 @@ const (
 	KeyIsolation Key = "isolation"
 	KeyProvision Key = "provision"
 	KeyNetwork   Key = "network"
+	KeyImage     Key = "image"
 	KeyHomeDir   Key = "homeDir"
 
 	KeyBindPaths   Key = "bindPaths"
@@ -34,6 +35,9 @@ const (
 	KeyRequireEgressRestricted     Key = "requireEgressRestricted"
 	KeyRequireKernelIsolation      Key = "requireKernelIsolation"
 )
+
+// Path names the key as a member of agentic.json, such as run.image.
+func (k Key) Path() string { return run.Name + "." + string(k) }
 
 // pointer is the JSON pointer of the key inside the run section.
 func (k Key) pointer() string { return "/" + string(k) }

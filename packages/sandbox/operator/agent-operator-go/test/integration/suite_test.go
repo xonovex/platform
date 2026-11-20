@@ -119,7 +119,7 @@ func TestMain(m *testing.M) {
 	if err := wiring.SetupWebhooks(mgr, testutil.NewPresets()); err != nil {
 		panic("failed to set up webhooks: " + err.Error())
 	}
-	if err := wiring.SetupControllers(mgr, wiring.DefaultConfig()); err != nil {
+	if err := wiring.SetupControllers(mgr, operatorConfig()); err != nil {
 		panic("failed to set up controllers: " + err.Error())
 	}
 
@@ -154,4 +154,12 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(code)
+}
+
+// operatorConfig is the default configuration of the operator with the
+// workspace init image the deployment of the operator names.
+func operatorConfig() wiring.Config {
+	config := wiring.DefaultConfig()
+	config.WorkspaceInitImage = testutil.WorkspaceInitImage
+	return config
 }

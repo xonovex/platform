@@ -5,10 +5,17 @@
 package isolation
 
 import (
+	"errors"
+
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
+
+// ErrNoImage reports a run on an isolation that starts the agent from a
+// container image without an image. No image ships with the platform: the image
+// is a setting of the user, so a caller names the setting that supplies it.
+var ErrNoImage = errors.New("the isolation starts the agent from a container image, and no image is set")
 
 // Process is the agent process of a run: its argument vector, its environment
 // as KEY=VALUE entries, and its working directory. The planner computes it from
@@ -99,6 +106,10 @@ type Confinement interface {
 	// that accepts it, and selection refuses the bind paths of a request for one
 	// that does not.
 	AcceptsHostBinds() bool
+	// RequiresImage reports whether the isolation starts the agent from a
+	// container image. Selection refuses a request without an image for one
+	// that does, with an error that wraps ErrNoImage.
+	RequiresImage() bool
 }
 
 // Launcher starts a confined agent process on this machine and applies a

@@ -118,9 +118,9 @@ var libraries = map[string][]string{
 	},
 	"internal/confine": {"shared-core-go/pkg/process"},
 	"internal/confine/launch": {
-		"shared-agent-go/pkg/agents", "shared-agent-go/pkg/egress", "shared-agent-go/pkg/network",
-		"shared-agent-go/pkg/policy", "shared-agent-go/pkg/provision", "shared-agent-go/pkg/types",
-		"shared-core-go/pkg/envutil", "shared-core-go/pkg/process",
+		"shared-agent-go/pkg/agents", "shared-agent-go/pkg/egress", "shared-agent-go/pkg/isolation",
+		"shared-agent-go/pkg/network", "shared-agent-go/pkg/policy", "shared-agent-go/pkg/provision",
+		"shared-agent-go/pkg/types", "shared-core-go/pkg/envutil", "shared-core-go/pkg/process",
 		"shared-launch-go/pkg/credential", "shared-launch-go/pkg/isolation", "shared-launch-go/pkg/launch",
 		"shared-launch-go/pkg/sandbox",
 	},

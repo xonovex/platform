@@ -15,6 +15,10 @@
     "isolation": {"$ref": "common.schema.json#/$defs/isolation"},
     "provision": {"$ref": "common.schema.json#/$defs/provision"},
     "network": {"$ref": "common.schema.json#/$defs/network"},
+    "image": {
+      "description": "The container image of a docker or openshell run, which holds the agent unless the provision supplies it. Both isolations need one: agent-cli ships no image.",
+      "$ref": "common.schema.json#/$defs/text"
+    },
     "homeDir": {"$ref": "common.schema.json#/$defs/text"},
     "bindPaths": {"$ref": "#/$defs/texts"},
     "roBindPaths": {"$ref": "#/$defs/texts"},

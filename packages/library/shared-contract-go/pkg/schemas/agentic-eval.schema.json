@@ -104,7 +104,7 @@
         "provision": {"$ref": "common.schema.json#/$defs/provision"},
         "network": {"$ref": "common.schema.json#/$defs/network"},
         "image": {
-          "description": "The container image of a docker run, which holds the harness program unless the provision supplies it.",
+          "description": "The container image of a docker run, which holds the harness program unless the provision supplies it. A docker run needs one: agent-eval ships no image.",
           "$ref": "common.schema.json#/$defs/text"
         },
         "runtime": {

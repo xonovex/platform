@@ -16,6 +16,7 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	agentprovision "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
@@ -90,6 +91,29 @@ func New(ports Ports, sandbox model.Sandbox) *Confiner {
 	return &Confiner{ports: ports, sandbox: sandbox, available: map[string]bool{}, prepared: map[string]contribution{}}
 }
 
+// Check reports a sandbox that no harness run can start in: an isolation that
+// starts the harness from a container image, and no image. It lets the caller
+// refuse the sandbox before the first run, with the setting that fixes it.
+func (c *Confiner) Check() error {
+	if c.sandbox.Image != "" || c.sandbox.Isolation == "" {
+		return nil
+	}
+	isolator, err := c.ports.Sandboxes.Isolator(isolation.IsolationMethod(c.sandbox.Isolation))
+	if err != nil || !isolator.RequiresImage() {
+		return nil
+	}
+	return imageHint(fmt.Errorf("isolation=%s: %w", c.sandbox.Isolation, isoshared.ErrNoImage))
+}
+
+// imageHint names the setting that supplies the image of an error that wraps
+// isoshared.ErrNoImage, and returns any other error as it is.
+func imageHint(err error) error {
+	if !errors.Is(err, isoshared.ErrNoImage) {
+		return err
+	}
+	return fmt.Errorf("%w; set eval.sandbox.image in the user or managed agentic.json, or pass --sandbox-image", err)
+}
+
 // Confine plans the run of request in its workspace and returns the command
 // that starts the harness inside the sandbox. The workspace is the only host
 // directory the sandbox binds, read-write. The sandbox gets no terminal, and it
@@ -102,7 +126,7 @@ func (c *Confiner) Confine(request confine.Request) (confine.Confined, error) {
 	workspace := request.Process.Dir
 	spec, choice, err := launchcore.PlanSpec(c.planRequest(request.Harness), agent, nil, workspace, workspace, c.ports.Home, c.ports.Sandboxes, true)
 	if err != nil {
-		return confine.Confined{}, err
+		return confine.Confined{}, imageHint(err)
 	}
 	isolator := choice.Isolator
 	if err := c.checkAvailable(string(spec.IsolationName), isolator); err != nil {

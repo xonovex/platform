@@ -114,7 +114,8 @@ type Host interface {
 // nothing when the sandbox asks for nothing, else the shared isolator over
 // host. The isolations that keep a sandbox alive apart from one command,
 // docker-sandboxes and openshell, are not offered: a harness run is one
-// process the executor starts and stops.
+// process the executor starts and stops. A sandbox that no run can start in
+// is an error before the first run.
 func Confiner(box model.Sandbox, facts agents.Catalog, host Host, log logging.Logger) (confine.Confiner, error) {
 	if box.Unconfined() {
 		return confinenone.New(), nil
@@ -123,13 +124,17 @@ func Confiner(box model.Sandbox, facts agents.Catalog, host Host, log logging.Lo
 	if err != nil {
 		return nil, err
 	}
-	return confinelaunch.New(confinelaunch.Ports{
+	confiner := confinelaunch.New(confinelaunch.Ports{
 		Sandboxes:   Sandboxes(host, log),
 		Credentials: Credentials(host),
 		Egress:      managed.Service{Host: host, Log: log},
 		Harnesses:   facts,
 		Home:        home,
-	}, box), nil
+	}, box)
+	if err := confiner.Check(); err != nil {
+		return nil, err
+	}
+	return confiner, nil
 }
 
 // Bridge returns the relay a sandbox with network managed runs the harness

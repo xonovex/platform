@@ -53,4 +53,7 @@ func TestTheFixedGuaranteesOfAPod(t *testing.T) {
 	if confinement.AcceptsHostBinds() {
 		t.Error("a pod accepts no host bind")
 	}
+	if !confinement.RequiresImage() {
+		t.Error("a pod starts from its image")
+	}
 }

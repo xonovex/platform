@@ -492,3 +492,9 @@ func TestPlacesNameTheWorkingDirectory(t *testing.T) {
 type wdFails struct{ *oshosttest.Fake }
 
 func (wdFails) Getwd() (string, error) { return "", errors.New("no working directory") }
+
+func TestPathNamesTheKeyInsideTheRunSection(t *testing.T) {
+	if got := KeyImage.Path(); got != "run.image" {
+		t.Errorf("Path() = %q, want run.image", got)
+	}
+}

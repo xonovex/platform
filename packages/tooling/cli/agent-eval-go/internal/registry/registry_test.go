@@ -10,6 +10,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 
 	confinelaunch "github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/confine/launch"
@@ -80,15 +81,19 @@ func TestTheSandboxSelectsTheConfinement(t *testing.T) {
 	if _, ok := unconfined.(confinenone.Confiner); !ok {
 		t.Errorf("%T, want the confinement that confines nothing", unconfined)
 	}
-	confined, err := registry.Confiner(model.Sandbox{Isolation: "docker"}, agents.Embedded(), host, log)
+	const image = "registry.example/eval@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+	confined, err := registry.Confiner(model.Sandbox{Isolation: "docker", Image: image}, agents.Embedded(), host, log)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if _, ok := confined.(*confinelaunch.Confiner); !ok {
 		t.Errorf("%T, want the shared isolator", confined)
 	}
+	if _, err := registry.Confiner(model.Sandbox{Isolation: "docker"}, agents.Embedded(), host, log); !errors.Is(err, isoshared.ErrNoImage) {
+		t.Errorf("a docker sandbox without an image: error = %v, want ErrNoImage before the first run", err)
+	}
 	host.HomeErr = errors.New("no home")
-	if _, err := registry.Confiner(model.Sandbox{Isolation: "docker"}, agents.Embedded(), host, log); err == nil {
+	if _, err := registry.Confiner(model.Sandbox{Isolation: "docker", Image: image}, agents.Embedded(), host, log); err == nil {
 		t.Error("a sandbox needs the home directory it hides")
 	}
 }

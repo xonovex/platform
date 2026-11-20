@@ -62,6 +62,8 @@ type fakeIsolator struct {
 	commandRun   isoshared.RunConfig
 	ran          bool
 	terminalRuns int
+	// needsImage makes the double start the agent from a container image.
+	needsImage bool
 }
 
 func (f *fakeIsolator) Available() (bool, error) { return !f.unavailable, nil }
@@ -93,6 +95,7 @@ func (f *fakeIsolator) EgressTransport() network.EgressTransport  { return netwo
 func (f *fakeIsolator) ConfinesNetwork() bool                     { return !f.noNetwork }
 func (f *fakeIsolator) Bounded() bool                             { return !f.unbounded }
 func (f *fakeIsolator) AcceptsHostBinds() bool                    { return true }
+func (f *fakeIsolator) RequiresImage() bool                       { return f.needsImage }
 
 func (f *fakeIsolator) CheckAgent(isoshared.RunConfig) error {
 	f.checked = true
@@ -164,12 +167,14 @@ type testSandbox struct {
 func newTestSandbox() testSandbox {
 	iso := &fakeIsolator{command: []string{"agent", "run"}}
 	nonConfining := &fakeIsolator{noNetwork: true, unbounded: true, command: []string{"agent"}}
+	image := &fakeIsolator{needsImage: true, unavailable: true, command: []string{"agent"}}
 	prov := &fakeProvisioner{}
 	pinned := &fakeProvisioner{pinned: true, handled: true}
 	registry := sandbox.NewRegistry[isoshared.Isolator]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return nonConfining }).
 		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return iso }).
 		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return iso }).
+		RegisterIsolator(isolation.IsolationOpenShell, func() isoshared.Isolator { return image }).
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return prov }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return prov }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return pinned })

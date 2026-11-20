@@ -64,6 +64,9 @@ func (i *Isolator) Bounded() bool { return true }
 // AcceptsHostBinds reports true: the profile grants access to a host path.
 func (i *Isolator) AcceptsHostBinds() bool { return true }
 
+// RequiresImage reports false: Seatbelt confines the host file system.
+func (i *Isolator) RequiresImage() bool { return false }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {

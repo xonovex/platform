@@ -68,6 +68,7 @@ func (podDouble) KernelIsolated(string) bool                                   {
 func (podDouble) ConfinesNetwork() bool                                        { return true }
 func (podDouble) EgressTransport() network.EgressTransport                     { return network.TransportNone }
 func (podDouble) Bounded() bool                                                { return true }
+func (podDouble) RequiresImage() bool                                          { return true }
 func (podDouble) AcceptsHostBinds() bool                                       { return false }
 
 // imageDouble is a provisioner that leaves every tool to the image.
@@ -162,6 +163,8 @@ type workspaceHarness struct {
 	events     *eventLog
 }
 
+const workspaceInitImage = "registry.example/git@sha256:dddd"
+
 func newWorkspaceHarness(objects ...any) workspaceHarness {
 	h := workspaceHarness{store: testutil.NewMemoryStore(objects...), clock: newFakeClock(), events: &eventLog{}}
 	h.reconciler = NewAgentWorkspaceReconciler(AgentWorkspaceDependencies{
@@ -170,6 +173,8 @@ func newWorkspaceHarness(objects ...any) workspaceHarness {
 		Events:    h.events,
 		Clock:     h.clock,
 		JobPolicy: isoshared.DefaultJobPolicy(),
+		// The image of the init Job is configuration of the deployment.
+		WorkspaceInitImage: workspaceInitImage,
 	})
 	return h
 }

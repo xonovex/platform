@@ -1,6 +1,7 @@
 package wiring
 
 import (
+	"errors"
 	"io/fs"
 	"strings"
 	"testing"
@@ -13,7 +14,6 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
@@ -37,7 +37,7 @@ func newOfflineManager(t *testing.T, scheme *runtime.Scheme) ctrl.Manager {
 func TestSetup_RegistersEveryControllerAndWebhook(t *testing.T) {
 	mgr := newOfflineManager(t, testutil.NewScheme())
 
-	if err := SetupControllers(mgr, DefaultConfig()); err != nil {
+	if err := SetupControllers(mgr, configured()); err != nil {
 		t.Fatalf("SetupControllers() error = %v", err)
 	}
 	if err := SetupWebhooks(mgr, providers.Catalog{}); err != nil {
@@ -46,18 +46,34 @@ func TestSetup_RegistersEveryControllerAndWebhook(t *testing.T) {
 }
 
 func TestSetupControllers_NamesTheControllerThatFails(t *testing.T) {
-	err := SetupControllers(newOfflineManager(t, runtime.NewScheme()), DefaultConfig())
+	err := SetupControllers(newOfflineManager(t, runtime.NewScheme()), configured())
 
 	if err == nil || !strings.Contains(err.Error(), "AgentRun controller") {
 		t.Errorf("SetupControllers() error = %v, want it to name the AgentRun controller", err)
 	}
 }
 
-func TestDefaultConfig_UsesThePinnedInitImageAndTheDefaultJobPolicy(t *testing.T) {
+// configured is the default configuration with the workspace init image a
+// deployment names.
+func configured() Config {
+	config := DefaultConfig()
+	config.WorkspaceInitImage = "registry.example/git@sha256:eeee"
+	return config
+}
+
+func TestDefaultConfig_NamesNoInitImageAndUsesTheDefaultJobPolicy(t *testing.T) {
 	config := DefaultConfig()
 
-	if config.WorkspaceInitImage != controller.DefaultWorkspaceInitImage || config.JobPolicy != isoshared.DefaultJobPolicy() {
+	if config.WorkspaceInitImage != "" || config.JobPolicy != isoshared.DefaultJobPolicy() {
 		t.Errorf("DefaultConfig() = %+v", config)
+	}
+}
+
+func TestSetupControllers_RefusesAConfigurationWithoutAnInitImage(t *testing.T) {
+	err := SetupControllers(newOfflineManager(t, testutil.NewScheme()), DefaultConfig())
+
+	if !errors.Is(err, ErrNoWorkspaceInitImage) {
+		t.Errorf("SetupControllers() error = %v, want ErrNoWorkspaceInitImage", err)
 	}
 }
 

@@ -27,8 +27,16 @@ func flagInput(options Options) []merge.Flag {
 			flags = append(flags, runconfig.Text(text.key, text.value))
 		}
 	}
-	if options.Provider != "" {
-		flags = append(flags, runconfig.Text(runconfig.KeyProvider, options.Provider))
+	for _, text := range []struct {
+		key   runconfig.Key
+		value string
+	}{
+		{runconfig.KeyProvider, options.Provider},
+		{runconfig.KeyImage, options.Image},
+	} {
+		if text.value != "" {
+			flags = append(flags, runconfig.Text(text.key, text.value))
+		}
 	}
 	for _, list := range []struct {
 		key   runconfig.Key
@@ -72,6 +80,7 @@ func applyResolved(options Options, resolved runconfig.Resolved) Options {
 		runconfig.KeyIsolation: &options.Isolation,
 		runconfig.KeyProvision: &options.Provision,
 		runconfig.KeyNetwork:   &options.Network,
+		runconfig.KeyImage:     &options.Image,
 		runconfig.KeyHomeDir:   &options.HomeDir,
 	} {
 		if resolved.Has(key) {

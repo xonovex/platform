@@ -86,7 +86,7 @@ func contracts() map[string]contract {
 		schemas.AgenticRun: {
 			valid: []string{
 				`{}`,
-				`{"agent":"claude","provider":"local","models":["main=m-1"],"isolation":"docker","provision":"nix","network":"managed","homeDir":"/home/agent",
+				`{"agent":"claude","provider":"local","models":["main=m-1"],"isolation":"docker","provision":"nix","network":"managed","image":"registry.example/agent@sha256:1111","homeDir":"/home/agent",
 				  "bindPaths":["/a"],"roBindPaths":["/b"],"customEnv":["A=1"],"allowHosts":["*.example.com:443"],"credentials":["TOKEN=env:TOKEN"],
 				  "requirePinnedProvision":true,"requireHostToolsUnreachable":false,"requireEgressRestricted":true,"requireKernelIsolation":false}`,
 			},
@@ -95,7 +95,8 @@ func contracts() map[string]contract {
 				{"unknown network", `{"network":"proxy"}`, "/network"},
 				{"model without slot", `{"models":["m-1"]}`, "/models/0"},
 				{"variable without name", `{"customEnv":["=1"]}`, "/customEnv/0"},
-				{"unknown key", `{"image":"x"}`, ""},
+				{"unknown key", `{"preset":"x"}`, ""},
+				{"empty image", `{"image":""}`, "/image"},
 			},
 		},
 		schemas.AgenticProviders: {

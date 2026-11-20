@@ -115,7 +115,8 @@ type Choice[I isoshared.Confinement] struct {
 // Evaluate resolves the isolator and provisioner for a request and computes the
 // guarantees they establish, without demanding any. Registry membership is the
 // validity check; the resolved plugins declare their own capabilities, so this
-// layer never names a concrete isolator or provisioner. Bind paths fail for an
+// layer never names a concrete isolator or provisioner. A request without an
+// image fails for an isolator that starts the agent from one, bind paths fail for an
 // isolator that cannot bind a host path, a network mode that needs confinement
 // fails for an isolator that cannot confine the network, and a managed run fails
 // for an isolator that declares no egress transport, whatever the policy.
@@ -127,6 +128,9 @@ func Evaluate[I isoshared.Confinement](reg *Registry[I], req Request) (Choice[I]
 	prov, err := reg.Provisioner(req.Provision)
 	if err != nil {
 		return Choice[I]{}, err
+	}
+	if iso.RequiresImage() && req.Image == "" {
+		return Choice[I]{}, fmt.Errorf("isolation=%s: %w", req.Isolation, isoshared.ErrNoImage)
 	}
 	if req.HasCustomBinds && !iso.AcceptsHostBinds() {
 		return Choice[I]{}, fmt.Errorf("isolation=%s cannot bind a host path; remove the bind paths", req.Isolation)

@@ -129,7 +129,7 @@ func TestMain(m *testing.M) {
 		panic("failed to create manager: " + err.Error())
 	}
 
-	if err := wiring.SetupControllers(mgr, wiring.DefaultConfig()); err != nil {
+	if err := wiring.SetupControllers(mgr, operatorConfig()); err != nil {
 		panic("failed to set up controllers: " + err.Error())
 	}
 
@@ -162,4 +162,12 @@ func runCmd(name string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+// operatorConfig is the default configuration of the operator with the
+// workspace init image the deployment of the operator names.
+func operatorConfig() wiring.Config {
+	config := wiring.DefaultConfig()
+	config.WorkspaceInitImage = testutil.WorkspaceInitImage
+	return config
 }

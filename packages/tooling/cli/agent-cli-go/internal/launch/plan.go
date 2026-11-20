@@ -19,6 +19,7 @@ import (
 	launchcore "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
@@ -91,6 +92,9 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry[iso
 	request := options.Request
 	request.Interactive = true
 	spec, choice, err := launchcore.PlanSpec(request, agent, provider, sourceDir, cwd, home, registry, enforce)
+	if errors.Is(err, isoshared.ErrNoImage) {
+		return Plan{}, fmt.Errorf("%w; set %s in the user or managed agentic.json, or pass --image", err, runconfig.KeyImage.Path())
+	}
 	if err != nil {
 		return Plan{}, err
 	}

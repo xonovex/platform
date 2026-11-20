@@ -1,12 +1,11 @@
 package docker
 
 import (
+	"errors"
 	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
-
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
@@ -41,6 +40,7 @@ func dockerCfg(net network.NetworkMethod) isoshared.RunConfig {
 		Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/work"},
 		HomeDir: "/home/user",
 		Network: net,
+		Image:   digestPinnedImage,
 	}
 }
 
@@ -232,8 +232,11 @@ func TestDocker_AppliesContribution(t *testing.T) {
 
 func TestDocker_Capabilities(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
-	if !i.HidesHost(false, "") {
-		t.Error("docker with the digest-pinned default image hides host-equivalent tools")
+	if i.HidesHost(false, "") {
+		t.Error("docker without an image must not claim to hide host-equivalent image tools")
+	}
+	if !i.RequiresImage() {
+		t.Error("docker starts the agent from an image")
 	}
 	digest := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	if i.HidesHost(false, "alpine:3.20") {
@@ -311,9 +314,15 @@ func TestDocker_MountsTheSourceRepositoryAndCallerPaths(t *testing.T) {
 	}
 }
 
-func TestDocker_UsesTheDefaultImageWithoutAnImage(t *testing.T) {
-	if args := dockerCommand(t, newHost(), dockerCfg(network.NetworkNone), provision.Contribution{}); !argHas(args, isolation.DefaultContainerImage) {
-		t.Errorf("args = %v, want the default image", args)
+func TestDocker_RefusesARunWithoutAnImage(t *testing.T) {
+	cfg := dockerCfg(network.NetworkNone)
+	cfg.Image = ""
+	isolator := NewIsolator(newHost(), testLog)
+	if _, err := isolator.Command(cfg, provision.Contribution{}); !errors.Is(err, isoshared.ErrNoImage) {
+		t.Errorf("Command() error = %v, want ErrNoImage", err)
+	}
+	if _, err := isolator.Run(cfg, provision.Contribution{}); !errors.Is(err, isoshared.ErrNoImage) {
+		t.Errorf("Run() error = %v, want ErrNoImage", err)
 	}
 }
 
@@ -400,14 +409,11 @@ func TestDocker_AvailableTracksTheDaemon(t *testing.T) {
 
 func TestDocker_CheckAgent(t *testing.T) {
 	isolator := NewIsolator(newHost(), testLog)
-	for _, image := range []string{"", isolation.DefaultContainerImage} {
-		cfg := dockerCfg(network.NetworkNone)
-		cfg.Image = image
-		if err := isolator.CheckAgent(cfg); err == nil || !strings.Contains(err.Error(), "default docker image") {
-			t.Errorf("CheckAgent(image=%q) error = %v, want default-image error", image, err)
-		}
-	}
 	cfg := dockerCfg(network.NetworkNone)
+	cfg.Image = ""
+	if err := isolator.CheckAgent(cfg); !errors.Is(err, isoshared.ErrNoImage) {
+		t.Errorf("CheckAgent(no image) error = %v, want ErrNoImage", err)
+	}
 	cfg.Image = digestPinnedImage
 	if err := isolator.CheckAgent(cfg); err != nil {
 		t.Errorf("CheckAgent(custom image) error = %v, want nil", err)

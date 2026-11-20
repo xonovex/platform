@@ -27,6 +27,7 @@ func Section() spec.Section {
 			key("/isolation", spec.Replace, spec.TrustedFiles, "Isolation axis."),
 			key("/provision", spec.Replace, spec.TrustedFiles, "Provision axis."),
 			key("/network", spec.Replace, spec.TrustedFiles, "Network egress axis."),
+			key("/image", spec.Replace, spec.TrustedFiles, "Container image of a docker or openshell run."),
 			key("/homeDir", spec.Replace, spec.TrustedFiles, "Home directory of the sandbox."),
 			key("/bindPaths", spec.Append, spec.TrustedFiles, "Read-write bind mounts."),
 			key("/roBindPaths", spec.Append, spec.TrustedFiles, "Read-only bind mounts."),

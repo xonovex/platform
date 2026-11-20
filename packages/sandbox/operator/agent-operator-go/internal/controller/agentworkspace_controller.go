@@ -17,12 +17,9 @@ import (
 	netshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/network/shared"
 )
 
-// DefaultWorkspaceInitImage is pinned to the multi-architecture OCI index for
-// alpine/git 2.54.0. Operators may configure another digest-pinned image.
-const DefaultWorkspaceInitImage = "docker.io/alpine/git:2.54.1@sha256:2306e2b05ee0ef99f5d25b0779f645b24ae9f91ba187107503592fcdfe78da3a"
-
 // AgentWorkspaceDependencies are the ports and settings of the AgentWorkspace
-// reconciler. An empty WorkspaceInitImage selects DefaultWorkspaceInitImage.
+// reconciler. WorkspaceInitImage is the digest-pinned image of the init Job,
+// which the deployment of the operator supplies: the operator ships no image.
 type AgentWorkspaceDependencies struct {
 	Store              WorkspaceStore
 	VCS                VCSResolver
@@ -40,9 +37,6 @@ type AgentWorkspaceReconciler struct {
 // NewAgentWorkspaceReconciler returns an AgentWorkspace reconciler over its
 // ports.
 func NewAgentWorkspaceReconciler(deps AgentWorkspaceDependencies) *AgentWorkspaceReconciler {
-	if deps.WorkspaceInitImage == "" {
-		deps.WorkspaceInitImage = DefaultWorkspaceInitImage
-	}
 	return &AgentWorkspaceReconciler{deps: deps}
 }
 

@@ -166,6 +166,9 @@ func TestNone_Capabilities(t *testing.T) {
 	if i.ConfinesNetwork() {
 		t.Error("none has no network namespace")
 	}
+	if i.RequiresImage() {
+		t.Error("the host isolation takes no image")
+	}
 	if !i.AcceptsHostBinds() {
 		t.Error("none reaches every host path")
 	}

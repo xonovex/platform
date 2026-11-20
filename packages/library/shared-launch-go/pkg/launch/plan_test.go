@@ -25,8 +25,9 @@ const revision = "0123456789abcdef0123456789abcdef01234567"
 // confinement declares a sandbox and starts nothing. The zero value is bounded,
 // confines the network over a loopback proxy and accepts host binds.
 type confinement struct {
-	unbounded bool
-	noBinds   bool
+	unbounded  bool
+	noBinds    bool
+	needsImage bool
 }
 
 func (confinement) PinnedProvision(_ provision.ProvisionMethod, pinned bool, _ string) bool {
@@ -38,6 +39,7 @@ func (confinement) ConfinesNetwork() bool                     { return true }
 func (confinement) EgressTransport() network.EgressTransport  { return network.TransportLoopback }
 func (c confinement) Bounded() bool                           { return !c.unbounded }
 func (c confinement) AcceptsHostBinds() bool                  { return !c.noBinds }
+func (c confinement) RequiresImage() bool                     { return c.needsImage }
 
 type provisioner struct{ pinned bool }
 
@@ -55,8 +57,8 @@ func registry() *sandbox.Registry[isoshared.Confinement] {
 	return sandbox.NewRegistry[isoshared.Confinement]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Confinement { return confinement{unbounded: true} }).
 		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Confinement { return confinement{} }).
-		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Confinement { return confinement{} }).
-		RegisterIsolator(isolation.IsolationOpenShell, func() isoshared.Confinement { return confinement{noBinds: true} }).
+		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Confinement { return confinement{needsImage: true} }).
+		RegisterIsolator(isolation.IsolationOpenShell, func() isoshared.Confinement { return confinement{noBinds: true, needsImage: true} }).
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return provisioner{} }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return provisioner{} }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return provisioner{pinned: true} })
@@ -264,8 +266,19 @@ func TestPlanSpecBindsTheSourceDirectoryOnlyWhereHostBindsAreAccepted(t *testing
 	if len(spec.Run.BindPaths) != 0 || spec.Run.Process.Dir != "/work/repo" {
 		t.Errorf("openshell run = binds %v, dir %q; want no bind and the source directory as work directory", spec.Run.BindPaths, spec.Run.Process.Dir)
 	}
-	if _, err := plan(t, Request{Agent: "claude", Isolation: "openshell", BindPaths: []string{"/cache"}}); err == nil || !strings.Contains(err.Error(), "cannot bind a host path") {
+	if _, err := plan(t, Request{Agent: "claude", Isolation: "openshell", Image: "registry.example/agent:1", BindPaths: []string{"/cache"}}); err == nil || !strings.Contains(err.Error(), "cannot bind a host path") {
 		t.Errorf("PlanSpec(openshell with binds) error = %v, want the refused bind", err)
+	}
+}
+
+func TestPlanSpecRefusesAnImageIsolationWithoutAnImage(t *testing.T) {
+	for _, name := range []string{"docker", "openshell"} {
+		if _, err := plan(t, Request{Agent: "claude", Isolation: name}); !errors.Is(err, isoshared.ErrNoImage) {
+			t.Errorf("isolation %s without an image: error = %v, want ErrNoImage", name, err)
+		}
+	}
+	if _, err := plan(t, Request{Agent: "claude", Isolation: "docker", Image: "registry.example/agent:1"}); err != nil {
+		t.Errorf("docker with an image: error = %v", err)
 	}
 }
 

@@ -64,7 +64,24 @@ func productionFile(path string) bool {
 
 type finding struct{ where, literal, kind string }
 
-func scan(t *testing.T, root string) []finding {
+// classifier names the kind of a forbidden string literal, or returns false for
+// a literal that is allowed.
+type classifier func(value string) (kind string, forbidden bool)
+
+// modelOrPreset flags a model id and a provider preset name.
+func modelOrPreset(value string) (string, bool) {
+	switch {
+	case presetName.MatchString(value):
+		return "provider preset name", true
+	case modelID.MatchString(value):
+		return "model id", true
+	}
+	return "", false
+}
+
+// scan returns the string literals of the production Go code under root that
+// classify flags.
+func scan(t *testing.T, root string, classify classifier) []finding {
 	t.Helper()
 	var found []finding
 	fset := token.NewFileSet()
@@ -95,12 +112,8 @@ func scan(t *testing.T, root string) []finding {
 			if err != nil {
 				return true
 			}
-			where := fset.Position(literal.Pos()).String()
-			switch {
-			case presetName.MatchString(value):
-				found = append(found, finding{where, value, "provider preset name"})
-			case modelID.MatchString(value):
-				found = append(found, finding{where, value, "model id"})
+			if kind, forbidden := classify(value); forbidden {
+				found = append(found, finding{fset.Position(literal.Pos()).String(), value, kind})
 			}
 			return true
 		})
@@ -114,7 +127,7 @@ func scan(t *testing.T, root string) []finding {
 
 func TestProductionCodeHoldsNoModelIDAndNoProviderPreset(t *testing.T) {
 	for _, module := range modules {
-		for _, f := range scan(t, filepath.Join(packagesDir(t), filepath.FromSlash(module))) {
+		for _, f := range scan(t, filepath.Join(packagesDir(t), filepath.FromSlash(module)), modelOrPreset) {
 			t.Errorf("%s: the %s %q belongs in a provider file or a setting, not in code", f.where, f.kind, f.literal)
 		}
 	}
