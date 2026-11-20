@@ -1,15 +1,19 @@
 #!/usr/bin/env node
-import {dirname} from "node:path";
-import {fileURLToPath} from "node:url";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {logError} from "@xonovex/script-moon-common/logging";
+import {processOutput} from "@xonovex/script-moon-common/adapters/output-node";
+import {errorLine} from "@xonovex/script-moon-common/logging";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
-import {runCli} from "./cli.js";
+import {main} from "./cli.js";
 
 try {
-  const root = findWorkspaceRoot(dirname(fileURLToPath(import.meta.url)));
-  process.exitCode = runCli(process.argv.slice(2), root, nodeFileSystem);
+  process.exitCode = main(
+    process.argv.slice(2),
+    findWorkspaceRoot(import.meta.dirname, undefined, nodeFileSystem),
+    {fs: nodeFileSystem, output: processOutput},
+  );
 } catch (error: unknown) {
-  logError(error instanceof Error ? error.message : String(error));
+  processOutput.stderr(
+    errorLine(error instanceof Error ? error.message : String(error)),
+  );
   process.exitCode = 1;
 }

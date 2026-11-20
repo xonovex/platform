@@ -1,4 +1,3 @@
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {loadPlugins} from "./catalog.js";
 import {inside, readText} from "./files.js";
@@ -8,7 +7,7 @@ import type {ReadmeUpdate} from "./model.js";
 
 const readmeUpdates = (
   root: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly ReadmeUpdate[] => {
   const catalog = loadPlugins(root, fs);
   return catalog.plugins.map((plugin) => {
@@ -27,7 +26,7 @@ const readmeUpdates = (
 
 const driftedReadmes = (
   root: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly ReadmeUpdate[] =>
   readmeUpdates(root, fs).filter(
     (update) => update.previous !== update.content,
@@ -35,7 +34,7 @@ const driftedReadmes = (
 
 export const syncInstallations = (
   root: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const drifted = driftedReadmes(root, fs);
   for (const update of drifted) {
@@ -46,5 +45,5 @@ export const syncInstallations = (
 
 export const checkInstallations = (
   root: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => driftedReadmes(root, fs).map((update) => update.path);

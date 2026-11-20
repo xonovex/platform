@@ -1,5 +1,4 @@
 import {basename} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {pluginHandoffNames} from "@xonovex/script-moon-common/skill-handoffs";
@@ -50,10 +49,7 @@ const withCompanions = (
   });
 };
 
-export const loadPlugins = (
-  root: string,
-  fs: FileSystem = nodeFileSystem,
-): Catalog => {
+export const loadPlugins = (root: string, fs: FileSystem): Catalog => {
   const marketplace = jsonFile(
     root,
     ".claude-plugin/marketplace.json",

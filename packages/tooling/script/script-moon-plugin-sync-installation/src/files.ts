@@ -1,5 +1,4 @@
 import {isAbsolute, relative, resolve, sep} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {z} from "zod";
 
@@ -12,24 +11,18 @@ export const inside = (root: string, path: string): string => {
   return resolved;
 };
 
-export const readText = (
-  root: string,
-  path: string,
-  fs: FileSystem = nodeFileSystem,
-): string => fs.readText(inside(root, path));
+export const readText = (root: string, path: string, fs: FileSystem): string =>
+  fs.readText(inside(root, path));
 
 export const jsonFile = <T>(
   root: string,
   path: string,
   schema: z.ZodType<T>,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): T => {
   const raw: unknown = JSON.parse(readText(root, path, fs));
   return schema.parse(raw);
 };
 
-export const exists = (
-  root: string,
-  path: string,
-  fs: FileSystem = nodeFileSystem,
-): boolean => fs.isFile(inside(root, path));
+export const exists = (root: string, path: string, fs: FileSystem): boolean =>
+  fs.isFile(inside(root, path));

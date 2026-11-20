@@ -1,10 +1,11 @@
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import {
-  logError,
-  logInfo,
-  logSuccess,
+  errorLine,
+  infoLine,
+  successLine,
 } from "@xonovex/script-moon-common/logging";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {checkInstallations, syncInstallations} from "./readme-sync.js";
 
 const syncTask =
@@ -22,34 +23,44 @@ const cliSpec = {
   },
 } as const;
 
-export const runCli = (
+export interface SyncInstallationDependencies {
+  readonly fs: FileSystem;
+  readonly output: Output;
+}
+
+/** Writes or checks the installation section of each plugin README and returns the exit code. */
+export const main = (
   argv: readonly string[],
   root: string,
-  fs: FileSystem,
+  dependencies: SyncInstallationDependencies,
 ): number => {
+  const {fs, output} = dependencies;
   const args = parseCliArgs(cliSpec, argv);
   if (args.kind === "help") {
-    console.log(args.text);
+    output.stdout(args.text);
     return 0;
   }
-  const {values} = args;
-  if (values.check === true) {
+  if (args.values.check === true) {
     const drifted = checkInstallations(root, fs);
     if (drifted.length === 0) {
-      logSuccess("Plugin installation sections are in sync.");
+      output.stdout(successLine("Plugin installation sections are in sync."));
       return 0;
     }
-    logError(
+    for (const line of [
       `Plugin installation sections have drifted in ${String(drifted.length)} README(s):`,
-    );
-    for (const path of drifted) logError(`  - ${path}`);
-    logError(`Run ${syncTask} to update them.`);
+      ...drifted.map((path) => `  - ${path}`),
+      `Run ${syncTask} to update them.`,
+    ]) {
+      output.stderr(errorLine(line));
+    }
     return 1;
   }
   const updated = syncInstallations(root, fs);
-  for (const path of updated) logInfo(`Updated ${path}`);
-  logSuccess(
-    `Updated ${String(updated.length)} plugin installation section(s).`,
+  for (const path of updated) output.stdout(infoLine(`Updated ${path}`));
+  output.stdout(
+    successLine(
+      `Updated ${String(updated.length)} plugin installation section(s).`,
+    ),
   );
   return 0;
 };

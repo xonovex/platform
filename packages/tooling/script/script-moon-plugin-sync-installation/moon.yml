@@ -17,10 +17,10 @@ fileGroups:
 tasks:
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "95"
+      TS_COVERAGE_MIN_LINES: "100"
       TS_COVERAGE_MIN_FUNCTIONS: "100"
-      TS_COVERAGE_MIN_BRANCHES: "94"
-      TS_COVERAGE_MIN_STATEMENTS: "95"
+      TS_COVERAGE_MIN_BRANCHES: "98"
+      TS_COVERAGE_MIN_STATEMENTS: "100"
   # Writes the marked installation section of every plugin README. Run it after
   # changing a plugin's version, name, dependencies, or harness support.
   plugin-installation-sync:
