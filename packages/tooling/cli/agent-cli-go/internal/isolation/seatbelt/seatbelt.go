@@ -61,6 +61,9 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // Bounded reports true: the profile confines what the agent writes and reaches.
 func (i *Isolator) Bounded() bool { return true }
 
+// AcceptsHostBinds reports true: the profile grants access to a host path.
+func (i *Isolator) AcceptsHostBinds() bool { return true }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {

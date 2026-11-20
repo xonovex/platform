@@ -99,6 +99,10 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // writes and reaches.
 func (i *Isolator) Bounded() bool { return true }
 
+// AcceptsHostBinds reports false: a sandbox on a gateway has no host bind, so
+// the work directory is uploaded instead.
+func (i *Isolator) AcceptsHostBinds() bool { return false }
+
 // CheckAgent requires an image, because the sandbox starts from it and the agent
 // must be in it.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {

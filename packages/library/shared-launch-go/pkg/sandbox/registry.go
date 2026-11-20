@@ -128,6 +128,9 @@ func Evaluate[I isoshared.Confinement](reg *Registry[I], req Request) (Choice[I]
 	if err != nil {
 		return Choice[I]{}, err
 	}
+	if req.HasCustomBinds && !iso.AcceptsHostBinds() {
+		return Choice[I]{}, fmt.Errorf("isolation=%s cannot bind a host path; remove the bind paths", req.Isolation)
+	}
 	if network.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
 		return Choice[I]{}, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
 	}

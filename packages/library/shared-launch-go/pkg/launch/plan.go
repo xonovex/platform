@@ -137,10 +137,13 @@ func PlanSpec[I isoshared.Confinement](request Request, agent *types.AgentConfig
 	if request.HomeDir != "" {
 		homeDir = request.HomeDir
 	}
-	// The source directory is bound as well, so a checkout can reach the shared
-	// .git directory of the repository it was created from.
-	bindPaths := append(slices.Clone(request.BindPaths), sourceDir)
 	confinement := selected.choice.Isolator
+	bindPaths := slices.Clone(request.BindPaths)
+	if confinement.AcceptsHostBinds() {
+		// The source directory is bound as well, so a checkout can reach the
+		// shared .git directory of the repository it was created from.
+		bindPaths = append(bindPaths, sourceDir)
+	}
 
 	return Spec{
 		Agent:         agent,

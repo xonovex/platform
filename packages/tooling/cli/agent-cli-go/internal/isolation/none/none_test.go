@@ -166,6 +166,9 @@ func TestNone_Capabilities(t *testing.T) {
 	if i.ConfinesNetwork() {
 		t.Error("none has no network namespace")
 	}
+	if !i.AcceptsHostBinds() {
+		t.Error("none reaches every host path")
+	}
 	if i.Bounded() {
 		t.Error("none sets no boundary around the agent")
 	}

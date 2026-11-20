@@ -226,6 +226,9 @@ func TestMountable(t *testing.T) {
 
 func TestCapabilitiesFailClosed(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
+	if !i.AcceptsHostBinds() {
+		t.Error("docker-sandboxes mounts a host path as a workspace")
+	}
 	if i.HidesHost(true, "img") || i.KernelIsolated("runsc") || i.ConfinesNetwork() || i.PinnedProvision(provision.ProvisionNix, true, "img") || !i.Bounded() {
 		t.Error("docker-sandboxes must claim none of the guarantees it cannot verify")
 	}

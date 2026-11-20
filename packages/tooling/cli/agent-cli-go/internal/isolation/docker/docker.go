@@ -98,6 +98,9 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // reaches.
 func (i *Isolator) Bounded() bool { return true }
 
+// AcceptsHostBinds reports true: docker mounts a host path into the container.
+func (i *Isolator) AcceptsHostBinds() bool { return true }
+
 // CheckAgent rejects the default image, which does not contain an agent; a
 // caller-supplied image is trusted to contain it.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {

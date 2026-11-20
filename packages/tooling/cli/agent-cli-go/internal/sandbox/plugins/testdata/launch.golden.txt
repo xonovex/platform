@@ -1571,15 +1571,15 @@ error: isolation=docker-sandboxes cannot restrict network egress (network="manag
 error: isolation=docker-sandboxes cannot restrict network egress (network="managed"); select an isolation that confines the network
 
 ## openshell / plain / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 out: 
 log: 
 
 ## openshell / plain / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / plain / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / provider and custom environment / dry run
 error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
@@ -1626,57 +1626,96 @@ error: prepare sandbox command: openshell cannot run this: a sandbox on a gatewa
 error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
 
 ## openshell / initialization commands / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 out: 
 log: 
 
 ## openshell / initialization commands / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / initialization commands / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / binds / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: isolation=openshell cannot bind a host path; remove the bind paths
 out: 
 log: 
 
 ## openshell / binds / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: isolation=openshell cannot bind a host path; remove the bind paths
 
 ## openshell / binds / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: isolation=openshell cannot bind a host path; remove the bind paths
 
 ## openshell / checkout / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 out: 
 log: 
 
 ## openshell / checkout / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / checkout / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare sandbox command: openshell cannot run this: a sandbox policy cannot express network mode "host"; use none or managed
 
 ## openshell / network none / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
-out: 
-log: 
+out: openshell sandbox exec --name agent-cli-1 --workdir /sandbox/repo --no-tty -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: none
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: openshell (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: none (flags command line)
 
 ## openshell / network none / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+capture: openshell sandbox list --names
+capture: openshell sandbox create --name agent-cli-1 --from registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef --policy /tmp/agent-cli-openshell-1/policy.json --no-auto-providers --detach
+capture: openshell sandbox upload agent-cli-1 /work/repo /sandbox/repo --no-git-ignore
+run: openshell sandbox exec --name agent-cli-1 --workdir /sandbox/repo --no-tty -- claude --permission-mode bypassPermissions review --depth 2
+run env: 
+run dir: 
+capture: openshell sandbox download agent-cli-1 /sandbox/repo /work
+capture: openshell sandbox delete agent-cli-1
 
 ## openshell / network none / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare terminal command: openshell cannot run this: a terminal wrapper cannot create and remove the sandbox
 
 ## openshell / network managed / dry run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
-out: 
-log: 
+out: openshell sandbox exec --name agent-cli-1 --workdir /sandbox/repo --no-tty -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: managed
+log: [INFO]   Allowed hosts: api.example.com:443
+log: [INFO]   Egress transport: policy
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: openshell (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: managed (flags command line)
+log: [INFO]     allowHosts: api.example.com (flags command line)
 
 ## openshell / network managed / run
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+capture: openshell sandbox list --names
+capture: openshell sandbox create --name agent-cli-1 --from registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef --policy /tmp/agent-cli-openshell-1/policy.json --no-auto-providers --detach
+capture: openshell sandbox upload agent-cli-1 /work/repo /sandbox/repo --no-git-ignore
+run: openshell sandbox exec --name agent-cli-1 --workdir /sandbox/repo --no-tty -- claude --permission-mode bypassPermissions review --depth 2
+run env: 
+run dir: 
+capture: openshell sandbox download agent-cli-1 /sandbox/repo /work
+capture: openshell sandbox delete agent-cli-1
 
 ## openshell / network managed / terminal
-error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+error: prepare terminal command: openshell cannot run this: a terminal wrapper cannot create and remove the sandbox
 

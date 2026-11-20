@@ -86,6 +86,11 @@ type Confinement interface {
 	// Bounded reports whether a boundary surrounds the agent, so the planner
 	// starts the agent without its own permission prompts.
 	Bounded() bool
+	// AcceptsHostBinds reports whether the isolation can bind a host path into
+	// the sandbox. The planner binds the source directory only into an isolation
+	// that accepts it, and selection refuses the bind paths of a request for one
+	// that does not.
+	AcceptsHostBinds() bool
 }
 
 // Launcher starts a confined agent process on this machine and applies a

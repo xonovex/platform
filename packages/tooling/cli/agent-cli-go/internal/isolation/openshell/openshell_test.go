@@ -337,6 +337,9 @@ func TestCapabilities(t *testing.T) {
 	if !i.PinnedProvision(provision.ProvisionNix, true, pinned) {
 		t.Error("a pinned image with a pinned provisioner is pinned")
 	}
+	if i.AcceptsHostBinds() {
+		t.Error("a sandbox on a gateway has no host bind")
+	}
 	if i.KernelIsolated("runsc") || !i.ConfinesNetwork() || i.EgressTransport() != network.TransportPolicy || !i.Bounded() {
 		t.Error("openshell declares a policy transport and no verified kernel boundary")
 	}

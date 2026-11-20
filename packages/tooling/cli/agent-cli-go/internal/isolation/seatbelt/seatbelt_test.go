@@ -163,6 +163,9 @@ func TestCommandRefusals(t *testing.T) {
 
 func TestCapabilities(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
+	if !i.AcceptsHostBinds() {
+		t.Error("the seatbelt profile grants access to a host path")
+	}
 	if i.HidesHost(false, "") || i.KernelIsolated("") || !i.ConfinesNetwork() || !i.Bounded() {
 		t.Error("seatbelt hides no host, is no kernel boundary, confines the network and bounds the agent")
 	}

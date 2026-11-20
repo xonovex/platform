@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
@@ -26,6 +27,8 @@ type fakeConfinement struct {
 	// noTransport makes the double declare no egress transport; the zero value
 	// declares the unix socket.
 	noTransport bool
+	// noBinds makes the double refuse host binds; the zero value accepts them.
+	noBinds bool
 }
 
 func (f fakeConfinement) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
@@ -39,8 +42,9 @@ func (f fakeConfinement) EgressTransport() network.EgressTransport {
 	}
 	return network.TransportUnixSocket
 }
-func (f fakeConfinement) ConfinesNetwork() bool { return !f.sharesNetwork }
-func (f fakeConfinement) Bounded() bool         { return true }
+func (f fakeConfinement) ConfinesNetwork() bool  { return !f.sharesNetwork }
+func (f fakeConfinement) Bounded() bool          { return true }
+func (f fakeConfinement) AcceptsHostBinds() bool { return !f.noBinds }
 
 // fakeIsolator adds a Launcher to the confinement, for the availability probe.
 type fakeIsolator struct {
@@ -156,6 +160,19 @@ func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
 
 	if !errors.Is(err, policy.ErrHostToolsReachable) {
 		t.Fatalf("Select() error = %v, want %v", err, policy.ErrHostToolsReachable)
+	}
+}
+
+func TestEvaluate_RejectsBindPathsForAnIsolationWithoutHostBinds(t *testing.T) {
+	reg := testRegistry(fakeConfinement{noBinds: true}, fakeProvisioner{})
+	req := bwrapNixReq()
+
+	if _, err := Evaluate(reg, req); err != nil {
+		t.Fatalf("Evaluate(no bind paths) error = %v, want nil", err)
+	}
+	req.HasCustomBinds = true
+	if _, err := Evaluate(reg, req); err == nil || !strings.Contains(err.Error(), "cannot bind a host path") {
+		t.Fatalf("Evaluate(bind paths) error = %v, want the refused bind", err)
 	}
 }
 

@@ -68,6 +68,9 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // Bounded reports true: the namespaces confine what the agent writes and reaches.
 func (i *Isolator) Bounded() bool { return true }
 
+// AcceptsHostBinds reports true: bwrap binds a host path into the sandbox.
+func (i *Isolator) AcceptsHostBinds() bool { return true }
+
 // CheckAgent requires host passthrough, because deny-default bwrap exposes no
 // host tool, and then the agent executable on the PATH it passes through.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {

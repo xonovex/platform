@@ -21,10 +21,11 @@ import (
 
 const revision = "0123456789abcdef0123456789abcdef01234567"
 
-// confinement declares a sandbox and starts nothing. The zero value is bounded
-// and confines the network over a loopback proxy.
+// confinement declares a sandbox and starts nothing. The zero value is bounded,
+// confines the network over a loopback proxy and accepts host binds.
 type confinement struct {
 	unbounded bool
+	noBinds   bool
 }
 
 func (confinement) PinnedProvision(_ provision.ProvisionMethod, pinned bool, _ string) bool {
@@ -35,6 +36,7 @@ func (confinement) KernelIsolated(runtime string) bool        { return runtime =
 func (confinement) ConfinesNetwork() bool                     { return true }
 func (confinement) EgressTransport() network.EgressTransport  { return network.TransportLoopback }
 func (c confinement) Bounded() bool                           { return !c.unbounded }
+func (c confinement) AcceptsHostBinds() bool                  { return !c.noBinds }
 
 type provisioner struct{ pinned bool }
 
@@ -46,13 +48,14 @@ func (provisioner) CheckAgent(provision.Contribution, *types.AgentConfig) (bool,
 	return false, nil
 }
 
-// registry registers the host as an unbounded isolation, and bwrap and docker
-// as bounded ones.
+// registry registers the host as an unbounded isolation, bwrap and docker as
+// bounded ones, and openshell as one without host binds.
 func registry() *sandbox.Registry[isoshared.Confinement] {
 	return sandbox.NewRegistry[isoshared.Confinement]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Confinement { return confinement{unbounded: true} }).
 		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Confinement { return confinement{} }).
 		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Confinement { return confinement{} }).
+		RegisterIsolator(isolation.IsolationOpenShell, func() isoshared.Confinement { return confinement{noBinds: true} }).
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return provisioner{} }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return provisioner{} }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return provisioner{pinned: true} })
@@ -221,6 +224,17 @@ func TestPlanSpecStartsTheAgentWithoutPromptsOnlyInsideABoundary(t *testing.T) {
 
 	if !slices.Equal(host.Run.Process.Argv, []string{"claude", "go"}) || host.Run.Egress.Transport != "" {
 		t.Errorf("host run = %v %+v, want the plain argv and no route", host.Run.Process.Argv, host.Run.Egress)
+	}
+}
+
+func TestPlanSpecBindsTheSourceDirectoryOnlyWhereHostBindsAreAccepted(t *testing.T) {
+	spec := mustPlan(t, Request{Agent: "claude", Isolation: "openshell", Image: "registry.example/agent:1"})
+
+	if len(spec.Run.BindPaths) != 0 || spec.Run.Process.Dir != "/work/repo" {
+		t.Errorf("openshell run = binds %v, dir %q; want no bind and the source directory as work directory", spec.Run.BindPaths, spec.Run.Process.Dir)
+	}
+	if _, err := plan(t, Request{Agent: "claude", Isolation: "openshell", BindPaths: []string{"/cache"}}); err == nil || !strings.Contains(err.Error(), "cannot bind a host path") {
+		t.Errorf("PlanSpec(openshell with binds) error = %v, want the refused bind", err)
 	}
 }
 

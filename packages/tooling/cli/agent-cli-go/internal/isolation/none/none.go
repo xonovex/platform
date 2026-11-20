@@ -53,6 +53,10 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // prompts.
 func (i *Isolator) Bounded() bool { return false }
 
+// AcceptsHostBinds reports true: the agent runs on the host, which reaches
+// every host path already.
+func (i *Isolator) AcceptsHostBinds() bool { return true }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {

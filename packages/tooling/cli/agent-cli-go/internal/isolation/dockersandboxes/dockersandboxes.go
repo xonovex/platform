@@ -74,6 +74,10 @@ func (i *Isolator) EgressTransport() network.EgressTransport { return network.Tr
 // Bounded reports true: the microVM confines what the agent writes.
 func (i *Isolator) Bounded() bool { return true }
 
+// AcceptsHostBinds reports true: the sandbox mounts a host path as a
+// workspace.
+func (i *Isolator) AcceptsHostBinds() bool { return true }
+
 // CheckAgent has nothing to check: the agent binary lives in the sandbox image.
 func (i *Isolator) CheckAgent(isoshared.RunConfig) error { return nil }
 

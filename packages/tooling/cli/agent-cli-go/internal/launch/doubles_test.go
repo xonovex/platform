@@ -62,6 +62,7 @@ func (f *fakeIsolator) KernelIsolated(runtime string) bool        { return runti
 func (f *fakeIsolator) EgressTransport() network.EgressTransport  { return network.TransportUnixSocket }
 func (f *fakeIsolator) ConfinesNetwork() bool                     { return !f.noNetwork }
 func (f *fakeIsolator) Bounded() bool                             { return !f.unbounded }
+func (f *fakeIsolator) AcceptsHostBinds() bool                    { return true }
 
 func (f *fakeIsolator) CheckAgent(isoshared.RunConfig) error {
 	f.checked = true

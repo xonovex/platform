@@ -251,6 +251,9 @@ func TestDocker_Capabilities(t *testing.T) {
 	if !i.ConfinesNetwork() {
 		t.Error("docker applies --network none")
 	}
+	if !i.AcceptsHostBinds() {
+		t.Error("docker mounts a host path into the container")
+	}
 	if !i.Bounded() {
 		t.Error("docker bounds the agent")
 	}
