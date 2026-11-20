@@ -60,6 +60,9 @@ type harness struct {
 	brokenDir string
 	// brokenOut makes the output writer fail.
 	brokenOut bool
+	// diskRoot, when set, is the absolute root of the tree, and the files of
+	// the harness sit below it on the disk.
+	diskRoot string
 }
 
 func (h *harness) run(t *testing.T, args ...string) (string, error) {
@@ -87,12 +90,19 @@ func (h *harness) run(t *testing.T, args ...string) (string, error) {
 			if h.openErr != nil {
 				return cmd.Environment{}, h.openErr
 			}
-			h.disk = memfs.New(h.files)
+			treeRoot, onDisk := ".", h.files
+			if h.diskRoot != "" {
+				treeRoot, onDisk = h.diskRoot, map[string]string{}
+				for name, content := range h.files {
+					onDisk[h.diskRoot+"/"+name] = content
+				}
+			}
+			h.disk = memfs.New(onDisk)
 			var disk fs.FileSystem = h.disk
 			if h.brokenDir != "" {
 				disk = brokenDir{FileSystem: h.disk, suffix: h.brokenDir}
 			}
-			return cmd.Environment{Tree: tree.Tree{FS: disk, Root: "."}, Repository: checktest.Repo{}}, nil
+			return cmd.Environment{Tree: tree.Tree{FS: disk, Root: treeRoot}, Repository: checktest.Repo{}}, nil
 		},
 		Validator: validator,
 		Checks:    h.checks,
@@ -217,6 +227,11 @@ func TestProjectFile(t *testing.T) {
 	if _, err := h.run(t, "--path", "cli-path"); err != nil || strings.Join(paths, ",") != "cli-path" {
 		t.Fatalf("paths = %v err = %v", paths, err)
 	}
+	h.diskRoot = "/repo"
+	if _, err := h.run(t, "--path", "/repo/cli-path/", "--path", "/elsewhere"); err != nil || strings.Join(paths, ",") != "cli-path,/elsewhere" {
+		t.Fatalf("an absolute path below the root is relative to it: paths = %v err = %v", paths, err)
+	}
+	h.diskRoot = ""
 	h.files = map[string]string{"custom.json": `{"version": 1, "validate": {"checks": {"gamma": {}}}}`}
 	if _, err := h.run(t, "--project", "custom.json"); code(err) != 2 || !strings.Contains(err.Error(), "unknown check") {
 		t.Fatalf("an unknown check in the project file is a usage error: %v", err)
@@ -271,6 +286,35 @@ func TestSeedBudgetsRecordsTheCurrentWordCounts(t *testing.T) {
 	}
 	if data, err := h.disk.ReadFile("out/b.json"); err != nil || string(data) != "{}\n" {
 		t.Fatalf("empty manifest = %q, %v", data, err)
+	}
+}
+
+func TestSeedBudgetsHonoursAbsolutePaths(t *testing.T) {
+	h := &harness{diskRoot: "/repo", files: map[string]string{
+		"packages/runtime/plugin/p/skills/using-a/SKILL.md": "one two three\n",
+		"catalog/q/skills/using-b/SKILL.md":                 "four five\n",
+	}}
+	if _, err := h.run(t, "seed-budgets", "--path", "/repo/catalog", "--file", "/var/budgets.json"); err != nil {
+		t.Fatal(err)
+	}
+	data, err := h.disk.ReadFile("/var/budgets.json")
+	if err != nil || string(data) != "{\n  \"catalog/q/skills/using-b/SKILL.md\": 2\n}\n" {
+		t.Fatalf("manifest at the absolute file = %q, %v", data, err)
+	}
+	if _, err := h.disk.ReadFile("/repo/var/budgets.json"); err == nil {
+		t.Fatal("the absolute file landed below the root")
+	}
+	if _, err := h.run(t, "seed-budgets", "--path", "catalog", "--file", "out/b.json"); err != nil {
+		t.Fatal(err)
+	}
+	if relative, err := h.disk.ReadFile("/repo/out/b.json"); err != nil || string(relative) != string(data) {
+		t.Fatalf("a relative path resolves against the root: %q, %v", relative, err)
+	}
+	if _, err := h.run(t, "seed-budgets", "--path", "/repo/packages/runtime/plugin/p/skills/using-a/SKILL.md", "--file", "../outside.json"); err != nil {
+		t.Fatal(err)
+	}
+	if outside, err := h.disk.ReadFile("/outside.json"); err != nil || !strings.Contains(string(outside), `"packages/runtime/plugin/p/skills/using-a/SKILL.md": 3`) {
+		t.Fatalf("a path outside the root stays allowed: %q, %v", outside, err)
 	}
 }
 

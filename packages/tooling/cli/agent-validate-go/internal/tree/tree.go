@@ -21,9 +21,10 @@ type Tree struct {
 	Skip []string
 }
 
-// Abs returns the file-system path of a repository path.
+// Abs returns the file-system path of a repository path. An absolute path
+// names itself, so a path the user spelled absolute never lands below Root.
 func (t Tree) Abs(rel string) string {
-	if t.Root == "" || t.Root == "." {
+	if path.IsAbs(rel) || t.Root == "" || t.Root == "." {
 		return path.Clean(rel)
 	}
 	return path.Join(t.Root, rel)

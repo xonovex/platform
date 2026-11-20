@@ -29,7 +29,7 @@ func seedCommand(d Dependencies, root *string) *cobra.Command {
 			if len(paths) == 0 {
 				paths = []string{defaultCatalog}
 			}
-			files, err := budget.Collect(env.Tree, paths)
+			files, err := budget.Collect(env.Tree, repositoryPaths(env.Tree, paths))
 			if err != nil {
 				return usage(err)
 			}
@@ -48,7 +48,7 @@ func seedCommand(d Dependencies, root *string) *cobra.Command {
 			return nil
 		},
 	}
-	c.Flags().StringArrayVar(&paths, "path", nil, "catalog path to measure, repeatable (default "+defaultCatalog+")")
-	c.Flags().StringVar(&file, "file", "budgets.json", "budget manifest to write, relative to the root")
+	c.Flags().StringArrayVar(&paths, "path", nil, "catalog path to measure, absolute or relative to the root, repeatable (default "+defaultCatalog+")")
+	c.Flags().StringVar(&file, "file", "budgets.json", "budget manifest to write, absolute or relative to the root")
 	return c
 }

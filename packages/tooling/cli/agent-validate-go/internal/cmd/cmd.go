@@ -119,7 +119,7 @@ func NewRootCommand(d Dependencies) *cobra.Command {
 	root.PersistentFlags().StringVar(&f.project, "project", "", "project agentic.json, relative to the root (default the nearest agentic.json from the root up to the repository root)")
 	root.Flags().StringVar(&f.format, "format", string(contractreport.Text), "output format: "+contractreport.Names(report.Formats()...))
 	root.Flags().BoolVar(&f.strict, "strict", false, "fail on warnings too")
-	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the validate section, repeatable")
+	root.Flags().StringArrayVar(&f.paths, "path", nil, "path to check instead of the paths of the validate section, absolute or relative to the root, repeatable")
 	root.AddCommand(listCommand(d))
 	root.AddCommand(seedCommand(d, &f.root))
 	root.AddCommand(configCommand(d, &f))
@@ -153,7 +153,7 @@ func run(cmd *cobra.Command, d Dependencies, f flags, names []string) error {
 		return fail(err)
 	}
 	env.Tree.Skip = slices.Concat(env.Tree.Skip, proj.Skip)
-	steps, err := project.Plan(d.Checks, proj, names, f.paths)
+	steps, err := project.Plan(d.Checks, proj, names, repositoryPaths(env.Tree, f.paths))
 	if err != nil {
 		return fail(err)
 	}

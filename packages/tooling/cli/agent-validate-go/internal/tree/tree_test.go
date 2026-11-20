@@ -18,6 +18,9 @@ func TestPaths(t *testing.T) {
 	if got := rooted.Abs("a/b"); got != "/repo/a/b" {
 		t.Fatalf("Abs = %s", got)
 	}
+	if got := rooted.Abs("/elsewhere/./x"); got != "/elsewhere/x" {
+		t.Fatalf("an absolute path names itself = %s", got)
+	}
 	if got := rooted.Rel("/repo/a/b"); got != "a/b" {
 		t.Fatalf("Rel = %s", got)
 	}
