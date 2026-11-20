@@ -69,6 +69,7 @@ projects:
     skill-using-git: packages/runtime/plugin/plugin-core/skills/using-git
     skill-using-github: packages/runtime/plugin/plugin-integrations/skills/using-github
     skill-using-gitlab: packages/runtime/plugin/plugin-integrations/skills/using-gitlab
+    skill-using-herdr-core: packages/runtime/plugin/plugin-agentic/skills/using-herdr-core
     skill-using-herdr-tui: packages/runtime/plugin/plugin-agentic/skills/using-herdr-tui
     skill-using-hono: packages/runtime/plugin/plugin-typescript/skills/using-hono
     skill-using-hono-opinionated: packages/runtime/plugin/plugin-typescript/skills/using-hono-opinionated

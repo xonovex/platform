@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "version": 1,
+  "title": "Sources",
+  "sources": [
+    {
+      "id": "installed-hc-guidance-help-and-schema",
+      "kind": "original",
+      "title": "Installed hc guidance, CLI help, and API schema",
+      "version": "0.1.21",
+      "outputSha256": "sha256:02dfacf565e179769997dd6c4f3a702847f818418ac2b8b69447e4f50d8a1c26",
+      "provenance": "Authoritative output from the installed `hc --version`, `hc --skill`, `hc --help`, then `--help` of `hc run`, `hc send`, `hc read`, `hc keys`, `hc interrupt`, `hc wait`, `hc ls`, `hc get`, `hc kill`, `hc rm`, `hc label`, `hc keep`, and `hc exec`, then `hc schema --json`.",
+      "reviewedAt": "2026-11-20",
+      "feeds": ["references/terminals.md"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Caller address in HC_TERMINAL_ID; background runs with names, working directories, labels, removal, recovery, and parent lifetime; argument lists without a shell and single strings through sh -c, both in the core's environment; Codex --no-daemon; send, read, keys, interrupt, and exec; wait results, reasons, timeouts, output matches, and children modes; status words and blocked handling; child report tags; error kinds; event notifications with heartbeat and missed notices; cleanup of own terminals; no server stop or restart."
+        }
+      ],
+      "remarks": "The digest covers each listed command's standard output followed by standard error, concatenated in the stated order. The output names no path of the run environment. The commands ran with HOME and the XDG configuration, data, cache, and state directories in a temporary directory. `hc schema --json` equals the OpenRPC dump of herdr-core 0.1.21 kept outside this repository. Read-only `hc ls --json` and `hc get --json $HC_TERMINAL_ID` on the running core showed the address, state, status, and turn fields and the `herdr.space` and `herdr.tab` labels of an app terminal; their output is live state and is not in the digest. No command started, messaged, labeled, or removed a terminal."
+    },
+    {
+      "id": "installed-herdr-app-guidance-and-commands",
+      "kind": "original",
+      "title": "Installed herdr-app guidance and command list",
+      "version": "0.1.16",
+      "outputSha256": "sha256:beeecbe234a92593fbe0dbdc7568f923d8dfed2280825fe35c1540d3b69479f9",
+      "provenance": "Authoritative output from the installed `herdr-app --version`, `herdr-app --skill`, `herdr-app --help`, and `herdr-app commands`.",
+      "reviewedAt": "2026-11-20",
+      "feeds": ["references/app-window.md"],
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "Window control only through herdr-app; inspection with ls, status, and commands; space.new, tab.new, pane.split, agent.focus, and layout.clone arguments; focus false; command result and error output; herdr.space and herdr.tab labels; no bare herdr-app and no stop or restart of the app or core."
+        }
+      ],
+      "remarks": "The digest covers each listed command's standard output followed by standard error, concatenated in the stated order. The commands ran with HOME and every XDG directory, including XDG_RUNTIME_DIR, in a temporary directory, so they could not reach the user's window; `herdr-app commands` prints the built-in list without a window. No `herdr-app do` command ran."
+    },
+    {
+      "id": "repository-workflow-synthesis",
+      "kind": "original",
+      "title": "Repository workflow synthesis",
+      "provenance": "Repository-original procedures for delegated agent work in herdr-core terminals: the direnv wrapper for a development shell, a named background launch with the task in the run command, waits instead of polling, verification of child reports, and cleanup limited to the caller's own terminals.",
+      "reviewedAt": "2026-11-20",
+      "coversAllReferences": true,
+      "claims": [
+        {
+          "id": "claim-1",
+          "statement": "The environment check and stop, the direnv exec wrapper, the refusal to force a permission decision, the treatment of error like blocked, and the rule that a status word or child report does not prove completion."
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "title": "Refresh",
+      "text": "After an hc or herdr-app update, load the installed guides and the cited help again, compare the API schema, and reconcile changed commands, result fields, status words, and error kinds. Then update the observed versions, review dates, and digests. Run only read-only commands to refresh: never start, message, label, kill, or remove a terminal, and never run herdr-app do.",
+      "after": "repository-workflow-synthesis"
+    }
+  ]
+}

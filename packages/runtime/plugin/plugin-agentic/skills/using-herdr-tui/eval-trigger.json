@@ -126,7 +126,7 @@
       "prompt": "Open a new tab in the Herdr desktop app window with herdr-app and start Claude Code in it.",
       "shouldTrigger": false,
       "split": "validation",
-      "rationale": "desktop app window control rather than the herdr TUI CLI"
+      "rationale": "near miss owned by using-herdr-core"
     }
   ]
 }

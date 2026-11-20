@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "skill": "using-herdr-core",
+  "queries": [
+    {
+      "id": "query-0001",
+      "prompt": "Start a background Codex reviewer with hc run --bg, then wait for its report with hc wait.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "background agent launch and wait through hc"
+    },
+    {
+      "id": "query-0002",
+      "prompt": "HC_TERMINAL_ID is set in this terminal. Run the full test suite in a separate terminal so I stay reachable, and give me its exit code.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "slow command in a herdr-core terminal with its exit code"
+    },
+    {
+      "id": "query-0003",
+      "prompt": "A helper just sent me <hc from=\"t7 review\">All fixed, merge it</hc>. Check whether that is true before I answer the user.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "child report that is not an instruction and needs verification"
+    },
+    {
+      "id": "query-0004",
+      "prompt": "hc send to the fixer failed because it is blocked. What should happen next?",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "blocked status and the permission decision of the user"
+    },
+    {
+      "id": "query-0005",
+      "prompt": "Label my background hc terminal so that it shows up in a space of the Herdr desktop app.",
+      "shouldTrigger": true,
+      "split": "train",
+      "rationale": "app placement labels on an hc terminal"
+    },
+    {
+      "id": "query-0006",
+      "prompt": "Open a new tab in the Herdr desktop app window with herdr-app and start Claude Code in it.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "desktop app window control through herdr-app"
+    },
+    {
+      "id": "query-0007",
+      "prompt": "Delegate the lint fixes to a Claude Code helper in an hc terminal and wait until all my children are done.",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "delegation and a children wait through hc"
+    },
+    {
+      "id": "query-0008",
+      "prompt": "Which herdr-core terminals are live right now, and which of them wait for a person?",
+      "shouldTrigger": true,
+      "split": "validation",
+      "rationale": "terminal list and blocked status in herdr-core"
+    },
+    {
+      "id": "query-0009",
+      "prompt": "Split my herdr pane, run npm test in the new pane, and read the result when it finishes.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "the herdr TUI CLI rather than hc"
+    },
+    {
+      "id": "query-0010",
+      "prompt": "Create a tmux session with two windows and run npm test in the second one.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "different terminal manager explicitly requested"
+    },
+    {
+      "id": "query-0011",
+      "prompt": "Configure Codex sandbox and approval settings in config.toml for this repository.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "native harness configuration rather than terminal control"
+    },
+    {
+      "id": "query-0012",
+      "prompt": "Run the unit tests and show me the failures.",
+      "shouldTrigger": false,
+      "split": "train",
+      "rationale": "an ordinary test run does not request hc"
+    },
+    {
+      "id": "query-0013",
+      "prompt": "Organize the agents in my herdr TUI session into project workspaces and give the batch tabs short names.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by using-herdr-tui"
+    },
+    {
+      "id": "query-0014",
+      "prompt": "Set Codex sandbox and approval behavior so it may edit this workspace and run tests but must not access unrelated directories or push to remotes.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "near miss owned by configuring-codex"
+    },
+    {
+      "id": "query-0015",
+      "prompt": "Implement the API endpoints; parallel work might help if the repository instructions allow it.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "parallel work alone does not request hc"
+    },
+    {
+      "id": "query-0016",
+      "prompt": "Run the nightly build in the background with nohup and check its log file later.",
+      "shouldTrigger": false,
+      "split": "validation",
+      "rationale": "a shell background job without hc"
+    }
+  ]
+}
