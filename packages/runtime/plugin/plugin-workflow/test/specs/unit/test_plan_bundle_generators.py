@@ -48,12 +48,12 @@ class Indexes(unittest.TestCase):
             "* [log](log/) - One entry for each skill run\n",
         )
 
-    def test_diagrams_get_no_index_and_staging_does(self):
-        files = {**BASE, "diagrams/flow.md": S.doc("type: Note"), "staging/run.md": S.doc("type: Note\ntitle: Run")}
+    def test_diagrams_get_no_index_and_other_directories_do(self):
+        files = {**BASE, "diagrams/flow.md": S.doc("type: Note"), "sketches/run.md": S.doc("type: Note\ntitle: Run")}
         generated = index_files(files)
         self.assertNotIn("diagrams/index.md", generated)
-        self.assertEqual(generated["staging/index.md"], "# Documents\n\n* [Run](run.md)\n")
-        self.assertIn("* [staging](staging/)\n", generated["index.md"])
+        self.assertEqual(generated["sketches/index.md"], "# Documents\n\n* [Run](run.md)\n")
+        self.assertIn("* [sketches](sketches/)\n", generated["index.md"])
 
     def test_refinement_is_a_generic_directory(self):
         files = {**BASE, "refinement/2026-10-28-x/pack.md": S.doc("type: Workflow Refinement Session\ntitle: Pack")}

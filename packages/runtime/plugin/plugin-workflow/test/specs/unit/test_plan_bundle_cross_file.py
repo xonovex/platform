@@ -33,8 +33,8 @@ class Relations(unittest.TestCase):
         files = {"work/w-abcd.md": S.work(extra="session: work/w-abcd\nfolded_into: [work/w-abcd]\n")}
         self.assertEqual(cross(files), [])
 
-    def test_remotes_are_not_checked(self):
-        extra = "remotes:\n  - {service: s, key: K, fields: {title: ''}}\n  - {service: s, key: K}\n"
+    def test_unknown_lists_are_not_checked(self):
+        extra = "links:\n  - {service: s, key: K, fields: {title: ''}}\n  - {service: s, key: K}\n"
         self.assertEqual(cross({"work/w-abcd.md": S.work(extra=extra)}), [])
 
     def test_decision_relation_must_name_a_decision(self):
@@ -210,7 +210,7 @@ class Locations(unittest.TestCase):
         for kind, path in (
             ("Workflow Refinement Session", "refinement/2026-10-28-x/pack.md"),
             ("Workflow Outcome", "refinement/bad/outcomes/abcd.md"),
-            ("Workflow Sync Operation", "staging/run/op.md"),
+            ("Workflow Sync Operation", "operations/run/op.md"),
         ):
             with self.subTest(kind):
                 self.assertEqual(located(path, S.doc(S.header(kind, "workflow/x/1"))), [])
