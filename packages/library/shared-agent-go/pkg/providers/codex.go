@@ -17,7 +17,7 @@ func codexPresets() map[string]func() *types.ModelProvider {
 func gpt5CodexCodexProvider() *types.ModelProvider {
 	return &types.ModelProvider{
 		Name:                "gpt5-codex",
-		DisplayName:         "OpenAI GPT-5.2 Codex",
+		DisplayName:         "OpenAI GPT-6.2 Sol",
 		AgentType:           types.AgentCodex,
 		CredentialSourceEnv: "CLI_PROXY_API_KEY",
 		CredentialTargetEnv: "CLI_PROXY_API_KEY",
@@ -29,7 +29,7 @@ func gpt5CodexCodexProvider() *types.ModelProvider {
 			"-c", `model_providers.proxy.base_url="http://127.0.0.1:8317/v1"`,
 			"-c", `model_providers.proxy.wire_api="responses"`,
 			"-c", `model_providers.proxy.env_key="CLI_PROXY_API_KEY"`,
-			"-c", `model="gpt-5.2-codex"`,
+			"-c", `model="gpt-6.2-sol"`,
 		},
 	}
 }

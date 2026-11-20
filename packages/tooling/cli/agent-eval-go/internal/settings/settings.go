@@ -49,7 +49,7 @@ const (
 // models holds the default generation and judge model of each harness.
 var models = map[string][2]string{
 	"claude": {"claude-haiku-5-5", "claude-sonnet-5-5"},
-	"codex":  {"gpt-5.3-codex", "gpt-5.3-codex"},
+	"codex":  {"gpt-6.2-sol", "gpt-6.2-astra"},
 }
 
 // environment names the variables that select a harness and its models.

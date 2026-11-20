@@ -34,7 +34,7 @@ func TestPrecedenceFlagEnvProjectDefault(t *testing.T) {
 		Budgets:        &model.Budgets{MaxModelRuns: 10, MaxCostUSD: 1},
 	}
 	s, err := settings.Resolve(project, settings.Flags{}, nil, model.Trigger)
-	if err != nil || s.Harness != "codex" || s.Model != "from-project" || s.JudgeModel != "gpt-5.3-codex" ||
+	if err != nil || s.Harness != "codex" || s.Model != "from-project" || s.JudgeModel != "gpt-6.2-astra" ||
 		s.Runs != 2 || s.BatchSize != 5 || s.Threshold != 0.7 || s.Effort != "low" || s.TimeoutSeconds != 90 ||
 		s.Limits.MaxModelRuns != 10 || s.Limits.MaxCostUSD != 1 {
 		t.Fatalf("%v %+v", err, s)

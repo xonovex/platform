@@ -79,7 +79,7 @@ func glmProvider() *types.ModelProvider {
 func gpt5CodexProvider() *types.ModelProvider {
 	return &types.ModelProvider{
 		Name:                "gpt5-codex",
-		DisplayName:         "OpenAI GPT-5.2 Codex",
+		DisplayName:         "OpenAI GPT-6.2 Sol",
 		AgentType:           types.AgentClaude,
 		CredentialSourceEnv: "CLI_PROXY_API_KEY",
 		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
@@ -88,10 +88,10 @@ func gpt5CodexProvider() *types.ModelProvider {
 			"ANTHROPIC_BASE_URL":                       "http://127.0.0.1:8317",
 			"API_TIMEOUT_MS":                           "3000000",
 			"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-			"ANTHROPIC_DEFAULT_OPUS_MODEL":             "gpt-5.2-codex(high)",
-			"ANTHROPIC_DEFAULT_SONNET_MODEL":           "gpt-5.2-codex(medium)",
-			"ANTHROPIC_DEFAULT_HAIKU_MODEL":            "gpt-5.2-codex(low)",
-			"CLAUDE_CODE_SUBAGENT_MODEL":               "gpt-5.2-codex(medium)",
+			"ANTHROPIC_DEFAULT_OPUS_MODEL":             "gpt-6.2-sol(high)",
+			"ANTHROPIC_DEFAULT_SONNET_MODEL":           "gpt-6.2-sol(medium)",
+			"ANTHROPIC_DEFAULT_HAIKU_MODEL":            "gpt-6.2-sol(low)",
+			"CLAUDE_CODE_SUBAGENT_MODEL":               "gpt-6.2-sol(medium)",
 		},
 		CliArgs: []string{},
 	}
