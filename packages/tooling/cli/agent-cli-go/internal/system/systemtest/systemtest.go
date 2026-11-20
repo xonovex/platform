@@ -178,6 +178,39 @@ func (f *Fake) Stat(p string) (fs.FileInfo, error) {
 	return fileInfo{name: path.Base(p), entry: e}, nil
 }
 
+// Lstat returns the information of p without following a final symlink.
+func (f *Fake) Lstat(p string) (fs.FileInfo, error) {
+	p = path.Clean(p)
+	parent, err := f.resolve(path.Dir(p), 0)
+	if err != nil {
+		return nil, &fs.PathError{Op: "lstat", Path: p, Err: err}
+	}
+	e, ok := f.files[path.Join(parent, path.Base(p))]
+	if !ok {
+		return nil, &fs.PathError{Op: "lstat", Path: p, Err: fs.ErrNotExist}
+	}
+	return fileInfo{name: path.Base(p), entry: e}, nil
+}
+
+// ReadDir returns the entries of the directory p, sorted by name.
+func (f *Fake) ReadDir(p string) ([]fs.DirEntry, error) {
+	resolved, err := f.resolve(p, 0)
+	if err != nil {
+		return nil, &fs.PathError{Op: "open", Path: p, Err: err}
+	}
+	if !f.files[resolved].dir {
+		return nil, &fs.PathError{Op: "readdir", Path: p, Err: fmt.Errorf("not a directory")}
+	}
+	var entries []fs.DirEntry
+	for name, e := range f.files {
+		if name != resolved && path.Dir(name) == resolved {
+			entries = append(entries, dirEntry{fileInfo{name: path.Base(name), entry: e}})
+		}
+	}
+	sort.Slice(entries, func(i, j int) bool { return entries[i].Name() < entries[j].Name() })
+	return entries, nil
+}
+
 // ReadFile returns the content of the file p.
 func (f *Fake) ReadFile(p string) ([]byte, error) {
 	resolved, err := f.resolve(p, 0)
@@ -212,6 +245,54 @@ func (f *Fake) CreateTemp(pattern string) (string, error) {
 	p := path.Join("/tmp", name)
 	f.AddFile(p, "", 0o600)
 	return p, nil
+}
+
+// MkdirTemp creates an empty directory under /tmp whose name replaces the last
+// "*" of pattern with a counter.
+func (f *Fake) MkdirTemp(pattern string) (string, error) {
+	f.tempCount++
+	name := pattern + fmt.Sprint(f.tempCount)
+	if i := strings.LastIndex(pattern, "*"); i >= 0 {
+		name = fmt.Sprintf("%s%d%s", pattern[:i], f.tempCount, pattern[i+1:])
+	}
+	p := path.Join("/tmp", name)
+	f.AddDir(p)
+	return p, nil
+}
+
+// Rename moves the entry oldPath, and everything below it, to newPath. The parent
+// of newPath must exist.
+func (f *Fake) Rename(oldPath, newPath string) error {
+	oldPath, newPath = path.Clean(oldPath), path.Clean(newPath)
+	if _, ok := f.files[oldPath]; !ok {
+		return &fs.PathError{Op: "rename", Path: oldPath, Err: fs.ErrNotExist}
+	}
+	if parent, ok := f.files[path.Dir(newPath)]; !ok || !parent.dir {
+		return &fs.PathError{Op: "rename", Path: newPath, Err: fs.ErrNotExist}
+	}
+	moved := map[string]entry{}
+	for name, e := range f.files {
+		if name == oldPath || strings.HasPrefix(name, oldPath+"/") {
+			moved[newPath+strings.TrimPrefix(name, oldPath)] = e
+			delete(f.files, name)
+		}
+	}
+	for name, e := range moved {
+		f.files[name] = e
+	}
+	return nil
+}
+
+// RemoveAll deletes the entry p and everything below it. A missing entry is not
+// an error.
+func (f *Fake) RemoveAll(p string) error {
+	p = path.Clean(p)
+	for name := range f.files {
+		if name == p || strings.HasPrefix(name, p+"/") {
+			delete(f.files, name)
+		}
+	}
+	return nil
 }
 
 // Remove deletes the entry p.
@@ -358,3 +439,10 @@ func (i fileInfo) Mode() fs.FileMode {
 func (i fileInfo) ModTime() time.Time { return time.Time{} }
 func (i fileInfo) IsDir() bool        { return i.entry.dir }
 func (i fileInfo) Sys() any           { return nil }
+
+type dirEntry struct{ info fileInfo }
+
+func (d dirEntry) Name() string               { return d.info.name }
+func (d dirEntry) IsDir() bool                { return d.info.IsDir() }
+func (d dirEntry) Type() fs.FileMode          { return d.info.Mode().Type() }
+func (d dirEntry) Info() (fs.FileInfo, error) { return d.info, nil }

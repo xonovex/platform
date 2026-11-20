@@ -214,3 +214,89 @@ func TestProcesses(t *testing.T) {
 		t.Errorf("Calls[2] = %+v", call)
 	}
 }
+
+func TestLstatDoesNotFollowAFinalLink(t *testing.T) {
+	f := New().AddFile("/data/file", "x", 0o644).AddLink("/link", "/data/file").AddLink("/dir", "/data")
+	info, err := f.Lstat("/link")
+	if err != nil || info.Mode()&fs.ModeSymlink == 0 || info.Name() != "link" {
+		t.Errorf("Lstat(link) = %v, %v; want the link itself", info, err)
+	}
+	if info, err := f.Lstat("/dir/file"); err != nil || !info.Mode().IsRegular() {
+		t.Errorf("Lstat(dir/file) = %v, %v; want the file behind the link directory", info, err)
+	}
+	if _, err := f.Lstat("/missing"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Lstat(missing) error = %v", err)
+	}
+	if _, err := f.Lstat("/missing/child"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Lstat(missing/child) error = %v", err)
+	}
+}
+
+func TestReadDirListsDirectChildrenSortedByName(t *testing.T) {
+	f := New().AddFile("/d/b", "", 0o644).AddFile("/d/a/inner", "", 0o644).AddLink("/d/c", "/d/b").AddFile("/other/x", "", 0o644).AddLink("/alias", "/d")
+	entries, err := f.ReadDir("/alias")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, entry := range entries {
+		info, _ := entry.Info()
+		got = append(got, entry.Name()+":"+strings.Join([]string{boolText(entry.IsDir()), entry.Type().String(), info.Name()}, ":"))
+	}
+	if want := "a:true:d---------:a,b:false:----------:b,c:false:L---------:c"; strings.Join(got, ",") != want {
+		t.Errorf("entries = %v, want %s", got, want)
+	}
+	if _, err := f.ReadDir("/d/b"); err == nil {
+		t.Error("ReadDir(file) error = nil")
+	}
+	if _, err := f.ReadDir("/missing"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("ReadDir(missing) error = %v", err)
+	}
+	if entries, err := f.ReadDir("/"); err != nil || len(entries) != 3 {
+		t.Errorf("ReadDir(/) = %d entries, %v", len(entries), err)
+	}
+}
+
+func boolText(value bool) string {
+	if value {
+		return "true"
+	}
+	return "false"
+}
+
+func TestMkdirTempRenameAndRemoveAll(t *testing.T) {
+	f := New()
+	first, _ := f.MkdirTemp("overlay-*")
+	second, _ := f.MkdirTemp("plain")
+	if first != "/tmp/overlay-1" || second != "/tmp/plain2" {
+		t.Errorf("MkdirTemp() = %q %q", first, second)
+	}
+	if info, err := f.Stat(first); err != nil || !info.IsDir() {
+		t.Errorf("Stat(temp) = %v, %v", info, err)
+	}
+
+	f.AddFile(first+"/a/b", "content", 0o644).AddFile(first+"-sibling", "x", 0o644).AddDir("/dest")
+	if err := f.Rename(first, "/dest/moved"); err != nil {
+		t.Fatalf("Rename() error = %v", err)
+	}
+	if content, ok := f.File("/dest/moved/a/b"); !ok || content != "content" || f.Exists(first) || !f.Exists(first+"-sibling") {
+		t.Errorf("Rename() moved %q, %v; old exists = %v", content, ok, f.Exists(first))
+	}
+	if err := f.Rename("/missing", "/dest/x"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Rename(missing) error = %v", err)
+	}
+	if err := f.Rename("/dest/moved", "/nowhere/x"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Rename(missing parent) error = %v", err)
+	}
+	f.AddFile("/file", "", 0o644)
+	if err := f.Rename("/dest/moved", "/file/x"); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("Rename(file parent) error = %v", err)
+	}
+
+	if err := f.RemoveAll("/dest"); err != nil || f.Exists("/dest") || f.Exists("/dest/moved/a/b") || !f.Exists(first+"-sibling") {
+		t.Errorf("RemoveAll() error = %v", err)
+	}
+	if err := f.RemoveAll("/dest"); err != nil {
+		t.Errorf("RemoveAll(missing) error = %v", err)
+	}
+}

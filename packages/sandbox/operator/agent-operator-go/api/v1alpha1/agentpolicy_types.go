@@ -64,7 +64,7 @@ type AgentPolicyDefaults struct {
 
 // AgentPolicySpec defines the desired state of AgentPolicy.
 type AgentPolicySpec struct {
-	// Enforced constraints — AgentRuns that violate these are rejected by the webhook.
+	// Enforced constraints. The webhook rejects AgentRuns that violate these.
 	Enforced AgentPolicyEnforced `json:"enforced,omitempty"`
 
 	// Defaults — applied when AgentRun fields are not set.

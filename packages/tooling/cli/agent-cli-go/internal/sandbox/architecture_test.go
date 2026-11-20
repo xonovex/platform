@@ -25,7 +25,10 @@ package sandbox
 //     production file of this module names a concrete agent type; the planner and
 //     the isolators compare the facts a harness declares.
 //   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
-//     name no concrete plugin, no OS adapter, and (for launch) no cobra.
+//     name no concrete plugin, no OS adapter, no origin leaf, no overlay adapter,
+//     and (for launch) no cobra and no plugin store.
+//
+// The origin axis (internal/origin) has its own fitness tests beside it.
 //
 // The checks use only the standard library (go/parser, go/ast) — no new dependency.
 
@@ -327,9 +330,13 @@ func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 		modPath + "/internal/workspace/git",
 		modPath + "/internal/workspace/jj",
 		modPath + "/internal/terminal/tmux",
+		modPath + "/internal/origin/directory",
+		modPath + "/internal/origin/git",
+		modPath + "/internal/origin/plugins",
+		modPath + "/internal/overlay",
 	}
 	for pkg, extra := range map[string][]string{
-		"launch": {"github.com/spf13/cobra", modPath + "/internal/cmd"},
+		"launch": {"github.com/spf13/cobra", modPath + "/internal/cmd", modPath + "/internal/plugin"},
 		"cmd":    nil,
 	} {
 		banned := append(append([]string{}, adapters...), extra...)

@@ -39,7 +39,7 @@ spec:
               properties:
                 enforced:
                   type: object
-                  description: Enforced constraints — AgentRuns that violate these are rejected by the webhook.
+                  description: Enforced constraints. The webhook rejects AgentRuns that violate these.
                   properties:
                     runtimeClassName:
                       type: string

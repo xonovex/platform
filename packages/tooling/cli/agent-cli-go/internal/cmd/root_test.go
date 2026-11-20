@@ -14,6 +14,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
+	pluginorigins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
@@ -63,6 +64,8 @@ type testRoot struct {
 	provisioner *recordingProvisioner
 	out         bytes.Buffer
 	deps        launch.Dependencies
+	ports       PluginPorts
+	host        *systemtest.Fake
 }
 
 func newTestRoot() *testRoot {
@@ -73,8 +76,10 @@ func newTestRoot() *testRoot {
 	for _, method := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker} {
 		registry.RegisterIsolator(method, func() isoshared.Isolator { return r.isolator })
 	}
+	r.host = systemtest.New()
+	r.ports = PluginPorts{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
 	r.deps = launch.Dependencies{
-		Host:      systemtest.New(),
+		Host:      r.host,
 		Log:       logging.New(io.Discard, io.Discard, false, false),
 		Out:       &r.out,
 		Sandboxes: registry,
@@ -83,7 +88,7 @@ func newTestRoot() *testRoot {
 }
 
 func (r *testRoot) execute(args ...string) error {
-	root := NewRootCommand(r.deps)
+	root := NewRootCommand(r.deps, r.ports)
 	root.SetArgs(args)
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)
@@ -91,7 +96,7 @@ func (r *testRoot) execute(args ...string) error {
 }
 
 func TestNewRootCommandRegistersSubcommandsAndFlags(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps)
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{})
 
 	for _, name := range []string{"run", "completion"} {
 		if command, _, err := root.Find([]string{name}); err != nil || command.Name() != name {
@@ -160,7 +165,7 @@ func TestRunCommandYieldsToThePinnedPairOnlyWithoutAnExplicitAxis(t *testing.T) 
 func TestRunCommandSilencesTheAgentExitCode(t *testing.T) {
 	r := newTestRoot()
 	r.isolator.exitCode = 4
-	root := NewRootCommand(r.deps)
+	root := NewRootCommand(r.deps, r.ports)
 	root.SetArgs([]string{"run"})
 	var output bytes.Buffer
 	root.SetOut(&output)
@@ -180,7 +185,7 @@ func TestRunCommandSilencesTheAgentExitCode(t *testing.T) {
 
 func TestRunCommandReportsOtherErrorsWithUsage(t *testing.T) {
 	r := newTestRoot()
-	root := NewRootCommand(r.deps)
+	root := NewRootCommand(r.deps, r.ports)
 	root.SetArgs([]string{"run", "--agent", "unknown"})
 	var output bytes.Buffer
 	root.SetOut(&output)
@@ -220,7 +225,7 @@ func TestRunCommandRejectsAnUnknownAgentAndAProviderForALoginAgent(t *testing.T)
 }
 
 func TestRunCommandHelpListsEveryHarness(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps)
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{})
 	run, _, _ := root.Find([]string{"run"})
 
 	usage := run.Flags().Lookup("agent").Usage
@@ -235,7 +240,7 @@ func TestRunCommandHelpListsEveryHarness(t *testing.T) {
 // complete returns the candidates the shell completion offers for args.
 func complete(t *testing.T, args ...string) []string {
 	t.Helper()
-	root := NewRootCommand(newTestRoot().deps)
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{})
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)

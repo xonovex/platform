@@ -146,3 +146,44 @@ func TestProcessEnvironmentAndIdentity(t *testing.T) {
 		t.Error("LookPath(missing) error = nil")
 	}
 }
+
+func TestFileOperationsWorkOnTheRealDisk(t *testing.T) {
+	s, _, _ := newTestSystem("")
+	root := t.TempDir()
+	if err := os.WriteFile(filepath.Join(root, "b"), []byte("b"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink("b", filepath.Join(root, "a")); err != nil {
+		t.Fatal(err)
+	}
+
+	entries, err := s.ReadDir(root)
+	if err != nil || len(entries) != 2 || entries[0].Name() != "a" {
+		t.Fatalf("ReadDir() = %v, %v", entries, err)
+	}
+	if info, err := s.Lstat(filepath.Join(root, "a")); err != nil || info.Mode()&fs.ModeSymlink == 0 {
+		t.Errorf("Lstat(link) = %v, %v", info, err)
+	}
+
+	dir, err := s.MkdirTemp("agent-cli-system-*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(dir) })
+	if info, err := os.Stat(dir); err != nil || !info.IsDir() || info.Mode().Perm() != 0o700 || !strings.Contains(filepath.Base(dir), "agent-cli-system-") {
+		t.Errorf("MkdirTemp() = %q, %v", dir, err)
+	}
+	moved := filepath.Join(root, "moved")
+	if err := s.Rename(dir, moved); err != nil {
+		t.Fatalf("Rename() error = %v", err)
+	}
+	if err := s.RemoveAll(moved); err != nil {
+		t.Fatalf("RemoveAll() error = %v", err)
+	}
+	if _, err := os.Stat(moved); !errors.Is(err, fs.ErrNotExist) {
+		t.Errorf("RemoveAll() left %s", moved)
+	}
+	if err := s.RemoveAll(moved); err != nil {
+		t.Errorf("RemoveAll(missing) error = %v", err)
+	}
+}

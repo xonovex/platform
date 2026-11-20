@@ -26,8 +26,10 @@ type Dependencies struct {
 	Host Host
 	Log  logging.Logger
 	// Out receives the command line of a dry run.
-	Out        io.Writer
-	Sandboxes  *sandbox.Registry
+	Out       io.Writer
+	Sandboxes *sandbox.Registry
+	// Overlays builds the artifact overlay; it may be nil for a build without one.
+	Overlays   Overlays
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
 }
@@ -74,7 +76,19 @@ func Execute(deps Dependencies, options Options) error {
 		return err
 	}
 
-	run := plan.Run
+	overlayResult, err := prepareOverlay(deps.Overlays, plan)
+	if err != nil {
+		return err
+	}
+	// A terminal session outlives this process, so its overlay stays on disk.
+	keepOverlay := false
+	defer func() {
+		if !keepOverlay {
+			overlayResult.Cleanup()
+		}
+	}()
+
+	run := applyOverlay(plan.Run, overlayResult)
 	if vcs != nil && !plan.DryRun {
 		dir, err := vcs.Setup(plan.Checkout.Config, plan.SourceDir, plan.Verbose)
 		if err != nil {
@@ -102,7 +116,7 @@ func Execute(deps Dependencies, options Options) error {
 	}
 
 	if plan.DryRun {
-		return printDryRun(deps.Log, deps.Out, plan, command)
+		return printDryRun(deps.Log, deps.Out, plan, overlayResult, command)
 	}
 
 	var code int
@@ -113,6 +127,10 @@ func Execute(deps Dependencies, options Options) error {
 		}
 		if plan.Verbose {
 			deps.Log.Info("Using terminal wrapper: " + string(plan.Terminal.Type))
+		}
+		if overlayResult.Root != "" {
+			keepOverlay = true
+			deps.Log.Info("The overlay stays at " + overlayResult.Root + " while the terminal session runs; remove it afterwards")
 		}
 		code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.WorkDir)
 		if err != nil {
@@ -171,7 +189,7 @@ func selectWorkspace(workspaces map[wsp.VCSType]wsshared.VCS, checkout *Checkout
 }
 
 // printDryRun reports the run and writes the sandbox command line to out.
-func printDryRun(log logging.Logger, out io.Writer, plan Plan, command []string) error {
+func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayResult, command []string) error {
 	log.Info("Dry run - would execute:")
 	log.Info("  Agent: " + plan.Agent.DisplayName)
 	log.Info("  Protocol: " + describeProtocol(plan.Agent))
@@ -186,6 +204,7 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, command []string)
 	} else {
 		log.Info("  Arguments: (none)")
 	}
+	logOverlay(log, overlay)
 	if len(command) == 0 {
 		return nil
 	}

@@ -58,6 +58,13 @@ type Options struct {
 	WorktreeDir          string
 	VCS                  string
 
+	// Plugins are the installed plugins whose artifacts the run overlays, and
+	// OverlayDirs are directories of artifacts the run overlays beside them. Store
+	// is the plugin store, empty for the default one.
+	Plugins     []string
+	OverlayDirs []string
+	Store       string
+
 	Config      string
 	BindPaths   []string
 	RoBindPaths []string
@@ -95,6 +102,8 @@ type Plan struct {
 	// when the run uses SourceDir itself.
 	SourceDir string
 	Checkout  *Checkout
+	// Overlay is the artifact overlay of the run, nil when the run has none.
+	Overlay *OverlayRequest
 	// Run launches in SourceDir; the executor moves it into a created checkout.
 	Run      isoshared.RunConfig
 	Terminal *termshared.TerminalConfig
@@ -121,6 +130,10 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 
 	sourceDir := absolute(cwd, options.WorkDir)
 	checkout, err := planCheckout(options, sourceDir)
+	if err != nil {
+		return Plan{}, err
+	}
+	overlayRequest, err := planOverlay(options, agent, cwd, sourceDir)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -154,6 +167,7 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		Provision:     input,
 		SourceDir:     sourceDir,
 		Checkout:      checkout,
+		Overlay:       overlayRequest,
 		Run: isoshared.RunConfig{
 			HomeDir:         absolute(cwd, homeDir),
 			WorkDir:         sourceDir,

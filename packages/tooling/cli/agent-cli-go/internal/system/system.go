@@ -57,6 +57,12 @@ func (System) Stat(path string) (fs.FileInfo, error) { return os.Stat(path) }
 // EvalSymlinks returns path with every symlink resolved.
 func (System) EvalSymlinks(path string) (string, error) { return filepath.EvalSymlinks(path) }
 
+// Lstat returns the file information of path without following a final symlink.
+func (System) Lstat(path string) (fs.FileInfo, error) { return os.Lstat(path) }
+
+// ReadDir returns the entries of the directory at path, sorted by name.
+func (System) ReadDir(path string) ([]fs.DirEntry, error) { return os.ReadDir(path) }
+
 // ReadFile returns the content of the file at path.
 func (System) ReadFile(path string) ([]byte, error) { return os.ReadFile(path) }
 
@@ -78,6 +84,17 @@ func (System) CreateTemp(pattern string) (string, error) {
 	}
 	return file.Name(), nil
 }
+
+// MkdirTemp creates a private directory in the temporary directory whose name
+// follows pattern, and returns its path.
+func (System) MkdirTemp(pattern string) (string, error) { return os.MkdirTemp("", pattern) }
+
+// Rename moves oldPath to newPath, replacing a file at newPath.
+func (System) Rename(oldPath, newPath string) error { return os.Rename(oldPath, newPath) }
+
+// RemoveAll deletes path and everything below it. A path that does not exist is
+// not an error.
+func (System) RemoveAll(path string) error { return os.RemoveAll(path) }
 
 // Remove deletes the file at path.
 func (System) Remove(path string) error { return os.Remove(path) }
