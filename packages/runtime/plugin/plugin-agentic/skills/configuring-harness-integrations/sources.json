@@ -7,7 +7,7 @@
       "id": "harness-integration-synthesis",
       "kind": "original",
       "title": "Harness integration synthesis",
-      "provenance": "Repository-original factoring of the integration lifecycle, capability-matrix shape, and portable patterns that the per-harness configuring skills share; each harness skill pins its own product documentation in its `SOURCES.md`",
+      "provenance": "Repository-original factoring of the integration lifecycle, capability-matrix shape, and portable patterns that the per-harness configuring skills share; each harness skill pins its own product documentation in its `sources.json`",
       "reviewedAt": "2026-11-20",
       "feeds": [
         "references/lifecycle.md",
