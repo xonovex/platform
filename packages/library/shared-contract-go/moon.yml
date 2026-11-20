@@ -4,6 +4,9 @@ tags:
   - shared
 language: go
 layer: library
+# The architecture tests read the source through shared-core-go pkg/archtest.
+dependsOn:
+  - shared-core-go
 fileGroups:
   # The schemas are embedded in pkg/schemas, so a change to one invalidates the
   # build, the tests and the coverage runs.
@@ -42,6 +45,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /packages/library/shared-core-go/pkg/archtest/**/*.go
     outputs: []
     options:
       cache: true

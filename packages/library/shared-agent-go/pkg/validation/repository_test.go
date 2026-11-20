@@ -16,6 +16,7 @@ func TestParseRepositoryURLAcceptsPublicRepositories(t *testing.T) {
 		{raw: "http://gitlab.com:8080/org/project.git", wantHost: "gitlab.com", wantPort: 8080, wantDisplay: "gitlab.com/org/project.git"},
 		{raw: "git@github.com:example/repo.git", wantHost: "github.com", wantPort: 22, wantDisplay: "github.com/example/repo.git"},
 		{raw: "https://8.8.8.8/example/repo", wantHost: "8.8.8.8", wantPort: 443, wantDisplay: "8.8.8.8/example/repo"},
+		{raw: "https://[2001:4860:4860::8888]/example/repo", wantHost: "2001:4860:4860::8888", wantPort: 443, wantDisplay: "[2001:4860:4860::8888]/example/repo"},
 	}
 	for _, test := range tests {
 		t.Run(test.raw, func(t *testing.T) {
@@ -42,6 +43,10 @@ func TestValidateRepositoryURLRejectsCredentialAndInternalTargets(t *testing.T) 
 		"https://127.0.0.1/repo.git",
 		"https://10.0.0.1/repo.git",
 		"https://169.254.169.254/latest/meta-data",
+		"https://[::1]/repo.git",
+		"https://[::ffff:10.0.0.1]/repo.git",
+		"https://[fe80::1%25eth0]/repo.git",
+		"https://[2001:4860:4860::8888%25eth0]/repo.git",
 		"https://EXAMPLE.com/repo.git",
 		"git@localhost:example/repo.git",
 		"git@github.com:example/repo",

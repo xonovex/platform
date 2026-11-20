@@ -81,7 +81,3 @@ type AgentWorkspaceList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AgentWorkspace `json:"items"`
 }
-
-func init() {
-	registerTypes(&AgentWorkspace{}, &AgentWorkspaceList{})
-}

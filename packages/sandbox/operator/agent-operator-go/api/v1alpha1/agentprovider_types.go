@@ -58,7 +58,3 @@ type AgentProviderList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AgentProvider `json:"items"`
 }
-
-func init() {
-	registerTypes(&AgentProvider{}, &AgentProviderList{})
-}

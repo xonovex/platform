@@ -10,6 +10,7 @@ dependsOn:
   - shared-agent-go
   - shared-contract-go
   - shared-config-go
+  - shared-core-go
   - id: eslint-config-cli
     scope: development
   - id: ts-config-cli
@@ -87,6 +88,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /packages/library/shared-core-go/pkg/archtest/**/*.go
     outputs: []
     options:
       cache: true

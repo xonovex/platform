@@ -6,16 +6,15 @@
 package arch
 
 import (
-	"go/ast"
-	"go/parser"
-	"go/token"
-	"io/fs"
+	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 )
 
 const module = "github.com/xonovex/platform/packages/tooling/cli/agent-eval-go"
@@ -186,10 +185,29 @@ var thirdParty = map[string]string{
 	"internal/cmd": "github.com/spf13/cobra",
 }
 
-// hostImports reach the real disk, the environment, the process or the network.
-var hostImports = map[string]bool{
-	"os": true, "os/exec": true, "os/user": true, "os/signal": true,
-	"io/ioutil": true, "net": true, "net/http": true, "syscall": true,
+func moduleRoot(t *testing.T) string {
+	t.Helper()
+	_, here, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller failed")
+	}
+	return filepath.Dir(filepath.Dir(filepath.Dir(here)))
+}
+
+// moduleFiles parses the module's source, without the fitness tests themselves.
+func moduleFiles(t *testing.T) []archtest.File {
+	t.Helper()
+	files, err := archtest.Load(os.DirFS(moduleRoot(t)), "cmd", "internal")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out []archtest.File
+	for _, f := range files {
+		if f.Dir != "internal/arch" {
+			out = append(out, f)
+		}
+	}
+	return out
 }
 
 // hostAdapters may import hostImports from non-test code.
@@ -201,111 +219,12 @@ var hostAdapters = map[string]bool{
 // rest of the tool.
 var clockRoots = map[string]bool{"cmd/agent-eval": true}
 
-type sourceFile struct {
-	path    string
-	dir     string
-	test    bool
-	imports []string
-	clock   bool
-}
-
-func moduleRoot(t *testing.T) string {
-	t.Helper()
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("runtime.Caller failed")
-	}
-	return filepath.Dir(filepath.Dir(filepath.Dir(file)))
-}
-
-func moduleFiles(t *testing.T) []sourceFile {
-	t.Helper()
-	root := moduleRoot(t)
-	fset := token.NewFileSet()
-	var files []sourceFile
-	for _, top := range []string{"cmd", "internal"} {
-		err := filepath.WalkDir(filepath.Join(root, top), func(path string, entry fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if entry.IsDir() || !strings.HasSuffix(path, ".go") {
-				return nil
-			}
-			parsed, err := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution)
-			if err != nil {
-				return err
-			}
-			rel, err := filepath.Rel(root, filepath.Dir(path))
-			if err != nil {
-				return err
-			}
-			file := sourceFile{path: path, dir: filepath.ToSlash(rel), test: strings.HasSuffix(path, "_test.go")}
-			for _, spec := range parsed.Imports {
-				value, err := strconv.Unquote(spec.Path.Value)
-				if err != nil {
-					return err
-				}
-				file.imports = append(file.imports, value)
-			}
-			file.clock = callsTimeNow(parsed)
-			files = append(files, file)
-			return nil
-		})
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-	return files
-}
-
-// callsTimeNow reports whether the file reads the clock through time.Now,
-// time.Since or time.Until.
-func callsTimeNow(file *ast.File) bool {
-	found := false
-	ast.Inspect(file, func(node ast.Node) bool {
-		selector, ok := node.(*ast.SelectorExpr)
-		if !ok {
-			return true
-		}
-		pkg, ok := selector.X.(*ast.Ident)
-		if ok && pkg.Name == "time" && (selector.Sel.Name == "Now" || selector.Sel.Name == "Since" || selector.Sel.Name == "Until") {
-			found = true
-		}
-		return true
-	})
-	return found
-}
-
-func isStdlib(path string) bool {
-	first, _, _ := strings.Cut(path, "/")
-	return !strings.Contains(first, ".")
-}
-
-func contains(list []string, item string) bool {
-	for _, candidate := range list {
-		if candidate == item {
-			return true
-		}
-	}
-	return false
-}
-
-func nonTest(files []sourceFile) []sourceFile {
-	var out []sourceFile
-	for _, f := range files {
-		if !f.test && f.dir != "internal/arch" {
-			out = append(out, f)
-		}
-	}
-	return out
-}
-
 // TestEveryPackageIsDeclared fails for a package missing from the table and for
 // a table entry with no package.
 func TestEveryPackageIsDeclared(t *testing.T) {
 	present := map[string]bool{}
-	for _, f := range nonTest(moduleFiles(t)) {
-		present[f.dir] = true
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		present[f.Dir] = true
 	}
 	for dir := range present {
 		if _, ok := allowed[dir]; !ok {
@@ -323,11 +242,11 @@ func TestEveryPackageIsDeclared(t *testing.T) {
 // hexagon: the core knows the ports, an adapter knows one port, and only the
 // composition root knows them all.
 func TestInternalImportsFollowTheTable(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
-			if inside && !contains(allowed[f.dir], rel) {
-				t.Errorf("%s imports %s; %s may import only %v", f.path, rel, f.dir, allowed[f.dir])
+			if inside && !slices.Contains(allowed[f.Dir], rel) {
+				t.Errorf("%s imports %s; %s may import only %v", f.Path, rel, f.Dir, allowed[f.Dir])
 			}
 		}
 	}
@@ -336,11 +255,11 @@ func TestInternalImportsFollowTheTable(t *testing.T) {
 // TestLibraryImportsFollowTheTable keeps each edge into a shared library a
 // decision of the libraries table.
 func TestLibraryImportsFollowTheTable(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, library)
-			if inside && !contains(libraries[f.dir], rel) {
-				t.Errorf("%s imports %s; %s may import only the libraries %v", f.path, rel, f.dir, libraries[f.dir])
+			if inside && !slices.Contains(libraries[f.Dir], rel) {
+				t.Errorf("%s imports %s; %s may import only the libraries %v", f.Path, rel, f.Dir, libraries[f.Dir])
 			}
 		}
 	}
@@ -349,10 +268,10 @@ func TestLibraryImportsFollowTheTable(t *testing.T) {
 // TestNoUnitTestImportsAHostLibrary keeps every unit test off the real host.
 func TestNoUnitTestImportsAHostLibrary(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		for _, imp := range f.imports {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, library)
-			if f.test && inside && contains(hostLibraries, rel) {
-				t.Errorf("%s imports %s; a unit test stays off the host", f.path, rel)
+			if f.Test && inside && slices.Contains(hostLibraries, rel) {
+				t.Errorf("%s imports %s; a unit test stays off the host", f.Path, rel)
 			}
 		}
 	}
@@ -362,12 +281,12 @@ func TestNoUnitTestImportsAHostLibrary(t *testing.T) {
 // registry is the one file that names the concrete leaves, and the main package
 // the one that names the host adapters and the registry.
 func TestConcretePackagesHaveOneImporter(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
 			owner, isConcrete := concrete[rel]
-			if inside && isConcrete && f.dir != owner && !doubles[f.dir] {
-				t.Errorf("%s imports %s; only %q may", f.path, rel, owner)
+			if inside && isConcrete && f.Dir != owner && !doubles[f.Dir] {
+				t.Errorf("%s imports %s; only %q may", f.Path, rel, owner)
 			}
 		}
 	}
@@ -377,13 +296,13 @@ func TestConcretePackagesHaveOneImporter(t *testing.T) {
 // library and the shared libraries.
 func TestOnlyDeclaredPackagesImportThirdParty(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		for _, imp := range f.imports {
-			if isStdlib(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, library) {
+		for _, imp := range f.Imports {
+			if archtest.IsStandard(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, library) {
 				continue
 			}
-			want, ok := thirdParty[f.dir]
+			want, ok := thirdParty[f.Dir]
 			if !ok || !strings.HasPrefix(imp, want) {
-				t.Errorf("%s imports %s; %s may import no outside module except %q", f.path, imp, f.dir, want)
+				t.Errorf("%s imports %s; %s may import no outside module except %q", f.Path, imp, f.Dir, want)
 			}
 		}
 	}
@@ -393,12 +312,12 @@ func TestOnlyDeclaredPackagesImportThirdParty(t *testing.T) {
 // network out of the core and out of every unit test.
 func TestOnlyHostAdaptersTouchTheHost(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		if hostAdapters[f.dir] && !f.test {
+		if hostAdapters[f.Dir] && !f.Test {
 			continue
 		}
-		for _, imp := range f.imports {
-			if hostImports[imp] {
-				t.Errorf("%s imports %s; only the non-test files of %v may", f.path, imp, keys(hostAdapters))
+		for _, imp := range f.Imports {
+			if archtest.IsHost(imp) {
+				t.Errorf("%s imports %s; only the non-test files of %v may", f.Path, imp, keys(hostAdapters))
 			}
 		}
 	}
@@ -408,8 +327,8 @@ func TestOnlyHostAdaptersTouchTheHost(t *testing.T) {
 // the instant it needs as an argument.
 func TestOnlyTheCompositionRootReadsTheClock(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		if f.clock && (!clockRoots[f.dir] || f.test) {
-			t.Errorf("%s reads the clock with time.Now, time.Since or time.Until; pass the instant in", f.path)
+		if archtest.ReadsClock(f.Syntax) && (!clockRoots[f.Dir] || f.Test) {
+			t.Errorf("%s reads the clock with time.Now, time.Since or time.Until; pass the instant in", f.Path)
 		}
 	}
 }
@@ -425,11 +344,11 @@ func keys(set map[string]bool) []string {
 
 // TestNoPackageImportsATestDouble keeps the doubles out of shipped code.
 func TestNoPackageImportsATestDouble(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
 			if inside && doubles[rel] {
-				t.Errorf("%s imports the test double %s", f.path, rel)
+				t.Errorf("%s imports the test double %s", f.Path, rel)
 			}
 		}
 	}
@@ -439,9 +358,9 @@ func TestNoPackageImportsATestDouble(t *testing.T) {
 // in one file.
 func TestTheRegistryIsOneFile(t *testing.T) {
 	var registry []string
-	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir == "internal/registry" {
-			registry = append(registry, filepath.Base(f.path))
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir == "internal/registry" {
+			registry = append(registry, filepath.Base(f.Path))
 		}
 	}
 	if len(registry) != 1 {
@@ -451,12 +370,12 @@ func TestTheRegistryIsOneFile(t *testing.T) {
 
 // TestLeavesNeverImportASibling keeps the variants of one axis independent.
 func TestLeavesNeverImportASibling(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		axis := filepath.Dir(f.dir)
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		axis := filepath.Dir(f.Dir)
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
-			if inside && rel != f.dir && filepath.Dir(rel) == axis && filepath.Base(axis) != "internal" && !doubles[rel] {
-				t.Errorf("%s imports its sibling %s", f.path, rel)
+			if inside && rel != f.Dir && filepath.Dir(rel) == axis && filepath.Base(axis) != "internal" && !doubles[rel] {
+				t.Errorf("%s imports its sibling %s", f.Path, rel)
 			}
 		}
 	}
@@ -477,25 +396,48 @@ var launchPorts = map[string]bool{
 // launcher, the registry names its variants, and the composition root builds
 // its host. The core and every other leaf never see it.
 func TestOnlyTheConfinementReachesTheLauncher(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, imp := range f.Imports {
 			if !strings.HasPrefix(imp, launcher) {
 				continue
 			}
 			rel := strings.TrimPrefix(imp, library)
-			switch f.dir {
+			switch f.Dir {
 			case "internal/registry":
 			case "internal/confine/launch":
 				if !launchPorts[rel] {
-					t.Errorf("%s imports %s; the launch leaf reaches only the ports of the launcher, never a variant", f.path, rel)
+					t.Errorf("%s imports %s; the launch leaf reaches only the ports of the launcher, never a variant", f.Path, rel)
 				}
 			case "cmd/agent-eval":
 				if rel != "shared-launch-go/pkg/oshost" {
-					t.Errorf("%s imports %s; the composition root reaches only the host of the launcher", f.path, rel)
+					t.Errorf("%s imports %s; the composition root reaches only the host of the launcher", f.Path, rel)
 				}
 			default:
-				t.Errorf("%s imports %s; only internal/confine/launch, internal/registry and cmd/agent-eval reach the launcher", f.path, rel)
+				t.Errorf("%s imports %s; only internal/confine/launch, internal/registry and cmd/agent-eval reach the launcher", f.Path, rel)
 			}
+		}
+	}
+}
+
+// TestOnlyTheCompositionRootPrints keeps the standard streams in the main
+// package: every other package writes to the io.Writer it is given.
+func TestOnlyTheCompositionRootPrints(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir == "cmd/agent-eval" {
+			continue
+		}
+		for _, use := range archtest.Prints(f.Syntax) {
+			t.Errorf("%s uses %s; write to the io.Writer the command is given", f.Path, use)
+		}
+	}
+}
+
+// TestNoPackageKeepsState keeps every package free of state that one run
+// could leave behind for the next.
+func TestNoPackageKeepsState(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, state := range archtest.PackageState(f.Syntax) {
+			t.Errorf("%s declares %s; pass state as a value", f.Path, state)
 		}
 	}
 }

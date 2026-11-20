@@ -32,7 +32,3 @@ type AgentToolchainList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AgentToolchain `json:"items"`
 }
-
-func init() {
-	registerTypes(&AgentToolchain{}, &AgentToolchainList{})
-}

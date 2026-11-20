@@ -1,11 +1,6 @@
 package overlay
 
 import (
-	"go/parser"
-	"go/token"
-	"os"
-	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -32,58 +27,6 @@ func TestEveryAgentHasADialect(t *testing.T) {
 func TestResolveRejectsAnUnknownAgent(t *testing.T) {
 	if _, err := Resolve(types.AgentType("nope")); err == nil {
 		t.Error("an unknown agent resolved")
-	}
-}
-
-// importsOf returns the import paths of the non-test Go files in dir.
-func importsOf(t *testing.T, dir string) []string {
-	t.Helper()
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var imports []string
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".go") || strings.HasSuffix(entry.Name(), "_test.go") {
-			continue
-		}
-		file, err := parser.ParseFile(token.NewFileSet(), filepath.Join(dir, entry.Name()), nil, parser.ImportsOnly)
-		if err != nil {
-			t.Fatal(err)
-		}
-		for _, spec := range file.Imports {
-			path, _ := strconv.Unquote(spec.Path.Value)
-			imports = append(imports, path)
-		}
-	}
-	return imports
-}
-
-// TestLeavesAreImportedOnlyByTheRegistry keeps the axis orthogonal: a leaf knows
-// the shared core and the artifact model, never a sibling leaf, and the shared
-// core knows no leaf and no machine.
-func TestLeavesAreImportedOnlyByTheRegistry(t *testing.T) {
-	const module = "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/"
-	leaves := []string{"claude", "codex", "copilot", "kiro", "opencode", "pi"}
-	for _, leaf := range leaves {
-		for _, path := range importsOf(t, leaf) {
-			if strings.HasPrefix(path, module+"overlay/") && path != module+"overlay/shared" {
-				t.Errorf("leaf %s imports %s", leaf, path)
-			}
-			if path == "os" || path == "os/exec" || strings.HasPrefix(path, "net") {
-				t.Errorf("leaf %s imports %s", leaf, path)
-			}
-		}
-	}
-	for _, path := range importsOf(t, "shared") {
-		for _, leaf := range leaves {
-			if path == module+"overlay/"+leaf {
-				t.Errorf("the shared core imports the leaf %s", leaf)
-			}
-		}
-		if path == "os" || path == "os/exec" {
-			t.Errorf("the shared core imports %s", path)
-		}
 	}
 }
 

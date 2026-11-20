@@ -6,14 +6,14 @@
 package arch
 
 import (
-	"go/parser"
-	"go/token"
-	"io/fs"
+	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
+	"slices"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 )
 
 const module = "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go"
@@ -27,75 +27,36 @@ var leaves = []string{
 	"internal/workspace/jj",
 }
 
-// sourceFile is one Go file of the module: the module-relative directory of
-// its package, whether it is a test file, and its import paths.
-type sourceFile struct {
-	path    string
-	dir     string
-	test    bool
-	imports []string
-}
-
 func moduleRoot(t *testing.T) string {
 	t.Helper()
-	_, file, _, ok := runtime.Caller(0)
+	_, here, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("runtime.Caller failed")
 	}
-	return filepath.Dir(filepath.Dir(filepath.Dir(file)))
+	return filepath.Dir(filepath.Dir(filepath.Dir(here)))
 }
 
-// moduleFiles parses the imports of every Go file of the module, whatever its
-// build tags.
-func moduleFiles(t *testing.T) []sourceFile {
+// moduleFiles parses the module's source, without the fitness tests themselves.
+func moduleFiles(t *testing.T) []archtest.File {
 	t.Helper()
-	root := moduleRoot(t)
-	fset := token.NewFileSet()
-	var files []sourceFile
-	err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() {
-			if entry.Name() == "testdata" || (strings.HasPrefix(entry.Name(), ".") && path != root) {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		if !strings.HasSuffix(path, ".go") {
-			return nil
-		}
-		parsed, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
-		if err != nil {
-			return err
-		}
-		dir, err := filepath.Rel(root, filepath.Dir(path))
-		if err != nil {
-			return err
-		}
-		file := sourceFile{path: path, dir: filepath.ToSlash(dir), test: strings.HasSuffix(path, "_test.go")}
-		for _, spec := range parsed.Imports {
-			if imported, err := strconv.Unquote(spec.Path.Value); err == nil {
-				file.imports = append(file.imports, imported)
-			}
-		}
-		files = append(files, file)
-		return nil
-	})
+	files, err := archtest.Load(os.DirFS(moduleRoot(t)), ".")
 	if err != nil {
-		t.Fatalf("walk %s: %v", root, err)
+		t.Fatal(err)
 	}
-	if len(files) == 0 {
-		t.Fatalf("no Go files under %s", root)
+	var out []archtest.File
+	for _, f := range files {
+		if f.Dir != "internal/arch" {
+			out = append(out, f)
+		}
 	}
-	return files
+	return out
 }
 
 // importers returns the files that import the module package at dir.
-func importers(files []sourceFile, dir string) []sourceFile {
-	var found []sourceFile
+func importers(files []archtest.File, dir string) []archtest.File {
+	var found []archtest.File
 	for _, file := range files {
-		for _, imported := range file.imports {
+		for _, imported := range file.Imports {
 			if imported == module+"/"+dir {
 				found = append(found, file)
 			}
@@ -110,8 +71,8 @@ func TestLeavesAreImportedOnlyByTheRegistry(t *testing.T) {
 	files := moduleFiles(t)
 	for _, leaf := range leaves {
 		for _, file := range importers(files, leaf) {
-			if file.dir != "internal/plugins" && file.dir != leaf {
-				t.Errorf("%s imports the leaf %s; only internal/plugins may", file.path, leaf)
+			if file.Dir != "internal/plugins" && file.Dir != leaf {
+				t.Errorf("%s imports the leaf %s; only internal/plugins may", file.Path, leaf)
 			}
 		}
 	}
@@ -128,8 +89,8 @@ func TestTheCompositionRootAloneImportsTheRegistryAndTheAdapters(t *testing.T) {
 	}
 	for dir, importersAllowed := range allowed {
 		for _, file := range importers(files, dir) {
-			if !importersAllowed[file.dir] || (file.dir == "config" && !file.test) {
-				t.Errorf("%s imports %s; only the composition root internal/wiring may", file.path, dir)
+			if !importersAllowed[file.Dir] || (file.Dir == "config" && !file.Test) {
+				t.Errorf("%s imports %s; only the composition root internal/wiring may", file.Path, dir)
 			}
 		}
 	}
@@ -146,12 +107,12 @@ func TestOnlyTheAdaptersImportControllerRuntime(t *testing.T) {
 		"internal/wiring":     true,
 	}
 	for _, file := range moduleFiles(t) {
-		if file.test || !strings.HasPrefix(file.dir, "internal/") || adapters[file.dir] {
+		if file.Test || !strings.HasPrefix(file.Dir, "internal/") || adapters[file.Dir] {
 			continue
 		}
-		for _, imported := range file.imports {
+		for _, imported := range file.Imports {
 			if strings.HasPrefix(imported, "sigs.k8s.io/controller-runtime") {
-				t.Errorf("%s imports %s; a core names only its own ports", file.path, imported)
+				t.Errorf("%s imports %s; a core names only its own ports", file.Path, imported)
 			}
 		}
 	}
@@ -174,10 +135,62 @@ var launchCore = map[string]bool{
 
 func TestOnlyTheLaunchCoreIsImported(t *testing.T) {
 	for _, file := range moduleFiles(t) {
-		for _, imported := range file.imports {
+		for _, imported := range file.Imports {
 			if pkg, inside := strings.CutPrefix(imported, launchLibrary+"/"); inside && !launchCore[pkg] {
-				t.Errorf("%s imports %s; the operator imports only the launch core", file.path, imported)
+				t.Errorf("%s imports %s; the operator imports only the launch core", file.Path, imported)
 			}
+		}
+	}
+}
+
+// compositionRoots are the main packages: they alone read the environment,
+// print and bind the adapters.
+var compositionRoots = map[string]bool{"cmd/operator": true, "cmd/e2e-summary": true}
+
+// endToEnd reports a file that builds only for an end-to-end tier, which drives
+// a real cluster from the machine that runs the tests.
+func endToEnd(f archtest.File) bool {
+	return slices.ContainsFunc([]string{"e2e", "e2e_gvisor", "e2e_kata", "e2e_coco"}, f.BuildsOnlyWith)
+}
+
+// TestOnlyTheCompositionRootsTouchTheHost keeps the disk, the environment, the
+// process and the network out of every core and adapter: the operator reaches
+// the cluster through controller-runtime, never through the machine it runs on.
+func TestOnlyTheCompositionRootsTouchTheHost(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if compositionRoots[f.Dir] || endToEnd(f) {
+			continue
+		}
+		for _, imp := range f.Imports {
+			if archtest.IsHost(imp) {
+				t.Errorf("%s imports %s; only %v may", f.Path, imp, []string{"cmd/e2e-summary", "cmd/operator"})
+			}
+		}
+	}
+}
+
+// TestOnlyTheCompositionRootsPrint keeps the standard streams in the main
+// packages: a reconciler and a webhook report through their results.
+func TestOnlyTheCompositionRootsPrint(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if compositionRoots[f.Dir] {
+			continue
+		}
+		for _, use := range archtest.Prints(f.Syntax) {
+			t.Errorf("%s uses %s; report through a result or the logger", f.Path, use)
+		}
+	}
+}
+
+// TestNoPackageKeepsState keeps every package free of state that one
+// reconcile could leave behind for the next.
+func TestNoPackageKeepsState(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if compositionRoots[f.Dir] {
+			continue
+		}
+		for _, state := range archtest.PackageState(f.Syntax) {
+			t.Errorf("%s declares %s; pass state as a value", f.Path, state)
 		}
 	}
 }

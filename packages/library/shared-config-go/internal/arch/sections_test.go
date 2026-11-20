@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/layer"
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/merge"
@@ -151,19 +152,19 @@ func TestTheFileSchemaHoldsEverySection(t *testing.T) {
 // own section.
 func TestNoSectionNamesAnotherSection(t *testing.T) {
 	declared := sections()
-	for _, f := range nonTest(moduleFiles(t)) {
-		own, ok := declared[f.dir]
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		own, ok := declared[f.Dir]
 		if !ok {
 			continue
 		}
-		ast.Inspect(f.parsed, func(node ast.Node) bool {
+		ast.Inspect(f.Syntax, func(node ast.Node) bool {
 			literal, ok := node.(*ast.BasicLit)
 			if !ok || literal.Kind != token.STRING {
 				return true
 			}
 			value, err := strconv.Unquote(literal.Value)
 			if err == nil && value != own.Name && slices.Contains(layer.SectionNames(), value) {
-				t.Errorf("%s names the %s section", f.path, value)
+				t.Errorf("%s names the %s section", f.Path, value)
 			}
 			return true
 		})

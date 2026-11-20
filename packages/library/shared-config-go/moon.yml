@@ -6,6 +6,8 @@ language: go
 layer: library
 dependsOn:
   - shared-contract-go
+  # The architecture tests read the source through pkg/archtest.
+  - shared-core-go
 tasks:
   go-test-coverage:
     env:
@@ -39,6 +41,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /packages/library/shared-core-go/pkg/archtest/**/*.go
     outputs: []
     options:
       cache: true

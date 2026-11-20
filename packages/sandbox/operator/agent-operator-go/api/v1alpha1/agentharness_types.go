@@ -32,7 +32,3 @@ type AgentHarnessList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []AgentHarness `json:"items"`
 }
-
-func init() {
-	registerTypes(&AgentHarness{}, &AgentHarnessList{})
-}

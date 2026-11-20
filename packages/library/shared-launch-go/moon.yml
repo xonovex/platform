@@ -59,6 +59,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /packages/library/shared-core-go/pkg/archtest/**/*.go
     outputs: []
     options:
       cache: true

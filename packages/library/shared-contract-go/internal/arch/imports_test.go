@@ -6,16 +6,15 @@
 package arch
 
 import (
-	"go/ast"
-	"go/parser"
-	"go/token"
-	"io/fs"
+	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
-	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 )
 
 const module = "github.com/xonovex/platform/packages/library/shared-contract-go"
@@ -50,131 +49,35 @@ var thirdParty = map[string]string{
 	"pkg/jsonschema/tekuri": "github.com/santhosh-tekuri/jsonschema/v6",
 }
 
-// hostImports reach the real disk, the environment, the process or the network.
-var hostImports = map[string]bool{
-	"os": true, "os/exec": true, "os/user": true, "os/signal": true,
-	"io/ioutil": true, "net": true, "net/http": true, "syscall": true,
-}
-
-// hostAdapters may import hostImports.
-var hostAdapters = map[string]bool{"pkg/fs/osfs": true}
-
-type sourceFile struct {
-	path    string
-	dir     string
-	test    bool
-	imports []string
-	clock   bool
-}
-
-func moduleRoot(t *testing.T) string {
+// moduleFiles parses the module's source, without the fitness tests themselves.
+func moduleFiles(t *testing.T) []archtest.File {
 	t.Helper()
-	_, file, _, ok := runtime.Caller(0)
+	_, here, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("runtime.Caller failed")
 	}
-	return filepath.Dir(filepath.Dir(filepath.Dir(file)))
-}
-
-func moduleFiles(t *testing.T) []sourceFile {
-	t.Helper()
-	root := moduleRoot(t)
-	fset := token.NewFileSet()
-	var files []sourceFile
-	err := filepath.WalkDir(filepath.Join(root, "pkg"), func(path string, entry fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if entry.IsDir() || !strings.HasSuffix(path, ".go") {
-			return nil
-		}
-		parsed, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly|parser.SkipObjectResolution)
-		if err != nil {
-			return err
-		}
-		full, err := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution)
-		if err != nil {
-			return err
-		}
-		file := sourceFile{
-			path: path,
-			dir:  filepath.ToSlash(mustRel(t, root, filepath.Dir(path))),
-			test: strings.HasSuffix(path, "_test.go"),
-		}
-		for _, spec := range parsed.Imports {
-			value, err := strconv.Unquote(spec.Path.Value)
-			if err != nil {
-				return err
-			}
-			file.imports = append(file.imports, value)
-		}
-		file.clock = callsTimeNow(full)
-		files = append(files, file)
-		return nil
-	})
+	files, err := archtest.Load(os.DirFS(filepath.Dir(filepath.Dir(filepath.Dir(here)))), "pkg")
 	if err != nil {
 		t.Fatal(err)
 	}
-	return files
-}
-
-func mustRel(t *testing.T, root, path string) string {
-	t.Helper()
-	rel, err := filepath.Rel(root, path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return rel
-}
-
-// callsTimeNow reports whether the file reads the clock through time.Now or
-// time.Since.
-func callsTimeNow(file *ast.File) bool {
-	found := false
-	ast.Inspect(file, func(node ast.Node) bool {
-		selector, ok := node.(*ast.SelectorExpr)
-		if !ok {
-			return true
-		}
-		pkg, ok := selector.X.(*ast.Ident)
-		if ok && pkg.Name == "time" && (selector.Sel.Name == "Now" || selector.Sel.Name == "Since" || selector.Sel.Name == "Until") {
-			found = true
-		}
-		return true
-	})
-	return found
-}
-
-func isStdlib(path string) bool {
-	first, _, _ := strings.Cut(path, "/")
-	return !strings.Contains(first, ".")
-}
-
-func contains(list []string, item string) bool {
-	for _, candidate := range list {
-		if candidate == item {
-			return true
-		}
-	}
-	return false
-}
-
-func nonTest(files []sourceFile) []sourceFile {
-	var out []sourceFile
+	var out []archtest.File
 	for _, f := range files {
-		if !f.test {
+		if f.Dir != "internal/arch" {
 			out = append(out, f)
 		}
 	}
 	return out
 }
 
+// hostAdapters may import hostImports.
+var hostAdapters = map[string]bool{"pkg/fs/osfs": true}
+
 // TestEveryPackageIsDeclared fails for a package missing from the table and for
 // a table entry with no package.
 func TestEveryPackageIsDeclared(t *testing.T) {
 	present := map[string]bool{}
 	for _, f := range moduleFiles(t) {
-		present[f.dir] = true
+		present[f.Dir] = true
 	}
 	for dir := range present {
 		if _, ok := allowed[dir]; !ok {
@@ -192,15 +95,15 @@ func TestEveryPackageIsDeclared(t *testing.T) {
 // hexagon: the core packages know the ports, adapters know one port each, and
 // only the composition root knows them all.
 func TestInternalImportsFollowTheTable(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		permitted := allowed[f.dir]
-		for _, imp := range f.imports {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		permitted := allowed[f.Dir]
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
 			if !inside {
 				continue
 			}
-			if !contains(permitted, rel) {
-				t.Errorf("%s imports %s; %s may import only %v", f.path, rel, f.dir, permitted)
+			if !slices.Contains(permitted, rel) {
+				t.Errorf("%s imports %s; %s may import only %v", f.Path, rel, f.Dir, permitted)
 			}
 		}
 	}
@@ -209,14 +112,14 @@ func TestInternalImportsFollowTheTable(t *testing.T) {
 // TestOnlyTheCompositionRootImportsAdapters keeps the concrete technology
 // behind the ports.
 func TestOnlyTheCompositionRootImportsAdapters(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir == "pkg/wiring" {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir == "pkg/wiring" {
 			continue
 		}
-		for _, imp := range f.imports {
+		for _, imp := range f.Imports {
 			rel, inside := strings.CutPrefix(imp, module+"/")
-			if inside && contains(adapters, rel) {
-				t.Errorf("%s imports the adapter %s; only pkg/wiring may", f.path, rel)
+			if inside && slices.Contains(adapters, rel) {
+				t.Errorf("%s imports the adapter %s; only pkg/wiring may", f.Path, rel)
 			}
 		}
 	}
@@ -226,13 +129,13 @@ func TestOnlyTheCompositionRootImportsAdapters(t *testing.T) {
 // library.
 func TestOnlyDeclaredAdaptersImportThirdParty(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		for _, imp := range f.imports {
-			if isStdlib(imp) || strings.HasPrefix(imp, module) {
+		for _, imp := range f.Imports {
+			if archtest.IsStandard(imp) || strings.HasPrefix(imp, module) {
 				continue
 			}
-			want, ok := thirdParty[f.dir]
+			want, ok := thirdParty[f.Dir]
 			if !ok || !strings.HasPrefix(imp, want) {
-				t.Errorf("%s imports %s; %s may import no module outside the standard library except %q", f.path, imp, f.dir, want)
+				t.Errorf("%s imports %s; %s may import no module outside the standard library except %q", f.Path, imp, f.Dir, want)
 			}
 		}
 	}
@@ -242,12 +145,12 @@ func TestOnlyDeclaredAdaptersImportThirdParty(t *testing.T) {
 // and network out of the core and out of every unit test.
 func TestOnlyTheOSAdapterTouchesTheHost(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		if hostAdapters[f.dir] && !f.test {
+		if hostAdapters[f.Dir] && !f.Test {
 			continue
 		}
-		for _, imp := range f.imports {
-			if hostImports[imp] {
-				t.Errorf("%s imports %s; only the non-test files of %v may", f.path, imp, keys(hostAdapters))
+		for _, imp := range f.Imports {
+			if archtest.IsHost(imp) {
+				t.Errorf("%s imports %s; only the non-test files of %v may", f.Path, imp, keys(hostAdapters))
 			}
 		}
 	}
@@ -257,8 +160,8 @@ func TestOnlyTheOSAdapterTouchesTheHost(t *testing.T) {
 // it needs as an argument.
 func TestNoPackageReadsTheClock(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		if f.clock {
-			t.Errorf("%s reads the clock with time.Now, time.Since or time.Until; pass the instant in", f.path)
+		if archtest.ReadsClock(f.Syntax) {
+			t.Errorf("%s reads the clock with time.Now, time.Since or time.Until; pass the instant in", f.Path)
 		}
 	}
 }
@@ -270,4 +173,24 @@ func keys(set map[string]bool) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+// TestNoPackagePrints keeps the standard streams out of the library: a package
+// writes to the io.Writer its caller passes.
+func TestNoPackagePrints(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, use := range archtest.Prints(f.Syntax) {
+			t.Errorf("%s uses %s; write to the io.Writer the caller passes", f.Path, use)
+		}
+	}
+}
+
+// TestNoPackageKeepsState keeps every package free of state that one caller
+// could change under another.
+func TestNoPackageKeepsState(t *testing.T) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		for _, state := range archtest.PackageState(f.Syntax) {
+			t.Errorf("%s declares %s; pass state as a value", f.Path, state)
+		}
+	}
 }

@@ -4,8 +4,6 @@ package arch
 
 import (
 	"go/ast"
-	"go/parser"
-	"go/token"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 )
 
@@ -37,22 +36,14 @@ func receiverName(expr ast.Expr) string {
 func confinements(t *testing.T) []string {
 	t.Helper()
 	port := reflect.TypeFor[isolation.Confinement]()
-	fset := token.NewFileSet()
 	methods := map[string]map[string]bool{}
-	for _, file := range moduleFiles(t) {
-		if file.test {
-			continue
-		}
-		parsed, err := parser.ParseFile(fset, file.path, nil, parser.SkipObjectResolution)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file.path, err)
-		}
-		for _, decl := range parsed.Decls {
+	for _, file := range archtest.Production(moduleFiles(t)) {
+		for _, decl := range file.Syntax.Decls {
 			fn, ok := decl.(*ast.FuncDecl)
 			if !ok || fn.Recv == nil || len(fn.Recv.List) == 0 {
 				continue
 			}
-			key := file.dir + "." + receiverName(fn.Recv.List[0].Type)
+			key := file.Dir + "." + receiverName(fn.Recv.List[0].Type)
 			if methods[key] == nil {
 				methods[key] = map[string]bool{}
 			}

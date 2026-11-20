@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
@@ -19,9 +20,9 @@ const agentLibrary = "github.com/xonovex/platform/packages/library/shared-agent-
 
 // selectors calls fn for every package-qualified selector of the file, with the
 // import path the qualifier names.
-func selectors(f sourceFile, fn func(path, name string)) {
+func selectors(f archtest.File, fn func(path, name string)) {
 	alias := map[string]string{}
-	for _, spec := range f.parsed.Imports {
+	for _, spec := range f.Syntax.Imports {
 		path, _ := strconv.Unquote(spec.Path.Value)
 		name := path[strings.LastIndexByte(path, '/')+1:]
 		if spec.Name != nil {
@@ -29,7 +30,7 @@ func selectors(f sourceFile, fn func(path, name string)) {
 		}
 		alias[name] = path
 	}
-	ast.Inspect(f.parsed, func(node ast.Node) bool {
+	ast.Inspect(f.Syntax, func(node ast.Node) bool {
 		if selector, ok := node.(*ast.SelectorExpr); ok {
 			if pkg, ok := selector.X.(*ast.Ident); ok && alias[pkg.Name] != "" {
 				fn(alias[pkg.Name], selector.Sel.Name)
@@ -47,13 +48,13 @@ func TestSelectionNamesNoVariant(t *testing.T) {
 		agentLibrary + "provision": {"ProvisionNone", "ProvisionNix", "ProvisionCommand"},
 		agentLibrary + "network":   {"ModeHost", "ModeNone", "ModeManaged"},
 	}
-	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir != "pkg/sandbox" {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir != "pkg/sandbox" {
 			continue
 		}
 		selectors(f, func(path, name string) {
 			if slices.Contains(variants[path], name) {
-				t.Errorf("%s names the variant %s; gate on the declared capabilities", f.path, name)
+				t.Errorf("%s names the variant %s; gate on the declared capabilities", f.Path, name)
 			}
 		})
 	}
@@ -64,10 +65,10 @@ var agentSurface = map[string]bool{"AgentType": true, "AgentConfig": true, "Agen
 
 // TestNoHarnessIsNamed keeps the core on the facts a harness declares.
 func TestNoHarnessIsNamed(t *testing.T) {
-	for _, f := range nonTest(moduleFiles(t)) {
+	for _, f := range archtest.Production(moduleFiles(t)) {
 		selectors(f, func(path, name string) {
 			if path == agentLibrary+"types" && strings.HasPrefix(name, "Agent") && !agentSurface[name] {
-				t.Errorf("%s names the harness %s; compare the declared facts instead", f.path, name)
+				t.Errorf("%s names the harness %s; compare the declared facts instead", f.Path, name)
 			}
 		})
 	}
@@ -97,13 +98,13 @@ func TestCredentialValuesStayInsideSecret(t *testing.T) {
 			t.Errorf("Secret exports the field %s", secret.Field(i).Name)
 		}
 	}
-	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir == "pkg/credential" {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir == "pkg/credential" {
 			continue
 		}
-		ast.Inspect(f.parsed, func(node ast.Node) bool {
+		ast.Inspect(f.Syntax, func(node ast.Node) bool {
 			if selector, ok := node.(*ast.SelectorExpr); ok && selector.Sel.Name == "Reveal" {
-				t.Errorf("%s calls Reveal; hand the Secret on to the executor", f.path)
+				t.Errorf("%s calls Reveal; hand the Secret on to the executor", f.Path)
 			}
 			return true
 		})
@@ -145,13 +146,13 @@ var specConcerns = []string{
 
 func TestSpecReachesNoForbiddenPackage(t *testing.T) {
 	for _, f := range moduleFiles(t) {
-		if f.dir != "pkg/launch" {
+		if f.Dir != "pkg/launch" {
 			continue
 		}
-		for _, imp := range f.imports {
+		for _, imp := range f.Imports {
 			for _, concern := range specConcerns {
 				if imp == concern || strings.HasPrefix(imp, concern+"/") {
-					t.Errorf("%s imports %s", f.path, imp)
+					t.Errorf("%s imports %s", f.Path, imp)
 				}
 			}
 		}
@@ -167,18 +168,18 @@ func TestIsolationBuildsNoAgentCommand(t *testing.T) {
 		agentLibrary + "providers": {"GetProviderCliArgs"},
 		agentLibrary + "agentcmd":  {"PlanProviderEnv"},
 	}
-	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir != "pkg/isolation" && f.dir != "pkg/hostlaunch" && !strings.HasPrefix(f.dir, "pkg/isolation/") {
+	for _, f := range archtest.Production(moduleFiles(t)) {
+		if f.Dir != "pkg/isolation" && f.Dir != "pkg/hostlaunch" && !strings.HasPrefix(f.Dir, "pkg/isolation/") {
 			continue
 		}
-		for _, imp := range f.imports {
+		for _, imp := range f.Imports {
 			if imp == agentLibrary+"agentcmd" {
-				t.Errorf("%s imports the agent command builder %s", f.path, imp)
+				t.Errorf("%s imports the agent command builder %s", f.Path, imp)
 			}
 		}
 		selectors(f, func(path, name string) {
 			if slices.Contains(builders[path], name) {
-				t.Errorf("%s calls %s; confine the planned process instead", f.path, name)
+				t.Errorf("%s calls %s; confine the planned process instead", f.Path, name)
 			}
 		})
 	}

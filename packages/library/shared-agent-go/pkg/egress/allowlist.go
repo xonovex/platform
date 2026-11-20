@@ -6,7 +6,7 @@ package egress
 import (
 	"errors"
 	"fmt"
-	"net"
+	"net/netip"
 	"sort"
 	"strconv"
 	"strings"
@@ -65,7 +65,7 @@ func ParseRule(text string) (Rule, error) {
 		if !strings.Contains(host, ".") {
 			return Rule{}, fmt.Errorf("egress rule %q is a wildcard over a top-level domain", original)
 		}
-		if net.ParseIP(host) != nil {
+		if _, err := netip.ParseAddr(host); err == nil {
 			return Rule{}, fmt.Errorf("egress rule %q is a wildcard over an address", original)
 		}
 	}

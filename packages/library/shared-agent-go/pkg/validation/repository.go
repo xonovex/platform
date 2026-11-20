@@ -2,7 +2,7 @@ package validation
 
 import (
 	"fmt"
-	"net"
+	"net/netip"
 	"net/url"
 	"strconv"
 	"strings"
@@ -19,7 +19,7 @@ type RepositoryURL struct {
 // Display returns a credential-free repository description for logs and events.
 func (repository RepositoryURL) Display() string {
 	host := repository.Host
-	if net.ParseIP(host) != nil && strings.Contains(host, ":") {
+	if _, ok := parseAddress(host); ok && strings.Contains(host, ":") {
 		host = "[" + host + "]"
 	}
 	return host + repository.Path
@@ -102,12 +102,23 @@ func repositoryPort(scheme, rawPort string) (int32, error) {
 	return int32(port), nil
 }
 
+// parseAddress reads an IP literal without a zone, and reads an IPv4-mapped
+// IPv6 address as the IPv4 address it carries, so the routability checks judge
+// the address a connection would reach.
+func parseAddress(host string) (netip.Addr, bool) {
+	address, err := netip.ParseAddr(host)
+	if err != nil || address.Zone() != "" {
+		return netip.Addr{}, false
+	}
+	return address.Unmap(), true
+}
+
 func validateRepositoryHost(host string) error {
 	normalized := strings.ToLower(strings.TrimSuffix(host, "."))
 	if normalized == "" || normalized != host {
 		return fmt.Errorf("repository URL host must use canonical lowercase DNS syntax")
 	}
-	if address := net.ParseIP(normalized); address != nil {
+	if address, ok := parseAddress(normalized); ok {
 		if !address.IsGlobalUnicast() || address.IsPrivate() || address.IsLoopback() || address.IsLinkLocalUnicast() {
 			return fmt.Errorf("repository URL host must be publicly routable")
 		}

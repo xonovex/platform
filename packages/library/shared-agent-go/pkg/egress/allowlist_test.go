@@ -21,7 +21,7 @@ func TestParseRule(t *testing.T) {
 			t.Errorf("ParseRule(%q) = %+v, %v; want %+v", text, got, err, want)
 		}
 	}
-	bad := []string{"", "  ", "*", "*.com", "*.192.0.2.10", "https://example.com", "example.com/path", "user@example.com", "a b", "example.com:0", "example.com:70000", "example.com:http", "ex*mple.com", "*."}
+	bad := []string{"", "  ", "*", "*.com", "*.192.0.2.10", "*.::ffff:192.0.2.10", "https://example.com", "example.com/path", "user@example.com", "a b", "example.com:0", "example.com:70000", "example.com:http", "ex*mple.com", "*."}
 	for _, text := range bad {
 		if _, err := ParseRule(text); err == nil {
 			t.Errorf("ParseRule(%q) succeeded, want an error", text)
