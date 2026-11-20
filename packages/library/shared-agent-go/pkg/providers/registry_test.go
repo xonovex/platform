@@ -163,7 +163,7 @@ func TestBuildProviderEnvAllowsProviderWithoutAuthenticationToken(t *testing.T) 
 func TestGetProviderCliArgs(t *testing.T) {
 	provider := geminiOpencodeProvider()
 	got := GetProviderCliArgs(provider)
-	want := []string{"--model", "google/gemini-2.5-pro"}
+	want := []string{"--model", "google/gemini-4-carbon"}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("GetProviderCliArgs() = %v, want %v", got, want)
 	}

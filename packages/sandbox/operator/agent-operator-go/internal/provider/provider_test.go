@@ -496,7 +496,7 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	want := []string{"--model", "google/gemini-2.5-pro", "--model", "custom/model"}
+	want := []string{"--model", "google/gemini-4-carbon", "--model", "custom/model"}
 	if !slices.Equal(resolved.CliArgs, want) {
 		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
 	}
@@ -517,7 +517,7 @@ func TestResolveProvider_InlinePresetContributesCliArgs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	want := []string{"--model", "google/gemini-2.5-pro"}
+	want := []string{"--model", "google/gemini-4-carbon"}
 	if !slices.Equal(resolved.CliArgs, want) {
 		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
 	}

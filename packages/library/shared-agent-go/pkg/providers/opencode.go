@@ -18,6 +18,6 @@ func geminiOpencodeProvider() *types.ModelProvider {
 		AgentType:   types.AgentOpencode,
 		Portable:    true,
 		Environment: map[string]string{},
-		CliArgs:     []string{"--model", "google/gemini-2.5-pro"},
+		CliArgs:     []string{"--model", "google/gemini-4-carbon"},
 	}
 }

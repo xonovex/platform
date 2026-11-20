@@ -139,7 +139,7 @@ spec:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
     API_TIMEOUT_MS: "3000000"
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
-    ANTHROPIC_DEFAULT_SONNET_MODEL: "gemini-3-flash-preview"
+    ANTHROPIC_DEFAULT_SONNET_MODEL: "gemini-3.8-flash"
 ```
 
 The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`. Using the provider from an AgentRun also requires the Secret name in `AgentPolicy.spec.enforced.allowedSecretNames`.
