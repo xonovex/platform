@@ -1,14 +1,12 @@
 # @xonovex/core
 
-Use `@xonovex/core` for common Node.js utilities in Xonovex TypeScript packages.
+Use `@xonovex/core` for terminal colors and leveled logging in Xonovex TypeScript packages.
 
 The package provides these utilities:
 
 - **Colors**: ANSI color codes for terminal output
-- **Logging**: Structured logging with color-coded levels
-- **Platform Detection**: OS detection and platform-specific commands
-- **Error Handling**: Graceful error handling and validation
-- **Path Utilities**: File system navigation and platform root detection
+- **Logging**: a logger that writes through a sink it receives, so it reads no console or environment itself
+- **Console logger**: the one function that wires a logger to a console and the `DEBUG` environment variable
 
 ## Installation
 
@@ -16,91 +14,56 @@ Import this internal package directly from another package in the monorepo. It i
 
 ## Usage
 
-Import only the functions that the script uses.
+Build the logger once at the entry point and pass it to the code that logs.
 
 ```typescript
-import {
-  die,
-  getPlatformRoot,
-  logDebug,
-  logError,
-  logInfo,
-  logSuccess,
-  logWarning,
-  printSection,
-  requireCommand,
-} from "@xonovex/core";
+import {createConsoleLogger} from "@xonovex/core";
 
-// Logging
-logInfo("Starting operation...");
-logSuccess("Operation completed!");
-logWarning("This is a warning");
-logError("An error occurred");
-logDebug("Debug information"); // Only shown if DEBUG env var is set
+const logger = createConsoleLogger(console, process.env);
 
-// Sections
-printSection("Configuration", "Loading platform configuration...");
+logger.info("Starting operation...");
+logger.success("Operation completed!");
+logger.warning("This is a warning");
+logger.error("An error occurred");
+logger.debug("Debug information"); // Only shown if DEBUG is set
 
-// Platform detection
-const root = await getPlatformRoot();
-logInfo("Platform root:", root);
+logger.printSection("Configuration", "Loading platform configuration...");
+logger.checkResult("lint", "PASS", "no findings");
+```
 
-// Error handling
-await requireCommand("git", "git");
-die("Fatal error occurred", 1);
+Tests build a logger over an in-memory sink with `createLogger`.
+
+```typescript
+import {createLogger} from "@xonovex/core";
+
+const lines: unknown[][] = [];
+const logger = createLogger({
+  sink: {
+    out: (...args) => {
+      lines.push(args);
+    },
+    err: (...args) => {
+      lines.push(args);
+    },
+  },
+  debug: false,
+});
 ```
 
 ## API Reference
 
-### Logging Functions
+### Logger
 
-Use the logging functions to produce consistent terminal output.
-
-- `logInfo(...args)` - Log info message (blue)
-- `logSuccess(...args)` - Log success message (green)
-- `logWarning(...args)` - Log warning message (yellow)
-- `logError(...args)` - Log error message (red)
-- `logDebug(...args)` - Log debug message (purple, only if DEBUG is set)
-- `printSection(title, content?)` - Print formatted section header
-- `printSubsection(title)` - Print subsection header
-- `checkResult(name, status, details?)` - Print check result with color
-
-### Platform Detection
-
-Use the platform functions when behavior must vary by operating system.
-
-- `isMacOS()` - Check if running on macOS
-- `isLinux()` - Check if running on Linux
-- `isWindows()` - Check if running on Windows
-- `getPlatformCommand(macCmd, linuxCmd, winCmd?)` - Get OS-specific command
-- `getOS()` - Get current OS name
-
-### Error Handling
-
-Use these functions to validate prerequisites and stop with an explicit error.
-
-- `die(message, exitCode?)` - Exit with error message
-- `requireCommand(cmd, package?)` - Verify command exists
-- `requireFile(path, description?)` - Verify file exists
-- `requireDirectory(path, description?)` - Verify directory exists
-- `validateInArray(value, array)` - Check if value is in array
-- `validateBoolean(value, varName)` - Validate boolean value
-- `validateRepository(repo, platformRoot?)` - Validate git repository
-
-### Path Utilities
-
-Use the path functions to locate the workspace and its files.
-
-- `getScriptDir(importMeta)` - Get script directory path
-- `getPlatformRoot(startDir?)` - Find platform root directory
-- `getGitRoot()` - Get git repository root
-- `fileExists(path)` - Check if file exists
-- `dirExists(path)` - Check if directory exists
-- `getFileMtime(path)` - Get file modification time
-- `formatTimestamp(date)` - Format date for display
-- `findClusterDirectory(platformRoot?)` - Find cluster directory
-- `findInfrastructureDirectory(platformRoot?)` - Find infrastructure directory
-- `detectAvailableEnvironments(infraDir?)` - List available environments
+- `createLogger({sink, debug})` - Build a logger over a `LogSink` with `out` and `err` functions
+- `createConsoleLogger(console, environment)` - Build a logger over a console, with debug output enabled when `environment.DEBUG` is non-empty
+- `logger.info(...args)` - Info message (blue, `out`)
+- `logger.success(...args)` - Success message (green, `out`)
+- `logger.warning(...args)` - Warning message (yellow, `out`)
+- `logger.error(...args)` - Error message (red, `err`)
+- `logger.debug(...args)` - Debug message (purple, `err`, only when the debug gate is open)
+- `logger.printSection(title, content?)` - Print a section header
+- `logger.printSubsection(title)` - Print a subsection header
+- `logger.checkResult(name, status, details?)` - Print a check result with color
 
 ### Colors
 
@@ -110,7 +73,6 @@ Use `Colors` only when direct ANSI color control is required.
 import {Colors} from "@xonovex/core";
 
 console.log(`${Colors.GREEN}Success!${Colors.NC}`);
-console.log(`${Colors.RED}Error!${Colors.NC}`);
 ```
 
 Available colors:
@@ -119,63 +81,7 @@ Available colors:
 
 ## Environment Variables
 
-Set these variables to control debugging and workspace discovery.
-
-- `DEBUG` - Enable debug logging
-- `PLATFORM_ROOT` - Override platform root detection
-
-## Examples
-
-These examples show the common script and error-handling patterns.
-
-### Simple Script
-
-Resolve the platform root before work that depends on repository paths.
-
-```typescript
-#!/usr/bin/env node
-import {getPlatformRoot, logInfo, logSuccess} from "@xonovex/core";
-
-async function main() {
-  const root = await getPlatformRoot();
-  logInfo("Working in:", root);
-
-  // Do something...
-
-  logSuccess("Done!");
-}
-
-main();
-```
-
-### Script with Error Handling
-
-Validate required tools and paths before the main operation.
-
-```typescript
-#!/usr/bin/env node
-import {
-  die,
-  logError,
-  logInfo,
-  requireCommand,
-  requireDirectory,
-} from "@xonovex/core";
-
-async function main() {
-  try {
-    await requireCommand("git");
-    await requireDirectory("./cluster", "cluster directory");
-
-    logInfo("All checks passed!");
-  } catch (error) {
-    logError("Validation failed:", error);
-    die("Cannot continue", 1);
-  }
-}
-
-main();
-```
+- `DEBUG` - Enable debug logging when passed to `createConsoleLogger`
 
 ## Development
 
