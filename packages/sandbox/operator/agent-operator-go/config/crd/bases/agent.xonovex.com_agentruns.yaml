@@ -169,7 +169,7 @@ spec:
                   properties:
                     presetRef:
                       type: string
-                      description: References a portable provider preset from shared-agent-go
+                      description: References a portable provider of the operator providers directory
                     agentType:
                       type: string
                       description: Agent type for preset disambiguation (defaults to "claude")

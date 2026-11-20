@@ -31,7 +31,7 @@ npm install -g @xonovex/agent-eval-go
 | `--project FILE` | Project file, `agentic.eval.json` in the working directory by default |
 | `--profile NAME` | Profile of the project file |
 | `--harness claude\|codex` | Agent harness, from `SKILL_EVAL_HARNESS` or the profile by default |
-| `--model`, `--judge-model` | Models that answer and that grade |
+| `--model`, `--judge-model` | Models that answer and that grade. Without them, a profile model or the variables `CLAUDE_MODEL`, `JUDGE_MODEL`, `CODEX_MODEL` and `CODEX_JUDGE_MODEL`, the run names no model and the harness uses its own default; the report and the results say `harness default` |
 | `--runs N` | Runs per query or arm, at most 3 |
 | `--concurrency N` | Parallel model runs, at most 2 |
 | `--max-model-runs N`, `--max-cost-usd USD` | Budget of one invocation, 24 runs and 2 US dollars by default |

@@ -28,13 +28,15 @@ type Reader interface {
 	GetSecret(ctx context.Context, key types.NamespacedName) (*corev1.Secret, error)
 }
 
-// ResolveProvider resolves the provider configuration for an agent execution.
-func ResolveProvider(ctx context.Context, reader Reader, run *agentv1alpha1.AgentRun, defaultProvider string) (ResolvedProvider, error) {
+// ResolveProvider resolves the provider configuration for an agent execution. A
+// presetRef names a portable provider of presets, the catalog the operator loaded
+// from its providers directory.
+func ResolveProvider(ctx context.Context, reader Reader, presets providers.Catalog, run *agentv1alpha1.AgentRun, defaultProvider string) (ResolvedProvider, error) {
 	env := make(map[string]string)
 
 	// Use inline provider if specified.
 	if run.Spec.Provider != nil {
-		return resolveInlineProvider(ctx, reader, run.Namespace, run.Spec.Provider)
+		return resolveInlineProvider(ctx, reader, presets, run.Namespace, run.Spec.Provider)
 	}
 
 	// Use provider ref if specified.
@@ -51,7 +53,7 @@ func ResolveProvider(ctx context.Context, reader Reader, run *agentv1alpha1.Agen
 		return ResolvedProvider{}, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
 	}
 
-	preset, err := mergePreset(env, provider.Spec.PresetRef, provider.Spec.AgentType)
+	preset, err := mergePreset(env, presets, provider.Spec.PresetRef, provider.Spec.AgentType)
 	if err != nil {
 		return ResolvedProvider{}, err
 	}
@@ -73,10 +75,10 @@ func ResolveProvider(ctx context.Context, reader Reader, run *agentv1alpha1.Agen
 	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, provider.Spec.AuthTokenSecretRef), CliArgs: cliArgs}, nil
 }
 
-func resolveInlineProvider(ctx context.Context, reader Reader, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
+func resolveInlineProvider(ctx context.Context, reader Reader, presets providers.Catalog, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
 	env := make(map[string]string)
 
-	preset, err := mergePreset(env, spec.PresetRef, spec.AgentType)
+	preset, err := mergePreset(env, presets, spec.PresetRef, spec.AgentType)
 	if err != nil {
 		return ResolvedProvider{}, err
 	}
@@ -125,7 +127,7 @@ type presetConfig struct {
 	cliArgs      []string
 }
 
-func mergePreset(env map[string]string, presetRef, agentType string) (presetConfig, error) {
+func mergePreset(env map[string]string, presets providers.Catalog, presetRef, agentType string) (presetConfig, error) {
 	if presetRef == "" {
 		return presetConfig{}, nil
 	}
@@ -133,7 +135,7 @@ func mergePreset(env map[string]string, presetRef, agentType string) (presetConf
 	if at == "" {
 		at = sharedtypes.AgentClaude
 	}
-	preset, err := providers.GetPortableProvider(presetRef, at)
+	preset, err := presets.ResolvePortable(presetRef, at)
 	if err != nil {
 		return presetConfig{}, fmt.Errorf("provider preset %q is unavailable for agent type %q: %w", presetRef, at, err)
 	}

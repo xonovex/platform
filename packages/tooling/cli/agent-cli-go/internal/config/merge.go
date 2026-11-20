@@ -106,6 +106,10 @@ func (r Resolved) Items(key Key) []string {
 	return texts
 }
 
+// Sourced returns the merged values of an append key, each with the layer that
+// supplied it, in the order a consumer applies them.
+func (r Resolved) Sourced(key Key) []Item { return slices.Clone(r.values[key].Items) }
+
 // Sources lists the layers that took part in the merge, in precedence order from
 // the lowest layer up.
 func (r Resolved) Sources() []Source { return slices.Clone(r.sources) }

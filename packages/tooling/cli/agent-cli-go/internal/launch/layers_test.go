@@ -16,7 +16,7 @@ func TestFlagInputHoldsOnlyWhatTheUserChose(t *testing.T) {
 	options := baseOptions()
 	options.Explicit = config.KeysOf(config.KeyIsolation)
 	options.Isolation = "bwrap"
-	options.Provider = "glm"
+	options.Provider = "beta"
 	options.BindPaths = []string{"/data"}
 	options.Policy.RequireEgressRestricted = true
 
@@ -28,7 +28,7 @@ func TestFlagInputHoldsOnlyWhatTheUserChose(t *testing.T) {
 	if _, ok := input.Entries[config.KeyNetwork]; ok {
 		t.Error("the default network is in the command line layer, so it would shadow a file")
 	}
-	if input.Entries[config.KeyIsolation].Text != "bwrap" || input.Entries[config.KeyProvider].Text != "glm" {
+	if input.Entries[config.KeyIsolation].Text != "bwrap" || input.Entries[config.KeyProvider].Text != "beta" {
 		t.Errorf("Entries = %+v, want the chosen isolation and the provider", input.Entries)
 	}
 	if got := input.Entries[config.KeyBindPaths].Items; len(got) != 1 || got[0] != "/data" {
@@ -41,7 +41,7 @@ func TestFlagInputHoldsOnlyWhatTheUserChose(t *testing.T) {
 
 func TestExecuteReadsTheUserLayerAndTheCommandLineWins(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile(userConfig, "isolation: bwrap\nnetwork: none\nprovider: glm\n", 0o600)
+	f.host.AddFile(userConfig, "isolation: bwrap\nnetwork: none\nprovider: beta\n", 0o600)
 	options := baseOptions()
 	options.Config = userConfig
 	options.Network = "host"
@@ -88,14 +88,14 @@ func TestExecuteAppliesTheManagedLayerAndRefusesAContradiction(t *testing.T) {
 
 func TestExecuteReadsTheProjectLayerFromTheWorkDirectory(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/work/repo/.agent-cli.yaml", "provider: gemini\n", 0o644)
+	f.host.AddFile("/work/repo/.agent-cli.yaml", "provider: alpha\n", 0o644)
 	options := bwrapOptions()
 	options.DryRun = true
 
 	if err := Execute(f.deps(), options); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
-	if !strings.Contains(f.log.String(), "provider: gemini (project /work/repo/.agent-cli.yaml)") {
+	if !strings.Contains(f.log.String(), "provider: alpha (project /work/repo/.agent-cli.yaml)") {
 		t.Errorf("dry run lacks the project provenance:\n%s", f.log.String())
 	}
 

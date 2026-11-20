@@ -6,6 +6,12 @@ language: go
 layer: library
 dependsOn:
   - shared-core-go
+fileGroups:
+  # The provider schema is embedded in pkg/providers, so a change to it
+  # invalidates the build, the tests and the coverage runs.
+  sources:
+    - "**/*.go"
+    - pkg/providers/*.json
 tasks:
   go-test-coverage:
     env:
@@ -17,6 +23,7 @@ tasks:
       # pkg/types declare shared types and hold no statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./pkg/agentcmd=95 \
+        ./pkg/approval=100 \
         ./pkg/agents=100 \
         ./pkg/egress=100 \
         ./pkg/artifact=100 \
@@ -32,7 +39,7 @@ tasks:
         ./pkg/overlay/shared=100 \
         ./pkg/plugin=100 \
         ./pkg/policy=100 \
-        ./pkg/providers=97 \
+        ./pkg/providers=98 \
         ./pkg/provision=exempt \
         ./pkg/provision/nix=85 \
         ./pkg/types=exempt \
@@ -40,6 +47,7 @@ tasks:
         ./pkg/workspace=100
     inputs:
       - /packages/library/shared-agent-go/pkg/**/*.go
+      - /packages/library/shared-agent-go/pkg/**/*.json
       - /packages/library/shared-agent-go/go.mod
       - /packages/library/shared-agent-go/go.sum
       - /packages/library/shared-core-go/**/*.go
@@ -53,3 +61,29 @@ tasks:
   coverage:
     deps:
       - go-package-coverage
+  # The architecture test reads the source of every module that ships a binary or
+  # a library the binaries use, so it carries the arch build tag and runs here
+  # instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /packages/tooling/cli/agent-cli-go/**/*.go
+      - /packages/tooling/cli/agent-eval-go/**/*.go
+      - /packages/sandbox/operator/agent-operator-go/**/*.go
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
+    options:
+      cache: false
+      mergeDeps: replace

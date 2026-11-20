@@ -96,7 +96,7 @@ type WorktreeSpec struct {
 
 // ProviderSpec defines inline provider configuration
 type ProviderSpec struct {
-	// PresetRef references a named provider preset from shared-agent-go.
+	// PresetRef references a portable provider of the operator providers directory.
 	// Preset env vars are applied as defaults; Environment overrides them.
 	// +optional
 	PresetRef string `json:"presetRef,omitempty"`

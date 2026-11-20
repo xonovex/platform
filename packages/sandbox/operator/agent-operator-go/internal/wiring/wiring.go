@@ -9,6 +9,7 @@ import (
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/kube"
@@ -24,12 +25,25 @@ const eventSource = "agent-operator"
 type Config struct {
 	WorkspaceInitImage string
 	JobPolicy          isoshared.JobPolicy
+	// Presets are the portable providers a presetRef names; the zero catalog
+	// defines none, and a presetRef then fails validation.
+	Presets providers.Catalog
 }
 
 // DefaultConfig returns the settings the operator uses when no flag overrides
 // them.
 func DefaultConfig() Config {
 	return Config{WorkspaceInitImage: controller.DefaultWorkspaceInitImage, JobPolicy: isoshared.DefaultJobPolicy()}
+}
+
+// LoadPresets reads the provider files of dir into the catalog a presetRef
+// resolves against.
+func LoadPresets(files providers.Reader, dir string) (providers.Catalog, error) {
+	documents, err := providers.LoadDir(files, dir, "operator")
+	if err != nil {
+		return providers.Catalog{}, err
+	}
+	return providers.NewCatalog(documents...), nil
 }
 
 type systemClock struct{}
@@ -54,6 +68,7 @@ func SetupControllers(mgr ctrl.Manager, config Config) error {
 			Events:     events,
 			Clock:      systemClock{},
 			JobPolicy:  config.JobPolicy,
+			Presets:    config.Presets,
 		}).SetupWithManager},
 		{name: "AgentProvider", setup: controller.NewAgentProviderReconciler(controller.AgentProviderDependencies{
 			Store:  store,
@@ -78,17 +93,18 @@ func SetupControllers(mgr ctrl.Manager, config Config) error {
 }
 
 // SetupWebhooks registers the defaulting and validating webhooks of every
-// agent resource with the manager.
-func SetupWebhooks(mgr ctrl.Manager) error {
+// agent resource with the manager. presets are the portable providers a presetRef
+// may name.
+func SetupWebhooks(mgr ctrl.Manager, presets providers.Catalog) error {
 	store := kube.NewStore(mgr.GetClient())
 	registry := plugins.Registry{}
 	webhooks := []struct {
 		name  string
 		setup func(ctrl.Manager) error
 	}{
-		{name: "AgentRun", setup: webhook.NewAgentRunWebhook(store, store, registry).SetupWebhookWithManager},
+		{name: "AgentRun", setup: webhook.NewAgentRunWebhook(store, store, registry, presets).SetupWebhookWithManager},
 		{name: "AgentHarness", setup: webhook.NewAgentHarnessWebhook(registry).SetupWebhookWithManager},
-		{name: "AgentProvider", setup: (&webhook.AgentProviderWebhook{}).SetupWebhookWithManager},
+		{name: "AgentProvider", setup: (&webhook.AgentProviderWebhook{Presets: presets}).SetupWebhookWithManager},
 		{name: "AgentToolchain", setup: webhook.NewAgentToolchainWebhook(registry).SetupWebhookWithManager},
 		{name: "AgentWorkspace", setup: webhook.NewAgentWorkspaceWebhook(store, registry).SetupWebhookWithManager},
 	}

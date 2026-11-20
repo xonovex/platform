@@ -3,6 +3,8 @@ package launch
 import (
 	"fmt"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
@@ -28,6 +30,7 @@ func flagInput(options Options) config.Input {
 		entries[config.KeyProvider] = config.Value{Text: options.Provider}
 	}
 	for key, items := range map[config.Key][]string{
+		config.KeyModels:      options.Models,
 		config.KeyBindPaths:   options.BindPaths,
 		config.KeyRoBindPaths: options.RoBindPaths,
 		config.KeyCustomEnv:   options.CustomEnv,
@@ -73,6 +76,7 @@ func applyResolved(options Options, resolved config.Resolved) Options {
 			options.Explicit = options.Explicit.With(key)
 		}
 	}
+	options.Models = resolved.Items(config.KeyModels)
 	options.BindPaths = resolved.Items(config.KeyBindPaths)
 	options.RoBindPaths = resolved.Items(config.KeyRoBindPaths)
 	options.CustomEnv = resolved.Items(config.KeyCustomEnv)
@@ -111,6 +115,25 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
 	}
 	effective := applyResolved(options, merged)
+	set, err := config.LoadProviders(deps.Host, options.Config, absolute(cwd, options.WorkDir))
+	if err != nil {
+		return resolution{}, fmt.Errorf("failed to load providers: %w", err)
+	}
+	effective.Catalog = providers.NewCatalog(set.Documents...)
+	effective.ProviderDirs = set.Dirs
+	if effective.ModelOverrides, err = parseModelOverrides(merged.Sourced(config.KeyModels)); err != nil {
+		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
+	}
+	material := providers.Material{Documents: set.Project, Models: config.ProjectModels(inputs)}
+	if needsApproval(effective, material) {
+		approved, err := approvedDigest(deps.Approvals, material.Digest())
+		if err != nil {
+			return resolution{}, fmt.Errorf("read the approvals: %w", err)
+		}
+		if !approved {
+			return resolution{}, &ApprovalRequiredError{Material: material}
+		}
+	}
 	home := effective.HomeDir
 	if home == "" {
 		if home, err = deps.Host.UserHomeDir(); err != nil {
@@ -123,4 +146,13 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 	}
 	plan, err := build(effective, cwd, home, deps.Sandboxes)
 	return resolution{config: merged, plan: plan, planErr: err}, nil
+}
+
+// approvedDigest asks the approvals whether the digest is approved; a build
+// without approvals approves nothing.
+func approvedDigest(approvals Approvals, digest string) (bool, error) {
+	if approvals == nil {
+		return false, nil
+	}
+	return approvals.Approved(ApprovalKind, digest)
 }

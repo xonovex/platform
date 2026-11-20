@@ -348,3 +348,55 @@ func TestAnUnreadableProjectFileIsAUsageError(t *testing.T) {
 		t.Fatalf("%d %v", code, err)
 	}
 }
+
+// modelless is a project whose profile names no model.
+func modelless() map[string]string {
+	files := baseFiles()
+	files["/w/agentic.eval.json"] = `{"version":1,"pluginDirs":["plugins"],"defaultProfile":"ci","profiles":{"ci":{"harness":"claude"}}}`
+	return files
+}
+
+func TestARunWithoutAModelLeavesTheChoiceToTheHarnessAndRecordsThat(t *testing.T) {
+	f := newFixture(t, modelless(), selects(good))
+
+	code, err := f.run("trigger", "alpha", "--runs", "1")
+
+	if err != nil || code != 0 {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+	for _, call := range f.exec.Calls() {
+		if call.Model != "" {
+			t.Errorf("the request names the model %q, want none so the harness uses its default", call.Model)
+		}
+	}
+	if !strings.Contains(f.out.String(), "model: harness default, judge model: harness default") {
+		t.Errorf("the report does not name the harness default:\n%s", f.out)
+	}
+	entries, _ := f.fs.ReadDir("/w/.agent-eval/results")
+	for _, e := range entries {
+		if !e.IsDir {
+			continue
+		}
+		data, err := f.fs.ReadFile("/w/.agent-eval/results/" + e.Name + "/results.json")
+		if err != nil || !strings.Contains(string(data), `"model": "harness default"`) || !strings.Contains(string(data), `"judgeModel": "harness default"`) {
+			t.Errorf("results = %s, %v, want the harness default recorded", data, err)
+		}
+	}
+	cost, err := f.fs.ReadFile("/w/.agent-eval/results/cost-history.json")
+	if err != nil || !strings.Contains(string(cost), `"model": "harness default"`) {
+		t.Errorf("cost history = %s, %v, want the harness default recorded", cost, err)
+	}
+}
+
+func TestADryRunNamesTheModelsItWouldUse(t *testing.T) {
+	f := newFixture(t, modelless(), selects(good))
+	if code, err := f.run("trigger", "alpha", "--dry-run"); err != nil || code != 0 || !strings.Contains(f.out.String(), "model: harness default, judge model: harness default") {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+
+	f = newFixture(t, modelless(), selects(good))
+	f.deps.Env = map[string]string{"CLAUDE_MODEL": "chosen", "JUDGE_MODEL": "judge-chosen"}
+	if code, err := f.run("trigger", "alpha", "--dry-run", "--format", "json"); err != nil || code != 0 || !strings.Contains(f.out.String(), `"model": "chosen"`) || !strings.Contains(f.out.String(), `"judgeModel": "judge-chosen"`) {
+		t.Fatalf("%d %v\n%s", code, err, f.out)
+	}
+}

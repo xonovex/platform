@@ -12,7 +12,9 @@ const (
 	// one --config names.
 	LayerUser Layer = "user"
 	// LayerProject is the file that sits in the project the agent works on. A
-	// project can be hostile, so it may set only keys that cannot widen access.
+	// project can be hostile, so it may set only keys that cannot widen access,
+	// and the provider content it supplies takes effect only after the user
+	// approves its digest.
 	LayerProject Layer = "project"
 	// LayerFlags is the command line of this run.
 	LayerFlags Layer = "flags"
@@ -26,6 +28,7 @@ type Key string
 const (
 	KeyAgent     Key = "agent"
 	KeyProvider  Key = "provider"
+	KeyModels    Key = "models"
 	KeyIsolation Key = "isolation"
 	KeyProvision Key = "provision"
 	KeyNetwork   Key = "network"
@@ -82,7 +85,8 @@ var (
 // Specs lists every key in display order.
 var Specs = []Spec{
 	{KeyAgent, RuleReplace, everyFile, "Agent to run."},
-	{KeyProvider, RuleReplace, everyFile, "Model provider preset."},
+	{KeyProvider, RuleReplace, everyFile, "Model provider to use, by name."},
+	{KeyModels, RuleAppend, everyFile, `Model slot overrides of the provider, as "slot=id". A later layer wins per slot, the managed layer last. A project value takes effect only after the user approves its digest.`},
 	{KeyIsolation, RuleReplace, trustedFiles, "Isolation axis."},
 	{KeyProvision, RuleReplace, trustedFiles, "Provision axis."},
 	{KeyNetwork, RuleReplace, trustedFiles, "Network egress axis (host, none, managed)."},

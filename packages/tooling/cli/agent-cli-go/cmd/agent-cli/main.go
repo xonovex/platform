@@ -20,6 +20,7 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/tmux"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/git"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/jj"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
@@ -45,6 +46,11 @@ func main() {
 			termshared.TerminalTmux:  tmux.NewExecutor(host, log),
 			termshared.TerminalHerdr: herdr.NewExecutor(host, log),
 		},
+	}
+	if approvals, err := approvalStore(host); err != nil {
+		log.Warning("Project provider files stay unapproved: " + err.Error())
+	} else {
+		deps.Approvals = approvals
 	}
 	var records cmd.RecordReader
 	if store, err := runStore(host); err != nil {
@@ -77,4 +83,13 @@ func runStore(host system.System) (record.Store, error) {
 		return record.Store{}, err
 	}
 	return record.NewStore(host, record.DefaultDir(host.Getenv, home))
+}
+
+// approvalStore opens the approval ledger of the user.
+func approvalStore(host system.System) (trust.Store, error) {
+	home, err := host.UserHomeDir()
+	if err != nil {
+		return trust.Store{}, err
+	}
+	return trust.NewStore(host, trust.DefaultFile(host.Getenv, home))
 }

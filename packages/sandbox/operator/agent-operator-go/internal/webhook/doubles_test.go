@@ -22,7 +22,7 @@ func (testCatalog) HasToolchain(tcType agentv1alpha1.ToolchainType) bool {
 }
 
 func newRunWebhook(store *testutil.MemoryStore) *AgentRunWebhook {
-	return NewAgentRunWebhook(store, store, testCatalog{})
+	return NewAgentRunWebhook(store, store, testCatalog{}, testutil.NewPresets())
 }
 
 func runWebhookWith(objects ...any) *AgentRunWebhook {

@@ -76,7 +76,7 @@ tasks:
       # internal/system/systemtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
-        ./internal/cmd=96 \
+        ./internal/cmd=97 \
         ./internal/config=100 \
         ./internal/credential/env=100 \
         ./internal/credential/file=100 \
@@ -94,6 +94,7 @@ tasks:
         ./internal/origin/shared=100 \
         ./internal/overlay=100 \
         ./internal/plugin=100 \
+        ./internal/trust=100 \
         ./internal/provision/command=100 \
         ./internal/provision/nix=99 \
         ./internal/provision/none=100 \

@@ -36,6 +36,14 @@ const defaultFlakeShell = "default"
 type Options struct {
 	Agent    string
 	Provider string
+	// Catalog holds the provider files of every layer, and ModelOverrides the model
+	// slot overrides in the order they apply. Models are the "slot=id" overrides
+	// of the command line. ProviderDirs are the directories the catalog was read
+	// from, named in the error of a provider that is not defined.
+	Catalog        providers.Catalog
+	Models         []string
+	ModelOverrides []providers.Override
+	ProviderDirs   []config.ProviderDir
 
 	Isolation string
 	Provision string
@@ -156,7 +164,7 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry, en
 	if err != nil {
 		return Plan{}, fmt.Errorf("%w; available agents: %v", err, agents.GetAgentTypes())
 	}
-	provider, err := resolveProvider(agent, options.Provider)
+	provider, err := resolveProvider(options, agent)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -274,22 +282,6 @@ func (p Plan) DisplayDir() string {
 		return p.Checkout.Dir
 	}
 	return p.SourceDir
-}
-
-// resolveProvider resolves the model provider by name. An agent that uses its own
-// login takes no provider, so a named one fails before the preset lookup.
-func resolveProvider(agent *types.AgentConfig, name string) (*types.ModelProvider, error) {
-	if name == "" {
-		return nil, nil
-	}
-	if !agents.TakesProvider(agent) {
-		return nil, fmt.Errorf("provider %s: agent %s uses its own login and takes no provider", name, agent.Type)
-	}
-	provider, err := providers.GetProvider(name, agent.Type)
-	if err != nil {
-		return nil, fmt.Errorf("%w; available providers: %v", err, providers.GetProviderNames(agent.Type))
-	}
-	return provider, nil
 }
 
 // planCheckout validates the worktree options and resolves the checkout

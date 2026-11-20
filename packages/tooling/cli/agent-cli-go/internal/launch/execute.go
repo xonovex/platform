@@ -3,6 +3,7 @@ package launch
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"sort"
 	"strings"
 	"time"
@@ -24,8 +25,16 @@ import (
 // working directory, the home directory, the configuration files and the clock.
 type Host interface {
 	config.Files
+	// ReadDir returns the entries of a directory, sorted by name.
+	ReadDir(path string) ([]fs.DirEntry, error)
 	Getwd() (string, error)
 	Now() time.Time
+}
+
+// Approvals answers whether the user approved a digest of content a repository
+// supplies.
+type Approvals interface {
+	Approved(kind, digest string) (bool, error)
 }
 
 // Recorder stores the record of a finished run and returns its id.
@@ -56,7 +65,10 @@ type Dependencies struct {
 	// Overlays builds the artifact overlay; it may be nil for a build without one.
 	Overlays Overlays
 	// Records stores the run record; it may be nil for a build that keeps none.
-	Records    Recorder
+	Records Recorder
+	// Approvals holds the digests the user approved; it may be nil for a build
+	// that approves nothing, and project provider content then never takes effect.
+	Approvals  Approvals
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
 }
@@ -279,6 +291,9 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 	log.Info("  Version probe: " + describeVersionProbe(plan.Agent))
 	if plan.Provider != nil {
 		log.Info("  Provider: " + plan.Provider.DisplayName)
+		for _, slot := range plan.Provider.Slots {
+			log.Info("  Model " + describeSlot(slot))
+		}
 	}
 	log.Info("  Work directory: " + plan.DisplayDir())
 	if len(plan.Run.AgentArgs) > 0 {

@@ -16,6 +16,9 @@ import (
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
+// userProviders is the providers directory beside the default user configuration.
+const userProviders = "/home/user/.config/sandboxed-claude/providers"
+
 // executeFixture wires Execute to doubles: the bwrap and docker methods resolve
 // to one isolator, a git checkout creates /work/created, and tmux is installed.
 type executeFixture struct {
@@ -31,6 +34,9 @@ type executeFixture struct {
 func newExecuteFixture() *executeFixture {
 	host := systemtest.New()
 	host.WorkingDir = "/work/repo"
+	for _, name := range []string{"alpha", "beta"} {
+		host.AddFile(userProviders+"/"+name+".json", providerFile(name, "claude", "Display "+name), 0o644)
+	}
 	return &executeFixture{
 		host:     host,
 		sandbox:  newTestSandbox(),
@@ -78,7 +84,7 @@ func TestExecuteDryRunWritesTheCommandWithoutACheckout(t *testing.T) {
 	options := bwrapOptions()
 	options.DryRun = true
 	options.WorktreeBranch = "feature"
-	options.Provider = "gemini"
+	options.Provider = "alpha"
 	options.AgentArgs = []string{"review"}
 
 	if err := Execute(f.deps(), options); err != nil {
@@ -90,7 +96,7 @@ func TestExecuteDryRunWritesTheCommandWithoutACheckout(t *testing.T) {
 	if len(f.vcs.configs) != 0 || f.sandbox.isolator.ran {
 		t.Errorf("dry run created a checkout (%d) or ran (%v)", len(f.vcs.configs), f.sandbox.isolator.ran)
 	}
-	for _, want := range []string{"Dry run", "Claude", "Gemini", "/work/repo-feature", "[review]"} {
+	for _, want := range []string{"Dry run", "Claude", "Display alpha", "Model main: model-main", "/work/repo-feature", "[review]"} {
 		if !strings.Contains(f.log.String(), want) {
 			t.Errorf("log = %q, want %q", f.log.String(), want)
 		}
@@ -363,7 +369,8 @@ func TestExecuteStopsOnAnInvalidPlan(t *testing.T) {
 
 func TestExecuteLoadsTheConfigurationFile(t *testing.T) {
 	f := newExecuteFixture()
-	f.host.AddFile("/etc/agent.yaml", "homeDir: /srv/home\nprovider: glm\n", 0o600)
+	f.host.AddFile("/etc/providers/beta.json", providerFile("beta", "claude", "Display beta"), 0o644)
+	f.host.AddFile("/etc/agent.yaml", "homeDir: /srv/home\nprovider: beta\n", 0o600)
 	f.host.HomeErr = errors.New("no home")
 	options := bwrapOptions()
 	options.Config = "/etc/agent.yaml"
@@ -372,7 +379,7 @@ func TestExecuteLoadsTheConfigurationFile(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 	run := f.sandbox.isolator.commandRun
-	if run.HomeDir != "/srv/home" || run.Provider == nil || run.Provider.Name != "glm" {
+	if run.HomeDir != "/srv/home" || run.Provider == nil || run.Provider.Name != "beta" {
 		t.Errorf("RunConfig = %+v, want the file home and provider", run)
 	}
 }

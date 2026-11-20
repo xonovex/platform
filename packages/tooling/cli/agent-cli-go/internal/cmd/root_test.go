@@ -22,6 +22,7 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
 // recordingIsolator records the RunConfig the command line produced; it runs
@@ -99,12 +100,14 @@ func newTestRoot() *testRoot {
 		registry.RegisterIsolator(method, func() isoshared.Isolator { return r.isolator })
 	}
 	r.host = systemtest.New()
+	approvals, _ := trust.NewStore(r.host, trust.DefaultFile(r.host.Getenv, r.host.Home))
 	r.ports = PluginPorts{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
 	r.deps = launch.Dependencies{
 		Host:      r.host,
 		Log:       logging.New(io.Discard, io.Discard, false, false),
 		Out:       &r.out,
 		Sandboxes: registry,
+		Approvals: approvals,
 	}
 	return r
 }
@@ -241,7 +244,7 @@ func TestRunCommandRejectsAnUnknownAgentAndAProviderForALoginAgent(t *testing.T)
 	if err := r.execute("run", "--dry-run", "--agent", "nosuch"); err == nil || !strings.Contains(err.Error(), "kiro") {
 		t.Fatalf("run --agent nosuch error = %v, want the available agents", err)
 	}
-	if err := r.execute("run", "--dry-run", "--agent", "kiro", "--provider", "gemini"); err == nil || !strings.Contains(err.Error(), "own login") {
+	if err := r.execute("run", "--dry-run", "--agent", "kiro", "--provider", "alpha"); err == nil || !strings.Contains(err.Error(), "own login") {
 		t.Fatalf("run --agent kiro --provider error = %v, want a native login rejection", err)
 	}
 }
@@ -262,7 +265,14 @@ func TestRunCommandHelpListsEveryHarness(t *testing.T) {
 // complete returns the candidates the shell completion offers for args.
 func complete(t *testing.T, args ...string) []string {
 	t.Helper()
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
+	return completeWith(t, newTestRoot(), args...)
+}
+
+// completeWith returns the candidates the shell completion offers for args on the
+// root r.
+func completeWith(t *testing.T, r *testRoot, args ...string) []string {
+	t.Helper()
+	root := NewRootCommand(r.deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)
@@ -289,8 +299,14 @@ func TestCompletionOffersTheRegisteredAgents(t *testing.T) {
 }
 
 func TestCompletionOffersTheProvidersOfTheSelectedAgent(t *testing.T) {
-	if got := complete(t, "run", "--agent", "codex", "--provider", ""); !slices.Equal(got, []string{"gpt5-codex"}) {
-		t.Fatalf("codex provider completion = %v, want [gpt5-codex]", got)
+	r := newTestRoot()
+	r.host.AddFile(userProviders+"/gamma.json", `{"name":"gamma","agent":"codex"}`, 0o644)
+	r.host.AddFile(userProviders+"/alpha.json", `{"name":"alpha","agent":"claude"}`, 0o644)
+	if got := completeWith(t, r, "run", "--agent", "codex", "--provider", ""); !slices.Equal(got, []string{"gamma"}) {
+		t.Fatalf("codex provider completion = %v, want [gamma]", got)
+	}
+	if got := complete(t, "run", "--agent", "codex", "--provider", ""); len(got) != 0 {
+		t.Fatalf("provider completion without a provider file = %v, want none", got)
 	}
 	if got := complete(t, "run", "--agent", "kiro", "--provider", ""); len(got) != 0 {
 		t.Fatalf("kiro provider completion = %v, want none", got)

@@ -108,6 +108,13 @@ func axisChoices(plan Plan, resolved config.Resolved) []AxisChoice {
 	}
 	if plan.Provider != nil {
 		axes = append(axes, AxisChoice{"provider", plan.Provider.Name, source(config.KeyProvider)})
+		for _, slot := range plan.Provider.Slots {
+			value := slot.ID
+			if slot.Effort != "" {
+				value += " (effort " + slot.Effort + ")"
+			}
+			axes = append(axes, AxisChoice{"model " + slot.Name, value, slot.Source})
+		}
 	}
 	workspace := "in-place"
 	if plan.Checkout != nil {

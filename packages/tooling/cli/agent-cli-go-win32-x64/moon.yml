@@ -24,6 +24,7 @@ tasks:
       - /packages/tooling/cli/agent-cli-go/go.mod
       - /packages/tooling/cli/agent-cli-go/go.sum
       - /packages/library/shared-agent-go/**/*.go
+      - /packages/library/shared-agent-go/**/*.schema.json
       - /packages/library/shared-agent-go/go.mod
       - /packages/library/shared-core-go/**/*.go
       - /packages/library/shared-core-go/go.mod

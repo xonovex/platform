@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 const testNixRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -191,7 +192,7 @@ func TestAgentRunWebhook_Default_SnapshotsReferencedHarnessAndProvider(t *testin
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "provider", Namespace: "test"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef:          "glm",
+			PresetRef:          testutil.PresetPortable,
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
 		},
 	}

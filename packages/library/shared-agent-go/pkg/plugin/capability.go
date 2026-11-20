@@ -84,18 +84,3 @@ func Authorize(carried, granted []Capability) error {
 	}
 	return fmt.Errorf("the plugin carries %s; grant each one with --allow, or leave the plugin out", strings.Join(missing, ", "))
 }
-
-// CheckApproval fails unless the user approved exactly the digest of the content
-// that was fetched. An empty approval is the preview step: it names the digest to
-// approve.
-func CheckApproval(digest, approved string) error {
-	switch {
-	case approved == "":
-		return fmt.Errorf("approval required: review the plugin, then repeat the command with --approve-digest %s", digest)
-	case !artifact.ValidDigest(approved):
-		return fmt.Errorf("the approved digest %q is not a sha256 digest", approved)
-	case approved != digest:
-		return fmt.Errorf("the approved digest %s differs from the digest of the fetched content %s", approved, digest)
-	}
-	return nil
-}

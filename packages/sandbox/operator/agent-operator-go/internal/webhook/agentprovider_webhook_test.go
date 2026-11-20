@@ -5,10 +5,11 @@ import (
 	"testing"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			AuthTokenEnv: "ANTHROPIC_AUTH_TOKEN",
@@ -30,7 +31,7 @@ func TestAgentProviderWebhook_Validate_Valid(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_Empty(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{},
 	}
@@ -48,7 +49,7 @@ func TestAgentProviderWebhook_RejectsSecretWithoutCredentialDestination(t *testi
 		},
 	}
 
-	_, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+	_, err := (&AgentProviderWebhook{Presets: testutil.NewPresets()}).ValidateCreate(context.Background(), provider)
 
 	if err == nil {
 		t.Fatal("ValidateCreate() error = nil, want missing authTokenEnv error")
@@ -64,7 +65,7 @@ func TestAgentProviderWebhook_RejectsCredentialDestinationWithLiteralValue(t *te
 		},
 	}
 
-	_, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+	_, err := (&AgentProviderWebhook{Presets: testutil.NewPresets()}).ValidateCreate(context.Background(), provider)
 
 	if err == nil {
 		t.Fatal("ValidateCreate() error = nil, want credential destination conflict")
@@ -72,7 +73,7 @@ func TestAgentProviderWebhook_RejectsCredentialDestinationWithLiteralValue(t *te
 }
 
 func TestAgentProviderWebhook_Validate_NilSecretRef(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{},
 	}
@@ -84,7 +85,7 @@ func TestAgentProviderWebhook_Validate_NilSecretRef(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_EmptySecretName(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
@@ -101,7 +102,7 @@ func TestAgentProviderWebhook_Validate_EmptySecretName(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_EmptySecretKey(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{
@@ -118,7 +119,7 @@ func TestAgentProviderWebhook_Validate_EmptySecretKey(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_InvalidSecretName(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	invalid := []string{"MySecret", "my_secret", "MY-SECRET", "my secret", ".hidden"}
 	for _, name := range invalid {
 		provider := &agentv1alpha1.AgentProvider{
@@ -137,7 +138,7 @@ func TestAgentProviderWebhook_Validate_InvalidSecretName(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_ValidEnvKeys(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			Environment: map[string]string{
@@ -155,7 +156,7 @@ func TestAgentProviderWebhook_Validate_ValidEnvKeys(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_InvalidEnvKey(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	invalid := []string{"1INVALID", "my-var", "my.var", "my var", ""}
 	for _, key := range invalid {
 		provider := &agentv1alpha1.AgentProvider{
@@ -171,7 +172,7 @@ func TestAgentProviderWebhook_Validate_InvalidEnvKey(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_BlockedEnvKey(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	blocked := []string{
 		"LD_PRELOAD", "LD_LIBRARY_PATH",
 		"DYLD_INSERT_LIBRARIES",
@@ -194,7 +195,7 @@ func TestAgentProviderWebhook_Validate_BlockedEnvKey(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_ValidCliArgs(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			CliArgs: []string{"--model", "claude-sonnet-5-5", "--max-tokens", "4096"},
@@ -208,7 +209,7 @@ func TestAgentProviderWebhook_Validate_ValidCliArgs(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_EmptyCliArg(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
 			CliArgs: []string{"--model", ""},
@@ -222,7 +223,7 @@ func TestAgentProviderWebhook_Validate_EmptyCliArg(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_Validate_InjectionCliArg(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	malicious := []string{
 		"--model; rm -rf /",
 		"--arg | cat /etc/passwd",
@@ -244,7 +245,7 @@ func TestAgentProviderWebhook_Validate_InjectionCliArg(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_ValidateUpdate(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	old := &agentv1alpha1.AgentProvider{}
 	updated := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{
@@ -263,7 +264,7 @@ func TestAgentProviderWebhook_ValidateUpdate(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_ValidateDelete(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	_, err := w.ValidateDelete(context.Background(), &agentv1alpha1.AgentProvider{})
 	if err != nil {
 		t.Errorf("ValidateDelete() error = %v", err)
@@ -271,7 +272,7 @@ func TestAgentProviderWebhook_ValidateDelete(t *testing.T) {
 }
 
 func TestAgentProviderWebhook_RejectsUnknownPreset(t *testing.T) {
-	w := &AgentProviderWebhook{}
+	w := &AgentProviderWebhook{Presets: testutil.NewPresets()}
 	provider := &agentv1alpha1.AgentProvider{
 		Spec: agentv1alpha1.AgentProviderSpec{PresetRef: "not-a-provider"},
 	}
@@ -287,10 +288,10 @@ func TestAgentProviderWebhook_RejectsUnknownPreset(t *testing.T) {
 
 func TestAgentProviderWebhook_RejectsLocalOnlyPreset(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
-		Spec: agentv1alpha1.AgentProviderSpec{PresetRef: "gemini"},
+		Spec: agentv1alpha1.AgentProviderSpec{PresetRef: testutil.PresetLocal},
 	}
 
-	warnings, err := (&AgentProviderWebhook{}).ValidateCreate(context.Background(), provider)
+	warnings, err := (&AgentProviderWebhook{Presets: testutil.NewPresets()}).ValidateCreate(context.Background(), provider)
 
 	if err == nil {
 		t.Fatal("ValidateCreate() error = nil, want local-only-preset error")

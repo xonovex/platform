@@ -19,7 +19,7 @@ func TestDefaultsPerProtocol(t *testing.T) {
 	} {
 		s, err := settings.Resolve(model.Project{}, settings.Flags{}, nil, protocol)
 		if err != nil || s.Runs != want.runs || s.BatchSize != want.batch || s.Harness != "claude" ||
-			s.Model != "claude-haiku-5-5" || s.JudgeModel != "claude-sonnet-5-5" || s.Concurrency != 2 ||
+			s.Model != "" || s.JudgeModel != "" || s.Concurrency != 2 ||
 			s.ProfileName != "default" || s.Threshold != 0.5 || s.MinimumLift != 0.5 {
 			t.Errorf("%s: %v %+v", protocol, err, s)
 		}
@@ -34,7 +34,7 @@ func TestPrecedenceFlagEnvProjectDefault(t *testing.T) {
 		Budgets:        &model.Budgets{MaxModelRuns: 10, MaxCostUSD: 1},
 	}
 	s, err := settings.Resolve(project, settings.Flags{}, nil, model.Trigger)
-	if err != nil || s.Harness != "codex" || s.Model != "from-project" || s.JudgeModel != "gpt-6.2-astra" ||
+	if err != nil || s.Harness != "codex" || s.Model != "from-project" || s.JudgeModel != "" ||
 		s.Runs != 2 || s.BatchSize != 5 || s.Threshold != 0.7 || s.Effort != "low" || s.TimeoutSeconds != 90 ||
 		s.Limits.MaxModelRuns != 10 || s.Limits.MaxCostUSD != 1 {
 		t.Fatalf("%v %+v", err, s)
@@ -98,5 +98,27 @@ func TestRejections(t *testing.T) {
 		if err == nil || !strings.Contains(err.Error(), tc.want) {
 			t.Errorf("%s: %v", name, err)
 		}
+	}
+}
+
+func TestAnUnchosenModelIsTheHarnessDefault(t *testing.T) {
+	for _, harness := range []string{"claude", "codex"} {
+		s, err := settings.Resolve(model.Project{}, settings.Flags{Harness: harness}, nil, model.Output)
+		if err != nil || s.Model != "" || s.JudgeModel != "" {
+			t.Fatalf("%s: %v %+v, want no model chosen", harness, err, s)
+		}
+		if s.ModelLabel() != settings.HarnessDefault || s.JudgeModelLabel() != settings.HarnessDefault {
+			t.Errorf("%s: labels = %q, %q, want %q", harness, s.ModelLabel(), s.JudgeModelLabel(), settings.HarnessDefault)
+		}
+	}
+	chosen, err := settings.Resolve(model.Project{}, settings.Flags{Model: "m", JudgeModel: "j"}, nil, model.Output)
+	if err != nil || chosen.ModelLabel() != "m" || chosen.JudgeModelLabel() != "j" {
+		t.Errorf("labels of chosen models = %q, %q, %v", chosen.ModelLabel(), chosen.JudgeModelLabel(), err)
+	}
+}
+
+func TestAHarnessWithoutEvalSupportFailsEvenWithoutAModel(t *testing.T) {
+	if _, err := settings.Resolve(model.Project{}, settings.Flags{Harness: "nosuch"}, nil, model.Output); err == nil || !strings.Contains(err.Error(), "nosuch") {
+		t.Errorf("error = %v", err)
 	}
 }

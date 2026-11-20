@@ -1,8 +1,10 @@
 package wiring
 
 import (
+	"io/fs"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -10,6 +12,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
@@ -37,7 +40,7 @@ func TestSetup_RegistersEveryControllerAndWebhook(t *testing.T) {
 	if err := SetupControllers(mgr, DefaultConfig()); err != nil {
 		t.Fatalf("SetupControllers() error = %v", err)
 	}
-	if err := SetupWebhooks(mgr); err != nil {
+	if err := SetupWebhooks(mgr, providers.Catalog{}); err != nil {
 		t.Fatalf("SetupWebhooks() error = %v", err)
 	}
 }
@@ -69,9 +72,36 @@ func TestSystemClock_ReadsTheCurrentTime(t *testing.T) {
 }
 
 func TestSetupWebhooks_NamesTheWebhookThatFails(t *testing.T) {
-	err := SetupWebhooks(newOfflineManager(t, runtime.NewScheme()))
+	err := SetupWebhooks(newOfflineManager(t, runtime.NewScheme()), providers.Catalog{})
 
 	if err == nil || !strings.Contains(err.Error(), "AgentRun webhook") {
 		t.Errorf("SetupWebhooks() error = %v, want it to name the AgentRun webhook", err)
+	}
+}
+
+// presetFiles serves provider files from memory.
+type presetFiles struct{ files fstest.MapFS }
+
+func (p presetFiles) ReadDir(dir string) ([]fs.DirEntry, error) {
+	return fs.ReadDir(p.files, strings.TrimPrefix(dir, "/"))
+}
+
+func (p presetFiles) ReadFile(file string) ([]byte, error) {
+	return fs.ReadFile(p.files, strings.TrimPrefix(file, "/"))
+}
+
+func TestLoadPresetsBuildsTheCatalogOfTheDirectory(t *testing.T) {
+	files := presetFiles{files: fstest.MapFS{"providers/route.json": {Data: []byte(`{"name":"route","agent":"claude","portable":true}`)}}}
+
+	catalog, err := LoadPresets(files, "/providers")
+
+	if err != nil {
+		t.Fatalf("LoadPresets() error = %v", err)
+	}
+	if _, err := catalog.ResolvePortable("route", "claude"); err != nil {
+		t.Errorf("ResolvePortable() error = %v", err)
+	}
+	if _, err := LoadPresets(presetFiles{files: fstest.MapFS{"providers/route.json": {Data: []byte("{")}}}, "/providers"); err == nil {
+		t.Error("LoadPresets() accepted a broken file")
 	}
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
 const (
@@ -298,8 +299,8 @@ func TestPluginInstallDeclinesOtherAnswers(t *testing.T) {
 	for _, answer := range []string{"", "n", "no", "yess", "ok", "y es"} {
 		r := terminalRoot(answer)
 		err := r.execute("plugin", "install", "/src/hello")
-		if !errors.Is(err, errDeclined) {
-			t.Errorf("answer %q: error = %v, want errDeclined", answer, err)
+		if !errors.Is(err, trust.ErrDeclined) {
+			t.Errorf("answer %q: error = %v, want trust.ErrDeclined", answer, err)
 		}
 		if r.host.Exists(defaultStore + "/lock.json") {
 			t.Errorf("answer %q: a declined install changed the store", answer)
@@ -309,8 +310,8 @@ func TestPluginInstallDeclinesOtherAnswers(t *testing.T) {
 
 func TestPluginInstallDeclinesAtTheEndOfTheInput(t *testing.T) {
 	r := terminalRoot()
-	if err := r.execute("plugin", "install", "/src/hello"); !errors.Is(err, errDeclined) {
-		t.Errorf("error = %v, want errDeclined", err)
+	if err := r.execute("plugin", "install", "/src/hello"); !errors.Is(err, trust.ErrDeclined) {
+		t.Errorf("error = %v, want trust.ErrDeclined", err)
 	}
 	if r.host.Exists(defaultStore + "/lock.json") {
 		t.Error("an unanswered install changed the store")
@@ -324,7 +325,7 @@ func TestPluginInstallStopsWhenTheAnswerCannotBeRead(t *testing.T) {
 	r := terminalRoot()
 	r.host.InputErr = errors.New("interrupted")
 	err := r.execute("plugin", "install", "/src/hello")
-	if err == nil || errors.Is(err, errDeclined) || !strings.Contains(err.Error(), "interrupted") {
+	if err == nil || errors.Is(err, trust.ErrDeclined) || !strings.Contains(err.Error(), "interrupted") {
 		t.Errorf("error = %v, want the read failure", err)
 	}
 	if r.host.Exists(defaultStore + "/lock.json") {

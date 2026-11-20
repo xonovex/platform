@@ -26,6 +26,9 @@ type FileConfig struct {
 	Network   string `yaml:"network" toml:"network"`
 	HomeDir   string `yaml:"homeDir" toml:"homeDir"`
 
+	// Models override model slots of the provider, as "slot=id".
+	Models []string `yaml:"models" toml:"models"`
+
 	BindPaths   []string `yaml:"bindPaths" toml:"bindPaths"`
 	RoBindPaths []string `yaml:"roBindPaths" toml:"roBindPaths"`
 	CustomEnv   []string `yaml:"customEnv" toml:"customEnv"`
@@ -54,7 +57,7 @@ func (f FileConfig) Entries() Entries {
 		}
 	}
 	for key, items := range map[Key][]string{
-		KeyBindPaths: f.BindPaths, KeyRoBindPaths: f.RoBindPaths, KeyCustomEnv: f.CustomEnv,
+		KeyModels: f.Models, KeyBindPaths: f.BindPaths, KeyRoBindPaths: f.RoBindPaths, KeyCustomEnv: f.CustomEnv,
 		KeyAllowHosts: f.AllowHosts, KeyCredentials: f.Credentials,
 	} {
 		if len(items) > 0 {

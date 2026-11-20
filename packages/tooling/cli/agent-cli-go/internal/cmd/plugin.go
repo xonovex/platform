@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"path"
@@ -12,6 +11,7 @@ import (
 	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
 	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
 // PluginHost is the machine the plugin and marketplace commands consult.
@@ -113,15 +113,9 @@ the answer: pass --allow for each.`,
 				return err
 			}
 			printPreview(ports.Out, fetched)
-			if approved == "" && ports.Host.IsTerminal() {
-				yes, err := askApproval(ports)
-				if err != nil {
-					return err
-				}
-				if !yes {
-					return errDeclined
-				}
-				approved = fetched.Digest
+			approved, err = trust.Decide(ports.Host, ports.Out, fetched.Digest, approved)
+			if err != nil {
+				return err
 			}
 			record, err := service.Commit(fetched, approved, capabilities)
 			if err != nil {
@@ -282,32 +276,6 @@ func printListing(out io.Writer, service plugin.Service, name string) error {
 		}
 	}
 	return nil
-}
-
-// errDeclined reports an answer other than yes to the approval question.
-var errDeclined = errors.New("install declined: the digest was not approved and nothing was installed")
-
-// askApproval asks the user to approve the digest just shown. Only y and yes
-// approve; an empty answer, any other answer or the end of the input decline.
-func askApproval(ports PluginPorts) (bool, error) {
-	if _, err := fmt.Fprint(ports.Out, "Approve this digest? [y/N] "); err != nil {
-		return false, err
-	}
-	answer, err := ports.Host.ReadLine()
-	if err != nil {
-		// The question stays unanswered on a closed input, so nothing is approved.
-		_, _ = fmt.Fprintln(ports.Out)
-		if errors.Is(err, io.EOF) {
-			return false, nil
-		}
-		return false, fmt.Errorf("read the answer: %w", err)
-	}
-	switch strings.ToLower(strings.TrimSpace(answer)) {
-	case "y", "yes":
-		return true, nil
-	default:
-		return false, nil
-	}
 }
 
 // printPreview shows what the user is asked to approve.

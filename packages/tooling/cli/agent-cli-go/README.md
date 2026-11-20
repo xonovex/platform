@@ -20,7 +20,7 @@ agent-cli run
 
 # Run with specific agent
 agent-cli run -a claude
-agent-cli run -a codex -p gpt5-codex
+agent-cli run -a codex -p <name>
 agent-cli run -a kiro
 
 # Run with the three sandbox axes: isolation, provision, and network
@@ -46,8 +46,13 @@ agent-cli preflight --isolation bwrap --require-kernel-isolation
 agent-cli runs list
 agent-cli runs show latest --json
 
+# Define and inspect model providers
+agent-cli providers list
+agent-cli run -p <name> --model sonnet=<model-id>
+
 # Print a JSON Schema
 agent-cli schema config
+agent-cli schema provider
 ```
 
 ## Commands
@@ -59,7 +64,9 @@ Use `run` to start an AI coding agent. Select the sandbox with the three indepen
 ```
 Options:
   -a, --agent <type>           Agent: claude, codex, copilot, kiro, opencode, pi (default: claude)
-  -p, --provider <name>        Model provider for the agent
+  -p, --provider <name>        Model provider, the name of a provider file
+      --model <slot>=<id>      Override a model slot of the provider (repeatable)
+      --approve-project-digest <digest>  Approve the project provider files and model overrides
   --isolation <method>         Isolation: none, bwrap, docker, seatbelt, docker-sandboxes, openshell (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
   --network <method>           Network egress: host, none, managed (default: host)
@@ -146,8 +153,102 @@ Each agent declares its facts, and the planner and the isolators compare those f
 - `kiro` starts `kiro-cli-chat chat --agent-engine v3` directly, because the `kiro-cli` router starts a program at a path under the real home directory.
 - Codex sandboxes its own commands, and that fails inside another sandbox, so an isolation adds `--sandbox danger-full-access`. Host execution keeps the Codex sandbox.
 - A provider that sets a route the agent does not read, such as environment for OpenCode, fails before the run, because the agent would drop it silently.
-- Provider presets: `claude` has `gemini`, `gemini-claude`, `glm` and `gpt5-codex`; `codex` has `gpt5-codex`; `opencode` has `gemini`. `pi` takes its Azure OpenAI variables through `--env`.
-- `--dry-run` prints the protocol, the model access and the version probe of the agent. `--agent` and `--provider` complete in the shell.
+- `agent-cli` ships no provider and no model id. You define each provider in a file, see [Providers](#providers). `pi` takes its Azure OpenAI variables through `--env`.
+- `--dry-run` prints the protocol, the model access and the version probe of the agent. `--agent` and `--provider` complete in the shell, and `--provider` offers only the providers you defined.
+
+### Providers
+
+A provider is a JSON file that names the agent it serves, the credential and the route the agent uses, and the models of that route as named slots. `agent-cli` ships no provider and no model id, so a new model never needs a new release: you change a file. `-p <name>` selects the file `<name>.json`, and a name that no file defines fails with `provider <name> is not defined; add <name>.json to <directory>`.
+
+| Layer | Directory | Role |
+| --- | --- | --- |
+| managed | `providers` in the managed configuration directory | An administrator defines providers that no other layer replaces. |
+| user | `providers` beside the user configuration file, `~/.config/sandboxed-claude/providers` by default | Your providers. |
+| project | `.agent-cli/providers` in the work directory | The providers of a repository. They take effect only after you approve their digest. |
+
+A later layer replaces an earlier file of the same name, managed last, so a project file never changes a managed provider.
+
+| Member | Meaning |
+| --- | --- |
+| `name`, `agent` | The name of the provider, which is also the file name, and the agent it serves. |
+| `displayName`, `portable` | A label, and whether the route is safe outside the local host environment. |
+| `extends` | A provider of the same agent to refine. Models and environment merge entry by entry, and `args` replace the inherited ones when set. |
+| `credential` | `sourceEnv` names the host variable that holds the credential and `targetEnv` the variable the agent reads. The file holds names, never a value. |
+| `models` | Named slots, each with an `id` and an optional `effort`. |
+| `environment`, `args` | The route. A value may hold `{model:<slot>}` for the id of a slot and `{model:<slot>:effort}` for the id with its effort in parentheses, or the id alone when the slot has no effort. |
+
+A route must use what its agent reads: `claude` reads `environment`, and `codex` reads `args` and `environment`.
+
+Override a slot for one run with `--model <slot>=<id>`, or for every run with the `models` list of a configuration file. A later layer wins per slot (user, project, command line, managed), and a command line value that contradicts a managed one is an error. `--dry-run` and `preflight` show the id of each slot and the file or layer that decided it. `agent-cli providers list` shows each defined provider and its layer, and `agent-cli schema provider` prints the schema of a provider file for an editor.
+
+A project file or a project `models` override takes effect only after you approve its digest. `agent-cli providers approve` shows each project file with the hosts its route reaches and its model slots, and records the digest after you answer yes on a terminal or pass `--approve-digest <digest>`. A run that needs the approval asks the same question on a terminal. Without a terminal it stops and names the digest, and `--approve-project-digest <digest>` approves it. Any change to a file or an override asks again. A project file can select a provider by name without approval, because naming a provider changes no route.
+
+The three files below are examples, not shipped code. Replace each `<model-id>` with an id your service accepts.
+
+A Claude Code route through an Anthropic-compatible endpoint, `zai.json`:
+
+```json
+{
+  "$schema": "https://schemas.xonovex.com/agent-cli/provider.schema.json",
+  "name": "zai",
+  "agent": "claude",
+  "portable": true,
+  "credential": {"sourceEnv": "ZAI_AUTH_TOKEN", "targetEnv": "ANTHROPIC_AUTH_TOKEN"},
+  "models": {
+    "opus": {"id": "<model-id>"},
+    "sonnet": {"id": "<model-id>"},
+    "haiku": {"id": "<model-id>"}
+  },
+  "environment": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "{model:opus}",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "{model:sonnet}",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "{model:haiku}"
+  }
+}
+```
+
+A Claude Code route through a proxy on the local host, `proxy.json`, with a reasoning effort on one slot:
+
+```json
+{
+  "name": "proxy",
+  "agent": "claude",
+  "credential": {"sourceEnv": "CLI_PROXY_API_KEY", "targetEnv": "ANTHROPIC_AUTH_TOKEN"},
+  "models": {
+    "opus": {"id": "<model-id>", "effort": "high"},
+    "sonnet": {"id": "<model-id>"}
+  },
+  "environment": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8317",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "{model:opus:effort}",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "{model:sonnet}",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "{model:sonnet}"
+  }
+}
+```
+
+A Codex route through the same proxy, `codex-proxy.json`:
+
+```json
+{
+  "name": "codex-proxy",
+  "agent": "codex",
+  "credential": {"sourceEnv": "CLI_PROXY_API_KEY", "targetEnv": "CLI_PROXY_API_KEY"},
+  "models": {"default": {"id": "<model-id>"}},
+  "args": [
+    "-c", "model_provider=\"proxy\"",
+    "-c", "model_providers.proxy.name=\"CLI proxy\"",
+    "-c", "model_providers.proxy.base_url=\"http://127.0.0.1:8317/v1\"",
+    "-c", "model_providers.proxy.wire_api=\"responses\"",
+    "-c", "model_providers.proxy.env_key=\"CLI_PROXY_API_KEY\"",
+    "-c", "model=\"{model:default}\""
+  ]
+}
+```
 
 ### Overlay
 
@@ -197,9 +298,13 @@ agent-cli runs show <id|latest> [--json]
 
 A store that cannot be written costs the run its record and never its result: the CLI prints a warning.
 
+### providers
+
+Use `providers list` to show every defined provider with its agent, the layer and the file it came from, and, for a project file, whether its digest is approved. Use `providers approve` to review and approve the provider files and model overrides of the project, see [Providers](#providers). Both take `--config` and `--work-dir`.
+
 ### schema
 
-Use `schema` to print a JSON Schema (draft 2020-12): `agent-cli schema config` for the configuration file and `agent-cli schema run-record` for a run record. `agent-cli schema` lists the names.
+Use `schema` to print a JSON Schema (draft 2020-12): `agent-cli schema config` for the configuration file, `agent-cli schema provider` for a provider file and `agent-cli schema run-record` for a run record. `agent-cli schema` lists the names.
 
 ### plugin
 
@@ -253,18 +358,20 @@ Create a YAML, JSON, or TOML file when run defaults must be reusable. The CLI me
 | --- | --- | --- |
 | managed | `managed.yaml`, `managed.yml` or `managed.toml` in `/etc/agent-cli` (`/Library/Application Support/agent-cli` on macOS, `%ProgramData%\agent-cli` on Windows) | An administrator sets a value that no other layer can change. The CLI refuses a file that group or others can write. |
 | user | `~/.config/sandboxed-claude/config` or the file of `--config` | The defaults of the user. |
-| project | `.agent-cli.yaml`, `.agent-cli.yml` or `.agent-cli.toml` in the work directory | The defaults of a repository. It can set only keys that cannot widen access: `agent`, `provider` and the four `require*` keys. |
+| project | `.agent-cli.yaml`, `.agent-cli.yml` or `.agent-cli.toml` in the work directory | The defaults of a repository. It can set only keys that cannot widen access: `agent`, `provider`, the four `require*` keys and `models`. A project `models` list and the provider files of the project take effect only after you approve their digest, see [Providers](#providers). |
 | flags | the command line | The choice of one run. |
 
 Each key has one merge rule, listed by `agent-cli schema config`:
 
 - `replace` (`agent`, `provider`, `isolation`, `provision`, `network`, `homeDir`): the managed value wins, then the flag, then the project, then the user. A flag that contradicts a managed value is an error.
-- `append` (`bindPaths`, `roBindPaths`, `customEnv`, `allowHosts`, `credentials`): the items of every layer join, user first and managed last, without duplicates.
+- `append` (`models`, `bindPaths`, `roBindPaths`, `customEnv`, `allowHosts`, `credentials`): the items of every layer join, user first and managed last, without duplicates.
 - `require` (`requirePinnedProvision`, `requireHostToolsUnreachable`, `requireEgressRestricted`, `requireKernelIsolation`): a guarantee that any layer demands stays demanded.
 
 ```yaml
 agent: claude
-provider: gemini
+provider: zai
+models:
+  - sonnet=<model-id>
 isolation: bwrap
 network: managed
 homeDir: /home/user

@@ -11,6 +11,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provider"
@@ -26,6 +27,9 @@ type AgentRunDependencies struct {
 	Events     EventRecorder
 	Clock      Clock
 	JobPolicy  isoshared.JobPolicy
+	// Presets are the portable providers a presetRef names; the zero catalog
+	// defines none.
+	Presets providers.Catalog
 }
 
 // AgentRunReconciler reconciles an AgentRun object
@@ -128,7 +132,7 @@ func (r *AgentRunReconciler) resolveExecution(ctx context.Context, run *agentv1a
 	if harness != nil {
 		defaultProvider = harness.Spec.DefaultProvider
 	}
-	resolvedProvider, err := provider.ResolveProvider(ctx, r.deps.Store, run, defaultProvider)
+	resolvedProvider, err := provider.ResolveProvider(ctx, r.deps.Store, r.deps.Presets, run, defaultProvider)
 	if err != nil {
 		return nil, fmt.Errorf("ProviderResolutionFailed: %w", err)
 	}

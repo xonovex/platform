@@ -13,6 +13,14 @@
     "inputsDigest": {"$ref": "common.schema.json#/$defs/digest"},
     "startedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
     "finishedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "model": {
+      "description": "The generation model of the run, or harness default when the harness chose its own.",
+      "$ref": "common.schema.json#/$defs/text"
+    },
+    "judgeModel": {
+      "description": "The judge model of the run, or harness default when the harness chose its own.",
+      "$ref": "common.schema.json#/$defs/text"
+    },
     "stop": {
       "description": "Why an incomplete or invalid run ended early: the budget ran out, or an infrastructure fault voided it.",
       "enum": ["budget", "infrastructure"]

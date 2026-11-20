@@ -132,26 +132,81 @@ func TestPreflightJSONReportsTheGuaranteeThatFails(t *testing.T) {
 	}
 }
 
+const routeProvider = `{"name":"route","agent":"claude","models":{"main":{"id":"model-main"}},"environment":{"ROUTE_MODEL":"{model:main}"}}`
+
 func TestTheProjectLayerShowsInTheDryRun(t *testing.T) {
 	m := newMachine(t, "0")
-	if err := os.WriteFile(filepath.Join(m.work, ".agent-cli.yaml"), []byte("provider: gemini\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	writeFile(t, filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json"), routeProvider, 0o644)
+	writeFile(t, filepath.Join(m.work, ".agent-cli.yaml"), "provider: route\n", 0o644)
 	cmd, stdout, stderr := m.command("run", "--dry-run")
-	// The gemini preset reads its token from the environment.
-	cmd.Env = append(cmd.Env, "CLI_PROXY_API_KEY=not-a-secret")
 
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("dry run: %v\n%s", err, stderr)
 	}
-	if output := stdout.String() + stderr.String(); !strings.Contains(output, "provider: gemini (project ") {
-		t.Errorf("dry run lacks the provenance of the project layer:\n%s", output)
+	output := stdout.String() + stderr.String()
+	if !strings.Contains(output, "provider: route (project ") || !strings.Contains(output, "Model main: model-main (") {
+		t.Errorf("dry run lacks the provenance of the project layer and the model slot:\n%s", output)
+	}
+}
+
+func TestAProviderThatNoFileDefinesFailsAndNamesTheDirectory(t *testing.T) {
+	m := newMachine(t, "0")
+	cmd, _, stderr := m.command("run", "--dry-run", "--provider", "ghost")
+
+	if got := exitCode(cmd.Run()); got != 1 {
+		t.Fatalf("exit code = %d, want 1", got)
+	}
+	if want := "provider ghost is not defined; add ghost.json to " + filepath.Join(m.home, ".config", "sandboxed-claude", "providers"); !strings.Contains(stderr.String(), want) {
+		t.Errorf("stderr = %s, want %q", stderr, want)
+	}
+}
+
+func TestProvidersListShowsTheLayerOfEachProvider(t *testing.T) {
+	m := newMachine(t, "0")
+	writeFile(t, filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json"), routeProvider, 0o644)
+	cmd, stdout, stderr := m.command("providers", "list")
+
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("providers list: %v\n%s", err, stderr)
+	}
+	if !strings.HasPrefix(stdout.String(), "route claude user "+filepath.Join(m.home, ".config", "sandboxed-claude", "providers", "route.json")) {
+		t.Errorf("providers list = %q", stdout)
+	}
+}
+
+func TestAProjectProviderNeedsTheApprovalOfItsDigest(t *testing.T) {
+	m := newMachine(t, "0")
+	writeFile(t, filepath.Join(m.work, ".agent-cli", "providers", "route.json"), routeProvider, 0o644)
+	cmd, _, stderr := m.command("run", "--dry-run", "--provider", "route")
+
+	if got := exitCode(cmd.Run()); got != 1 {
+		t.Fatalf("exit code = %d, want 1 without an approval and without a terminal", got)
+	}
+	_, digest, found := strings.Cut(stderr.String(), "--approve-project-digest ")
+	if !found || len(digest) < 71 {
+		t.Fatalf("stderr = %s, want the digest to approve", stderr)
+	}
+	digest = digest[:71]
+
+	approved, _, stderr2 := m.command("run", "--dry-run", "--provider", "route", "--approve-project-digest", digest)
+	if err := approved.Run(); err != nil {
+		t.Fatalf("approved run: %v\n%s", err, stderr2)
+	}
+	again, _, stderr3 := m.command("run", "--dry-run", "--provider", "route")
+	if err := again.Run(); err != nil {
+		t.Fatalf("a run after the approval: %v\n%s", err, stderr3)
+	}
+
+	writeFile(t, filepath.Join(m.work, ".agent-cli", "providers", "route.json"), routeProvider+"\n", 0o644)
+	changed, _, _ := m.command("run", "--dry-run", "--provider", "route")
+	if got := exitCode(changed.Run()); got != 1 {
+		t.Errorf("exit code after the file changed = %d, want 1", got)
 	}
 }
 
 func TestSchemaCommandsPrintValidJSON(t *testing.T) {
 	m := newMachine(t, "0")
-	for _, name := range []string{"config", "run-record"} {
+	for _, name := range []string{"config", "provider", "run-record"} {
 		cmd, stdout, stderr := m.command("schema", name)
 		if err := cmd.Run(); err != nil {
 			t.Fatalf("schema %s: %v\n%s", name, err, stderr)

@@ -2,12 +2,14 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
@@ -43,7 +45,7 @@ func TestResolveProvider_NoProvider(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -67,7 +69,7 @@ func TestResolveProvider_InlineProvider(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -105,7 +107,7 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -134,7 +136,7 @@ func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
 		}},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
@@ -166,7 +168,7 @@ func TestResolveProvider_ProviderRef(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -205,7 +207,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -228,7 +230,7 @@ func TestResolveProvider_ProviderRefNotFound(t *testing.T) {
 		},
 	}
 
-	_, err := ResolveProvider(context.Background(), c, run, "")
+	_, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err == nil {
 		t.Error("ResolveProvider() expected error for nonexistent provider ref")
 	}
@@ -258,7 +260,7 @@ func TestResolveProvider_SecretNotFound(t *testing.T) {
 		},
 	}
 
-	_, err := ResolveProvider(context.Background(), c, run, "")
+	_, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err == nil {
 		t.Error("ResolveProvider() expected error for missing secret")
 	}
@@ -294,7 +296,7 @@ func TestResolveProvider_SecretMissingKey(t *testing.T) {
 		},
 	}
 
-	_, err := ResolveProvider(context.Background(), c, run, "")
+	_, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err == nil {
 		t.Error("ResolveProvider() expected error for missing key in secret")
 	}
@@ -316,7 +318,7 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "default-claude-provider")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "default-claude-provider")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -329,7 +331,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "preset-provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "glm",
+			PresetRef: testutil.PresetPortable,
 		},
 	}
 
@@ -342,7 +344,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -355,7 +357,7 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "preset-override", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "glm",
+			PresetRef: testutil.PresetPortable,
 			Environment: map[string]string{
 				"ANTHROPIC_BASE_URL": "http://custom:9999",
 			},
@@ -371,7 +373,7 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -388,7 +390,7 @@ func TestResolveProvider_UnknownPresetReturnsError(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "unknown-preset", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "nonexistent-preset",
+			PresetRef: "not-defined",
 			Environment: map[string]string{
 				"CUSTOM_VAR": "value",
 			},
@@ -404,7 +406,7 @@ func TestResolveProvider_UnknownPresetReturnsError(t *testing.T) {
 		},
 	}
 
-	if _, err := ResolveProvider(context.Background(), c, run, ""); err == nil {
+	if _, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, ""); err == nil {
 		t.Fatal("ResolveProvider() error = nil, want unknown-preset error")
 	}
 }
@@ -416,7 +418,7 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{
 			Provider: &agentv1alpha1.ProviderSpec{
-				PresetRef: "glm",
+				PresetRef: testutil.PresetPortable,
 				Environment: map[string]string{
 					"ANTHROPIC_BASE_URL": "http://override:8080",
 				},
@@ -424,7 +426,7 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -466,7 +468,7 @@ func TestResolveProvider_InjectsAuthTokenIntoExplicitDestinationWithoutBaseURL(t
 		},
 	}
 
-	env, err := ResolveProvider(context.Background(), c, run, "")
+	env, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
@@ -480,7 +482,7 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 	provider := &agentv1alpha1.AgentProvider{
 		ObjectMeta: metav1.ObjectMeta{Name: "opencode-provider", Namespace: "default"},
 		Spec: agentv1alpha1.AgentProviderSpec{
-			PresetRef: "gemini",
+			PresetRef: testutil.PresetArgs,
 			AgentType: "opencode",
 			CliArgs:   []string{"--model", "custom/model"},
 		},
@@ -491,12 +493,12 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{ProviderRef: provider.Name},
 	}
 
-	resolved, err := ResolveProvider(context.Background(), c, run, "")
+	resolved, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	want := []string{"--model", "google/gemini-4-carbon", "--model", "custom/model"}
+	want := []string{"--model", testutil.PresetArgsModel, "--model", "custom/model"}
 	if !slices.Equal(resolved.CliArgs, want) {
 		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
 	}
@@ -507,18 +509,48 @@ func TestResolveProvider_InlinePresetContributesCliArgs(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{
-			PresetRef: "gemini",
+			PresetRef: testutil.PresetArgs,
 			AgentType: "opencode",
 		}},
 	}
 
-	resolved, err := ResolveProvider(context.Background(), c, run, "")
+	resolved, err := ResolveProvider(context.Background(), c, testutil.NewPresets(), run, "")
 
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	want := []string{"--model", "google/gemini-4-carbon"}
+	want := []string{"--model", testutil.PresetArgsModel}
 	if !slices.Equal(resolved.CliArgs, want) {
 		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
+	}
+}
+
+func TestResolveProvider_PresetRefWithoutAnyDefinedProviderFailsClearly(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Provider: &agentv1alpha1.ProviderSpec{PresetRef: testutil.PresetPortable},
+		},
+	}
+
+	_, err := ResolveProvider(context.Background(), testutil.NewMemoryStore(), providers.Catalog{}, run, "")
+
+	if !errors.Is(err, providers.ErrNotDefined) {
+		t.Errorf("ResolveProvider() error = %v, want it to wrap ErrNotDefined", err)
+	}
+}
+
+func TestResolveProvider_LocalOnlyPresetIsRefused(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec: agentv1alpha1.AgentRunSpec{
+			Provider: &agentv1alpha1.ProviderSpec{PresetRef: testutil.PresetLocal},
+		},
+	}
+
+	_, err := ResolveProvider(context.Background(), testutil.NewMemoryStore(), testutil.NewPresets(), run, "")
+
+	if !errors.Is(err, providers.ErrLocalOnly) {
+		t.Errorf("ResolveProvider() error = %v, want it to wrap ErrLocalOnly", err)
 	}
 }

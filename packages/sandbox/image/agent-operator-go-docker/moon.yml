@@ -11,6 +11,7 @@ fileGroups:
     - /packages/sandbox/operator/agent-operator-go/go.mod
     - /packages/sandbox/operator/agent-operator-go/go.sum
     - /packages/library/shared-agent-go/**/*.go
+    - /packages/library/shared-agent-go/**/*.schema.json
     - /packages/library/shared-agent-go/go.mod
     - /packages/library/shared-agent-go/go.sum
     - /packages/library/shared-core-go/**/*.go

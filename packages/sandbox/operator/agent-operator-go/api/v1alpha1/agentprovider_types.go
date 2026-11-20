@@ -6,7 +6,7 @@ import (
 
 // AgentProviderSpec defines the desired state of AgentProvider
 type AgentProviderSpec struct {
-	// PresetRef references a portable provider preset from shared-agent-go.
+	// PresetRef references a portable provider of the operator providers directory.
 	// Preset env vars are applied as defaults; Environment overrides them.
 	// +optional
 	PresetRef string `json:"presetRef,omitempty"`

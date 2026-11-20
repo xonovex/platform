@@ -28,4 +28,7 @@ formatters:
 run:
   timeout: 5m
   tests: true
+  # The architecture test carries a build tag, so lint reads it.
+  build-tags:
+    - arch
   modules-download-mode: readonly

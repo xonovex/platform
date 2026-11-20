@@ -8,6 +8,7 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
@@ -45,6 +46,9 @@ func fold(t *testing.T, options Options, file config.FileConfig) Options {
 
 func plan(t *testing.T, options Options, file config.FileConfig) (Plan, error) {
 	t.Helper()
+	if len(options.Catalog.List()) == 0 {
+		options.Catalog = testCatalog(t)
+	}
 	return NewPlan(fold(t, options, file), "/work/repo", "/home/user", newTestSandbox().registry)
 }
 
@@ -101,16 +105,16 @@ func TestNewPlanRejectsAnUnknownAgentAndListsTheAgents(t *testing.T) {
 
 func TestNewPlanPrefersTheProviderFlagOverTheFile(t *testing.T) {
 	options := baseOptions()
-	options.Provider = "gemini"
+	options.Provider = "alpha"
 
-	p := mustPlan(t, options, config.FileConfig{Provider: "glm"})
-	if p.Provider == nil || p.Provider.Name != "gemini" || p.Run.Provider != p.Provider {
-		t.Fatalf("provider = %+v, want gemini", p.Provider)
+	p := mustPlan(t, options, config.FileConfig{Provider: "beta"})
+	if p.Provider == nil || p.Provider.Name != "alpha" || p.Run.Provider != p.Provider {
+		t.Fatalf("provider = %+v, want alpha", p.Provider)
 	}
 
-	fromFile := mustPlan(t, baseOptions(), config.FileConfig{Provider: "glm"})
-	if fromFile.Provider == nil || fromFile.Provider.Name != "glm" {
-		t.Fatalf("provider = %+v, want glm from the file", fromFile.Provider)
+	fromFile := mustPlan(t, baseOptions(), config.FileConfig{Provider: "beta"})
+	if fromFile.Provider == nil || fromFile.Provider.Name != "beta" {
+		t.Fatalf("provider = %+v, want beta from the file", fromFile.Provider)
 	}
 }
 
@@ -120,8 +124,8 @@ func TestNewPlanRejectsAnUnknownProviderAndListsTheProviders(t *testing.T) {
 
 	_, err := plan(t, options, config.FileConfig{})
 
-	if err == nil || !strings.Contains(err.Error(), "available providers") || !strings.Contains(err.Error(), "gemini") {
-		t.Fatalf("NewPlan() error = %v, want the available providers", err)
+	if err == nil || !strings.Contains(err.Error(), "provider unknown is not defined") || !strings.Contains(err.Error(), "alpha, beta") || !errors.Is(err, providers.ErrNotDefined) {
+		t.Fatalf("NewPlan() error = %v, want the defined providers", err)
 	}
 }
 
@@ -568,12 +572,12 @@ func TestNewPlanListsEveryHarnessForAnUnknownAgent(t *testing.T) {
 func TestNewPlanResolvesTheCodexProvider(t *testing.T) {
 	options := baseOptions()
 	options.Agent = "codex"
-	options.Provider = "gpt5-codex"
+	options.Provider = "gamma"
 
 	p := mustPlan(t, options, config.FileConfig{})
 
-	if p.Provider == nil || p.Provider.Name != "gpt5-codex" || p.Provider.AgentType != "codex" {
-		t.Fatalf("provider = %+v, want the codex gpt5-codex preset", p.Provider)
+	if p.Provider == nil || p.Provider.Name != "gamma" || p.Provider.AgentType != "codex" {
+		t.Fatalf("provider = %+v, want the codex provider gamma", p.Provider)
 	}
 }
 
@@ -585,9 +589,9 @@ func TestNewPlanRejectsAProviderForAnAgentThatUsesItsOwnLogin(t *testing.T) {
 				options.Agent = agent
 				file := config.FileConfig{}
 				if fromFlag {
-					options.Provider = "gemini"
+					options.Provider = "alpha"
 				} else {
-					file.Provider = "gemini"
+					file.Provider = "alpha"
 				}
 
 				_, err := plan(t, options, file)
@@ -600,14 +604,14 @@ func TestNewPlanRejectsAProviderForAnAgentThatUsesItsOwnLogin(t *testing.T) {
 	}
 }
 
-func TestNewPlanRejectsAProviderPresetThatAnotherAgentOwns(t *testing.T) {
+func TestNewPlanRejectsAProviderThatIsDefinedForAnotherAgent(t *testing.T) {
 	options := baseOptions()
 	options.Agent = "pi"
-	options.Provider = "gemini"
+	options.Provider = "alpha"
 
 	_, err := plan(t, options, config.FileConfig{})
 
-	if err == nil || !strings.Contains(err.Error(), "unknown provider") {
+	if err == nil || !strings.Contains(err.Error(), "provider alpha is not defined") {
 		t.Fatalf("NewPlan() error = %v, want an unknown provider error", err)
 	}
 }

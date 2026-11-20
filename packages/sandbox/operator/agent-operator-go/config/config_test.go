@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"sigs.k8s.io/yaml"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/validator"
@@ -76,7 +77,7 @@ func TestSampleAgentRunPassesAdmissionWithSamplePolicyAndProvider(t *testing.T) 
 		Data:       map[string][]byte{"api-key": []byte("test-token")},
 	}
 	store := testutil.NewMemoryStore(policy, provider, secret)
-	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.Registry{})
+	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.Registry{}, providers.Catalog{})
 
 	warnings, err := admissionWebhook.ValidateCreate(context.Background(), run)
 

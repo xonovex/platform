@@ -78,10 +78,12 @@ func renderText(r run.Report) string {
 	var b strings.Builder
 	if r.Dry {
 		fmt.Fprintf(&b, "dry run: %d units planned, %d pending, up to %d model runs\n", r.Planned, r.Pending, r.ModelRuns)
+		fmt.Fprintf(&b, "model: %s, judge model: %s\n", r.Results.Model, r.Results.JudgeModel)
 		return b.String()
 	}
 	res := r.Results
 	fmt.Fprintf(&b, "%s %s (%s): %s\n", res.Protocol, res.RunID, res.Profile, status(r))
+	fmt.Fprintf(&b, "model: %s, judge model: %s\n", res.Model, res.JudgeModel)
 	for _, c := range res.Cases {
 		fmt.Fprintf(&b, "  %-8s %s%s\n", c.Outcome, c.Key(), score(c))
 	}

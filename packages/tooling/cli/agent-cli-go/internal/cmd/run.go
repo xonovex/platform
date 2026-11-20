@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
@@ -17,8 +15,9 @@ import (
 
 // newRunCommand binds the run flags into launch.Options and executes them
 // through deps.
-func newRunCommand(deps launch.Dependencies) *cobra.Command {
+func newRunCommand(deps launch.Dependencies, ports PluginPorts) *cobra.Command {
 	options := defaultOptions()
+	var approveDigest string
 	cmd := &cobra.Command{
 		Use:   "run [agent-args...]",
 		Short: "Run an AI coding agent",
@@ -28,7 +27,7 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 			run.Verbose, _ = cmd.Flags().GetBool("verbose")
 			run.Explicit = chosenKeys(cmd)
 			run.AgentArgs = args
-			err := launch.Execute(deps, run)
+			err := executeWithApproval(deps, ports, run, approveDigest)
 			// The agent reported its own failure; the CLI passes on only the code.
 			var exit launch.ExitError
 			if errors.As(err, &exit) {
@@ -40,6 +39,7 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	}
 
 	bindRunFlags(cmd, &options, deps)
+	cmd.Flags().StringVar(&approveDigest, "approve-project-digest", "", "Digest of the reviewed provider files and model overrides of the project (sha256:...); approves without a question")
 	cmd.Flags().BoolVarP(&options.DryRun, "dry-run", "n", false, "Show configuration without executing")
 	return cmd
 }
@@ -81,7 +81,8 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 	flags := cmd.Flags()
 	// Bare axis selectors.
 	flags.StringVarP(&options.Agent, "agent", "a", options.Agent, "Agent to run ("+strings.Join(agentNames(), ", ")+")")
-	flags.StringVarP(&options.Provider, "provider", "p", "", "Model provider")
+	flags.StringVarP(&options.Provider, "provider", "p", "", "Model provider, by the name of a provider file (see agent-cli providers list)")
+	flags.StringArrayVar(&options.Models, "model", nil, "Model slot override of the provider, as slot=id (repeatable)")
 	flags.StringVar(&options.Isolation, "isolation", options.Isolation, "Isolation axis (none, bwrap, docker, seatbelt, docker-sandboxes, openshell)")
 	flags.StringVar(&options.Provision, "provision", options.Provision, "Provision axis (none, nix, command)")
 	flags.StringVar(&options.Network, "network", options.Network, "Network egress axis (host, none, managed)")
@@ -131,7 +132,7 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 		return agentNames(), cobra.ShellCompDirectiveNoFileComp
 	})
 	_ = cmd.RegisterFlagCompletionFunc("provider", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
-		return providers.GetProviderNames(types.AgentType(options.Agent)), cobra.ShellCompDirectiveNoFileComp
+		return definedProviders(deps, *options, options.Agent), cobra.ShellCompDirectiveNoFileComp
 	})
 
 	_ = cmd.RegisterFlagCompletionFunc("isolation", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {

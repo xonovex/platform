@@ -139,7 +139,7 @@ spec:
     ANTHROPIC_BASE_URL: "http://litellm-proxy:8317"
     API_TIMEOUT_MS: "3000000"
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
-    ANTHROPIC_DEFAULT_SONNET_MODEL: "gemini-3.8-flash"
+    ANTHROPIC_DEFAULT_SONNET_MODEL: "<model-id>"
 ```
 
 The controller validates that the referenced Secret exists and contains the specified key, reporting readiness via `.status.ready`. Using the provider from an AgentRun also requires the Secret name in `AgentPolicy.spec.enforced.allowedSecretNames`.
@@ -150,11 +150,11 @@ Use these fields to select a provider preset or define its credential and enviro
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `presetRef` | string | Portable shared provider preset; host-loopback presets are rejected |
+| `presetRef` | string | Portable provider of the operator providers directory, set with `--providers-dir`; a provider that is not portable is rejected, and without the flag no `presetRef` is defined |
 | `agentType` | string | Agent used to resolve `presetRef`; defaults to `claude` |
 | `displayName` | string | Human-readable name |
 | `authTokenSecretRef` | object | Secret reference for the auth token |
-| `authTokenEnv` | string | Credential destination; supplied by a preset when omitted |
+| `authTokenEnv` | string | Credential destination; supplied by the provider file of a preset when omitted |
 | `environment` | map | Environment variables to set |
 | `cliArgs` | list | Additional CLI arguments |
 

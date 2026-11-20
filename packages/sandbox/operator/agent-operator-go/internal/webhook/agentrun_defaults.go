@@ -44,6 +44,7 @@ func (w *AgentRunWebhook) applyReferencedDefaults(ctx context.Context, run *agen
 			referencedProvider.Spec.AuthTokenEnv,
 			referencedProvider.Spec.Environment,
 			referencedProvider.Spec.CliArgs,
+			w.presets,
 		); err != nil {
 			return fmt.Errorf("invalid referenced provider: %w", err)
 		}

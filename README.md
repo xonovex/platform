@@ -27,12 +27,15 @@ Choose the local Agent CLI, Kubernetes operator, or plugin installation path for
 
 ### Agent CLI
 
-Install the CLI and start a Claude Code run in a bubblewrap sandbox with the Gemini provider.
+Install the CLI, define a model provider in a file, and start a Claude Code run in a bubblewrap sandbox.
 
 ```bash
 npm install -g @xonovex/agent-cli-go
-agent-cli run --agent claude --isolation bwrap --provider gemini
+agent-cli providers list
+agent-cli run --agent claude --isolation bwrap --provider <name>
 ```
+
+The CLI ships no provider and no model id. The [provider reference](packages/tooling/cli/agent-cli-go/README.md#providers) holds example files to copy.
 
 Select isolation, provisioning, and network behavior independently. Use `agent-cli run --dry-run` to inspect the resolved configuration. The [CLI reference](packages/tooling/cli/agent-cli-go/README.md#run) lists supported flags, and the [agent execution policy](packages/AGENTS.md#agent-execution-policy) defines the guarantees.
 

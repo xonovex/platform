@@ -21,6 +21,9 @@ import (
 type Options struct {
 	Protocol model.Protocol
 	Profile  string
+	// Model and JudgeModel name the models of the run for its record.
+	Model      string
+	JudgeModel string
 	// Resume continues the incomplete run that has the same inputs, and returns
 	// the saved verdict of a complete one.
 	Resume bool
@@ -72,6 +75,7 @@ func Execute(ctx context.Context, plan protocol.Plan, opts Options) (Report, err
 			results.Stop = ""
 		}
 	}
+	results.Model, results.JudgeModel = opts.Model, opts.JudgeModel
 	done := results.Done()
 	var pending []protocol.Unit
 	modelRuns := 0

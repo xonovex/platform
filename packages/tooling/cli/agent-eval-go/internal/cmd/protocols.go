@@ -135,7 +135,8 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	resultsDir := resolve(deps.Dir, o.resultsDir)
 	st := store.Store{FS: deps.FS, Reader: deps.reader(), Dir: resultsDir}
 	rep, err := run.Execute(context.Background(), plan, run.Options{
-		Protocol: spec.name, Profile: resolved.ProfileName, Resume: o.resume, DryRun: o.dryRun,
+		Protocol: spec.name, Profile: resolved.ProfileName, Model: resolved.ModelLabel(), JudgeModel: resolved.JudgeModelLabel(),
+		Resume: o.resume, DryRun: o.dryRun,
 		Concurrency: resolved.Concurrency, BatchSize: resolved.BatchSize, Guard: guard, Store: st, Now: deps.Now,
 	})
 	if err != nil {
@@ -149,7 +150,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 		return err
 	}
 	if !rep.Dry {
-		if err := recordCost(deps, resultsDir, rep, resolved.Model, guard, deps.Now()); err != nil {
+		if err := recordCost(deps, resultsDir, rep, resolved.ModelLabel(), guard, deps.Now()); err != nil {
 			return err
 		}
 	}

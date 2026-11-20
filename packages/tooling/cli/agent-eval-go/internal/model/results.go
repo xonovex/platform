@@ -67,18 +67,22 @@ func CaseKey(id string, condition Condition) string {
 // Results is the record of one eval run. An incomplete run lists the cases it
 // finished, so a resumer restarts at the first case it lacks.
 type Results struct {
-	Schema       string       `json:"$schema,omitempty"`
-	Version      int          `json:"version"`
-	RunID        string       `json:"runId"`
-	Protocol     Protocol     `json:"protocol"`
-	Profile      string       `json:"profile"`
-	InputsDigest string       `json:"inputsDigest"`
-	StartedAt    string       `json:"startedAt"`
-	FinishedAt   string       `json:"finishedAt,omitempty"`
-	Status       Status       `json:"status"`
-	Stop         Stop         `json:"stop,omitempty"`
-	Cases        []CaseResult `json:"cases"`
-	Usage        *Usage       `json:"usage,omitempty"`
+	Schema       string   `json:"$schema,omitempty"`
+	Version      int      `json:"version"`
+	RunID        string   `json:"runId"`
+	Protocol     Protocol `json:"protocol"`
+	Profile      string   `json:"profile"`
+	InputsDigest string   `json:"inputsDigest"`
+	StartedAt    string   `json:"startedAt"`
+	FinishedAt   string   `json:"finishedAt,omitempty"`
+	Status       Status   `json:"status"`
+	// Model and JudgeModel are the models the run used, or "harness default" for a
+	// harness that chose its own.
+	Model      string       `json:"model,omitempty"`
+	JudgeModel string       `json:"judgeModel,omitempty"`
+	Stop       Stop         `json:"stop,omitempty"`
+	Cases      []CaseResult `json:"cases"`
+	Usage      *Usage       `json:"usage,omitempty"`
 }
 
 // Done returns the case results that are finished, keyed by CaseResult.Key.

@@ -115,23 +115,6 @@ func TestAuthorizeNamesEveryMissingGrant(t *testing.T) {
 	}
 }
 
-func TestCheckApproval(t *testing.T) {
-	digest := "sha256:" + strings.Repeat("a", 64)
-	other := "sha256:" + strings.Repeat("b", 64)
-	if err := CheckApproval(digest, digest); err != nil {
-		t.Errorf("the matching digest failed: %v", err)
-	}
-	if err := CheckApproval(digest, ""); err == nil || !strings.Contains(err.Error(), "--approve-digest "+digest) {
-		t.Errorf("the preview step must name the digest: %v", err)
-	}
-	if err := CheckApproval(digest, "nonsense"); err == nil {
-		t.Error("a malformed digest passed")
-	}
-	if err := CheckApproval(digest, other); err == nil || !strings.Contains(err.Error(), "differs") {
-		t.Errorf("a different digest passed: %v", err)
-	}
-}
-
 const claudeMarketplace = `{"name":"mk","plugins":[{"name":"b-plugin","source":"./plugins/b","description":"B"},{"name":"a-plugin","source":"./plugins/a/"},{"name":"remote","source":{"source":"github","repo":"x/y"}}]}`
 const codexMarketplace = `{"name":"mk","plugins":[{"name":"a-plugin","source":"./plugins/a/"},{"name":"c-plugin","source":"./plugins/c"}]}`
 

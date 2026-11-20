@@ -8,7 +8,7 @@ The flow runs in five phases: **Baseline → Scope → Excise → Gate → Ablat
 
 - **Skill** (required unless the whole catalog is selected): the path to a `SKILL.md` or a skill directory
 - **Whole catalog** (optional): optimize every skill in the catalog, each one separately and in parallel
-- **Weakest model** (optional): the model to measure and ablate against; defaults to `haiku`
+- **Weakest model** (optional): the model to measure and ablate against; else harness default
 - **Tier** (optional): the trim depth; defaults to `auto`, which classifies each skill
 - **Report only** (optional): ablate and report the regressions without restoring the cuts
 - **Preview** (optional): show the cuts without writing a file

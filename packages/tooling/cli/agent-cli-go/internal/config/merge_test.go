@@ -153,7 +153,7 @@ func TestProvenanceNamesTheSourceOfEveryValue(t *testing.T) {
 
 func TestEveryKeyHasASpecAndAnEntry(t *testing.T) {
 	file := FileConfig{
-		Agent: "a", Provider: "p", Isolation: "i", Provision: "v", Network: "n", HomeDir: "h",
+		Agent: "a", Provider: "p", Models: []string{"m=1"}, Isolation: "i", Provision: "v", Network: "n", HomeDir: "h",
 		BindPaths: []string{"b"}, RoBindPaths: []string{"r"}, CustomEnv: []string{"E=1"}, AllowHosts: []string{"x"}, Credentials: []string{"C=env:X"},
 		RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true,
 	}

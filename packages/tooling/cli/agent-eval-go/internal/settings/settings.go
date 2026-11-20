@@ -1,7 +1,8 @@
 // Package settings resolves what one invocation runs with. A value comes from
 // the first of: a command-line flag, an environment variable, the project file,
-// and a built-in default. The package checks the hard caps that keep an eval
-// run small and cheap, so no protocol has to.
+// and a built-in default. The package holds no model id: a run that names no
+// model leaves the choice to the harness. It checks the hard caps that keep an
+// eval run small and cheap, so no protocol has to.
 package settings
 
 import (
@@ -46,14 +47,13 @@ const (
 	DefaultTriggerBatchSize = MaxBatchModelRuns / DefaultTriggerRuns
 )
 
-// models holds the default generation and judge model of each harness.
-var models = map[string][2]string{
-	"claude": {"claude-haiku-5-5", "claude-sonnet-5-5"},
-	"codex":  {"gpt-6.2-sol", "gpt-6.2-astra"},
-}
+// HarnessDefault is how a report and a record name the model of a run that
+// chose none, so the harness used its own default.
+const HarnessDefault = "harness default"
 
-// environment names the variables that select a harness and its models.
-var environment = map[string][2]string{
+// variables names, for each harness the eval supports, the environment
+// variables that select its generation model and its judge model.
+var variables = map[string][2]string{
 	"claude": {"CLAUDE_MODEL", "JUDGE_MODEL"},
 	"codex":  {"CODEX_MODEL", "CODEX_JUDGE_MODEL"},
 }
@@ -80,9 +80,11 @@ type Flags struct {
 type Settings struct {
 	ProfileName string
 	Harness     string
-	Model       string
-	JudgeModel  string
-	Effort      model.Effort
+	// Model and JudgeModel are empty when no flag, variable or profile chose one,
+	// and the harness then runs with its own default.
+	Model      string
+	JudgeModel string
+	Effort     model.Effort
 	// TimeoutSeconds is the profile timeout, or zero for the protocol default.
 	TimeoutSeconds int
 	Runs           int
@@ -95,6 +97,14 @@ type Settings struct {
 	Limits         budget.Limits
 }
 
+// ModelLabel is the generation model for a report: the chosen id, or
+// HarnessDefault.
+func (s Settings) ModelLabel() string { return first(s.Model, HarnessDefault) }
+
+// JudgeModelLabel is the judge model for a report: the chosen id, or
+// HarnessDefault.
+func (s Settings) JudgeModelLabel() string { return first(s.JudgeModel, HarnessDefault) }
+
 // Resolve merges flags, environment and project for a protocol.
 func Resolve(project model.Project, flags Flags, env map[string]string, protocol model.Protocol) (Settings, error) {
 	name := first(flags.Profile, project.DefaultProfile, DefaultProfileName)
@@ -103,16 +113,15 @@ func Resolve(project model.Project, flags Flags, env map[string]string, protocol
 		return Settings{}, fmt.Errorf("profile %q is not defined in the project", name)
 	}
 	harness := first(flags.Harness, env[HarnessVariable], profile.Harness, DefaultHarness)
-	defaults, ok := models[harness]
+	vars, ok := variables[harness]
 	if !ok {
 		return Settings{}, fmt.Errorf("no eval support for harness %q", harness)
 	}
-	vars := environment[harness]
 	s := Settings{
 		ProfileName:    name,
 		Harness:        harness,
-		Model:          first(flags.Model, env[vars[0]], profile.Model, defaults[0]),
-		JudgeModel:     first(flags.JudgeModel, env[vars[1]], defaults[1]),
+		Model:          first(flags.Model, env[vars[0]], profile.Model),
+		JudgeModel:     first(flags.JudgeModel, env[vars[1]]),
 		Effort:         profile.Effort,
 		TimeoutSeconds: profile.TimeoutSeconds,
 		Concurrency:    MaxConcurrency,

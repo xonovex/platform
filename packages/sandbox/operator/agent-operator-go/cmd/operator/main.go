@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/fs"
 	"math"
 	"os"
 
@@ -20,12 +21,14 @@ import (
 func main() {
 	var probeAddr string
 	var enableLeaderElection bool
+	var providersDir string
 	config := wiring.DefaultConfig()
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
 	flag.StringVar(&config.WorkspaceInitImage, "workspace-init-image", config.WorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
 	flag.DurationVar(&config.JobPolicy.WorkspaceInitTimeout, "workspace-init-timeout", config.JobPolicy.WorkspaceInitTimeout, "Active deadline of a workspace init Job.")
+	flag.StringVar(&providersDir, "providers-dir", "", "Directory of provider files, <name>.json, that a presetRef may name; empty defines none.")
 	ttl := flag.Int("job-ttl-seconds", int(config.JobPolicy.DefaultTTLSecondsAfterFinished), "Seconds a finished Job is kept when its run sets no TTL.")
 
 	opts := zap.Options{Development: true}
@@ -49,6 +52,13 @@ func main() {
 	}
 	config.JobPolicy.DefaultTTLSecondsAfterFinished = int32(*ttl)
 
+	if providersDir != "" {
+		if config.Presets, err = wiring.LoadPresets(osFiles{}, providersDir); err != nil {
+			setupLog.Error(err, "unable to load provider files", "dir", providersDir)
+			os.Exit(1)
+		}
+	}
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		HealthProbeBindAddress: probeAddr,
@@ -64,7 +74,7 @@ func main() {
 		setupLog.Error(err, "unable to create controllers")
 		os.Exit(1)
 	}
-	if err := wiring.SetupWebhooks(mgr); err != nil {
+	if err := wiring.SetupWebhooks(mgr, config.Presets); err != nil {
 		setupLog.Error(err, "unable to set up webhooks")
 		os.Exit(1)
 	}
@@ -95,3 +105,9 @@ func newScheme() (*runtime.Scheme, error) {
 	}
 	return scheme, nil
 }
+
+// osFiles reads provider files from the local file system.
+type osFiles struct{}
+
+func (osFiles) ReadDir(dir string) ([]fs.DirEntry, error) { return os.ReadDir(dir) }
+func (osFiles) ReadFile(file string) ([]byte, error)      { return os.ReadFile(file) }

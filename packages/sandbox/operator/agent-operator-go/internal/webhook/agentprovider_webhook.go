@@ -16,7 +16,10 @@ import (
 )
 
 // AgentProviderWebhook implements validation for AgentProvider
-type AgentProviderWebhook struct{}
+type AgentProviderWebhook struct {
+	// Presets are the portable providers a presetRef may name.
+	Presets providers.Catalog
+}
 
 var _ admission.Validator[*agentv1alpha1.AgentProvider] = &AgentProviderWebhook{}
 
@@ -50,18 +53,19 @@ func (w *AgentProviderWebhook) validate(provider *agentv1alpha1.AgentProvider) (
 		provider.Spec.AuthTokenEnv,
 		provider.Spec.Environment,
 		provider.Spec.CliArgs,
+		w.Presets,
 	)
 	return nil, err
 }
 
-func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha1.SecretKeyRef, authTokenEnv string, environment map[string]string, cliArgs []string) error {
+func validateProviderConfig(presetRef, agentType string, secretRef *agentv1alpha1.SecretKeyRef, authTokenEnv string, environment map[string]string, cliArgs []string, presets providers.Catalog) error {
 	presetAuthTokenEnv := ""
 	if presetRef != "" {
 		at := sharedtypes.AgentType(agentType)
 		if at == "" {
 			at = sharedtypes.AgentClaude
 		}
-		preset, err := providers.GetPortableProvider(presetRef, at)
+		preset, err := presets.ResolvePortable(presetRef, at)
 		if err != nil {
 			return fmt.Errorf("presetRef %q is not a portable provider preset for agent type %q: %w", presetRef, at, err)
 		}

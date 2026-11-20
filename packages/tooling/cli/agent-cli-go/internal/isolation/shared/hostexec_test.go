@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
@@ -80,11 +79,7 @@ func TestHostExecutionFailures(t *testing.T) {
 		t.Error("an invalid custom variable must fail")
 	}
 	cfg = claudeConfig(t)
-	provider, err := providers.GetProvider("gemini", types.AgentClaude)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg.Provider = provider
+	cfg.Provider = &types.ModelProvider{Name: "route", AgentType: types.AgentClaude, CredentialSourceEnv: "ROUTE_KEY", CredentialTargetEnv: "AGENT_KEY"}
 	if _, _, err := HostExecution(host, cfg, provision.Contribution{}, false); err == nil {
 		t.Error("a provider whose credential is not set must fail")
 	}

@@ -116,7 +116,7 @@ func TestMain(m *testing.M) {
 		panic("failed to create manager: " + err.Error())
 	}
 
-	if err := wiring.SetupWebhooks(mgr); err != nil {
+	if err := wiring.SetupWebhooks(mgr, testutil.NewPresets()); err != nil {
 		panic("failed to set up webhooks: " + err.Error())
 	}
 	if err := wiring.SetupControllers(mgr, wiring.DefaultConfig()); err != nil {

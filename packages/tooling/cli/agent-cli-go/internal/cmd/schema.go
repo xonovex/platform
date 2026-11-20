@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 )
@@ -16,6 +17,7 @@ import (
 // schemas are the JSON Schemas the CLI prints, by name.
 var schemas = map[string]func() []byte{
 	"config":     config.Schema,
+	"provider":   providers.Schema,
 	"run-record": record.Schema,
 }
 
@@ -43,7 +45,7 @@ func writeJSON(out io.Writer, value any) error {
 func newSchemaCommand(out io.Writer) *cobra.Command {
 	return &cobra.Command{
 		Use:       "schema [" + strings.Join(schemaNames(), "|") + "]",
-		Short:     "Print a JSON Schema of the configuration file or the run record",
+		Short:     "Print a JSON Schema of the configuration file, a provider file or the run record",
 		Args:      cobra.MaximumNArgs(1),
 		ValidArgs: schemaNames(),
 		RunE: func(_ *cobra.Command, args []string) error {

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
@@ -42,10 +41,7 @@ func TestBuildAgentCommandNoPrefix(t *testing.T) {
 }
 
 func TestBuildAgentCommandFromDeclaredFacts(t *testing.T) {
-	codexProvider, err := providers.GetProvider("gpt5-codex", types.AgentCodex)
-	if err != nil {
-		t.Fatalf("GetProvider err = %v", err)
-	}
+	codexProvider := &types.ModelProvider{Name: "route", AgentType: types.AgentCodex, CliArgs: []string{"-c", `model="<model-id>"`}}
 	tests := []struct {
 		name     string
 		agent    types.AgentType

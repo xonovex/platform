@@ -34,3 +34,13 @@ func describeAccess(agent *types.AgentConfig) string {
 func describeVersionProbe(agent *types.AgentConfig) string {
 	return strings.Join(append([]string{agent.Binary}, agent.VersionArgs...), " ")
 }
+
+// describeSlot names a model slot with its id, its effort and the layer or file
+// that decided the id.
+func describeSlot(slot types.ModelSlot) string {
+	text := slot.Name + ": " + slot.ID
+	if slot.Effort != "" {
+		text += " (effort " + slot.Effort + ")"
+	}
+	return text + " (" + slot.Source + ")"
+}
