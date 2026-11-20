@@ -14,7 +14,7 @@ Configure GitHub Copilot's native hook and extension surface without inventing u
 - **Preserve handler support** - Commands cover hook types; HTTP and prompt handlers have narrower rules and surface limits.
 - **Respect policy precedence** - CLI policy hooks load first and cannot be disabled by lower scopes.
 - **Review repository execution** - Hooks, plugin extensions, and skill scripts require trust and security review.
-- **Onboard reversibly** - Preview scope, handler, cloud data flow, permissions, firewall, verification, disable, and rollback.
+- **Onboard reversibly** - Follow **configuring-harness-integrations**; preview scope, handler, cloud data flow, and firewall.
 
 ## Gotchas
 

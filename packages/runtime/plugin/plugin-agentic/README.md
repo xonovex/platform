@@ -41,6 +41,7 @@ Choose the skill that owns the task. The harness loads its instructions when the
 | [configuring-claude-code](skills/configuring-claude-code/SKILL.md) | Setting up, testing, or debugging Claude Code hooks, plugins, skills, settings, or managed configuration. |
 | [configuring-codex](skills/configuring-codex/SKILL.md) | Setting up or debugging Codex hooks, plugins, skills, config layers, or managed requirements. |
 | [configuring-copilot](skills/configuring-copilot/SKILL.md) | Setting up or debugging GitHub Copilot CLI or cloud-agent hooks, policy hooks, plugins, or skills. |
+| [configuring-harness-integrations](skills/configuring-harness-integrations/SKILL.md) | Adding, reviewing, comparing, or removing a guardrail, hook, plugin, or extension for an agent harness, whichever harness it is. |
 | [configuring-kiro](skills/configuring-kiro/SKILL.md) | Setting up or debugging Kiro IDE or CLI v3 hooks, command actions, or agent actions. |
 | [configuring-opencode](skills/configuring-opencode/SKILL.md) | Writing or debugging OpenCode JavaScript or TypeScript plugins, events, custom tools, or settings. |
 | [configuring-pi](skills/configuring-pi/SKILL.md) | Writing or configuring Pi extensions, packages, skills, settings, or permissions. |

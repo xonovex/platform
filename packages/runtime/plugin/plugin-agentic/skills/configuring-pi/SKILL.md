@@ -14,6 +14,7 @@ Configure Pi's native extension and interception surface without inventing unsup
 - **Map extension events** - Preserve sequential preflight, concurrent tool execution, middleware result order, and mutable inputs.
 - **Separate skills from enforcement** - Skills add instructions and scripts but do not prove an extension blocked.
 - **Own the sandbox boundary** - Pi has no built-in sandbox; isolation is external or extension/package responsibility.
+- **Onboard transactionally** - Follow the lifecycle owned by **configuring-harness-integrations**.
 - **Bound child processes** - Subagent patterns explicitly enforce depth, permissions, cwd trust, budgets, cancellation, and results.
 
 ## Gotchas
@@ -26,7 +27,7 @@ Configure Pi's native extension and interception surface without inventing unsup
 
 ## Example
 
-A project extension that blocks destructive shell calls remains disabled until project trust and source review pass; its `tool_call` handler validates mutable input, returns a documented block, declares full process authority, and is tested with concurrent sibling tools and a rollback to the prior settings digest.
+A project extension that blocks destructive shell calls remains disabled until project trust and source review pass; its `tool_call` handler validates mutable input, returns a documented block, and declares full process authority.
 
 ## Progressive Disclosure
 

@@ -14,7 +14,7 @@ Configure OpenCode's native plugin and event surface without inventing unsupport
 - **Use tool interception precisely** - `tool.execute.before` can inspect/mutate or fail a call; other events may only observe.
 - **Separate permission events** - Event availability does not itself prove decision control.
 - **Review automatic installs** - Config dependencies and npm plugins may trigger Bun installation at startup.
-- **Onboard through native scopes** - Preview config/plugin source, permissions, data flow, ordering, verification, disable, and rollback.
+- **Onboard through native scopes** - Follow the lifecycle owned by **configuring-harness-integrations**, previewing config/plugin source and ordering.
 
 ## Gotchas
 
@@ -26,7 +26,7 @@ Configure OpenCode's native plugin and event surface without inventing unsupport
 
 ## Example
 
-A secret-file control uses a reviewed project plugin with `tool.execute.before`; onboarding verifies the project source and dependencies, tests the thrown denial, records sequential load order and conflicting plugins, and rolls back by removing only the owned plugin and config dependency.
+A secret-file control uses a reviewed project plugin with `tool.execute.before`; onboarding verifies the project source and dependencies, tests the thrown denial, and rolls back by removing only the owned plugin and config dependency.
 
 ## Progressive Disclosure
 

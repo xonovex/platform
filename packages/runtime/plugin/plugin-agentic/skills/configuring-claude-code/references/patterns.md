@@ -1,7 +1,5 @@
 # Claude Code Adoption Patterns
 
-Map each portable pattern to the Claude Code capability that implements it and retain the native limits.
-
 ## Claude Code mappings
 
 | Pattern | Native mapping | Caveat |
@@ -14,5 +12,3 @@ Map each portable pattern to the Claude Code capability that implements it and r
 | Model evaluator | `prompt` handler only on a supported event, otherwise explicit command runner | Validate a closed output schema |
 | Specialist agent | Experimental `agent` handler or explicit bounded runner | Native agent handler remains optional and experimental |
 | Organization-managed | Managed hooks plus pinned device/package distribution | Test startup and lower-scope non-weakening behavior |
-
-Do not hide a model evaluator inside a deterministic template. The preview must state when model input leaves the process, which content is sent, and what happens on timeout or invalid output.

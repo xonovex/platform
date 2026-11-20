@@ -1,7 +1,5 @@
 ## Pi mappings
 
-Map each portable pattern to the Pi capability that implements it and retain the native limits.
-
 | Pattern | Native mapping | Caveat |
 | --- | --- | --- |
 | Protected path / secret / tool policy | `tool_call` extension handler | Validate mutable input; no automatic revalidation |

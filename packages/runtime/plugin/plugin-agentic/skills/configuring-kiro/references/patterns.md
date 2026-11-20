@@ -1,7 +1,5 @@
 ## Kiro mappings
 
-Map each portable pattern to the Kiro capability that implements it and retain the native limits.
-
 | Pattern | Native mapping | Caveat |
 | --- | --- | --- |
 | Protected path / secret / tool policy | `PreToolUse` command action | Exit `2` is the documented block; validate tool categories |

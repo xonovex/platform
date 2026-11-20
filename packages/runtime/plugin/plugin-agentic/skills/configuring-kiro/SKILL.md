@@ -14,7 +14,7 @@ Configure Kiro's native hook and action surface without inventing unsupported gu
 - **Bound agent actions** - Treat Ask Kiro actions as model execution with credits, authority, and output limits.
 - **Use exit code 2 precisely** - Blocking applies only to documented pre-events.
 - **Respect workspace roots** - File events and configuration are scoped to the defining workspace root.
-- **Review generated hooks** - Natural-language generation is a draft requiring diff, security review, tests, and authorization.
+- **Onboard transactionally** - Follow **configuring-harness-integrations**; treat a generated hook as an untrusted draft.
 
 ## Gotchas
 

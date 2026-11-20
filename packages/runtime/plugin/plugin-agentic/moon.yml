@@ -13,6 +13,7 @@ tasks:
       - skill-configuring-claude-code:ci-check
       - skill-configuring-codex:ci-check
       - skill-configuring-copilot:ci-check
+      - skill-configuring-harness-integrations:ci-check
       - skill-configuring-kiro:ci-check
       - skill-configuring-opencode:ci-check
       - skill-configuring-pi:ci-check

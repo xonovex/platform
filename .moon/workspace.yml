@@ -34,6 +34,7 @@ projects:
     skill-configuring-claude-code: packages/runtime/plugin/plugin-agentic/skills/configuring-claude-code
     skill-configuring-codex: packages/runtime/plugin/plugin-agentic/skills/configuring-codex
     skill-configuring-copilot: packages/runtime/plugin/plugin-agentic/skills/configuring-copilot
+    skill-configuring-harness-integrations: packages/runtime/plugin/plugin-agentic/skills/configuring-harness-integrations
     skill-configuring-kiro: packages/runtime/plugin/plugin-agentic/skills/configuring-kiro
     skill-configuring-opencode: packages/runtime/plugin/plugin-agentic/skills/configuring-opencode
     skill-configuring-pi: packages/runtime/plugin/plugin-agentic/skills/configuring-pi

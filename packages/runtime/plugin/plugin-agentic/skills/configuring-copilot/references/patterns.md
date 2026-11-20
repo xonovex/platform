@@ -1,7 +1,5 @@
 ## GitHub Copilot mappings
 
-Map each portable pattern to the GitHub Copilot capability that implements it and retain the native limits.
-
 | Pattern | Native mapping | Caveat |
 | --- | --- | --- |
 | Protected path / secret / tool policy | `preToolUse` command or HTTPS handler | Cloud and CLI inputs/environments differ |

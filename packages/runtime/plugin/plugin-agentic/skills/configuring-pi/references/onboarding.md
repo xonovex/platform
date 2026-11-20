@@ -1,6 +1,6 @@
 # Pi Onboarding
 
-Inspect the installed Pi runtime and configuration, then verify the selected integration before enabling it.
+Applies the lifecycle of **configuring-harness-integrations** to Pi extensions and packages.
 
 ## Discover
 
@@ -10,19 +10,18 @@ Inspect the installed Pi runtime and configuration, then verify the selected int
 
 ## Preview
 
-Show the exact settings/package/resource change, scope, source/version/digest, project trust consequence, enabled resource filters, extension code paths, npm install behavior, permissions, files, network, secrets, model/context content, side effects, concurrency, idempotency, evidence, verification, disable, removal, update, and rollback.
+Show the exact settings/package/resource change, scope, source/version/digest, project trust consequence, enabled resource filters, extension code paths, npm install behavior, side effects, and idempotency.
 
 Trying a package with a one-run extension flag is still code execution, not a safe preview. A preview reads and reviews the source without loading it.
 
 ## Apply and verify
 
-After explicit consent and project trust where applicable, use native install/configuration or reviewed local paths. Verify list/config state and then probe trust rejection, event mapping, tool blocking, input mutation, result middleware, concurrent siblings, context filtering, compaction, cancellation, and output bounds.
+Require project trust where applicable, then use native install/configuration or reviewed local paths. Verify list/config state, then probe trust rejection, event mapping, tool blocking, input mutation, result middleware, context filtering, compaction, cancellation, and output bounds.
 
 ## Lifecycle
 
 - Disable resources with native configuration filters or remove only the owned path/package entry.
 - Roll back settings and the pinned package or local extension digest; verify resources no longer load.
-- Update pinned sources only through a new preview and permission/trust review.
-- Drift includes trust decision, settings precedence, package identity/ref/digest, enabled filters, extension code/imports, full permissions, child process behavior, context/data access, and runtime version.
+- Drift includes trust decision, package identity/ref/digest, enabled filters, extension code/imports, and child process behavior.
 
 Non-interactive project trust defaults can skip or accept project resources without a prompt. Treat that mode and its explicit approval flags as part of the authorization record.

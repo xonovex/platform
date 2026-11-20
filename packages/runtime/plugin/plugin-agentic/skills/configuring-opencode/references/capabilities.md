@@ -1,6 +1,6 @@
 # OpenCode Capability Matrix
 
-Verify OpenCode event coverage and blocking behavior before treating documented support as runtime enforcement.
+Native mapping of the portable semantic intents for OpenCode.
 
 ## Matrix identity
 
@@ -13,7 +13,7 @@ Verify OpenCode event coverage and blocking behavior before treating documented 
 | Evidence status        | Documentation-verified; runtime-unverified |
 | Refresh trigger        | OpenCode/plugin API release or 90 days     |
 
-The probe observed the installed CLI version on a host with a working credentialed install (`opencode auth list` reports three stored credentials), and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) locally on the same host. Native plugin registration was not exercised: hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
+The probe ran on a host with a working credentialed install (`opencode auth list` reports three stored credentials). Native plugin registration was not exercised, so the hook-level rows below stay documentation-verified.
 
 ## Native capabilities
 

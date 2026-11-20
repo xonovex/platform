@@ -1,7 +1,5 @@
 ## OpenCode mappings
 
-Map each portable pattern to the OpenCode capability that implements it and retain the native limits.
-
 | Pattern | Native mapping | Caveat |
 | --- | --- | --- |
 | Protected path / secret / tool policy | `tool.execute.before` plugin | Validate tool name and arguments; test failure behavior |

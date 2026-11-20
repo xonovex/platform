@@ -14,7 +14,7 @@ Verify GitHub Copilot event coverage and blocking behavior before treating docum
 | Surfaces               | Copilot CLI and cloud agent                  |
 | Evidence status        | Documentation-verified; runtime-unverified   |
 
-The probe observed the installed CLI version on a host with a working credentialed install (local CLI auth/session state present; the GitHub CLI on the same host reports a signed-in account), and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) locally on the same host. The cloud-agent surface and native hook registration were not exercised: hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
+The probe ran on a host with a working credentialed install (local CLI auth/session state present; the GitHub CLI on the same host reports a signed-in account), and the deterministic guard contract ran locally there. The cloud-agent surface and native hook registration were not exercised.
 
 ## Handler correction
 

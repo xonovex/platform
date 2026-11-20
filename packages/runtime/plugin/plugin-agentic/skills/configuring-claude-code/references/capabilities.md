@@ -31,7 +31,3 @@ Handler types are `command`, `http`, `mcp_tool`, `prompt`, and `agent`, but avai
 | Model evaluator | `prompt` handler on documented events | Supported on selected events | Bounded model decision | Consumes model capacity; validate output |
 | Agent verifier | `agent` handler on documented events | Experimental | Event-specific | Do not claim a verified blocking guarantee |
 | HTTP/MCP integration | `http` / `mcp_tool` on documented events | Supported | Event-specific | URL/env allowlists and connected-server state constrain execution |
-
-## Guarantee boundary
-
-A hook is not an independent sandbox. Confirm the exact event, handler support, covered tools, output schema, exit behavior, permission mode, timeout, parallel sibling behavior, and active settings sources. Use independent enforcement for operations the native event cannot cover.

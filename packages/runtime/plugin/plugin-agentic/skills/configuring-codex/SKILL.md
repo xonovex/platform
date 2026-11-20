@@ -14,7 +14,7 @@ Configure Codex's native hooks and guardrails without inventing unsupported guar
 - **Reject parsed-only support** - Prompt, agent, and asynchronous command handlers are not executing release behavior in this snapshot.
 - **Scope the guardrail** - `PreToolUse` covers shell and unified exec, patch/edit/write, MCP, and most local function tools; hosted and specialized opt-out paths remain outside the guarantee.
 - **Preserve trust layers** - Non-managed definitions are hash-reviewed; managed hooks require separately distributed scripts.
-- **Transact native config** - Preview and verify hooks.json, config.toml, plugin, or requirements changes without replacing unrelated state.
+- **Transact native config** - Preview hooks.json, config.toml, plugin, or requirements changes; lifecycle owned by **configuring-harness-integrations**.
 
 ## Gotchas
 

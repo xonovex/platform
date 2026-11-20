@@ -100,5 +100,17 @@
     "rationale": "validation near miss owned by configuring-pi",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "detect configuration drift of a hook after a harness release across any harness",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by configuring-harness-integrations"
+  },
+  {
+    "query": "map semantic intents like tool before use to native events for several harnesses",
+    "should_trigger": false,
+    "split": "validation",
+    "rationale": "near miss owned by configuring-harness-integrations"
   }
 ]

@@ -1,6 +1,6 @@
 # Pi Capability Matrix
 
-Verify Pi event coverage and blocking behavior before treating documented support as runtime enforcement.
+Native mapping of the portable semantic intents for Pi.
 
 ## Matrix identity
 
@@ -13,7 +13,7 @@ Verify Pi event coverage and blocking behavior before treating documented suppor
 | Documentation channel  | `latest`                                   |
 | Evidence status        | Documentation-verified; runtime-unverified |
 
-The probe observed the installed CLI version on a host with a working credentialed install (the agent auth store `~/.pi/agent/auth.json` is present), and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) locally on the same host. Native extension registration was not exercised: extension-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
+The probe ran on a host with a working credentialed install (the agent auth store `~/.pi/agent/auth.json` is present). Native extension registration was not exercised, so the extension-level rows below stay documentation-verified.
 
 ## Native capabilities
 

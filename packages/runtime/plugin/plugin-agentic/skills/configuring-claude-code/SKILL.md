@@ -14,7 +14,7 @@ Configure Claude Code's native hook and extension surface without inventing unsu
 - **Preserve handler differences** - Command, HTTP, MCP-tool, prompt, and agent handlers have event-specific support and output behavior.
 - **Assume parallel matching** - Make handlers reentrant and do not expect a denial to cancel sibling side effects.
 - **Respect settings authority** - Managed, user, project, local, plugin, and component hooks have native precedence and trust rules.
-- **Onboard transactionally** - Preview exact settings/plugin changes, permissions, data flow, verification, disable, and rollback before apply.
+- **Onboard transactionally** - Preview exact settings or plugin changes before apply; lifecycle owned by **configuring-harness-integrations**.
 - **Keep hooks focused** - Give each handler one native event contract and one explicit responsibility.
 
 ## Gotchas

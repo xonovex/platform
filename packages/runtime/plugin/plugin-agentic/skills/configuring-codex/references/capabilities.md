@@ -13,7 +13,7 @@ Verify Codex event coverage and blocking behavior before treating documented sup
 | Evidence status        | Documentation-verified; runtime-unverified    |
 | Refresh trigger        | Codex release, hook schema change, or 90 days |
 
-The probe observed the installed CLI version on a host with a working credentialed install (`codex login status` reports a signed-in account), and the walking skeleton exercised the deterministic guard contract (JSON event on stdin, exit 0 allow / exit 2 deny) locally on the same host. Native hook registration was not exercised: hook-level rows below remain documentation-verified and must not be reported as runtime conformance. Re-run the probe and skeleton whenever the installed version differs from the observed one.
+The probe observed the installed CLI on a host with a signed-in account (`codex login status`), and the deterministic guard contract ran locally. Native hook registration was not exercised: hook rows remain documentation-verified.
 
 ## Configuration and execution
 
@@ -35,4 +35,4 @@ Codex loads `hooks.json` or inline `hooks` tables next to active configuration l
 
 ## Guardrail boundary
 
-A Codex hook cannot claim complete mandatory coverage unless the requested operation set is restricted to verified intercepted paths. `write_stdin` does not emit a second `PreToolUse` event for a command that already passed the hook. Managed requirements can restrict hook sources and pin features, but do not distribute scripts from the managed directory.
+`write_stdin` does not emit a second `PreToolUse` event for a command that already passed the hook. Managed requirements can restrict hook sources and pin features, but do not distribute scripts from the managed directory.
