@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/eval-output.schema.json",
+  "title": "Output eval",
+  "description": "Cases that run a prompt with and without a skill and judge the two outputs.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "skill": {"$ref": "common.schema.json#/$defs/identifier"},
+    "judge": {"$ref": "#/$defs/judge"},
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/case"}
+    }
+  },
+  "required": ["version", "skill", "cases"],
+  "additionalProperties": false,
+  "$defs": {
+    "gate": {
+      "description": "A required case fails the run when it fails. An advisory case only reports.",
+      "enum": ["required", "advisory"]
+    },
+    "judge": {
+      "type": "object",
+      "properties": {
+        "harness": {"$ref": "common.schema.json#/$defs/harness"},
+        "model": {"$ref": "common.schema.json#/$defs/text"},
+        "rubric": {"$ref": "common.schema.json#/$defs/text"}
+      },
+      "required": ["harness"],
+      "additionalProperties": false
+    },
+    "fixture": {
+      "description": "A file placed in the workspace before the run.",
+      "type": "object",
+      "properties": {
+        "path": {"$ref": "common.schema.json#/$defs/relativePath"},
+        "content": {"type": "string"},
+        "contentFile": {"$ref": "common.schema.json#/$defs/relativePath"}
+      },
+      "required": ["path"],
+      "oneOf": [{"required": ["content"]}, {"required": ["contentFile"]}],
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "allOf": [{"$ref": "common.schema.json#/$defs/prompt"}],
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "gate": {"$ref": "#/$defs/gate"},
+        "fixtures": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/fixture"}
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "predicate.schema.json"}
+        }
+      },
+      "required": ["id", "gate", "expect"],
+      "unevaluatedProperties": false
+    }
+  }
+}

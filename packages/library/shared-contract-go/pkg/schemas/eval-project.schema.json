@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/eval-project.schema.json",
+  "title": "Eval project",
+  "description": "The configuration of one eval project: where its plugins and instructions live, the profiles that run them, the protocol settings and the budgets.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "pluginDirs": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/relativePath"},
+      "uniqueItems": true
+    },
+    "instructionRoots": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/relativePath"},
+      "uniqueItems": true
+    },
+    "defaultProfile": {"$ref": "common.schema.json#/$defs/identifier"},
+    "profiles": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9]+(-[a-z0-9]+)*$": {"$ref": "#/$defs/profile"}
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "protocols": {"$ref": "#/$defs/protocols"},
+    "budgets": {"$ref": "#/$defs/budgets"}
+  },
+  "required": ["version", "profiles"],
+  "additionalProperties": false,
+  "$defs": {
+    "profile": {
+      "description": "One way to run a model: the harness, the model and its limits.",
+      "type": "object",
+      "properties": {
+        "harness": {"$ref": "common.schema.json#/$defs/harness"},
+        "model": {"$ref": "common.schema.json#/$defs/text"},
+        "effort": {"enum": ["low", "medium", "high", "xhigh", "max"]},
+        "timeoutSeconds": {"$ref": "common.schema.json#/$defs/positiveCount"}
+      },
+      "required": ["harness"],
+      "additionalProperties": false
+    },
+    "protocols": {
+      "type": "object",
+      "properties": {
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "runs": {"$ref": "common.schema.json#/$defs/positiveCount"},
+            "batchSize": {"type": "integer", "minimum": 1, "maximum": 24},
+            "threshold": {"$ref": "common.schema.json#/$defs/ratio"}
+          },
+          "additionalProperties": false
+        },
+        "routing": {
+          "type": "object",
+          "properties": {
+            "runs": {"$ref": "common.schema.json#/$defs/positiveCount"},
+            "threshold": {"$ref": "common.schema.json#/$defs/ratio"}
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "properties": {
+            "runs": {"$ref": "common.schema.json#/$defs/positiveCount"},
+            "minimumWinRate": {"$ref": "common.schema.json#/$defs/ratio"}
+          },
+          "additionalProperties": false
+        },
+        "instruction": {
+          "type": "object",
+          "properties": {
+            "runs": {"$ref": "common.schema.json#/$defs/positiveCount"},
+            "minimumLift": {"$ref": "common.schema.json#/$defs/ratio"}
+          },
+          "additionalProperties": false
+        },
+        "orchestration": {
+          "type": "object",
+          "properties": {
+            "runs": {"$ref": "common.schema.json#/$defs/positiveCount"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "maxModelRuns": {"$ref": "common.schema.json#/$defs/positiveCount"},
+        "maxCostUsd": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "additionalProperties": false
+    }
+  }
+}

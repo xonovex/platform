@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/eval-instruction.schema.json",
+  "title": "Instruction eval",
+  "description": "Cases that test one rule of an instruction file by running the prompt with the rule present, absent or ablated.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "instruction": {"$ref": "common.schema.json#/$defs/relativePath"},
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/case"}
+    }
+  },
+  "required": ["version", "instruction", "cases"],
+  "additionalProperties": false,
+  "$defs": {
+    "anchor": {
+      "description": "The rule under test, named by a heading or by an exact quotation of the instruction file.",
+      "type": "object",
+      "properties": {
+        "heading": {"$ref": "common.schema.json#/$defs/text"},
+        "text": {"$ref": "common.schema.json#/$defs/text"}
+      },
+      "oneOf": [{"required": ["heading"]}, {"required": ["text"]}],
+      "additionalProperties": false
+    },
+    "predicates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "predicate.schema.json"}
+    },
+    "expectations": {
+      "description": "The predicates that must hold under each condition of the case.",
+      "type": "object",
+      "properties": {
+        "present": {"$ref": "#/$defs/predicates"},
+        "absent": {"$ref": "#/$defs/predicates"},
+        "ablated": {"$ref": "#/$defs/predicates"}
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "case": {
+      "type": "object",
+      "allOf": [{"$ref": "common.schema.json#/$defs/prompt"}],
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "anchor": {"$ref": "#/$defs/anchor"},
+        "expect": {"$ref": "#/$defs/expectations"},
+        "ablate": {
+          "description": "The part of the anchored rule that the ablated condition removes.",
+          "$ref": "common.schema.json#/$defs/text"
+        }
+      },
+      "required": ["id", "anchor", "expect"],
+      "if": {
+        "properties": {"expect": {"required": ["ablated"]}},
+        "required": ["expect"]
+      },
+      "then": {"required": ["ablate"]},
+      "unevaluatedProperties": false
+    }
+  }
+}

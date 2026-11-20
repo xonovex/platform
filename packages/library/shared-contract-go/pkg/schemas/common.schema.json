@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/common.schema.json",
+  "title": "Shared definitions",
+  "description": "Definitions that more than one contract schema references.",
+  "$defs": {
+    "version": {
+      "description": "The contract version of the document.",
+      "const": 1
+    },
+    "identifier": {
+      "description": "A lower-case slug that names a case, source, step or profile.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 64
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "date": {
+      "description": "A calendar date.",
+      "type": "string",
+      "format": "date"
+    },
+    "timestamp": {
+      "description": "An instant in RFC 3339 form.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "minLength": 1
+    },
+    "digest": {
+      "description": "A SHA-256 digest of the inputs, as sha256: and 64 hexadecimal digits.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "relativePath": {
+      "description": "A slash path below the document that names it: not absolute, with no parent segment and no backslash.",
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "anyOf": [
+          {"pattern": "^/"},
+          {"pattern": "^[A-Za-z]:"},
+          {"pattern": "(^|/)\\.\\.(/|$)"},
+          {"pattern": "\\\\"}
+        ]
+      }
+    },
+    "regex": {
+      "description": "A regular expression in the RE2 subset every engine accepts.",
+      "type": "string",
+      "format": "regex",
+      "minLength": 1
+    },
+    "harness": {
+      "description": "The agent harness that runs a prompt.",
+      "enum": ["claude", "codex", "copilot", "kiro", "opencode", "pi"]
+    },
+    "condition": {
+      "description": "The state of an instruction during a run.",
+      "enum": ["present", "absent", "ablated"]
+    },
+    "prompt": {
+      "description": "Either an inline prompt or a Markdown file that holds a long one.",
+      "type": "object",
+      "properties": {
+        "prompt": {"$ref": "#/$defs/text"},
+        "promptFile": {"$ref": "#/$defs/relativePath"}
+      },
+      "oneOf": [{"required": ["prompt"]}, {"required": ["promptFile"]}]
+    },
+    "ratio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "positiveCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "usage": {
+      "description": "The model usage of one run.",
+      "type": "object",
+      "properties": {
+        "inputTokens": {"$ref": "#/$defs/count"},
+        "outputTokens": {"$ref": "#/$defs/count"},
+        "costUsd": {"type": "number", "minimum": 0}
+      },
+      "required": ["inputTokens", "outputTokens", "costUsd"],
+      "additionalProperties": false
+    }
+  }
+}

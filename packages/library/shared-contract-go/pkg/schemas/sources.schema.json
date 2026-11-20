@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/sources.schema.json",
+  "title": "Source catalog",
+  "description": "The sources a skill, instruction or document draws its claims from. The same shape serves the root sources.json and every shard in sources.d.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source"}
+    }
+  },
+  "required": ["version", "sources"],
+  "additionalProperties": false,
+  "$defs": {
+    "kind": {
+      "description": "How an audit reads the source: a git repository, an http document, a file on disk, a web page, or a repository path.",
+      "enum": ["git", "http", "filesystem", "web", "repository"]
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "statement": {"$ref": "common.schema.json#/$defs/text"},
+        "anchor": {
+          "description": "The heading slug, line range or fragment of the source that backs the claim.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "evidence": {
+          "description": "A quotation or observation from the source at the anchor.",
+          "$ref": "common.schema.json#/$defs/text"
+        }
+      },
+      "required": ["id", "statement"],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "kind": {"$ref": "#/$defs/kind"},
+        "title": {"$ref": "common.schema.json#/$defs/text"},
+        "url": {"$ref": "common.schema.json#/$defs/url"},
+        "path": {"$ref": "common.schema.json#/$defs/relativePath"},
+        "ref": {
+          "description": "The git commit, tag or branch that pins a git source.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "provenance": {
+          "description": "How the source was obtained when it has no address of its own.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "reviewedAt": {"$ref": "common.schema.json#/$defs/date"},
+        "reviewAfter": {"$ref": "common.schema.json#/$defs/date"},
+        "supersededBy": {"$ref": "common.schema.json#/$defs/identifier"},
+        "feeds": {
+          "description": "The files that draw on this source.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/relativePath"},
+          "uniqueItems": true
+        },
+        "claims": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/claim"}
+        }
+      },
+      "required": ["id", "kind", "title", "reviewedAt"],
+      "allOf": [
+        {
+          "if": {
+            "properties": {"kind": {"enum": ["git", "http", "web"]}},
+            "required": ["kind"]
+          },
+          "then": {"required": ["url"]}
+        },
+        {
+          "if": {
+            "properties": {"kind": {"enum": ["filesystem", "repository"]}},
+            "required": ["kind"]
+          },
+          "then": {"required": ["path"]}
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

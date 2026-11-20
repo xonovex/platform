@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/predicate.schema.json",
+  "title": "Predicate",
+  "description": "One check on the outcome of a run: the files it left, the session it ran, or a judgement by a model.",
+  "oneOf": [
+    {
+      "title": "Filesystem predicate",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "filesystem"},
+        "path": {"$ref": "common.schema.json#/$defs/relativePath"},
+        "check": {
+          "enum": ["exists", "absent", "contains", "matches", "equals"]
+        },
+        "value": {"type": "string"}
+      },
+      "required": ["kind", "path", "check"],
+      "if": {
+        "properties": {"check": {"enum": ["contains", "matches", "equals"]}},
+        "required": ["check"]
+      },
+      "then": {"required": ["value"]},
+      "additionalProperties": false
+    },
+    {
+      "title": "Session predicate",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "session"},
+        "event": {
+          "enum": ["tool-call", "file-read", "file-write", "command", "message"]
+        },
+        "match": {"$ref": "common.schema.json#/$defs/regex"},
+        "min": {"$ref": "common.schema.json#/$defs/count"},
+        "max": {"$ref": "common.schema.json#/$defs/count"}
+      },
+      "required": ["kind", "event", "match"],
+      "additionalProperties": false
+    },
+    {
+      "title": "Model predicate",
+      "type": "object",
+      "properties": {
+        "kind": {"const": "llm"},
+        "criterion": {"$ref": "common.schema.json#/$defs/text"},
+        "threshold": {"$ref": "common.schema.json#/$defs/ratio"}
+      },
+      "required": ["kind", "criterion"],
+      "additionalProperties": false
+    }
+  ]
+}

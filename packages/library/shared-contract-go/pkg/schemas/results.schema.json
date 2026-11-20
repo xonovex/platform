@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/results.schema.json",
+  "title": "Eval results",
+  "description": "The record of one eval run. A run that is incomplete lists the cases it finished, so a resumer restarts at the first case it lacks.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "runId": {"$ref": "common.schema.json#/$defs/identifier"},
+    "protocol": {"$ref": "#/$defs/protocol"},
+    "profile": {"$ref": "common.schema.json#/$defs/identifier"},
+    "inputsDigest": {"$ref": "common.schema.json#/$defs/digest"},
+    "startedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "finishedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "status": {
+      "description": "complete holds a verdict; incomplete awaits a resume; invalid means an infrastructure fault voids the run.",
+      "enum": ["complete", "incomplete", "invalid"]
+    },
+    "cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/caseResult"}
+    },
+    "usage": {"$ref": "common.schema.json#/$defs/usage"}
+  },
+  "required": [
+    "version",
+    "runId",
+    "protocol",
+    "profile",
+    "inputsDigest",
+    "startedAt",
+    "status",
+    "cases"
+  ],
+  "if": {
+    "properties": {"status": {"enum": ["complete", "invalid"]}},
+    "required": ["status"]
+  },
+  "then": {"required": ["finishedAt"]},
+  "additionalProperties": false,
+  "$defs": {
+    "protocol": {
+      "enum": ["trigger", "routing", "output", "instruction", "orchestration"]
+    },
+    "caseResult": {
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "condition": {"$ref": "common.schema.json#/$defs/condition"},
+        "outcome": {"enum": ["passed", "failed", "errored"]},
+        "score": {"$ref": "common.schema.json#/$defs/ratio"},
+        "durationMs": {"$ref": "common.schema.json#/$defs/count"},
+        "usage": {"$ref": "common.schema.json#/$defs/usage"},
+        "predicates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {"enum": ["filesystem", "session", "llm"]},
+              "passed": {"type": "boolean"},
+              "detail": {"type": "string"}
+            },
+            "required": ["kind", "passed"],
+            "additionalProperties": false
+          }
+        },
+        "error": {"$ref": "common.schema.json#/$defs/text"}
+      },
+      "required": ["id", "outcome"],
+      "if": {
+        "properties": {"outcome": {"const": "errored"}},
+        "required": ["outcome"]
+      },
+      "then": {"required": ["error"]},
+      "additionalProperties": false
+    }
+  }
+}

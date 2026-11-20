@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/eval-orchestration.schema.json",
+  "title": "Orchestration eval",
+  "description": "A flow in which several agents each run a step after the steps they depend on.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "id": {"$ref": "common.schema.json#/$defs/identifier"},
+    "description": {"$ref": "common.schema.json#/$defs/text"},
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/agent"}
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/step"}
+    },
+    "budget": {"$ref": "#/$defs/budget"}
+  },
+  "required": ["version", "id", "agents", "steps"],
+  "additionalProperties": false,
+  "$defs": {
+    "agent": {
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "harness": {"$ref": "common.schema.json#/$defs/harness"},
+        "model": {"$ref": "common.schema.json#/$defs/text"},
+        "role": {"$ref": "common.schema.json#/$defs/text"}
+      },
+      "required": ["id", "harness"],
+      "additionalProperties": false
+    },
+    "step": {
+      "type": "object",
+      "allOf": [{"$ref": "common.schema.json#/$defs/prompt"}],
+      "properties": {
+        "id": {"$ref": "common.schema.json#/$defs/identifier"},
+        "agent": {"$ref": "common.schema.json#/$defs/identifier"},
+        "after": {
+          "description": "The steps whose result this step needs.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/identifier"},
+          "uniqueItems": true
+        },
+        "expect": {
+          "type": "array",
+          "items": {"$ref": "predicate.schema.json"}
+        }
+      },
+      "required": ["id", "agent"],
+      "unevaluatedProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "maxModelRuns": {"$ref": "common.schema.json#/$defs/positiveCount"},
+        "maxCostUsd": {"type": "number", "exclusiveMinimum": 0},
+        "timeoutSeconds": {"$ref": "common.schema.json#/$defs/positiveCount"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

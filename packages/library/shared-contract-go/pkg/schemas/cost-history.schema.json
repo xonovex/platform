@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/cost-history.schema.json",
+  "title": "Eval cost history",
+  "description": "The model cost of each eval run, appended once per run.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "runId": {"$ref": "common.schema.json#/$defs/identifier"},
+          "recordedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
+          "protocol": {"$ref": "results.schema.json#/$defs/protocol"},
+          "profile": {"$ref": "common.schema.json#/$defs/identifier"},
+          "model": {"$ref": "common.schema.json#/$defs/text"},
+          "modelRuns": {"$ref": "common.schema.json#/$defs/count"},
+          "usage": {"$ref": "common.schema.json#/$defs/usage"}
+        },
+        "required": [
+          "runId",
+          "recordedAt",
+          "protocol",
+          "profile",
+          "model",
+          "modelRuns",
+          "usage"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "entries"],
+  "additionalProperties": false
+}
