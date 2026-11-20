@@ -8,12 +8,15 @@ replace github.com/xonovex/platform/packages/library/shared-contract-go => ../..
 
 replace github.com/xonovex/platform/packages/library/shared-core-go => ../../../library/shared-core-go
 
+replace github.com/xonovex/platform/packages/library/shared-launch-go => ../../../library/shared-launch-go
+
 require (
 	github.com/spf13/cobra v1.10.2
 	github.com/xonovex/platform/packages/library/shared-agent-go v0.0.0-00010101000000-000000000000
 	github.com/xonovex/platform/packages/library/shared-config-go v0.0.0-00010101000000-000000000000
 	github.com/xonovex/platform/packages/library/shared-contract-go v0.0.0-00010101000000-000000000000
 	github.com/xonovex/platform/packages/library/shared-core-go v0.0.0-00010101000000-000000000000
+	github.com/xonovex/platform/packages/library/shared-launch-go v0.0.0-00010101000000-000000000000
 )
 
 require (

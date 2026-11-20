@@ -134,7 +134,7 @@ func runProtocol(c *cobra.Command, deps Dependencies, spec protocolSpec, o *opti
 	if err != nil {
 		return err
 	}
-	exec, predicates, err := deps.Engine(facts)
+	exec, predicates, err := deps.Engine(facts, project.Sandbox)
 	if err != nil {
 		return err
 	}

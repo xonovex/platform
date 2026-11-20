@@ -11,6 +11,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/scratchtest"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/confine"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/confine/none"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/execute"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 )
@@ -53,7 +55,7 @@ func build(l leaf, proc *processtest.Fake, files map[string]string) fixture {
 	clock := time.Unix(0, 0)
 	return fixture{
 		exec: execute.Executor{
-			Harnesses: reg, Runner: proc, Scratch: sc, FS: fsys,
+			Harnesses: reg, Confiner: none.New(), Runner: proc, Scratch: sc, FS: fsys,
 			Now:   func() time.Time { clock = clock.Add(5 * time.Millisecond); return clock },
 			Pause: func(int) {},
 		},
@@ -184,5 +186,131 @@ func TestAgentRunSnapshotsTheRunAndSkipsTheStagedSetup(t *testing.T) {
 	plain, _ := g.exec.Execute(context.Background(), harness.Request{Harness: "leaf", Role: harness.RoleJudge})
 	if plain.Files != nil {
 		t.Fatal("a judge run has no snapshot")
+	}
+}
+
+// sandbox wraps every request in a named container and records what it holds.
+type sandbox struct {
+	err      error
+	released int
+}
+
+func (s *sandbox) Confine(request confine.Request) (confine.Confined, error) {
+	if s.err != nil {
+		return confine.Confined{}, s.err
+	}
+	wrapped := request.Process
+	wrapped.Name = "box"
+	wrapped.Args = append([]string{"run", "--rm", "--name", "eval-1", request.Process.Name}, request.Process.Args...)
+	return confine.Confined{
+		Process: wrapped,
+		Stop:    &process.Request{Name: "box", Args: []string{"rm", "--force", "eval-1"}, Timeout: time.Second},
+		Release: func() { s.released++ },
+	}, nil
+}
+
+func confined(box *sandbox, proc *processtest.Fake) fixture {
+	f := build(leaf{}, proc, nil)
+	f.exec.Confiner = box
+	return f
+}
+
+func TestATimeoutStopsTheSandbox(t *testing.T) {
+	box := &sandbox{}
+	proc := processtest.Script().
+		On(processtest.Key("box", "run", "--rm", "--name", "eval-1", "leaf-bin", "-x", "--", "go"), processtest.Reply{TimedOut: true}).
+		On(processtest.Key("box", "rm", "--force", "eval-1"), processtest.Reply{})
+	f := confined(box, proc)
+	if _, err := f.exec.Execute(context.Background(), harness.Request{Harness: "leaf", Prompt: "go", Caps: harness.Caps{Timeout: time.Second}}); err != nil {
+		t.Fatal(err)
+	}
+	calls := proc.Calls()
+	if len(calls) != 2 || calls[0].Timeout != time.Second || calls[0].Dir != "/scratch/agent-eval-1" {
+		t.Fatalf("calls = %+v, want the run with the timeout and workspace of the request, then a stop", calls)
+	}
+	if strings.Join(calls[1].Args, " ") != "rm --force eval-1" {
+		t.Errorf("stopped %v, want the container of the run removed", calls[1].Args)
+	}
+	if box.released != 1 {
+		t.Errorf("released %d times, want once", box.released)
+	}
+}
+
+func TestAStoppedOrCancelledRunStopsTheSandbox(t *testing.T) {
+	stopped := processtest.Script().
+		On(processtest.Key("box", "run", "--rm", "--name", "eval-1", "leaf-bin", "-x", "--", "go"), processtest.Reply{Stdout: processtest.Lines("stop", "more")}).
+		On(processtest.Key("box", "rm", "--force", "eval-1"), processtest.Reply{})
+	if obs, err := confined(&sandbox{}, stopped).exec.Execute(context.Background(), harness.Request{Harness: "leaf", Prompt: "go"}); err != nil || obs.Text != "stop" {
+		t.Fatalf("%v %+v", err, obs)
+	}
+	if calls := stopped.Calls(); len(calls) != 2 || calls[1].Args[0] != "rm" {
+		t.Errorf("calls = %+v, want the sandbox stopped after the scanner stopped the run", calls)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancelled := processtest.New(func(request process.Request) processtest.Reply {
+		if request.Args[0] == "run" {
+			cancel()
+			return processtest.Reply{Err: context.Canceled}
+		}
+		return processtest.Reply{}
+	})
+	if _, err := confined(&sandbox{}, cancelled).exec.Execute(ctx, harness.Request{Harness: "leaf", Prompt: "go"}); !errors.Is(err, context.Canceled) {
+		t.Fatalf("%v", err)
+	}
+	if calls := cancelled.Calls(); len(calls) != 2 || calls[1].Args[0] != "rm" {
+		t.Errorf("calls = %+v, want the sandbox stopped after the run was cancelled", calls)
+	}
+}
+
+func TestACleanRunNeedsNoStop(t *testing.T) {
+	proc := processtest.Script().On(processtest.Key("box", "run", "--rm", "--name", "eval-1", "leaf-bin", "-x", "--", "go"), processtest.Reply{Stdout: processtest.Lines("ok")})
+	box := &sandbox{}
+	if _, err := confined(box, proc).exec.Execute(context.Background(), harness.Request{Harness: "leaf", Prompt: "go"}); err != nil {
+		t.Fatal(err)
+	}
+	if len(proc.Calls()) != 1 || box.released != 1 {
+		t.Errorf("calls = %d, released = %d: a run that ended by itself left nothing running", len(proc.Calls()), box.released)
+	}
+}
+
+func TestASandboxThatCannotBeStoppedIsAFault(t *testing.T) {
+	for name, stop := range map[string]processtest.Reply{
+		"refused": {ExitCode: 1, Stderr: "daemon down\n"},
+		"missing": {Err: errors.New("no such program")},
+	} {
+		proc := processtest.Script().
+			On(processtest.Key("box", "run", "--rm", "--name", "eval-1", "leaf-bin", "-x", "--", "go"), processtest.Reply{TimedOut: true}).
+			On(processtest.Key("box", "rm", "--force", "eval-1"), stop)
+		_, err := confined(&sandbox{}, proc).exec.Execute(context.Background(), harness.Request{Harness: "leaf", Prompt: "go"})
+		var infra *execute.InfrastructureError
+		if err == nil || errors.As(err, &infra) || !strings.Contains(err.Error(), "stop sandbox") || len(proc.Calls()) != 1+execute.Attempts {
+			t.Errorf("%s: %v after %d calls, want a run, every stop attempt, and then the end of the eval", name, err, len(proc.Calls()))
+		}
+	}
+}
+
+func TestASandboxThatIsTearingItselfDownIsStoppedAgain(t *testing.T) {
+	stops := 0
+	proc := processtest.New(func(request process.Request) processtest.Reply {
+		if request.Args[0] == "run" {
+			return processtest.Reply{TimedOut: true}
+		}
+		stops++
+		if stops == 1 {
+			return processtest.Reply{ExitCode: 1, Stderr: "removal of container eval-1 is already in progress"}
+		}
+		return processtest.Reply{}
+	})
+	if _, err := confined(&sandbox{}, proc).exec.Execute(context.Background(), harness.Request{Harness: "leaf", Prompt: "go"}); err != nil || stops != 2 {
+		t.Fatalf("%v after %d stops, want the second stop to end the sandbox", err, stops)
+	}
+}
+
+func TestASandboxThatCannotBeMadeIsAFault(t *testing.T) {
+	proc := processtest.Sequence()
+	_, err := confined(&sandbox{err: errors.New("no image")}, proc).exec.Execute(context.Background(), harness.Request{Harness: "leaf"})
+	if err == nil || !strings.Contains(err.Error(), "confine leaf: no image") || len(proc.Calls()) != 0 {
+		t.Fatalf("%v", err)
 	}
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/predicate"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/protocol"
 )
@@ -44,9 +45,12 @@ type Dependencies struct {
 	Prompter    trust.Prompter
 	// Protocols holds the eval protocols by name.
 	Protocols *protocol.Registry
-	// Engine builds, over the facts of the harnesses, the executor that runs one
-	// model request and the predicates that check what a run showed.
-	Engine func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error)
+	// Engine builds, over the facts of the harnesses and the sandbox of the eval
+	// section, the executor that runs one model request inside the sandbox and the
+	// predicates that check what a run showed.
+	Engine func(facts agents.Catalog, sandbox model.Sandbox) (harness.Executor, *predicate.Registry, error)
+	// Bridge relays the loopback port of a managed sandbox to its egress proxy.
+	Bridge EgressBridge
 	// Env holds the environment variables the tool reads.
 	Env map[string]string
 	// Dir is the working directory that relative paths resolve against.
@@ -79,6 +83,6 @@ func NewRootCommand(deps Dependencies) *cobra.Command {
 	root.SetOut(deps.Out)
 	root.SetErr(deps.Err)
 	root.AddCommand(newProtocolCommands(deps)...)
-	root.AddCommand(newBaselineCommand(deps), newCostCommand(deps), newMigrateCommand(deps), newConfigCommand(deps), newCompletionCommand())
+	root.AddCommand(newBaselineCommand(deps), newCostCommand(deps), newMigrateCommand(deps), newConfigCommand(deps), newCompletionCommand(), newEgressBridgeCommand(deps.Bridge))
 	return root
 }

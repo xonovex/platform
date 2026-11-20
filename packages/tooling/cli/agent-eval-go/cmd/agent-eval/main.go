@@ -15,11 +15,14 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/osexec"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/osscratch"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/execute"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/predicate"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/registry"
 )
@@ -42,13 +45,21 @@ func run() int {
 		return findings.ExitUsage
 	}
 	fsys := osfs.New()
-	engine := func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+	// Standard output carries the report, so the host of the sandbox writes to
+	// standard error.
+	host := oshost.New(os.Stdin, os.Stderr, os.Stderr)
+	log := logging.FromEnvironment(host.Getenv, os.Stderr, os.Stderr)
+	engine := func(facts agents.Catalog, sandbox model.Sandbox) (harness.Executor, *predicate.Registry, error) {
 		harnesses, err := registry.Harnesses(facts.Get)
 		if err != nil {
 			return nil, nil, err
 		}
+		confiner, err := registry.Confiner(sandbox, facts, host, log)
+		if err != nil {
+			return nil, nil, err
+		}
 		exec := execute.Executor{
-			Harnesses: harnesses, Runner: osexec.New(), Scratch: osscratch.New(), FS: fsys,
+			Harnesses: harnesses, Confiner: confiner, Runner: osexec.New(), Scratch: osscratch.New(), FS: fsys,
 			Now:   time.Now,
 			Pause: func(attempt int) { time.Sleep(time.Duration(attempt) * retryPause) },
 		}
@@ -56,7 +67,7 @@ func run() int {
 	}
 	deps := cmd.Dependencies{
 		FS: fsys, Validator: validator, ConfigFiles: osfiles.Files{}, Places: osfiles.Places{},
-		Prompter: osfiles.NewPrompter(), Protocols: registry.Protocols(), Engine: engine,
+		Prompter: osfiles.NewPrompter(), Protocols: registry.Protocols(), Engine: engine, Bridge: registry.Bridge(host),
 		Env: environment(), Dir: dir, Now: time.Now, Out: os.Stdout, Err: os.Stderr,
 	}
 

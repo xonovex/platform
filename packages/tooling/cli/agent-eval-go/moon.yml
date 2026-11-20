@@ -11,6 +11,7 @@ dependsOn:
   - shared-config-go
   - shared-contract-go
   - shared-core-go
+  - shared-launch-go
   - id: eslint-config-cli
     scope: development
   - id: ts-config-cli
@@ -40,7 +41,8 @@ tasks:
       # go-integration covers it, because a unit test may not start a process or
       # touch the disk. Every other package reaches the machine through a port,
       # so the unit tier covers it with memfs, processtest, scratchtest and
-      # protocoltest.
+      # protocoltest. internal/confine is the port of the sandbox and holds no
+      # statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-eval=exempt \
         ./internal/ablation=100 \
@@ -48,6 +50,9 @@ tasks:
         ./internal/budget=100 \
         ./internal/catalog=94 \
         ./internal/cmd=92 \
+        ./internal/confine=exempt \
+        ./internal/confine/launch=95 \
+        ./internal/confine/none=100 \
         ./internal/cost=96 \
         ./internal/document=98 \
         ./internal/execute=92 \

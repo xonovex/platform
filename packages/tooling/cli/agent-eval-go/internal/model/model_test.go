@@ -90,3 +90,31 @@ func TestProtocolsListsEveryProtocol(t *testing.T) {
 		t.Fatal("five protocols")
 	}
 }
+
+func TestASandboxIsUnconfinedOnlyWhenItAsksForNothing(t *testing.T) {
+	if !(model.Sandbox{}).Unconfined() || !(model.Sandbox{Isolation: "none", Provision: "none", Network: "host"}).Unconfined() {
+		t.Error("no sandbox, or every axis at its unconfined value, runs the harness on the host")
+	}
+	for name, sandbox := range map[string]model.Sandbox{
+		"isolation":   {Isolation: "docker"},
+		"provision":   {Provision: "nix"},
+		"network":     {Network: "none"},
+		"image":       {Image: "registry.example/eval:1"},
+		"runtime":     {Runtime: "runsc"},
+		"passthrough": {HostPassthrough: true},
+		"init":        {InitCommands: []string{"true"}},
+		"nix package": {NixPackages: []string{"git"}},
+		"nix rev":     {NixRev: "0123"},
+		"allow":       {AllowHosts: []string{"api.example.com"}},
+		"credential":  {Credentials: []string{"KEY=env:KEY"}},
+		"env":         {CustomEnv: []string{"MODE=ci"}},
+		"pinned":      {RequirePinnedProvision: true},
+		"hidden host": {RequireHostToolsUnreachable: true},
+		"egress":      {RequireEgressRestricted: true},
+		"kernel":      {RequireKernelIsolation: true},
+	} {
+		if sandbox.Unconfined() {
+			t.Errorf("%s: a sandbox that asks for %s is not unconfined", name, name)
+		}
+	}
+}

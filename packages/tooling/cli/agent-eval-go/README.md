@@ -48,7 +48,7 @@ The exit status is 0 on a pass, 1 on a fail, 2 when the input is invalid or an i
 
 ## Configuration
 
-The `eval` section of `agentic.json` holds the plugin directories, the profiles, the protocol settings and the budgets. `shared-config-go` merges the managed, user and project files with the budget flags. A relative plugin directory resolves against the directory of the file that set it.
+The `eval` section of `agentic.json` holds the plugin directories, the profiles, the protocol settings, the budgets and the sandbox. `shared-config-go` merges the managed, user and project files with the budget flags. A relative plugin directory resolves against the directory of the file that set it.
 
 ```json
 {
@@ -67,18 +67,38 @@ The eval section of a project file takes effect only after the user approves the
 
 The program, the flags and the file layout of each harness come from the harness facts of `shared-agent-go`. A file `harnesses.d/<harness>.json` beside the `agentic.json` of a layer overrides the facts it names, and the schema `https://schemas.xonovex.com/agent/harness-override.schema.json` checks it. The user file applies first, then the project file, then the managed file. A project override can change the program a run starts, so it takes effect only after the user approves its own digest, like the eval section.
 
+### Sandbox
+
+By default the harness runs on the host, as it runs without agent-eval. The `sandbox` member of the eval section runs every harness process inside the isolator of agent-cli instead. It has the axes and the guarantees of the run section of agent-cli: `isolation` (`none`, `bwrap`, `docker` or `seatbelt`), `provision` (`none`, `nix` or `command`), `network` (`host`, `none` or `managed`) and the four `require*` guarantees. A sandbox that cannot give a guarantee stops the run with exit status 2. Only a user or managed file chooses the sandbox and what it may reach; a project file may only demand a guarantee. `docker-sandboxes` and `openshell` keep a sandbox alive apart from one command, so agent-eval does not offer them.
+
+```json
+{
+  "version": 1,
+  "eval": {
+    "sandbox": {
+      "isolation": "docker",
+      "image": "registry.example/agent-eval-claude@sha256:...",
+      "network": "none"
+    }
+  }
+}
+```
+
+The sandbox binds only the private workspace of the run, read-write, and gets no terminal. The harness program must come from the sandbox, and the image is user data: agent-eval names no image. A docker sandbox needs an `image` that holds the harness program in `/usr/local/bin`, `/usr/bin` or `/bin`, or a `nix` provision with a pinned `nixRev`, which mounts the closure of the harness package. Without an `image`, docker falls back to the base image of agent-cli, which holds no harness program, so only a `nix` provision can run there. A docker run starts with `--rm` and the name `agent-eval-<hash of the workspace>`, and when a timeout or a stopped run ends the docker client first, agent-eval removes the container with `docker rm --force`. A container that cannot be removed is an infrastructure fault.
+
 ## Layout
 
 | Package | Concern |
 | --- | --- |
 | `cmd/agent-eval` | Composition root |
 | `internal/cmd` | Command tree, the driving adapter |
-| `internal/registry` | The one file that names the concrete harnesses, protocols and predicates |
+| `internal/registry` | The one file that names the concrete harnesses, protocols, predicates and confinements, and the isolators of agent-cli |
 | `internal/run` | Drives the units of a plan under a budget, with checkpoints and resume |
 | `internal/protocol/{trigger,routing,output,instruction,orchestration}` | One eval protocol each |
 | `internal/harness`, `internal/harness/{claude,codex}` | Harness port and its leaves |
 | `internal/predicate`, `internal/predicate/{filesystem,session,llm}` | Predicate port and its leaves |
 | `internal/execute`, `internal/judge` | Runs one request with retries, and grades with a model |
+| `internal/confine`, `internal/confine/{none,launch}` | Confine port, and its leaves: no sandbox, and the isolator of agent-cli |
 | `internal/document`, `internal/model`, `internal/catalog`, `internal/settings`, `internal/budget` | Documents, plugin discovery, settings and caps |
 | `internal/store`, `internal/baseline`, `internal/cost`, `internal/report`, `internal/migrate`, `internal/ablation` | Checkpoints, baselines, cost history, output, legacy conversion, rule ablation |
 

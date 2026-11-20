@@ -27,7 +27,7 @@ const module = "github.com/xonovex/platform/packages/tooling/cli/agent-eval-go"
 var allowed = map[string][]string{
 	// The composition root binds every adapter and the registries.
 	"cmd/agent-eval": {
-		"internal/cmd", "internal/execute", "internal/harness", "internal/predicate", "internal/registry",
+		"internal/cmd", "internal/execute", "internal/harness", "internal/model", "internal/predicate", "internal/registry",
 	},
 
 	// The driving adapter reaches the core and the ports, never an adapter.
@@ -37,9 +37,11 @@ var allowed = map[string][]string{
 		"internal/report", "internal/run", "internal/settings", "internal/store",
 	},
 
-	// The one file that names the concrete harnesses, protocols and predicates.
+	// The one file that names the concrete harnesses, protocols, predicates and
+	// confinements.
 	"internal/registry": {
-		"internal/harness", "internal/harness/claude", "internal/harness/codex", "internal/judge",
+		"internal/confine", "internal/confine/launch", "internal/confine/none",
+		"internal/harness", "internal/harness/claude", "internal/harness/codex", "internal/judge", "internal/model",
 		"internal/predicate", "internal/predicate/filesystem", "internal/predicate/llm", "internal/predicate/session",
 		"internal/protocol", "internal/protocol/instruction", "internal/protocol/orchestration",
 		"internal/protocol/output", "internal/protocol/routing", "internal/protocol/trigger",
@@ -58,10 +60,11 @@ var allowed = map[string][]string{
 	"internal/migrate":  {"internal/document", "internal/model"},
 	"internal/report":   {"internal/model", "internal/run"},
 	"internal/run":      {"internal/budget", "internal/model", "internal/protocol", "internal/store"},
-	"internal/execute":  {"internal/harness"},
+	"internal/execute":  {"internal/confine", "internal/harness"},
 	"internal/judge":    {"internal/harness", "internal/model"},
 
 	// Ports. A port holds the contract and the test double holds a fake.
+	"internal/confine":   {},
 	"internal/harness":   {"internal/model"},
 	"internal/predicate": {"internal/harness", "internal/judge", "internal/model"},
 	"internal/protocol": {
@@ -74,6 +77,8 @@ var allowed = map[string][]string{
 	},
 
 	// Leaves: one variant of one axis each. A leaf knows its port and never a sibling.
+	"internal/confine/launch":         {"internal/confine", "internal/model"},
+	"internal/confine/none":           {"internal/confine"},
 	"internal/harness/claude":         {"internal/harness", "internal/model"},
 	"internal/harness/codex":          {"internal/harness", "internal/model"},
 	"internal/predicate/filesystem":   {"internal/model", "internal/predicate"},
@@ -97,7 +102,8 @@ var libraries = map[string][]string{
 		"shared-agent-go/pkg/agents",
 		"shared-config-go/pkg/osfiles",
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
-		"shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
+		"shared-core-go/pkg/logging", "shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
+		"shared-launch-go/pkg/oshost",
 	},
 	"internal/baseline": {"shared-contract-go/pkg/fs"},
 	"internal/budget":   {"shared-config-go/pkg/section/eval"},
@@ -110,6 +116,14 @@ var libraries = map[string][]string{
 		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
 		"shared-contract-go/pkg/report",
 	},
+	"internal/confine": {"shared-core-go/pkg/process"},
+	"internal/confine/launch": {
+		"shared-agent-go/pkg/agents", "shared-agent-go/pkg/egress", "shared-agent-go/pkg/network",
+		"shared-agent-go/pkg/policy", "shared-agent-go/pkg/provision", "shared-agent-go/pkg/types",
+		"shared-core-go/pkg/envutil", "shared-core-go/pkg/process",
+		"shared-launch-go/pkg/credential", "shared-launch-go/pkg/isolation", "shared-launch-go/pkg/launch",
+		"shared-launch-go/pkg/sandbox",
+	},
 	"internal/cost":                  {"shared-contract-go/pkg/fs"},
 	"internal/document":              {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema", "shared-contract-go/pkg/schemas"},
 	"internal/execute":               {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process", "shared-core-go/pkg/scratch"},
@@ -120,21 +134,34 @@ var libraries = map[string][]string{
 	"internal/model":                 {"shared-contract-go/pkg/condition"},
 	"internal/protocol":              {"shared-contract-go/pkg/fs"},
 	"internal/protocol/protocoltest": {"shared-agent-go/pkg/agents", "shared-agent-go/pkg/types", "shared-contract-go/pkg/fs/memfs", "shared-contract-go/pkg/wiring"},
-	"internal/registry":              {"shared-agent-go/pkg/types"},
-	"internal/report":                {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/report"},
-	"internal/store":                 {"shared-contract-go/pkg/fs"},
+	"internal/registry": {
+		"shared-agent-go/pkg/agents", "shared-agent-go/pkg/isolation", "shared-agent-go/pkg/provision",
+		"shared-agent-go/pkg/types", "shared-core-go/pkg/logging",
+		"shared-launch-go/pkg/credential", "shared-launch-go/pkg/credential/env", "shared-launch-go/pkg/credential/file",
+		"shared-launch-go/pkg/credential/keychain", "shared-launch-go/pkg/credential/pass",
+		"shared-launch-go/pkg/credential/secretservice", "shared-launch-go/pkg/egress/managed",
+		"shared-launch-go/pkg/isolation", "shared-launch-go/pkg/isolation/bwrap", "shared-launch-go/pkg/isolation/docker",
+		"shared-launch-go/pkg/isolation/none", "shared-launch-go/pkg/isolation/seatbelt",
+		"shared-launch-go/pkg/provision", "shared-launch-go/pkg/provision/command", "shared-launch-go/pkg/provision/nix",
+		"shared-launch-go/pkg/provision/none", "shared-launch-go/pkg/sandbox",
+	},
+	"internal/report": {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/report"},
+	"internal/store":  {"shared-contract-go/pkg/fs"},
 }
 
 // hostLibraries are the library leaves that touch the host. Only the
 // composition root imports them, and no unit test does.
 var hostLibraries = []string{
 	"shared-config-go/pkg/osfiles", "shared-contract-go/pkg/fs/osfs", "shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
+	"shared-launch-go/pkg/oshost",
 }
 
 // concrete lists the packages that bind a port to a technology or name a
 // variant, with the one package that may import each from non-test code.
 var concrete = map[string]string{
 	"internal/registry":               "cmd/agent-eval",
+	"internal/confine/launch":         "internal/registry",
+	"internal/confine/none":           "internal/registry",
 	"internal/harness/claude":         "internal/registry",
 	"internal/harness/codex":          "internal/registry",
 	"internal/predicate/filesystem":   "internal/registry",
@@ -430,6 +457,44 @@ func TestLeavesNeverImportASibling(t *testing.T) {
 			rel, inside := strings.CutPrefix(imp, module+"/")
 			if inside && rel != f.dir && filepath.Dir(rel) == axis && filepath.Base(axis) != "internal" && !doubles[rel] {
 				t.Errorf("%s imports its sibling %s", f.path, rel)
+			}
+		}
+	}
+}
+
+// launcher is the shared library of the isolators of agent-cli.
+const launcher = library + "shared-launch-go/"
+
+// launchPorts are the packages of the launcher that name no variant: the
+// ports, the registry and the planner.
+var launchPorts = map[string]bool{
+	"shared-launch-go/pkg/credential": true, "shared-launch-go/pkg/isolation": true, "shared-launch-go/pkg/launch": true,
+	"shared-launch-go/pkg/provision": true, "shared-launch-go/pkg/sandbox": true,
+}
+
+// TestOnlyTheConfinementReachesTheLauncher keeps the isolators of agent-cli
+// behind the confine port: the launch leaf plans through the ports of the
+// launcher, the registry names its variants, and the composition root builds
+// its host. The core and every other leaf never see it.
+func TestOnlyTheConfinementReachesTheLauncher(t *testing.T) {
+	for _, f := range nonTest(moduleFiles(t)) {
+		for _, imp := range f.imports {
+			if !strings.HasPrefix(imp, launcher) {
+				continue
+			}
+			rel := strings.TrimPrefix(imp, library)
+			switch f.dir {
+			case "internal/registry":
+			case "internal/confine/launch":
+				if !launchPorts[rel] {
+					t.Errorf("%s imports %s; the launch leaf reaches only the ports of the launcher, never a variant", f.path, rel)
+				}
+			case "cmd/agent-eval":
+				if rel != "shared-launch-go/pkg/oshost" {
+					t.Errorf("%s imports %s; the composition root reaches only the host of the launcher", f.path, rel)
+				}
+			default:
+				t.Errorf("%s imports %s; only internal/confine/launch, internal/registry and cmd/agent-eval reach the launcher", f.path, rel)
 			}
 		}
 	}

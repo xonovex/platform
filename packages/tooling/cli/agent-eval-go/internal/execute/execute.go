@@ -1,6 +1,7 @@
 // Package execute runs one harness request end to end: it makes a private
-// workspace, stages what the harness leaf asks for, starts the program, feeds
-// its output to the leaf's scanner and removes the workspace. A run that fails
+// workspace, stages what the harness leaf asks for, starts the program inside
+// the sandbox of the run, feeds its output to the leaf's scanner, ends what the
+// sandbox left running and removes the workspace. A run that fails
 // for an infrastructure reason is tried again, and a run that keeps failing is
 // an error, never a failed verdict.
 package execute
@@ -16,6 +17,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/confine"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 )
 
@@ -37,9 +39,11 @@ func (e *InfrastructureError) Error() string {
 // Executor is the harness.Executor built from its ports.
 type Executor struct {
 	Harnesses *harness.Registry
-	Runner    process.Runner
-	Scratch   scratch.Scratch
-	FS        fs.FileSystem
+	// Confiner places every harness process inside the sandbox of the run.
+	Confiner confine.Confiner
+	Runner   process.Runner
+	Scratch  scratch.Scratch
+	FS       fs.FileSystem
 	// Now is the clock. The composition root passes time.Now.
 	Now func() time.Time
 	// Pause waits between attempts. A test passes a no-op.
@@ -99,9 +103,19 @@ func (e Executor) once(ctx context.Context, h harness.Harness, req harness.Reque
 	started := e.Now()
 	// The "--" keeps a variadic flag before it from taking the prompt.
 	args := append(append([]string{}, plan.Args...), "--", plan.Prompt)
-	result, err := e.Runner.Run(ctx, process.Request{
+	confined, err := e.Confiner.Confine(confine.Request{Harness: req.Harness, Process: process.Request{
 		Dir: plan.Dir, Name: h.Binary(), Args: args, Env: plan.Env, Timeout: req.Caps.Timeout,
-	}, process.Lines(scanner.Feed))
+	}})
+	if err != nil {
+		return harness.Observation{}, fmt.Errorf("confine %s: %w", req.Harness, err)
+	}
+	defer confined.Release()
+	result, err := e.Runner.Run(ctx, confined.Process, process.Lines(scanner.Feed))
+	if confined.Stop != nil && (err != nil || result.TimedOut || result.Stopped) {
+		if stopErr := e.stop(ctx, *confined.Stop); stopErr != nil {
+			return harness.Observation{}, errors.Join(stopErr, err)
+		}
+	}
 	if err != nil {
 		if ctx.Err() != nil {
 			return harness.Observation{}, ctx.Err()
@@ -114,6 +128,35 @@ func (e Executor) once(ctx context.Context, h harness.Harness, req harness.Reque
 		obs.Files = e.snapshot(workspace, plan.Stage)
 	}
 	return obs, nil
+}
+
+// stop ends what a confined process left running. It runs after a cancelled
+// context too, so a cancelled eval leaves no sandbox behind. A sandbox that is
+// tearing itself down can refuse a stop until it is gone, so a failed stop is
+// tried again. A stop that keeps failing leaves a sandbox running, which is a
+// fault and not a result.
+func (e Executor) stop(ctx context.Context, request process.Request) error {
+	var err error
+	for attempt := 1; attempt <= Attempts; attempt++ {
+		if err = e.stopOnce(context.WithoutCancel(ctx), request); err == nil {
+			return nil
+		}
+		if attempt < Attempts && e.Pause != nil {
+			e.Pause(attempt)
+		}
+	}
+	return err
+}
+
+func (e Executor) stopOnce(ctx context.Context, request process.Request) error {
+	result, err := e.Runner.Run(ctx, request, nil)
+	switch {
+	case err != nil:
+		return fmt.Errorf("stop sandbox: %w", err)
+	case !result.Succeeded():
+		return fmt.Errorf("stop sandbox: %s exited with status %d: %s", request.Name, result.ExitCode, strings.TrimSpace(result.Stderr))
+	}
+	return nil
 }
 
 // maxSnapshotBytes bounds one file of the workspace snapshot, so a run that

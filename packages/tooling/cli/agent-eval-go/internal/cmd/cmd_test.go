@@ -72,7 +72,7 @@ func newFixture(t *testing.T, files map[string]string, exec *protocoltest.Exec) 
 	f.deps = cmd.Dependencies{
 		FS: fsys, Validator: validator, ConfigFiles: approved(files), Prompter: &configtest.Prompter{},
 		Places: configtest.Places{User: "/home/u/.config/agentic", State: stateDir, Wd: "/w"}, Protocols: registry.Protocols(),
-		Engine: func(facts agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+		Engine: func(facts agents.Catalog, _ model.Sandbox) (harness.Executor, *predicate.Registry, error) {
 			f.facts = facts
 			return exec, registry.Predicates(exec), nil
 		},
@@ -503,7 +503,7 @@ func TestAProjectHarnessOverrideNeedsItsOwnApproval(t *testing.T) {
 
 func TestAnEngineFaultVoidsTheRun(t *testing.T) {
 	f := newFixture(t, baseFiles(), selects(good))
-	f.deps.Engine = func(agents.Catalog) (harness.Executor, *predicate.Registry, error) {
+	f.deps.Engine = func(agents.Catalog, model.Sandbox) (harness.Executor, *predicate.Registry, error) {
 		return nil, nil, errors.New("no leaf")
 	}
 	if _, err := f.run("trigger", "alpha", "--runs", "1"); err == nil || err.Error() != "no leaf" {
