@@ -1,6 +1,6 @@
 import {resolve} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {
   conflictingQueryOwners,
   missingValidationRoutingOwners,
@@ -28,60 +28,85 @@ const HELP = [
   "  -h, --help    show this help message and exit",
 ].join("\n");
 
+const routingFindings = (
+  catalogRoot: string,
+  fs: FileSystem,
+): readonly string[] => [
+  ...missingValidationRoutingOwners(catalogRoot, fs).map(
+    (owner) =>
+      `routing: ${owner} owns no validation-split routing scenario; ` +
+      "another skill must carry one of its validation positives as a negative",
+  ),
+  ...conflictingQueryOwners(catalogRoot, fs).map(
+    ({owners, query}) =>
+      `routing: ${owners.join(" and ")} both mark "${query}" should_trigger; ` +
+      "exactly one skill owns a query and the others carry it as a negative",
+  ),
+  ...unresolvedOperationRationales(catalogRoot, fs).map(
+    ({operation, skill}) =>
+      `routing: ${skill} cites the '${operation}' operation, which no skill ` +
+      "owns a reference file for; name the operation that exists or drop it",
+  ),
+];
+
+export interface RenderedRoutingReport {
+  readonly lines: readonly string[];
+  readonly exitCode: number;
+}
+
+export const renderRoutingReport = (
+  failures: readonly string[],
+): RenderedRoutingReport =>
+  failures.length > 0
+    ? {
+        lines: [
+          ...failures.map((failure) => `[FAIL] ${failure}`),
+          "",
+          `Routing: ${String(failures.length)} finding(s)`,
+        ],
+        exitCode: 1,
+      }
+    : {
+        lines: [
+          "Routing: every skill owns a validation routing scenario, no query " +
+            "is claimed twice, and every cited operation resolves",
+        ],
+        exitCode: 0,
+      };
+
+export interface ValidateRoutingDependencies {
+  readonly fs: FileSystem;
+  readonly output: Output;
+}
+
+/** Checks the routing declarations of a catalog and returns the exit code. */
 export const main = (
   argv: readonly string[],
-  fs: FileSystem = nodeFileSystem,
+  cwd: string,
+  dependencies: ValidateRoutingDependencies,
 ): number => {
+  const {fs, output} = dependencies;
   if (argv.includes("-h") || argv.includes("--help")) {
-    console.log(HELP);
+    output.stdout(HELP);
     return 0;
   }
   const unknown = argv.find((argument) => argument.startsWith("-"));
   if (unknown !== undefined) {
-    process.stderr.write(`Error: unrecognized argument: ${unknown}\n`);
+    output.stderr(`Error: unrecognized argument: ${unknown}`);
     return 2;
   }
 
-  const catalogRoot = resolve(argv[0] ?? "packages/runtime/plugin");
-  const failures: string[] = [];
+  const catalogRoot = resolve(cwd, argv[0] ?? "packages/runtime/plugin");
+  let failures: readonly string[];
   try {
-    for (const owner of missingValidationRoutingOwners(catalogRoot, fs)) {
-      failures.push(
-        `routing: ${owner} owns no validation-split routing scenario; ` +
-          "another skill must carry one of its validation positives as a negative",
-      );
-    }
-    for (const {owners, query} of conflictingQueryOwners(catalogRoot, fs)) {
-      failures.push(
-        `routing: ${owners.join(" and ")} both mark "${query}" should_trigger; ` +
-          "exactly one skill owns a query and the others carry it as a negative",
-      );
-    }
-    for (const {operation, skill} of unresolvedOperationRationales(
-      catalogRoot,
-      fs,
-    )) {
-      failures.push(
-        `routing: ${skill} cites the '${operation}' operation, which no skill ` +
-          "owns a reference file for; name the operation that exists or drop it",
-      );
-    }
+    failures = routingFindings(catalogRoot, fs);
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    process.stderr.write(`Error: ${detail}\n`);
+    output.stderr(
+      `Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return 2;
   }
-
-  if (failures.length > 0) {
-    for (const failure of failures) console.log(`[FAIL] ${failure}`);
-    console.log();
-    console.log(`Routing: ${String(failures.length)} finding(s)`);
-    return 1;
-  }
-
-  console.log(
-    "Routing: every skill owns a validation routing scenario, no query " +
-      "is claimed twice, and every cited operation resolves",
-  );
-  return 0;
+  const report = renderRoutingReport(failures);
+  for (const line of report.lines) output.stdout(line);
+  return report.exitCode;
 };

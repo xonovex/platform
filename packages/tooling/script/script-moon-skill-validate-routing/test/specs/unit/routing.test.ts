@@ -1,14 +1,22 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import {main} from "../../../src/routing.js";
 
 const ROOT = "/catalog";
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
+// Runs the check from the catalog root and returns the exit code with its output.
+const run = (argv: readonly string[], fs: FileSystem = memoryFileSystem()) => {
+  const output = memoryOutput();
+  const code = main(argv, ROOT, {fs, output});
+  return {
+    code,
+    stdout: output.stdoutLines().join("\n"),
+    stderr: output.stderrLines().join("\n"),
+  };
+};
 
 interface CatalogSkill {
   readonly name: string;
@@ -40,25 +48,20 @@ const query = (text: string, shouldTrigger: boolean) => ({
 
 describe("routing owners check", () => {
   it("renders help without reading a catalog", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const result = run(["--help"]);
 
-    expect(main(["--help"])).toBe(0);
-    expect(log.mock.calls.at(0)?.at(0)).toContain(
-      "moon-skill-validate-routing",
-    );
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("moon-skill-validate-routing");
   });
 
   it("rejects an unrecognized option", () => {
-    const write = vi
-      .spyOn(process.stderr, "write")
-      .mockImplementation(() => true);
-
-    expect(main(["--unknown"])).toBe(2);
-    expect(write.mock.calls.at(0)?.at(0)).toContain("unrecognized argument");
+    expect(run(["--unknown"])).toMatchObject({
+      code: 2,
+      stderr: "Error: unrecognized argument: --unknown",
+    });
   });
 
   it("passes when every skill owns a validation routing scenario", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const fs = writeCatalog([
       {
         name: "owner",
@@ -70,25 +73,27 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([ROOT], fs)).toBe(0);
-    expect(log.mock.calls.at(-1)?.at(0)).toContain("every skill owns");
+    const result = run(["."], fs);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("every skill owns");
   });
 
   it("reports a skill whose only pairing was stripped", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const fs = writeCatalog([
       {name: "owner", queries: [query("unpaired routing query", true)]},
       {name: "rival", queries: [query("a query nobody else carries", true)]},
     ]);
 
-    expect(main([ROOT], fs)).toBe(1);
-    expect(
-      log.mock.calls.map((call) => String(call.at(0))).join("\n"),
-    ).toContain("owns no validation-split routing scenario");
+    const result = run(["."], fs);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain(
+      "owns no validation-split routing scenario",
+    );
   });
 
   it("reports a query two skills both claim", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const fs = writeCatalog([
       {
         name: "owner",
@@ -106,16 +111,19 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([ROOT], fs)).toBe(1);
-    expect(
-      log.mock.calls.map((call) => String(call.at(0))).join("\n"),
-    ).toContain(
+    const result = run(["."], fs);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain(
       'using-owner and using-rival both mark "contested query" should_trigger',
     );
+    expect(result.stdout.split("\n").slice(-2)).toEqual([
+      "",
+      "Routing: 3 finding(s)",
+    ]);
   });
 
   it("reports a rationale citing an operation no reference file backs", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
     const fs = writeCatalog([
       {
         name: "owner",
@@ -138,18 +146,18 @@ describe("routing owners check", () => {
       },
     ]);
 
-    expect(main([ROOT], fs)).toBe(1);
-    expect(
-      log.mock.calls.map((call) => String(call.at(0))).join("\n"),
-    ).toContain("using-owner cites the 'owner-decide' operation");
+    const result = run(["."], fs);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toContain(
+      "using-owner cites the 'owner-decide' operation",
+    );
   });
 
   it("reports an unreadable catalog root", () => {
-    const write = vi
-      .spyOn(process.stderr, "write")
-      .mockImplementation(() => true);
+    const result = run(["/absent-catalog"]);
 
-    expect(main(["/absent-catalog"], memoryFileSystem())).toBe(2);
-    expect(write.mock.calls.at(0)?.at(0)).toContain("catalog root not found");
+    expect(result.code).toBe(2);
+    expect(result.stderr).toContain("catalog root not found");
   });
 });
