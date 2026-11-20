@@ -13,12 +13,12 @@ import (
 
 func TestDefaultDirPrefersAnAbsoluteXDGDataHome(t *testing.T) {
 	env := map[string]string{"XDG_DATA_HOME": "/data"}
-	if got := DefaultDir(func(k string) string { return env[k] }, "/home/u"); got != "/data/agent-cli/plugins" {
+	if got := DefaultDir(func(k string) string { return env[k] }, "/home/u"); got != "/data/agentic/plugins" {
 		t.Errorf("DefaultDir = %s", got)
 	}
 	for _, value := range []string{"", "relative"} {
 		env["XDG_DATA_HOME"] = value
-		if got := DefaultDir(func(k string) string { return env[k] }, "/home/u"); got != "/home/u/.local/share/agent-cli/plugins" {
+		if got := DefaultDir(func(k string) string { return env[k] }, "/home/u"); got != "/home/u/.local/share/agentic/plugins" {
 			t.Errorf("DefaultDir(%q) = %s", value, got)
 		}
 	}

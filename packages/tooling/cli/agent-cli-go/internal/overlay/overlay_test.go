@@ -18,7 +18,7 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
 )
 
-const store = "/home/user/.local/share/agent-cli/plugins"
+const store = "/home/user/.local/share/agentic/plugins"
 
 // host wraps the fake so a test can fail one operation.
 type host struct {
@@ -211,7 +211,7 @@ func TestThePluginStoreFollowsTheRequestAndTheEnvironment(t *testing.T) {
 	fake := machine()
 	fake.Env["XDG_DATA_HOME"] = "/data"
 	b := builder(host{Fake: fake})
-	dir, _ := plugin.NewStore(fake, "/data/agent-cli/plugins")
+	dir, _ := plugin.NewStore(fake, "/data/agentic/plugins")
 	service := plugin.Service{Store: dir, Files: fake, Origins: b.Origins}
 	fetched, _ := service.Fetch("/src/hello")
 	if _, err := service.Commit(fetched, nil); err != nil {
@@ -222,7 +222,7 @@ func TestThePluginStoreFollowsTheRequestAndTheEnvironment(t *testing.T) {
 	if _, err := b.Prepare(req); err != nil {
 		t.Errorf("the environment store: %v", err)
 	}
-	req.Store = "/data/agent-cli/plugins"
+	req.Store = "/data/agentic/plugins"
 	if _, err := b.Prepare(req); err != nil {
 		t.Errorf("the requested store: %v", err)
 	}

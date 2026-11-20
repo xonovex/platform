@@ -85,7 +85,7 @@ func TestARunLeavesARecordThatSatisfiesTheSchema(t *testing.T) {
 	if err != nil || got.Status != record.StatusExited || got.ExitCode == nil || *got.ExitCode != 3 || got.Agent.Name != "claude" {
 		t.Errorf("record = %+v, %v", got, err)
 	}
-	info, err := os.Stat(filepath.Join(m.stateDir(), "agent-cli", "runs", got.ID+".json"))
+	info, err := os.Stat(filepath.Join(m.stateDir(), "agentic", "runs", got.ID+".json"))
 	if err != nil || info.Mode().Perm() != 0o600 {
 		t.Errorf("record file = %v, %v; want a private file", info, err)
 	}

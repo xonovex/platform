@@ -109,7 +109,7 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 	flags.StringSliceVar(&options.RoBindPaths, "ro-bind", nil, "Read-only bind mount")
 	flags.StringSliceVar(&options.Plugins, "plugin", nil, "Installed plugin to overlay on the run (repeatable; see agent-cli plugin)")
 	flags.StringSliceVar(&options.OverlayDirs, "overlay-dir", nil, "Directory of skills, agents, commands and AGENTS.md to overlay on the run (repeatable)")
-	flags.StringVar(&options.Store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agent-cli/plugins)")
+	flags.StringVar(&options.Store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agentic/plugins)")
 	flags.StringSliceVar(&options.CustomEnv, "env", nil, "Environment variables (KEY=VALUE)")
 	flags.StringVarP(&options.Terminal, "terminal", "t", "", "Terminal wrapper (tmux, herdr)")
 	flags.StringVar(&options.TerminalSession, "terminal-session", "", "Custom tmux session name (tmux only)")

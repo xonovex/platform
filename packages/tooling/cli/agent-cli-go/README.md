@@ -97,7 +97,7 @@ Options:
   -t, --terminal <wrapper>     Terminal wrapper: tmux, herdr
   --plugin <name>              Overlay an installed plugin on the run (repeatable)
   --overlay-dir <dir>          Overlay a directory of skills, agents, commands and AGENTS.md (repeatable)
-  --store <dir>                Plugin store (default: $XDG_DATA_HOME/agent-cli/plugins)
+  --store <dir>                Plugin store (default: $XDG_DATA_HOME/agentic/plugins)
   -n, --dry-run                Show configuration without executing
 ```
 
@@ -296,7 +296,7 @@ The report lists each axis choice with the layer that made it, each guarantee wi
 
 ### runs
 
-Every run that is not a dry run leaves a JSON record in `$XDG_STATE_HOME/agent-cli/runs` (default `~/.local/state/agent-cli/runs`), readable by its owner only. A record holds the agent and its version probe, the choice on each axis, each guarantee with its outcome, the digest of each plugin and overlay directory, the names of the credentials, the work directory, the exit code and the layers that decided each configuration key. It never holds a credential value. A run that fails before the agent starts leaves a record with the error and no exit code.
+Every run that is not a dry run leaves a JSON record in `$XDG_STATE_HOME/agentic/runs` (default `~/.local/state/agentic/runs`), readable by its owner only. A record holds the agent and its version probe, the choice on each axis, each guarantee with its outcome, the digest of each plugin and overlay directory, the names of the credentials, the work directory, the exit code and the layers that decided each configuration key. It never holds a credential value. A run that fails before the agent starts leaves a record with the error and no exit code.
 
 ```
 agent-cli runs list [--json]
@@ -414,6 +414,8 @@ This release still reads the configuration files of the previous release, and th
 A layer that has both a legacy file and an `agentic.json` is an error that names both files. The legacy project providers and model overrides take effect only after you approve their digest, and an approval in the previous ledger `$XDG_DATA_HOME/agent-cli/approvals.json` still holds.
 
 `agent-cli config migrate` writes the user file, the project file of the work directory and, with `--managed`, the managed file as `agentic.json`, and each legacy provider file as `providers.d/<name>.json` beside it. It checks each file against the schema and never replaces a file. Check the new files, then remove the legacy files. A migrated project file needs a new approval.
+
+The run records moved from `$XDG_STATE_HOME/agent-cli/runs` to `$XDG_STATE_HOME/agentic/runs`, and the plugin store moved from `$XDG_DATA_HOME/agent-cli/plugins` to `$XDG_DATA_HOME/agentic/plugins`. The store holds only relative paths, so move the old directory to the new place to keep the installed plugins and marketplaces.
 
 ## Testing
 

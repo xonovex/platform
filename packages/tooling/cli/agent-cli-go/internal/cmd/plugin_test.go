@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultStore = "/home/user/.local/share/agent-cli/plugins"
+	defaultStore = "/home/user/.local/share/agentic/plugins"
 	helloPlugin  = `{"name":"hello","version":"1.0.0","description":"d"}`
 )
 
@@ -163,7 +163,7 @@ func TestTheStoreFlagAndTheEnvironmentChooseTheStore(t *testing.T) {
 		t.Error("a relative store is not resolved against the working directory")
 	}
 	r.host.Env["XDG_DATA_HOME"] = "/data"
-	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil || !r.host.Exists("/data/agent-cli/plugins/lock.json") {
+	if err := r.execute("plugin", "install", "/src/hello", "--approve-config-digest", digest); err != nil || !r.host.Exists("/data/agentic/plugins/lock.json") {
 		t.Errorf("the environment store: %v", err)
 	}
 	if err := r.execute("plugin", "list", "--store", "/abs/../x"); err != nil {

@@ -34,14 +34,14 @@ const (
 	stagingPrefix    = ".staging-"
 )
 
-// DefaultDir returns the store directory: agent-cli/plugins below the XDG data
+// DefaultDir returns the store directory: agentic/plugins below the XDG data
 // directory when it is absolute, else below ~/.local/share.
 func DefaultDir(getenv func(string) string, home string) string {
 	data := getenv("XDG_DATA_HOME")
 	if !path.IsAbs(data) {
 		data = path.Join(home, ".local", "share")
 	}
-	return path.Join(data, "agent-cli", "plugins")
+	return path.Join(data, "agentic", "plugins")
 }
 
 // Store is the plugin directory on disk.

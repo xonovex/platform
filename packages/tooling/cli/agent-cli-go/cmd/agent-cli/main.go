@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"os"
+	"path/filepath"
 
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
@@ -18,6 +19,7 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/legacy"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
@@ -79,11 +81,12 @@ func main() {
 	}
 }
 
-// runStore opens the run record store in the state directory of the user.
+// runStore opens the run record store in the agentic state directory of the
+// user, beside the approval ledger.
 func runStore(host oshost.System) (record.Store, error) {
-	home, err := host.UserHomeDir()
+	state, err := runconfig.Places{Host: host}.StateDir()
 	if err != nil {
 		return record.Store{}, err
 	}
-	return record.NewStore(host, record.DefaultDir(host.Getenv, home, "agent-cli"))
+	return record.NewStore(host, filepath.Join(state, "runs"))
 }

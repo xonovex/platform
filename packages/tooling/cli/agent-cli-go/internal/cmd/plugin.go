@@ -67,7 +67,7 @@ laid over a run with agent-cli run --plugin <name>. An install fails closed: it
 needs the digest you reviewed, and a grant for each hook, MCP server, language
 server or settings file the plugin carries.`,
 	}
-	command.PersistentFlags().StringVar(&store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agent-cli/plugins)")
+	command.PersistentFlags().StringVar(&store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agentic/plugins)")
 	command.AddCommand(
 		newPluginInstallCommand(ports, &store),
 		newPluginListCommand(ports, &store),
@@ -194,7 +194,7 @@ func newMarketplaceCommand(ports PluginPorts) *cobra.Command {
 .agents/plugins/marketplace.json. A registered marketplace lets you install a
 plugin as name@marketplace.`,
 	}
-	command.PersistentFlags().StringVar(&store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agent-cli/plugins)")
+	command.PersistentFlags().StringVar(&store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agentic/plugins)")
 	command.AddCommand(
 		&cobra.Command{
 			Use:   "add <source>",
