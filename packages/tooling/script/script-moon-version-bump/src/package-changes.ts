@@ -1,5 +1,5 @@
-import {existsSync, readFileSync} from "node:fs";
 import {dirname, join, relative} from "node:path";
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import {logInfo} from "@xonovex/script-moon-common/logging";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {
@@ -10,7 +10,7 @@ import {
 } from "./changelog.js";
 import type {FileChange} from "./file-transaction.js";
 import {findChangelogRange, getCommitsSince} from "./git-log.js";
-import type {GitRunner} from "./git.js";
+import type {VersionGit} from "./git.js";
 
 interface ChangelogRequest {
   readonly rootDir: string;
@@ -23,7 +23,8 @@ interface ChangelogRequest {
   readonly changelogFilename: string | undefined;
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
-  readonly git: GitRunner;
+  readonly git: VersionGit;
+  readonly fs: FileSystem;
 }
 
 const serializePackage = (pkg: PackageJson): string =>
@@ -34,12 +35,7 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   const filename = request.changelogFilename ?? "CHANGELOG.md";
   const range =
     request.gitBase === undefined
-      ? findChangelogRange(
-          request.rootDir,
-          pkgDir,
-          request.oldVersion,
-          request.git,
-        )
+      ? findChangelogRange(pkgDir, request.oldVersion, request.git)
       : {since: request.gitBase};
 
   if (range === undefined) {
@@ -50,12 +46,7 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   }
 
   const bumpLevel = determineBumpLevel(request.oldVersion, request.newVersion);
-  const commits = getCommitsSince(
-    request.rootDir,
-    pkgDir,
-    range.since,
-    request.git,
-  );
+  const commits = getCommitsSince(pkgDir, range.since, request.git);
   const entry = generateChangelogEntry(
     request.newVersion,
     commits,
@@ -72,8 +63,8 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
     return undefined;
   }
   const changelogPath = join(dirname(request.packagePath), filename);
-  const existing = existsSync(changelogPath)
-    ? readFileSync(changelogPath, "utf8")
+  const existing = request.fs.isFile(changelogPath)
+    ? request.fs.readText(changelogPath)
     : undefined;
   return {
     path: changelogPath,

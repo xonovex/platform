@@ -1,8 +1,6 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
 import {
   packageJsonPaths,
@@ -13,8 +11,8 @@ import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {bumpVersion, type BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
 import {planDependentUpdates} from "./dependents-command.js";
-import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getGitVersion, runGit, type GitRunner} from "./git.js";
+import type {FileChange} from "./file-transaction.js";
+import {getGitVersion, type VersionGit} from "./git.js";
 import {readWorkspacePackages, runLockstep} from "./lockstep-command.js";
 import {parseLockstepNames} from "./lockstep.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
@@ -38,11 +36,10 @@ const validateVersionRequest = (
   }
 };
 
-// The two ports that reach outside this process: git reads, and the moon query
-// that lists workspace packages. Supplying both lets a caller drive main over a
-// plain directory tree with no repository and no moon invocation.
+// The ports that reach outside this process. Supplying them lets a caller drive
+// main over a plain directory tree with no repository and no moon invocation.
 export interface VersionBumpDependencies {
-  readonly git: GitRunner;
+  readonly openRepository: (rootDir: string) => VersionGit;
   readonly listProjects: (rootDir: string) => readonly MoonProject[];
   readonly fs: FileSystem;
   // How the planned changes are installed. The transaction owns the ordering and
@@ -50,21 +47,12 @@ export interface VersionBumpDependencies {
   readonly applyChanges: (changes: readonly FileChange[]) => void;
 }
 
-export const defaultDependencies: VersionBumpDependencies = {
-  git: runGit,
-  listProjects: queryMoonProjects,
-  fs: nodeFileSystem,
-  applyChanges: (changes) => {
-    applyFileChanges(changes);
-  },
-};
-
 export const main = (
   argv: readonly string[],
-  workingDirectory = process.cwd(),
-  dependencies: VersionBumpDependencies = defaultDependencies,
+  workingDirectory: string,
+  dependencies: VersionBumpDependencies,
 ): number => {
-  const {applyChanges, fs, git, listProjects} = dependencies;
+  const {applyChanges, fs, listProjects, openRepository} = dependencies;
   const listPackagePaths = (rootDir: string): readonly string[] =>
     packageJsonPaths(rootDir, listProjects(rootDir), fs);
   const args = parseCliArgs(
@@ -144,6 +132,7 @@ export const main = (
   if (lockstep !== undefined) {
     validateVersionRequest(exact, bumpType);
     const lockstepRoot = findWorkspaceRoot(workingDirectory, undefined, fs);
+    const git = openRepository(lockstepRoot);
     return runLockstep({
       rootDir: lockstepRoot,
       packages: readWorkspacePackages(
@@ -163,6 +152,8 @@ export const main = (
       gitBase,
       includedTypes,
       git,
+      fs,
+      applyChanges,
     });
   }
 
@@ -181,6 +172,7 @@ export const main = (
 
   const oldVersion = pkg.version;
   const rootDir = findWorkspaceRoot(workingDirectory, undefined, fs);
+  const git = openRepository(rootDir);
   const gitVersion = getGitVersion(rootDir, pkgPath, git);
   let newVersion: string;
   const changes: FileChange[] = [];
@@ -227,11 +219,12 @@ export const main = (
       oldVersion,
       newVersion,
       dryRun,
-      depUpdates: detectDepUpdates(rootDir, pkgPath, readPkg(pkgPath, fs)),
+      depUpdates: detectDepUpdates(rootDir, pkgPath, readPkg(pkgPath, fs), git),
       changelogFilename: changelogPath,
       gitBase,
       includedTypes,
       git,
+      fs,
     });
     if (changelog !== undefined) changes.push(changelog);
   }

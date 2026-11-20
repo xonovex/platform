@@ -1,5 +1,6 @@
 import {describe, expect, it} from "vitest";
-import {getWorkspaceDeps} from "../../../src/dep-updates.js";
+import {detectDepUpdates, getWorkspaceDeps} from "../../../src/dep-updates.js";
+import {emptyHistory, manifestsAtHead} from "../../util/version-git.js";
 
 describe("getWorkspaceDeps", () => {
   it("should extract @xonovex dependencies", () => {
@@ -29,5 +30,45 @@ describe("getWorkspaceDeps", () => {
 
   it("should handle missing dep fields", () => {
     expect(getWorkspaceDeps({name: "test"})).toEqual(new Map());
+  });
+});
+
+describe("detectDepUpdates", () => {
+  const path = "packages/core/package.json";
+
+  it("reports each workspace dependency whose range changed since HEAD", () => {
+    const git = emptyHistory({
+      readFile: manifestsAtHead({
+        [path]: {
+          dependencies: {"@xonovex/a": "1.0.0", "@xonovex/b": "1.0.0"},
+        },
+      }),
+    });
+
+    expect(
+      detectDepUpdates(
+        "/repo",
+        `/repo/${path}`,
+        {
+          dependencies: {
+            "@xonovex/a": "1.1.0",
+            "@xonovex/b": "1.0.0",
+            "@xonovex/c": "1.0.0",
+          },
+        },
+        git,
+      ),
+    ).toEqual([{name: "@xonovex/a", version: "1.1.0"}]);
+  });
+
+  it("reports nothing for a package that HEAD does not hold", () => {
+    expect(
+      detectDepUpdates(
+        "/repo",
+        `/repo/${path}`,
+        {dependencies: {"@xonovex/a": "1.1.0"}},
+        emptyHistory(),
+      ),
+    ).toEqual([]);
   });
 });

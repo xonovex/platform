@@ -1,7 +1,7 @@
 import {readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {describe, expect, it} from "vitest";
-import {applyFileChanges} from "../../../src/file-transaction.js";
+import {applyFileChangesOnDisk} from "../../../src/adapters/file-transaction-node.js";
 import {temporaryDirectories} from "../../util/git-repository.js";
 
 // The rollback rules are driven from an in-memory io in test/specs/unit; what is
@@ -16,7 +16,7 @@ describe("applyFileChanges against a real disk", () => {
     const added = join(root, "added.json");
     writeFileSync(existing, "existing-original\n");
 
-    applyFileChanges([
+    applyFileChangesOnDisk([
       {path: existing, content: "existing-updated\n"},
       {path: added, content: "added\n"},
     ]);
@@ -34,7 +34,7 @@ describe("applyFileChanges against a real disk", () => {
     const target = join(root, "package.json");
 
     expect(() => {
-      applyFileChanges([
+      applyFileChangesOnDisk([
         {path: target, content: "one"},
         {path: target, content: "two"},
       ]);

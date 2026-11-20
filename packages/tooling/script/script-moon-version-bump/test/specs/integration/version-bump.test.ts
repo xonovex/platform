@@ -1,13 +1,32 @@
 import {mkdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
+import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
-import {main} from "../../../src/version-bump.js";
+import {applyFileChangesOnDisk} from "../../../src/adapters/file-transaction-node.js";
+import {
+  main as runMain,
+  type VersionBumpDependencies,
+} from "../../../src/version-bump.js";
 import {
   commitAll,
   gitRepositories,
   temporaryDirectories,
 } from "../../util/git-repository.js";
+
+// The same adapters the entry point composes, so each case runs main over a real
+// repository and disk.
+const nodeDependencies: VersionBumpDependencies = {
+  openRepository: nodeGitRepository,
+  listProjects: queryMoonProjects,
+  fs: nodeFileSystem,
+  applyChanges: applyFileChangesOnDisk,
+};
+
+const main = (argv: readonly string[], workingDirectory: string): number =>
+  runMain(argv, workingDirectory, nodeDependencies);
 
 const repository = gitRepositories();
 const temporaryDirectory = temporaryDirectories();

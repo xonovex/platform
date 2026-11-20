@@ -1,5 +1,5 @@
+import type {GitRepository} from "@xonovex/script-moon-common/git";
 import {parsePackageJson} from "@xonovex/script-moon-common/package-json";
-import {runGit, type GitRunner} from "./git.js";
 
 interface Commit {
   readonly hash: string;
@@ -33,37 +33,18 @@ const isIncludedType = (
   includedTypes?: ReadonlySet<string>,
 ): boolean => (includedTypes ?? INCLUDED_TYPES).has(type);
 
-const hasParent = (rootDir: string, hash: string, git: GitRunner): boolean => {
-  const parents = git(["rev-list", "--parents", "-n", "1", hash], rootDir)
-    .trim()
-    .split(" ");
-  return parents.length > 1;
-};
-
 const findChangelogRange = (
-  rootDir: string,
   pkgDir: string,
   currentVersion: string,
-  git: GitRunner = runGit,
+  git: Pick<GitRepository, "pathHistory" | "readFile" | "hasParent">,
 ): ChangelogRange | undefined => {
   // The first historical package version that differs bounds the current release.
-  const hashes = git(
-    ["log", "--format=%H", "--", `${pkgDir}/package.json`],
-    rootDir,
-  )
-    .trim()
-    .split("\n")
-    .filter(Boolean);
+  const path = `${pkgDir}/package.json`;
+  const hashes = git.pathHistory(path);
 
   for (const hash of hashes) {
-    const path = `${pkgDir}/package.json`;
-    const listed = git(
-      ["ls-tree", "-z", "--name-only", hash, "--", path],
-      rootDir,
-    );
-    if (listed.length === 0) continue;
-
-    const oldPkgJson = git(["show", `${hash}:${path}`], rootDir);
+    const oldPkgJson = git.readFile(hash, path);
+    if (oldPkgJson === undefined) continue;
     const oldVersion = parsePackageJson(oldPkgJson, `${hash}:${path}`).version;
     if (oldVersion !== currentVersion) {
       return {since: hash};
@@ -75,51 +56,31 @@ const findChangelogRange = (
   const earliest = hashes.at(-1);
   if (earliest === undefined) return undefined;
   return {
-    since: hasParent(rootDir, earliest, git) ? `${earliest}~1` : undefined,
+    since: git.hasParent(earliest) ? `${earliest}~1` : undefined,
   };
 };
 
 const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
 
 const getCommitsSince = (
-  rootDir: string,
   pkgDir: string,
   sinceRef: string | undefined,
-  git: GitRunner = runGit,
-): readonly Commit[] => {
-  const raw = git(
-    [
-      "log",
-      "--format=%x00%H|%aN%n%B",
-      ...(sinceRef === undefined ? ["HEAD"] : [`${sinceRef}..HEAD`]),
-      "--",
-      pkgDir,
-    ],
-    rootDir,
-  );
-  return raw
-    .split("\0")
-    .filter(Boolean)
-    .map((record) => {
-      const lines = record.trim().split("\n");
-      const header = lines[0] ?? "";
-      const separatorIndex = header.indexOf("|");
-      const hash = header.slice(0, separatorIndex);
-      const author = header.slice(separatorIndex + 1);
-      const bodyLines = lines.slice(1);
-      const messages = bodyLines.filter((line) =>
-        CONVENTIONAL_COMMIT_RE.test(line.trim()),
-      );
-      return {
-        hash,
-        author,
-        messages:
-          messages.length > 0
-            ? messages.map((l) => l.trim())
-            : bodyLines.slice(0, 1).map((l) => l.trim()),
-      };
-    });
-};
+  git: Pick<GitRepository, "commitsSince">,
+): readonly Commit[] =>
+  git.commitsSince(sinceRef, pkgDir).map((record) => {
+    const bodyLines = record.message === "" ? [] : record.message.split("\n");
+    const messages = bodyLines.filter((line) =>
+      CONVENTIONAL_COMMIT_RE.test(line.trim()),
+    );
+    return {
+      hash: record.hash,
+      author: record.author,
+      messages:
+        messages.length > 0
+          ? messages.map((line) => line.trim())
+          : bodyLines.slice(0, 1).map((line) => line.trim()),
+    };
+  });
 
 export {
   findChangelogRange,

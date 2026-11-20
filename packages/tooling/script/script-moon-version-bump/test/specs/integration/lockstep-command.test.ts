@@ -1,8 +1,11 @@
 import {mkdirSync, readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
-import {getGitVersion, runGit} from "../../../src/git.js";
+import {applyFileChangesOnDisk} from "../../../src/adapters/file-transaction-node.js";
+import {getGitVersion} from "../../../src/git.js";
 import {
   runLockstep,
   type LockstepOptions,
@@ -92,7 +95,11 @@ const createRepository = (line: (version: string) => Manifests): string => {
 const workspacePackages = (root: string): readonly WorkspacePackage[] =>
   readdirSync(join(root, "packages")).map((directory) => {
     const path = join(root, "packages", directory, "package.json");
-    return {path, pkg: readPkg(path), headVersion: getGitVersion(root, path)};
+    return {
+      path,
+      pkg: readPkg(path),
+      headVersion: getGitVersion(root, path, nodeGitRepository(root)),
+    };
   });
 
 const lockstepOptions = (
@@ -100,7 +107,9 @@ const lockstepOptions = (
   names: readonly string[],
   overrides: Partial<LockstepOptions> = {},
 ): LockstepOptions => ({
-  git: runGit,
+  git: nodeGitRepository(root),
+  fs: nodeFileSystem,
+  applyChanges: applyFileChangesOnDisk,
   rootDir: root,
   packages: workspacePackages(root),
   names,

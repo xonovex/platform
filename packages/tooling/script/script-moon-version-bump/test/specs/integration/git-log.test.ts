@@ -1,5 +1,6 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {describe, expect, it} from "vitest";
 import {
   findChangelogRange,
@@ -78,7 +79,13 @@ describe("git history", () => {
     writePackage(directory, "2.0.0");
     commitAll(directory, "chore: release 2.0.0");
 
-    expect(findChangelogRange(directory, "packages/example", "2.0.0")).toEqual({
+    expect(
+      findChangelogRange(
+        "packages/example",
+        "2.0.0",
+        nodeGitRepository(directory),
+      ),
+    ).toEqual({
       since: previousVersionCommit,
     });
   });
@@ -90,11 +97,21 @@ describe("git history", () => {
     writePackage(directory, "1.0.0");
     const introduction = commitAll(directory, "feat: initial package");
 
-    expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
+    expect(
+      findChangelogRange(
+        "packages/example",
+        "1.0.0",
+        nodeGitRepository(directory),
+      ),
+    ).toEqual({
       since: `${introduction}~1`,
     });
     expect(
-      findChangelogRange(directory, "packages/missing", "1.0.0"),
+      findChangelogRange(
+        "packages/missing",
+        "1.0.0",
+        nodeGitRepository(directory),
+      ),
     ).toBeUndefined();
   });
 
@@ -103,11 +120,21 @@ describe("git history", () => {
     writePackage(directory, "1.0.0");
     const introduction = commitAll(directory, "feat: initial package");
 
-    expect(findChangelogRange(directory, "packages/example", "1.0.0")).toEqual({
+    expect(
+      findChangelogRange(
+        "packages/example",
+        "1.0.0",
+        nodeGitRepository(directory),
+      ),
+    ).toEqual({
       since: undefined,
     });
     expect(
-      getCommitsSince(directory, "packages/example", undefined),
+      getCommitsSince(
+        "packages/example",
+        undefined,
+        nodeGitRepository(directory),
+      ),
     ).toMatchObject([{hash: introduction, author: "Test Author"}]);
   });
 
@@ -122,7 +149,13 @@ describe("git history", () => {
       "docs: explain feature\n\nfree-form detail",
     );
 
-    expect(getCommitsSince(directory, "packages/example", initial)).toEqual([
+    expect(
+      getCommitsSince(
+        "packages/example",
+        initial,
+        nodeGitRepository(directory),
+      ),
+    ).toEqual([
       {
         hash: feature,
         author: "Test Author",
@@ -139,7 +172,11 @@ describe("git history", () => {
     commitAll(directory, "Plain message");
 
     expect(
-      getCommitsSince(directory, "packages/example", initial)[0],
+      getCommitsSince(
+        "packages/example",
+        initial,
+        nodeGitRepository(directory),
+      )[0],
     ).toMatchObject({
       messages: ["Plain message"],
     });

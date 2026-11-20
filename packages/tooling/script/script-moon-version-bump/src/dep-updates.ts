@@ -1,11 +1,7 @@
-import {execFileSync} from "node:child_process";
-import {relative} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {
-  parsePackageJson,
-  type PackageJson,
-} from "@xonovex/script-moon-common/package-json";
+import type {GitRepository} from "@xonovex/script-moon-common/git";
+import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import type {DepUpdate} from "./changelog.js";
+import {readHeadPackage} from "./git.js";
 
 const getWorkspaceDeps = (pkg: PackageJson): ReadonlyMap<string, string> => {
   const deps = new Map<string, string>();
@@ -28,31 +24,14 @@ const detectDepUpdates = (
   rootDir: string,
   pkgPath: string,
   currentPkg: PackageJson,
+  git: Pick<GitRepository, "readFile">,
 ): readonly DepUpdate[] => {
-  const currentDeps = getWorkspaceDeps(currentPkg);
-
-  const relativePath = relative(rootDir, pkgPath);
-  const listed = execFileSync(
-    resolveExecutable("git"),
-    ["ls-tree", "-z", "--name-only", "HEAD", "--", relativePath],
-    {cwd: rootDir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"]},
-  );
-  if (listed.length === 0) return [];
-
-  const oldPkgJson = execFileSync(
-    resolveExecutable("git"),
-    ["show", `HEAD:${relativePath}`],
-    {
-      cwd: rootDir,
-      encoding: "utf8",
-    },
-  );
-  const oldDeps = getWorkspaceDeps(
-    parsePackageJson(oldPkgJson, `HEAD:${relativePath}`),
-  );
+  const headPkg = readHeadPackage(rootDir, pkgPath, git);
+  if (headPkg === undefined) return [];
+  const oldDeps = getWorkspaceDeps(headPkg);
 
   const updates: DepUpdate[] = [];
-  for (const [name, version] of currentDeps) {
+  for (const [name, version] of getWorkspaceDeps(currentPkg)) {
     const oldVersion = oldDeps.get(name);
     if (oldVersion && oldVersion !== version) {
       updates.push({name, version});

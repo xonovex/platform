@@ -17,10 +17,10 @@ fileGroups:
 tasks:
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "83"
-      TS_COVERAGE_MIN_FUNCTIONS: "82"
-      TS_COVERAGE_MIN_BRANCHES: "74"
-      TS_COVERAGE_MIN_STATEMENTS: "83"
+      TS_COVERAGE_MIN_LINES: "99"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "94"
+      TS_COVERAGE_MIN_STATEMENTS: "99"
   coverage:
     command: noop
     deps: [ts-coverage]

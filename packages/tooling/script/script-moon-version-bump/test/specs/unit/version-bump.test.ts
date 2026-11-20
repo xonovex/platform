@@ -3,7 +3,7 @@ import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import type {FileChange} from "../../../src/file-transaction.js";
-import type {GitRunner} from "../../../src/git.js";
+import type {VersionGit} from "../../../src/git.js";
 import {main, type VersionBumpDependencies} from "../../../src/version-bump.js";
 
 afterEach(() => {
@@ -29,32 +29,35 @@ const workspace = (packages: Readonly<Record<string, unknown>>): FileSystem =>
     ),
   });
 
-// Answers the two reads getGitVersion makes. An empty ls-tree means the path is
-// absent at HEAD, which is how a never-committed package looks.
-const gitAtHead = (versions: Readonly<Record<string, string>>): GitRunner => {
-  return (args) => {
-    const [command] = args;
-    if (command === "ls-tree") {
-      const path = args.at(-1) ?? "";
-      return versions[path] === undefined ? "" : `${path}\0`;
-    }
-    if (command === "show") {
-      const ref = args[1] ?? "";
-      const path = ref.slice("HEAD:".length);
-      return `${JSON.stringify({name: path, version: versions[path]})}\n`;
-    }
-    throw new Error(`unexpected git command ${String(command)}`);
-  };
-};
+// Answers the HEAD reads getGitVersion makes. A path without a version is
+// absent at HEAD, which is how a never-committed package looks. The history
+// reads throw, so a case that plans a changelog must supply its own.
+const gitAtHead = (versions: Readonly<Record<string, string>>): VersionGit => ({
+  readFile: (commit, path) => {
+    const version = versions[path];
+    return commit === "HEAD" && version !== undefined
+      ? `${JSON.stringify({name: path, version})}\n`
+      : undefined;
+  },
+  pathHistory: () => {
+    throw new Error("unexpected history read");
+  },
+  hasParent: () => {
+    throw new Error("unexpected history read");
+  },
+  commitsSince: () => {
+    throw new Error("unexpected history read");
+  },
+});
 
 // applyChanges installs into the same tree the reads come from, so a case can
 // assert on what a run wrote without a disk.
 const dependencies = (
-  git: GitRunner,
+  git: VersionGit,
   paths: readonly string[],
   fs: FileSystem,
 ): VersionBumpDependencies => ({
-  git,
+  openRepository: () => git,
   fs,
   listProjects: () =>
     paths.map((path) => ({
@@ -282,5 +285,68 @@ describe("main", () => {
         dependencies(gitAtHead({}), [packagePath("core")], fs),
       ),
     ).toThrow("missing a name or version");
+  });
+
+  it("writes a changelog of the chosen commit types since the given base", () => {
+    const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
+    const corePath = packagePath("core");
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const since: (string | undefined)[] = [];
+
+    main(
+      ["--type", "minor", "--git-base", "v1.2.3", "--include-types", "chore"],
+      join(ROOT, "packages", "core"),
+      dependencies(
+        {
+          ...gitAtHead({"packages/core/package.json": "1.2.3"}),
+          commitsSince: (ref) => {
+            since.push(ref);
+            return [
+              {hash: "aaa1111", author: "Ada", message: "feat: add a thing"},
+              {hash: "bbb2222", author: "Ada", message: "chore: tidy a thing"},
+            ];
+          },
+        },
+        [corePath],
+        fs,
+      ),
+    );
+
+    expect(since).toEqual(["v1.2.3"]);
+    const changelog = fs.readText(
+      join(ROOT, "packages", "core", "CHANGELOG.md"),
+    );
+    expect(changelog).toContain("## 1.3.0");
+    expect(changelog).toContain("tidy a thing");
+    expect(changelog).not.toContain("add a thing");
+  });
+
+  it("moves the named packages to one version under --lockstep", () => {
+    const fs = workspace({
+      core: {name: "@xonovex/core", version: "1.2.3"},
+      extra: {name: "@xonovex/extra", version: "1.0.0"},
+    });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const code = main(
+      ["--lockstep", "@xonovex/core,@xonovex/extra", "--no-changelog"],
+      ROOT,
+      dependencies(
+        gitAtHead({
+          "packages/core/package.json": "1.2.3",
+          "packages/extra/package.json": "1.0.0",
+        }),
+        [packagePath("core"), packagePath("extra")],
+        fs,
+      ),
+    );
+
+    expect(code).toBe(0);
+    expect(JSON.parse(fs.readText(packagePath("core")))).toMatchObject({
+      version: "1.2.4",
+    });
+    expect(JSON.parse(fs.readText(packagePath("extra")))).toMatchObject({
+      version: "1.2.4",
+    });
   });
 });

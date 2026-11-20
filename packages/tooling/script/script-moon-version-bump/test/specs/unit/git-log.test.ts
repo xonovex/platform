@@ -5,47 +5,31 @@ import {
   isIncludedType,
   parseConventionalCommit,
 } from "../../../src/git-log.js";
-import type {GitRunner} from "../../../src/git.js";
+import type {VersionGit} from "../../../src/git.js";
 
-const ROOT = "/workspace";
 const PKG = "packages/core";
 
-// Answers the four git reads these functions make, from recorded output rather
-// than a repository. `absent` names the hashes at which the manifest does not
-// exist, which is how ls-tree reports a path introduced later.
+// Answers the history reads these functions make from a recording rather than a
+// repository. `absent` names the hashes at which the manifest does not exist,
+// which is how a path introduced later looks.
 const recordedGit = (recording: {
   readonly hashes?: readonly string[];
   readonly versions?: Readonly<Record<string, string>>;
   readonly absent?: readonly string[];
-  readonly parents?: Readonly<Record<string, readonly string[]>>;
-  readonly log?: string;
-}): GitRunner => {
-  return (args) => {
-    const [command] = args;
-    if (command === "log" && args[1] === "--format=%H") {
-      return `${(recording.hashes ?? []).join("\n")}\n`;
-    }
-    if (command === "log") return recording.log ?? "";
-    if (command === "ls-tree") {
-      const hash = args[3] ?? "";
-      return (recording.absent ?? []).includes(hash)
-        ? ""
-        : `${PKG}/package.json\0`;
-    }
-    if (command === "show") {
-      const hash = (args[1] ?? "").split(":", 1)[0] ?? "";
-      return `${JSON.stringify({
-        name: "@xonovex/core",
-        version: recording.versions?.[hash] ?? "0.0.0",
-      })}\n`;
-    }
-    if (command === "rev-list") {
-      const hash = args.at(-1) ?? "";
-      return [hash, ...(recording.parents?.[hash] ?? [])].join(" ");
-    }
-    throw new Error(`unexpected git command ${String(command)}`);
-  };
-};
+  readonly parents?: readonly string[];
+  readonly commits?: VersionGit["commitsSince"];
+}): VersionGit => ({
+  pathHistory: () => recording.hashes ?? [],
+  readFile: (commit) =>
+    (recording.absent ?? []).includes(commit)
+      ? undefined
+      : JSON.stringify({
+          name: "@xonovex/core",
+          version: recording.versions?.[commit] ?? "0.0.0",
+        }),
+  hasParent: (commit) => (recording.parents ?? []).includes(commit),
+  commitsSince: recording.commits ?? (() => []),
+});
 
 describe("parseConventionalCommit", () => {
   it("reads a type and description, with and without a scope", () => {
@@ -79,7 +63,7 @@ describe("findChangelogRange", () => {
       versions: {c3: "1.2.3", c2: "1.1.0", c1: "1.0.0"},
     });
 
-    expect(findChangelogRange(ROOT, PKG, "1.2.3", git)).toEqual({since: "c2"});
+    expect(findChangelogRange(PKG, "1.2.3", git)).toEqual({since: "c2"});
   });
 
   it("skips a commit where the manifest does not yet exist", () => {
@@ -89,23 +73,21 @@ describe("findChangelogRange", () => {
       absent: ["c2"],
     });
 
-    expect(findChangelogRange(ROOT, PKG, "1.2.3", git)).toEqual({since: "c1"});
+    expect(findChangelogRange(PKG, "1.2.3", git)).toEqual({since: "c1"});
   });
 
   it("returns undefined when the package has no history at all", () => {
-    expect(
-      findChangelogRange(ROOT, PKG, "1.2.3", recordedGit({})),
-    ).toBeUndefined();
+    expect(findChangelogRange(PKG, "1.2.3", recordedGit({}))).toBeUndefined();
   });
 
   it("covers from before the introducing commit when no version ever differed", () => {
     const git = recordedGit({
       hashes: ["c2", "c1"],
       versions: {c2: "1.2.3", c1: "1.2.3"},
-      parents: {c1: ["c0"]},
+      parents: ["c1"],
     });
 
-    expect(findChangelogRange(ROOT, PKG, "1.2.3", git)).toEqual({
+    expect(findChangelogRange(PKG, "1.2.3", git)).toEqual({
       since: "c1~1",
     });
   });
@@ -114,22 +96,28 @@ describe("findChangelogRange", () => {
     const git = recordedGit({
       hashes: ["c1"],
       versions: {c1: "1.2.3"},
-      parents: {},
     });
 
-    expect(findChangelogRange(ROOT, PKG, "1.2.3", git)).toEqual({
+    expect(findChangelogRange(PKG, "1.2.3", git)).toEqual({
       since: undefined,
     });
   });
 });
 
 describe("getCommitsSince", () => {
-  it("reads the hash, author and conventional subjects of each commit", () => {
+  it("keeps the conventional lines of each commit message", () => {
     const git = recordedGit({
-      log: "\0aaa|Ada\nfeat: add a thing\n\nfix: and repair another\0bbb|Grace\nrefactor: tidy up\n",
+      commits: () => [
+        {
+          hash: "aaa",
+          author: "Ada",
+          message: "feat: add a thing\n\nfix: and repair another",
+        },
+        {hash: "bbb", author: "Grace", message: "refactor: tidy up"},
+      ],
     });
 
-    expect(getCommitsSince(ROOT, PKG, "c1", git)).toEqual([
+    expect(getCommitsSince(PKG, "c1", git)).toEqual([
       {
         hash: "aaa",
         author: "Ada",
@@ -139,24 +127,35 @@ describe("getCommitsSince", () => {
     ]);
   });
 
-  it("falls back to the first body line when no subject is conventional", () => {
-    const git = recordedGit({log: "\0aaa|Ada\nmerge branch main\nnoise\n"});
+  it("falls back to the first line when no line is conventional", () => {
+    const git = recordedGit({
+      commits: () => [
+        {hash: "aaa", author: "Ada", message: "merge branch main\nnoise"},
+        {hash: "bbb", author: "Grace", message: ""},
+      ],
+    });
 
-    expect(getCommitsSince(ROOT, PKG, "c1", git)).toEqual([
+    expect(getCommitsSince(PKG, "c1", git)).toEqual([
       {hash: "aaa", author: "Ada", messages: ["merge branch main"]},
+      {hash: "bbb", author: "Grace", messages: []},
     ]);
   });
 
-  it("reads the whole history when no starting ref is given", () => {
-    const seen: string[][] = [];
-    const git: GitRunner = (args) => {
-      seen.push([...args]);
-      return "";
-    };
+  it("asks for the history of the package since the given ref", () => {
+    const seen: [string | undefined, string][] = [];
+    const git = recordedGit({
+      commits: (since, path) => {
+        seen.push([since, path]);
+        return [];
+      },
+    });
 
-    getCommitsSince(ROOT, PKG, undefined, git);
+    getCommitsSince(PKG, undefined, git);
+    getCommitsSince(PKG, "c1", git);
 
-    expect(seen[0]).toContain("HEAD");
-    expect(seen[0]?.some((arg) => arg.includes(".."))).toBe(false);
+    expect(seen).toEqual([
+      [undefined, PKG],
+      ["c1", PKG],
+    ]);
   });
 });

@@ -1,5 +1,6 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
+import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {detectDepUpdates} from "../../../src/dep-updates.js";
@@ -45,10 +46,15 @@ describe("Git package history", () => {
       }),
     );
 
-    expect(getGitVersion(root, pkgPath)).toBe("1.0.0");
-    expect(detectDepUpdates(root, pkgPath, readPkg(pkgPath))).toEqual([
-      {name: "@xonovex/shared", version: "workspace:2.0.0"},
-    ]);
+    expect(getGitVersion(root, pkgPath, nodeGitRepository(root))).toBe("1.0.0");
+    expect(
+      detectDepUpdates(
+        root,
+        pkgPath,
+        readPkg(pkgPath),
+        nodeGitRepository(root),
+      ),
+    ).toEqual([{name: "@xonovex/shared", version: "workspace:2.0.0"}]);
   });
 
   it("distinguishes a new package from a Git failure", () => {
@@ -61,12 +67,25 @@ describe("Git package history", () => {
       JSON.stringify({name: "@xonovex/new-package", version: "1.0.0"}),
     );
 
-    expect(getGitVersion(root, newPackagePath)).toBeUndefined();
     expect(
-      detectDepUpdates(root, newPackagePath, readPkg(newPackagePath)),
+      getGitVersion(root, newPackagePath, nodeGitRepository(root)),
+    ).toBeUndefined();
+    expect(
+      detectDepUpdates(
+        root,
+        newPackagePath,
+        readPkg(newPackagePath),
+        nodeGitRepository(root),
+      ),
     ).toEqual([]);
 
     const nonRepository = temporaryDirectory("version-bump-no-git-");
-    expect(() => getGitVersion(nonRepository, newPackagePath)).toThrow();
+    expect(() =>
+      getGitVersion(
+        nonRepository,
+        newPackagePath,
+        nodeGitRepository(nonRepository),
+      ),
+    ).toThrow();
   });
 });

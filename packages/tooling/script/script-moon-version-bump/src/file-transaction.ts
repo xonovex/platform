@@ -1,5 +1,3 @@
-import {randomUUID} from "node:crypto";
-import {existsSync, renameSync, rmSync, writeFileSync} from "node:fs";
 import {basename, dirname, join} from "node:path";
 
 interface FileChange {
@@ -22,18 +20,6 @@ interface StagedChange extends FileChange {
   backedUp: boolean;
   installed: boolean;
 }
-
-const defaultIo: FileTransactionIo = {
-  exists: existsSync,
-  write: (path, content) => {
-    writeFileSync(path, content, {encoding: "utf8", flag: "wx"});
-  },
-  rename: renameSync,
-  remove: (path) => {
-    rmSync(path, {force: true});
-  },
-  id: randomUUID,
-};
 
 const transactionPath = (
   target: string,
@@ -70,7 +56,7 @@ const rollback = (
 
 const applyFileChanges = (
   changes: readonly FileChange[],
-  io: FileTransactionIo = defaultIo,
+  io: FileTransactionIo,
 ): void => {
   validateChanges(changes);
   const staged: StagedChange[] = changes.map((change) => {

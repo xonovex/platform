@@ -3,8 +3,8 @@ import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import type {BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
-import {applyFileChanges, type FileChange} from "./file-transaction.js";
-import {getGitVersion, type GitRunner} from "./git.js";
+import type {FileChange} from "./file-transaction.js";
+import {getGitVersion, type VersionGit} from "./git.js";
 import {
   planLockstep,
   type DependentPlan,
@@ -26,12 +26,14 @@ interface LockstepOptions {
   readonly changelogPath: string | undefined;
   readonly gitBase: string | undefined;
   readonly includedTypes: ReadonlySet<string> | undefined;
-  readonly git: GitRunner;
+  readonly git: VersionGit;
+  readonly fs: FileSystem;
+  readonly applyChanges: (changes: readonly FileChange[]) => void;
 }
 
 const readWorkspacePackages = (
   rootDir: string,
-  git: GitRunner,
+  git: VersionGit,
   packagePaths: readonly string[],
   fs: FileSystem,
 ): readonly WorkspacePackage[] =>
@@ -60,11 +62,17 @@ const planMemberChanges = (
     oldVersion: member.baseVersion,
     newVersion: targetVersion,
     dryRun: options.dryRun,
-    depUpdates: detectDepUpdates(options.rootDir, member.path, member.pkg),
+    depUpdates: detectDepUpdates(
+      options.rootDir,
+      member.path,
+      member.pkg,
+      options.git,
+    ),
     changelogFilename: options.changelogPath,
     gitBase: options.gitBase,
     includedTypes: options.includedTypes,
     git: options.git,
+    fs: options.fs,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;
@@ -99,11 +107,13 @@ const planDependentChanges = (
       options.rootDir,
       dependent.path,
       dependent.pkg,
+      options.git,
     ),
     changelogFilename: options.changelogPath,
     gitBase: options.gitBase,
     includedTypes: options.includedTypes,
     git: options.git,
+    fs: options.fs,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;
@@ -139,7 +149,7 @@ const runLockstep = (options: LockstepOptions): number => {
     changes.push(...planDependentChanges(options, dependent));
   }
 
-  if (!options.dryRun) applyFileChanges(changes);
+  if (!options.dryRun) options.applyChanges(changes);
 
   const prefix = options.dryRun ? "[dry-run] Would bump" : "Bumped";
   logSuccess(
