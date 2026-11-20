@@ -6,6 +6,7 @@ package integration
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -21,10 +22,22 @@ func testBinary(t testing.TB) string {
 
 func testCommand(t *testing.T, args ...string) *exec.Cmd {
 	t.Helper()
-	home := t.TempDir()
 	cmd := exec.Command(testBinary(t), args...)
-	cmd.Env = append(os.Environ(), "HOME="+home, "XDG_CONFIG_HOME="+home)
+	cmd.Env = isolatedEnv(t.TempDir())
 	return cmd
+}
+
+// isolatedEnv is the environment of the test process with every directory of
+// the user below home, so a run never reads or writes the configuration, the
+// approval ledger, the run records or the plugin store of the developer. A
+// later value of a variable replaces the inherited one.
+func isolatedEnv(home string) []string {
+	return append(os.Environ(),
+		"HOME="+home,
+		"XDG_CONFIG_HOME="+home,
+		"XDG_DATA_HOME="+filepath.Join(home, "data"),
+		"XDG_STATE_HOME="+filepath.Join(home, "state"),
+	)
 }
 
 func TestRunCommand_Help(t *testing.T) {

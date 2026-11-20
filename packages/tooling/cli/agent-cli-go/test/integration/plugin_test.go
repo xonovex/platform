@@ -27,7 +27,7 @@ func newPluginEnvironment(t *testing.T) pluginEnvironment {
 func (e pluginEnvironment) run(args ...string) (string, error) {
 	e.t.Helper()
 	cmd := exec.Command(testBinary(e.t), args...)
-	cmd.Env = append(os.Environ(), "HOME="+e.home, "XDG_CONFIG_HOME="+e.home, "XDG_DATA_HOME="+filepath.Join(e.home, "data"))
+	cmd.Env = isolatedEnv(e.home)
 	output, err := cmd.CombinedOutput()
 	return string(output), err
 }
@@ -148,7 +148,7 @@ func TestPluginInstallDoesNotTreatPipedInputAsApproval(t *testing.T) {
 	plugin := makePlugin(t)
 
 	cmd := exec.Command(testBinary(t), "plugin", "install", plugin, "--store", env.store)
-	cmd.Env = append(os.Environ(), "HOME="+env.home, "XDG_CONFIG_HOME="+env.home, "XDG_DATA_HOME="+filepath.Join(env.home, "data"))
+	cmd.Env = isolatedEnv(env.home)
 	cmd.Stdin = strings.NewReader("yes\n")
 	output, err := cmd.CombinedOutput()
 	if err == nil {
