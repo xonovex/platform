@@ -5,7 +5,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/events"
 	ctrl "sigs.k8s.io/controller-runtime"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
@@ -28,30 +27,12 @@ func newOfflineManager(t *testing.T, scheme *runtime.Scheme) ctrl.Manager {
 }
 
 // setupFuncs is every reconciler's manager registration, which is what
-// cmd/operator wires at startup.
+// internal/wiring does at startup.
 func setupFuncs() map[string]func(ctrl.Manager) error {
 	return map[string]func(ctrl.Manager) error{
-		"AgentRun": func(mgr ctrl.Manager) error {
-			return (&AgentRunReconciler{
-				Client:   mgr.GetClient(),
-				Scheme:   mgr.GetScheme(),
-				Recorder: events.NewFakeRecorder(10),
-			}).SetupWithManager(mgr)
-		},
-		"AgentProvider": func(mgr ctrl.Manager) error {
-			return (&AgentProviderReconciler{
-				Client:   mgr.GetClient(),
-				Scheme:   mgr.GetScheme(),
-				Recorder: events.NewFakeRecorder(10),
-			}).SetupWithManager(mgr)
-		},
-		"AgentWorkspace": func(mgr ctrl.Manager) error {
-			return (&AgentWorkspaceReconciler{
-				Client:   mgr.GetClient(),
-				Scheme:   mgr.GetScheme(),
-				Recorder: events.NewFakeRecorder(10),
-			}).SetupWithManager(mgr)
-		},
+		"AgentRun":       newRunHarness().reconciler.SetupWithManager,
+		"AgentProvider":  newProviderHarness().reconciler.SetupWithManager,
+		"AgentWorkspace": newWorkspaceHarness().reconciler.SetupWithManager,
 	}
 }
 

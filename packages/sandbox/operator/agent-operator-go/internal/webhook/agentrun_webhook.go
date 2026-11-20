@@ -7,25 +7,29 @@ import (
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentvalidation "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/validation"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
 )
 
 // AgentRunWebhook implements defaulting and validation for AgentRun
 type AgentRunWebhook struct {
-	Client client.Client
+	policies   PolicySource
+	references ReferenceReader
+	catalog    Catalog
+}
+
+// NewAgentRunWebhook returns the AgentRun webhook over its ports.
+func NewAgentRunWebhook(policies PolicySource, references ReferenceReader, catalog Catalog) *AgentRunWebhook {
+	return &AgentRunWebhook{policies: policies, references: references, catalog: catalog}
 }
 
 var _ admission.Defaulter[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
 var _ admission.Validator[*agentv1alpha1.AgentRun] = &AgentRunWebhook{}
 
-// SetupWebhookWithManager sets up the webhook with the Manager
+// SetupWebhookWithManager registers the webhook with the Manager
 func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	w.Client = mgr.GetClient()
 	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentRun{}).
 		WithDefaulter(w).
 		WithValidator(w).
@@ -34,13 +38,11 @@ func (w *AgentRunWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // Default implements admission.Defaulter
 func (w *AgentRunWebhook) Default(ctx context.Context, run *agentv1alpha1.AgentRun) error {
-	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
+	policy, err := namespacePolicy(ctx, w.policies, run.Namespace)
 	if err != nil {
 		return err
 	}
-	if policy != nil {
-		applyPolicyDefaults(run, policy)
-	}
+	applyPolicyDefaults(run, policy)
 	if err := w.applyReferencedDefaults(ctx, run); err != nil {
 		return err
 	}
@@ -83,18 +85,17 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 
 	// Validate inline types
 	if run.Spec.Harness != nil && run.Spec.Harness.Type != "" {
-		if _, err := plugins.GetHarnessCommand(run.Spec.Harness.Type); err != nil {
+		if !w.catalog.HasHarness(run.Spec.Harness.Type) {
 			return nil, fmt.Errorf("invalid agent type: %s", run.Spec.Harness.Type)
 		}
 	}
 	if run.Spec.Workspace != nil && run.Spec.Workspace.Type != "" {
-		if _, err := plugins.GetVCSStrategy(run.Spec.Workspace.Type); err != nil {
+		if !w.catalog.HasWorkspace(run.Spec.Workspace.Type) {
 			return nil, fmt.Errorf("invalid workspace type: %s", run.Spec.Workspace.Type)
 		}
 	}
 	if run.Spec.Toolchain != nil && run.Spec.Toolchain.Type != "" {
-		validTypes := map[agentv1alpha1.ToolchainType]bool{agentv1alpha1.ToolchainTypeNix: true}
-		if !validTypes[run.Spec.Toolchain.Type] {
+		if !w.catalog.HasToolchain(run.Spec.Toolchain.Type) {
 			return nil, fmt.Errorf("invalid toolchain type: %s", run.Spec.Toolchain.Type)
 		}
 		if err := validateNixSpec(run.Spec.Toolchain.Nix); err != nil {
@@ -153,14 +154,12 @@ func (w *AgentRunWebhook) validate(ctx context.Context, run *agentv1alpha1.Agent
 		}
 	}
 
-	policy, err := namespacePolicy(ctx, w.Client, run.Namespace)
+	policy, err := namespacePolicy(ctx, w.policies, run.Namespace)
 	if err != nil {
 		return nil, err
 	}
 	effectiveRun := run.DeepCopy()
-	if policy != nil {
-		applyPolicyDefaults(effectiveRun, policy)
-	}
+	applyPolicyDefaults(effectiveRun, policy)
 	if err := w.applyReferencedDefaults(ctx, effectiveRun); err != nil {
 		return nil, err
 	}

@@ -142,3 +142,34 @@ func TestApplyHarnessDefaults_RuntimeClassName_RunTakesPrecedence(t *testing.T) 
 		t.Errorf("RuntimeClassName = %q, want gvisor", *run.Spec.RuntimeClassName)
 	}
 }
+
+func TestApplyHarnessDefaults_FillsTheSandboxDefaultsARunLeavesEmpty(t *testing.T) {
+	ttl := int32(600)
+	harness := &agentv1alpha1.AgentHarness{Spec: agentv1alpha1.AgentSpec{
+		DefaultSecurityContext:         &corev1.SecurityContext{ReadOnlyRootFilesystem: boolPointer(true)},
+		DefaultPodSecurityContext:      &corev1.PodSecurityContext{FSGroup: int64Pointer(1000)},
+		DefaultNetworkPolicy:           &agentv1alpha1.AgentNetworkPolicy{Disabled: true},
+		DefaultTTLSecondsAfterFinished: &ttl,
+	}}
+	run := &agentv1alpha1.AgentRun{}
+
+	d := ApplyHarnessDefaults(run, harness)
+
+	if run.Spec.SecurityContext == nil || run.Spec.PodSecurityContext == nil {
+		t.Errorf("security contexts = %v, %v, want the harness defaults", run.Spec.SecurityContext, run.Spec.PodSecurityContext)
+	}
+	if d.NetworkPolicy == nil || !d.NetworkPolicy.Disabled {
+		t.Errorf("NetworkPolicy = %v, want the harness default", d.NetworkPolicy)
+	}
+	if d.TTL == nil || *d.TTL != ttl {
+		t.Errorf("TTL = %v, want %d", d.TTL, ttl)
+	}
+	*harness.Spec.DefaultTTLSecondsAfterFinished = 1
+	if *d.TTL != 600 {
+		t.Error("the run shares the harness TTL instead of a copy")
+	}
+}
+
+func boolPointer(value bool) *bool { return &value }
+
+func int64Pointer(value int64) *int64 { return &value }

@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/wiring"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -106,28 +106,8 @@ func TestMain(m *testing.M) {
 		panic("failed to create manager: " + err.Error())
 	}
 
-	if err := (&controller.AgentRunReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentrun-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentRun controller: " + err.Error())
-	}
-
-	if err := (&controller.AgentProviderReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentprovider-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentProvider controller: " + err.Error())
-	}
-
-	if err := (&controller.AgentWorkspaceReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentworkspace-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentWorkspace controller: " + err.Error())
+	if err := wiring.SetupControllers(mgr, wiring.DefaultConfig()); err != nil {
+		panic("failed to set up controllers: " + err.Error())
 	}
 
 	go func() {

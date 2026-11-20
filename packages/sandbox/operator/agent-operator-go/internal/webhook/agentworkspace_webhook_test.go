@@ -6,10 +6,8 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 func sandboxedAgentWorkspaceWebhook() *AgentWorkspaceWebhook {
@@ -24,7 +22,7 @@ func sandboxedAgentWorkspaceWebhook() *AgentWorkspaceWebhook {
 			Defaults: agentv1alpha1.AgentPolicyDefaults{RuntimeClassName: &runtimeClassName},
 		},
 	}
-	return &AgentWorkspaceWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+	return workspaceWebhookWith(policy)
 }
 
 func TestAgentWorkspaceWebhook_Default_SetsStorageSize(t *testing.T) {
@@ -34,7 +32,7 @@ func TestAgentWorkspaceWebhook_Default_SetsStorageSize(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	if err := webhook.Default(context.Background(), ws); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -55,7 +53,7 @@ func TestAgentWorkspaceWebhook_Default_SetsSharedVolumeStorageSize(t *testing.T)
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	if err := webhook.Default(context.Background(), ws); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -76,7 +74,7 @@ func TestAgentWorkspaceWebhook_Default_PreservesExistingValues(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	if err := webhook.Default(context.Background(), ws); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -123,7 +121,7 @@ func TestAgentWorkspaceWebhook_Validate_MissingRepoURL(t *testing.T) {
 		Spec: agentv1alpha1.AgentWorkspaceSpec{},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for missing repository URL")
@@ -140,7 +138,7 @@ func TestAgentWorkspaceWebhook_Validate_EmptySharedVolumeName(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for empty shared volume name")
@@ -157,7 +155,7 @@ func TestAgentWorkspaceWebhook_Validate_EmptySharedVolumeMountPath(t *testing.T)
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for empty shared volume mount path")
@@ -175,7 +173,7 @@ func TestAgentWorkspaceWebhook_Validate_DuplicateSharedVolumeName(t *testing.T) 
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for duplicate shared volume name")
@@ -194,7 +192,7 @@ func TestAgentWorkspaceWebhook_ValidateUpdateRejectsSpecMutation(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateUpdate(context.Background(), old, new)
 	if err == nil {
 		t.Fatal("expected immutable spec error")
@@ -220,7 +218,7 @@ func TestAgentWorkspaceWebhook_ValidateDelete(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "test"},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateDelete(context.Background(), ws)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -250,7 +248,7 @@ func TestAgentWorkspaceWebhook_Validate_InvalidStorageSize(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for invalid storage size")
@@ -267,7 +265,7 @@ func TestAgentWorkspaceWebhook_Validate_InvalidSharedVolumeStorageSize(t *testin
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for invalid shared volume storage size")
@@ -285,7 +283,7 @@ func TestAgentWorkspaceWebhook_Validate_DuplicateMountPath(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for duplicate mount path")
@@ -302,7 +300,7 @@ func TestAgentWorkspaceWebhook_Validate_RelativeMountPath(t *testing.T) {
 		},
 	}
 
-	webhook := &AgentWorkspaceWebhook{}
+	webhook := workspaceWebhookWith()
 	_, err := webhook.ValidateCreate(context.Background(), ws)
 	if err == nil {
 		t.Fatal("expected error for relative mount path")
@@ -335,7 +333,7 @@ func TestAgentWorkspaceWebhookRejectsMissingPolicy(t *testing.T) {
 		RuntimeClassName: &runtimeClassName,
 	}}
 
-	_, err := (&AgentWorkspaceWebhook{}).ValidateCreate(context.Background(), ws)
+	_, err := workspaceWebhookWith().ValidateCreate(context.Background(), ws)
 
 	if err == nil || !strings.Contains(err.Error(), "requires exactly one AgentPolicy") {
 		t.Fatalf("ValidateCreate() error = %v, want missing-policy error", err)

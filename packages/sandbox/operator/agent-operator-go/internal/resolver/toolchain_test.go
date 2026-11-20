@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
@@ -23,10 +22,7 @@ func newStoredToolchain(namespace, name, image string) *agentv1alpha1.AgentToolc
 
 func TestResolveToolchain_InlineSpecTakesPriorityOverRef(t *testing.T) {
 	stored := newStoredToolchain("default", "stored", "stored-image")
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 	inline := &agentv1alpha1.ToolchainSpec{
 		Type: agentv1alpha1.ToolchainTypeNix,
 		Nix:  &agentv1alpha1.NixSpec{Image: "inline-image"},
@@ -47,10 +43,7 @@ func TestResolveToolchain_InlineSpecTakesPriorityOverRef(t *testing.T) {
 
 func TestResolveToolchain_ResolvesAReference(t *testing.T) {
 	stored := newStoredToolchain("default", "stored", "stored-image")
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 
 	resolved, err := ResolveToolchain(context.Background(), c, "default", "stored", nil)
 
@@ -68,7 +61,7 @@ func TestResolveToolchain_ResolvesAReference(t *testing.T) {
 // A run may legitimately carry no toolchain, so the absence of both inputs is
 // not an error.
 func TestResolveToolchain_ReturnsNothingWithoutInlineOrRef(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	resolved, err := ResolveToolchain(context.Background(), c, "default", "", nil)
 
@@ -81,7 +74,7 @@ func TestResolveToolchain_ReturnsNothingWithoutInlineOrRef(t *testing.T) {
 }
 
 func TestResolveToolchain_PropagatesAMissingReference(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	resolved, err := ResolveToolchain(context.Background(), c, "default", "absent", nil)
 
@@ -95,10 +88,7 @@ func TestResolveToolchain_PropagatesAMissingReference(t *testing.T) {
 
 func TestResolveToolchain_DoesNotCrossNamespaces(t *testing.T) {
 	stored := newStoredToolchain("other", "stored", "stored-image")
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 
 	if _, err := ResolveToolchain(
 		context.Background(), c, "default", "stored", nil,

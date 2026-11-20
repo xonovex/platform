@@ -1,6 +1,6 @@
 // Package shared is the harness axis core: the leaf-free command-builder port. The
-// agent-type registry that wires concrete leaves (claude, opencode) lives in the
-// composition root (internal/plugins).
+// concrete leaves (claude, opencode) register in internal/plugins, and the
+// composition root (internal/wiring) passes that registry to the cores.
 package shared
 
 import (

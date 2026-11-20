@@ -69,9 +69,10 @@ func TestBuildMainContainers_WithoutNix(t *testing.T) {
 	}
 }
 
-func TestBuildMainContainers_Claude(t *testing.T) {
+func TestBuildMainContainers_RunsTheHarnessCommand(t *testing.T) {
 	run := workspaceRun()
 	run.ObjectMeta = metav1.ObjectMeta{Name: "test"}
+	run.Spec.Prompt = "Fix the tests"
 	containers := mustBuildMainContainers(t, run, nil, "image:latest", agentv1alpha1.AgentTypeClaude, nil)
 
 	if len(containers) != 1 {
@@ -81,63 +82,30 @@ func TestBuildMainContainers_Claude(t *testing.T) {
 	if c.Name != "agent" {
 		t.Errorf("name = %q, want %q", c.Name, "agent")
 	}
-	if c.Command[0] != "claude" {
-		t.Errorf("command = %v, want [claude]", c.Command)
+	if len(c.Command) != 1 || c.Command[0] != "claude" {
+		t.Errorf("command = %v, want the harness command [claude]", c.Command)
+	}
+	if len(c.Args) != 2 || c.Args[0] != "--prompt" || c.Args[1] != "Fix the tests" {
+		t.Errorf("args = %v, want the harness args", c.Args)
 	}
 	if c.WorkingDir != "/workspace" {
 		t.Errorf("workingDir = %q, want %q", c.WorkingDir, "/workspace")
 	}
-
-	foundPermFlag := false
-	for i, arg := range c.Args {
-		if arg == "--permission-mode" && i+1 < len(c.Args) && c.Args[i+1] == "bypassPermissions" {
-			foundPermFlag = true
-			break
-		}
-	}
-	if !foundPermFlag {
-		t.Errorf("args missing '--permission-mode bypassPermissions', got %v", c.Args)
-	}
 }
 
-func TestBuildMainContainers_ClaudeWithPrompt(t *testing.T) {
-	run := workspaceRun()
-	run.Spec.Prompt = "Fix the tests"
-	containers := mustBuildMainContainers(t, run, nil, "image", agentv1alpha1.AgentTypeClaude, nil)
-
-	args := containers[0].Args
-	foundPrint := false
-	foundPrompt := false
-	for i, arg := range args {
-		if arg == "--print" {
-			foundPrint = true
-		}
-		if arg == "--prompt" && i+1 < len(args) && args[i+1] == "Fix the tests" {
-			foundPrompt = true
-		}
-	}
-	if !foundPrint {
-		t.Errorf("args missing '--print', got %v", args)
-	}
-	if !foundPrompt {
-		t.Errorf("args missing '--prompt Fix the tests', got %v", args)
-	}
-}
-
-func TestBuildMainContainers_Opencode(t *testing.T) {
-	run := workspaceRun()
+func TestBuildMainContainers_PassesProviderArgsToTheHarness(t *testing.T) {
 	providerCliArgs := []string{"--model", "google/gemini-2.5-pro"}
 
-	containers, err := BuildMainContainers(run, nil, providerCliArgs, "image", agentv1alpha1.AgentTypeOpencode, nil)
+	containers, err := buildMainContainers(workspaceRun(), nil, providerCliArgs, "image", stubHarness{agent: agentv1alpha1.AgentTypeOpencode}, nil)
 
 	if err != nil {
-		t.Fatalf("BuildMainContainers() error = %v", err)
+		t.Fatalf("buildMainContainers() error = %v", err)
 	}
 	c := containers[0]
 	if c.Command[0] != "opencode" {
 		t.Errorf("command = %v, want [opencode]", c.Command)
 	}
-	if len(c.Args) < 2 || c.Args[0] != "--model" || c.Args[1] != "google/gemini-2.5-pro" {
+	if len(c.Args) != 2 || c.Args[0] != "--model" || c.Args[1] != "google/gemini-2.5-pro" {
 		t.Errorf("args = %v, want [--model google/gemini-2.5-pro]", c.Args)
 	}
 }
@@ -207,18 +175,17 @@ func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
 	}
 }
 
-func TestBuildMainContainers_UnknownAgentTypeReturnsError(t *testing.T) {
-	_, err := BuildMainContainers(workspaceRun(), nil, nil, "image", "unknown", nil)
-
-	if err == nil {
-		t.Fatal("expected unknown agent type to return an error")
+func TestBuildMainContainers_SurfacesAHarnessFailure(t *testing.T) {
+	if _, err := buildMainContainers(workspaceRun(), nil, nil, "image", failingHarness{}, nil); err == nil {
+		t.Fatal("expected the harness failure to return an error")
+	}
+	if _, err := buildWorkspaceMainContainers(workspaceRun(), nil, nil, "image", failingHarness{}, nil, nil, nil); err == nil {
+		t.Fatal("expected the harness failure to return an error")
 	}
 }
 
-func TestBuildInitContainers_UnknownWorkspaceTypeReturnsError(t *testing.T) {
-	_, err := BuildInitContainers(workspaceRun(), "image", "unknown", nil)
-
-	if err == nil {
-		t.Fatal("expected unknown workspace type to return an error")
+func TestBuildMainContainers_RequiresAHarness(t *testing.T) {
+	if _, err := buildMainContainers(workspaceRun(), nil, nil, "image", nil, nil); err == nil {
+		t.Fatal("expected a missing harness to return an error")
 	}
 }

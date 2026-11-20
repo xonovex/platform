@@ -1,7 +1,8 @@
 // Package shared is the provision axis core: the leaf-free Toolchain port. The
 // neutral handoff out of provision is the pod image (a pinned-source guarantee),
-// not a method-specific type. The registry that wires concrete leaves lives in the
-// composition root (internal/plugins), so this core names no leaf.
+// not a method-specific type. The leaves register in internal/plugins, and the
+// composition root (internal/wiring) passes that registry to the cores, so this
+// core names no leaf.
 package shared
 
 // Toolchain is a pluggable provisioning strategy for the agent pod. A toolchain

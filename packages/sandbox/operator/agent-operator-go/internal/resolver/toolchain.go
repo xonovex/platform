@@ -4,13 +4,17 @@ import (
 	"context"
 
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
+// ToolchainReader reads a named AgentToolchain.
+type ToolchainReader interface {
+	GetAgentToolchain(ctx context.Context, key types.NamespacedName) (*agentv1alpha1.AgentToolchain, error)
+}
+
 // ResolveToolchain resolves toolchain config from either inline or a named reference.
-func ResolveToolchain(ctx context.Context, c client.Client, namespace, toolchainRef string, inline *agentv1alpha1.ToolchainSpec) (*agentv1alpha1.ToolchainSpec, error) {
+func ResolveToolchain(ctx context.Context, reader ToolchainReader, namespace, toolchainRef string, inline *agentv1alpha1.ToolchainSpec) (*agentv1alpha1.ToolchainSpec, error) {
 	if inline != nil {
 		return inline, nil
 	}
@@ -19,10 +23,10 @@ func ResolveToolchain(ctx context.Context, c client.Client, namespace, toolchain
 		return nil, nil
 	}
 
-	var tc agentv1alpha1.AgentToolchain
-	if err := c.Get(ctx, types.NamespacedName{Name: toolchainRef, Namespace: namespace}, &tc); err != nil {
+	toolchain, err := reader.GetAgentToolchain(ctx, types.NamespacedName{Name: toolchainRef, Namespace: namespace})
+	if err != nil {
 		return nil, err
 	}
 
-	return &tc.Spec, nil
+	return &toolchain.Spec, nil
 }

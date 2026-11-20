@@ -12,17 +12,50 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
+	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 	wsshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
-// resolveTTL returns the TTL pointer to use, defaulting to 3600 if nil.
-func resolveTTL(ttl *int32) *int32 {
+// JobPolicy holds the operator settings of every Job the isolation core builds.
+type JobPolicy struct {
+	// DefaultTTLSecondsAfterFinished applies to a run Job whose run sets no TTL.
+	DefaultTTLSecondsAfterFinished int32
+	// WorkspaceInitTimeout bounds the Job that clones a shared workspace.
+	WorkspaceInitTimeout time.Duration
+}
+
+// DefaultJobPolicy returns the JobPolicy the operator uses when no flag
+// overrides it.
+func DefaultJobPolicy() JobPolicy {
+	return JobPolicy{
+		DefaultTTLSecondsAfterFinished: 3600,
+		WorkspaceInitTimeout:           10 * time.Minute,
+	}
+}
+
+// resolveTTL returns the run TTL, or the policy default when the run sets none.
+func resolveTTL(ttl *int32, policy JobPolicy) *int32 {
 	if ttl != nil {
 		return ttl
 	}
-	defaultTTL := int32(3600)
+	defaultTTL := policy.DefaultTTLSecondsAfterFinished
 	return &defaultTTL
+}
+
+// RunJob is the resolved input of the agent Job of one AgentRun. Harness and VCS
+// are the leaves the composition root resolved for the run's agent and
+// workspace types.
+type RunJob struct {
+	ProviderEnv     []corev1.EnvVar
+	ProviderCliArgs []string
+	PVCName         string
+	Image           string
+	Timeout         time.Duration
+	AgentType       agentv1alpha1.AgentType
+	Harness         harnessshared.CommandBuilder
+	VCS             wsshared.VCSStrategy
+	TTL             *int32
+	Workspace       *WorkspaceBinding
 }
 
 // WorkspaceBinding is the workspace diff fed into the unified Job builder. A nil
@@ -70,26 +103,27 @@ func repositoryCredentialsVolume(ref *agentv1alpha1.SecretKeyRef) corev1.Volume 
 }
 
 // BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
-// realizer: a nil ws produces the standalone Job, a non-nil ws produces the
-// workspace-based Job. pvcName is the workspace PVC the pod mounts.
-func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, pvcName, image string, timeout time.Duration, agentType agentv1alpha1.AgentType, wsType agentv1alpha1.WorkspaceType, ttl *int32, ws *WorkspaceBinding) (*batchv1.Job, error) {
-	if timeout <= 0 {
+// realizer: a nil input.Workspace produces the standalone Job, a non-nil one
+// produces the workspace-based Job. input.PVCName is the workspace PVC the pod
+// mounts.
+func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*batchv1.Job, error) {
+	if input.Timeout <= 0 {
 		return nil, fmt.Errorf("timeout must be greater than zero")
 	}
-	activeDeadlineSeconds := int64(math.Ceil(timeout.Seconds()))
+	activeDeadlineSeconds := int64(math.Ceil(input.Timeout.Seconds()))
 	backoffLimit := int32(0)
 
 	labels := map[string]string{
 		"app.kubernetes.io/name":       "agent-operator",
 		"app.kubernetes.io/instance":   run.Name,
 		"app.kubernetes.io/component":  "agent-run",
-		"agent.xonovex.com/agent-type": string(agentType),
+		"agent.xonovex.com/agent-type": string(input.AgentType),
 	}
 
-	volumes := []corev1.Volume{pvcVolume(wsshared.WorkspaceVolumeName, pvcName)}
+	volumes := []corev1.Volume{pvcVolume(wsshared.WorkspaceVolumeName, input.PVCName)}
 
 	var initContainers, mainContainers []corev1.Container
-	if ws != nil {
+	if ws := input.Workspace; ws != nil {
 		labels["agent.xonovex.com/workspace"] = ws.WorkspaceRef
 		for _, vol := range ws.SharedVolumes {
 			if sharedPVC, ok := ws.SharedVolumePVCs[vol.Name]; ok {
@@ -97,12 +131,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 			}
 		}
 		volumes = append(volumes, tmpVolume())
+		initContainers = buildWorktreeInitContainers(run, input.Image, input.VCS, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
 		var err error
-		initContainers, err = BuildWorktreeInitContainers(run, image, wsType, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
-		if err != nil {
-			return nil, err
-		}
-		mainContainers, err = BuildWorkspaceMainContainers(run, providerEnv, providerCliArgs, image, agentType, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
+		mainContainers, err = buildWorkspaceMainContainers(run, input.ProviderEnv, input.ProviderCliArgs, input.Image, input.Harness, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}
@@ -111,12 +142,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 		if run.Spec.Workspace != nil && run.Spec.Workspace.Repository.CredentialsSecretRef != nil {
 			volumes = append(volumes, repositoryCredentialsVolume(run.Spec.Workspace.Repository.CredentialsSecretRef))
 		}
+		initContainers = buildInitContainers(run, input.Image, input.VCS, run.Spec.SecurityContext)
 		var err error
-		initContainers, err = BuildInitContainers(run, image, wsType, run.Spec.SecurityContext)
-		if err != nil {
-			return nil, err
-		}
-		mainContainers, err = BuildMainContainers(run, providerEnv, providerCliArgs, image, agentType, run.Spec.SecurityContext)
+		mainContainers, err = buildMainContainers(run, input.ProviderEnv, input.ProviderCliArgs, input.Image, input.Harness, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +159,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 		Spec: batchv1.JobSpec{
 			ActiveDeadlineSeconds:   &activeDeadlineSeconds,
 			BackoffLimit:            &backoffLimit,
-			TTLSecondsAfterFinished: resolveTTL(ttl),
+			TTLSecondsAfterFinished: resolveTTL(input.TTL, policy),
 			Template: corev1.PodTemplateSpec{
 				// Clone so the pod-template labels are independent of the Job's; a
 				// later mutation of one must not corrupt the other's identity/selector.
@@ -156,18 +184,18 @@ func BuildJob(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, provider
 }
 
 // BuildWorkspaceInitJob creates the Job that clones the repository into the
-// workspace PVC (run by the AgentWorkspace controller).
-func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string) (*batchv1.Job, error) {
+// workspace PVC (run by the AgentWorkspace controller). strategy is the VCS leaf
+// of the workspace type.
+func BuildWorkspaceInitJob(ws *agentv1alpha1.AgentWorkspace, pvcName, image string, runtimeClassName *string, strategy wsshared.VCSStrategy, policy JobPolicy) (*batchv1.Job, error) {
 	if runtimeClassName == nil || strings.TrimSpace(*runtimeClassName) == "" {
 		return nil, fmt.Errorf("workspace initialization requires a sandboxed runtimeClassName")
 	}
-	activeDeadlineSeconds := int64((10 * time.Minute).Seconds())
+	if policy.WorkspaceInitTimeout <= 0 {
+		return nil, fmt.Errorf("workspace initialization timeout must be greater than zero")
+	}
+	activeDeadlineSeconds := int64(math.Ceil(policy.WorkspaceInitTimeout.Seconds()))
 	backoffLimit := int32(0)
 
-	strategy, err := plugins.GetVCSStrategy(ws.Spec.Type)
-	if err != nil {
-		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", ws.Spec.Type, err)
-	}
 	script := wsshared.CloneScript(ws.Spec.Repository, strategy)
 
 	job := &batchv1.Job{

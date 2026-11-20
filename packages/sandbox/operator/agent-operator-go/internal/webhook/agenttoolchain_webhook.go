@@ -12,7 +12,15 @@ import (
 )
 
 // AgentToolchainWebhook implements validation for AgentToolchain
-type AgentToolchainWebhook struct{}
+type AgentToolchainWebhook struct {
+	catalog Catalog
+}
+
+// NewAgentToolchainWebhook returns the AgentToolchain webhook over the catalog
+// of registered toolchain types.
+func NewAgentToolchainWebhook(catalog Catalog) *AgentToolchainWebhook {
+	return &AgentToolchainWebhook{catalog: catalog}
+}
 
 var _ admission.Validator[*agentv1alpha1.AgentToolchain] = &AgentToolchainWebhook{}
 
@@ -35,10 +43,7 @@ func (w *AgentToolchainWebhook) ValidateDelete(_ context.Context, _ *agentv1alph
 }
 
 func (w *AgentToolchainWebhook) validate(tc *agentv1alpha1.AgentToolchain) (admission.Warnings, error) {
-	validTypes := map[agentv1alpha1.ToolchainType]bool{
-		agentv1alpha1.ToolchainTypeNix: true,
-	}
-	if tc.Spec.Type != "" && !validTypes[tc.Spec.Type] {
+	if tc.Spec.Type != "" && !w.catalog.HasToolchain(tc.Spec.Type) {
 		return nil, fmt.Errorf("invalid toolchain type: %s", tc.Spec.Type)
 	}
 

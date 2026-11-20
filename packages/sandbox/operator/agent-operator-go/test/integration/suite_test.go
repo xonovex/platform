@@ -20,8 +20,7 @@ import (
 	crwebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
-	agentwebhook "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/webhook"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/wiring"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
@@ -117,44 +116,11 @@ func TestMain(m *testing.M) {
 		panic("failed to create manager: " + err.Error())
 	}
 
-	if err := (&agentwebhook.AgentRunWebhook{Client: mgr.GetClient()}).SetupWebhookWithManager(mgr); err != nil {
-		panic("failed to setup AgentRun webhook: " + err.Error())
+	if err := wiring.SetupWebhooks(mgr); err != nil {
+		panic("failed to set up webhooks: " + err.Error())
 	}
-	if err := (&agentwebhook.AgentHarnessWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		panic("failed to setup AgentHarness webhook: " + err.Error())
-	}
-	if err := (&agentwebhook.AgentProviderWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		panic("failed to setup AgentProvider webhook: " + err.Error())
-	}
-	if err := (&agentwebhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		panic("failed to setup AgentToolchain webhook: " + err.Error())
-	}
-	if err := (&agentwebhook.AgentWorkspaceWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		panic("failed to setup AgentWorkspace webhook: " + err.Error())
-	}
-
-	if err := (&controller.AgentRunReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentrun-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentRun controller: " + err.Error())
-	}
-
-	if err := (&controller.AgentProviderReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentprovider-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentProvider controller: " + err.Error())
-	}
-
-	if err := (&controller.AgentWorkspaceReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agentworkspace-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		panic("failed to setup AgentWorkspace controller: " + err.Error())
+	if err := wiring.SetupControllers(mgr, wiring.DefaultConfig()); err != nil {
+		panic("failed to set up controllers: " + err.Error())
 	}
 
 	managerStopped := make(chan error, 1)

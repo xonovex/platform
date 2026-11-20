@@ -8,25 +8,28 @@ import (
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/resource"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	agentvalidation "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/validation"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
 )
 
 // AgentWorkspaceWebhook implements defaulting and validation for AgentWorkspace
 type AgentWorkspaceWebhook struct {
-	Client client.Client
+	policies PolicySource
+	catalog  Catalog
+}
+
+// NewAgentWorkspaceWebhook returns the AgentWorkspace webhook over its ports.
+func NewAgentWorkspaceWebhook(policies PolicySource, catalog Catalog) *AgentWorkspaceWebhook {
+	return &AgentWorkspaceWebhook{policies: policies, catalog: catalog}
 }
 
 var _ admission.Defaulter[*agentv1alpha1.AgentWorkspace] = &AgentWorkspaceWebhook{}
 var _ admission.Validator[*agentv1alpha1.AgentWorkspace] = &AgentWorkspaceWebhook{}
 
-// SetupWebhookWithManager sets up the webhook with the Manager
+// SetupWebhookWithManager registers the webhook with the Manager
 func (w *AgentWorkspaceWebhook) SetupWebhookWithManager(mgr ctrl.Manager) error {
-	w.Client = mgr.GetClient()
 	return ctrl.NewWebhookManagedBy(mgr, &agentv1alpha1.AgentWorkspace{}).
 		WithDefaulter(w).
 		WithValidator(w).
@@ -45,7 +48,7 @@ func (w *AgentWorkspaceWebhook) Default(ctx context.Context, ws *agentv1alpha1.A
 		}
 	}
 
-	policy, err := namespacePolicy(ctx, w.Client, ws.Namespace)
+	policy, err := namespacePolicy(ctx, w.policies, ws.Namespace)
 	if err != nil {
 		return err
 	}
@@ -86,7 +89,7 @@ func (w *AgentWorkspaceWebhook) validate(ctx context.Context, ws *agentv1alpha1.
 		return nil, err
 	}
 	if ws.Spec.Type != "" {
-		if _, err := plugins.GetVCSStrategy(ws.Spec.Type); err != nil {
+		if !w.catalog.HasWorkspace(ws.Spec.Type) {
 			return nil, fmt.Errorf("invalid workspace type: %s", ws.Spec.Type)
 		}
 	}
@@ -125,7 +128,7 @@ func (w *AgentWorkspaceWebhook) validate(ctx context.Context, ws *agentv1alpha1.
 		}
 	}
 
-	policy, err := namespacePolicy(ctx, w.Client, ws.Namespace)
+	policy, err := namespacePolicy(ctx, w.policies, ws.Namespace)
 	if err != nil {
 		return nil, err
 	}

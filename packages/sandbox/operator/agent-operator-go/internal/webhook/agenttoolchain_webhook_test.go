@@ -48,7 +48,7 @@ func TestAgentToolchainWebhook_ValidatesPinnedNixToolchain(t *testing.T) {
 			wantErr: true,
 		},
 	}
-	webhook := &AgentToolchainWebhook{}
+	webhook := NewAgentToolchainWebhook(testCatalog{})
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {

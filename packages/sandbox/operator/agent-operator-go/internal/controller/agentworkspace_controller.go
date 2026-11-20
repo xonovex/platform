@@ -3,38 +3,47 @@ package controller
 import (
 	"context"
 	"fmt"
-	"time"
 
 	batchv1 "k8s.io/api/batch/v1"
-	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/events"
-	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	agentvalidation "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/validation"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/network/shared"
-	wsshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
 // DefaultWorkspaceInitImage is pinned to the multi-architecture OCI index for
 // alpine/git 2.54.0. Operators may configure another digest-pinned image.
 const DefaultWorkspaceInitImage = "docker.io/alpine/git:2.54.1@sha256:2306e2b05ee0ef99f5d25b0779f645b24ae9f91ba187107503592fcdfe78da3a"
 
+// AgentWorkspaceDependencies are the ports and settings of the AgentWorkspace
+// reconciler. An empty WorkspaceInitImage selects DefaultWorkspaceInitImage.
+type AgentWorkspaceDependencies struct {
+	Store              WorkspaceStore
+	VCS                VCSResolver
+	Events             EventRecorder
+	Clock              Clock
+	JobPolicy          isoshared.JobPolicy
+	WorkspaceInitImage string
+}
+
 // AgentWorkspaceReconciler reconciles an AgentWorkspace object
 type AgentWorkspaceReconciler struct {
-	client.Client
-	Scheme             *runtime.Scheme
-	Recorder           events.EventRecorder
-	WorkspaceInitImage string
+	deps AgentWorkspaceDependencies
+}
+
+// NewAgentWorkspaceReconciler returns an AgentWorkspace reconciler over its
+// ports.
+func NewAgentWorkspaceReconciler(deps AgentWorkspaceDependencies) *AgentWorkspaceReconciler {
+	if deps.WorkspaceInitImage == "" {
+		deps.WorkspaceInitImage = DefaultWorkspaceInitImage
+	}
+	return &AgentWorkspaceReconciler{deps: deps}
 }
 
 // +kubebuilder:rbac:groups=agent.xonovex.com,resources=agentworkspaces,verbs=get;list;watch;create;update;patch;delete
@@ -46,209 +55,114 @@ type AgentWorkspaceReconciler struct {
 // +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete
 
 func (r *AgentWorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues(
-		"workspace", req.Name,
-		"namespace", req.Namespace,
-	)
+	logger := log.FromContext(ctx).WithValues("workspace", req.Name, "namespace", req.Namespace)
 
-	var ws agentv1alpha1.AgentWorkspace
-	if err := r.Get(ctx, req.NamespacedName, &ws); err != nil {
-		if errors.IsNotFound(err) {
+	workspace, err := r.deps.Store.GetAgentWorkspace(ctx, req.NamespacedName)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
 	}
-	if !ws.DeletionTimestamp.IsZero() {
+	if workspaceSettled(workspace) {
 		return ctrl.Result{}, nil
 	}
 
-	// Skip if already in terminal phase
-	if ws.Status.Phase == agentv1alpha1.AgentWorkspacePhaseReady ||
-		ws.Status.Phase == agentv1alpha1.AgentWorkspacePhaseFailed {
-		return ctrl.Result{}, nil
-	}
-
-	// 1. Create workspace PVC if needed
-	workspacePVCName := fmt.Sprintf("%s-ws", ws.Name)
-	if ws.Status.WorkspacePVC == "" {
-		pvc := wsshared.BuildWorkspacePVC(workspacePVCName, &ws)
-		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create workspace PVC")
-			return ctrl.Result{}, err
-		}
-
-		ws.Status.WorkspacePVC = workspacePVCName
-	}
-
-	// 2. Create shared volume PVCs if needed
-	if ws.Status.SharedVolumePVCs == nil {
-		ws.Status.SharedVolumePVCs = make(map[string]string)
-	}
-
-	for _, vol := range ws.Spec.SharedVolumes {
-		if _, exists := ws.Status.SharedVolumePVCs[vol.Name]; exists {
-			continue
-		}
-
-		sharedPVCName := fmt.Sprintf("%s-%s", ws.Name, vol.Name)
-		pvc := wsshared.BuildSharedVolumePVC(sharedPVCName, &ws, vol)
-		if err := r.Create(ctx, pvc); err != nil && !errors.IsAlreadyExists(err) {
-			log.Error(err, "failed to create shared volume PVC", "volume", vol.Name)
-			return ctrl.Result{}, err
-		}
-
-		ws.Status.SharedVolumePVCs[vol.Name] = sharedPVCName
-	}
-
-	// Update status to Pending after PVCs are created
-	if ws.Status.Phase == "" {
-		if _, err := r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhasePending, ""); err != nil {
+	claims, status := workspaceClaims(workspace)
+	for _, claim := range claims {
+		if err := ensureClaim(ctx, r.deps.Store, claim); err != nil {
+			logger.Error(err, "failed to create workspace PVC", "pvc", claim.Name)
 			return ctrl.Result{}, err
 		}
 	}
-	if err := ensureAgentServiceAccount(ctx, r.Client, ws.Namespace); err != nil {
+	workspace.Status = status
+	if workspace.Status.Phase == "" {
+		if _, err := r.setPhase(ctx, workspace, agentv1alpha1.AgentWorkspacePhasePending, ""); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+	if err := ensureAgentServiceAccount(ctx, r.deps.Store, workspace.Namespace); err != nil {
 		return ctrl.Result{}, fmt.Errorf("create workspace ServiceAccount: %w", err)
 	}
-	if err := r.ensureWorkspaceInitNetworkPolicy(ctx, &ws); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	// 3. Create init Job if needed
-	initJobName := fmt.Sprintf("%s-init", ws.Name)
-	if ws.Status.InitJobName == "" {
-		image := r.WorkspaceInitImage
-		if image == "" {
-			image = DefaultWorkspaceInitImage
-		}
-
-		job, err := isoshared.BuildWorkspaceInitJob(&ws, workspacePVCName, image, ws.Spec.RuntimeClassName)
-		if err != nil {
-			log.Error(err, "failed to build workspace init job")
-			return r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseFailed, fmt.Sprintf("WorkspaceInitBuildFailed: %v", err))
-		}
-		if err := ctrl.SetControllerReference(&ws, job, r.Scheme); err != nil {
-			return ctrl.Result{}, err
-		}
-
-		if err := r.Create(ctx, job); err != nil {
-			if !errors.IsAlreadyExists(err) {
-				log.Error(err, "failed to create workspace init job")
-				return ctrl.Result{}, err
-			}
-			var existing batchv1.Job
-			if err := r.Get(ctx, client.ObjectKeyFromObject(job), &existing); err != nil {
-				return ctrl.Result{}, fmt.Errorf("get existing workspace init Job: %w", err)
-			}
-			if err := verifyControlledResource(&ws, &existing, job.Spec, existing.Spec); err != nil {
-				return ctrl.Result{}, fmt.Errorf("existing workspace init Job %q: %w", job.Name, err)
-			}
-		} else {
-			repository, err := agentvalidation.ParseRepositoryURL(ws.Spec.Repository.URL)
-			if err != nil {
-				return r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseFailed, "WorkspaceRepositoryInvalid")
-			}
-			r.Recorder.Eventf(&ws, nil, corev1.EventTypeNormal, "WorkspaceInitStarted", "WorkspaceInitStarted",
-				"Created init Job %s to clone %s", initJobName, repository.Display())
-		}
-
-		ws.Status.InitJobName = initJobName
-		if _, err := r.updateWorkspacePhase(ctx, &ws, agentv1alpha1.AgentWorkspacePhaseInitializing, ""); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
-
-	// 4. Watch init Job status
-	var job batchv1.Job
-	if err := r.Get(ctx, types.NamespacedName{Name: initJobName, Namespace: ws.Namespace}, &job); err != nil {
-		if errors.IsNotFound(err) {
-			return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
-		}
-		return ctrl.Result{}, err
-	}
-
-	return r.reconcileInitJobStatus(ctx, &ws, &job)
-}
-
-func (r *AgentWorkspaceReconciler) ensureWorkspaceInitNetworkPolicy(ctx context.Context, workspace *agentv1alpha1.AgentWorkspace) error {
 	networkPolicy, err := netshared.BuildWorkspaceInitNetworkPolicy(workspace)
 	if err != nil {
-		return fmt.Errorf("build workspace NetworkPolicy: %w", err)
+		return ctrl.Result{}, fmt.Errorf("build workspace NetworkPolicy: %w", err)
 	}
-	if err := ctrl.SetControllerReference(workspace, networkPolicy, r.Scheme); err != nil {
-		return err
-	}
-	if err := r.Create(ctx, networkPolicy); err != nil {
-		if !errors.IsAlreadyExists(err) {
-			return fmt.Errorf("create workspace NetworkPolicy: %w", err)
-		}
-		var existing networkingv1.NetworkPolicy
-		if err := r.Get(ctx, client.ObjectKeyFromObject(networkPolicy), &existing); err != nil {
-			return fmt.Errorf("get existing workspace NetworkPolicy: %w", err)
-		}
-		if err := verifyControlledResource(workspace, &existing, networkPolicy.Spec, existing.Spec); err != nil {
-			return fmt.Errorf("existing NetworkPolicy %q: %w", networkPolicy.Name, err)
-		}
-	}
-	return nil
-}
-
-func (r *AgentWorkspaceReconciler) reconcileInitJobStatus(ctx context.Context, ws *agentv1alpha1.AgentWorkspace, job *batchv1.Job) (ctrl.Result, error) {
-	for _, condition := range job.Status.Conditions {
-		if condition.Type == batchv1.JobComplete && condition.Status == corev1.ConditionTrue {
-			r.Recorder.Eventf(ws, nil, corev1.EventTypeNormal, "WorkspaceReady", "WorkspaceReady",
-				"Repository cloned successfully, workspace is ready")
-			return r.updateWorkspacePhase(ctx, ws, agentv1alpha1.AgentWorkspacePhaseReady, "")
-		}
-		if condition.Type == batchv1.JobFailed && condition.Status == corev1.ConditionTrue {
-			r.Recorder.Eventf(ws, nil, corev1.EventTypeWarning, "WorkspaceFailed", "WorkspaceFailed",
-				"Init Job failed: %s", condition.Message)
-			return r.updateWorkspacePhase(ctx, ws, agentv1alpha1.AgentWorkspacePhaseFailed, condition.Message)
-		}
-	}
-
-	return ctrl.Result{RequeueAfter: 5 * time.Second}, nil
-}
-
-func (r *AgentWorkspaceReconciler) updateWorkspacePhase(ctx context.Context, ws *agentv1alpha1.AgentWorkspace, phase agentv1alpha1.AgentWorkspacePhase, message string) (ctrl.Result, error) {
-	ws.Status.Phase = phase
-
-	if message != "" {
-		condition := metav1.Condition{
-			Type:               string(phase),
-			Status:             metav1.ConditionTrue,
-			LastTransitionTime: metav1.Now(),
-			Reason:             string(phase),
-			Message:            message,
-		}
-		ws.Status.Conditions = append(ws.Status.Conditions, condition)
-	}
-
-	if err := r.updateWorkspaceStatus(ctx, ws); err != nil {
+	setController(workspace, agentWorkspaceKind, networkPolicy)
+	if _, err := ensureNetworkPolicy(ctx, r.deps.Store, workspace, agentWorkspaceKind, networkPolicy); err != nil {
 		return ctrl.Result{}, err
 	}
-	return ctrl.Result{}, nil
-}
 
-func (r *AgentWorkspaceReconciler) updateWorkspaceStatus(ctx context.Context, workspace *agentv1alpha1.AgentWorkspace) error {
-	desired := workspace.DeepCopy().Status
-	key := client.ObjectKeyFromObject(workspace)
-	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		var current agentv1alpha1.AgentWorkspace
-		if err := r.Get(ctx, key, &current); err != nil {
-			if errors.IsNotFound(err) {
-				return nil
+	if workspace.Status.InitJobName == "" {
+		job, err := r.buildInitJob(workspace)
+		if err != nil {
+			logger.Error(err, "failed to build workspace init job")
+			return r.setPhase(ctx, workspace, agentv1alpha1.AgentWorkspacePhaseFailed, fmt.Sprintf("WorkspaceInitBuildFailed: %v", err))
+		}
+		created, err := ensureJob(ctx, r.deps.Store, workspace, agentWorkspaceKind, job)
+		if err != nil {
+			logger.Error(err, "failed to create workspace init job")
+			return ctrl.Result{}, err
+		}
+		if created {
+			repository, err := agentvalidation.ParseRepositoryURL(workspace.Spec.Repository.URL)
+			if err != nil {
+				return r.setPhase(ctx, workspace, agentv1alpha1.AgentWorkspacePhaseFailed, "WorkspaceRepositoryInvalid")
 			}
-			return err
+			r.record(workspace, normalEvent("WorkspaceInitStarted",
+				fmt.Sprintf("Created init Job %s to clone %s", job.Name, repository.Display())))
 		}
-		current.Status = desired
-		if err := r.Status().Update(ctx, &current); err != nil {
-			return err
+		workspace.Status.InitJobName = job.Name
+		if _, err := r.setPhase(ctx, workspace, agentv1alpha1.AgentWorkspacePhaseInitializing, ""); err != nil {
+			return ctrl.Result{}, err
 		}
-		*workspace = current
-		return nil
-	})
+	}
+
+	job, err := r.deps.Store.GetJob(ctx, types.NamespacedName{Namespace: workspace.Namespace, Name: workspaceInitJobName(workspace)})
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{RequeueAfter: pendingRequeue}, nil
+		}
+		return ctrl.Result{}, err
+	}
+	observation := observeInitJob(workspace, job, r.deps.Clock.Now())
+	if observation.write {
+		workspace.Status = observation.status
+		if err := r.deps.Store.UpdateAgentWorkspaceStatus(ctx, workspace); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+	for _, e := range observation.events {
+		r.record(workspace, e)
+	}
+	return observation.result, nil
 }
 
+// buildInitJob resolves the VCS leaf of the workspace and builds its init Job.
+func (r *AgentWorkspaceReconciler) buildInitJob(workspace *agentv1alpha1.AgentWorkspace) (*batchv1.Job, error) {
+	vcs, err := r.deps.VCS.ResolveVCSStrategy(workspace.Spec.Type)
+	if err != nil {
+		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", workspace.Spec.Type, err)
+	}
+	job, err := isoshared.BuildWorkspaceInitJob(workspace, workspacePVCName(workspace), r.deps.WorkspaceInitImage,
+		workspace.Spec.RuntimeClassName, vcs, r.deps.JobPolicy)
+	if err != nil {
+		return nil, err
+	}
+	setController(workspace, agentWorkspaceKind, job)
+	return job, nil
+}
+
+func (r *AgentWorkspaceReconciler) setPhase(ctx context.Context, workspace *agentv1alpha1.AgentWorkspace, phase agentv1alpha1.AgentWorkspacePhase, message string) (ctrl.Result, error) {
+	workspace.Status = withWorkspacePhase(workspace.Status, phase, message, r.deps.Clock.Now())
+	return ctrl.Result{}, r.deps.Store.UpdateAgentWorkspaceStatus(ctx, workspace)
+}
+
+func (r *AgentWorkspaceReconciler) record(workspace *agentv1alpha1.AgentWorkspace, e event) {
+	r.deps.Events.Record(workspace, e.eventType, e.reason, e.message)
+}
+
+// SetupWithManager registers the reconciler with the manager.
 func (r *AgentWorkspaceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.AgentWorkspace{}).

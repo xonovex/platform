@@ -7,22 +7,10 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
-
-func newScheme() *runtime.Scheme {
-	s := runtime.NewScheme()
-	if err := corev1.AddToScheme(s); err != nil {
-		panic(err)
-	}
-	if err := agentv1alpha1.AddToScheme(s); err != nil {
-		panic(err)
-	}
-	return s
-}
 
 func lookupEnvVar(env []corev1.EnvVar, name string) (corev1.EnvVar, bool) {
 	for _, variable := range env {
@@ -49,7 +37,7 @@ func envValue(t testing.TB, env []corev1.EnvVar, name string) string {
 }
 
 func TestResolveProvider_NoProvider(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -65,7 +53,7 @@ func TestResolveProvider_NoProvider(t *testing.T) {
 }
 
 func TestResolveProvider_InlineProvider(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -99,7 +87,7 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret).Build()
+	c := testutil.NewMemoryStore(secret)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -136,7 +124,7 @@ func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
 		ObjectMeta: metav1.ObjectMeta{Name: "api-key", Namespace: "default"},
 		Data:       map[string][]byte{"token": []byte(secretValue)},
 	}
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret).Build()
+	c := testutil.NewMemoryStore(secret)
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{
@@ -169,7 +157,7 @@ func TestResolveProvider_ProviderRef(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -208,7 +196,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret, provider).Build()
+	c := testutil.NewMemoryStore(secret, provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -231,7 +219,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 }
 
 func TestResolveProvider_ProviderRefNotFound(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -261,7 +249,7 @@ func TestResolveProvider_SecretNotFound(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -297,7 +285,7 @@ func TestResolveProvider_SecretMissingKey(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret, provider).Build()
+	c := testutil.NewMemoryStore(secret, provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -322,7 +310,7 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -345,7 +333,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -374,7 +362,7 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -407,7 +395,7 @@ func TestResolveProvider_UnknownPresetReturnsError(t *testing.T) {
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -422,7 +410,7 @@ func TestResolveProvider_UnknownPresetReturnsError(t *testing.T) {
 }
 
 func TestResolveProvider_InlinePresetRef(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -469,7 +457,7 @@ func TestResolveProvider_InjectsAuthTokenIntoExplicitDestinationWithoutBaseURL(t
 		},
 	}
 
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(secret, provider).Build()
+	c := testutil.NewMemoryStore(secret, provider)
 
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
@@ -497,7 +485,7 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 			CliArgs:   []string{"--model", "custom/model"},
 		},
 	}
-	c := fake.NewClientBuilder().WithScheme(newScheme()).WithObjects(provider).Build()
+	c := testutil.NewMemoryStore(provider)
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec:       agentv1alpha1.AgentRunSpec{ProviderRef: provider.Name},
@@ -515,7 +503,7 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 }
 
 func TestResolveProvider_InlinePresetContributesCliArgs(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newScheme()).Build()
+	c := testutil.NewMemoryStore()
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
 		Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{

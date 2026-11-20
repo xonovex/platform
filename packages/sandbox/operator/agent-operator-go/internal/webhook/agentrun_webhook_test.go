@@ -9,16 +9,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 const testNixRevision = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 func TestAgentRunWebhook_Default_SetsTimeout(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{},
 	}
@@ -36,7 +34,7 @@ func TestAgentRunWebhook_Default_SetsTimeout(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Default_PreservesExistingValues(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	customTimeout := metav1.Duration{Duration: 30 * time.Minute}
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
@@ -64,7 +62,7 @@ func sandboxedAgentRunWebhook(namespaces ...string) *AgentRunWebhook {
 			AllowedRuntimeClassNames: []string{"kata"},
 		}},
 	}
-	return &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+	return runWebhookWith(policy)
 }
 
 func TestAgentRunWebhook_Validate_ValidStandalone(t *testing.T) {
@@ -133,7 +131,7 @@ func TestAgentRunWebhook_Default_AppliesInlineHarnessExecutionDefaults(t *testin
 		DefaultRuntimeClassName: &runtimeClassName,
 	}}}
 
-	if err := (&AgentRunWebhook{}).Default(context.Background(), run); err != nil {
+	if err := runWebhookWith().Default(context.Background(), run); err != nil {
 		t.Fatalf("Default() error = %v", err)
 	}
 
@@ -157,7 +155,7 @@ func TestAgentRunWebhook_Default_SnapshotsReferencedToolchain(t *testing.T) {
 			},
 		},
 	}
-	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(toolchain).Build()}
+	w := runWebhookWith(toolchain)
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "test"},
 		Spec:       agentv1alpha1.AgentRunSpec{ToolchainRef: toolchain.Name},
@@ -197,7 +195,7 @@ func TestAgentRunWebhook_Default_SnapshotsReferencedHarnessAndProvider(t *testin
 			AuthTokenSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
 		},
 	}
-	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(harness, provider).Build()}
+	w := runWebhookWith(harness, provider)
 	run := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Namespace: "test"},
 		Spec:       agentv1alpha1.AgentRunSpec{HarnessRef: harness.Name},
@@ -271,7 +269,7 @@ func TestAgentRunWebhook_Validate_AllowsPolicyApprovedSecret(t *testing.T) {
 	policy := basePolicy()
 	policy.ObjectMeta = metav1.ObjectMeta{Name: "sandbox-policy", Namespace: "test-ns"}
 	policy.Spec.Enforced.AllowedSecretNames = []string{"provider-auth"}
-	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(testutil.NewScheme()).WithObjects(policy).Build()}
+	w := runWebhookWith(policy)
 	run := baseRun()
 	run.Spec.Provider = &agentv1alpha1.ProviderSpec{
 		AuthSecretRef: &agentv1alpha1.SecretKeyRef{Name: "provider-auth", Key: "token"},
@@ -385,7 +383,7 @@ func TestAgentRunWebhook_Validate_InvalidInlineWorkspaceStorageSize(t *testing.T
 	run := baseRun()
 	run.Spec.Workspace.StorageSize = "not-a-quantity"
 
-	_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+	_, err := runWebhookWith().ValidateCreate(context.Background(), run)
 	if err == nil || !strings.Contains(err.Error(), "storageSize") {
 		t.Fatalf("ValidateCreate() error = %v, want storageSize validation error", err)
 	}
@@ -395,7 +393,7 @@ func TestAgentRunWebhook_Validate_ProxyFailsClosed(t *testing.T) {
 	run := baseRun()
 	run.Spec.Network = agentv1alpha1.NetworkModeProxy
 
-	_, err := (&AgentRunWebhook{}).ValidateCreate(context.Background(), run)
+	_, err := runWebhookWith().ValidateCreate(context.Background(), run)
 	if err == nil || !strings.Contains(err.Error(), "network=proxy") {
 		t.Fatalf("ValidateCreate() error = %v, want unavailable proxy error", err)
 	}
@@ -441,10 +439,7 @@ func TestAgentRunWebhook_Validate_ReferencedHarnessDefaultsCannotBypassPolicy(t 
 			test.mutate(harness)
 			policy := basePolicy()
 			policy.ObjectMeta = metav1.ObjectMeta{Name: "sandbox-policy", Namespace: "test-ns"}
-			webhook := &AgentRunWebhook{Client: fake.NewClientBuilder().
-				WithScheme(testutil.NewScheme()).
-				WithObjects(harness, policy).
-				Build()}
+			webhook := runWebhookWith(harness, policy)
 			run := baseRun()
 			run.Spec.HarnessRef = harness.Name
 			run.Spec.Image = ""
@@ -536,7 +531,7 @@ func TestAgentRunWebhook_RejectsUnknownInlineProviderPreset(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_BothToolchainRefAndInline(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			ToolchainRef: "my-toolchain",
@@ -558,7 +553,7 @@ func TestAgentRunWebhook_Validate_BothToolchainRefAndInline(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_InvalidAgentType(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Harness: &agentv1alpha1.AgentSpec{
@@ -603,7 +598,7 @@ func TestAgentRunWebhook_Validate_ValidAgentType(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_InvalidWorkspaceType(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{
@@ -644,7 +639,7 @@ func TestAgentRunWebhook_Validate_ValidWorkspaceTypeJujutsu(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_InvalidToolchainType(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Toolchain: &agentv1alpha1.ToolchainSpec{
@@ -694,7 +689,7 @@ func TestAgentRunWebhook_ValidateUpdate(t *testing.T) {
 }
 
 func TestAgentRunWebhook_ValidateUpdateRejectsExecutionMutation(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	oldRun := baseRun()
 	newRun := oldRun.DeepCopy()
 	newRun.Spec.Prompt = "changed after execution started"
@@ -705,7 +700,7 @@ func TestAgentRunWebhook_ValidateUpdateRejectsExecutionMutation(t *testing.T) {
 }
 
 func TestAgentRunWebhook_ValidateDelete(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{}
 
 	_, err := w.ValidateDelete(context.Background(), run)
@@ -715,7 +710,7 @@ func TestAgentRunWebhook_ValidateDelete(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_MaliciousURL(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{
@@ -733,7 +728,7 @@ func TestAgentRunWebhook_Validate_MaliciousURL(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_MaliciousBranch(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{
@@ -752,7 +747,7 @@ func TestAgentRunWebhook_Validate_MaliciousBranch(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_MaliciousCommit(t *testing.T) {
-	w := &AgentRunWebhook{}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{

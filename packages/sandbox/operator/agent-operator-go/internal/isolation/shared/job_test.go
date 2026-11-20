@@ -26,7 +26,7 @@ func TestBuildJob_Basic(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "test-pvc", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "test-pvc", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if job.Name != "test-run" {
 		t.Errorf("job name = %q, want %q", job.Name, "test-run")
@@ -71,7 +71,7 @@ func TestBuildJob_CustomTimeout(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", 30*time.Minute, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", 30*time.Minute, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	expected := int64(1800)
 	if *job.Spec.ActiveDeadlineSeconds != expected {
@@ -89,7 +89,7 @@ func TestBuildJob_CustomImage(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "custom-image:latest", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "custom-image:latest", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	initImage := job.Spec.Template.Spec.InitContainers[0].Image
 	if initImage != "custom-image:latest" {
@@ -121,7 +121,7 @@ func TestBuildJob_WithResources(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	resources := job.Spec.Template.Spec.Containers[0].Resources
 	if resources.Requests.Cpu().String() != "500m" {
@@ -149,7 +149,7 @@ func TestBuildJob_NodeSelectorAndTolerations(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	podSpec := job.Spec.Template.Spec
 	if podSpec.NodeSelector["gpu"] != "true" {
@@ -175,7 +175,7 @@ func TestBuildJob_WithRuntimeClassName(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName == nil {
 		t.Fatal("expected RuntimeClassName to be set")
@@ -195,7 +195,7 @@ func TestBuildJob_WithoutRuntimeClassName(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if job.Spec.Template.Spec.RuntimeClassName != nil {
 		t.Errorf("expected RuntimeClassName to be nil, got %q", *job.Spec.Template.Spec.RuntimeClassName)
@@ -212,16 +212,7 @@ func TestBuildJob_WithNixImage(t *testing.T) {
 		},
 	}
 
-	tc := &agentv1alpha1.ToolchainSpec{
-		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix: &agentv1alpha1.NixSpec{
-			NixpkgsRev: "abc123",
-			Packages:   []string{"nodejs_22", "python3"},
-			Image:      "ghcr.io/xonovex/agent@sha256:abc",
-		},
-	}
-
-	job := mustBuildJob(t, run, nil, "pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, tc, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 	podSpec := job.Spec.Template.Spec
 
 	// Image-based nix: NO nix-env init container or volume (per-pod install gone).
@@ -269,7 +260,7 @@ func TestBuildJob_AllImagesReceiveWritableHome(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if len(job.Spec.Template.Spec.Volumes) != 3 {
 		t.Errorf("len(Volumes) = %d, want 3 (workspace + tmp + home)", len(job.Spec.Template.Spec.Volumes))
@@ -288,7 +279,7 @@ func TestBuildJob_RejectsNonPositiveTimeout(t *testing.T) {
 		}},
 	}
 
-	_, err := BuildJob(run, nil, nil, "pvc", "image", 0, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
+	_, err := BuildJob(run, RunJob{PVCName: "pvc", Image: "image", AgentType: agentv1alpha1.AgentTypeClaude, Harness: stubHarness{}, VCS: stubVCS{}}, DefaultJobPolicy())
 
 	if err == nil {
 		t.Fatal("BuildJob() error = nil, want non-positive timeout error")
@@ -303,7 +294,7 @@ func TestBuildJob_RoundsSubsecondTimeoutUp(t *testing.T) {
 		}},
 	}
 
-	job, err := BuildJob(run, nil, nil, "pvc", "image", time.Millisecond, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
+	job, err := BuildJob(run, RunJob{PVCName: "pvc", Image: "image", Timeout: time.Millisecond, AgentType: agentv1alpha1.AgentTypeClaude, Harness: stubHarness{}, VCS: stubVCS{}}, DefaultJobPolicy())
 
 	if err != nil {
 		t.Fatalf("BuildJob() error = %v", err)
@@ -324,7 +315,7 @@ func TestBuildJob_MountsRepositoryCredentialsOnlyInCloneContainer(t *testing.T) 
 		}},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	foundVolume := false
 	for _, volume := range job.Spec.Template.Spec.Volumes {
@@ -361,7 +352,7 @@ func TestBuildJob_Labels(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeOpencode, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeOpencode, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	expectedLabels := map[string]string{
 		"app.kubernetes.io/name":       "agent-operator",
@@ -389,7 +380,7 @@ func TestBuildJob_PodSecurityContext(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	psc := job.Spec.Template.Spec.SecurityContext
 	if psc == nil {
@@ -413,7 +404,7 @@ func TestBuildJob_TmpVolume(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	foundTmp := false
 	for _, v := range job.Spec.Template.Spec.Volumes {
@@ -436,7 +427,7 @@ func TestBuildJob_ContainerSecurityContext(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	// Check main container
 	mainSC := job.Spec.Template.Spec.Containers[0].SecurityContext
@@ -467,7 +458,7 @@ func TestBuildJob_DefaultTTL(t *testing.T) {
 		},
 	}
 
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil)
 
 	if job.Spec.TTLSecondsAfterFinished == nil {
 		t.Fatal("TTLSecondsAfterFinished should not be nil")
@@ -488,7 +479,7 @@ func TestBuildJob_ExplicitTTL(t *testing.T) {
 	}
 
 	ttl := int32(0)
-	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, &ttl, nil)
+	job := mustBuildJob(t, run, nil, "pvc", "image", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, &ttl, nil)
 
 	if job.Spec.TTLSecondsAfterFinished == nil {
 		t.Fatal("TTLSecondsAfterFinished should not be nil")

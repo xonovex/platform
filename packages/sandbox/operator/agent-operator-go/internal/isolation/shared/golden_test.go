@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"embed"
 	"flag"
 	"os"
 	"path/filepath"
@@ -15,6 +16,12 @@ import (
 )
 
 var updateGolden = flag.Bool("update-golden", false, "regenerate pod-spec golden files")
+
+// goldenFiles holds the goldens in the test binary, so a normal run reads no
+// file; only -update-golden writes to testdata.
+//
+//go:embed testdata/*.golden.yaml
+var goldenFiles embed.FS
 
 // goldenJobs returns representative Jobs whose full serialized pod spec is frozen
 // in testdata/*.golden.yaml. The goldens were generated from the post-merge
@@ -35,19 +42,14 @@ func goldenJobs(t *testing.T) map[string]*batchv1.Job {
 		ObjectMeta: metav1.ObjectMeta{Name: "golden-ws-run", Namespace: "default"},
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
 	}
-	nixTC := &agentv1alpha1.ToolchainSpec{
-		Type: agentv1alpha1.ToolchainTypeNix,
-		Nix:  &agentv1alpha1.NixSpec{NixpkgsRev: "abc123", Packages: []string{"nodejs_22"}, Image: "ghcr.io/xonovex/agent@sha256:abc"},
-	}
-
 	return map[string]*batchv1.Job{
 		"standalone-claude-git": mustBuildJob(t, stdRun(), nil, "golden-pvc", "node:trixie-slim", time.Hour,
-			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, nil),
+			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil),
 		"workspace-git": mustBuildJob(t, wsRun, nil, "my-workspace-ws", "node:trixie-slim", time.Hour,
-			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil,
+			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil,
 			&WorkspaceBinding{WorktreeBranch: "feature", WorkspaceRef: "my-workspace"}),
 		"nix-image": mustBuildJob(t, stdRun(), nil, "golden-pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour,
-			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nixTC, nil, nil),
+			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil),
 	}
 }
 
@@ -57,19 +59,19 @@ func TestBuildJobGolden(t *testing.T) {
 		if err != nil {
 			t.Fatalf("marshal %s: %v", name, err)
 		}
-		path := filepath.Join("testdata", name+".golden.yaml")
+		path := "testdata/" + name + ".golden.yaml"
 
 		if *updateGolden {
 			if err := os.MkdirAll("testdata", 0o755); err != nil {
 				t.Fatal(err)
 			}
-			if err := os.WriteFile(path, got, 0o644); err != nil {
+			if err := os.WriteFile(filepath.FromSlash(path), got, 0o644); err != nil {
 				t.Fatal(err)
 			}
 			continue
 		}
 
-		want, err := os.ReadFile(path)
+		want, err := goldenFiles.ReadFile(path)
 		if err != nil {
 			t.Fatalf("read golden %s (run with -update-golden to generate): %v", path, err)
 		}

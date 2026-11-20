@@ -2,16 +2,14 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/equality"
-	"k8s.io/apimachinery/pkg/api/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/tools/events"
-	"k8s.io/client-go/util/retry"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -21,22 +19,28 @@ import (
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
+// AgentProviderDependencies are the ports of the AgentProvider reconciler.
+type AgentProviderDependencies struct {
+	Store  ProviderStore
+	Events EventRecorder
+	Clock  Clock
+}
+
 // AgentProviderReconciler reconciles an AgentProvider object
 type AgentProviderReconciler struct {
-	client.Client
-	Scheme   *runtime.Scheme
-	Recorder events.EventRecorder
+	deps AgentProviderDependencies
+}
+
+// NewAgentProviderReconciler returns an AgentProvider reconciler over its
+// ports.
+func NewAgentProviderReconciler(deps AgentProviderDependencies) *AgentProviderReconciler {
+	return &AgentProviderReconciler{deps: deps}
 }
 
 func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := log.FromContext(ctx).WithValues(
-		"provider", req.Name,
-		"namespace", req.Namespace,
-	)
-
-	var provider agentv1alpha1.AgentProvider
-	if err := r.Get(ctx, req.NamespacedName, &provider); err != nil {
-		if errors.IsNotFound(err) {
+	provider, err := r.deps.Store.GetAgentProvider(ctx, req.NamespacedName)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
 		return ctrl.Result{}, err
@@ -45,26 +49,35 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return ctrl.Result{}, nil
 	}
 
-	ready := true
-	if provider.Spec.AuthTokenSecretRef != nil {
-		var secret corev1.Secret
-		secretName := types.NamespacedName{
-			Name:      provider.Spec.AuthTokenSecretRef.Name,
-			Namespace: provider.Namespace,
+	var secret *corev1.Secret
+	if ref := provider.Spec.AuthTokenSecretRef; ref != nil {
+		secret, err = r.deps.Store.GetSecret(ctx, types.NamespacedName{Namespace: provider.Namespace, Name: ref.Name})
+		if err != nil && !apierrors.IsNotFound(err) {
+			return ctrl.Result{}, err
 		}
-		if err := r.Get(ctx, secretName, &secret); err != nil {
-			if errors.IsNotFound(err) {
-				ready = false
-				log.Info("referenced secret not found", "secret", secretName)
-			} else {
-				return ctrl.Result{}, err
-			}
-		} else {
-			if _, ok := secret.Data[provider.Spec.AuthTokenSecretRef.Key]; !ok {
-				ready = false
-				log.Info("key not found in secret", "secret", secretName, "key", provider.Spec.AuthTokenSecretRef.Key)
-			}
-		}
+	}
+
+	desired, transition := decideProviderStatus(provider, secret, r.deps.Clock.Now())
+	if !desired.Status.Ready {
+		log.FromContext(ctx).Info("referenced secret or key not found", "provider", req.NamespacedName)
+	}
+	if err := r.deps.Store.UpdateAgentProviderStatus(ctx, desired); err != nil {
+		return ctrl.Result{}, err
+	}
+	if transition != nil {
+		r.deps.Events.Record(desired, transition.eventType, transition.reason, transition.message)
+	}
+	return ctrl.Result{}, nil
+}
+
+// decideProviderStatus returns the provider with the Ready status that secret
+// decides, and the event to record when readiness of a secret-backed provider
+// changes. A nil secret means the referenced Secret does not exist.
+func decideProviderStatus(provider *agentv1alpha1.AgentProvider, secret *corev1.Secret, now time.Time) (*agentv1alpha1.AgentProvider, *event) {
+	ref := provider.Spec.AuthTokenSecretRef
+	ready := ref == nil
+	if ref != nil && secret != nil {
+		_, ready = secret.Data[ref.Key]
 	}
 
 	conditionStatus := metav1.ConditionFalse
@@ -74,66 +87,41 @@ func (r *AgentProviderReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		message = "Provider is ready"
 	}
 	previous := meta.FindStatusCondition(provider.Status.Conditions, "Ready")
-	reportTransition := provider.Spec.AuthTokenSecretRef != nil &&
-		(previous == nil || previous.Status != conditionStatus || previous.ObservedGeneration != provider.Generation)
+	changed := previous == nil || previous.Status != conditionStatus || previous.ObservedGeneration != provider.Generation
 
 	desired := provider.DeepCopy()
 	desired.Status.Ready = ready
-	condition := metav1.Condition{
+	meta.SetStatusCondition(&desired.Status.Conditions, metav1.Condition{
 		Type:               "Ready",
 		Status:             conditionStatus,
 		ObservedGeneration: provider.Generation,
+		LastTransitionTime: metav1.NewTime(now),
 		Reason:             "SecretValidation",
 		Message:            message,
-	}
-	meta.SetStatusCondition(&desired.Status.Conditions, condition)
-
-	if err := r.updateProviderStatus(ctx, desired); err != nil {
-		return ctrl.Result{}, err
-	}
-	if reportTransition {
-		r.recordSecretTransition(desired, ready)
-	}
-
-	return ctrl.Result{}, nil
-}
-
-func (r *AgentProviderReconciler) recordSecretTransition(provider *agentv1alpha1.AgentProvider, ready bool) {
-	if r.Recorder == nil || provider.Spec.AuthTokenSecretRef == nil {
-		return
-	}
-	ref := provider.Spec.AuthTokenSecretRef
-	if ready {
-		r.Recorder.Eventf(provider, nil, corev1.EventTypeNormal, "ProviderSecretResolved", "ProviderSecretResolved",
-			"Secret %s key %s resolved successfully", ref.Name, ref.Key)
-		return
-	}
-	r.Recorder.Eventf(provider, nil, corev1.EventTypeWarning, "ProviderSecretMissing", "ProviderSecretMissing",
-		"Secret %s not found or key %s missing", ref.Name, ref.Key)
-}
-
-func (r *AgentProviderReconciler) updateProviderStatus(ctx context.Context, provider *agentv1alpha1.AgentProvider) error {
-	desired := provider.DeepCopy().Status
-	key := client.ObjectKeyFromObject(provider)
-	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		var current agentv1alpha1.AgentProvider
-		if err := r.Get(ctx, key, &current); err != nil {
-			if errors.IsNotFound(err) {
-				return nil
-			}
-			return err
-		}
-		if equality.Semantic.DeepEqual(current.Status, desired) {
-			*provider = current
-			return nil
-		}
-		current.Status = desired
-		if err := r.Status().Update(ctx, &current); err != nil {
-			return err
-		}
-		*provider = current
-		return nil
 	})
+
+	if ref == nil || !changed {
+		return desired, nil
+	}
+	if ready {
+		resolved := normalEvent("ProviderSecretResolved", fmt.Sprintf("Secret %s key %s resolved successfully", ref.Name, ref.Key))
+		return desired, &resolved
+	}
+	missing := warningEvent("ProviderSecretMissing", fmt.Sprintf("Secret %s not found or key %s missing", ref.Name, ref.Key))
+	return desired, &missing
+}
+
+// providersReferencingSecret returns a reconcile request for each provider
+// whose auth token names the Secret.
+func providersReferencingSecret(providers []agentv1alpha1.AgentProvider, secretName string) []reconcile.Request {
+	requests := make([]reconcile.Request, 0)
+	for index := range providers {
+		provider := &providers[index]
+		if provider.Spec.AuthTokenSecretRef != nil && provider.Spec.AuthTokenSecretRef.Name == secretName {
+			requests = append(requests, reconcile.Request{NamespacedName: keyOf(provider)})
+		}
+	}
+	return requests
 }
 
 func (r *AgentProviderReconciler) providersForSecret(ctx context.Context, object client.Object) []reconcile.Request {
@@ -141,23 +129,15 @@ func (r *AgentProviderReconciler) providersForSecret(ctx context.Context, object
 	if !ok {
 		return nil
 	}
-
-	var providers agentv1alpha1.AgentProviderList
-	if err := r.List(ctx, &providers, client.InNamespace(secret.Namespace)); err != nil {
-		log.FromContext(ctx).Error(err, "list providers for secret", "secret", client.ObjectKeyFromObject(secret))
+	providers, err := r.deps.Store.ListAgentProviders(ctx, secret.Namespace)
+	if err != nil {
+		log.FromContext(ctx).Error(err, "list providers for secret", "secret", keyOf(secret))
 		return nil
 	}
-
-	requests := make([]reconcile.Request, 0)
-	for i := range providers.Items {
-		provider := &providers.Items[i]
-		if provider.Spec.AuthTokenSecretRef != nil && provider.Spec.AuthTokenSecretRef.Name == secret.Name {
-			requests = append(requests, reconcile.Request{NamespacedName: client.ObjectKeyFromObject(provider)})
-		}
-	}
-	return requests
+	return providersReferencingSecret(providers, secret.Name)
 }
 
+// SetupWithManager registers the reconciler with the manager.
 func (r *AgentProviderReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&agentv1alpha1.AgentProvider{}).

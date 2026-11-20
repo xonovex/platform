@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
@@ -13,10 +11,7 @@ import (
 func TestResolveHarness_InlineSpecTakesPriorityOverRef(t *testing.T) {
 	stored := testutil.NewAgentHarness("default", "stored",
 		testutil.WithDefaultImage("stored-image"))
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 	inline := &agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeOpencode}
 
 	harness, err := ResolveHarness(context.Background(), c, "default", "stored", inline)
@@ -39,10 +34,7 @@ func TestResolveHarness_InlineSpecTakesPriorityOverRef(t *testing.T) {
 func TestResolveHarness_ResolvesAReference(t *testing.T) {
 	stored := testutil.NewAgentHarness("default", "stored",
 		testutil.WithDefaultImage("stored-image"))
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 
 	harness, err := ResolveHarness(context.Background(), c, "default", "stored", nil)
 
@@ -60,7 +52,7 @@ func TestResolveHarness_ResolvesAReference(t *testing.T) {
 // Neither an inline spec nor a reference means the run carries no harness, which
 // is a valid state rather than an error.
 func TestResolveHarness_ReturnsNothingWithoutInlineOrRef(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	harness, err := ResolveHarness(context.Background(), c, "default", "", nil)
 
@@ -73,7 +65,7 @@ func TestResolveHarness_ReturnsNothingWithoutInlineOrRef(t *testing.T) {
 }
 
 func TestResolveHarness_PropagatesAMissingReference(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(testutil.NewScheme()).Build()
+	c := testutil.NewMemoryStore()
 
 	harness, err := ResolveHarness(context.Background(), c, "default", "absent", nil)
 
@@ -90,10 +82,7 @@ func TestResolveHarness_PropagatesAMissingReference(t *testing.T) {
 func TestResolveHarness_DoesNotCrossNamespaces(t *testing.T) {
 	stored := testutil.NewAgentHarness("other", "stored",
 		testutil.WithDefaultImage("stored-image"))
-	c := fake.NewClientBuilder().
-		WithScheme(testutil.NewScheme()).
-		WithObjects(stored).
-		Build()
+	c := testutil.NewMemoryStore(stored)
 
 	if _, err := ResolveHarness(
 		context.Background(), c, "default", "stored", nil,

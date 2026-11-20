@@ -12,12 +12,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/yaml"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/validator"
 	agentwebhook "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/webhook"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 func TestSamplesStrictlyDecodeAgainstAgentAPI(t *testing.T) {
@@ -70,19 +71,12 @@ func TestSampleAgentRunPassesAdmissionWithSamplePolicyAndProvider(t *testing.T) 
 	})
 	provider := decodeSample[agentv1alpha1.AgentProvider](t, "agentprovider_sample.yaml", nil)
 	run := decodeSample[agentv1alpha1.AgentRun](t, "agentrun_sample.yaml", nil)
-	scheme := runtime.NewScheme()
-	if err := corev1.AddToScheme(scheme); err != nil {
-		t.Fatalf("add core API to scheme: %v", err)
-	}
-	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
-		t.Fatalf("add agent API to scheme: %v", err)
-	}
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{Name: "anthropic-credentials", Namespace: "ai-agents"},
 		Data:       map[string][]byte{"api-key": []byte("test-token")},
 	}
-	fakeClient := fake.NewClientBuilder().WithScheme(scheme).WithObjects(policy, provider, secret).Build()
-	admissionWebhook := &agentwebhook.AgentRunWebhook{Client: fakeClient}
+	store := testutil.NewMemoryStore(policy, provider, secret)
+	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.Registry{})
 
 	warnings, err := admissionWebhook.ValidateCreate(context.Background(), run)
 
@@ -99,7 +93,7 @@ func TestSampleAgentToolchainPassesAdmission(t *testing.T) {
 		"<nixpkgsRev>": strings.Repeat("b", 40),
 		"<digest>":     strings.Repeat("a", 64),
 	})
-	toolchainWebhook := &agentwebhook.AgentToolchainWebhook{}
+	toolchainWebhook := agentwebhook.NewAgentToolchainWebhook(plugins.Registry{})
 
 	warnings, err := toolchainWebhook.ValidateCreate(context.Background(), toolchain)
 
@@ -115,7 +109,7 @@ func TestSampleAgentHarnessPassesAdmission(t *testing.T) {
 	harness := decodeSample[agentv1alpha1.AgentHarness](t, "agentharness_sample.yaml", map[string]string{
 		"<digest>": strings.Repeat("a", 64),
 	})
-	harnessWebhook := &agentwebhook.AgentHarnessWebhook{}
+	harnessWebhook := agentwebhook.NewAgentHarnessWebhook(plugins.Registry{})
 
 	warnings, err := harnessWebhook.ValidateCreate(context.Background(), harness)
 

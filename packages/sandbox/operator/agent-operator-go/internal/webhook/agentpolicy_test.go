@@ -11,12 +11,9 @@ import (
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
 
 func boolPtr(b bool) *bool    { return &b }
@@ -415,7 +412,7 @@ func TestEnforcePolicy_RejectsRuntimeClassNotInAllowedList(t *testing.T) {
 }
 
 func TestAgentRunWebhook_RequiresNamespacePolicy(t *testing.T) {
-	w := &AgentRunWebhook{Client: nil}
+	w := runWebhookWith()
 	run := &agentv1alpha1.AgentRun{
 		Spec: agentv1alpha1.AgentRunSpec{
 			Workspace: &agentv1alpha1.WorkspaceSpec{
@@ -453,10 +450,6 @@ func TestEnforcePolicy_RejectsNilTimeoutWhenMaximumIsConfigured(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Default_AppliesNamespacePolicyDefaults(t *testing.T) {
-	scheme := runtime.NewScheme()
-	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
-		t.Fatalf("AddToScheme() error = %v", err)
-	}
 	policy := &agentv1alpha1.AgentPolicy{
 		ObjectMeta: metav1.ObjectMeta{Name: "namespace-policy", Namespace: "test-ns"},
 		Spec: agentv1alpha1.AgentPolicySpec{Defaults: agentv1alpha1.AgentPolicyDefaults{
@@ -465,7 +458,7 @@ func TestAgentRunWebhook_Default_AppliesNamespacePolicyDefaults(t *testing.T) {
 			RuntimeClassName: strPtr("kata"),
 		}},
 	}
-	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(policy).Build()}
+	w := runWebhookWith(policy)
 	run := &agentv1alpha1.AgentRun{ObjectMeta: metav1.ObjectMeta{Namespace: "test-ns"}}
 
 	if err := w.Default(context.Background(), run); err != nil {
@@ -484,15 +477,10 @@ func TestAgentRunWebhook_Default_AppliesNamespacePolicyDefaults(t *testing.T) {
 }
 
 func TestAgentRunWebhook_Validate_RejectsMultipleNamespacePolicies(t *testing.T) {
-	scheme := runtime.NewScheme()
-	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
-		t.Fatalf("AddToScheme() error = %v", err)
-	}
-	policies := []client.Object{
+	w := runWebhookWith(
 		&agentv1alpha1.AgentPolicy{ObjectMeta: metav1.ObjectMeta{Name: "first", Namespace: "test-ns"}},
 		&agentv1alpha1.AgentPolicy{ObjectMeta: metav1.ObjectMeta{Name: "second", Namespace: "test-ns"}},
-	}
-	w := &AgentRunWebhook{Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(policies...).Build()}
+	)
 
 	_, err := w.validate(context.Background(), baseRun())
 	if err == nil {
@@ -501,17 +489,9 @@ func TestAgentRunWebhook_Validate_RejectsMultipleNamespacePolicies(t *testing.T)
 }
 
 func TestAgentRunWebhook_Validate_FailsClosedWhenPolicyLookupFails(t *testing.T) {
-	scheme := runtime.NewScheme()
-	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
-		t.Fatalf("AddToScheme() error = %v", err)
-	}
-	baseClient := fake.NewClientBuilder().WithScheme(scheme).Build()
-	failingClient := interceptor.NewClient(baseClient, interceptor.Funcs{
-		List: func(context.Context, client.WithWatch, client.ObjectList, ...client.ListOption) error {
-			return errors.New("policy API unavailable")
-		},
-	})
-	w := &AgentRunWebhook{Client: failingClient}
+	store := testutil.NewMemoryStore()
+	store.Fail("ListAgentPolicies", errors.New("policy API unavailable"))
+	w := newRunWebhook(store)
 
 	_, err := w.validate(context.Background(), baseRun())
 	if err == nil {

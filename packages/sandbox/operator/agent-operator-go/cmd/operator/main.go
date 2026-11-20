@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -12,19 +13,20 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/validator"
-	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/webhook"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/wiring"
 )
 
 func main() {
 	var probeAddr string
 	var enableLeaderElection bool
-	var workspaceInitImage string
+	config := wiring.DefaultConfig()
 
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false, "Enable leader election for controller manager.")
-	flag.StringVar(&workspaceInitImage, "workspace-init-image", controller.DefaultWorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
+	flag.StringVar(&config.WorkspaceInitImage, "workspace-init-image", config.WorkspaceInitImage, "Digest-pinned image used to initialize shared workspaces.")
+	flag.DurationVar(&config.JobPolicy.WorkspaceInitTimeout, "workspace-init-timeout", config.JobPolicy.WorkspaceInitTimeout, "Active deadline of a workspace init Job.")
+	ttl := flag.Int("job-ttl-seconds", int(config.JobPolicy.DefaultTTLSecondsAfterFinished), "Seconds a finished Job is kept when its run sets no TTL.")
 
 	opts := zap.Options{Development: true}
 	opts.BindFlags(flag.CommandLine)
@@ -37,10 +39,15 @@ func main() {
 		setupLog.Error(err, "unable to register Kubernetes API schemes")
 		os.Exit(1)
 	}
-	if err := validator.ValidatePinnedImageReference(workspaceInitImage); err != nil {
-		setupLog.Error(err, "invalid workspace init image", "image", workspaceInitImage)
+	if err := validator.ValidatePinnedImageReference(config.WorkspaceInitImage); err != nil {
+		setupLog.Error(err, "invalid workspace init image", "image", config.WorkspaceInitImage)
 		os.Exit(1)
 	}
+	if *ttl < 0 || *ttl > math.MaxInt32 || config.JobPolicy.WorkspaceInitTimeout <= 0 {
+		setupLog.Error(fmt.Errorf("job-ttl-seconds must be in [0, %d] and workspace-init-timeout positive", math.MaxInt32), "invalid Job policy")
+		os.Exit(1)
+	}
+	config.JobPolicy.DefaultTTLSecondsAfterFinished = int32(*ttl)
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
@@ -53,52 +60,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.AgentRunReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agent-operator"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AgentRun")
+	if err := wiring.SetupControllers(mgr, config); err != nil {
+		setupLog.Error(err, "unable to create controllers")
 		os.Exit(1)
 	}
-
-	if err = (&controller.AgentProviderReconciler{
-		Client:   mgr.GetClient(),
-		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorder("agent-operator"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AgentProvider")
-		os.Exit(1)
-	}
-
-	if err = (&controller.AgentWorkspaceReconciler{
-		Client:             mgr.GetClient(),
-		Scheme:             mgr.GetScheme(),
-		Recorder:           mgr.GetEventRecorder("agent-operator"),
-		WorkspaceInitImage: workspaceInitImage,
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AgentWorkspace")
-		os.Exit(1)
-	}
-
-	if err = (&webhook.AgentRunWebhook{Client: mgr.GetClient()}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentRun")
-		os.Exit(1)
-	}
-	if err = (&webhook.AgentHarnessWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentHarness")
-		os.Exit(1)
-	}
-	if err = (&webhook.AgentProviderWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentProvider")
-		os.Exit(1)
-	}
-	if err = (&webhook.AgentToolchainWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentToolchain")
-		os.Exit(1)
-	}
-	if err = (&webhook.AgentWorkspaceWebhook{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to set up webhook", "webhook", "AgentWorkspace")
+	if err := wiring.SetupWebhooks(mgr); err != nil {
+		setupLog.Error(err, "unable to set up webhooks")
 		os.Exit(1)
 	}
 

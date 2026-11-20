@@ -14,32 +14,34 @@ tasks:
   go-package-coverage:
     script: |
       set -euo pipefail
-      # Every package the module builds is named here. cmd/operator is manager
-      # wiring covered by go-test-integration under envtest, test/testutil is
-      # test support, and config, internal/arch and the shared packages declare
-      # interfaces and embedded manifests with no statements.
+      # Every package the module builds is named here. cmd/operator parses flags
+      # and starts the manager, which go-test-integration covers under envtest,
+      # test/testutil is test support, and config, internal/arch and the shared
+      # packages declare interfaces and embedded manifests with no statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./api/v1alpha1=100 \
         ./cmd/e2e-summary=87 \
         ./cmd/operator=exempt \
         ./config=exempt \
         ./internal/arch=exempt \
-        ./internal/controller=83 \
+        ./internal/controller=95 \
         ./internal/harness/claude=85 \
         ./internal/harness/opencode=80 \
         ./internal/harness/shared=exempt \
-        ./internal/isolation/shared=85 \
+        ./internal/isolation/shared=91 \
+        ./internal/kube=100 \
         ./internal/network/shared=100 \
         ./internal/plugins=100 \
         ./internal/provider=90 \
         ./internal/provision/nix=100 \
         ./internal/provision/shared=exempt \
-        ./internal/resolver=91 \
+        ./internal/resolver=100 \
         ./internal/validator=100 \
-        ./internal/webhook=85 \
+        ./internal/webhook=87 \
+        ./internal/wiring=100 \
         ./internal/workspace/git=100 \
         ./internal/workspace/jj=100 \
-        ./internal/workspace/shared=75 \
+        ./internal/workspace/shared=97 \
         ./test/testutil=exempt
     inputs:
       - "@globs(sources)"

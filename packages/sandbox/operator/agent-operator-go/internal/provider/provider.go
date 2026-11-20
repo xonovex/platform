@@ -10,7 +10,6 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	sharedtypes "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
@@ -23,13 +22,19 @@ type ResolvedProvider struct {
 	CliArgs     []string
 }
 
+// Reader reads the AgentProvider and the Secret a provider resolution names.
+type Reader interface {
+	GetAgentProvider(ctx context.Context, key types.NamespacedName) (*agentv1alpha1.AgentProvider, error)
+	GetSecret(ctx context.Context, key types.NamespacedName) (*corev1.Secret, error)
+}
+
 // ResolveProvider resolves the provider configuration for an agent execution.
-func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.AgentRun, defaultProvider string) (ResolvedProvider, error) {
+func ResolveProvider(ctx context.Context, reader Reader, run *agentv1alpha1.AgentRun, defaultProvider string) (ResolvedProvider, error) {
 	env := make(map[string]string)
 
 	// Use inline provider if specified.
 	if run.Spec.Provider != nil {
-		return resolveInlineProvider(ctx, c, run.Namespace, run.Spec.Provider)
+		return resolveInlineProvider(ctx, reader, run.Namespace, run.Spec.Provider)
 	}
 
 	// Use provider ref if specified.
@@ -41,8 +46,8 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 		return ResolvedProvider{}, nil
 	}
 
-	var provider agentv1alpha1.AgentProvider
-	if err := c.Get(ctx, types.NamespacedName{Name: providerRef, Namespace: run.Namespace}, &provider); err != nil {
+	provider, err := reader.GetAgentProvider(ctx, types.NamespacedName{Name: providerRef, Namespace: run.Namespace})
+	if err != nil {
 		return ResolvedProvider{}, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
 	}
 
@@ -61,14 +66,14 @@ func ResolveProvider(ctx context.Context, c client.Client, run *agentv1alpha1.Ag
 	if authTokenEnv == "" {
 		authTokenEnv = preset.authTokenEnv
 	}
-	if err := validateAuthToken(ctx, c, run.Namespace, authTokenEnv, provider.Spec.AuthTokenSecretRef, env); err != nil {
+	if err := validateAuthToken(ctx, reader, run.Namespace, authTokenEnv, provider.Spec.AuthTokenSecretRef, env); err != nil {
 		return ResolvedProvider{}, fmt.Errorf("failed to resolve auth token: %w", err)
 	}
 
 	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, provider.Spec.AuthTokenSecretRef), CliArgs: cliArgs}, nil
 }
 
-func resolveInlineProvider(ctx context.Context, c client.Client, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
+func resolveInlineProvider(ctx context.Context, reader Reader, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
 	env := make(map[string]string)
 
 	preset, err := mergePreset(env, spec.PresetRef, spec.AgentType)
@@ -85,7 +90,7 @@ func resolveInlineProvider(ctx context.Context, c client.Client, namespace strin
 	if authTokenEnv == "" {
 		authTokenEnv = preset.authTokenEnv
 	}
-	if err := validateAuthToken(ctx, c, namespace, authTokenEnv, spec.AuthSecretRef, env); err != nil {
+	if err := validateAuthToken(ctx, reader, namespace, authTokenEnv, spec.AuthSecretRef, env); err != nil {
 		return ResolvedProvider{}, fmt.Errorf("failed to resolve inline auth token: %w", err)
 	}
 
@@ -141,7 +146,7 @@ func mergePreset(env map[string]string, presetRef, agentType string) (presetConf
 	}, nil
 }
 
-func validateAuthToken(ctx context.Context, c client.Client, namespace, authTokenEnv string, ref *agentv1alpha1.SecretKeyRef, environment map[string]string) error {
+func validateAuthToken(ctx context.Context, reader Reader, namespace, authTokenEnv string, ref *agentv1alpha1.SecretKeyRef, environment map[string]string) error {
 	if ref == nil {
 		return nil
 	}
@@ -151,12 +156,12 @@ func validateAuthToken(ctx context.Context, c client.Client, namespace, authToke
 	if _, exists := environment[authTokenEnv]; exists {
 		return fmt.Errorf("environment variable %q conflicts with the auth token Secret", authTokenEnv)
 	}
-	return validateSecretKey(ctx, c, namespace, ref)
+	return validateSecretKey(ctx, reader, namespace, ref)
 }
 
-func validateSecretKey(ctx context.Context, c client.Client, namespace string, ref *agentv1alpha1.SecretKeyRef) error {
-	var secret corev1.Secret
-	if err := c.Get(ctx, types.NamespacedName{Name: ref.Name, Namespace: namespace}, &secret); err != nil {
+func validateSecretKey(ctx context.Context, reader Reader, namespace string, ref *agentv1alpha1.SecretKeyRef) error {
+	secret, err := reader.GetSecret(ctx, types.NamespacedName{Name: ref.Name, Namespace: namespace})
+	if err != nil {
 		return fmt.Errorf("secret %s not found: %w", ref.Name, err)
 	}
 

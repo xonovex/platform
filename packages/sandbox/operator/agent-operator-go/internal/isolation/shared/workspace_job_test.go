@@ -73,8 +73,8 @@ func TestBuildWorkspaceInitJob_WithJujutsu(t *testing.T) {
 	if !strings.Contains(script, "git clone") {
 		t.Error("jj workspace init should still use git clone")
 	}
-	if !strings.Contains(script, "jj git init --colocate") {
-		t.Errorf("jj workspace init missing 'jj git init --colocate', got:\n%s", script)
+	if !strings.Contains(script, "post-clone jj") {
+		t.Errorf("jj workspace init missing the post-clone step of the VCS strategy, got:\n%s", script)
 	}
 }
 
@@ -85,7 +85,7 @@ func TestBuildWorkspaceInitJob_RejectsMissingRuntimeClassName(t *testing.T) {
 			Repository: agentv1alpha1.RepositorySpec{URL: "https://github.com/org/repo.git", Branch: "main"},
 		},
 	}
-	_, err := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil)
+	_, err := BuildWorkspaceInitJob(ws, "my-workspace-ws", "alpine/git:latest", nil, stubVCS{workspace: agentv1alpha1.WorkspaceTypeGit}, DefaultJobPolicy())
 	if err == nil {
 		t.Fatal("BuildWorkspaceInitJob() error = nil, want missing runtimeClassName error")
 	}
@@ -118,25 +118,25 @@ func TestBuildWorktreeInitContainers_Basic(t *testing.T) {
 	if containers[0].Name != "git-worktree" {
 		t.Errorf("name = %s, want git-worktree", containers[0].Name)
 	}
-	if script := containers[0].Args[1]; !strings.Contains(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'main'") {
+	if script := containers[0].Args[1]; !strings.Contains(script, "git worktree /workspace-wt/agent-1 agent-1-work main") {
 		t.Errorf("expected quoted worktree command, got: %s", script)
 	}
 }
 
 func TestBuildWorktreeInitContainers_DefaultSourceBranch(t *testing.T) {
 	containers := mustBuildWorktreeInitContainers(t, worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeGit, "agent-1-work", "", nil)
-	if script := containers[0].Args[1]; !strings.Contains(script, "git worktree add '/workspace-wt/agent-1' -b 'agent-1-work' 'HEAD'") {
+	if script := containers[0].Args[1]; !strings.Contains(script, "git worktree /workspace-wt/agent-1 agent-1-work HEAD") {
 		t.Errorf("expected HEAD default source branch, got: %s", script)
 	}
 }
 
 func TestBuildWorktreeInitContainers_WithJujutsu(t *testing.T) {
 	containers := mustBuildWorktreeInitContainers(t, worktreeRun(), "node:trixie-slim", agentv1alpha1.WorkspaceTypeJujutsu, "agent-1-work", "main", nil)
-	if containers[0].Name != "jj-workspace" {
-		t.Errorf("name = %s, want jj-workspace", containers[0].Name)
+	if containers[0].Name != "jj-worktree" {
+		t.Errorf("name = %s, want jj-worktree", containers[0].Name)
 	}
 	script := containers[0].Args[1]
-	if !strings.Contains(script, "jj workspace add '/workspace-wt/agent-1' --revision 'main'") {
+	if !strings.Contains(script, "jj worktree /workspace-wt/agent-1 agent-1-work main") {
 		t.Errorf("expected quoted jj workspace add, got: %s", script)
 	}
 	if strings.Contains(script, "git worktree") {
@@ -190,7 +190,7 @@ func TestBuildWorkspaceJob_Basic(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
 	}
 
-	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
@@ -220,7 +220,7 @@ func TestBuildWorkspaceJob_WithSharedVolumes(t *testing.T) {
 	sharedVolumes := []agentv1alpha1.SharedVolumeSpec{{Name: "claude-config", MountPath: "/root/.claude", StorageSize: "1Gi"}}
 	sharedVolumePVCs := map[string]string{"claude-config": "my-workspace-claude-config"}
 
-	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, &WorkspaceBinding{
 		SharedVolumes:    sharedVolumes,
 		SharedVolumePVCs: sharedVolumePVCs,
 		WorktreeBranch:   "agent-1-work",
@@ -291,7 +291,7 @@ func TestBuildWorkspaceJob_WithRuntimeClassName(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace", RuntimeClassName: &runtimeClass},
 	}
 
-	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
@@ -307,7 +307,7 @@ func TestBuildWorkspaceJob_DefaultTTL(t *testing.T) {
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
 	}
 
-	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil, &WorkspaceBinding{
+	job := mustBuildJob(t, run, nil, "my-workspace-ws", "node:trixie-slim", time.Hour, agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, &WorkspaceBinding{
 		WorktreeBranch: "agent-1-work",
 		WorkspaceRef:   "my-workspace",
 	})
@@ -317,18 +317,32 @@ func TestBuildWorkspaceJob_DefaultTTL(t *testing.T) {
 	}
 }
 
-func TestBuildWorkspaceInitJob_UnknownWorkspaceTypeReturnsError(t *testing.T) {
+func TestBuildWorkspaceInitJob_TakesTheDeadlineFromThePolicy(t *testing.T) {
 	ws := &agentv1alpha1.AgentWorkspace{
-		ObjectMeta: metav1.ObjectMeta{Name: "invalid", Namespace: "default"},
-		Spec: agentv1alpha1.AgentWorkspaceSpec{
-			Type:       "unknown",
-			Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
-		},
+		ObjectMeta: metav1.ObjectMeta{Name: "slow", Namespace: "default"},
+		Spec:       agentv1alpha1.AgentWorkspaceSpec{Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"}},
 	}
+	runtimeClassName := "kata"
+	policy := DefaultJobPolicy()
+	policy.WorkspaceInitTimeout = 90 * time.Second
 
-	_, err := BuildWorkspaceInitJob(ws, "invalid-ws", "image", nil)
+	job, err := BuildWorkspaceInitJob(ws, "slow-ws", "image", &runtimeClassName, stubVCS{}, policy)
+
+	if err != nil {
+		t.Fatalf("BuildWorkspaceInitJob() error = %v", err)
+	}
+	if got := job.Spec.ActiveDeadlineSeconds; got == nil || *got != 90 {
+		t.Errorf("activeDeadlineSeconds = %v, want 90", got)
+	}
+}
+
+func TestBuildWorkspaceInitJob_RejectsANonPositiveDeadline(t *testing.T) {
+	ws := &agentv1alpha1.AgentWorkspace{ObjectMeta: metav1.ObjectMeta{Name: "ws", Namespace: "default"}}
+	runtimeClassName := "kata"
+
+	_, err := BuildWorkspaceInitJob(ws, "ws-ws", "image", &runtimeClassName, stubVCS{}, JobPolicy{})
 
 	if err == nil {
-		t.Fatal("expected unknown workspace type to return an error")
+		t.Fatal("expected a zero workspace init timeout to return an error")
 	}
 }

@@ -21,10 +21,7 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - args:
-        - --permission-mode
-        - bypassPermissions
-        command:
+      - command:
         - claude
         env:
         - name: HOME
@@ -67,7 +64,7 @@ spec:
         - |
           set -e
           cd /workspace
-          git worktree add '/workspace-wt/golden-ws-run' -b 'feature' 'HEAD'
+          git worktree /workspace-wt/golden-ws-run feature HEAD
         command:
         - sh
         env:
