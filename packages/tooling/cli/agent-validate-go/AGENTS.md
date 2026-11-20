@@ -1,0 +1,11 @@
+# Agent Validate Go
+
+Validate skills, plugins, instructions and repository files with one check per concern behind a port.
+
+- Add a check as a package under `internal/check/<name>` that implements `check.Check`, plus one line in `internal/registry`, the only package that imports a concrete check. A check reads files through the injected `tree.Tree` and git through `check.Repository`, takes its options through `check.DecodeOptions`, and never imports another check. `internal/arch` enforces each of these and fails a package that is missing from its table.
+- Report a defect as a finding with a stable code that starts with the check name, and return an error only for a fault of the infrastructure. A broken file yields findings; an unreadable file, a bad option or an unknown check yields exit status 2, so a partial run never reads as a pass.
+- Select the checks, paths, options and severity cap of a repository in `agentic.validate.json`, which `shared-contract-go` validates through `validate-project.schema.json`. A `level` cap lowers the severity of a check and replaces a separate warn mode. Exit status 0 means clean, 1 means a finding at drift level or above (a warning too under `--strict`), and 2 means a usage error or a fault.
+- Reach the machine only through a port: `shared-contract-go` `fs` for files, `jsonschema` for schemas and `internal/gitrepo` for git. Only `cmd/agent-validate` imports the host, `osfs` and `wiring`. Unit tests use `memfs` and `internal/checktest`.
+- Keep a shared reader beside the checks that need it, never inside one: `internal/markdown`, `internal/document`, `internal/catalog`, `internal/component` and `internal/glob`. A rule that two checks restate belongs there.
+- Hold a new JSON grammar in `shared-contract-go` as a schema with valid and invalid fixtures, and validate it through `ctx.Validator`; never hand-write a grammar check that a schema can state.
+- `ci-check` runs the fast gates, including the per-package coverage floors in `moon.yml` and the architecture test. `ci-integration` builds the binary and runs it over this repository and over temporary git repositories behind the `integration` build tag; it stays out of CI.

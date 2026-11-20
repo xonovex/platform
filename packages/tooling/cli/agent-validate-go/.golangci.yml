@@ -1,0 +1,42 @@
+version: "2"
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - ineffassign
+    - misspell
+    - forbidigo
+  settings:
+    forbidigo:
+      forbid:
+        - pattern: ^os\.UserHomeDir$
+          msg: a test must not read the host home directory; give the code under test a systemtest.Fake with its own Home instead
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+      # forbidigo guards the tests only: internal/system reads the host home
+      # in production, and a test that reads it measures the workstation.
+      - path-except: _test\.go
+        linters:
+          - forbidigo
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    gofmt:
+      simplify: true
+    goimports:
+      local-prefixes:
+        - github.com/xonovex/platform
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly

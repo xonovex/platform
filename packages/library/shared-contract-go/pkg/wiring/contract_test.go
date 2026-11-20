@@ -70,6 +70,19 @@ func contracts() map[string]contract {
 				{"repeated skip", `{"version":1,"skip":["a","a"]}`, "/skip"},
 			},
 		},
+		schemas.Kit: {
+			valid: []string{
+				`{"schemaVersion":"2","kind":"sandbox","name":"a","sandbox":{}}`,
+				`{"schemaVersion":"2","kind":"mixin","name":"a"}`,
+			},
+			invalid: []invalid{
+				{"no name", `{"schemaVersion":"2","kind":"mixin"}`, ""},
+				{"wrong version", `{"schemaVersion":"1","kind":"mixin","name":"a"}`, "/schemaVersion"},
+				{"unknown kind", `{"schemaVersion":"2","kind":"other","name":"a"}`, "/kind"},
+				{"sandbox needs sandbox", `{"schemaVersion":"2","kind":"sandbox","name":"a"}`, ""},
+				{"mixin extends", `{"schemaVersion":"2","kind":"mixin","name":"a","extends":"b"}`, ""},
+			},
+		},
 		schemas.EvalTrigger: {
 			valid: []string{
 				`{"version":1,"skill":"using-hono","queries":[

@@ -1,0 +1,121 @@
+$schema: https://moonrepo.dev/schemas/v2/project.json
+language: go
+layer: application
+tags:
+  - go
+  - cli
+dependsOn:
+  - shared-contract-go
+fileGroups:
+  # The validator embeds nothing itself, but its schemas live in the contract
+  # module that its tests compile against.
+  sources:
+    - "**/*.go"
+tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "92"
+  go-package-coverage:
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. cmd/agent-validate is the
+      # composition root that binds the disk, the schema engine and git, so
+      # go-integration covers it. internal/checktest is test support and
+      # internal/arch holds only architecture tests behind a build tag. Every
+      # other package reaches the machine through a port, so the unit tier
+      # covers it over an in-memory file system.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./cmd/agent-validate=exempt \
+        ./internal/arch=exempt \
+        ./internal/catalog=95 \
+        ./internal/check=100 \
+        ./internal/check/agent=91 \
+        ./internal/check/command=96 \
+        ./internal/check/drift=93 \
+        ./internal/check/hook=97 \
+        ./internal/check/instructions=91 \
+        ./internal/check/kit=92 \
+        ./internal/check/links=85 \
+        ./internal/check/llms=93 \
+        ./internal/check/marketplace=93 \
+        ./internal/check/outputstyle=86 \
+        ./internal/check/plugin=91 \
+        ./internal/check/repository=89 \
+        ./internal/check/routing=94 \
+        ./internal/check/schema=92 \
+        ./internal/check/skill=93 \
+        ./internal/check/sources=90 \
+        ./internal/check/text=93 \
+        ./internal/check/workspace=93 \
+        ./internal/checktest=exempt \
+        ./internal/cmd=94 \
+        ./internal/component=100 \
+        ./internal/document=100 \
+        ./internal/gitrepo=100 \
+        ./internal/glob=100 \
+        ./internal/markdown=99 \
+        ./internal/project=95 \
+        ./internal/registry=100 \
+        ./internal/report=100 \
+        ./internal/runner=100 \
+        ./internal/tree=94
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
+    options:
+      cache: true
+      runInCI: true
+  coverage:
+    deps:
+      - go-package-coverage
+  # The architecture tests read the source tree, so they carry the arch build
+  # tag and run here instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
+    options:
+      cache: false
+      mergeDeps: replace
+  # go-integration builds the real binary and runs it over this repository and
+  # over temporary repositories, so it is an integration tier rather than a
+  # ci-check gate.
+  go-integration:
+    script: |
+      set -euo pipefail
+      binary="$projectRoot/dist/agent-validate"
+      go build -o "$binary" ./cmd/agent-validate
+      AGENT_VALIDATE_BINARY="$binary" go test -tags=integration -v ./test/integration/
+    deps:
+      - ^:go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - go.mod
+      - go.sum
+      - /agentic.validate.json
+    options:
+      cache: false
+      runInCI: false
+  ci-integration:
+    command: noop
+    deps:
+      - go-integration
+    options:
+      cache: false
+      runInCI: false

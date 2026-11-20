@@ -36,6 +36,8 @@ Each schema has an `$id` under `https://schemas.xonovex.com/agent/`.
 | `results.schema.json` | One eval run, resumable while it is incomplete |
 | `baseline.schema.json` | Pass rates that a later run is compared with |
 | `cost-history.schema.json` | Model cost of each eval run |
+| `validate-project.schema.json` | The `agentic.validate.json` project file: skipped directories and the paths, options and level cap of each check |
+| `kit.schema.json` | A Docker Sandbox kit v2 specification |
 | `predicate.schema.json` | Filesystem, session and model checks on a run |
 | `common.schema.json` | Definitions that the other schemas share |
 

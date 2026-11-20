@@ -28,6 +28,7 @@ const (
 	Baseline          = Namespace + "baseline.schema.json"
 	CostHistory       = Namespace + "cost-history.schema.json"
 	ValidateProject   = Namespace + "validate-project.schema.json"
+	Kit               = Namespace + "kit.schema.json"
 )
 
 //go:embed *.schema.json
@@ -38,6 +39,7 @@ func IDs() []string {
 	ids := []string{
 		Common, Predicate, Sources, EvalTrigger, EvalOutput, EvalInstruction,
 		EvalOrchestration, EvalProject, Results, Baseline, CostHistory, ValidateProject,
+		Kit,
 	}
 	sort.Strings(ids)
 	return ids
