@@ -55,9 +55,6 @@ agent-cli run -p <name> --model sonnet=<model-id>
 # Show the merged configuration and where each value came from
 agent-cli config show --sources
 
-# Write agentic.json from the configuration files of the previous release
-agent-cli config migrate
-
 # Print a JSON Schema
 agent-cli schema agentic
 agent-cli schema provider
@@ -324,8 +321,6 @@ Use `providers list` to show every defined provider with its agent, the layer an
 
 Use `config show` to print the merged `run` and `providers` sections as JSON, and `config show --sources` to print each value with the layer and the file that set it. It reads the layers as a run does, so project content passes the trust gate first. It takes `--project`, `--work-dir` and `--approve-config-digest`.
 
-Use `config migrate` to write the legacy configuration files as `agentic.json` and `providers.d` files, see [Legacy configuration](#legacy-configuration). It takes `--work-dir` for the project and `--managed` to also write the managed file.
-
 ### schema
 
 Use `schema` to print a JSON Schema (draft 2020-12): `agentic` for an `agentic.json` file, `agentic-run` and `agentic-providers` for its `run` and `providers` sections, `provider` for a provider file, `harness-override` for a harness file and `run-record` for a run record. `agent-cli schema` lists the names.
@@ -413,19 +408,9 @@ Each key has one merge rule, listed by `agent-cli schema agentic-run`:
 }
 ```
 
-### Legacy configuration
+### Files of earlier releases
 
-This release still reads the configuration files of the previous release, and the next release removes them. Each legacy file prints a warning, and `--dry-run`, `preflight` and `config show --sources` name it with the suffix `(legacy)`.
-
-| Layer | Legacy file | Legacy provider directory |
-| --- | --- | --- |
-| managed | `/etc/agent-cli/managed.yaml`, `managed.yml` or `managed.toml` (`/Library/Application Support/agent-cli` on macOS, `%ProgramData%\agent-cli` on Windows) | `/etc/agent-cli/providers` |
-| user | `~/.config/sandboxed-claude/config` (YAML, TOML or `key=value`) | `~/.config/sandboxed-claude/providers` |
-| project | `.agent-cli.yaml`, `.agent-cli.yml` or `.agent-cli.toml` in the work directory | `.agent-cli/providers` in the work directory |
-
-A layer that has both a legacy file and an `agentic.json` is an error that names both files. The legacy project providers and model overrides take effect only after you approve their digest, and an approval in the previous ledger `$XDG_DATA_HOME/agent-cli/approvals.json` still holds.
-
-`agent-cli config migrate` writes the user file, the project file of the work directory and, with `--managed`, the managed file as `agentic.json`, and each legacy provider file as `providers.d/<name>.json` beside it. It checks each file against the schema and never replaces a file. Check the new files, then remove the legacy files. A migrated project file needs a new approval.
+agent-cli no longer reads `~/.config/sandboxed-claude/config` or any other configuration file of an earlier release, and no migration command exists. Write each setting by hand in the `run` section of the managed, user or project `agentic.json`, and each provider in its `providers` section or as `providers.d/<name>.json` beside it.
 
 The run records moved from `$XDG_STATE_HOME/agent-cli/runs` to `$XDG_STATE_HOME/agentic/runs`, and the plugin store moved from `$XDG_DATA_HOME/agent-cli/plugins` to `$XDG_DATA_HOME/agentic/plugins`. The store holds only relative paths, so move the old directory to the new place to keep the installed plugins and marketplaces.
 

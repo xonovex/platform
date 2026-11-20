@@ -27,25 +27,13 @@ type ProviderListing struct {
 // ReadConfig reads the configuration of the options without the trust gate,
 // for a command that reports on the project content or approves it.
 func ReadConfig(deps Dependencies, options Options) (runconfig.Loaded, error) {
-	return readConfig(deps, options, runconfig.Read)
+	return runconfig.Read(deps.ConfigEnv(), configRequest(options))
 }
 
 // LoadConfig reads the configuration of the options as a run does: the
 // project content passes the trust gate first.
 func LoadConfig(deps Dependencies, options Options) (runconfig.Loaded, error) {
-	return readConfig(deps, options, runconfig.Load)
-}
-
-// readConfig reads the configuration and warns of each legacy file it read.
-func readConfig(deps Dependencies, options Options, read func(runconfig.Env, runconfig.Request) (runconfig.Loaded, error)) (runconfig.Loaded, error) {
-	loaded, err := read(deps.ConfigEnv(), configRequest(options))
-	if err != nil {
-		return runconfig.Loaded{}, err
-	}
-	for _, notice := range loaded.Notices() {
-		deps.Log.Warning(notice)
-	}
-	return loaded, nil
+	return runconfig.Load(deps.ConfigEnv(), configRequest(options))
 }
 
 // ListProviders reads the providers of every layer and marks each project
@@ -55,8 +43,8 @@ func ListProviders(deps Dependencies, options Options) (ProviderListing, error) 
 	if err != nil {
 		return ProviderListing{}, err
 	}
-	// A project document that no pending content covers was approved before
-	// this command, such as a legacy file that the previous ledger approves.
+	// A project provider waits only while the pending content that defines it
+	// is not approved.
 	waiting := map[string]bool{}
 	for _, p := range loaded.Pending {
 		yes, err := runconfig.Approved(deps.ConfigEnv(), p)

@@ -16,7 +16,6 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/legacy"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
@@ -42,7 +41,6 @@ func main() {
 		Egress:      managed.Service{Host: host, Log: log},
 		Credentials: plugins.DefaultCredentials(host),
 		Overlays:    overlay.Builder{Host: host, Origins: origins},
-		Legacy:      legacy.Adapter{},
 		Workspaces: map[wsp.VCSType]wsshared.VCS{
 			wsp.VCSGit:     git.New(host, log),
 			wsp.VCSJujutsu: jj.New(host, log),

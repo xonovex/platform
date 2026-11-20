@@ -67,10 +67,7 @@ type Dependencies struct {
 	// Records stores the run record; it may be nil for a build that keeps none.
 	Records Recorder
 	// Validator checks each agentic.json against the schemas of the contract.
-	Validator jsonschema.Validator
-	// Legacy reads the configuration files of the previous release; nil reads
-	// none.
-	Legacy     runconfig.Legacy
+	Validator  jsonschema.Validator
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
 	// AutoTerminals lists, among Terminals, the wrappers that --terminal auto

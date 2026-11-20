@@ -7,7 +7,7 @@
 These changes need an action when you upgrade from 0.2.0.
 
 - `-c/--config <file>` is removed. agent-cli reads the `run` and `providers` sections of three `agentic.json` layers: the managed file (`/etc/agentic/agentic.json` on Linux), the user file `$XDG_CONFIG_HOME/agentic/agentic.json`, and the nearest project `agentic.json` or the file that `--project <file>` names. A project file takes effect only after you approve its digest with `agent-cli providers approve` or `--approve-config-digest <digest>`.
-- The 0.2.0 configuration file `~/.config/sandboxed-claude/config` is read for this release only, with a notice. Run `agent-cli config migrate` to write it as the user `agentic.json`, check the new file, then remove the old file.
+- The 0.2.0 configuration file `~/.config/sandboxed-claude/config` is no longer read, and no migration command exists. Write its settings by hand in the `run` section of the user `agentic.json`.
 - No provider ships. The `gemini`, `gemini-claude`, `glm` and `gpt5-codex` presets of Claude Code and the `gemini` preset of OpenCode are removed. Define each provider in the `providers` section of an `agentic.json`, or as `providers.d/<name>.json` beside it. `-p <name>` fails for a name that no layer defines.
 - The `docker` isolation has no default image. Set `run.image` in a user or managed `agentic.json`, or pass `--image`. A run without an image stops before it starts. The new `openshell` isolation also needs an image.
 
@@ -20,7 +20,6 @@ These changes need an action when you upgrade from 0.2.0.
 - [`fe12d0f`](https://github.com/xonovex/platform/commit/fe12d0f04e248b440c771d6c3c5c8b1c2d6654d0) [@Deorder](https://github.com/Deorder)! - **Breaking:** attach a terminal only to an interactive run
 - [`0449ad9`](https://github.com/xonovex/platform/commit/0449ad9075a0498b111bf86394f9d18ba9966b4e) [@Deorder](https://github.com/Deorder)! - **Breaking:** plan the provider environment before the credential is read
 - [`4e6891a`](https://github.com/xonovex/platform/commit/4e6891a763de57188d78372d710fee77669dc611) [@Deorder](https://github.com/Deorder)! - **Breaking:** keep the run records and the plugin store in agentic
-- [`679f1ef`](https://github.com/xonovex/platform/commit/679f1efe0989415a2de3be5bd15f95f0d31bb388) [@Deorder](https://github.com/Deorder)! - read and migrate the configuration of the previous release
 - [`d8d653a`](https://github.com/xonovex/platform/commit/d8d653aa00545928992c7932cf14fcda339ce874) [@Deorder](https://github.com/Deorder)! - refuse a managed agentic.json others can write
 - [`ca8c611`](https://github.com/xonovex/platform/commit/ca8c611ae8d096fcfc0083a0582ef02ae3ac7914) [@Deorder](https://github.com/Deorder)! - **Breaking:** install a plugin through the shared trust gate
 - [`d805682`](https://github.com/xonovex/platform/commit/d8056828d1851e614a34e2e87095e8d01f46f364) [@Deorder](https://github.com/Deorder)! - apply the harness overrides of every layer

@@ -116,7 +116,7 @@ type resolution struct {
 // ConfigEnv is the environment the configuration of a run is read through.
 // The trust gate asks its question on Out.
 func (d Dependencies) ConfigEnv() runconfig.Env {
-	return runconfig.Env{Host: d.Host, Validator: d.Validator, Legacy: d.Legacy, Out: d.Out}
+	return runconfig.Env{Host: d.Host, Validator: d.Validator, Out: d.Out}
 }
 
 // configRequest locates the configuration of the options.
