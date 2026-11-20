@@ -28,6 +28,7 @@ tasks:
         ./pkg/section/providers=100 \
         ./pkg/section/run=100 \
         ./pkg/section/validate=100 \
+        ./pkg/shard=100 \
         ./pkg/spec=100 \
         ./pkg/trust=100
     inputs:

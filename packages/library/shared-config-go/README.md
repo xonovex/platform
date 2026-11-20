@@ -41,6 +41,7 @@ The `run`, `providers` and `eval` sections of a project file take effect only af
 | `pkg/trust` | The digest approval gate and the approval ledger |
 | `pkg/explain` | The merged values with their origins, for `config show --sources` |
 | `pkg/resolve` | Find, read, check, gate and merge in one call |
+| `pkg/shard` | The override files of one kind, such as `harnesses.d/<name>.json`, beside the `agentic.json` of each layer; a project shard passes the trust gate |
 | `pkg/osfiles` | Adapter for the disk, the host directories and the terminal |
 | `pkg/configtest` | In-memory test doubles |
 

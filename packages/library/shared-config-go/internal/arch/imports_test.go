@@ -40,6 +40,7 @@ var allowed = map[string][]string{
 	"pkg/trust":             {"pkg/layer"},
 	"pkg/explain":           {"pkg/merge", "pkg/spec"},
 	"pkg/resolve":           {"pkg/discover", "pkg/layer", "pkg/merge", "pkg/spec", "pkg/trust"},
+	"pkg/shard":             {"pkg/discover", "pkg/layer", "pkg/spec", "pkg/trust"},
 	"pkg/osfiles":           {"pkg/discover"},
 	"pkg/configtest":        {"pkg/discover"},
 }
