@@ -1,0 +1,1682 @@
+## none / plain / dry run
+out: claude review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## none / plain / run
+run: claude review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / plain / terminal
+terminal: claude review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / provider and custom environment / dry run
+out: claude review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Provider: route
+log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     provider: route (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     customEnv: CUSTOM=1 (flags command line)
+log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
+
+## none / provider and custom environment / run
+run: claude review --depth 2
+run env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / provider and custom environment / terminal
+terminal: claude review --depth 2
+terminal env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / provider arguments / dry run
+out: codex --model model-override review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Codex
+log: [INFO]   Protocol: responses
+log: [INFO]   Model access: provider (environment, arguments)
+log: [INFO]   Version probe: codex --version
+log: [INFO]   Provider: coder
+log: [INFO]   Model main: model-override (flags command line)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: codex (flags command line)
+log: [INFO]     provider: coder (flags command line)
+log: [INFO]     models: main=model-override (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## none / provider arguments / run
+run: codex --model model-override review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / provider arguments / terminal
+terminal: codex --model model-override review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / credential / dry run
+out: claude review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Credential: API_KEY from env:SECRET_SOURCE ([redacted])
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
+
+## none / credential / run
+run: claude review --depth 2
+run env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / credential / terminal
+terminal: claude review --depth 2
+terminal env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / overlay / dry run
+out: claude --plugin-dir /tmp/overlay/plugins review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Overlay:
+log: [INFO]     placed hello
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## none / overlay / run
+run: claude --plugin-dir /tmp/overlay/plugins review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / overlay / terminal
+terminal: claude --plugin-dir /tmp/overlay/plugins review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / initialization commands / dry run
+out: sh -c echo ready && touch /tmp/marker && exec 'claude' 'review' '--depth' '2'
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: command (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## none / initialization commands / run
+run: sh -c echo ready && touch /tmp/marker && exec 'claude' 'review' '--depth' '2'
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / initialization commands / terminal
+terminal: sh -c echo ready && touch /tmp/marker && exec 'claude' 'review' '--depth' '2'
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / binds / dry run
+out: claude review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     bindPaths: /etc (flags command line)
+log: [INFO]     roBindPaths: /lib (flags command line)
+
+## none / binds / run
+run: claude review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## none / binds / terminal
+terminal: claude review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## none / checkout / dry run
+out: claude review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo-feature
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: none (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## none / checkout / run
+run: claude review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/checkout
+
+## none / checkout / terminal
+terminal: claude review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/checkout
+
+## none / network none / dry run
+error: isolation=none cannot restrict network egress (network="none"); select an isolation that confines the network
+out: 
+log: 
+
+## none / network none / run
+error: isolation=none cannot restrict network egress (network="none"); select an isolation that confines the network
+
+## none / network none / terminal
+error: isolation=none cannot restrict network egress (network="none"); select an isolation that confines the network
+
+## none / network managed / dry run
+error: isolation=none cannot restrict network egress (network="managed"); select an isolation that confines the network
+out: 
+log: 
+
+## none / network managed / run
+error: isolation=none cannot restrict network egress (network="managed"); select an isolation that confines the network
+
+## none / network managed / terminal
+error: isolation=none cannot restrict network egress (network="managed"); select an isolation that confines the network
+
+## bwrap / plain / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## bwrap / plain / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / plain / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / provider and custom environment / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Provider: route
+log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     provider: route (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     customEnv: CUSTOM=1 (flags command line)
+log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
+
+## bwrap / provider and custom environment / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+run env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / provider and custom environment / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / provider arguments / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- codex --sandbox danger-full-access --model model-override review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Codex
+log: [INFO]   Protocol: responses
+log: [INFO]   Model access: provider (environment, arguments)
+log: [INFO]   Version probe: codex --version
+log: [INFO]   Provider: coder
+log: [INFO]   Model main: model-override (flags command line)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: codex (flags command line)
+log: [INFO]     provider: coder (flags command line)
+log: [INFO]     models: main=model-override (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## bwrap / provider arguments / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- codex --sandbox danger-full-access --model model-override review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / provider arguments / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- codex --sandbox danger-full-access --model model-override review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / credential / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Credential: API_KEY from env:SECRET_SOURCE ([redacted])
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
+
+## bwrap / credential / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+run env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / credential / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / overlay / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --ro-bind /tmp/overlay /tmp/overlay --chdir /work/repo -- claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Overlay:
+log: [INFO]     placed hello
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## bwrap / overlay / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --ro-bind /tmp/overlay /tmp/overlay --chdir /work/repo -- claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / overlay / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --ro-bind /tmp/overlay /tmp/overlay --chdir /work/repo -- claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / initialization commands / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: command (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## bwrap / initialization commands / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / initialization commands / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / binds / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /etc /etc --bind /work/repo /work/repo --ro-bind /lib /lib --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     bindPaths: /etc (flags command line)
+log: [INFO]     roBindPaths: /lib (flags command line)
+
+## bwrap / binds / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /etc /etc --bind /work/repo /work/repo --ro-bind /lib /lib --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / binds / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /etc /etc --bind /work/repo /work/repo --ro-bind /lib /lib --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / checkout / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo-feature
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## bwrap / checkout / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/checkout /work/checkout --ro-bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/checkout -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / checkout / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --share-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/checkout /work/checkout --ro-bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/checkout -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/checkout
+
+## bwrap / network none / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: none
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: none (flags command line)
+
+## bwrap / network none / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / network none / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## bwrap / network managed / dry run
+out: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo --bind /run/egress /run/egress --ro-bind /opt/agent-cli/agent-cli /opt/agent-cli/agent-cli -- /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: managed
+log: [INFO]   Allowed hosts: api.example.com:443
+log: [INFO]   Egress transport: unix-socket
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: bwrap (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: managed (flags command line)
+log: [INFO]     allowHosts: api.example.com (flags command line)
+
+## bwrap / network managed / run
+run: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo --bind /run/egress /run/egress --ro-bind /opt/agent-cli/agent-cli /opt/agent-cli/agent-cli -- /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## bwrap / network managed / terminal
+terminal: bwrap --unshare-uts --unshare-ipc --unshare-pid --unshare-cgroup --die-with-parent --dev /dev --proc /proc --tmpfs /tmp --unsetenv LANG --unsetenv ROUTE_TOKEN --unsetenv SECRET_SOURCE --unsetenv UNRELATED_HOST --unshare-net --tmpfs /home/user --ro-bind /home/user/.claude /home/user/.claude --bind /work/repo /work/repo --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /bin /bin --ro-bind /etc /etc --bind /work/repo /work/repo --chdir /work/repo --bind /run/egress /run/egress --ro-bind /opt/agent-cli/agent-cli /opt/agent-cli/agent-cli -- /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / plain / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+capture: docker info
+
+## docker / plain / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / plain / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / provider and custom environment / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e CUSTOM -e HOME -e PATH -e ROUTE_AUTH -e ROUTE_MODEL -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Provider: route
+log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     provider: route (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     customEnv: CUSTOM=1 (flags command line)
+log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
+capture: docker info
+
+## docker / provider and custom environment / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e CUSTOM -e HOME -e PATH -e ROUTE_AUTH -e ROUTE_MODEL -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: CUSTOM=1 HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / provider and custom environment / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e CUSTOM -e HOME -e PATH -e ROUTE_AUTH -e ROUTE_MODEL -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: CUSTOM=1 HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / provider arguments / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef codex --sandbox danger-full-access --model model-override review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Codex
+log: [INFO]   Protocol: responses
+log: [INFO]   Model access: provider (environment, arguments)
+log: [INFO]   Version probe: codex --version
+log: [INFO]   Provider: coder
+log: [INFO]   Model main: model-override (flags command line)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: codex (flags command line)
+log: [INFO]     provider: coder (flags command line)
+log: [INFO]     models: main=model-override (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+capture: docker info
+
+## docker / provider arguments / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef codex --sandbox danger-full-access --model model-override review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / provider arguments / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef codex --sandbox danger-full-access --model model-override review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / credential / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e API_KEY -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Credential: API_KEY from env:SECRET_SOURCE ([redacted])
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
+capture: docker info
+
+## docker / credential / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e API_KEY -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: API_KEY=s3cret HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / credential / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e API_KEY -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: API_KEY=s3cret HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / overlay / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /tmp/overlay:/tmp/overlay:ro -e HOME -e OVERLAY_HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Overlay:
+log: [INFO]     placed hello
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+capture: docker info
+
+## docker / overlay / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /tmp/overlay:/tmp/overlay:ro -e HOME -e OVERLAY_HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / overlay / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /tmp/overlay:/tmp/overlay:ro -e HOME -e OVERLAY_HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / initialization commands / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: command (flags command line)
+log: [INFO]     network: host (flags command line)
+capture: docker info
+
+## docker / initialization commands / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / initialization commands / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / binds / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /etc:/etc -v /work/repo:/work/repo -v /lib:/lib:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     bindPaths: /etc (flags command line)
+log: [INFO]     roBindPaths: /lib (flags command line)
+capture: docker info
+
+## docker / binds / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /etc:/etc -v /work/repo:/work/repo -v /lib:/lib:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / binds / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /etc:/etc -v /work/repo:/work/repo -v /lib:/lib:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / checkout / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo-feature
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+capture: docker info
+
+## docker / checkout / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/checkout -v /work/checkout:/work/checkout -v /work/repo:/work/repo:ro -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / checkout / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network host -u 1000:1000 -w /work/checkout -v /work/checkout:/work/checkout -v /work/repo:/work/repo:ro -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/checkout
+
+## docker / network none / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: none
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: none (flags command line)
+capture: docker info
+
+## docker / network none / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / network none / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## docker / network managed / dry run
+out: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /run/egress:/run/egress -v /opt/agent-cli/agent-cli:/opt/agent-cli/agent-cli:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: managed
+log: [INFO]   Allowed hosts: api.example.com:443
+log: [INFO]   Egress transport: unix-socket
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: managed (flags command line)
+log: [INFO]     allowHosts: api.example.com (flags command line)
+capture: docker info
+
+## docker / network managed / run
+capture: docker info
+run: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /run/egress:/run/egress -v /opt/agent-cli/agent-cli:/opt/agent-cli/agent-cli:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+run dir: 
+
+## docker / network managed / terminal
+capture: docker info
+terminal: docker run --rm -it --security-opt no-new-privileges --security-opt apparmor=docker-default --cap-drop ALL --read-only --tmpfs /tmp:rw,noexec,nosuid --tmpfs /home/agent:rw,mode=1777 --pids-limit 4096 --memory 8g --cpus 4 --network none -u 1000:1000 -w /work/repo -v /work/repo:/work/repo -v /home/user/.claude:/home/agent/.claude:ro -v /work/repo:/work/repo -v /run/egress:/run/egress -v /opt/agent-cli/agent-cli:/opt/agent-cli/agent-cli:ro -e HOME -e PATH -e SHELL -e TMPDIR registry.example/agent@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef /opt/agent-cli/agent-cli egress-bridge --socket /run/egress/proxy.sock --listen 127.0.0.1:3128 -- claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/agent LANG=C.UTF-8 PATH=/usr/local/bin:/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret SHELL=/bin/bash TMPDIR=/tmp UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / plain / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## seatbelt / plain / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / plain / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / provider and custom environment / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Provider: route
+log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     provider: route (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     customEnv: CUSTOM=1 (flags command line)
+log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
+
+## seatbelt / provider and custom environment / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / provider and custom environment / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / provider arguments / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ codex --sandbox danger-full-access --model model-override review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Codex
+log: [INFO]   Protocol: responses
+log: [INFO]   Model access: provider (environment, arguments)
+log: [INFO]   Version probe: codex --version
+log: [INFO]   Provider: coder
+log: [INFO]   Model main: model-override (flags command line)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: codex (flags command line)
+log: [INFO]     provider: coder (flags command line)
+log: [INFO]     models: main=model-override (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## seatbelt / provider arguments / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ codex --sandbox danger-full-access --model model-override review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / provider arguments / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ codex --sandbox danger-full-access --model model-override review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / credential / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Credential: API_KEY from env:SECRET_SOURCE ([redacted])
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
+
+## seatbelt / credential / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / credential / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / overlay / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/tmp/overlay") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Overlay:
+log: [INFO]     placed hello
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## seatbelt / overlay / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/tmp/overlay") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / overlay / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/tmp/overlay") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / initialization commands / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: command (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## seatbelt / initialization commands / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / initialization commands / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ sh -c echo ready && touch /tmp/marker && exec 'claude' '--permission-mode' 'bypassPermissions' 'review' '--depth' '2'
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / binds / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/etc") (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/etc") (subpath "/home/user/.claude") (subpath "/lib") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     bindPaths: /etc (flags command line)
+log: [INFO]     roBindPaths: /lib (flags command line)
+
+## seatbelt / binds / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/etc") (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/etc") (subpath "/home/user/.claude") (subpath "/lib") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / binds / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/etc") (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/etc") (subpath "/home/user/.claude") (subpath "/lib") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / checkout / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo-feature
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## seatbelt / checkout / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/checkout") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/checkout") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/checkout
+
+## seatbelt / checkout / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/checkout") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/checkout") (subpath "/work/repo") (subpath "/work/repo"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/checkout
+
+## seatbelt / network none / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: none
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: none (flags command line)
+
+## seatbelt / network none / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+ claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: /work/repo
+
+## seatbelt / network none / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+terminal dir: /work/repo
+
+## seatbelt / network managed / dry run
+out: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+(allow network-outbound (remote ip "localhost:41000"))
+ claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: managed
+log: [INFO]   Allowed hosts: api.example.com:443
+log: [INFO]   Egress transport: loopback
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: seatbelt (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: managed (flags command line)
+log: [INFO]     allowHosts: api.example.com (flags command line)
+
+## seatbelt / network managed / run
+run: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+(allow network-outbound (remote ip "localhost:41000"))
+ claude --permission-mode bypassPermissions review --depth 2
+run env: ALL_PROXY=http://127.0.0.1:41000 HOME=/home/user HTTPS_PROXY=http://127.0.0.1:41000 HTTP_PROXY=http://127.0.0.1:41000 LANG=C.UTF-8 NO_PROXY= PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only all_proxy=http://127.0.0.1:41000 http_proxy=http://127.0.0.1:41000 https_proxy=http://127.0.0.1:41000 no_proxy=
+run dir: /work/repo
+
+## seatbelt / network managed / terminal
+terminal: sandbox-exec -p (version 1)
+(allow default)
+(deny file-write*)
+(allow file-write* (literal "/dev/null") (literal "/dev/tty") (literal "/dev/dtracehelper"))
+(allow file-write* (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/dev/fd") (subpath "/private/tmp") (subpath "/private/var/folders"))
+(deny file-read-data (subpath "/home/user"))
+(allow file-read-data (subpath "/home/user/.claude") (subpath "/work/repo") (subpath "/work/repo") (subpath "/work/repo"))
+(deny network*)
+(allow network-outbound (remote ip "localhost:41000"))
+ claude --permission-mode bypassPermissions review --depth 2
+terminal env: ALL_PROXY=http://127.0.0.1:41000 HOME=/home/user HTTPS_PROXY=http://127.0.0.1:41000 HTTP_PROXY=http://127.0.0.1:41000 LANG=C.UTF-8 NO_PROXY= PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only all_proxy=http://127.0.0.1:41000 http_proxy=http://127.0.0.1:41000 https_proxy=http://127.0.0.1:41000 no_proxy=
+terminal dir: /work/repo
+
+## docker-sandboxes / plain / dry run
+out: sbx exec -i -t -w /work/repo agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## docker-sandboxes / plain / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/repo /work/repo
+run: sbx exec -i -t -w /work/repo agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / plain / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / provider and custom environment / dry run
+out: sbx exec -i -t -w /work/repo -e CUSTOM -e ROUTE_AUTH -e ROUTE_MODEL agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Provider: route
+log: [INFO]   Model main: model-main (/home/user/.config/sandboxed-claude/providers/route.json)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     provider: route (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     customEnv: CUSTOM=1 (flags command line)
+log: [INFO]     customEnv: ROUTE_MODEL=custom-wins (flags command line)
+
+## docker-sandboxes / provider and custom environment / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/repo /work/repo
+run: sbx exec -i -t -w /work/repo -e CUSTOM -e ROUTE_AUTH -e ROUTE_MODEL agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+run env: CUSTOM=1 HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_AUTH=route-token ROUTE_MODEL=custom-wins ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / provider and custom environment / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / provider arguments / dry run
+out: sbx exec -i -t -w /work/repo agent-cli-1 codex --sandbox danger-full-access --model model-override review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Codex
+log: [INFO]   Protocol: responses
+log: [INFO]   Model access: provider (environment, arguments)
+log: [INFO]   Version probe: codex --version
+log: [INFO]   Provider: coder
+log: [INFO]   Model main: model-override (flags command line)
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: codex (flags command line)
+log: [INFO]     provider: coder (flags command line)
+log: [INFO]     models: main=model-override (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## docker-sandboxes / provider arguments / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 codex /work/repo /work/repo
+run: sbx exec -i -t -w /work/repo agent-cli-1 codex --sandbox danger-full-access --model model-override review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / provider arguments / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / credential / dry run
+out: sbx exec -i -t -w /work/repo -e API_KEY agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Credential: API_KEY from env:SECRET_SOURCE ([redacted])
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     credentials: API_KEY=env:SECRET_SOURCE (flags command line)
+
+## docker-sandboxes / credential / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/repo /work/repo
+run: sbx exec -i -t -w /work/repo -e API_KEY agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+run env: API_KEY=s3cret HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / credential / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / overlay / dry run
+out: sbx exec -i -t -w /work/repo -e OVERLAY_HOME agent-cli-1 claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Overlay:
+log: [INFO]     placed hello
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## docker-sandboxes / overlay / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/repo /work/repo /tmp/overlay:ro
+run: sbx exec -i -t -w /work/repo -e OVERLAY_HOME agent-cli-1 claude --permission-mode bypassPermissions --plugin-dir /tmp/overlay/plugins review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 OVERLAY_HOME=/tmp/overlay PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / overlay / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / initialization commands / dry run
+error: prepare sandbox command: docker-sandboxes cannot run this: the sandbox starts the agent itself, so initialization commands cannot run before it
+out: 
+log: 
+
+## docker-sandboxes / initialization commands / run
+error: prepare sandbox command: docker-sandboxes cannot run this: the sandbox starts the agent itself, so initialization commands cannot run before it
+
+## docker-sandboxes / initialization commands / terminal
+error: prepare sandbox command: docker-sandboxes cannot run this: the sandbox starts the agent itself, so initialization commands cannot run before it
+
+## docker-sandboxes / binds / dry run
+out: sbx exec -i -t -w /work/repo agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+log: [INFO]     bindPaths: /etc (flags command line)
+log: [INFO]     roBindPaths: /lib (flags command line)
+
+## docker-sandboxes / binds / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/repo /etc /work/repo /lib:ro
+run: sbx exec -i -t -w /work/repo agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / binds / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / checkout / dry run
+out: sbx exec -i -t -w /work/repo agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+log: [INFO] Dry run - would execute:
+log: [INFO]   Agent: Claude Code
+log: [INFO]   Protocol: messages
+log: [INFO]   Model access: provider (environment)
+log: [INFO]   Version probe: claude --version
+log: [INFO]   Work directory: /work/repo-feature
+log: [INFO]   Arguments: [review --depth 2]
+log: [INFO]   Network: host
+log: [INFO]   Configuration:
+log: [INFO]     agent: claude (flags command line)
+log: [INFO]     isolation: docker-sandboxes (flags command line)
+log: [INFO]     provision: none (flags command line)
+log: [INFO]     network: host (flags command line)
+
+## docker-sandboxes / checkout / run
+capture: sbx ls -q
+capture: sbx create --no-progress --name agent-cli-1 claude /work/checkout /work/repo
+run: sbx exec -i -t -w /work/checkout agent-cli-1 claude --permission-mode bypassPermissions review --depth 2
+run env: HOME=/home/user LANG=C.UTF-8 PATH=/usr/bin:/bin ROUTE_TOKEN=route-token SECRET_SOURCE=s3cret UNRELATED_HOST=host-only
+run dir: 
+capture: sbx stop agent-cli-1
+capture: sbx rm --force agent-cli-1
+
+## docker-sandboxes / checkout / terminal
+error: prepare terminal command: docker-sandboxes cannot run this: a terminal wrapper cannot create and remove the sandbox
+
+## docker-sandboxes / network none / dry run
+error: isolation=docker-sandboxes cannot restrict network egress (network="none"); select an isolation that confines the network
+out: 
+log: 
+
+## docker-sandboxes / network none / run
+error: isolation=docker-sandboxes cannot restrict network egress (network="none"); select an isolation that confines the network
+
+## docker-sandboxes / network none / terminal
+error: isolation=docker-sandboxes cannot restrict network egress (network="none"); select an isolation that confines the network
+
+## docker-sandboxes / network managed / dry run
+error: isolation=docker-sandboxes cannot restrict network egress (network="managed"); select an isolation that confines the network
+out: 
+log: 
+
+## docker-sandboxes / network managed / run
+error: isolation=docker-sandboxes cannot restrict network egress (network="managed"); select an isolation that confines the network
+
+## docker-sandboxes / network managed / terminal
+error: isolation=docker-sandboxes cannot restrict network egress (network="managed"); select an isolation that confines the network
+
+## openshell / plain / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / plain / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / plain / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / provider and custom environment / dry run
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+out: 
+log: 
+
+## openshell / provider and custom environment / run
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+
+## openshell / provider and custom environment / terminal
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+
+## openshell / provider arguments / dry run
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+out: 
+log: 
+
+## openshell / provider arguments / run
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+
+## openshell / provider arguments / terminal
+error: prepare sandbox command: openshell cannot run this: a provider credential would appear in an argument of the exec command
+
+## openshell / credential / dry run
+error: prepare sandbox command: openshell cannot run this: a credential would appear in an argument of the exec command
+out: 
+log: 
+
+## openshell / credential / run
+error: prepare sandbox command: openshell cannot run this: a credential would appear in an argument of the exec command
+
+## openshell / credential / terminal
+error: prepare sandbox command: openshell cannot run this: a credential would appear in an argument of the exec command
+
+## openshell / overlay / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / overlay / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / overlay / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / initialization commands / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / initialization commands / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / initialization commands / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / binds / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / binds / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / binds / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / checkout / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / checkout / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / checkout / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / network none / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / network none / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / network none / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / network managed / dry run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+out: 
+log: 
+
+## openshell / network managed / run
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
+## openshell / network managed / terminal
+error: prepare sandbox command: openshell cannot run this: a sandbox on a gateway has no host bind; the work directory is uploaded
+
