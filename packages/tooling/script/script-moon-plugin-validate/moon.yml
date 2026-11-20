@@ -22,10 +22,10 @@ tasks:
       cache: false
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "85"
-      TS_COVERAGE_MIN_FUNCTIONS: "90"
-      TS_COVERAGE_MIN_BRANCHES: "70"
-      TS_COVERAGE_MIN_STATEMENTS: "80"
+      TS_COVERAGE_MIN_LINES: "100"
+      TS_COVERAGE_MIN_FUNCTIONS: "100"
+      TS_COVERAGE_MIN_BRANCHES: "88"
+      TS_COVERAGE_MIN_STATEMENTS: "98"
   ci-check:
     deps: [coverage]
     options:

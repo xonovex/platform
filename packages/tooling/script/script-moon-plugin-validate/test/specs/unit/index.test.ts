@@ -1,6 +1,8 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-const {mainMock} = vi.hoisted(() => ({mainMock: vi.fn()}));
+const {mainMock} = vi.hoisted(() => ({
+  mainMock: vi.fn<(...args: readonly unknown[]) => number>(),
+}));
 
 vi.mock("../../../src/cli.js", () => ({main: mainMock}));
 
@@ -19,12 +21,15 @@ afterEach(() => {
 });
 
 describe("plugin validate entry point", () => {
-  it("passes the arguments through to the validator", async () => {
+  it("runs the validator from the working directory", async () => {
     mainMock.mockReturnValue(0);
 
     await runEntryPoint();
 
-    expect(mainMock).toHaveBeenCalledWith(process.argv.slice(2));
+    expect(mainMock.mock.calls[0]?.slice(0, 2)).toEqual([
+      process.argv.slice(2),
+      process.cwd(),
+    ]);
     expect(process.exitCode).toBe(0);
   });
 

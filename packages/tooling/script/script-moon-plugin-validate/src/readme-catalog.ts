@@ -1,5 +1,4 @@
 import {join, relative} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {issue, type ValidationIssue} from "./validation.js";
 
@@ -32,7 +31,7 @@ export const checkReadmeCatalog = (
   packageDirectory: string,
   skillNames: readonly string[],
   repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly ValidationIssue[] => {
   const readmePath = join(packageDirectory, "README.md");
   if (!fs.isFile(readmePath)) return [];

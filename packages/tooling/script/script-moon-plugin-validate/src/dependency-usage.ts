@@ -1,5 +1,4 @@
 import {basename, dirname, join, relative} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {pluginHandoffNames} from "@xonovex/script-moon-common/skill-handoffs";
@@ -21,7 +20,7 @@ export interface DependencyUsageInput {
 // name one in bold.
 export const checkDependencyUsage = (
   input: DependencyUsageInput,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly ValidationIssue[] => {
   const handoffs = pluginHandoffNames(input.packageDirectory, fs);
   const isUnused = (plugin: string): boolean => {

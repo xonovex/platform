@@ -1,5 +1,4 @@
-import {join, relative, resolve} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {join, relative} from "node:path";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
@@ -73,8 +72,8 @@ const checkNoCommands = (
 
 export const validatePluginPackage = (
   packageDir: string,
-  repositoryRoot = resolve(packageDir, "../../../.."),
-  fs: FileSystem = nodeFileSystem,
+  repositoryRoot: string,
+  fs: FileSystem,
 ): ValidationReport => {
   const issues: ValidationIssue[] = [];
   const packageManifest = readJson(
