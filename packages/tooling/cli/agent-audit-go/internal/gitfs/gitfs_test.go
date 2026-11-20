@@ -6,19 +6,19 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/gitfs"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/processtest"
 )
 
 func tree(fake *processtest.Fake) gitfs.FS { return gitfs.FS{Runner: fake, Dir: "cat", Ref: "main"} }
 
 func TestReadFile(t *testing.T) {
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git show main:./sources.json", processtest.Reply{Stdout: "{}"}).
 		On("git show main:./sources.d/a.json", processtest.Reply{ExitCode: 128})
 	got, err := tree(fake).ReadFile("./sources.json")
-	if err != nil || string(got) != "{}" || fake.Calls[0].Dir != "cat" {
-		t.Fatalf("ReadFile = %q, %v, call %+v", got, err, fake.Calls[0])
+	if err != nil || string(got) != "{}" || fake.Calls()[0].Dir != "cat" {
+		t.Fatalf("ReadFile = %q, %v, call %+v", got, err, fake.Calls()[0])
 	}
 	if _, err := tree(fake).ReadFile("sources.d/a.json"); !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("err = %v", err)
@@ -26,7 +26,7 @@ func TestReadFile(t *testing.T) {
 }
 
 func TestStat(t *testing.T) {
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git cat-file -t main:./dir", processtest.Reply{Stdout: "tree\n"}).
 		On("git cat-file -t main:./file", processtest.Reply{Stdout: "blob\n"}).
 		On("git cat-file -s main:./file", processtest.Reply{Stdout: "42\n"}).
@@ -43,7 +43,7 @@ func TestStat(t *testing.T) {
 }
 
 func TestReadDir(t *testing.T) {
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git cat-file -t main:./sources.d", processtest.Reply{Stdout: "tree\n"}).
 		On("git ls-tree -z main:./sources.d", processtest.Reply{Stdout: "100644 blob aaa\tb.json\x00040000 tree bbb\tsub\x00100644 blob ccc\ta.json\x00"}).
 		On("git cat-file -t main:./file", processtest.Reply{Stdout: "blob\n"}).
@@ -63,7 +63,7 @@ func TestReadDir(t *testing.T) {
 }
 
 func TestReadDirIgnoresMalformedRecords(t *testing.T) {
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git cat-file -t main:./d", processtest.Reply{Stdout: "tree\n"}).
 		On("git ls-tree -z main:./d", processtest.Reply{Stdout: "garbage\x00\x00100644\tx\x00"})
 	got, err := tree(fake).ReadDir("d")
@@ -75,10 +75,10 @@ func TestReadDirIgnoresMalformedRecords(t *testing.T) {
 func TestFaultsOfTheRunnerPropagate(t *testing.T) {
 	boom := errors.New("no git")
 	cases := map[string]*processtest.Fake{
-		"show": processtest.New().On("git show main:./f", processtest.Reply{Err: boom}),
-		"type": processtest.New().On("git cat-file -t main:./f", processtest.Reply{Err: boom}),
-		"size": processtest.New().On("git cat-file -t main:./f", processtest.Reply{Stdout: "blob"}).On("git cat-file -s main:./f", processtest.Reply{Err: boom}),
-		"ls":   processtest.New().On("git cat-file -t main:./f", processtest.Reply{Stdout: "tree"}).On("git ls-tree -z main:./f", processtest.Reply{Err: boom}),
+		"show": processtest.Script().On("git show main:./f", processtest.Reply{Err: boom}),
+		"type": processtest.Script().On("git cat-file -t main:./f", processtest.Reply{Err: boom}),
+		"size": processtest.Script().On("git cat-file -t main:./f", processtest.Reply{Stdout: "blob"}).On("git cat-file -s main:./f", processtest.Reply{Err: boom}),
+		"ls":   processtest.Script().On("git cat-file -t main:./f", processtest.Reply{Stdout: "tree"}).On("git ls-tree -z main:./f", processtest.Reply{Err: boom}),
 	}
 	if _, err := tree(cases["show"]).ReadFile("f"); !errors.Is(err, boom) {
 		t.Errorf("show: %v", err)
@@ -98,7 +98,7 @@ func TestFaultsOfTheRunnerPropagate(t *testing.T) {
 }
 
 func TestTheTreeIsReadOnly(t *testing.T) {
-	f := tree(processtest.New())
+	f := tree(processtest.Script())
 	for name, err := range map[string]error{"write": f.WriteFile("a", nil), "mkdir": f.MkdirAll("a"), "remove": f.Remove("a")} {
 		if !errors.Is(err, gitfs.ErrReadOnly) {
 			t.Errorf("%s: err = %v", name, err)

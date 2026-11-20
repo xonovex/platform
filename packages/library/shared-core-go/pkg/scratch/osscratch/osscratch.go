@@ -1,5 +1,5 @@
 // Package osscratch is the scratch adapter that makes real temporary
-// directories. Only the composition root imports it.
+// directories. Only a composition root imports it.
 package osscratch
 
 import "os"

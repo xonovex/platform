@@ -14,8 +14,8 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/observe"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
 )
 
 // Name is the name of the transport in reports.
@@ -65,8 +65,8 @@ func (t Transport) Observe(ctx context.Context, request observe.Request) (observ
 	}
 	state.Resolved = true
 
-	git := func(args ...string) (process.Result, error) {
-		return t.Runner.Run(ctx, process.Command{Dir: dir, Name: "git", Args: args})
+	git := func(args ...string) (process.Captured, error) {
+		return process.Capture(ctx, t.Runner, process.Request{Dir: dir, Name: "git", Args: args})
 	}
 
 	if request.Pull {
@@ -113,7 +113,7 @@ func (t Transport) Observe(ctx context.Context, request observe.Request) (observ
 	return result, t.diff(git, source, state, state.Ref+".."+end)
 }
 
-type gitFunc func(args ...string) (process.Result, error)
+type gitFunc func(args ...string) (process.Captured, error)
 
 func (t Transport) diff(git gitFunc, source sources.Source, state *observe.Git, rng string) error {
 	paths := make([]string, 0, len(source.Watch))
@@ -220,7 +220,7 @@ func atoi(digits string) int {
 
 // lines returns the trimmed, non-empty lines of the output of a successful
 // command, and none for a command that failed.
-func lines(result process.Result) []string {
+func lines(result process.Captured) []string {
 	if !result.Succeeded() {
 		return nil
 	}

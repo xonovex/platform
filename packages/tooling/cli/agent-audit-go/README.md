@@ -61,7 +61,7 @@ The exit status is 0 when nothing reaches the failing level, 1 when a finding do
 | `internal/stamp` | Writes review dates |
 | `internal/legacy` | `SOURCES.md` converter |
 | `internal/render` | Text, JSON and SARIF output |
-| `internal/process`, `internal/web` | Ports for programs and HTTP, with `osexec`, `nethttp` and test doubles |
+| `internal/web` | Port for HTTP, with `nethttp` and a test double |
 
 ## Tasks
 

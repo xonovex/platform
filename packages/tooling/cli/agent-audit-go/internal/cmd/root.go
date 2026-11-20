@@ -14,8 +14,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/observe"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
 )
 
 // Name is the name of the binary.

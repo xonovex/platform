@@ -8,6 +8,7 @@ tags:
   - cli
 dependsOn:
   - shared-contract-go
+  - shared-core-go
   - id: eslint-config-cli
     scope: development
   - id: ts-config-cli
@@ -28,17 +29,15 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "92"
+      GO_COVERAGE_MIN: "94"
   go-package-coverage:
     script: |
       set -euo pipefail
       # Every package the module builds is named here. cmd/agent-eval is the
-      # composition root, and internal/process/osexec and
-      # internal/scratch/osscratch are the host adapters; go-integration covers
-      # all three, because a unit test may not start a process or touch the
-      # disk. internal/process and internal/scratch declare an interface and
-      # hold no statements. Every other package reaches the machine through a
-      # port, so the unit tier covers it with memfs, processtest, scratchtest and
+      # composition root that binds the host adapters of the shared libraries;
+      # go-integration covers it, because a unit test may not start a process or
+      # touch the disk. Every other package reaches the machine through a port,
+      # so the unit tier covers it with memfs, processtest, scratchtest and
       # protocoltest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-eval=exempt \
@@ -60,9 +59,6 @@ tasks:
         ./internal/predicate/filesystem=100 \
         ./internal/predicate/llm=100 \
         ./internal/predicate/session=100 \
-        ./internal/process=exempt \
-        ./internal/process/osexec=exempt \
-        ./internal/process/processtest=100 \
         ./internal/protocol=98 \
         ./internal/protocol/instruction=100 \
         ./internal/protocol/orchestration=96 \
@@ -73,9 +69,6 @@ tasks:
         ./internal/registry=100 \
         ./internal/report=100 \
         ./internal/run=98 \
-        ./internal/scratch=exempt \
-        ./internal/scratch/osscratch=exempt \
-        ./internal/scratch/scratchtest=100 \
         ./internal/settings=95 \
         ./internal/store=96
     inputs:

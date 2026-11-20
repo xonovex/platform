@@ -10,8 +10,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/observe"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/git"
 )
 
@@ -33,7 +33,7 @@ func observeWith(t *testing.T, fsys fs.FileSystem, fake *processtest.Fake, s sou
 }
 
 func scripted() *processtest.Fake {
-	return processtest.New().
+	return processtest.Script().
 		On("git tag --list", processtest.Reply{Stdout: "v1.0.0\nv1.2.0\nv1.10.0\nnightly\nv2.0.0-rc1\n"}).
 		On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{}).
 		On("git log --oneline abc1234..v1.10.0 -- src/components src/hooks", processtest.Reply{Stdout: "c3 third\nc2 second\nc1 first\n"}).
@@ -75,7 +75,7 @@ func TestObserveStaysCurrentWhenTheLatestReleaseIsPinned(t *testing.T) {
 
 func TestObserveDiffsToHeadWithoutAReleaseTagAndWithoutWatchedPaths(t *testing.T) {
 	s := sources.Source{Kind: sources.Git, Checkout: "../up", Commit: "abc1234"}
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git tag --list", processtest.Reply{Stdout: "nightly\n"}).
 		On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{}).
 		On("git log --oneline abc1234..HEAD", processtest.Reply{Stdout: "c1 first\n"}).
@@ -91,7 +91,7 @@ func TestObserveDiffsToHeadWithoutAReleaseTagAndWithoutWatchedPaths(t *testing.T
 
 func TestObserveFallsBackToTheVersionWhenNoCommitIsPinned(t *testing.T) {
 	s := sources.Source{Kind: sources.Git, Checkout: "../up", Version: "1.0.0"}
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git tag --list", processtest.Reply{Stdout: "1.0.0\n"}).
 		On("git rev-parse --verify --quiet 1.0.0^{commit}", processtest.Reply{}).
 		On("git log --oneline 1.0.0..1.0.0", processtest.Reply{}).
@@ -108,7 +108,7 @@ func TestObserveCapsTheListedCommits(t *testing.T) {
 		fmt.Fprintf(&many, "c%d subject\n", i)
 	}
 	s := sources.Source{Kind: sources.Git, Checkout: "../up", Commit: "abc1234"}
-	fake := processtest.New().
+	fake := processtest.Script().
 		On("git tag --list", processtest.Reply{}).
 		On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{}).
 		On("git log --oneline abc1234..HEAD", processtest.Reply{Stdout: many.String()}).
@@ -121,35 +121,35 @@ func TestObserveCapsTheListedCommits(t *testing.T) {
 
 func TestObserveReportsAnUnusableCheckoutAsState(t *testing.T) {
 	t.Run("no repository", func(t *testing.T) {
-		got, err := observeWith(t, memfs.New(nil), processtest.New(), source(), false)
+		got, err := observeWith(t, memfs.New(nil), processtest.Script(), source(), false)
 		if err != nil || got.Git.Resolved {
 			t.Fatalf("git = %+v, err = %v", got.Git, err)
 		}
 	})
 	t.Run("pull failed", func(t *testing.T) {
-		fake := processtest.New().On("git fetch --tags --quiet", processtest.Reply{ExitCode: 128})
+		fake := processtest.Script().On("git fetch --tags --quiet", processtest.Reply{ExitCode: 128})
 		got, err := observeWith(t, repo(), fake, source(), true)
-		if err != nil || !got.Git.PullFailed || len(fake.Calls) != 1 {
+		if err != nil || !got.Git.PullFailed || len(fake.Calls()) != 1 {
 			t.Fatalf("git = %+v, err = %v", got.Git, err)
 		}
 	})
 	t.Run("pull succeeded", func(t *testing.T) {
 		fake := scripted().On("git fetch --tags --quiet", processtest.Reply{})
 		got, err := observeWith(t, repo(), fake, source(), true)
-		if err != nil || got.Git.PullFailed || got.Git.CommitCount != 3 || fake.Calls[0].Dir != "cat/../up" && fake.Calls[0].Dir != "up" {
-			t.Fatalf("git = %+v, err = %v, first call %+v", got.Git, err, fake.Calls[0])
+		if err != nil || got.Git.PullFailed || got.Git.CommitCount != 3 || fake.Calls()[0].Dir != "cat/../up" && fake.Calls()[0].Dir != "up" {
+			t.Fatalf("git = %+v, err = %v, first call %+v", got.Git, err, fake.Calls()[0])
 		}
 	})
 	t.Run("nothing pinned", func(t *testing.T) {
 		s := sources.Source{Kind: sources.Git, Checkout: "../up"}
-		fake := processtest.New().On("git tag --list", processtest.Reply{Stdout: "v1.0.0\n"})
+		fake := processtest.Script().On("git tag --list", processtest.Reply{Stdout: "v1.0.0\n"})
 		got, err := observeWith(t, repo(), fake, s, false)
 		if err != nil || !got.Git.NoRef || got.Git.LatestVersion != "v1.0.0" || got.Git.Behind {
 			t.Fatalf("git = %+v, err = %v", got.Git, err)
 		}
 	})
 	t.Run("pinned ref missing", func(t *testing.T) {
-		fake := processtest.New().
+		fake := processtest.Script().
 			On("git tag --list", processtest.Reply{}).
 			On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{ExitCode: 1})
 		got, err := observeWith(t, repo(), fake, source(), false)
@@ -158,7 +158,7 @@ func TestObserveReportsAnUnusableCheckoutAsState(t *testing.T) {
 		}
 	})
 	t.Run("a failing tag listing reads as no release", func(t *testing.T) {
-		fake := processtest.New().
+		fake := processtest.Script().
 			On("git tag --list", processtest.Reply{ExitCode: 128}).
 			On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{ExitCode: 1})
 		got, err := observeWith(t, repo(), fake, source(), false)
@@ -167,7 +167,7 @@ func TestObserveReportsAnUnusableCheckoutAsState(t *testing.T) {
 		}
 	})
 	t.Run("a failing log reads as no commits", func(t *testing.T) {
-		fake := processtest.New().
+		fake := processtest.Script().
 			On("git tag --list", processtest.Reply{}).
 			On("git rev-parse --verify --quiet abc1234^{commit}", processtest.Reply{}).
 			On("git log --oneline abc1234..HEAD -- src/components src/hooks", processtest.Reply{ExitCode: 128}).
@@ -197,7 +197,7 @@ func TestObservePropagatesAFaultOfTheInfrastructure(t *testing.T) {
 		})
 	}
 	t.Run("stat", func(t *testing.T) {
-		_, err := observeWith(t, statFails{repo(), boom}, processtest.New(), source(), false)
+		_, err := observeWith(t, statFails{repo(), boom}, processtest.Script(), source(), false)
 		if !errors.Is(err, boom) {
 			t.Fatalf("err = %v", err)
 		}

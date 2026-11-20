@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process"
 )
 
 type stub struct{ name string }

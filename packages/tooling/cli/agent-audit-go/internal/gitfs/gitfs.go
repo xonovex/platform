@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 )
 
 // ErrReadOnly reports a write to a tree of a git ref.
@@ -30,8 +30,8 @@ type FS struct {
 	Ref string
 }
 
-func (f FS) git(args ...string) (process.Result, error) {
-	return f.Runner.Run(context.Background(), process.Command{Dir: f.Dir, Name: "git", Args: args})
+func (f FS) git(args ...string) (process.Captured, error) {
+	return process.Capture(context.Background(), f.Runner, process.Request{Dir: f.Dir, Name: "git", Args: args})
 }
 
 // object names a path of the tree, relative to the working directory.

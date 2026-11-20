@@ -27,7 +27,7 @@ const module = "github.com/xonovex/platform/packages/tooling/cli/agent-eval-go"
 var allowed = map[string][]string{
 	// The composition root binds every adapter and the registries.
 	"cmd/agent-eval": {
-		"internal/cmd", "internal/execute", "internal/process/osexec", "internal/registry", "internal/scratch/osscratch",
+		"internal/cmd", "internal/execute", "internal/registry",
 	},
 
 	// The driving adapter reaches the core and the ports, never an adapter.
@@ -58,16 +58,12 @@ var allowed = map[string][]string{
 	"internal/migrate":  {"internal/document", "internal/model"},
 	"internal/report":   {"internal/model", "internal/run"},
 	"internal/run":      {"internal/budget", "internal/model", "internal/protocol", "internal/store"},
-	"internal/execute":  {"internal/harness", "internal/process", "internal/scratch"},
+	"internal/execute":  {"internal/harness"},
 	"internal/judge":    {"internal/harness", "internal/model"},
 
 	// Ports. A port holds the contract and the test double holds a fake.
-	"internal/process":             {},
-	"internal/process/processtest": {"internal/process"},
-	"internal/scratch":             {},
-	"internal/scratch/scratchtest": {},
-	"internal/harness":             {"internal/model", "internal/process"},
-	"internal/predicate":           {"internal/harness", "internal/judge", "internal/model"},
+	"internal/harness":   {"internal/model"},
+	"internal/predicate": {"internal/harness", "internal/judge", "internal/model"},
 	"internal/protocol": {
 		"internal/catalog", "internal/document", "internal/harness", "internal/judge", "internal/model",
 		"internal/predicate", "internal/settings",
@@ -78,10 +74,8 @@ var allowed = map[string][]string{
 	},
 
 	// Leaves: one variant of one axis each. A leaf knows its port and never a sibling.
-	"internal/process/osexec":         {"internal/process"},
-	"internal/scratch/osscratch":      {},
-	"internal/harness/claude":         {"internal/harness", "internal/model", "internal/process"},
-	"internal/harness/codex":          {"internal/harness", "internal/model", "internal/process"},
+	"internal/harness/claude":         {"internal/harness", "internal/model"},
+	"internal/harness/codex":          {"internal/harness", "internal/model"},
 	"internal/predicate/filesystem":   {"internal/model", "internal/predicate"},
 	"internal/predicate/llm":          {"internal/judge", "internal/model", "internal/predicate"},
 	"internal/predicate/session":      {"internal/harness", "internal/model", "internal/predicate"},
@@ -92,11 +86,42 @@ var allowed = map[string][]string{
 	"internal/protocol/orchestration": {"internal/document", "internal/harness", "internal/judge", "internal/model", "internal/predicate", "internal/protocol", "internal/settings"},
 }
 
+// library is the path prefix of the shared Go libraries.
+const library = "github.com/xonovex/platform/packages/library/"
+
+// libraries lists, for each package, the library packages it may import from
+// its non-test files. A package missing from the table imports no library, so a
+// new edge into a library is a decision in this file.
+var libraries = map[string][]string{
+	"cmd/agent-eval": {
+		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
+		"shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
+	},
+	"internal/baseline":              {"shared-contract-go/pkg/fs"},
+	"internal/catalog":               {"shared-contract-go/pkg/fs"},
+	"internal/cmd":                   {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema"},
+	"internal/cost":                  {"shared-contract-go/pkg/fs"},
+	"internal/document":              {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema", "shared-contract-go/pkg/schemas"},
+	"internal/execute":               {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process", "shared-core-go/pkg/scratch"},
+	"internal/harness":               {"shared-core-go/pkg/process"},
+	"internal/harness/claude":        {"shared-core-go/pkg/process"},
+	"internal/harness/codex":         {"shared-core-go/pkg/process"},
+	"internal/migrate":               {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/schemas"},
+	"internal/model":                 {"shared-contract-go/pkg/condition"},
+	"internal/protocol":              {"shared-contract-go/pkg/fs"},
+	"internal/protocol/protocoltest": {"shared-contract-go/pkg/fs/memfs", "shared-contract-go/pkg/wiring"},
+	"internal/store":                 {"shared-contract-go/pkg/fs"},
+}
+
+// hostLibraries are the library leaves that touch the host. Only the
+// composition root imports them, and no unit test does.
+var hostLibraries = []string{
+	"shared-contract-go/pkg/fs/osfs", "shared-core-go/pkg/process/osexec", "shared-core-go/pkg/scratch/osscratch",
+}
+
 // concrete lists the packages that bind a port to a technology or name a
 // variant, with the one package that may import each from non-test code.
 var concrete = map[string]string{
-	"internal/process/osexec":         "cmd/agent-eval",
-	"internal/scratch/osscratch":      "cmd/agent-eval",
 	"internal/registry":               "cmd/agent-eval",
 	"internal/harness/claude":         "internal/registry",
 	"internal/harness/codex":          "internal/registry",
@@ -113,8 +138,6 @@ var concrete = map[string]string{
 // doubles are the test-double packages. They are for tests only: no non-test
 // package outside the table imports them, and they may name leaves.
 var doubles = map[string]bool{
-	"internal/process/processtest":   true,
-	"internal/scratch/scratchtest":   true,
 	"internal/protocol/protocoltest": true,
 }
 
@@ -132,9 +155,7 @@ var hostImports = map[string]bool{
 
 // hostAdapters may import hostImports from non-test code.
 var hostAdapters = map[string]bool{
-	"cmd/agent-eval":             true,
-	"internal/process/osexec":    true,
-	"internal/scratch/osscratch": true,
+	"cmd/agent-eval": true,
 }
 
 // clockRoots may read the clock: the composition root hands the instant to the
@@ -273,6 +294,31 @@ func TestInternalImportsFollowTheTable(t *testing.T) {
 	}
 }
 
+// TestLibraryImportsFollowTheTable keeps each edge into a shared library a
+// decision of the libraries table.
+func TestLibraryImportsFollowTheTable(t *testing.T) {
+	for _, f := range nonTest(moduleFiles(t)) {
+		for _, imp := range f.imports {
+			rel, inside := strings.CutPrefix(imp, library)
+			if inside && !contains(libraries[f.dir], rel) {
+				t.Errorf("%s imports %s; %s may import only the libraries %v", f.path, rel, f.dir, libraries[f.dir])
+			}
+		}
+	}
+}
+
+// TestNoUnitTestImportsAHostLibrary keeps every unit test off the real host.
+func TestNoUnitTestImportsAHostLibrary(t *testing.T) {
+	for _, f := range moduleFiles(t) {
+		for _, imp := range f.imports {
+			rel, inside := strings.CutPrefix(imp, library)
+			if f.test && inside && contains(hostLibraries, rel) {
+				t.Errorf("%s imports %s; a unit test stays off the host", f.path, rel)
+			}
+		}
+	}
+}
+
 // TestConcretePackagesHaveOneImporter keeps a variant behind its port: the
 // registry is the one file that names the concrete leaves, and the main package
 // the one that names the host adapters and the registry.
@@ -289,12 +335,11 @@ func TestConcretePackagesHaveOneImporter(t *testing.T) {
 }
 
 // TestOnlyDeclaredPackagesImportThirdParty keeps the core on the standard
-// library and the contract module.
+// library and the shared libraries.
 func TestOnlyDeclaredPackagesImportThirdParty(t *testing.T) {
-	const contract = "github.com/xonovex/platform/packages/library/shared-contract-go"
 	for _, f := range moduleFiles(t) {
 		for _, imp := range f.imports {
-			if isStdlib(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, contract) {
+			if isStdlib(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, library) {
 				continue
 			}
 			want, ok := thirdParty[f.dir]

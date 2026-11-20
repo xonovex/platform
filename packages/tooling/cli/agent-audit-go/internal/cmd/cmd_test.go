@@ -12,8 +12,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/cmd"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/web"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/web/webtest"
@@ -43,7 +43,7 @@ func newHarness(t *testing.T, files map[string]string) *harness {
 	}
 	h := &harness{out: &bytes.Buffer{}, err: &bytes.Buffer{}, fs: fsys}
 	h.web = webtest.New(map[string]webtest.Page{"https://e.test/doc": {{Response: web.Response{Status: 200, Body: []byte("body")}}}})
-	h.git = processtest.New()
+	h.git = processtest.Script()
 	h.deps = cmd.Dependencies{
 		FS: fsys, Runner: h.git,
 		Transports: plugins.DefaultRegistry(plugins.Ports{FS: fsys, Runner: h.git, Web: h.web}),

@@ -4,8 +4,8 @@ package plugins
 
 import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/observe"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/filesystem"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/git"
 	httptransport "github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/http"

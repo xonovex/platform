@@ -8,6 +8,11 @@ linters:
     - unused
     - ineffassign
     - misspell
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
 
 formatters:
   enable:
@@ -23,4 +28,8 @@ formatters:
 run:
   timeout: 5m
   tests: true
+  # The architecture and integration tests carry build tags, so lint reads them.
+  build-tags:
+    - arch
+    - integration
   modules-download-mode: readonly

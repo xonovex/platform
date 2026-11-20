@@ -8,6 +8,7 @@ tags:
   - cli
 dependsOn:
   - shared-contract-go
+  - shared-core-go
   - id: eslint-config-cli
     scope: development
   - id: ts-config-cli
@@ -28,17 +29,17 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "92"
+      GO_COVERAGE_MIN: "95"
   go-package-coverage:
     script: |
       set -euo pipefail
       # Every package the module builds is named here. cmd/agent-audit is the
-      # composition root, internal/process/osexec and internal/web/nethttp are
-      # the host adapters; go-integration covers all three, because a unit test
-      # may not start a process or open a socket. internal/web declares an
-      # interface and holds no statements. Every other package reaches the
-      # machine through a port, so the unit tier covers it with the memory file
-      # system, processtest and webtest.
+      # composition root and internal/web/nethttp is the host adapter;
+      # go-integration covers both, because a unit test may not start a process
+      # or open a socket. internal/web declares an interface and holds no
+      # statements. Every other package reaches the machine through a port, so
+      # the unit tier covers it with the memory file system, processtest and
+      # webtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-audit=exempt \
         ./internal/audit=100 \
@@ -49,9 +50,6 @@ tasks:
         ./internal/gitfs=100 \
         ./internal/legacy=98 \
         ./internal/observe=100 \
-        ./internal/process=exempt \
-        ./internal/process/osexec=exempt \
-        ./internal/process/processtest=100 \
         ./internal/render=100 \
         ./internal/rules=100 \
         ./internal/stamp=97 \

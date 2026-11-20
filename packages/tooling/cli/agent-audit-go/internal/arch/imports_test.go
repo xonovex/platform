@@ -26,12 +26,12 @@ const module = "github.com/xonovex/platform/packages/tooling/cli/agent-audit-go"
 // always a decision in this file.
 var allowed = map[string][]string{
 	// The composition root binds every adapter.
-	"cmd/agent-audit": {"internal/cmd", "internal/process/osexec", "internal/transport/plugins", "internal/web/nethttp"},
+	"cmd/agent-audit": {"internal/cmd", "internal/transport/plugins", "internal/web/nethttp"},
 
 	// The driving adapter reaches the core and the ports, never an adapter.
 	"internal/cmd": {
 		"internal/audit", "internal/catalogs", "internal/compare", "internal/compare/gitbase",
-		"internal/legacy", "internal/observe", "internal/process", "internal/render",
+		"internal/legacy", "internal/observe", "internal/render",
 		"internal/rules", "internal/stamp",
 	},
 
@@ -46,36 +46,69 @@ var allowed = map[string][]string{
 	"internal/stamp":    {},
 
 	// Ports and the test doubles of the ports.
-	"internal/process":             {},
-	"internal/process/processtest": {"internal/process"},
-	"internal/web":                 {},
-	"internal/web/webtest":         {"internal/web"},
+	"internal/web":         {},
+	"internal/web/webtest": {"internal/web"},
 
 	// Adapters: one port each, plus the registry that names them.
-	"internal/compare/gitbase":      {"internal/gitfs", "internal/process"},
-	"internal/gitfs":                {"internal/process"},
-	"internal/process/osexec":       {"internal/process"},
+	"internal/compare/gitbase":      {"internal/gitfs"},
+	"internal/gitfs":                {},
 	"internal/web/nethttp":          {"internal/web"},
 	"internal/transport/filesystem": {"internal/observe"},
-	"internal/transport/git":        {"internal/observe", "internal/process"},
+	"internal/transport/git":        {"internal/observe"},
 	"internal/transport/http":       {"internal/observe", "internal/web"},
 	"internal/transport/plugins": {
-		"internal/observe", "internal/process", "internal/transport/filesystem",
+		"internal/observe", "internal/transport/filesystem",
 		"internal/transport/git", "internal/transport/http", "internal/web",
 	},
 }
+
+// library is the path prefix of the shared Go libraries.
+const library = "github.com/xonovex/platform/packages/library/"
+
+// libraries lists, for each package, the library packages it may import from
+// its non-test files. A package missing from the table imports no library, so a
+// new edge into a library is a decision in this file.
+var libraries = map[string][]string{
+	"cmd/agent-audit": {
+		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs/osfs", "shared-contract-go/pkg/wiring",
+		"shared-core-go/pkg/process/osexec",
+	},
+	"internal/audit":    {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
+	"internal/catalogs": {"shared-contract-go/pkg/discovery", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
+	"internal/cmd": {
+		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/jsonschema",
+		"shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources", "shared-core-go/pkg/process",
+	},
+	"internal/compare": {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sources"},
+	"internal/compare/gitbase": {
+		"shared-contract-go/pkg/findings", "shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources",
+		"shared-core-go/pkg/process",
+	},
+	"internal/gitfs":                {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process"},
+	"internal/legacy":               {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/schemas", "shared-contract-go/pkg/sources"},
+	"internal/observe":              {"shared-contract-go/pkg/sources"},
+	"internal/render":               {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sarif"},
+	"internal/rules":                {"shared-contract-go/pkg/findings", "shared-contract-go/pkg/sources"},
+	"internal/stamp":                {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
+	"internal/transport/filesystem": {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources"},
+	"internal/transport/git":        {"shared-contract-go/pkg/fs", "shared-contract-go/pkg/sources", "shared-core-go/pkg/process"},
+	"internal/transport/http":       {"shared-contract-go/pkg/sources"},
+	"internal/transport/plugins":    {"shared-contract-go/pkg/fs", "shared-core-go/pkg/process"},
+}
+
+// hostLibraries are the library leaves that touch the host. Only the
+// composition root imports them, and no unit test does.
+var hostLibraries = []string{"shared-contract-go/pkg/fs/osfs", "shared-core-go/pkg/process/osexec"}
 
 // concrete lists the packages that bind a port to a technology or name a
 // concrete transport, with the one package that may import each from non-test
 // code. The test doubles are for tests only.
 var concrete = map[string]string{
-	"internal/process/osexec":       "cmd/agent-audit",
 	"internal/web/nethttp":          "cmd/agent-audit",
 	"internal/transport/filesystem": "internal/transport/plugins",
 	"internal/transport/git":        "internal/transport/plugins",
 	"internal/transport/http":       "internal/transport/plugins",
 	"internal/transport/plugins":    "cmd/agent-audit",
-	"internal/process/processtest":  "",
 	"internal/web/webtest":          "",
 }
 
@@ -93,9 +126,8 @@ var hostImports = map[string]bool{
 
 // hostAdapters may import hostImports from non-test code.
 var hostAdapters = map[string]bool{
-	"cmd/agent-audit":         true,
-	"internal/process/osexec": true,
-	"internal/web/nethttp":    true,
+	"cmd/agent-audit":      true,
+	"internal/web/nethttp": true,
 }
 
 // clockRoots may read the clock: the composition root hands the instant to the
@@ -234,6 +266,31 @@ func TestInternalImportsFollowTheTable(t *testing.T) {
 	}
 }
 
+// TestLibraryImportsFollowTheTable keeps each edge into a shared library a
+// decision of the libraries table.
+func TestLibraryImportsFollowTheTable(t *testing.T) {
+	for _, f := range nonTest(moduleFiles(t)) {
+		for _, imp := range f.imports {
+			rel, inside := strings.CutPrefix(imp, library)
+			if inside && !contains(libraries[f.dir], rel) {
+				t.Errorf("%s imports %s; %s may import only the libraries %v", f.path, rel, f.dir, libraries[f.dir])
+			}
+		}
+	}
+}
+
+// TestNoUnitTestImportsAHostLibrary keeps every unit test off the real host.
+func TestNoUnitTestImportsAHostLibrary(t *testing.T) {
+	for _, f := range moduleFiles(t) {
+		for _, imp := range f.imports {
+			rel, inside := strings.CutPrefix(imp, library)
+			if f.test && inside && contains(hostLibraries, rel) {
+				t.Errorf("%s imports %s; a unit test stays off the host", f.path, rel)
+			}
+		}
+	}
+}
+
 // TestConcretePackagesHaveOneImporter keeps a technology behind its port: the
 // registry is the one file that names the concrete transports, and the main
 // package the one that names the adapters and the registry.
@@ -264,12 +321,11 @@ func TestTheRegistryIsTheOnlyFileThatNamesTransports(t *testing.T) {
 }
 
 // TestOnlyDeclaredPackagesImportThirdParty keeps the core on the standard
-// library and the contract module.
+// library and the shared libraries.
 func TestOnlyDeclaredPackagesImportThirdParty(t *testing.T) {
-	const contract = "github.com/xonovex/platform/packages/library/shared-contract-go"
 	for _, f := range moduleFiles(t) {
 		for _, imp := range f.imports {
-			if isStdlib(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, contract) {
+			if isStdlib(imp) || strings.HasPrefix(imp, module) || strings.HasPrefix(imp, library) {
 				continue
 			}
 			want, ok := thirdParty[f.dir]

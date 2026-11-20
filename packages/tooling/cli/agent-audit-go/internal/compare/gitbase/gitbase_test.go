@@ -8,8 +8,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/compare/gitbase"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/processtest"
 )
 
 const catalog = `{"version":1,"sources":[{"id":"a","kind":"original","title":"A","provenance":"p","reviewedAt":"2026-01-01"}]}`
@@ -19,7 +19,7 @@ func newBase(fake *processtest.Fake) gitbase.Base {
 }
 
 func known() *processtest.Fake {
-	return processtest.New().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{})
+	return processtest.Script().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{})
 }
 
 func TestCatalogReadsTheTreeOfTheRef(t *testing.T) {
@@ -45,7 +45,7 @@ func TestACatalogThatDidNotExistIsEmpty(t *testing.T) {
 }
 
 func TestAnUnknownRefIsAnError(t *testing.T) {
-	fake := processtest.New().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{ExitCode: 1})
+	fake := processtest.Script().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{ExitCode: 1})
 	if _, err := newBase(fake).Catalog("cat"); !errors.Is(err, gitbase.ErrUnknownRef) {
 		t.Errorf("Catalog: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestAnUnknownRefIsAnError(t *testing.T) {
 
 func TestFaultsPropagate(t *testing.T) {
 	boom := errors.New("boom")
-	failing := processtest.New().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{Err: boom})
+	failing := processtest.Script().On("git rev-parse --verify --quiet main^{commit}", processtest.Reply{Err: boom})
 	if _, err := newBase(failing).Catalog("cat"); !errors.Is(err, boom) {
 		t.Errorf("verify: %v", err)
 	}

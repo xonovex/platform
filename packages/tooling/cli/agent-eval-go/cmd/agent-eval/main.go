@@ -13,11 +13,11 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/osexec"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/osscratch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/execute"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process/osexec"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/registry"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/scratch/osscratch"
 )
 
 // retryPause is how long the executor waits after a failed attempt, per attempt

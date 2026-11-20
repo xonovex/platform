@@ -12,8 +12,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/audit"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/processtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/rules"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/web"
@@ -57,7 +57,7 @@ const cleanCatalog = `{"version":1,"sources":[
 
 func TestCleanCatalogPasses(t *testing.T) {
 	fsys := memfs.New(map[string]string{"s/sources.json": cleanCatalog, "s/references/a.md": "x"})
-	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.New(), webtest.New(nil)), "s", options())
+	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.Script(), webtest.New(nil)), "s", options())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestCleanCatalogPasses(t *testing.T) {
 }
 
 func TestMissingCatalogStopsTheAudit(t *testing.T) {
-	report, err := audit.Catalog(context.Background(), deps(t, memfs.New(map[string]string{"s/x": ""}), processtest.New(), webtest.New(nil)), "s", options())
+	report, err := audit.Catalog(context.Background(), deps(t, memfs.New(map[string]string{"s/x": ""}), processtest.Script(), webtest.New(nil)), "s", options())
 	if err != nil || len(report.Findings) != 1 || report.Findings[0].Code != sources.CodeMissing {
 		t.Fatalf("report = %+v, err = %v", report, err)
 	}
@@ -82,7 +82,7 @@ func TestEveryRuleReachesTheReport(t *testing.T) {
   {"id":"unmapped","kind":"original","title":"Unmapped","provenance":"here","reviewedAt":"2026-11-01"},
   {"id":"unpinned","kind":"web","title":"Unpinned","urls":["https://e.test/doc"],"version":"1.0.0","reviewedAt":"2026-11-01","feeds":["references/a.md"]}]}`
 	fsys := memfs.New(map[string]string{"s/sources.json": catalog, "s/references/a.md": "x", "s/references/b.md": "x"})
-	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.New(), webtest.New(nil)), "s", options())
+	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.Script(), webtest.New(nil)), "s", options())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -102,7 +102,7 @@ func TestRemoteTransportsRunOnlyWhenFetching(t *testing.T) {
 	files := map[string]string{"s/sources.json": catalog, "s/references/a.md": "x"}
 	client := webtest.New(map[string]webtest.Page{"https://e.test/doc": {{Response: web.Response{Status: 200, Body: []byte("# Other\n")}}}})
 
-	offline, err := audit.Catalog(context.Background(), deps(t, memfs.New(files), processtest.New(), client), "s", options())
+	offline, err := audit.Catalog(context.Background(), deps(t, memfs.New(files), processtest.Script(), client), "s", options())
 	if err != nil || has(offline.Findings, rules.CodeAnchorMissing) || len(client.Requests) != 0 {
 		t.Fatalf("offline: %v, err %v, requests %v", codes(offline.Findings), err, client.Requests)
 	}
@@ -112,7 +112,7 @@ func TestRemoteTransportsRunOnlyWhenFetching(t *testing.T) {
 
 	opts := options()
 	opts.Fetch = true
-	online, err := audit.Catalog(context.Background(), deps(t, memfs.New(files), processtest.New(), client), "s", opts)
+	online, err := audit.Catalog(context.Background(), deps(t, memfs.New(files), processtest.Script(), client), "s", opts)
 	if err != nil || !has(online.Findings, rules.CodeAnchorMissing) {
 		t.Fatalf("online: %v, err %v", codes(online.Findings), err)
 	}
@@ -125,7 +125,7 @@ func TestLocalTransportsRunOffline(t *testing.T) {
 	catalog := `{"version":1,"sources":[{"id":"file","kind":"filesystem","title":"File","path":"docs/spec.md","reviewedAt":"2026-11-01","feeds":["references/a.md"],
     "claims":[{"id":"c","statement":"s","anchor":"gone"}]}]}`
 	fsys := memfs.New(map[string]string{"s/sources.json": catalog, "s/references/a.md": "x", "s/docs/spec.md": "# Spec\n"})
-	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.New(), webtest.New(nil)), "s", options())
+	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.Script(), webtest.New(nil)), "s", options())
 	if err != nil || !has(report.Findings, rules.CodeAnchorMissing) {
 		t.Fatalf("%v, err %v", codes(report.Findings), err)
 	}
@@ -134,7 +134,7 @@ func TestLocalTransportsRunOffline(t *testing.T) {
 func TestATransportThatCannotRunIsAFinding(t *testing.T) {
 	catalog := `{"version":1,"sources":[{"id":"up","kind":"git","title":"Up","checkout":"../up","commit":"abc1234","reviewedAt":"2026-11-01","feeds":["references/a.md"]}]}`
 	fsys := memfs.New(map[string]string{"s/sources.json": catalog, "s/references/a.md": "x", "up/.git/HEAD": "ref"})
-	runner := processtest.New().On("git tag --list", processtest.Reply{Err: errors.New("git is not installed")})
+	runner := processtest.Script().On("git tag --list", processtest.Reply{Err: errors.New("git is not installed")})
 	report, err := audit.Catalog(context.Background(), deps(t, fsys, runner, webtest.New(nil)), "s", options())
 	if err != nil {
 		t.Fatal(err)
@@ -154,14 +154,14 @@ func TestCoverDirCanBeTurnedOffOrBeAbsent(t *testing.T) {
 	fsys := memfs.New(map[string]string{"s/sources.json": cleanCatalog, "s/references/a.md": "x", "s/references/extra.md": "x"})
 	opts := options()
 	opts.CoverDir = ""
-	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.New(), webtest.New(nil)), "s", opts)
+	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.Script(), webtest.New(nil)), "s", opts)
 	if err != nil || has(report.Findings, rules.CodeReferenceUncovered) {
 		t.Fatalf("%v, err %v", codes(report.Findings), err)
 	}
 	// The cleanCatalog feeds references/a.md, which this file system lacks.
 	noDir := memfs.New(map[string]string{"s/sources.json": cleanCatalog})
 	opts.CoverDir = "references"
-	report, err = audit.Catalog(context.Background(), deps(t, noDir, processtest.New(), webtest.New(nil)), "s", opts)
+	report, err = audit.Catalog(context.Background(), deps(t, noDir, processtest.Script(), webtest.New(nil)), "s", opts)
 	if err != nil || has(report.Findings, rules.CodeReferenceUncovered) || !has(report.Findings, rules.CodeReferenceDangling) {
 		t.Fatalf("%v, err %v", codes(report.Findings), err)
 	}
@@ -184,10 +184,10 @@ func TestFileSystemFaultsAreErrors(t *testing.T) {
 	boom := errors.New("boom")
 	base := memfs.New(map[string]string{"s/sources.json": cleanCatalog, "s/references/a.md": "x"})
 
-	if _, err := audit.Catalog(context.Background(), deps(t, faulty{FileSystem: base, readDir: boom, only: "s/sources.d"}, processtest.New(), webtest.New(nil)), "s", options()); !errors.Is(err, boom) {
+	if _, err := audit.Catalog(context.Background(), deps(t, faulty{FileSystem: base, readDir: boom, only: "s/sources.d"}, processtest.Script(), webtest.New(nil)), "s", options()); !errors.Is(err, boom) {
 		t.Errorf("loader fault: err = %v", err)
 	}
-	if _, err := audit.Catalog(context.Background(), deps(t, faulty{FileSystem: base, readDir: boom, only: "s/references"}, processtest.New(), webtest.New(nil)), "s", options()); !errors.Is(err, boom) {
+	if _, err := audit.Catalog(context.Background(), deps(t, faulty{FileSystem: base, readDir: boom, only: "s/references"}, processtest.Script(), webtest.New(nil)), "s", options()); !errors.Is(err, boom) {
 		t.Errorf("listing fault: err = %v", err)
 	}
 }
@@ -196,7 +196,7 @@ func TestMappingIgnoresAFailingExistenceCheck(t *testing.T) {
 	// A feed whose existence cannot be decided is reported as dangling.
 	boom := errors.New("boom")
 	fsys := statFaulty{FileSystem: memfs.New(map[string]string{"s/sources.json": cleanCatalog}), err: boom}
-	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.New(), webtest.New(nil)), "s", options())
+	report, err := audit.Catalog(context.Background(), deps(t, fsys, processtest.Script(), webtest.New(nil)), "s", options())
 	if err == nil && !has(report.Findings, rules.CodeReferenceDangling) {
 		t.Fatalf("%v", codes(report.Findings))
 	}

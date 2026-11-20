@@ -9,8 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/osexec"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/web/nethttp"
 )
 
@@ -48,30 +46,5 @@ func TestNetHTTPReportsFaults(t *testing.T) {
 	}
 	if _, err := client.Get(context.Background(), "://bad"); err == nil {
 		t.Error("a malformed URL must be an error")
-	}
-}
-
-func TestOSExecRunsAProgram(t *testing.T) {
-	runner := osexec.New()
-	dir := t.TempDir()
-
-	ok, err := runner.Run(context.Background(), process.Command{Dir: dir, Name: "git", Args: []string{"--version"}})
-	if err != nil || !ok.Succeeded() || !strings.HasPrefix(string(ok.Stdout), "git version") {
-		t.Fatalf("ok = %+v, %v", ok, err)
-	}
-
-	// A program that exits with a status is a result, not an error.
-	failed, err := runner.Run(context.Background(), process.Command{Dir: dir, Name: "git", Args: []string{"rev-parse", "--verify", "--quiet", "HEAD"}})
-	if err != nil || failed.Succeeded() {
-		t.Fatalf("failed = %+v, %v", failed, err)
-	}
-
-	if _, err := runner.Run(context.Background(), process.Command{Name: "agent-audit-no-such-program"}); err == nil {
-		t.Error("a program that cannot start must be an error")
-	}
-	cancelled, cancel := context.WithCancel(context.Background())
-	cancel()
-	if _, err := runner.Run(cancelled, process.Command{Name: "git", Args: []string{"--version"}}); err == nil {
-		t.Error("a cancelled context must be an error")
 	}
 }

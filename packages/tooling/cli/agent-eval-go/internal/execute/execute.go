@@ -14,9 +14,9 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/scratch"
 )
 
 // Attempts is how many times a run is tried before its failure voids the batch.
@@ -101,7 +101,7 @@ func (e Executor) once(ctx context.Context, h harness.Harness, req harness.Reque
 	args := append(append([]string{}, plan.Args...), "--", plan.Prompt)
 	result, err := e.Runner.Run(ctx, process.Request{
 		Dir: plan.Dir, Name: h.Binary(), Args: args, Env: plan.Env, Timeout: req.Caps.Timeout,
-	}, scanner.Feed)
+	}, process.Lines(scanner.Feed))
 	if err != nil {
 		if ctx.Err() != nil {
 			return harness.Observation{}, ctx.Err()

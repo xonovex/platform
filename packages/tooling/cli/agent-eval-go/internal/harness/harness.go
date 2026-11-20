@@ -12,8 +12,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process"
 )
 
 // Role is what a run is for. It decides which tools the harness may use.

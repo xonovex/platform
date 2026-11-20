@@ -12,8 +12,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/osfs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/osexec"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/cmd"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process/osexec"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/transport/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/web/nethttp"
 )

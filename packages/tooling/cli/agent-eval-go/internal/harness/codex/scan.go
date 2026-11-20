@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/model"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process"
 )
 
 // triggerOutputLimit is how many answer characters a trigger run may stream

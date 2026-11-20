@@ -58,7 +58,6 @@ The exit status is 0 on a pass, 1 on a fail, 2 when the input is invalid or an i
 | `internal/execute`, `internal/judge` | Runs one request with retries, and grades with a model |
 | `internal/document`, `internal/model`, `internal/catalog`, `internal/settings`, `internal/budget` | Documents, plugin discovery, settings and caps |
 | `internal/store`, `internal/baseline`, `internal/cost`, `internal/report`, `internal/migrate`, `internal/ablation` | Checkpoints, baselines, cost history, output, legacy conversion, rule ablation |
-| `internal/process`, `internal/scratch` | Ports for programs and throwaway directories, with `osexec`, `osscratch` and test doubles |
 
 ## Tasks
 

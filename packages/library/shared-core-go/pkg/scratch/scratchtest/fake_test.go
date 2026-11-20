@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/scratch/scratchtest"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/scratchtest"
 )
 
 func TestMakeNumbersDirectoriesAndRemoveRecords(t *testing.T) {

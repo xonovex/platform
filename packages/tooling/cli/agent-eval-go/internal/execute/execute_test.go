@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs/memfs"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process/processtest"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/scratch/scratchtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/execute"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/harness"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/process/processtest"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/scratch/scratchtest"
 )
 
 type leaf struct{ stages []harness.Stage }
@@ -69,7 +69,7 @@ func TestExecuteStagesRunsAndCleans(t *testing.T) {
 		{Kind: harness.StageAppend, Dst: "/scratch/agent-eval-1/skills/one/SKILL.md", Content: "+tail"},
 		{Kind: harness.StageWrite, Dst: "/scratch/agent-eval-1/w.txt", Content: "w"},
 	}
-	f := build(leaf{stages}, processtest.Sequence(processtest.Reply{Lines: []string{"a", "b"}}),
+	f := build(leaf{stages}, processtest.Sequence(processtest.Reply{Stdout: processtest.Lines("a", "b")}),
 		map[string]string{"/skills/one/SKILL.md": "skill", "/skills/one/ref/r.md": "ref"})
 	obs, err := f.exec.Execute(context.Background(), harness.Request{
 		Harness: "leaf", Prompt: "go", Fixtures: []harness.File{{Path: "in/a.txt", Content: "fx"}},
@@ -96,7 +96,7 @@ func TestExecuteStagesRunsAndCleans(t *testing.T) {
 
 func TestExecuteRetriesThenSucceeds(t *testing.T) {
 	f := build(leaf{}, processtest.Sequence(
-		processtest.Reply{ExitCode: 1}, processtest.Reply{Err: errors.New("spawn")}, processtest.Reply{Lines: []string{"ok"}},
+		processtest.Reply{ExitCode: 1}, processtest.Reply{Err: errors.New("spawn")}, processtest.Reply{Stdout: processtest.Lines("ok")},
 	), nil)
 	obs, err := f.exec.Execute(context.Background(), harness.Request{Harness: "leaf"})
 	if err != nil || obs.Text != "ok" || len(f.proc.Calls()) != 3 || len(f.scratch.Removed()) != 3 {

@@ -11,8 +11,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/findings"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/fs"
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/sources"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/process"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/gitfs"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/process"
 )
 
 // ErrUnknownRef reports a base ref that the repository does not have.
@@ -26,8 +26,8 @@ type Base struct {
 	LoaderFor func(fs.FileSystem) (sources.Loader, error)
 }
 
-func (b Base) git(dir string, args ...string) (process.Result, error) {
-	return b.Runner.Run(context.Background(), process.Command{Dir: dir, Name: "git", Args: args})
+func (b Base) git(dir string, args ...string) (process.Captured, error) {
+	return process.Capture(context.Background(), b.Runner, process.Request{Dir: dir, Name: "git", Args: args})
 }
 
 // verify fails when the ref is not a commit of the repository, so a mistyped

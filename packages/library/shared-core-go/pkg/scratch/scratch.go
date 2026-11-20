@@ -1,6 +1,6 @@
-// Package scratch is the port for a private working directory. A harness run
-// stages skills, fixtures and an isolated home in one, so a run reads nothing
-// of the developer's machine and leaves nothing behind.
+// Package scratch is the port for a private working directory. A caller stages
+// what a program needs in one, so the program reads nothing of the developer's
+// machine and leaves nothing behind.
 package scratch
 
 // Scratch makes and removes private directories.
