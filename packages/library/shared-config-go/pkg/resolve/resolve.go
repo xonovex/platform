@@ -45,31 +45,44 @@ type Request struct {
 
 // Resolve reads, checks, gates and merges the layers.
 func Resolve(env Env, request Request) (merge.Resolved, error) {
-	candidates, err := discover.Find(env.Files, env.Places, request.Start, request.Project)
+	documents, err := Load(env.Files, env.Places, env.Validator, request)
 	if err != nil {
 		return merge.Resolved{}, err
 	}
+	for _, document := range documents {
+		if document.Layer != spec.Project {
+			continue
+		}
+		gate := trust.Request{Document: document, Sections: Gated(document, request.Sections), Flag: request.ApproveDigest}
+		if err := trust.Gate(gate, env.Approvals, env.Prompter, env.Out); err != nil {
+			return merge.Resolved{}, err
+		}
+	}
+	return merge.Merge(request.Sections, documents, request.Flags)
+}
+
+// Load finds, reads and checks the files of the layers without the trust
+// gate, for a tool that gates a project file itself or only reports on it.
+func Load(files discover.Files, places discover.Places, validator jsonschema.Validator, request Request) ([]layer.Document, error) {
+	candidates, err := discover.Find(files, places, request.Start, request.Project)
+	if err != nil {
+		return nil, err
+	}
 	var documents []layer.Document
 	for _, candidate := range candidates {
-		document, found, err := read(env.Files, candidate)
+		document, found, err := read(files, candidate)
 		if err != nil {
-			return merge.Resolved{}, err
+			return nil, err
 		}
 		if !found {
 			continue
 		}
-		if err := document.Check(env.Validator, request.Sections); err != nil {
-			return merge.Resolved{}, err
-		}
-		if document.Layer == spec.Project {
-			gate := trust.Request{Document: document, Sections: gated(document, request.Sections), Flag: request.ApproveDigest}
-			if err := trust.Gate(gate, env.Approvals, env.Prompter, env.Out); err != nil {
-				return merge.Resolved{}, err
-			}
+		if err := document.Check(validator, request.Sections); err != nil {
+			return nil, err
 		}
 		documents = append(documents, document)
 	}
-	return merge.Merge(request.Sections, documents, request.Flags)
+	return documents, nil
 }
 
 // read reads one candidate. A missing file is no layer unless the user named
@@ -93,8 +106,8 @@ func read(files discover.Files, candidate discover.Candidate) (layer.Document, b
 	return document, err == nil, err
 }
 
-// gated lists the gated sections among sections that the document sets.
-func gated(document layer.Document, sections []spec.Section) []string {
+// Gated lists the gated sections among sections that the document sets.
+func Gated(document layer.Document, sections []spec.Section) []string {
 	var names []string
 	for _, section := range sections {
 		if _, set := document.Sections[section.Name]; set && section.Gated {

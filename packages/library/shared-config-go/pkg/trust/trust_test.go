@@ -196,9 +196,17 @@ func TestApproveKeepsOneSortedRecordPerDigest(t *testing.T) {
 	}
 }
 
-type failingStore struct{ read bool }
+// failingStore fails every write, and every read unless read is set; held is
+// the digest a successful read holds.
+type failingStore struct {
+	read bool
+	held string
+}
 
 func (s failingStore) ReadFile(string) ([]byte, error) {
+	if s.read && s.held != "" {
+		return []byte(`{"version":1,"approvals":[{"digest":"` + s.held + `","path":"/p"}]}`), nil
+	}
 	if s.read {
 		return []byte(`{"version":1,"approvals":[]}`), nil
 	}
@@ -206,3 +214,54 @@ func (s failingStore) ReadFile(string) ([]byte, error) {
 }
 
 func (failingStore) WriteFile(string, []byte) error { return errBoom }
+
+func TestDecideShowsTheReviewOfAnySubject(t *testing.T) {
+	digest := "sha256:" + strings.Repeat("c", 64)
+	subject := trust.Subject{Digest: digest, Path: "plugin hello", Notice: "plugin hello is installed only after you approve its digest", Review: "files: 3\n"}
+	l, _ := ledger(nil)
+	var out strings.Builder
+	if err := trust.Decide(subject, "", l, &configtest.Prompter{Terminal: true, Answers: []string{"y"}}, &out); err != nil {
+		t.Fatal(err)
+	}
+	if want := "plugin hello is installed only after you approve its digest.\n\nfiles: 3\n\nDigest: " + digest + "\nApprove this digest? [y/N] "; out.String() != want {
+		t.Fatalf("shown = %q", out.String())
+	}
+	l, _ = ledger(nil)
+	err := trust.Decide(subject, "", l, &configtest.Prompter{}, &strings.Builder{})
+	if !errors.Is(err, trust.ErrNotApproved) || !strings.Contains(err.Error(), "not approved: plugin hello is installed only after you approve its digest: review it") {
+		t.Fatalf("err = %v", err)
+	}
+}
+
+func TestRevokeRemovesOnlyTheDigest(t *testing.T) {
+	a, b := "sha256:"+strings.Repeat("a", 64), "sha256:"+strings.Repeat("b", 64)
+	l, _ := ledger(nil)
+	if removed, err := l.Revoke(a); removed || err != nil {
+		t.Fatalf("revoke from an empty ledger = %v, %v", removed, err)
+	}
+	for _, digest := range []string{a, b} {
+		if err := l.Approve(trust.Approval{Digest: digest, Path: "/p"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if removed, err := l.Revoke(a); !removed || err != nil {
+		t.Fatalf("revoke = %v, %v", removed, err)
+	}
+	if ok, _ := l.Approved(a); ok {
+		t.Fatal("the revoked digest is still approved")
+	}
+	if ok, _ := l.Approved(b); !ok {
+		t.Fatal("revoke removed another digest")
+	}
+	homeless := trust.Ledger{Store: configtest.NewFiles(nil), StateDir: func() (string, error) { return "", errBoom }}
+	if _, err := homeless.Revoke(a); !errors.Is(err, errBoom) {
+		t.Fatalf("revoke without a state directory = %v", err)
+	}
+	if _, err := (trust.Ledger{Store: failingStore{}, StateDir: stateDir}).Revoke(a); !errors.Is(err, errBoom) {
+		t.Fatalf("read fault = %v", err)
+	}
+	broken := trust.Ledger{Store: failingStore{read: true, held: a}, StateDir: stateDir}
+	if _, err := broken.Revoke(a); !errors.Is(err, errBoom) {
+		t.Fatalf("write fault = %v", err)
+	}
+}

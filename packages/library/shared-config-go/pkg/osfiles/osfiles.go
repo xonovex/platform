@@ -29,6 +29,19 @@ func (Files) Stat(path string) (discover.Info, error) {
 	return discover.Info{Mode: info.Mode()}, nil
 }
 
+// ReadDir names the entries of a directory, sorted.
+func (Files) ReadDir(path string) ([]string, error) {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(entries))
+	for i, entry := range entries {
+		names[i] = entry.Name()
+	}
+	return names, nil
+}
+
 // WriteFile replaces a file whole: it writes a private temporary file beside it
 // and renames it over the target, so a reader never sees a partial file.
 func (Files) WriteFile(path string, data []byte) error {

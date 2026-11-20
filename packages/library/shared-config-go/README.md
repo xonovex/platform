@@ -38,10 +38,10 @@ The `run`, `providers` and `eval` sections of a project file take effect only af
 | `pkg/layer` | Envelope check, sections and digest of one file |
 | `pkg/discover` | The files of the layers and the directories of a host |
 | `pkg/merge` | The merge of the layers with the origin of each value |
-| `pkg/trust` | The digest approval gate and the approval ledger |
+| `pkg/trust` | The one digest approval gate of a project file, a project shard or other content such as a plugin, and the approval ledger with approve and revoke |
 | `pkg/explain` | The merged values with their origins, for `config show --sources` |
-| `pkg/resolve` | Find, read, check, gate and merge in one call |
-| `pkg/shard` | The override files of one kind, such as `harnesses.d/<name>.json`, beside the `agentic.json` of each layer; a project shard passes the trust gate |
+| `pkg/resolve` | Find, read, check, gate and merge in one call; `Load` reads and checks without the gate |
+| `pkg/shard` | The override files of one kind, such as `harnesses.d/<name>.json`, beside the `agentic.json` of each layer; a project shard passes the trust gate; a request without names reads every shard of the directory, and `Find` reads without the gate |
 | `pkg/osfiles` | Adapter for the disk, the host directories and the terminal |
 | `pkg/configtest` | In-memory test doubles |
 

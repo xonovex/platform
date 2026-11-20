@@ -38,6 +38,15 @@ func TestFiles(t *testing.T) {
 	if err := files.WriteFile("/a", []byte("y")); err == nil {
 		t.Fatal("writing over a directory must fail")
 	}
+	if names, err := files.ReadDir("/a"); err != nil || len(names) != 1 || names[0] != "b" {
+		t.Fatalf("ReadDir of a directory = %v, %v", names, err)
+	}
+	if names, err := files.ReadDir("/a/b"); err != nil || len(names) != 1 || names[0] != "c.json" {
+		t.Fatalf("ReadDir of files = %v, %v", names, err)
+	}
+	if _, err := files.ReadDir("/a/b/c.json"); !errors.Is(err, iofs.ErrNotExist) {
+		t.Fatalf("ReadDir of a file = %v", err)
+	}
 }
 
 func TestPlaces(t *testing.T) {

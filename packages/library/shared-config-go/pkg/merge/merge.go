@@ -34,6 +34,9 @@ type Value struct {
 	Origins []Origin
 	// Entries holds the origin of each entry of a Merge key.
 	Entries map[string]Origin
+	// Items holds the origin of each item of an Append key, in the order of
+	// the merged array.
+	Items []Origin
 }
 
 // Resolved is the merged configuration of the requested sections.
@@ -249,7 +252,7 @@ func equal(a, b json.RawMessage) bool {
 
 func appendValue(key spec.Key, settings map[spec.Layer]setting) (Value, error) {
 	items := []json.RawMessage{}
-	var origins []Origin
+	var origins, itemOrigins []Origin
 	for _, l := range appendOrder {
 		s, ok := settings[l]
 		if !ok {
@@ -261,10 +264,13 @@ func appendValue(key spec.Key, settings map[spec.Layer]setting) (Value, error) {
 		}
 		items = append(items, layerItems...)
 		origins = append(origins, s.origin)
+		for range layerItems {
+			itemOrigins = append(itemOrigins, s.origin)
+		}
 	}
 	// The items were parsed from JSON, so they always encode.
 	raw, _ := json.Marshal(items)
-	return Value{Key: key, Raw: raw, Origins: origins}, nil
+	return Value{Key: key, Raw: raw, Origins: origins, Items: itemOrigins}, nil
 }
 
 func requireValue(key spec.Key, settings map[spec.Layer]setting) (Value, error) {

@@ -38,6 +38,12 @@ func TestWriteFileReplacesTheFileWhole(t *testing.T) {
 	if _, err := files.Stat(path + ".missing"); !errors.Is(err, iofs.ErrNotExist) {
 		t.Fatalf("Stat missing = %v", err)
 	}
+	if names, err := files.ReadDir(filepath.Dir(path)); err != nil || len(names) != 1 || names[0] != "trust.json" {
+		t.Fatalf("ReadDir = %v, %v", names, err)
+	}
+	if _, err := files.ReadDir(path + ".missing"); !errors.Is(err, iofs.ErrNotExist) {
+		t.Fatalf("ReadDir missing = %v", err)
+	}
 }
 
 func TestPlacesFollowTheXDGVariables(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"io"
 	iofs "io/fs"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	"github.com/xonovex/platform/packages/library/shared-config-go/pkg/discover"
@@ -68,6 +69,38 @@ func (f *Files) Stat(path string) (discover.Info, error) {
 	default:
 		return discover.Info{}, notExist("stat", path)
 	}
+}
+
+// ReadDir names the files and directories directly inside a directory, sorted.
+func (f *Files) ReadDir(path string) ([]string, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	path = filepath.Clean(path)
+	if !f.dirs[path] {
+		return nil, notExist("readdir", path)
+	}
+	seen := map[string]bool{}
+	for _, entries := range []map[string]bool{f.fileSet(), f.dirs} {
+		for entry := range entries {
+			if entry != path && filepath.Dir(entry) == path {
+				seen[filepath.Base(entry)] = true
+			}
+		}
+	}
+	names := make([]string, 0, len(seen))
+	for name := range seen {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names, nil
+}
+
+func (f *Files) fileSet() map[string]bool {
+	set := make(map[string]bool, len(f.files))
+	for path := range f.files {
+		set[path] = true
+	}
+	return set
 }
 
 // WriteFile creates or replaces a file.

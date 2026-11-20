@@ -143,3 +143,44 @@ func TestReadReportsEveryFault(t *testing.T) {
 		})
 	}
 }
+
+type faultyLister struct{ err error }
+
+func (l faultyLister) ReadDir(string) ([]string, error) { return nil, l.err }
+
+func TestARequestWithoutNamesReadsEveryShard(t *testing.T) {
+	files := layered()
+	e := env(files, configtest.NewFiles(nil), &configtest.Prompter{}, &strings.Builder{})
+	e.Lister = files
+	all := shard.Request{Dir: "harnesses.d", Kind: "harness", Start: "."}
+	shards, err := shard.Find(e, all)
+	want := []string{
+		"user:/home/u/.config/agentic/harnesses.d/claude.json",
+		"user:/home/u/.config/agentic/harnesses.d/codex.json",
+		"project:/repo/harnesses.d/claude.json",
+		"managed:/etc/agentic/harnesses.d/claude.json",
+	}
+	if err != nil || !reflect.DeepEqual(names(shards), want) {
+		t.Fatalf("Find() = %v, %v, want %v", names(shards), err, want)
+	}
+	if shards[2].Digest != layer.Digest([]byte(projectShard)) {
+		t.Fatalf("Digest = %s", shards[2].Digest)
+	}
+	if _, err := shard.Read(e, all); !errors.Is(err, trust.ErrNotApproved) {
+		t.Fatalf("Read() of an unapproved project shard = %v", err)
+	}
+	e.Lister = faultyLister{err: errors.New("list fault")}
+	if _, err := shard.Find(e, all); err == nil || !strings.Contains(err.Error(), "list fault") {
+		t.Fatalf("Find() with a list fault = %v", err)
+	}
+	e.Lister = nil
+	if _, err := shard.Find(e, all); err == nil || !strings.Contains(err.Error(), "needs a Lister") {
+		t.Fatalf("Find() without a Lister = %v", err)
+	}
+	empty := configtest.NewFiles(map[string]string{"/repo/.git/HEAD": "", "/repo/harnesses.d/.json": "{}"})
+	e = env(empty, empty, &configtest.Prompter{}, &strings.Builder{})
+	e.Lister = empty
+	if shards, err := shard.Find(e, all); err != nil || len(shards) != 0 {
+		t.Fatalf("Find() without shard files = %v, %v", names(shards), err)
+	}
+}

@@ -1,7 +1,8 @@
-// Package trust is the gate a project file passes before its gated sections
-// take effect: the user approves the sha256 digest of exactly the file that was
+// Package trust is the one gate that content a user did not write passes
+// before it takes effect: a project file, an override shard beside it or a
+// plugin. The user approves the sha256 digest of exactly the content that was
 // reviewed, at a terminal prompt or with a flag, and the approval is kept in a
-// ledger. A file that is not approved fails closed.
+// ledger. Content that is not approved fails closed.
 package trust
 
 import (
@@ -17,15 +18,14 @@ import (
 // terminal.
 const ApproveFlag = "approve-config-digest"
 
-// ErrNotApproved reports a project file whose gated sections the user has not
-// approved.
-var ErrNotApproved = errors.New("project configuration not approved")
+// ErrNotApproved reports content whose digest the user has not approved.
+var ErrNotApproved = errors.New("not approved")
 
-// Approval is one approved file digest.
+// Approval is one approved digest.
 type Approval struct {
 	Digest string `json:"digest"`
-	// Path is the file the digest was approved for, kept for a reader of the
-	// ledger. The digest alone decides.
+	// Path names the content the digest was approved for, kept for a reader of
+	// the ledger. The digest alone decides.
 	Path string `json:"path"`
 }
 
@@ -43,38 +43,38 @@ type Prompter interface {
 	ReadLine() (string, error)
 }
 
-// Request is one gate check.
-type Request struct {
-	Document layer.Document
-	// Sections are the gated sections the document sets that the tool reads.
-	Sections []string
-	// Flag is the digest the user approved on the command line, empty when
-	// none.
-	Flag string
+// Subject is content that takes effect only after the user approves its
+// digest.
+type Subject struct {
+	// Digest is the sha256 digest of exactly the content that Review shows or
+	// summarises.
+	Digest string
+	// Path names the content in the ledger and in the messages.
+	Path string
+	// Notice says what the content does and that it waits for the approval, as
+	// one sentence without its full stop.
+	Notice string
+	// Review is the text a person reads before answering.
+	Review string
 }
 
-// Gate lets the request through when the digest of the document is approved,
-// approved by the flag, or approved at the terminal; otherwise it fails with
-// ErrNotApproved. A request without sections always passes.
-func Gate(request Request, approvals Approvals, prompter Prompter, out io.Writer) error {
-	if len(request.Sections) == 0 {
-		return nil
-	}
-	document := request.Document
-	approved, err := approvals.Approved(document.Digest)
+// Decide lets the subject through when its digest is approved, approved by the
+// flag, or approved at the terminal, and records a new approval in the
+// ledger; otherwise it fails with ErrNotApproved.
+func Decide(subject Subject, flag string, approvals Approvals, prompter Prompter, out io.Writer) error {
+	approved, err := approvals.Approved(subject.Digest)
 	if err != nil || approved {
 		return err
 	}
-	approval := Approval{Digest: document.Digest, Path: document.Path}
-	sections := strings.Join(request.Sections, ", ")
+	approval := Approval{Digest: subject.Digest, Path: subject.Path}
 	switch {
-	case request.Flag != "":
-		if request.Flag != document.Digest {
-			return fmt.Errorf("%w: --%s %s differs from the digest %s of %s", ErrNotApproved, ApproveFlag, request.Flag, document.Digest, document.Path)
+	case flag != "":
+		if flag != subject.Digest {
+			return fmt.Errorf("%w: --%s %s differs from the digest %s of %s", ErrNotApproved, ApproveFlag, flag, subject.Digest, subject.Path)
 		}
 		return approvals.Approve(approval)
 	case prompter.IsTerminal():
-		if _, err := fmt.Fprintf(out, "%s sets the %s configuration, which takes effect only after you approve the digest of the file.\n\n%s\n\nDigest: %s\n", document.Path, sections, strings.TrimRight(string(document.Data), "\n"), document.Digest); err != nil {
+		if _, err := fmt.Fprintf(out, "%s.\n\n%s\n\nDigest: %s\n", subject.Notice, strings.TrimRight(subject.Review, "\n"), subject.Digest); err != nil {
 			return err
 		}
 		yes, err := ask(prompter, out)
@@ -84,11 +84,41 @@ func Gate(request Request, approvals Approvals, prompter Prompter, out io.Writer
 		if !yes {
 			// A character device that is not a terminal, such as /dev/null, also
 			// reaches the prompt, so the refusal names the flag as well.
-			return fmt.Errorf("%w: %s was declined; to approve it without the prompt, run again with --%s %s", ErrNotApproved, document.Path, ApproveFlag, document.Digest)
+			return fmt.Errorf("%w: %s was declined; to approve it without the prompt, run again with --%s %s", ErrNotApproved, subject.Path, ApproveFlag, subject.Digest)
 		}
 		return approvals.Approve(approval)
 	default:
-		return fmt.Errorf("%w: %s sets the %s configuration, which takes effect only after you approve the digest of the file: review it, then run again with --%s %s", ErrNotApproved, document.Path, sections, ApproveFlag, document.Digest)
+		return fmt.Errorf("%w: %s: review it, then run again with --%s %s", ErrNotApproved, subject.Notice, ApproveFlag, subject.Digest)
+	}
+}
+
+// Request is one gate check of a project file.
+type Request struct {
+	Document layer.Document
+	// Sections are the gated sections the document sets that the tool reads.
+	Sections []string
+	// Flag is the digest the user approved on the command line, empty when
+	// none.
+	Flag string
+}
+
+// Gate decides on the file of the request, whose whole content is the
+// review. A request without sections always passes.
+func Gate(request Request, approvals Approvals, prompter Prompter, out io.Writer) error {
+	if len(request.Sections) == 0 {
+		return nil
+	}
+	return Decide(FileSubject(request.Document, request.Sections), request.Flag, approvals, prompter, out)
+}
+
+// FileSubject is the subject of a project file that sets gated sections: the
+// review is the file itself.
+func FileSubject(document layer.Document, sections []string) Subject {
+	return Subject{
+		Digest: document.Digest,
+		Path:   document.Path,
+		Notice: fmt.Sprintf("%s sets the %s configuration, which takes effect only after you approve the digest of the file", document.Path, strings.Join(sections, ", ")),
+		Review: string(document.Data),
 	}
 }
 

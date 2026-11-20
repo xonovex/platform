@@ -94,11 +94,18 @@ func TestAProjectCannotSetATrustedKey(t *testing.T) {
 
 func TestAppendPutsTheManagedItemsLast(t *testing.T) {
 	r := resolve(t, []layer.Document{
-		doc(t, spec.Managed, `{"items":["m"]}`), doc(t, spec.User, `{"items":["u"]}`), doc(t, spec.Project, `{"items":["p"]}`),
+		doc(t, spec.Managed, `{"items":["m"]}`), doc(t, spec.User, `{"items":["u","v"]}`), doc(t, spec.Project, `{"items":["p"]}`),
 	}, flag("/items", `["f"]`))
 	v := value(t, r, "/items")
-	if string(v.Raw) != `["u","p","f","m"]` || len(v.Origins) != 4 {
+	if string(v.Raw) != `["u","v","p","f","m"]` || len(v.Origins) != 4 {
 		t.Fatalf("items = %s from %v", v.Raw, v.Origins)
+	}
+	var layers []spec.Layer
+	for _, origin := range v.Items {
+		layers = append(layers, origin.Layer)
+	}
+	if want := []spec.Layer{spec.User, spec.User, spec.Project, spec.Flags, spec.Managed}; !reflect.DeepEqual(layers, want) {
+		t.Fatalf("item origins = %v, want %v", layers, want)
 	}
 }
 

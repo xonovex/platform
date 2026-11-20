@@ -86,9 +86,36 @@ func (l Ledger) Approve(approval Approval) error {
 	}
 	approvals = append(approvals, approval)
 	sort.Slice(approvals, func(i, j int) bool { return approvals[i].Digest < approvals[j].Digest })
+	return write(l.Store, path, approvals)
+}
+
+// Revoke removes the approval of the digest and reports whether the ledger
+// held it. A ledger that does not hold it is left as it is.
+func (l Ledger) Revoke(digest string) (bool, error) {
+	path, err := l.path()
+	if err != nil {
+		return false, err
+	}
+	approvals, err := read(l.Store, path)
+	if err != nil {
+		return false, err
+	}
+	kept := make([]Approval, 0, len(approvals))
+	for _, approval := range approvals {
+		if approval.Digest != digest {
+			kept = append(kept, approval)
+		}
+	}
+	if len(kept) == len(approvals) {
+		return false, nil
+	}
+	return true, write(l.Store, path, kept)
+}
+
+func write(store Store, path string, approvals []Approval) error {
 	// The ledger holds only strings, which always encode.
 	data, _ := json.MarshalIndent(ledgerFile{Version: ledgerVersion, Approvals: approvals}, "", "  ")
-	if err := l.Store.WriteFile(path, append(data, '\n')); err != nil {
+	if err := store.WriteFile(path, append(data, '\n')); err != nil {
 		return fmt.Errorf("write the approval ledger %s: %w", path, err)
 	}
 	return nil
