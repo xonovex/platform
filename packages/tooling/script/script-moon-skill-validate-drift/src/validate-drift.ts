@@ -59,7 +59,7 @@ export const main = (
   const rootIndex = argv.indexOf("--repo-root");
   const repositoryRoot =
     rootIndex === -1
-      ? findWorkspaceRoot(scriptDirectory, undefined, fs)
+      ? findWorkspaceRoot(scriptDirectory, fs)
       : resolve(cwd, argv[rootIndex + 1] ?? ".");
 
   const files = collectSkillCatalogFiles(repositoryRoot, fs);

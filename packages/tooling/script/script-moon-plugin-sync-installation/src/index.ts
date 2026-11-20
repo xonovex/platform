@@ -8,7 +8,7 @@ import {main} from "./cli.js";
 try {
   process.exitCode = main(
     process.argv.slice(2),
-    findWorkspaceRoot(import.meta.dirname, undefined, nodeFileSystem),
+    findWorkspaceRoot(import.meta.dirname, nodeFileSystem),
     {fs: nodeFileSystem, output: processOutput},
   );
 } catch (error: unknown) {

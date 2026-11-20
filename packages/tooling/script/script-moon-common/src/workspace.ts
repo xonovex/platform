@@ -1,11 +1,10 @@
 import {dirname, join} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 export const findWorkspaceRoot = (
   start: string,
+  fs: FileSystem,
   root?: string,
-  fs: FileSystem = nodeFileSystem,
 ): string => {
   let dir = start;
   while (dir !== dirname(dir)) {

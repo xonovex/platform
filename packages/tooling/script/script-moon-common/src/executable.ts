@@ -1,5 +1,4 @@
 import {delimiter, isAbsolute, resolve, sep} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 /** The process settings that decide where a bare command name resolves. */
@@ -23,7 +22,7 @@ const executableExtensions = (
 export const findExecutable = (
   name: string,
   environment: ExecutableEnvironment,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): string => {
   if (
     name.length === 0 ||

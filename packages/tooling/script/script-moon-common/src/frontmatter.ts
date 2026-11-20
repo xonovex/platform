@@ -1,11 +1,10 @@
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 // The name a markdown document declares in its YAML frontmatter, used to identify a
 // skill by the name it publishes rather than by its directory.
 export const parseFrontmatterName = (
   skillFile: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): string | undefined => {
   const text = fs.readText(skillFile);
   const match = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text);

@@ -1,5 +1,4 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {GitRepository} from "@xonovex/script-moon-common/git";
 import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
@@ -37,7 +36,7 @@ export const detectVersionChanges = (
   commit: string,
   projects: readonly MoonProject[],
   git: Pick<GitRepository, "readFile">,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const changed: string[] = [];
 

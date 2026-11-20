@@ -1,5 +1,4 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 export interface PackageLayout {
@@ -9,7 +8,7 @@ export interface PackageLayout {
 
 export const packageLayout = (
   repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): PackageLayout => {
   const visit = (directory: string): PackageLayout => {
     if (
@@ -34,7 +33,7 @@ export const packageLayout = (
 
 export const pluginSkillDirectories = (
   pluginDirectory: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const root = join(pluginDirectory, "skills");
   if (!fs.isDirectory(root)) return [];

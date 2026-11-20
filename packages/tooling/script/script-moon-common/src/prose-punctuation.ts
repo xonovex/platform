@@ -1,5 +1,4 @@
 import {extname, join, relative} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 interface ProsePunctuationRule {
@@ -134,7 +133,7 @@ const proseFiles = (
 /** Every finding under `root`, with paths relative to `root`. */
 export const scanProsePunctuation = (
   root: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly ProsePunctuationFinding[] =>
   proseFiles(root, root, fs)
     .toSorted()

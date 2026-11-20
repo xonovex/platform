@@ -18,11 +18,7 @@ export const main = (
   startDirectory: string,
   dependencies: ReleaseValidateDependencies,
 ): number => {
-  const repositoryRoot = findWorkspaceRoot(
-    startDirectory,
-    undefined,
-    dependencies.fs,
-  );
+  const repositoryRoot = findWorkspaceRoot(startDirectory, dependencies.fs);
   const result = validateRelease(
     readReleaseSnapshot(
       repositoryRoot,

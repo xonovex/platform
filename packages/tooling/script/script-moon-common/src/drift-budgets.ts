@@ -1,5 +1,4 @@
 import {z} from "zod";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 // Drift findings are advisory until the mode is switched to enforce.
@@ -51,7 +50,7 @@ export const countProseWords = (text: string): number => {
 
 export const readBudgetManifest = (
   path: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): {readonly manifest: BudgetManifest; readonly error?: string} => {
   if (!fs.isFile(path)) return {manifest: {}};
   let parsed: unknown;

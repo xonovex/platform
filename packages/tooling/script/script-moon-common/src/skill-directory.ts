@@ -1,10 +1,9 @@
 import {dirname, join} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 export const resolveSkillDirectory = (
   base: string,
-  fs: Pick<FileSystem, "isFile" | "readDirectory"> = nodeFileSystem,
+  fs: Pick<FileSystem, "isFile" | "readDirectory">,
 ): string => {
   if (fs.isFile(join(base, "SKILL.md"))) return base;
   const nested = fs
@@ -21,7 +20,7 @@ export const resolveSkillDirectory = (
 
 export const findPluginDirectory = (
   skillDirectory: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): string => {
   const parent = dirname(skillDirectory);
   return fs.isFile(join(dirname(parent), ".claude-plugin", "plugin.json"))

@@ -1,6 +1,5 @@
 import {join} from "node:path";
 import {z} from "zod";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 const PlatformMetaSchema = z.strictObject({
@@ -13,7 +12,7 @@ export type PlatformMeta = z.infer<typeof PlatformMetaSchema>;
 
 export const readPlatformMeta = (
   pkgDir: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): PlatformMeta | undefined => {
   const metaPath = join(pkgDir, "platform.json");
   if (!fs.isFile(metaPath)) return undefined;

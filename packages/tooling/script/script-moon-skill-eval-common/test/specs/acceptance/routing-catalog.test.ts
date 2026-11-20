@@ -1,4 +1,5 @@
 import {resolve} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {describe, expect, it} from "vitest";
 import {
   conflictingQueryOwners,
@@ -16,11 +17,15 @@ const CATALOG_ROOT = resolve(
 
 describe("the live skill catalog", () => {
   it("gives every catalog skill a validation routing scenario", () => {
-    expect(missingValidationRoutingOwners(CATALOG_ROOT)).toEqual([]);
+    expect(
+      missingValidationRoutingOwners(CATALOG_ROOT, nodeFileSystem),
+    ).toEqual([]);
   });
 
   it("keeps the catalog free of claimed-twice queries and phantom operations", () => {
-    expect(conflictingQueryOwners(CATALOG_ROOT)).toEqual([]);
-    expect(unresolvedOperationRationales(CATALOG_ROOT)).toEqual([]);
+    expect(conflictingQueryOwners(CATALOG_ROOT, nodeFileSystem)).toEqual([]);
+    expect(unresolvedOperationRationales(CATALOG_ROOT, nodeFileSystem)).toEqual(
+      [],
+    );
   });
 });

@@ -1,5 +1,4 @@
 import {join, resolve} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {parseFrontmatterName} from "@xonovex/script-moon-common/frontmatter";
 import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
@@ -62,7 +61,7 @@ const catalogCandidates = (
 
 export const buildRoutingScenarios = (
   catalogRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly RoutingScenario[] => {
   const root = resolve(catalogRoot);
   if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
@@ -113,7 +112,7 @@ export const buildRoutingScenarios = (
 // one that belongs to no skill at all.
 export const catalogQueryOwners = (
   catalogRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): ReadonlyMap<string, string> => {
   const root = resolve(catalogRoot);
   if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
@@ -161,7 +160,7 @@ const normalizeQuery = (query: string): string =>
 // the query its routing coverage on top of the ambiguity itself.
 export const conflictingQueryOwners = (
   catalogRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly QueryOwnerConflict[] => {
   const root = resolve(catalogRoot);
   if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
@@ -203,7 +202,7 @@ const OPERATION_MENTION = /`([a-z0-9]+(?:-[a-z0-9]+)*)`\s+operation/gu;
 // English compound ('a version-control operation') is not an identifier.
 export const unresolvedOperationRationales = (
   catalogRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly UnresolvedOperation[] => {
   const root = resolve(catalogRoot);
   if (!fs.isDirectory(root)) throw new Error(`catalog root not found: ${root}`);
@@ -245,7 +244,7 @@ export const unresolvedOperationRationales = (
 
 export const missingValidationRoutingOwners = (
   catalogRoot: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const scenarios = buildRoutingScenarios(catalogRoot, fs);
   const validationOwners = new Set(

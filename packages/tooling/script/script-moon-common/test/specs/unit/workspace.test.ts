@@ -8,19 +8,19 @@ describe("findWorkspaceRoot", () => {
       directories: ["/repo/.moon", "/repo/a/b/c"],
     });
 
-    expect(findWorkspaceRoot("/repo/a/b/c", undefined, fs)).toBe("/repo");
+    expect(findWorkspaceRoot("/repo/a/b/c", fs)).toBe("/repo");
   });
 
   it("should return start dir if it contains .moon", () => {
     const fs = memoryFileSystem({directories: ["/repo/.moon"]});
 
-    expect(findWorkspaceRoot("/repo", undefined, fs)).toBe("/repo");
+    expect(findWorkspaceRoot("/repo", fs)).toBe("/repo");
   });
 
   it("should stop at the boundary when no .moon directory is found", () => {
     const fs = memoryFileSystem({directories: ["/repo/a"]});
 
-    expect(() => findWorkspaceRoot("/repo/a", "/repo/a", fs)).toThrow(
+    expect(() => findWorkspaceRoot("/repo/a", fs, "/repo/a")).toThrow(
       "Could not find workspace root",
     );
   });
@@ -28,7 +28,7 @@ describe("findWorkspaceRoot", () => {
   it("should stop at the filesystem root when no boundary is given", () => {
     const fs = memoryFileSystem({directories: ["/repo/a"]});
 
-    expect(() => findWorkspaceRoot("/repo/a", undefined, fs)).toThrow(
+    expect(() => findWorkspaceRoot("/repo/a", fs)).toThrow(
       "Could not find workspace root",
     );
   });

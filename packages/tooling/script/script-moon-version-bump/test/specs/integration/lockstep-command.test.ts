@@ -98,7 +98,7 @@ const workspacePackages = (root: string): readonly WorkspacePackage[] =>
     const path = join(root, "packages", directory, "package.json");
     return {
       path,
-      pkg: readPkg(path),
+      pkg: readPkg(path, nodeFileSystem),
       headVersion: getGitVersion(root, path, nodeGitRepository(root)),
     };
   });
@@ -128,7 +128,7 @@ const lockstepOptions = (
 });
 
 const manifestAt = (root: string, directory: string): Manifest =>
-  readPkg(join(root, "packages", directory, "package.json"));
+  readPkg(join(root, "packages", directory, "package.json"), nodeFileSystem);
 
 const changelogAt = (root: string, directory: string): string =>
   readFileSync(join(root, "packages", directory, "CHANGELOG.md"), "utf8");

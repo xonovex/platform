@@ -64,7 +64,7 @@ describe("version bump command", () => {
     );
 
     expect(exitCode).toBe(0);
-    expect(readPkg(packagePath).version).toBe("1.0.1");
+    expect(readPkg(packagePath, nodeFileSystem).version).toBe("1.0.1");
   });
 
   it("previews a requested version without changing the package", () => {
@@ -82,7 +82,7 @@ describe("version bump command", () => {
     );
 
     expect(exitCode).toBe(0);
-    expect(readPkg(packagePath).version).toBe("1.0.0");
+    expect(readPkg(packagePath, nodeFileSystem).version).toBe("1.0.0");
   });
 
   it("updates the package and changelog in one command", () => {
@@ -96,7 +96,7 @@ describe("version bump command", () => {
     const exitCode = main(["--no-dependents"], packageDirectory);
 
     expect(exitCode).toBe(0);
-    expect(readPkg(packagePath).version).toBe("1.1.1");
+    expect(readPkg(packagePath, nodeFileSystem).version).toBe("1.1.1");
     expect(
       readFileSync(join(packageDirectory, "CHANGELOG.md"), "utf8"),
     ).toContain("## 1.1.1");
@@ -112,7 +112,7 @@ describe("version bump command", () => {
     );
 
     expect(exitCode).toBe(0);
-    expect(readPkg(packagePath).version).toBe("1.0.1");
+    expect(readPkg(packagePath, nodeFileSystem).version).toBe("1.0.1");
   });
 
   it("rejects invalid requests and package metadata", () => {

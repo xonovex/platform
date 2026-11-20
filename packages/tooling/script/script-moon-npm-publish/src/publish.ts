@@ -1,6 +1,3 @@
-import {spawnSync} from "node:child_process";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-
 interface PackageIdentity {
   readonly name: string;
   readonly version: string;
@@ -63,25 +60,9 @@ export const publishedFromResult = (
   throw new Error(`npm view failed for ${name}@${version}: ${errorDetail}`);
 };
 
-const runNpmView: NpmView = ({name, version}) => {
-  const result = spawnSync(
-    resolveExecutable("npm"),
-    ["view", `${name}@${version}`, "version"],
-    {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    },
-  );
-  return {
-    ...(result.error ? {error: result.error} : {}),
-    status: result.status,
-    stderr: result.stderr,
-  };
-};
-
 export const isPublished = (
   identity: PackageIdentity,
-  view: NpmView = runNpmView,
+  view: NpmView,
 ): boolean => publishedFromResult(identity, view(identity));
 
 export const publishPackage = (

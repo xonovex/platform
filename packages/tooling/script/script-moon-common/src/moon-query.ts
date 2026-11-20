@@ -1,6 +1,5 @@
 import {join} from "node:path";
 import {z} from "zod";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 
 const MoonProjectSchema = z.looseObject({
@@ -36,7 +35,7 @@ export const parseMoonProjects = (output: string): readonly MoonProject[] => {
 export const packageJsonPaths = (
   rootDir: string,
   projects: readonly MoonProject[],
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] =>
   projects
     .map((project) => join(rootDir, project.source, "package.json"))

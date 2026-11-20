@@ -41,7 +41,7 @@ export const main = (
   }
   const ref =
     (args.values.ref as string | undefined) ?? args.positionals[0] ?? "HEAD~1";
-  const rootDir = findWorkspaceRoot(startDirectory, undefined, dependencies.fs);
+  const rootDir = findWorkspaceRoot(startDirectory, dependencies.fs);
   const repository = dependencies.openRepository(rootDir);
   const changed = detectVersionChanges(
     rootDir,

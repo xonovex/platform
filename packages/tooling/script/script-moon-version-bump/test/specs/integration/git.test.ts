@@ -1,5 +1,6 @@
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
@@ -51,7 +52,7 @@ describe("Git package history", () => {
       detectDepUpdates(
         root,
         pkgPath,
-        readPkg(pkgPath),
+        readPkg(pkgPath, nodeFileSystem),
         nodeGitRepository(root),
       ),
     ).toEqual([{name: "@xonovex/shared", version: "workspace:2.0.0"}]);
@@ -74,7 +75,7 @@ describe("Git package history", () => {
       detectDepUpdates(
         root,
         newPackagePath,
-        readPkg(newPackagePath),
+        readPkg(newPackagePath, nodeFileSystem),
         nodeGitRepository(root),
       ),
     ).toEqual([]);

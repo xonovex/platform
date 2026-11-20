@@ -133,7 +133,7 @@ export const main = (
 
   if (lockstep !== undefined) {
     validateVersionRequest(exact, bumpType);
-    const lockstepRoot = findWorkspaceRoot(workingDirectory, undefined, fs);
+    const lockstepRoot = findWorkspaceRoot(workingDirectory, fs);
     const git = openRepository(lockstepRoot);
     return runLockstep({
       rootDir: lockstepRoot,
@@ -174,7 +174,7 @@ export const main = (
   validateVersionRequest(exact, bumpType);
 
   const oldVersion = pkg.version;
-  const rootDir = findWorkspaceRoot(workingDirectory, undefined, fs);
+  const rootDir = findWorkspaceRoot(workingDirectory, fs);
   const git = openRepository(rootDir);
   const gitVersion = getGitVersion(rootDir, pkgPath, git);
   let newVersion: string;

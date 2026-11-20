@@ -1,5 +1,4 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 import {pluginSkillDirectories} from "./package-layout.js";
 import {boldSkillNameMentions} from "./skill-name.js";
@@ -18,7 +17,7 @@ const markdownFiles = (directory: string, fs: FileSystem): readonly string[] =>
 // the plugin sets in bold, the one written form of a handoff to another skill.
 export const pluginHandoffNames = (
   pluginDirectory: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): ReadonlySet<string> =>
   new Set(
     pluginSkillDirectories(pluginDirectory, fs)

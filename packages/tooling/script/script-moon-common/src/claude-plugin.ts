@@ -1,5 +1,4 @@
 import {basename, dirname, join, resolve} from "node:path";
-import {nodeFileSystem} from "./adapters/file-system-node.js";
 import type {FileSystem} from "./file-system.js";
 import {pluginSkillDirectories} from "./package-layout.js";
 
@@ -13,7 +12,7 @@ export const planClaudePluginStages = (
   args: readonly string[],
   workspace: string,
   selectedSkills: readonly string[],
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): {
   readonly args: readonly string[];
   readonly stages: readonly ClaudePluginStage[];
@@ -44,7 +43,7 @@ export const stageClaudePluginArguments = (
   args: readonly string[],
   workspace: string,
   selectedSkills: readonly string[],
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const plan = planClaudePluginStages(args, workspace, selectedSkills, fs);
   for (const stage of plan.stages) {
@@ -145,7 +144,7 @@ const readClaudePluginManifest = (
 
 export const resolveClaudePluginDirectories = (
   targetDirectory: string,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): readonly string[] => {
   const target = resolve(targetDirectory);
   const siblingRoot = dirname(target);

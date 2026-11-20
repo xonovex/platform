@@ -1,5 +1,4 @@
 import {join} from "node:path";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {Environment} from "../environment.js";
 
@@ -31,7 +30,7 @@ export const stageCodexWorkspace = (
   scope: CodexSkillScope,
   skills: readonly StagedSkill[],
   environment: Environment,
-  fs: FileSystem = nodeFileSystem,
+  fs: FileSystem,
 ): CodexWorkspace => {
   const home = join(workspace, "home");
   const codexHome = join(workspace, ".codex");

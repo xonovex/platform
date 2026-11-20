@@ -89,7 +89,7 @@ const workspaceRootOrUndefined = (
   fs: FileSystem,
 ): string | undefined => {
   try {
-    return findWorkspaceRoot(start, undefined, fs);
+    return findWorkspaceRoot(start, fs);
   } catch {
     return undefined;
   }

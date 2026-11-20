@@ -88,6 +88,12 @@ describe("drift budgets", () => {
     ]);
   });
 
+  it("keeps one budget for a path listed twice", () => {
+    expect(seedBudgets([file("a.md", "one"), file("a.md", "one two")])).toEqual(
+      {"a.md": 2},
+    );
+  });
+
   it("round-trips seeded budgets without findings", () => {
     const files = [file("a.md", "one two three"), file("b.md", "four five")];
 
@@ -112,6 +118,20 @@ describe("drift budgets", () => {
     );
     expect(readBudgetManifest("/repo/negative.json", fs).error).toContain(
       "positive word budget",
+    );
+  });
+
+  it("reports a read that throws a value that is not an error", () => {
+    const thrown: unknown = "disk gone";
+    const fs = {
+      ...memoryFileSystem({files: {"/repo/budgets.json": "{}"}}),
+      readText: (): string => {
+        throw thrown;
+      },
+    };
+
+    expect(readBudgetManifest("/repo/budgets.json", fs).error).toContain(
+      "disk gone",
     );
   });
 
