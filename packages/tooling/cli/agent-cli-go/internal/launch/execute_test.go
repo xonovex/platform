@@ -417,3 +417,34 @@ func TestExecuteReportsAMissingWorkingDirectory(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 }
+
+func TestExecuteDryRunReportsTheDeclaredFacts(t *testing.T) {
+	tests := []struct {
+		agent string
+		want  []string
+	}{
+		{"claude", []string{"Protocol: messages", "Model access: provider (environment)", "Version probe: claude --version"}},
+		{"codex", []string{"Protocol: responses", "Model access: provider (environment, arguments)", "Version probe: codex --version"}},
+		{"opencode", []string{"Protocol: none", "Model access: provider (arguments)", "Version probe: opencode --version"}},
+		{"pi", []string{"Protocol: responses", "Version probe: pi --version"}},
+		{"copilot", []string{"Protocol: none", "Model access: native login", "Version probe: copilot --version"}},
+		{"kiro", []string{"Protocol: none", "Model access: native login", "Version probe: kiro-cli-chat --version"}},
+	}
+	for _, test := range tests {
+		t.Run(test.agent, func(t *testing.T) {
+			f := newExecuteFixture()
+			options := bwrapOptions()
+			options.DryRun = true
+			options.Agent = test.agent
+
+			if err := Execute(f.deps(), options); err != nil {
+				t.Fatalf("Execute() error = %v", err)
+			}
+			for _, want := range test.want {
+				if !strings.Contains(f.log.String(), want) {
+					t.Errorf("log = %q, want %q", f.log.String(), want)
+				}
+			}
+		})
+	}
+}

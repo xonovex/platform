@@ -90,8 +90,7 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if _, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory"); err != nil {
 		return nil, nil, err
 	}
-	behavior, err := agents.Lookup(cfg.Agent.Type)
-	if err != nil {
+	if _, err := agents.GetAgent(cfg.Agent.Type); err != nil {
 		return nil, nil, err
 	}
 	var providerCliArgs []string
@@ -102,7 +101,7 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if err != nil {
 		return nil, nil, err
 	}
-	agentArgs := behavior.BuildArgs(cfg.AgentArgs, types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs})
+	agentArgs := agents.BuildArgs(cfg.Agent, cfg.AgentArgs, types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs})
 
 	cmd := append([]string{cfg.Agent.Binary}, agentArgs...)
 	cmd = isoshared.WrapWithInitCommands(cmd, c.InitCommands)

@@ -193,3 +193,79 @@ func TestRunCommandReportsOtherErrorsWithUsage(t *testing.T) {
 		t.Errorf("output = %q, want the error and the usage", output.String())
 	}
 }
+
+func TestRunCommandRunsEveryHarness(t *testing.T) {
+	for _, agent := range []string{"claude", "codex", "copilot", "kiro", "opencode", "pi"} {
+		t.Run(agent, func(t *testing.T) {
+			r := newTestRoot()
+
+			if err := r.execute("run", "--dry-run", "--agent", agent, "--", "review"); err != nil {
+				t.Fatalf("run --agent %s error = %v", agent, err)
+			}
+			if got := r.isolator.run.Agent.Type; string(got) != agent {
+				t.Errorf("agent = %q, want %q", got, agent)
+			}
+		})
+	}
+}
+
+func TestRunCommandRejectsAnUnknownAgentAndAProviderForALoginAgent(t *testing.T) {
+	r := newTestRoot()
+	if err := r.execute("run", "--dry-run", "--agent", "nosuch"); err == nil || !strings.Contains(err.Error(), "kiro") {
+		t.Fatalf("run --agent nosuch error = %v, want the available agents", err)
+	}
+	if err := r.execute("run", "--dry-run", "--agent", "kiro", "--provider", "gemini"); err == nil || !strings.Contains(err.Error(), "own login") {
+		t.Fatalf("run --agent kiro --provider error = %v, want a native login rejection", err)
+	}
+}
+
+func TestRunCommandHelpListsEveryHarness(t *testing.T) {
+	root := NewRootCommand(newTestRoot().deps)
+	run, _, _ := root.Find([]string{"run"})
+
+	usage := run.Flags().Lookup("agent").Usage
+
+	for _, agent := range []string{"claude", "codex", "copilot", "kiro", "opencode", "pi"} {
+		if !strings.Contains(usage, agent) {
+			t.Errorf("--agent usage = %q, want %q", usage, agent)
+		}
+	}
+}
+
+// complete returns the candidates the shell completion offers for args.
+func complete(t *testing.T, args ...string) []string {
+	t.Helper()
+	root := NewRootCommand(newTestRoot().deps)
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(io.Discard)
+	root.SetArgs(append([]string{"__complete"}, args...))
+	if err := root.Execute(); err != nil {
+		t.Fatalf("__complete error = %v", err)
+	}
+	var candidates []string
+	for _, line := range strings.Split(out.String(), "\n") {
+		if line != "" && !strings.HasPrefix(line, ":") && !strings.HasPrefix(line, "Completion ended") {
+			candidates = append(candidates, line)
+		}
+	}
+	return candidates
+}
+
+func TestCompletionOffersTheRegisteredAgents(t *testing.T) {
+	got := complete(t, "run", "--agent", "")
+
+	want := []string{"claude", "codex", "copilot", "kiro", "opencode", "pi"}
+	if !slices.Equal(got, want) {
+		t.Fatalf("agent completion = %v, want %v", got, want)
+	}
+}
+
+func TestCompletionOffersTheProvidersOfTheSelectedAgent(t *testing.T) {
+	if got := complete(t, "run", "--agent", "codex", "--provider", ""); !slices.Equal(got, []string{"gpt5-codex"}) {
+		t.Fatalf("codex provider completion = %v, want [gpt5-codex]", got)
+	}
+	if got := complete(t, "run", "--agent", "kiro", "--provider", ""); len(got) != 0 {
+		t.Fatalf("kiro provider completion = %v, want none", got)
+	}
+}

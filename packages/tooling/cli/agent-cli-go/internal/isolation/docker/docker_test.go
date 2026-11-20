@@ -3,11 +3,13 @@ package docker
 import (
 	"errors"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
@@ -17,6 +19,16 @@ import (
 
 // newHost returns an in-memory host with an empty home and a work directory,
 // uid and gid 1000 and 4 CPUs.
+// registeredAgent returns the declared facts of an agent type, as the planner
+// supplies them.
+func registeredAgent(agentType types.AgentType) *types.AgentConfig {
+	agent, err := agents.GetAgent(agentType)
+	if err != nil {
+		panic(err)
+	}
+	return agent
+}
+
 func newHost() *systemtest.Fake {
 	return systemtest.New().AddDir("/home/user").AddDir("/work")
 }
@@ -26,7 +38,7 @@ func newHost() *systemtest.Fake {
 // user's configuration.
 func dockerCfg(net netshared.Mode) isoshared.RunConfig {
 	return isoshared.RunConfig{
-		Agent:   &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
+		Agent:   registeredAgent(types.AgentClaude),
 		WorkDir: "/work",
 		HomeDir: "/home/user",
 		Network: net,
@@ -387,5 +399,31 @@ func TestDocker_CheckAgent(t *testing.T) {
 	cfg.Image = digestPinnedImage
 	if err := isolator.CheckAgent(cfg); err != nil {
 		t.Errorf("CheckAgent(custom image) error = %v, want nil", err)
+	}
+}
+
+func TestDocker_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
+	tests := []struct {
+		agent types.AgentType
+		want  []string
+	}{
+		{types.AgentCodex, []string{"codex", "--sandbox", "danger-full-access", "go"}},
+		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
+		{types.AgentCopilot, []string{"copilot", "go"}},
+		{types.AgentPi, []string{"pi", "go"}},
+	}
+	for _, test := range tests {
+		t.Run(string(test.agent), func(t *testing.T) {
+			c := dockerCfg(netshared.ModeHost)
+			c.Agent = registeredAgent(test.agent)
+			c.AgentArgs = []string{"go"}
+
+			command := dockerCommand(t, newHost(), c, provision.Contribution{})
+
+			tail := command[len(command)-len(test.want):]
+			if !slices.Equal(tail, test.want) {
+				t.Errorf("command tail = %v, want %v", tail, test.want)
+			}
+		})
 	}
 }

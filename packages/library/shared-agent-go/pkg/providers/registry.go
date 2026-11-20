@@ -17,6 +17,8 @@ func presets(agentType types.AgentType) map[string]func() *types.ModelProvider {
 	switch agentType {
 	case types.AgentClaude:
 		return claudePresets()
+	case types.AgentCodex:
+		return codexPresets()
 	case types.AgentOpencode:
 		return opencodePresets()
 	default:

@@ -15,8 +15,7 @@ import (
 // always uses slashes. It takes only the fields it needs (data coupling), not a
 // whole config struct.
 func BuildAgentCommand(agent *types.AgentConfig, provider *types.ModelProvider, agentArgs []string, binaryPrefix string) ([]string, error) {
-	behavior, err := agents.Lookup(agent.Type)
-	if err != nil {
+	if _, err := agents.GetAgent(agent.Type); err != nil {
 		return nil, err
 	}
 
@@ -25,7 +24,7 @@ func BuildAgentCommand(agent *types.AgentConfig, provider *types.ModelProvider, 
 		providerCliArgs = providers.GetProviderCliArgs(provider)
 	}
 
-	builtArgs := behavior.BuildArgs(agentArgs, types.AgentExecOptions{
+	builtArgs := agents.BuildArgs(agent, agentArgs, types.AgentExecOptions{
 		Sandbox:         true,
 		ProviderCliArgs: providerCliArgs,
 	})
@@ -51,8 +50,7 @@ func BuildProviderEnv(agent *types.AgentConfig, provider *types.ModelProvider, g
 		return map[string]string{}, nil
 	}
 
-	behavior, err := agents.Lookup(agent.Type)
-	if err != nil {
+	if _, err := agents.GetAgent(agent.Type); err != nil {
 		return nil, err
 	}
 
@@ -61,5 +59,5 @@ func BuildProviderEnv(agent *types.AgentConfig, provider *types.ModelProvider, g
 		return nil, fmt.Errorf("failed to build provider environment: %w", err)
 	}
 
-	return behavior.BuildEnv(providerEnv), nil
+	return agents.BuildEnv(agent, providerEnv), nil
 }

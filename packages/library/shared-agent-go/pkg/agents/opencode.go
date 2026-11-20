@@ -4,35 +4,21 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
-func opencode() Agent {
-	return Agent{Config: opencodeAgent, BuildArgs: BuildOpencodeArgs, BuildEnv: BuildOpencodeEnv}
-}
-
+// opencodeAgent declares OpenCode, which takes the provider through arguments
+// and reads no provider environment.
 func opencodeAgent() *types.AgentConfig {
 	return &types.AgentConfig{
-		Type:        types.AgentOpencode,
-		DisplayName: "OpenCode",
-		Binary:      "opencode",
-		NixPackage:  "opencode",
+		Type:         types.AgentOpencode,
+		DisplayName:  "OpenCode",
+		Binary:       "opencode",
+		NixPackage:   "opencode",
+		Access:       types.AccessProvider,
+		ProviderArgs: true,
+		VersionArgs:  []string{"--version"},
 	}
 }
 
-// BuildOpencodeArgs builds arguments for OpenCode agent
+// BuildOpencodeArgs builds the arguments of OpenCode for the agent operator.
 func BuildOpencodeArgs(baseArgs []string, options types.AgentExecOptions) []string {
-	args := make([]string, 0, len(baseArgs)+len(options.ProviderCliArgs))
-
-	// Add provider CLI args first
-	args = append(args, options.ProviderCliArgs...)
-
-	// Add base args
-	args = append(args, baseArgs...)
-
-	return args
-}
-
-// BuildOpencodeEnv builds environment for OpenCode agent
-func BuildOpencodeEnv(providerEnv map[string]string) map[string]string {
-	// OpenCode doesn't use provider environment variables
-	// It uses CLI args for model selection instead
-	return map[string]string{}
+	return BuildArgs(opencodeAgent(), baseArgs, options)
 }

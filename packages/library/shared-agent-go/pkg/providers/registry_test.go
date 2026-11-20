@@ -2,6 +2,7 @@ package providers
 
 import (
 	"reflect"
+	"slices"
 	"strings"
 	"testing"
 
@@ -18,6 +19,7 @@ func TestGetProvider(t *testing.T) {
 		{name: "glm", agentType: types.AgentClaude},
 		{name: "gpt5-codex", agentType: types.AgentClaude},
 		{name: "gemini", agentType: types.AgentOpencode},
+		{name: "gpt5-codex", agentType: types.AgentCodex},
 	}
 	for _, test := range tests {
 		t.Run(string(test.agentType)+"/"+test.name, func(t *testing.T) {
@@ -74,7 +76,11 @@ func TestGetProviderNamesReturnsSortedProviderNames(t *testing.T) {
 		want      []string
 	}{
 		{agentType: types.AgentClaude, want: []string{"gemini", "gemini-claude", "glm", "gpt5-codex"}},
+		{agentType: types.AgentCodex, want: []string{"gpt5-codex"}},
 		{agentType: types.AgentOpencode, want: []string{"gemini"}},
+		{agentType: types.AgentPi, want: []string{}},
+		{agentType: types.AgentCopilot, want: []string{}},
+		{agentType: types.AgentKiro, want: []string{}},
 		{agentType: types.AgentType("unknown"), want: []string{}},
 	}
 	for _, test := range tests {
@@ -164,5 +170,32 @@ func TestGetProviderCliArgs(t *testing.T) {
 	got[0] = "changed"
 	if provider.CliArgs[0] == "changed" {
 		t.Fatal("GetProviderCliArgs() returned shared mutable arguments")
+	}
+}
+
+func TestCodexPresetKeepsTheKeyOutOfArguments(t *testing.T) {
+	provider, err := GetProvider("gpt5-codex", types.AgentCodex)
+	if err != nil {
+		t.Fatalf("GetProvider() error = %v", err)
+	}
+	env, err := BuildProviderEnv(provider, func(key string) string {
+		if key == "CLI_PROXY_API_KEY" {
+			return "secret"
+		}
+		return ""
+	})
+	if err != nil {
+		t.Fatalf("BuildProviderEnv() error = %v", err)
+	}
+	if env["CLI_PROXY_API_KEY"] != "secret" {
+		t.Fatalf("env = %v, want the key in the variable env_key names", env)
+	}
+	for _, arg := range provider.CliArgs {
+		if strings.Contains(arg, "secret") {
+			t.Fatalf("argument %q holds the key", arg)
+		}
+	}
+	if !slices.Contains(provider.CliArgs, `model_providers.proxy.env_key="CLI_PROXY_API_KEY"`) {
+		t.Fatalf("CliArgs = %v, want an env_key argument that names the credential variable", provider.CliArgs)
 	}
 }

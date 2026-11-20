@@ -21,6 +21,9 @@ package sandbox
 //     package reaches the machine through a port it declares.
 //   - TestInternalPackagesDoNotPrint — explicit output: no package writes to the
 //     process streams through fmt.Print*; output goes through a logger or writer.
+//   - TestNoHarnessIsNamedOutsideTheAgentRegistry — facts, not names: no
+//     production file of this module names a concrete agent type; the planner and
+//     the isolators compare the facts a harness declares.
 //   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
 //     name no concrete plugin, no OS adapter, and (for launch) no cobra.
 //
@@ -336,6 +339,36 @@ func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 					t.Errorf("internal/%s imports adapter %s", pkg, imp)
 				}
 			}
+		}
+	}
+}
+
+// agentTypeSurface lists the identifiers of the shared agent types package that
+// name no concrete agent.
+var agentTypeSurface = map[string]bool{"AgentType": true, "AgentConfig": true, "AgentExecOptions": true}
+
+func TestNoHarnessIsNamedOutsideTheAgentRegistry(t *testing.T) {
+	root := internalRoot(t)
+	roots := []string{root, filepath.Join(filepath.Dir(root), "cmd")}
+
+	fset := token.NewFileSet()
+	for _, dir := range roots {
+		for _, file := range productionFiles(t, dir) {
+			f, err := parser.ParseFile(fset, file, nil, 0)
+			if err != nil {
+				t.Fatalf("parse %s: %v", file, err)
+			}
+			ast.Inspect(f, func(n ast.Node) bool {
+				sel, ok := n.(*ast.SelectorExpr)
+				if !ok {
+					return true
+				}
+				pkg, ok := sel.X.(*ast.Ident)
+				if ok && pkg.Name == "types" && strings.HasPrefix(sel.Sel.Name, "Agent") && !agentTypeSurface[sel.Sel.Name] {
+					t.Errorf("%s names the concrete agent %s; compare the declared facts instead", file, sel.Sel.Name)
+				}
+				return true
+			})
 		}
 	}
 }

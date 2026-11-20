@@ -449,3 +449,107 @@ func TestNewPlanDefaultsEmptyAxes(t *testing.T) {
 		t.Errorf("Provisioner = %v, want the unpinned none provisioner", p.Provisioner)
 	}
 }
+
+func TestNewPlanSupportsEveryHarness(t *testing.T) {
+	tests := []struct {
+		agent  string
+		binary string
+		nix    string
+	}{
+		{"claude", "claude", "claude-code"},
+		{"codex", "codex", "codex"},
+		{"copilot", "copilot", "github-copilot-cli"},
+		{"kiro", "kiro-cli-chat", "kiro-cli-unwrapped"},
+		{"opencode", "opencode", "opencode"},
+		{"pi", "pi", "pi-coding-agent"},
+	}
+	for _, test := range tests {
+		t.Run(test.agent, func(t *testing.T) {
+			options := baseOptions()
+			options.Agent = test.agent
+
+			p := mustPlan(t, options, config.FileConfig{})
+
+			if p.Agent.Binary != test.binary || p.Agent.NixPackage != test.nix {
+				t.Fatalf("agent = %+v, want binary %q and nix package %q", p.Agent, test.binary, test.nix)
+			}
+			if p.Provider != nil {
+				t.Fatalf("provider = %+v, want none", p.Provider)
+			}
+		})
+	}
+}
+
+func TestNewPlanListsEveryHarnessForAnUnknownAgent(t *testing.T) {
+	options := baseOptions()
+	options.Agent = "unknown"
+
+	_, err := plan(t, options, config.FileConfig{})
+
+	for _, want := range []string{"claude", "codex", "copilot", "kiro", "opencode", "pi"} {
+		if err == nil || !strings.Contains(err.Error(), want) {
+			t.Fatalf("NewPlan() error = %v, want it to list %q", err, want)
+		}
+	}
+}
+
+func TestNewPlanResolvesTheCodexProvider(t *testing.T) {
+	options := baseOptions()
+	options.Agent = "codex"
+	options.Provider = "gpt5-codex"
+
+	p := mustPlan(t, options, config.FileConfig{})
+
+	if p.Provider == nil || p.Provider.Name != "gpt5-codex" || p.Provider.AgentType != "codex" {
+		t.Fatalf("provider = %+v, want the codex gpt5-codex preset", p.Provider)
+	}
+}
+
+func TestNewPlanRejectsAProviderForAnAgentThatUsesItsOwnLogin(t *testing.T) {
+	for _, agent := range []string{"copilot", "kiro"} {
+		for name, fromFlag := range map[string]bool{"flag": true, "file": false} {
+			t.Run(agent+"/"+name, func(t *testing.T) {
+				options := baseOptions()
+				options.Agent = agent
+				file := config.FileConfig{}
+				if fromFlag {
+					options.Provider = "gemini"
+				} else {
+					file.Provider = "gemini"
+				}
+
+				_, err := plan(t, options, file)
+
+				if err == nil || !strings.Contains(err.Error(), "uses its own login") {
+					t.Fatalf("NewPlan() error = %v, want a native login rejection", err)
+				}
+			})
+		}
+	}
+}
+
+func TestNewPlanRejectsAProviderPresetThatAnotherAgentOwns(t *testing.T) {
+	options := baseOptions()
+	options.Agent = "pi"
+	options.Provider = "gemini"
+
+	_, err := plan(t, options, config.FileConfig{})
+
+	if err == nil || !strings.Contains(err.Error(), "unknown provider") {
+		t.Fatalf("NewPlan() error = %v, want an unknown provider error", err)
+	}
+}
+
+func TestNewPlanKeepsTheRequirePoliciesForEveryHarness(t *testing.T) {
+	for _, agent := range []string{"codex", "copilot", "kiro", "pi"} {
+		t.Run(agent, func(t *testing.T) {
+			options := baseOptions()
+			options.Agent = agent
+			options.Policy.RequireKernelIsolation = true
+
+			if _, err := plan(t, options, config.FileConfig{}); err == nil {
+				t.Fatal("NewPlan() error = nil, want the kernel isolation guarantee refused on isolation none")
+			}
+		})
+	}
+}

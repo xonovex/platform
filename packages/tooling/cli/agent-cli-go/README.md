@@ -1,6 +1,6 @@
 # @xonovex/agent-cli-go
 
-Use `agent-cli` to configure a sandbox, model provider, workspace, and terminal session before it launches Claude Code or OpenCode.
+Use `agent-cli` to configure a sandbox, model provider, workspace, and terminal session before it launches Claude Code, Codex, GitHub Copilot CLI, Kiro CLI, OpenCode, or Pi.
 
 ## Installation
 
@@ -20,7 +20,8 @@ agent-cli run
 
 # Run with specific agent
 agent-cli run -a claude
-agent-cli run -a opencode
+agent-cli run -a codex -p gpt5-codex
+agent-cli run -a kiro
 
 # Run with the three sandbox axes: isolation, provision, and network
 agent-cli run --isolation bwrap --provision command --isolation-bwrap-passthrough --init-command 'command -v claude'
@@ -43,7 +44,7 @@ Use `run` to start an AI coding agent. Select the sandbox with the three indepen
 
 ```
 Options:
-  -a, --agent <type>           Agent: claude, opencode (default: claude)
+  -a, --agent <type>           Agent: claude, codex, copilot, kiro, opencode, pi (default: claude)
   -p, --provider <name>        Model provider for the agent
   --isolation <method>         Isolation: none, bwrap, docker (default: none)
   --provision <method>         Provision: none, nix, command (default: none)
@@ -66,6 +67,26 @@ Options:
   -c, --config <file>          Load configuration from file
   -n, --dry-run                Show configuration without executing
 ```
+
+### Agents
+
+Each agent declares its facts, and the planner and the isolators compare those facts: no code names an agent. The sandbox axes and the `--require-*` guarantees stay the same for every agent.
+
+| Agent | Binary | Nix package | Protocol | Model access | Added in an isolation |
+| --- | --- | --- | --- | --- | --- |
+| `claude` | `claude` | `claude-code` | Messages | provider environment | `--permission-mode bypassPermissions` |
+| `codex` | `codex` | `codex` | Responses | provider arguments and environment | `--sandbox danger-full-access` |
+| `copilot` | `copilot` | `github-copilot-cli` | none | the login of the user with GitHub | nothing |
+| `kiro` | `kiro-cli-chat` | `kiro-cli-unwrapped` | none | the login of the user with the vendor | nothing |
+| `opencode` | `opencode` | `opencode` | none | provider arguments | nothing |
+| `pi` | `pi` | `pi-coding-agent` | Responses | provider arguments and environment | nothing |
+
+- An agent that uses its own login (`copilot`, `kiro`) takes no provider: `--provider` or a provider in the configuration file fails before the run. Log in on the host before you run it with `--isolation none`.
+- `kiro` starts `kiro-cli-chat chat --agent-engine v3` directly, because the `kiro-cli` router starts a program at a path under the real home directory.
+- Codex sandboxes its own commands, and that fails inside another sandbox, so an isolation adds `--sandbox danger-full-access`. Host execution keeps the Codex sandbox.
+- A provider that sets a route the agent does not read, such as environment for OpenCode, fails before the run, because the agent would drop it silently.
+- Provider presets: `claude` has `gemini`, `gemini-claude`, `glm` and `gpt5-codex`; `codex` has `gpt5-codex`; `opencode` has `gemini`. `pi` takes its Azure OpenAI variables through `--env`.
+- `--dry-run` prints the protocol, the model access and the version probe of the agent. `--agent` and `--provider` complete in the shell.
 
 ### completion
 

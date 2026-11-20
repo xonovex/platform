@@ -174,6 +174,9 @@ func selectWorkspace(workspaces map[wsp.VCSType]wsshared.VCS, checkout *Checkout
 func printDryRun(log logging.Logger, out io.Writer, plan Plan, command []string) error {
 	log.Info("Dry run - would execute:")
 	log.Info("  Agent: " + plan.Agent.DisplayName)
+	log.Info("  Protocol: " + describeProtocol(plan.Agent))
+	log.Info("  Model access: " + describeAccess(plan.Agent))
+	log.Info("  Version probe: " + describeVersionProbe(plan.Agent))
 	if plan.Provider != nil {
 		log.Info("  Provider: " + plan.Provider.DisplayName)
 	}

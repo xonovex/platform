@@ -111,8 +111,11 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 	if err != nil {
 		return Plan{}, fmt.Errorf("%w; available agents: %v", err, agents.GetAgentTypes())
 	}
-	provider, err := resolveProvider(agent.Type, options.Provider, file.Provider)
+	provider, err := resolveProvider(agent, options.Provider, file.Provider)
 	if err != nil {
+		return Plan{}, err
+	}
+	if err := agents.CheckRoutes(agent, provider); err != nil {
 		return Plan{}, err
 	}
 
@@ -182,8 +185,9 @@ func (p Plan) DisplayDir() string {
 }
 
 // resolveProvider resolves the model provider from the flag, falling back to the
-// file config's provider.
-func resolveProvider(agentType types.AgentType, optionProvider, fileProvider string) (*types.ModelProvider, error) {
+// file config's provider. An agent that uses its own login takes no provider, so
+// a named one fails before the preset lookup.
+func resolveProvider(agent *types.AgentConfig, optionProvider, fileProvider string) (*types.ModelProvider, error) {
 	name := optionProvider
 	if name == "" {
 		name = fileProvider
@@ -191,9 +195,12 @@ func resolveProvider(agentType types.AgentType, optionProvider, fileProvider str
 	if name == "" {
 		return nil, nil
 	}
-	provider, err := providers.GetProvider(name, agentType)
+	if !agents.TakesProvider(agent) {
+		return nil, fmt.Errorf("provider %s: agent %s uses its own login and takes no provider", name, agent.Type)
+	}
+	provider, err := providers.GetProvider(name, agent.Type)
 	if err != nil {
-		return nil, fmt.Errorf("%w; available providers: %v", err, providers.GetProviderNames(agentType))
+		return nil, fmt.Errorf("%w; available providers: %v", err, providers.GetProviderNames(agent.Type))
 	}
 	return provider, nil
 }

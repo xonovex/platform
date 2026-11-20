@@ -2,9 +2,11 @@ package bwrap
 
 import (
 	"errors"
+	"slices"
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
@@ -14,6 +16,16 @@ import (
 
 // newHost returns an in-memory host with an empty home, a work directory and
 // the host system directories that passthrough binds.
+// registeredAgent returns the declared facts of an agent type, as the planner
+// supplies them.
+func registeredAgent(agentType types.AgentType) *types.AgentConfig {
+	agent, err := agents.GetAgent(agentType)
+	if err != nil {
+		panic(err)
+	}
+	return agent
+}
+
 func newHost() *systemtest.Fake {
 	host := systemtest.New().AddDir("/home/user").AddDir("/work").AddDir("/usr").AddDir("/bin").AddDir("/etc")
 	host.Env["PATH"] = "/usr/bin"
@@ -25,7 +37,7 @@ func newHost() *systemtest.Fake {
 // user's configuration.
 func claudeCfg(net netshared.Mode, passthrough bool) isoshared.RunConfig {
 	return isoshared.RunConfig{
-		Agent:           &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
+		Agent:           registeredAgent(types.AgentClaude),
 		WorkDir:         "/work",
 		HomeDir:         "/home/user",
 		Network:         net,
@@ -368,5 +380,31 @@ func TestBwrap_CommandRejectsUnknownAgentType(t *testing.T) {
 
 	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("Command() error = nil, want unknown agent type error")
+	}
+}
+
+func TestBwrap_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
+	tests := []struct {
+		agent types.AgentType
+		want  []string
+	}{
+		{types.AgentCodex, []string{"codex", "--sandbox", "danger-full-access", "go"}},
+		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
+		{types.AgentCopilot, []string{"copilot", "go"}},
+		{types.AgentPi, []string{"pi", "go"}},
+	}
+	for _, test := range tests {
+		t.Run(string(test.agent), func(t *testing.T) {
+			c := claudeCfg(netshared.ModeHost, false)
+			c.Agent = registeredAgent(test.agent)
+			c.AgentArgs = []string{"go"}
+
+			command := bwrapCommand(t, newHost(), c, provision.Contribution{})
+
+			tail := command[len(command)-len(test.want):]
+			if !slices.Equal(tail, test.want) {
+				t.Errorf("command tail = %v, want %v", tail, test.want)
+			}
+		})
 	}
 }

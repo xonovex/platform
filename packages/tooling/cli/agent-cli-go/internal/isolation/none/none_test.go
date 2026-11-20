@@ -5,12 +5,23 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
+
+// registeredAgent returns the declared facts of an agent type, as the planner
+// supplies them.
+func registeredAgent(agentType types.AgentType) *types.AgentConfig {
+	agent, err := agents.GetAgent(agentType)
+	if err != nil {
+		panic(err)
+	}
+	return agent
+}
 
 func newHost() *systemtest.Fake {
 	host := systemtest.New().AddDir("/work").AddDir("/home/user")
@@ -20,7 +31,7 @@ func newHost() *systemtest.Fake {
 
 func cfg(net netshared.Mode) isoshared.RunConfig {
 	return isoshared.RunConfig{
-		Agent:   &types.AgentConfig{Type: types.AgentClaude, Binary: "claude"},
+		Agent:   registeredAgent(types.AgentClaude),
 		HomeDir: "/home/user",
 		WorkDir: "/work",
 		Network: net,
@@ -206,5 +217,32 @@ func TestNone_AvailableAndPinnedProvision(t *testing.T) {
 		if got := isolator.PinnedProvision(provision.ProvisionNix, pinned, ""); got != pinned {
 			t.Errorf("PinnedProvision(pinned=%v) = %v, want %v", pinned, got, pinned)
 		}
+	}
+}
+
+func TestNone_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
+	tests := []struct {
+		agent types.AgentType
+		want  []string
+	}{
+		{types.AgentCodex, []string{"codex", "go"}},
+		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
+		{types.AgentCopilot, []string{"copilot", "go"}},
+		{types.AgentPi, []string{"pi", "go"}},
+	}
+	for _, test := range tests {
+		t.Run(string(test.agent), func(t *testing.T) {
+			c := cfg(netshared.ModeHost)
+			c.Agent = registeredAgent(test.agent)
+			c.AgentArgs = []string{"go"}
+
+			cmd, err := NewIsolator(newHost(), testLog).Command(c, provision.Contribution{})
+			if err != nil {
+				t.Fatalf("Command() error = %v", err)
+			}
+			if !slices.Equal(cmd, test.want) {
+				t.Errorf("command = %v, want %v (no sandbox arguments on the host)", cmd, test.want)
+			}
+		})
 	}
 }

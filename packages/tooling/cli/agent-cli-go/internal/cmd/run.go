@@ -2,9 +2,13 @@ package cmd
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 )
 
@@ -43,7 +47,7 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 
 	flags := cmd.Flags()
 	// Bare axis selectors.
-	flags.StringVarP(&options.Agent, "agent", "a", options.Agent, "Agent to run (claude, opencode)")
+	flags.StringVarP(&options.Agent, "agent", "a", options.Agent, "Agent to run ("+strings.Join(agentNames(), ", ")+")")
 	flags.StringVarP(&options.Provider, "provider", "p", "", "Model provider")
 	flags.StringVar(&options.Isolation, "isolation", options.Isolation, "Isolation axis (none, bwrap, docker)")
 	flags.StringVar(&options.Provision, "provision", options.Provision, "Provision axis (none, nix, command)")
@@ -85,5 +89,22 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	flags.BoolVar(&options.Policy.RequireKernelIsolation, "require-kernel-isolation", false,
 		"Require a kernel-isolating runtime such as docker with runsc")
 
+	// The flags exist above, so registration cannot fail.
+	_ = cmd.RegisterFlagCompletionFunc("agent", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return agentNames(), cobra.ShellCompDirectiveNoFileComp
+	})
+	_ = cmd.RegisterFlagCompletionFunc("provider", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return providers.GetProviderNames(types.AgentType(options.Agent)), cobra.ShellCompDirectiveNoFileComp
+	})
+
 	return cmd
+}
+
+// agentNames lists the registered agent types in sorted order.
+func agentNames() []string {
+	names := make([]string, 0, len(agents.GetAgentTypes()))
+	for _, agentType := range agents.GetAgentTypes() {
+		names = append(names, string(agentType))
+	}
+	return names
 }
