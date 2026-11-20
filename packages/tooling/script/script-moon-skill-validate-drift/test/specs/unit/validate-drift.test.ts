@@ -1,7 +1,9 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import type {DriftLintMode} from "@xonovex/script-moon-common/drift-budgets";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import {main} from "../../../src/validate-drift.js";
 
 const INVARIANT =
@@ -34,34 +36,62 @@ const repositoryFixture = (
     },
   });
 
+// Runs the validator from /repo/work and returns the exit code with its output.
+const run = (
+  argv: readonly string[],
+  fs: FileSystem = memoryFileSystem({directories: [ROOT]}),
+  driftMode: DriftLintMode = "warn",
+) => {
+  const output = memoryOutput();
+  const code = main(argv, join(ROOT, "work"), {
+    fs,
+    output,
+    driftMode,
+    scriptDirectory: join(ROOT, "packages", "script", "dist"),
+  });
+  return {code, stdout: output.stdoutLines(), stderr: output.stderrLines()};
+};
+
 describe("moon-skill-validate-drift", () => {
-  beforeEach(() => {
-    vi.spyOn(console, "log").mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-    delete process.env.XONOVEX_LINT_MODE;
-  });
-
   it("prints help and exits zero", () => {
-    expect(main(["--help"])).toBe(0);
+    const result = run(["--help"]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout[0]).toContain("usage: moon-skill-validate-drift");
   });
 
   it("rejects an unknown option", () => {
-    expect(main(["--nope"])).toBe(2);
+    expect(run(["--nope"])).toMatchObject({
+      code: 2,
+      stderr: ["Error: unrecognized argument: --nope"],
+    });
   });
 
   it("fails when the repository holds no catalog files", () => {
-    const fs = memoryFileSystem({directories: [ROOT]});
+    expect(run(["--repo-root", ".."])).toMatchObject({
+      code: 2,
+      stderr: ["Error: no catalog files under /repo"],
+    });
+  });
 
-    expect(main(["--repo-root", ROOT], fs)).toBe(2);
+  it("finds the workspace root above the script directory", () => {
+    const fs = repositoryFixture(
+      {alpha: "one two three"},
+      {[join(ROOT, ".moon", "workspace.yml")]: ""},
+    );
+
+    expect(run([], fs).stdout.at(-1)).toBe(
+      "Drift (warn mode): 1 files, 0 finding(s)",
+    );
   });
 
   it("seeds budgets from current sizes", () => {
     const fs = repositoryFixture({alpha: "one two three"});
 
-    expect(main(["--seed", "--repo-root", ROOT], fs)).toBe(0);
+    expect(run(["--seed", "--repo-root", ROOT], fs)).toMatchObject({
+      code: 0,
+      stdout: ["Seeded 1 budgets into budgets.json"],
+    });
 
     const manifest: unknown = JSON.parse(
       fs.readText(join(ROOT, "budgets.json")),
@@ -78,7 +108,10 @@ describe("moon-skill-validate-drift", () => {
       gamma: INVARIANT,
     });
 
-    expect(main(["--repo-root", ROOT], fs)).toBe(0);
+    const result = run(["--repo-root", ROOT], fs);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout[0]).toMatch(/^\[DRIFT\] duplication:/u);
   });
 
   it("fails in enforce mode when an invariant is restated", () => {
@@ -87,9 +120,10 @@ describe("moon-skill-validate-drift", () => {
       beta: INVARIANT,
       gamma: INVARIANT,
     });
-    process.env.XONOVEX_LINT_MODE = "enforce";
+    const result = run(["--repo-root", ROOT], fs, "enforce");
 
-    expect(main(["--repo-root", ROOT], fs)).toBe(1);
+    expect(result.code).toBe(1);
+    expect(result.stdout[0]).toMatch(/^\[FAIL\] duplication:/u);
   });
 
   it("fails on a malformed manifest in either mode", () => {
@@ -98,6 +132,6 @@ describe("moon-skill-validate-drift", () => {
       {[join(ROOT, "budgets.json")]: "{"},
     );
 
-    expect(main(["--repo-root", ROOT], fs)).toBe(1);
+    expect(run(["--repo-root", ROOT], fs).code).toBe(1);
   });
 });
