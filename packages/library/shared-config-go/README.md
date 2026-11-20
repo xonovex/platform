@@ -6,7 +6,7 @@ Use this shared Go library to read the layered `agentic.json` configuration: fin
 
 | Layer | File |
 | --- | --- |
-| managed | `/etc/agentic/agentic.json`, `/Library/Application Support/agentic/agentic.json` on macOS, `%ProgramData%\agentic\agentic.json` on Windows |
+| managed | `/etc/agentic/agentic.json`, `/Library/Application Support/agentic/agentic.json` on macOS, `%ProgramData%\agentic\agentic.json` on Windows. A file that its group or others can write is refused |
 | user | `$XDG_CONFIG_HOME/agentic/agentic.json`, else `~/.config/agentic/agentic.json` (`%AppData%\agentic` on Windows) |
 | project | The nearest `agentic.json` from the start directory up to the root of the git or jj repository; outside a repository only the start directory |
 | flags | The command line of the run |

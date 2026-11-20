@@ -122,6 +122,11 @@ func TestResolveReportsEveryFault(t *testing.T) {
 			e.Files = unreadable{configtest.NewFiles(map[string]string{user: "{}"})}
 			return e
 		}, "permission denied"},
+		"writable managed file": {func() resolve.Env {
+			files := configtest.NewFiles(map[string]string{"/etc/agentic/agentic.json": `{"version":1}`})
+			files.Chmod("/etc/agentic/agentic.json", 0o664)
+			return env(files, &configtest.Prompter{})
+		}, "writable by its group or by others"},
 		"broken envelope": {func() resolve.Env {
 			return env(configtest.NewFiles(map[string]string{user: `{"version":2}`}), &configtest.Prompter{})
 		}, "version is 2"},

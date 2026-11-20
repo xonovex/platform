@@ -249,3 +249,12 @@ func TestExecuteStartsTheBinaryOfAHarnessOverride(t *testing.T) {
 		t.Errorf("Execute() error = %v, want the broken override named", err)
 	}
 }
+
+func TestExecuteRefusesAManagedFileOthersCanWrite(t *testing.T) {
+	f := newExecuteFixture()
+	f.host.AddFile(managedFile, runFile(`{"network":"none"}`), 0o666)
+
+	if err := Execute(f.deps(), dryRunOptions()); err == nil || !strings.Contains(err.Error(), "writable by its group or by others") {
+		t.Errorf("Execute() error = %v, want the writable managed file refused", err)
+	}
+}

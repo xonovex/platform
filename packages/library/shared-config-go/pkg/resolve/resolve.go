@@ -98,6 +98,11 @@ func read(files discover.Files, candidate discover.Candidate) (layer.Document, b
 	if !info.Mode.IsRegular() {
 		return layer.Document{}, false, fmt.Errorf("%s configuration %s is not a regular file", candidate.Layer, candidate.Path)
 	}
+	// The managed layer wins over every other, so it is only as strong as the
+	// write protection of its file.
+	if candidate.Layer == spec.Managed && info.Mode.Perm()&0o022 != 0 {
+		return layer.Document{}, false, fmt.Errorf("managed configuration %s is writable by its group or by others; refuse a policy that anyone can change", candidate.Path)
+	}
 	data, err := files.ReadFile(candidate.Path)
 	if err != nil {
 		return layer.Document{}, false, fmt.Errorf("%s configuration %s: %w", candidate.Layer, candidate.Path, err)

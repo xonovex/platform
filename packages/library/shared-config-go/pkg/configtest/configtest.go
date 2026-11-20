@@ -18,11 +18,12 @@ type Files struct {
 	mu    sync.Mutex
 	files map[string][]byte
 	dirs  map[string]bool
+	modes map[string]iofs.FileMode
 }
 
 // NewFiles returns a tree that holds files, keyed by path.
 func NewFiles(files map[string]string) *Files {
-	f := &Files{files: map[string][]byte{}, dirs: map[string]bool{}}
+	f := &Files{files: map[string][]byte{}, dirs: map[string]bool{}, modes: map[string]iofs.FileMode{}}
 	for path, content := range files {
 		f.put(path, []byte(content))
 	}
@@ -44,6 +45,13 @@ func notExist(op, path string) error {
 	return &iofs.PathError{Op: op, Path: path, Err: iofs.ErrNotExist}
 }
 
+// Chmod sets the permission bits Stat reports for a file, 0644 by default.
+func (f *Files) Chmod(path string, mode iofs.FileMode) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.modes[filepath.Clean(path)] = mode
+}
+
 // ReadFile returns the content of a file.
 func (f *Files) ReadFile(path string) ([]byte, error) {
 	f.mu.Lock()
@@ -63,6 +71,9 @@ func (f *Files) Stat(path string) (discover.Info, error) {
 	_, file := f.files[path]
 	switch {
 	case file:
+		if mode, set := f.modes[path]; set {
+			return discover.Info{Mode: mode}, nil
+		}
 		return discover.Info{Mode: 0o644}, nil
 	case f.dirs[path]:
 		return discover.Info{Mode: iofs.ModeDir | 0o755}, nil

@@ -20,6 +20,10 @@ func TestFiles(t *testing.T) {
 	if info, err := files.Stat("/a/b/c.json"); err != nil || !info.Mode.IsRegular() {
 		t.Fatalf("Stat file = %v, %v", info, err)
 	}
+	files.Chmod("/a/b/c.json", 0o600)
+	if info, err := files.Stat("/a/b/c.json"); err != nil || info.Mode != 0o600 {
+		t.Fatalf("Stat after Chmod = %v, %v", info, err)
+	}
 	if info, err := files.Stat("/empty"); err != nil || !info.Mode.IsRegular() {
 		t.Fatalf("Stat empty file = %v, %v", info, err)
 	}
