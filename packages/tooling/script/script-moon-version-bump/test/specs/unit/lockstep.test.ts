@@ -577,3 +577,246 @@ describe("planLockstep", () => {
     expect(plan.dependents[0]?.newVersion).toBeUndefined();
   });
 });
+
+// A launcher pins its two platform packages at its own version, and a private
+// release package pins the platform packages only. The package named by holder
+// holds an exact reference to a member of the config line.
+const cliLine = (
+  version = "0.3.0",
+  holder: "cli" | "cli-linux-x64" = "cli",
+): readonly WorkspacePackage[] => [
+  workspacePackage("cli", {
+    name: "@xonovex/cli",
+    version,
+    ...(holder === "cli"
+      ? {devDependencies: {"@xonovex/eslint-config-base": "0.1.22"}}
+      : {}),
+    optionalDependencies: {
+      "@xonovex/cli-linux-x64": version,
+      "@xonovex/cli-win32-x64": version,
+    },
+  }),
+  workspacePackage("cli-linux-x64", {
+    name: "@xonovex/cli-linux-x64",
+    version,
+    ...(holder === "cli-linux-x64"
+      ? {devDependencies: {"@xonovex/prettier-config": "0.1.22"}}
+      : {}),
+  }),
+  workspacePackage("cli-win32-x64", {name: "@xonovex/cli-win32-x64", version}),
+  workspacePackage("cli-github", {
+    name: "@xonovex/cli-github",
+    version: "0.0.0",
+    private: true,
+    optionalDependencies: {
+      "@xonovex/cli-linux-x64": version,
+      "@xonovex/cli-win32-x64": version,
+    },
+  }),
+];
+
+const configRequest = (
+  packages: readonly WorkspacePackage[],
+  isReleased: (path: string, version: string) => boolean = always,
+) => ({
+  packages,
+  names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+  bumpType: "patch" as const,
+  preid: undefined,
+  exact: undefined,
+  isReleased,
+});
+
+describe("planLockstep release lines", () => {
+  it("moves a released dependent together with its whole release line", () => {
+    const plan = planLockstep(configRequest([...cyclicLine(), ...cliLine()]));
+
+    const byName = new Map(
+      plan.dependents.map((dependent) => [dependent.name, dependent]),
+    );
+    expect(byName.get("@xonovex/cli")?.pkg).toEqual({
+      name: "@xonovex/cli",
+      version: "0.3.1",
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+      optionalDependencies: {
+        "@xonovex/cli-linux-x64": "0.3.1",
+        "@xonovex/cli-win32-x64": "0.3.1",
+      },
+    });
+    for (const platform of [
+      "@xonovex/cli-linux-x64",
+      "@xonovex/cli-win32-x64",
+    ]) {
+      expect(byName.get(platform)).toMatchObject({
+        previousVersion: "0.3.0",
+        newVersion: "0.3.1",
+        referenceCount: 0,
+        withReleaseLine: true,
+      });
+    }
+    expect(byName.get("@xonovex/cli")?.withReleaseLine).toBe(true);
+    expect(byName.get("@xonovex/cli-github")).toMatchObject({
+      newVersion: undefined,
+      withReleaseLine: false,
+      referenceCount: 2,
+      pkg: {
+        version: "0.0.0",
+        optionalDependencies: {
+          "@xonovex/cli-linux-x64": "0.3.1",
+          "@xonovex/cli-win32-x64": "0.3.1",
+        },
+      },
+    });
+  });
+
+  it("reaches the launcher from a platform package that is the dependent", () => {
+    const packages = [...cyclicLine(), ...cliLine("0.3.0", "cli-linux-x64")];
+
+    const plan = planLockstep(configRequest(packages));
+
+    expect(
+      plan.dependents
+        .filter((dependent) => dependent.newVersion === "0.3.1")
+        .map((dependent) => dependent.name)
+        .toSorted(),
+    ).toEqual([
+      "@xonovex/cli",
+      "@xonovex/cli-linux-x64",
+      "@xonovex/cli-win32-x64",
+    ]);
+  });
+
+  it("counts a line as released when any of its packages was released", () => {
+    const plan = planLockstep(
+      configRequest([...cyclicLine(), ...cliLine()], (path) =>
+        path.includes("cli-win32-x64"),
+      ),
+    );
+
+    expect(
+      plan.dependents.find((dependent) => dependent.name === "@xonovex/cli")
+        ?.newVersion,
+    ).toBe("0.3.1");
+  });
+
+  it("keeps a never-released line at its version and moves only the reference", () => {
+    const plan = planLockstep(
+      configRequest([...cyclicLine(), ...cliLine("0.1.0")], () => false),
+    );
+
+    expect(plan.dependents.map((dependent) => dependent.name)).toEqual([
+      "@xonovex/cli",
+    ]);
+    expect(plan.dependents[0]).toMatchObject({
+      newVersion: undefined,
+      withReleaseLine: false,
+      pkg: {
+        version: "0.1.0",
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+      },
+    });
+  });
+
+  it("does not join packages whose versions differ from the pin holder", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("app", {
+        name: "@xonovex/app",
+        version: "2.0.0",
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+        optionalDependencies: {"@xonovex/plugin": "1.0.0"},
+      }),
+      workspacePackage("plugin", {name: "@xonovex/plugin", version: "1.0.0"}),
+    ];
+
+    const plan = planLockstep(configRequest(packages));
+
+    expect(plan.dependents.map((dependent) => dependent.name)).toEqual([
+      "@xonovex/app",
+    ]);
+    expect(plan.dependents[0]?.withReleaseLine).toBe(false);
+  });
+
+  it("rejects a lockstep set that names only part of a release line", () => {
+    expect(() =>
+      planLockstep({
+        packages: cliLine(),
+        names: ["@xonovex/cli", "@xonovex/cli-linux-x64"],
+        bumpType: "minor",
+        preid: undefined,
+        exact: undefined,
+        isReleased: always,
+      }),
+    ).toThrow(
+      "the lockstep set splits the release line of @xonovex/cli; add @xonovex/cli-win32-x64",
+    );
+  });
+
+  it("accepts a lockstep set that names a whole release line", () => {
+    const plan = planLockstep({
+      packages: cliLine(),
+      names: [
+        "@xonovex/cli",
+        "@xonovex/cli-linux-x64",
+        "@xonovex/cli-win32-x64",
+      ],
+      bumpType: "minor",
+      preid: undefined,
+      exact: undefined,
+      isReleased: always,
+    });
+
+    expect(plan.members.map((member) => member.pkg.version)).toEqual([
+      "0.4.0",
+      "0.4.0",
+      "0.4.0",
+    ]);
+  });
+
+  it("moves the named packages of a line that holds a nameless package", () => {
+    const nameless = workspacePackage("cli-extra", {
+      version: "0.3.0",
+      optionalDependencies: {"@xonovex/cli-linux-x64": "0.3.0"},
+    });
+
+    const plan = planLockstep(
+      configRequest([...cyclicLine(), ...cliLine(), nameless]),
+    );
+
+    expect(
+      plan.dependents.find((dependent) => dependent.name === "@xonovex/cli")
+        ?.newVersion,
+    ).toBe("0.3.1");
+    expect(
+      plan.dependents.find((dependent) => dependent.path === nameless.path),
+    ).toMatchObject({
+      newVersion: undefined,
+      pkg: {
+        version: "0.3.0",
+        optionalDependencies: {"@xonovex/cli-linux-x64": "0.3.1"},
+      },
+    });
+  });
+
+  it("names a nameless package of a split line by its path", () => {
+    const nameless = workspacePackage("cli-extra", {
+      version: "0.3.0",
+      optionalDependencies: {"@xonovex/cli-linux-x64": "0.3.0"},
+    });
+
+    expect(() =>
+      planLockstep({
+        packages: [...cliLine(), nameless],
+        names: [
+          "@xonovex/cli",
+          "@xonovex/cli-linux-x64",
+          "@xonovex/cli-win32-x64",
+        ],
+        bumpType: "minor",
+        preid: undefined,
+        exact: undefined,
+        isReleased: always,
+      }),
+    ).toThrow(`add ${nameless.path}`);
+  });
+});

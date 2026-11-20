@@ -57,7 +57,9 @@ const CONFIG_RELEASES = ["consumer-v1.4.0", "downstream-consumer-v3.0.0"];
 
 // A launcher that was never released holds an exact reference to a member next
 // to its own platform package. Of the two released dependents, one records its
-// release as a version that moved between the commits, the other as a tag.
+// release as a version that moved between the commits, the other as a tag. The
+// cli line is a launcher with two platform packages and a private release
+// package, released when a case tags it.
 const releaseLine = (version: string): Manifests => ({
   ...configMembers(version),
   launcher: {
@@ -76,6 +78,26 @@ const releaseLine = (version: string): Manifests => ({
     name: "@xonovex/tagged-consumer",
     version: "2.0.0",
     devDependencies: {"@xonovex/eslint-config-base": version},
+  },
+  cli: {
+    name: "@xonovex/cli",
+    version: "0.3.0",
+    devDependencies: {"@xonovex/eslint-config-base": version},
+    optionalDependencies: {
+      "@xonovex/cli-linux-x64": "0.3.0",
+      "@xonovex/cli-win32-x64": "0.3.0",
+    },
+  },
+  "cli-linux-x64": {name: "@xonovex/cli-linux-x64", version: "0.3.0"},
+  "cli-win32-x64": {name: "@xonovex/cli-win32-x64", version: "0.3.0"},
+  "cli-github": {
+    name: "@xonovex/cli-github",
+    version: "0.0.0",
+    private: true,
+    optionalDependencies: {
+      "@xonovex/cli-linux-x64": "0.3.0",
+      "@xonovex/cli-win32-x64": "0.3.0",
+    },
   },
 });
 
@@ -442,6 +464,48 @@ describe("runLockstep", () => {
     expect(manifestAt(root, "launcher")).toMatchObject({
       devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
     });
+    expect(git(root, ["status", "--porcelain"])).toBe("");
+  });
+
+  it("moves a released launcher with its platform packages in one write", () => {
+    const root = createRepository(releaseLine, ["cli-v0.3.0"]);
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        bumpType: "patch",
+      }),
+    );
+
+    expect(manifestAt(root, "cli")).toEqual({
+      name: "@xonovex/cli",
+      version: "0.3.1",
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+      optionalDependencies: {
+        "@xonovex/cli-linux-x64": "0.3.1",
+        "@xonovex/cli-win32-x64": "0.3.1",
+      },
+    });
+    for (const directory of ["cli", "cli-linux-x64", "cli-win32-x64"]) {
+      expect(manifestAt(root, directory).version).toBe("0.3.1");
+      expect(changelogAt(root, directory)).toContain("## 0.3.1");
+    }
+    expect(manifestAt(root, "cli-github")).toMatchObject({
+      version: "0.0.0",
+      optionalDependencies: {
+        "@xonovex/cli-linux-x64": "0.3.1",
+        "@xonovex/cli-win32-x64": "0.3.1",
+      },
+    });
+    expect(manifestAt(root, "launcher").version).toBe("0.1.0");
+    expect(manifestAt(root, "launcher-linux-x64").version).toBe("0.1.0");
+  });
+
+  it("refuses a lockstep set that splits a release line and writes nothing", () => {
+    const root = createRepository(releaseLine, ["cli-v0.3.0"]);
+
+    expect(() =>
+      runLockstep(lockstepOptions(root, ["cli", "cli-linux-x64"])),
+    ).toThrow("splits the release line of @xonovex/cli");
     expect(git(root, ["status", "--porcelain"])).toBe("");
   });
 });

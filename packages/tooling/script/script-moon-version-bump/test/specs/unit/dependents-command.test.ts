@@ -33,7 +33,6 @@ const options = (
 ): DependentUpdateOptions => ({
   rootDir: "/repo",
   packagePaths: Object.keys(MANIFESTS).map((name) => manifestPath(name)),
-  packagePath: manifestPath("core"),
   packageName: "@xonovex/core",
   newVersion: "1.1.0",
   dryRun: false,
@@ -107,13 +106,15 @@ describe("planDependentUpdates", () => {
     );
   });
 
-  it("names a dependent without a name by its path", () => {
+  it("names a dependent without a name by its path and keeps its version", () => {
     const path = manifestPath("anonymous");
+    const output = memoryOutput();
     const result = planDependentUpdates(
       options({
-        packagePaths: [path],
+        packagePaths: [manifestPath("core"), path],
         fs: memoryFileSystem({
           files: {
+            [manifestPath("core")]: JSON.stringify(MANIFESTS.core),
             [path]: JSON.stringify({
               version: "1.0.0",
               dependencies: {"@xonovex/core": "1.0.0"},
@@ -122,17 +123,20 @@ describe("planDependentUpdates", () => {
         }),
         git: emptyHistory({
           readFile: manifestsAtHead({
+            "packages/core/package.json": MANIFESTS.core,
             "packages/anonymous/package.json": {version: "1.0.0"},
           }),
           tags: () => ["anonymous-v1.0.0"],
         }),
+        output,
       }),
     );
 
-    expect(
-      result.changes.find((change) => change.path.endsWith("CHANGELOG.md"))
-        ?.content,
-    ).toContain(`# ${path}`);
+    expect(result.changes.map((change) => change.path)).toEqual([path]);
+    expect(result.changes[0]?.content).toContain('"version": "1.0.0"');
+    expect(output.stdoutLines().join("\n")).toContain(
+      `${path}: 1 reference(s) updated (version unchanged)`,
+    );
   });
 
   it("rewrites the reference of a never-released dependent and keeps its version", () => {

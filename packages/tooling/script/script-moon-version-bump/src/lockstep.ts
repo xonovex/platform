@@ -24,6 +24,8 @@ interface DependentPlan {
   readonly referenceCount: number;
   readonly previousVersion: string | undefined;
   readonly newVersion: string | undefined;
+  /** Whether the version moves with a release line of more than one package. */
+  readonly withReleaseLine: boolean;
 }
 
 interface LockstepPlan {
@@ -168,23 +170,64 @@ const selectBaseVersion = (members: readonly ResolvedMember[]): string => {
   );
 };
 
-// A dependent earns a version of its own only when it is publishable, the
-// worktree has not already bumped it away from its committed version, and it was
-// released: a never-released package ships the rewritten reference in its first
-// release at its current version, which keeps it in step with its own line.
-const dependentVersionOf = (
+// Two public packages share a release line when one pins the other exactly in
+// optionalDependencies and both hold that version, as a launcher pins its
+// platform packages.
+const pinsInLine = (
+  holder: WorkspacePackage,
+  held: WorkspacePackage,
+): boolean =>
+  holder.pkg.private !== true &&
+  held.pkg.private !== true &&
+  held.pkg.name !== undefined &&
+  held.pkg.version !== undefined &&
+  holder.pkg.version === held.pkg.version &&
+  holder.pkg.optionalDependencies?.[held.pkg.name] === held.pkg.version;
+
+/** The release line of entry: entry first, then every package it reaches. */
+const releaseLineOf = (
+  packages: readonly WorkspacePackage[],
   entry: WorkspacePackage,
+): readonly WorkspacePackage[] => {
+  const grow = (
+    line: readonly WorkspacePackage[],
+  ): readonly WorkspacePackage[] => {
+    const reached = packages.filter(
+      (other) =>
+        line.every((member) => member.path !== other.path) &&
+        line.some(
+          (member) => pinsInLine(member, other) || pinsInLine(other, member),
+        ),
+    );
+    return reached.length === 0 ? line : grow([...line, ...reached]);
+  };
+  return grow([entry]);
+};
+
+// A dependent earns a version of its own only when it is publishable, the
+// worktree has not already bumped it away from its committed version, and its
+// release line was released: a never-released line ships the rewritten
+// reference in its first release at its current version. Every package of a
+// line holds the same version, so the whole line moves one patch past it and a
+// launcher never leaves its platform packages behind.
+const lineVersionOf = (
+  entry: WorkspacePackage,
+  line: readonly WorkspacePackage[],
   isReleased: ReleasePredicate,
 ): string | undefined => {
   const currentVersion = entry.pkg.version;
   if (
     currentVersion === undefined ||
     entry.pkg.private === true ||
-    entry.headVersion !== currentVersion ||
-    !isReleased(entry.path, currentVersion)
+    entry.headVersion !== currentVersion
   )
     return undefined;
-  return bumpVersion(currentVersion, "patch");
+  const released = line.some(
+    (member) =>
+      member.pkg.version !== undefined &&
+      isReleased(member.path, member.pkg.version),
+  );
+  return released ? bumpVersion(currentVersion, "patch") : undefined;
 };
 
 // A patch-bumped dependent is itself held by exact references elsewhere, so the
@@ -211,9 +254,14 @@ const resolveVersions = (
         rewriteReferences(entry.pkg, resolved).changed === 0
       )
         continue;
-      const newVersion = dependentVersionOf(entry, isReleased);
+      const line = releaseLineOf(packages, entry);
+      const newVersion = lineVersionOf(entry, line, isReleased);
       if (newVersion === undefined) continue;
-      resolved.set(name, newVersion);
+      for (const member of line) {
+        if (member.pkg.name !== undefined) {
+          resolved.set(member.pkg.name, newVersion);
+        }
+      }
       settled = false;
     }
   }
@@ -221,14 +269,14 @@ const resolveVersions = (
 };
 
 const planDependent = (
+  packages: readonly WorkspacePackage[],
   entry: WorkspacePackage,
   versions: ReadonlyMap<string, string>,
 ): DependentPlan | undefined => {
   const rewritten = rewriteReferences(entry.pkg, versions);
-  if (rewritten.changed === 0) return undefined;
-  const currentVersion = entry.pkg.version;
   const newVersion =
     entry.pkg.name === undefined ? undefined : versions.get(entry.pkg.name);
+  if (newVersion === undefined && rewritten.changed === 0) return undefined;
   return {
     name: entry.pkg.name ?? entry.path,
     path: entry.path,
@@ -237,9 +285,30 @@ const planDependent = (
         ? rewritten.pkg
         : {...rewritten.pkg, version: newVersion},
     referenceCount: rewritten.changed,
-    previousVersion: newVersion === undefined ? undefined : currentVersion,
+    previousVersion: newVersion === undefined ? undefined : entry.pkg.version,
     newVersion,
+    withReleaseLine:
+      newVersion !== undefined && releaseLineOf(packages, entry).length > 1,
   };
+};
+
+// A release line moves as one, so a set that names part of a line would leave
+// the rest of it on the old version.
+const assertWholeLines = (
+  packages: readonly WorkspacePackage[],
+  members: readonly ResolvedMember[],
+  memberPaths: ReadonlySet<string>,
+): void => {
+  for (const member of members) {
+    const missing = releaseLineOf(packages, member.entry).filter(
+      (entry) => !memberPaths.has(entry.path),
+    );
+    if (missing.length > 0) {
+      throw new Error(
+        `the lockstep set splits the release line of ${member.name}; add ${missing.map((entry) => entry.pkg.name ?? entry.path).join(", ")}`,
+      );
+    }
+  }
 };
 
 const planLockstep = (request: LockstepRequest): LockstepPlan => {
@@ -250,6 +319,7 @@ const planLockstep = (request: LockstepRequest): LockstepPlan => {
   const targetVersion =
     request.exact ?? bumpVersion(baseVersion, request.bumpType, request.preid);
   const memberPaths = new Set(members.map((member) => member.entry.path));
+  assertWholeLines(request.packages, members, memberPaths);
   const versions = resolveVersions(
     request.packages,
     memberPaths,
@@ -270,7 +340,7 @@ const planLockstep = (request: LockstepRequest): LockstepPlan => {
 
   const dependentPlans = request.packages
     .filter((entry) => !memberPaths.has(entry.path))
-    .map((entry) => planDependent(entry, versions))
+    .map((entry) => planDependent(request.packages, entry, versions))
     .filter((plan) => plan !== undefined);
 
   return {

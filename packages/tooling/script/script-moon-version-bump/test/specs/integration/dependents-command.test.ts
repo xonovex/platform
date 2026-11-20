@@ -62,12 +62,10 @@ const createRepository = (): {
 const dependentOptions = (
   root: string,
   packagePaths: readonly string[],
-  packagePath: string,
   overrides: Partial<DependentUpdateOptions> = {},
 ): DependentUpdateOptions => ({
   rootDir: root,
   packagePaths,
-  packagePath,
   git: nodeGitRepository(root),
   fs: nodeFileSystem,
   output: memoryOutput(),
@@ -86,7 +84,7 @@ describe("planDependentUpdates", () => {
     const {root, corePath, consumerPath, privatePath} = createRepository();
 
     const result = planDependentUpdates(
-      dependentOptions(root, [corePath, consumerPath, privatePath], corePath),
+      dependentOptions(root, [corePath, consumerPath, privatePath]),
     );
 
     expect(result.updated).toBe(2);
@@ -113,7 +111,7 @@ describe("planDependentUpdates", () => {
     git(root, ["tag", "--delete", "consumer-v2.0.0"]);
 
     const result = planDependentUpdates(
-      dependentOptions(root, [corePath, consumerPath], corePath),
+      dependentOptions(root, [corePath, consumerPath]),
     );
 
     expect(result.updated).toBe(1);
@@ -126,7 +124,7 @@ describe("planDependentUpdates", () => {
     const {root, corePath, consumerPath} = createRepository();
 
     const result = planDependentUpdates(
-      dependentOptions(root, [corePath, consumerPath], corePath, {
+      dependentOptions(root, [corePath, consumerPath], {
         dryRun: true,
       }),
     );
@@ -139,7 +137,7 @@ describe("planDependentUpdates", () => {
     const {root, corePath, consumerPath} = createRepository();
 
     const result = planDependentUpdates(
-      dependentOptions(root, [corePath, consumerPath], corePath, {
+      dependentOptions(root, [corePath, consumerPath], {
         noChangelog: true,
       }),
     );
@@ -155,9 +153,41 @@ describe("planDependentUpdates", () => {
     });
 
     const result = planDependentUpdates(
-      dependentOptions(root, [corePath, unrelatedPath], corePath),
+      dependentOptions(root, [corePath, unrelatedPath]),
     );
 
     expect(result).toEqual({updated: 0, changes: []});
+  });
+
+  it("moves a released launcher dependent with its platform packages", () => {
+    const {root, corePath} = createRepository();
+    const launcherPath = writeManifest(root, "cli", {
+      name: "@xonovex/cli",
+      version: "0.3.0",
+      devDependencies: {"@xonovex/core": "1.0.0"},
+      optionalDependencies: {"@xonovex/cli-linux-x64": "0.3.0"},
+    });
+    const platformPath = writeManifest(root, "cli-linux-x64", {
+      name: "@xonovex/cli-linux-x64",
+      version: "0.3.0",
+    });
+    commitAll(root, "feat(cli): introduce the cli line");
+    git(root, ["tag", "cli-v0.3.0"]);
+
+    const result = planDependentUpdates(
+      dependentOptions(root, [corePath, launcherPath, platformPath], {
+        noChangelog: true,
+      }),
+    );
+
+    expect(result.changes.map((change) => change.path)).toEqual([
+      launcherPath,
+      platformPath,
+    ]);
+    expect(result.changes[0]?.content).toContain('"version": "0.3.1"');
+    expect(result.changes[0]?.content).toContain(
+      '"@xonovex/cli-linux-x64": "0.3.1"',
+    );
+    expect(result.changes[1]?.content).toContain('"version": "0.3.1"');
   });
 });

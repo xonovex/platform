@@ -91,13 +91,3 @@ export const compareVersions = (left: string, right: string): number => {
   }
   return comparePrerelease(parsedLeft.prerelease, parsedRight.prerelease);
 };
-
-export const updateDependencyVersions = (
-  deps: Record<string, string> | undefined,
-  name: string,
-  newVersion: string,
-): boolean => {
-  if (!deps || !(name in deps)) return false;
-  deps[name] = newVersion;
-  return true;
-};

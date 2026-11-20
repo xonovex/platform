@@ -14,9 +14,10 @@ import {detectDepUpdates} from "./dep-updates.js";
 import {planDependentUpdates} from "./dependents-command.js";
 import type {FileChange} from "./file-transaction.js";
 import {getGitVersion, type VersionGit} from "./git.js";
-import {readWorkspacePackages, runLockstep} from "./lockstep-command.js";
+import {runLockstep} from "./lockstep-command.js";
 import {parseLockstepNames} from "./lockstep.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
+import {readWorkspacePackages} from "./workspace-packages.js";
 
 const validateVersionRequest = (
   exact: string | undefined,
@@ -208,7 +209,6 @@ export const main = (
         fs,
         rootDir,
         packagePaths: listPackagePaths(rootDir),
-        packagePath: pkgPath,
         packageName: pkg.name,
         newVersion,
         dryRun,

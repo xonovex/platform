@@ -1,9 +1,5 @@
 import {describe, expect, it} from "vitest";
-import {
-  bumpVersion,
-  compareVersions,
-  updateDependencyVersions,
-} from "../../../src/bump.js";
+import {bumpVersion, compareVersions} from "../../../src/bump.js";
 
 describe("bumpVersion", () => {
   it("should bump patch", () => {
@@ -66,26 +62,5 @@ describe("compareVersions", () => {
     expect(compareVersions("1.0.0-1", "1.0.0-beta")).toBeLessThan(0);
     expect(compareVersions("1.0.0-beta", "1.0.0-1")).toBeGreaterThan(0);
     expect(compareVersions("1.0.0-beta.1", "1.0.0-beta.1")).toBe(0);
-  });
-});
-
-describe("updateDependencyVersions", () => {
-  it("should update an existing dependency", () => {
-    const deps = {"@xonovex/core": "1.0.0"};
-    const result = updateDependencyVersions(deps, "@xonovex/core", "1.0.1");
-    expect(result).toBe(true);
-    expect(deps["@xonovex/core"]).toBe("1.0.1");
-  });
-
-  it("should return false if dependency is not present", () => {
-    const deps = {"@xonovex/core": "1.0.0"};
-    const result = updateDependencyVersions(deps, "@xonovex/other", "1.0.1");
-    expect(result).toBe(false);
-  });
-
-  it("should return false for undefined deps", () => {
-    expect(updateDependencyVersions(undefined, "@xonovex/core", "1.0.1")).toBe(
-      false,
-    );
   });
 });

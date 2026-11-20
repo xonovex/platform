@@ -1,14 +1,13 @@
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import {infoLine, successLine} from "@xonovex/script-moon-common/logging";
 import type {Output} from "@xonovex/script-moon-common/output";
-import {readPkg} from "@xonovex/script-moon-common/package-json";
 import type {BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
+import {planDependentChanges} from "./dependents-command.js";
 import type {FileChange} from "./file-transaction.js";
-import {getGitVersion, type VersionGit} from "./git.js";
+import type {VersionGit} from "./git.js";
 import {
   planLockstep,
-  type DependentPlan,
   type MemberPlan,
   type WorkspacePackage,
 } from "./lockstep.js";
@@ -33,18 +32,6 @@ interface LockstepOptions {
   readonly output: Output;
   readonly applyChanges: (changes: readonly FileChange[]) => void;
 }
-
-const readWorkspacePackages = (
-  rootDir: string,
-  git: VersionGit,
-  packagePaths: readonly string[],
-  fs: FileSystem,
-): readonly WorkspacePackage[] =>
-  packagePaths.map((path) => ({
-    path,
-    pkg: readPkg(path, fs),
-    headVersion: getGitVersion(rootDir, path, git),
-  }));
 
 const planMemberChanges = (
   options: LockstepOptions,
@@ -82,48 +69,6 @@ const planMemberChanges = (
   return changes;
 };
 
-const planDependentChanges = (
-  options: LockstepOptions,
-  dependent: DependentPlan,
-): readonly FileChange[] => {
-  const changes: FileChange[] = [];
-  if (!options.dryRun) {
-    changes.push({
-      path: dependent.path,
-      content: serializePackage(dependent.pkg),
-    });
-  }
-  if (
-    options.noChangelog ||
-    dependent.previousVersion === undefined ||
-    dependent.newVersion === undefined
-  ) {
-    return changes;
-  }
-  const changelog = planChangelog({
-    rootDir: options.rootDir,
-    packagePath: dependent.path,
-    packageName: dependent.name,
-    oldVersion: dependent.previousVersion,
-    newVersion: dependent.newVersion,
-    dryRun: options.dryRun,
-    depUpdates: detectDepUpdates(
-      options.rootDir,
-      dependent.path,
-      dependent.pkg,
-      options.git,
-    ),
-    changelogFilename: options.changelogPath,
-    gitBase: options.gitBase,
-    includedTypes: options.includedTypes,
-    git: options.git,
-    fs: options.fs,
-    output: options.output,
-  });
-  if (changelog !== undefined) changes.push(changelog);
-  return changes;
-};
-
 const runLockstep = (options: LockstepOptions): number => {
   const plan = planLockstep({
     packages: options.packages,
@@ -147,15 +92,6 @@ const runLockstep = (options: LockstepOptions): number => {
 
   const dependents = options.noDependents ? [] : plan.dependents;
   for (const dependent of dependents) {
-    const versionNote =
-      dependent.newVersion === undefined
-        ? "version unchanged"
-        : `${String(dependent.previousVersion)} -> ${dependent.newVersion}`;
-    options.output.stdout(
-      infoLine(
-        `${label}${dependent.name}: ${String(dependent.referenceCount)} reference(s) updated (${versionNote})`,
-      ),
-    );
     changes.push(...planDependentChanges(options, dependent));
   }
 
@@ -170,5 +106,5 @@ const runLockstep = (options: LockstepOptions): number => {
   return 0;
 };
 
-export {readWorkspacePackages, runLockstep};
+export {runLockstep};
 export type {LockstepOptions};
