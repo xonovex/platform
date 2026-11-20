@@ -11,7 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/jsonschema/tekuri"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
+	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/wiring"
 )
 
 var started = time.Date(2026, time.November, 20, 12, 30, 5, 0, time.UTC)
@@ -39,11 +40,11 @@ func exited(code int) Record {
 // violations as one error, or nil.
 func validateRecord(t *testing.T, data []byte) error {
 	t.Helper()
-	validator, err := tekuri.New(map[string][]byte{SchemaID: Schema()})
+	validator, err := wiring.NewValidator()
 	if err != nil {
-		t.Fatalf("compile the run record schema: %v", err)
+		t.Fatalf("compile the contract schemas: %v", err)
 	}
-	violations, err := validator.Validate(SchemaID, data)
+	violations, err := validator.Validate(schemas.RunRecord, data)
 	if err != nil {
 		t.Fatalf("validate: %v", err)
 	}
@@ -108,14 +109,6 @@ func TestSchemaRejectsABrokenRecord(t *testing.T) {
 		if err := validateRecord(t, mutated); err == nil {
 			t.Errorf("%s: the schema accepted the document", name)
 		}
-	}
-}
-
-func TestSchemaReturnsACopy(t *testing.T) {
-	first := Schema()
-	first[0] = 'X'
-	if Schema()[0] == 'X' {
-		t.Error("Schema() must return a copy of the embedded document")
 	}
 }
 

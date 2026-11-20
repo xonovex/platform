@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.xonovex.com/agent-cli/run-record.schema.json",
-  "title": "agent-cli run record",
+  "$id": "https://schemas.xonovex.com/agent/run-record.schema.json",
+  "title": "Run record",
   "description": "One run of agent-cli: what ran, on which axes, under which guarantees. It holds credential names and never their values.",
   "type": "object",
   "required": [

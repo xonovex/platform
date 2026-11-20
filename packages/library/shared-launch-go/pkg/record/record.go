@@ -1,11 +1,11 @@
 // Package record is the run record: the JSON file every run leaves behind that
-// says what ran and under which guarantees. The model and its schema are pure;
-// the Store writes and reads the records through a file port.
+// says what ran and under which guarantees. The model is pure, its schema is
+// schemas.RunRecord of shared-contract-go, and the Store writes and reads the
+// records through a file port.
 package record
 
 import (
 	"bytes"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -13,15 +13,6 @@ import (
 
 // SchemaVersion is the version of the record layout.
 const SchemaVersion = 1
-
-// SchemaID identifies the JSON Schema of a run record.
-const SchemaID = "https://schemas.xonovex.com/agent-cli/run-record.schema.json"
-
-//go:embed run-record.schema.json
-var schema []byte
-
-// Schema returns the JSON Schema (draft 2020-12) of a run record.
-func Schema() []byte { return append([]byte(nil), schema...) }
 
 // Status is how a run ended.
 type Status string

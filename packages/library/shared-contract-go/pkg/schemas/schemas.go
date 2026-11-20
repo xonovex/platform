@@ -39,12 +39,13 @@ const (
 	AgenticEval      = Namespace + "agentic-eval.schema.json"
 )
 
-// Ids of the agent schemas: a model provider route, the facts of a harness and
-// an override of some of them.
+// Ids of the agent schemas: a model provider route, the facts of a harness, an
+// override of some of them, and the record a sandboxed run leaves.
 const (
 	Provider        = Namespace + "provider.schema.json"
 	Harness         = Namespace + "harness.schema.json"
 	HarnessOverride = Namespace + "harness-override.schema.json"
+	RunRecord       = Namespace + "run-record.schema.json"
 )
 
 //go:embed *.schema.json
@@ -56,7 +57,7 @@ func IDs() []string {
 		Common, Predicate, Sources, EvalTrigger, EvalOutput, EvalInstruction,
 		EvalOrchestration, Results, Baseline, CostHistory, Kit,
 		Agentic, AgenticRun, AgenticProviders, AgenticValidate, AgenticAudit, AgenticEval,
-		Provider, Harness, HarnessOverride,
+		Provider, Harness, HarnessOverride, RunRecord,
 	}
 	sort.Strings(ids)
 	return ids

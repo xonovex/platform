@@ -146,6 +146,21 @@ func contracts() map[string]contract {
 				{"unknown member", `{"name":"h","displayName":"H","binary":"h","nixPackage":"h","access":"provider","versionArgs":["-v"],"flags":[]}`, ""},
 			},
 		},
+		schemas.RunRecord: {
+			valid: []string{
+				`{"schemaVersion":1,"id":"20261120T123005Z","startedAt":"2026-11-20T12:30:05Z","endedAt":"2026-11-20T12:31:00Z","status":"exited","exitCode":0,
+					"agent":{"name":"claude","versionProbe":"claude --version","provider":"route"},
+					"axes":{"isolation":"bwrap","provision":"none","network":"none","workspace":{"mode":"in-place"}},
+					"guarantees":[{"name":"egress-restricted","required":true,"provided":true}],
+					"overlay":{"plugins":[{"name":"hello","digest":"` + digest + `"}],"directories":[]},
+					"credentials":["API_KEY"],"workDir":"/work",
+					"config":{"sources":[{"layer":"user","path":"/home/u/.config/agentic/agentic.json"},{"layer":"flags"}],"decided":{"network":["flags"]}}}`,
+			},
+			invalid: []invalid{
+				{"other version", `{"schemaVersion":2}`, "/schemaVersion"},
+				{"id not a timestamp", `{"schemaVersion":1,"id":"latest","startedAt":"2026-11-20T12:30:05Z","endedAt":"2026-11-20T12:31:00Z","status":"exited","agent":{"name":"claude","versionProbe":"v"},"axes":{"isolation":"none","provision":"none","network":"host","workspace":{"mode":"in-place"}},"guarantees":[],"overlay":{"plugins":[],"directories":[]},"credentials":[],"workDir":"/w","config":{"sources":[],"decided":{}}}`, "/id"},
+			},
+		},
 		schemas.HarnessOverride: {
 			valid: []string{
 				`{}`,

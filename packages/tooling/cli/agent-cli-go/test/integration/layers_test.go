@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/schematest"
 )
@@ -72,7 +73,11 @@ func TestARunLeavesARecordThatSatisfiesTheSchema(t *testing.T) {
 	if err := show.Run(); err != nil {
 		t.Fatalf("runs show: %v\n%s", err, stderr)
 	}
-	if err := schematest.Validate(record.Schema(), stdout.Bytes()); err != nil {
+	documents, err := contract.Documents()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := schematest.Validate(documents[contract.RunRecord], stdout.Bytes()); err != nil {
 		t.Errorf("the record violates its schema: %v\n%s", err, stdout)
 	}
 	got, err := record.Unmarshal(stdout.Bytes())

@@ -42,6 +42,7 @@ Each schema has an `$id` under `https://schemas.xonovex.com/agent/`.
 | `provider.schema.json` | One model provider route: agent, credential, environment, arguments and model slots |
 | `harness.schema.json` | The facts of one agent harness: binary, nix package, model access, launch, sandbox, version and headless arguments, and the files it reads |
 | `harness-override.schema.json` | A `harnesses.d/<name>.json` file that changes some facts of one harness |
+| `run-record.schema.json` | The record a sandboxed run of agent-cli leaves: agent, axes, guarantees, overlay, configuration layers and outcome |
 | `agentic-validate.schema.json` | The `validate` section: skipped directories and the paths, options and level cap of each check |
 | `agentic-audit.schema.json` | The `audit` section: review ages and the directory that needs sources |
 | `agentic-eval.schema.json` | The `eval` section: profiles, protocol settings, plugin directories and budgets |

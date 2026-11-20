@@ -8,12 +8,11 @@ import (
 
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
 
-	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
 func TestSchemaPrintsEachSchemaAsJSON(t *testing.T) {
-	for name, id := range map[string]string{"config": config.SchemaID, "provider": contract.Provider, "run-record": record.SchemaID} {
+	for name, id := range map[string]string{"config": config.SchemaID, "provider": contract.Provider, "run-record": contract.RunRecord} {
 		r := newTestRoot()
 
 		if err := r.execute("schema", name); err != nil {

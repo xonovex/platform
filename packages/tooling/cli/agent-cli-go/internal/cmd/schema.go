@@ -11,7 +11,6 @@ import (
 
 	contract "github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas"
 
-	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 )
 
@@ -21,19 +20,21 @@ type schemaSource func() ([]byte, error)
 // schemas are the JSON Schemas the CLI prints, by name.
 var schemas = map[string]schemaSource{
 	"config":     infallible(config.Schema),
-	"provider":   providerSchema,
-	"run-record": infallible(record.Schema),
+	"provider":   contractSchema(contract.Provider),
+	"run-record": contractSchema(contract.RunRecord),
 }
 
 func infallible(build func() []byte) schemaSource {
 	return func() ([]byte, error) { return build(), nil }
 }
 
-// providerSchema returns the provider schema, which shared-contract-go owns
-// because the providers section of agentic.json references it.
-func providerSchema() ([]byte, error) {
-	documents, err := contract.Documents()
-	return documents[contract.Provider], err
+// contractSchema returns the schema of shared-contract-go with the id, which
+// the contract owns because more than one tool reads or writes its documents.
+func contractSchema(id string) schemaSource {
+	return func() ([]byte, error) {
+		documents, err := contract.Documents()
+		return documents[id], err
+	}
 }
 
 func schemaNames() []string {
