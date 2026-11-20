@@ -22,7 +22,7 @@ tasks:
       # Every package the module builds is named here. pkg/provision and
       # pkg/types declare shared types and hold no statements.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
-        ./pkg/agentcmd=95 \
+        ./pkg/agentcmd=100 \
         ./pkg/approval=100 \
         ./pkg/agents=100 \
         ./pkg/egress=100 \
