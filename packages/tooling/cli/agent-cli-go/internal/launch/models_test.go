@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 const (
@@ -125,7 +125,7 @@ func TestAProviderThatIsNotDefinedNamesTheDirectoryToAddItTo(t *testing.T) {
 	}
 
 	empty := newExecuteFixture()
-	empty.host = systemtest.New()
+	empty.host = oshosttest.New()
 	empty.host.WorkingDir = "/work/repo"
 	if err := Execute(empty.deps(), options); err == nil || !strings.Contains(err.Error(), "no provider is defined") {
 		t.Errorf("Execute() without providers error = %v", err)

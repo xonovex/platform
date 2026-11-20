@@ -17,8 +17,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/egress/managed"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost"
 )
 
 func TestRunHelpListsTheManagedNetworkFlags(t *testing.T) {
@@ -86,7 +86,7 @@ func TestEgressBridgeRunsAndExitsWithTheCodeOfItsCommand(t *testing.T) {
 // makes: inside an isolated network namespace a direct socket to the host fails,
 // and the bridge reaches the allowed host through the proxy.
 func TestBwrapSandboxReachesOnlyTheAllowedHost(t *testing.T) {
-	machine := system.New(os.Stdin, io.Discard, io.Discard)
+	machine := oshost.New(os.Stdin, io.Discard, io.Discard)
 	bwrap, err := machine.LookPath("bwrap")
 	if err != nil {
 		t.Skip("bwrap is not installed")

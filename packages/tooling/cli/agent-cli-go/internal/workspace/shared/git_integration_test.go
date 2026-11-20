@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost"
 )
 
 func runGit(t *testing.T, cwd string, args ...string) string {
@@ -127,4 +127,4 @@ func TestGetCurrentBranchSync_ReturnsEmptyOutsideARepository(t *testing.T) {
 
 // realHost is the operating-system adapter, so these cases run the real git and
 // jj binaries.
-func realHost() system.System { return system.New(os.Stdin, os.Stdout, os.Stderr) }
+func realHost() oshost.System { return oshost.New(os.Stdin, os.Stdout, os.Stderr) }

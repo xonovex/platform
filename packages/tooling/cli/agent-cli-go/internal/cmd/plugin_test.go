@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
@@ -172,7 +172,7 @@ func TestTheStoreFlagAndTheEnvironmentChooseTheStore(t *testing.T) {
 }
 
 type brokenHost struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	cwd, home, relative bool
 }
 
@@ -198,7 +198,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 		{"plugin", "install", "/src"}, {"plugin", "list"}, {"plugin", "remove", "a"},
 		{"marketplace", "add", "/m"}, {"marketplace", "list"}, {"marketplace", "list", "a"}, {"marketplace", "remove", "a"},
 	}
-	hosts := []brokenHost{{Fake: systemtest.New(), cwd: true}, {Fake: systemtest.New(), home: true}, {Fake: systemtest.New(), relative: true}}
+	hosts := []brokenHost{{Fake: oshosttest.New(), cwd: true}, {Fake: oshosttest.New(), home: true}, {Fake: oshosttest.New(), relative: true}}
 	for _, host := range hosts {
 		for _, args := range commands {
 			if host.relative {
@@ -214,7 +214,7 @@ func TestAMissingWorkingOrHomeDirectoryStopsTheCommand(t *testing.T) {
 		}
 	}
 	// A relative store needs no home directory.
-	host := brokenHost{Fake: systemtest.New(), home: true}
+	host := brokenHost{Fake: oshosttest.New(), home: true}
 	root := NewRootCommand(newTestRoot().deps, PluginPorts{Host: host, Out: io.Discard}, RecordPorts{}, &recordingBridge{})
 	root.SetArgs([]string{"plugin", "list", "--store", "s"})
 	root.SetOut(io.Discard)

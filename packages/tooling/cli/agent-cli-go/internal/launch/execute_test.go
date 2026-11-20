@@ -10,8 +10,8 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
@@ -22,7 +22,7 @@ const userProviders = "/home/user/.config/sandboxed-claude/providers"
 // executeFixture wires Execute to doubles: the bwrap and docker methods resolve
 // to one isolator, a git checkout creates /work/created, and tmux is installed.
 type executeFixture struct {
-	host     *systemtest.Fake
+	host     *oshosttest.Fake
 	sandbox  testSandbox
 	vcs      *fakeVCS
 	terminal *fakeTerminal
@@ -32,7 +32,7 @@ type executeFixture struct {
 }
 
 func newExecuteFixture() *executeFixture {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.WorkingDir = "/work/repo"
 	for _, name := range []string{"alpha", "beta"} {
 		host.AddFile(userProviders+"/"+name+".json", providerFile(name, "claude", "Display "+name), 0o644)
@@ -414,7 +414,7 @@ func TestExecuteReportsHostFailures(t *testing.T) {
 }
 
 // getwdFailure is a host whose working directory is gone.
-type getwdFailure struct{ *systemtest.Fake }
+type getwdFailure struct{ *oshosttest.Fake }
 
 func (getwdFailure) Getwd() (string, error) { return "", errors.New("deleted") }
 

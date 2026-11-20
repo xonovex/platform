@@ -70,21 +70,15 @@ tasks:
     script: |
       set -euo pipefail
       # Every package the module builds is named here. cmd/agent-cli is the
-      # composition root and internal/system the operating-system adapter; both
-      # are covered by go-integration, because a unit test may not start a
-      # process or touch a file. Every other package reaches the machine through a port, so
-      # the unit tier covers it with internal/system/systemtest.
+      # composition root, which go-integration covers, because a unit test may
+      # not start a process or touch a file. Every other package reaches the
+      # machine through a port, so the unit tier covers it with the oshosttest
+      # double of shared-launch-go.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
         ./internal/cmd=97 \
         ./internal/config=100 \
-        ./internal/credential/env=100 \
-        ./internal/credential/file=100 \
-        ./internal/credential/keychain=100 \
-        ./internal/credential/pass=100 \
-        ./internal/credential/secretservice=100 \
         ./internal/launch=99 \
-        ./internal/network/managed=100 \
         ./internal/origin=exempt \
         ./internal/origin/directory=100 \
         ./internal/origin/git=100 \
@@ -93,20 +87,8 @@ tasks:
         ./internal/overlay=100 \
         ./internal/plugin=100 \
         ./internal/trust=100 \
-        ./internal/provision/command=100 \
-        ./internal/provision/nix=99 \
-        ./internal/provision/none=100 \
-        ./internal/isolation/bwrap=98 \
-        ./internal/isolation/docker=98 \
-        ./internal/isolation/dockersandboxes=98 \
-        ./internal/isolation/none=100 \
-        ./internal/isolation/openshell=99 \
-        ./internal/isolation/seatbelt=96 \
-        ./internal/isolation/shared=98 \
         ./internal/sandbox/plugins=100 \
         ./internal/schematest=92 \
-        ./internal/system=exempt \
-        ./internal/system/systemtest=99 \
         ./internal/terminal/herdr=100 \
         ./internal/terminal/shared=100 \
         ./internal/terminal/tmux=100 \

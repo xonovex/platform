@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 type namedOrigin struct{ accepts bool }
@@ -32,7 +32,7 @@ func TestRegistrySelectFailsClosed(t *testing.T) {
 }
 
 func TestReadTreeReadsRegularFilesAndSkipsGit(t *testing.T) {
-	host := systemtest.New().
+	host := oshosttest.New().
 		AddFile("/p/skills/a/SKILL.md", "skill", 0o644).
 		AddFile("/p/skills/a/run.sh", "#!/bin/sh", 0o755).
 		AddFile("/p/.git/config", "git", 0o644).
@@ -55,31 +55,31 @@ func TestReadTreeReadsRegularFilesAndSkipsGit(t *testing.T) {
 }
 
 func TestReadTreeFailsClosed(t *testing.T) {
-	link := systemtest.New().AddFile("/p/a", "x", 0o644).AddLink("/p/b", "/p/a")
+	link := oshosttest.New().AddFile("/p/a", "x", 0o644).AddLink("/p/b", "/p/a")
 	if _, err := ReadTree(link, "/p"); err == nil || !strings.Contains(err.Error(), "symlink") {
 		t.Errorf("symlink: %v", err)
 	}
-	if _, err := ReadTree(systemtest.New(), "/missing"); !errors.Is(err, fs.ErrNotExist) {
+	if _, err := ReadTree(oshosttest.New(), "/missing"); !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("missing dir: %v", err)
 	}
-	if _, err := ReadTree(systemtest.New().AddFile("/p/A", "x", 0o644).AddFile("/p/a", "y", 0o644), "/p"); err == nil {
+	if _, err := ReadTree(oshosttest.New().AddFile("/p/A", "x", 0o644).AddFile("/p/a", "y", 0o644), "/p"); err == nil {
 		t.Error("colliding names passed")
 	}
 }
 
 func TestReadTreeEnforcesTheLimits(t *testing.T) {
-	big := systemtest.New().AddFile("/p/big", strings.Repeat("x", MaxFileBytes+1), 0o644)
+	big := oshosttest.New().AddFile("/p/big", strings.Repeat("x", MaxFileBytes+1), 0o644)
 	if _, err := ReadTree(big, "/p"); err == nil || !strings.Contains(err.Error(), "larger than") {
 		t.Errorf("big file: %v", err)
 	}
-	many := systemtest.New()
+	many := oshosttest.New()
 	for index := range MaxFiles + 1 {
 		many.AddFile("/p/f"+strings.Repeat("a", index%7)+"/"+itoa(index), "", 0o644)
 	}
 	if _, err := ReadTree(many, "/p"); err == nil || !strings.Contains(err.Error(), "more than 4096 files") {
 		t.Errorf("many files: %v", err)
 	}
-	heavy := systemtest.New()
+	heavy := oshosttest.New()
 	chunk := strings.Repeat("x", MaxFileBytes)
 	for index := range MaxTreeBytes/MaxFileBytes + 1 {
 		heavy.AddFile("/p/f"+itoa(index), chunk, 0o644)
@@ -101,7 +101,7 @@ func itoa(n int) string {
 }
 
 func TestReadFilesReadsTheNamedFilesThatExist(t *testing.T) {
-	host := systemtest.New().AddFile("/m/a.json", "A", 0o644).AddFile("/m/dir/b.json", "B", 0o644)
+	host := oshosttest.New().AddFile("/m/a.json", "A", 0o644).AddFile("/m/dir/b.json", "B", 0o644)
 	tree, err := ReadFiles(host, "/m", []string{"a.json", "missing.json", "dir/b.json"})
 	if err != nil || len(tree) != 2 || tree[0].Path != "a.json" || string(tree[1].Content) != "B" {
 		t.Errorf("tree = %v, %v", tree, err)
@@ -109,7 +109,7 @@ func TestReadFilesReadsTheNamedFilesThatExist(t *testing.T) {
 	if _, err := ReadFiles(host, "/m", []string{"dir"}); err == nil {
 		t.Error("a directory passed as a file")
 	}
-	if _, err := ReadFiles(systemtest.New().AddFile("/m/big", strings.Repeat("x", MaxFileBytes+1), 0o644), "/m", []string{"big"}); err == nil {
+	if _, err := ReadFiles(oshosttest.New().AddFile("/m/big", strings.Repeat("x", MaxFileBytes+1), 0o644), "/m", []string{"big"}); err == nil {
 		t.Error("a big file passed")
 	}
 	if tree, err := ReadFiles(host, "/m", []string{"a.json/x"}); err != nil || len(tree) != 0 {
@@ -119,7 +119,7 @@ func TestReadFilesReadsTheNamedFilesThatExist(t *testing.T) {
 
 // flaky fails one operation on one path, and passes the rest to the fake.
 type flaky struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	op, path string
 	err      error
 }
@@ -147,8 +147,8 @@ func (f flaky) ReadFile(p string) ([]byte, error) {
 
 func TestReadersReportEveryFailureOfTheMachine(t *testing.T) {
 	boom := errors.New("boom")
-	base := func() *systemtest.Fake {
-		return systemtest.New().AddFile("/p/sub/a", "x", 0o644).AddFile("/p/b", "y", 0o644)
+	base := func() *oshosttest.Fake {
+		return oshosttest.New().AddFile("/p/sub/a", "x", 0o644).AddFile("/p/b", "y", 0o644)
 	}
 	for _, c := range []struct{ op, path string }{{"lstat", "/p/b"}, {"readdir", "/p/sub"}, {"read", "/p/sub/a"}} {
 		if _, err := ReadTree(flaky{base(), c.op, c.path, boom}, "/p"); !errors.Is(err, boom) {
@@ -170,7 +170,7 @@ type odd struct{ fs.FileInfo }
 func (odd) Mode() fs.FileMode { return fs.ModeNamedPipe }
 func (odd) IsDir() bool       { return false }
 
-type oddFiles struct{ *systemtest.Fake }
+type oddFiles struct{ *oshosttest.Fake }
 
 func (o oddFiles) Lstat(p string) (fs.FileInfo, error) {
 	info, err := o.Fake.Lstat(p)
@@ -181,13 +181,13 @@ func (o oddFiles) Lstat(p string) (fs.FileInfo, error) {
 }
 
 func TestReadTreeRefusesAFileThatIsNeitherRegularNorADirectory(t *testing.T) {
-	if _, err := ReadTree(oddFiles{systemtest.New().AddFile("/p/pipe", "", 0o644)}, "/p"); err == nil || !strings.Contains(err.Error(), "neither a regular file") {
+	if _, err := ReadTree(oddFiles{oshosttest.New().AddFile("/p/pipe", "", 0o644)}, "/p"); err == nil || !strings.Contains(err.Error(), "neither a regular file") {
 		t.Errorf("pipe: %v", err)
 	}
 }
 
 func TestCheckNoSymlinks(t *testing.T) {
-	host := systemtest.New().AddFile("/c/plugins/a/x", "x", 0o644).AddLink("/c/evil", "/etc")
+	host := oshosttest.New().AddFile("/c/plugins/a/x", "x", 0o644).AddLink("/c/evil", "/etc")
 	if err := CheckNoSymlinks(host, "/c", "plugins/a"); err != nil {
 		t.Errorf("a plain path failed: %v", err)
 	}

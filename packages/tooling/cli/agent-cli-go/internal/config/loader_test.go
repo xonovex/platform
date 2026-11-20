@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestLoadReadsLaunchFields(t *testing.T) {
-	files := systemtest.New().AddFile("/etc/agent/config.yaml", "provider: gemini\nhomeDir: /tmp/home\nbindPaths:\n  - ./rw\nroBindPaths:\n  - ./ro\ncustomEnv:\n  - FEATURE=true\n", 0o600)
+	files := oshosttest.New().AddFile("/etc/agent/config.yaml", "provider: gemini\nhomeDir: /tmp/home\nbindPaths:\n  - ./rw\nroBindPaths:\n  - ./ro\ncustomEnv:\n  - FEATURE=true\n", 0o600)
 
 	config, err := Load(files, "/etc/agent/config.yaml")
 	if err != nil {
@@ -29,7 +29,7 @@ func TestLoadReadsLaunchFields(t *testing.T) {
 }
 
 func TestLoadReadsTheDefaultPathUnderHome(t *testing.T) {
-	files := systemtest.New().AddFile(DefaultPath("/home/user"), "provider=glm\n", 0o600)
+	files := oshosttest.New().AddFile(DefaultPath("/home/user"), "provider=glm\n", 0o600)
 
 	config, err := Load(files, "")
 	if err != nil || config.Provider != "glm" {
@@ -38,14 +38,14 @@ func TestLoadReadsTheDefaultPathUnderHome(t *testing.T) {
 }
 
 func TestLoadReturnsAnEmptyConfigWithoutTheDefaultFile(t *testing.T) {
-	config, err := Load(systemtest.New(), "")
+	config, err := Load(oshosttest.New(), "")
 	if err != nil || !reflect.DeepEqual(config, FileConfig{}) {
 		t.Fatalf("Load(absent default) = (%#v, %v), want an empty config", config, err)
 	}
 }
 
 func TestLoadFailsWithoutAHomeForTheDefaultPath(t *testing.T) {
-	files := systemtest.New()
+	files := oshosttest.New()
 	files.HomeErr = errors.New("no home")
 
 	if _, err := Load(files, ""); err == nil || !strings.Contains(err.Error(), "resolve user home directory") {
@@ -54,7 +54,7 @@ func TestLoadFailsWithoutAHomeForTheDefaultPath(t *testing.T) {
 }
 
 func TestLoadRejectsMissingExplicitPath(t *testing.T) {
-	if _, err := Load(systemtest.New(), "/etc/agent/missing.yaml"); err == nil {
+	if _, err := Load(oshosttest.New(), "/etc/agent/missing.yaml"); err == nil {
 		t.Error("Load() error = nil, want explicit missing-file error")
 	}
 }

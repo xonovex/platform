@@ -1,0 +1,46 @@
+package secretservice
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
+)
+
+func TestAvailable(t *testing.T) {
+	host := oshosttest.New()
+	host.Env["PATH"] = "/usr/bin"
+	if New(host).Available() {
+		t.Error("the store must be unavailable without secret-tool")
+	}
+	host.AddExecutable("/usr/bin/secret-tool")
+	if !New(host).Available() {
+		t.Error("the store must be available with secret-tool")
+	}
+}
+
+func TestLookup(t *testing.T) {
+	host := oshosttest.New()
+	host.Outcomes["secret-tool lookup service svc account acct"] = oshosttest.Outcome{Stdout: "pw1\n"}
+	host.Outcomes["secret-tool lookup service svc"] = oshosttest.Outcome{Stdout: "pw2\n"}
+	host.Outcomes["secret-tool lookup service blank"] = oshosttest.Outcome{Stdout: ""}
+	store := New(host)
+	if secret, err := store.Lookup("svc/acct"); err != nil || secret.Reveal() != "pw1" {
+		t.Errorf("Lookup(svc/acct) = %v, %v", secret, err)
+	}
+	if secret, err := store.Lookup("svc"); err != nil || secret.Reveal() != "pw2" {
+		t.Errorf("Lookup(svc) = %v, %v", secret, err)
+	}
+	if _, err := store.Lookup("blank"); !errors.Is(err, credential.ErrNotFound) {
+		t.Errorf("an empty value error = %v, want ErrNotFound", err)
+	}
+	if _, err := store.Lookup("absent"); !errors.Is(err, credential.ErrNotFound) {
+		t.Errorf("a failed tool error = %v, want ErrNotFound", err)
+	}
+	for _, bad := range []string{"-x", "svc/", ""} {
+		if _, err := store.Lookup(bad); err == nil {
+			t.Errorf("Lookup(%q) succeeded", bad)
+		}
+	}
+}

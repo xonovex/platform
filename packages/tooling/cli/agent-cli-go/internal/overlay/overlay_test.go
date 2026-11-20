@@ -12,17 +12,17 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/overlay/shared"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 const store = "/home/user/.local/share/agent-cli/plugins"
 
 // host wraps the fake so a test can fail one operation.
 type host struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	fail func(op, path string) error
 }
 
@@ -72,8 +72,8 @@ func failOn(op string) func(string, string) error {
 	}
 }
 
-func machine() *systemtest.Fake {
-	fake := systemtest.New()
+func machine() *oshosttest.Fake {
+	fake := oshosttest.New()
 	fake.AddDir("/work/repo").
 		AddFile("/src/hello/.claude-plugin/plugin.json", `{"name":"hello","version":"1.0.0"}`, 0o644).
 		AddFile("/src/hello/skills/greet/SKILL.md", "---\nname: greet\ndescription: Use when greeting.\n---\n# Greet\n", 0o644).

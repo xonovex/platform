@@ -9,4 +9,4 @@ Release each CLI and its platform binaries together, and resolve execution envir
 - Keep model ids and provider routes in data the user supplies, never in code.
 - Declare each isolator's egress transport as data, and never let a credential store reveal a secret.
 - List every file a Go binary embeds as an input of each platform `go-build` task, and make a launcher's `npm-publish` wait for its platform packages.
-- Give every unit test an `internal/system/systemtest.Fake` host with its own home directory and environment: only `internal/system` touches the machine, so a test never binds the agent configuration of the developer who runs it, and `forbidigo` fails a test that reads the host home directly.
+- Give every unit test a shared-launch-go `pkg/oshost/oshosttest.Fake` host with its own home directory and environment: only shared-launch-go `pkg/oshost` touches the machine, so a test never binds the agent configuration of the developer who runs it, and `forbidigo` fails a test that reads the host home directly.

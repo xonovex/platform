@@ -6,12 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 // failingHost makes the launch script operations fail on demand.
 type failingHost struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	createErr error
 	writeErr  error
 }
@@ -52,7 +52,7 @@ func TestFilterEnvironmentRejectsInvalidAndReservedNames(t *testing.T) {
 }
 
 func TestCreateLaunchScriptWritesAPrivateSelfDeletingScript(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	secret := "token with '$HOME' and a newline\nvalue"
 
 	path, err := LaunchScript(host, []string{"claude", "--model", "opus"}, []string{
@@ -90,14 +90,14 @@ func TestCreateLaunchScriptWritesAPrivateSelfDeletingScript(t *testing.T) {
 }
 
 func TestCreateLaunchScriptRequiresCommand(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	if _, err := LaunchScript(host, nil, nil); err == nil {
 		t.Fatal("LaunchScript(nil, nil) error = nil, want error")
 	}
 }
 
 func TestCreateLaunchScriptReportsCreateFailure(t *testing.T) {
-	host := failingHost{Fake: systemtest.New(), createErr: errors.New("disk full")}
+	host := failingHost{Fake: oshosttest.New(), createErr: errors.New("disk full")}
 
 	_, err := LaunchScript(host, []string{"claude"}, nil)
 
@@ -107,7 +107,7 @@ func TestCreateLaunchScriptReportsCreateFailure(t *testing.T) {
 }
 
 func TestCreateLaunchScriptRemovesTheFileOnWriteFailure(t *testing.T) {
-	host := failingHost{Fake: systemtest.New(), writeErr: errors.New("disk full")}
+	host := failingHost{Fake: oshosttest.New(), writeErr: errors.New("disk full")}
 
 	_, err := LaunchScript(host, []string{"claude"}, nil)
 

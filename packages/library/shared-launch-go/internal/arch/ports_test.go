@@ -159,8 +159,8 @@ func TestSpecReachesNoForbiddenPackage(t *testing.T) {
 }
 
 // TestIsolationBuildsNoAgentCommand keeps the agent command line and its
-// provider environment in the planner: an isolation confines the planned
-// process.
+// provider environment in the planner: an isolation, and the helpers its leaves
+// share in hostlaunch, confine the planned process.
 func TestIsolationBuildsNoAgentCommand(t *testing.T) {
 	builders := map[string][]string{
 		agentLibrary + "agents":    {"BuildArgs", "BuildEnv"},
@@ -168,7 +168,7 @@ func TestIsolationBuildsNoAgentCommand(t *testing.T) {
 		agentLibrary + "agentcmd":  {"BuildProviderEnv"},
 	}
 	for _, f := range nonTest(moduleFiles(t)) {
-		if f.dir != "pkg/isolation" && !strings.HasPrefix(f.dir, "pkg/isolation/") {
+		if f.dir != "pkg/isolation" && f.dir != "pkg/hostlaunch" && !strings.HasPrefix(f.dir, "pkg/isolation/") {
 			continue
 		}
 		for _, imp := range f.imports {

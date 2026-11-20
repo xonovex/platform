@@ -13,14 +13,15 @@ linters:
     forbidigo:
       forbid:
         - pattern: ^os\.UserHomeDir$
-          msg: a test must not read the host home directory; give the code under test a systemtest.Fake with its own Home instead
+          msg: a test must not read the host home directory; give the code under test an oshosttest.Fake with its own Home instead
   exclusions:
     rules:
       - path: _test\.go
         linters:
           - errcheck
-      # forbidigo guards the tests only: internal/system reads the host home
-      # in production, and a test that reads it measures the workstation.
+      # forbidigo guards the tests only: the oshost adapter of shared-launch-go
+      # reads the host home in production, and a test that reads it measures
+      # the workstation.
       - path-except: _test\.go
         linters:
           - forbidigo

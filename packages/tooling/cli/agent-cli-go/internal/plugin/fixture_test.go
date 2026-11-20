@@ -5,16 +5,16 @@ import (
 	"io/fs"
 
 	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 const storeDir = "/store"
 
 // faulty fails the operations that fail names, and passes the rest to the fake.
 type faulty struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	fail func(op, path string) error
 }
 
@@ -88,7 +88,7 @@ func failOn(op string) func(string, string) error {
 // fixture is a service over the in-memory machine with a plugin directory and a
 // marketplace directory in place.
 type fixture struct {
-	host    *systemtest.Fake
+	host    *oshosttest.Fake
 	service Service
 }
 
@@ -103,9 +103,9 @@ func manifest(name string, dependencies ...string) string {
 func newFixture(t interface {
 	Helper()
 	Fatal(...any)
-}, wrap func(*systemtest.Fake) Files) fixture {
+}, wrap func(*oshosttest.Fake) Files) fixture {
 	t.Helper()
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.WorkingDir = "/work"
 	host.AddFile("/src/hello/.claude-plugin/plugin.json", manifest("hello"), 0o644).
 		AddFile("/src/hello/skills/greet/SKILL.md", "---\nname: greet\ndescription: Use when greeting.\n---\n# Greet\n", 0o644).

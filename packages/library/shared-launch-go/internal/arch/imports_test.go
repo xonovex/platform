@@ -7,6 +7,7 @@ package arch
 
 import (
 	"go/ast"
+	"go/build/constraint"
 	"go/parser"
 	"go/token"
 	"io/fs"
@@ -32,30 +33,85 @@ var libraries = []string{
 // imports more than its entry lists, fails the test, so a new dependency edge is
 // always a decision in this file.
 var allowed = map[string][]string{
-	"pkg/isolation":  {},
-	"pkg/provision":  {},
-	"pkg/credential": {},
-	"pkg/record":     {},
-	"pkg/sandbox":    {"pkg/isolation", "pkg/provision"},
-	"pkg/launch":     {"pkg/credential", "pkg/isolation", "pkg/provision", "pkg/sandbox"},
+	"pkg/isolation":                 {},
+	"pkg/provision":                 {},
+	"pkg/credential":                {},
+	"pkg/record":                    {},
+	"pkg/sandbox":                   {"pkg/isolation", "pkg/provision"},
+	"pkg/launch":                    {"pkg/credential", "pkg/isolation", "pkg/provision", "pkg/sandbox"},
+	"pkg/hostlaunch":                {"pkg/isolation"},
+	"pkg/isolation/none":            {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/isolation/bwrap":           {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/isolation/docker":          {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/isolation/seatbelt":        {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/isolation/dockersandboxes": {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/isolation/openshell":       {"pkg/hostlaunch", "pkg/isolation"},
+	"pkg/provision/none":            {"pkg/provision"},
+	"pkg/provision/command":         {"pkg/provision"},
+	"pkg/provision/nix":             {"pkg/provision"},
+	"pkg/credential/env":            {"pkg/credential"},
+	"pkg/credential/file":           {"pkg/credential"},
+	"pkg/credential/keychain":       {"pkg/credential"},
+	"pkg/credential/pass":           {"pkg/credential"},
+	"pkg/credential/secretservice":  {"pkg/credential"},
+	"pkg/egress/managed":            {"pkg/isolation"},
+	"pkg/oshost":                    {},
+	"pkg/oshost/oshosttest":         {},
 }
 
 // axes are the directories whose subdirectories are leaves: one variant of
-// the axis each, behind the port the axis directory declares.
-var axes = []string{"pkg/isolation", "pkg/provision", "pkg/credential"}
+// the axis each, behind the port the axis directory declares or, for egress,
+// behind the EgressRoute of the isolation core.
+var axes = []string{"pkg/isolation", "pkg/provision", "pkg/credential", "pkg/egress"}
 
-// hostImports reach the real disk, the environment, the process or the network.
-var hostImports = map[string]bool{
+// hostAdapters are the leaves that belong to no axis: the operating-system
+// adapter and its in-memory double.
+var hostAdapters = []string{"pkg/oshost", "pkg/oshost/oshosttest"}
+
+// osAdapter is the only package that reaches the disk, the environment, the
+// processes and the clock of the machine.
+const osAdapter = "pkg/oshost"
+
+// machineImports reach the real disk, the environment or the processes.
+var machineImports = map[string]bool{
 	"os": true, "os/exec": true, "os/user": true, "os/signal": true, "io/ioutil": true,
-	"net": true, "net/http": true, "net/netip": true, "syscall": true, "runtime": true,
+	"syscall": true, "runtime": true,
 }
 
+// networkImports name connections and listeners. A leaf that serves or relays
+// traffic needs their types; a core package never does.
+var networkImports = map[string]bool{"net": true, "net/http": true, "net/netip": true}
+
 type sourceFile struct {
-	path    string
-	dir     string
-	test    bool
-	imports []string
-	parsed  *ast.File
+	path string
+	dir  string
+	test bool
+	// integration marks a file that builds only under the integration tag: it
+	// may start real programs and touch the machine.
+	integration bool
+	imports     []string
+	parsed      *ast.File
+}
+
+// integrationOnly reports whether the build constraint of file holds with the
+// integration tag and fails without it.
+func integrationOnly(file *ast.File) bool {
+	for _, group := range file.Comments {
+		if group.Pos() >= file.Package {
+			break
+		}
+		for _, comment := range group.List {
+			if !constraint.IsGoBuild(comment.Text) {
+				continue
+			}
+			expr, err := constraint.Parse(comment.Text)
+			if err != nil {
+				return false
+			}
+			return expr.Eval(func(tag string) bool { return tag == "integration" }) && !expr.Eval(func(string) bool { return false })
+		}
+	}
+	return false
 }
 
 func moduleRoot(t *testing.T) string {
@@ -79,7 +135,7 @@ func moduleFiles(t *testing.T) []sourceFile {
 		if entry.IsDir() || !strings.HasSuffix(path, ".go") {
 			return nil
 		}
-		parsed, err := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution)
+		parsed, err := parser.ParseFile(fset, path, nil, parser.SkipObjectResolution|parser.ParseComments)
 		if err != nil {
 			return err
 		}
@@ -87,7 +143,7 @@ func moduleFiles(t *testing.T) []sourceFile {
 		if err != nil {
 			return err
 		}
-		file := sourceFile{path: path, dir: filepath.ToSlash(rel), test: strings.HasSuffix(path, "_test.go"), parsed: parsed}
+		file := sourceFile{path: path, dir: filepath.ToSlash(rel), test: strings.HasSuffix(path, "_test.go"), integration: integrationOnly(parsed), parsed: parsed}
 		for _, spec := range parsed.Imports {
 			value, err := strconv.Unquote(spec.Path.Value)
 			if err != nil {
@@ -129,7 +185,7 @@ func isLibrary(path string) bool {
 }
 
 // leafOf returns the axis and the leaf directory of dir, or false when dir is no
-// leaf.
+// leaf. A host adapter is a leaf of its own, with no axis.
 func leafOf(dir string) (string, string, bool) {
 	for _, axis := range axes {
 		if rest, ok := strings.CutPrefix(dir, axis+"/"); ok {
@@ -137,7 +193,16 @@ func leafOf(dir string) (string, string, bool) {
 			return axis, axis + "/" + leaf, true
 		}
 	}
+	if slices.Contains(hostAdapters, dir) {
+		return "", dir, true
+	}
 	return "", "", false
+}
+
+// isCore reports whether dir is a core package: one that is no leaf.
+func isCore(dir string) bool {
+	_, _, leaf := leafOf(dir)
+	return !leaf
 }
 
 // TestEveryPackageIsDeclared fails for a core package missing from the table
@@ -182,20 +247,62 @@ func TestTheCoreUsesOnlyTheStandardLibraryAndTheSharedLibraries(t *testing.T) {
 	}
 }
 
-// TestNoPackageTouchesTheHost keeps the real disk, environment, process and
-// network out of the core and out of every unit test.
-func TestNoPackageTouchesTheHost(t *testing.T) {
+// TestOnlyTheOSAdapterTouchesTheMachine keeps the real disk, environment and
+// processes inside oshost. Only an integration test, which builds under its own
+// tag, reaches the machine itself.
+func TestOnlyTheOSAdapterTouchesTheMachine(t *testing.T) {
 	for _, f := range moduleFiles(t) {
+		if f.integration || (f.dir == osAdapter && !f.test) {
+			continue
+		}
 		for _, imp := range f.imports {
-			if hostImports[imp] {
+			if machineImports[imp] {
 				t.Errorf("%s imports %s; reach the machine through a port", f.path, imp)
 			}
 		}
 	}
 }
 
-// TestNoPackageImportsALeaf leaves the choice of a leaf to the composition root
-// of a consumer.
+// TestTheCoreNamesNoNetwork keeps connections and listeners in the leaves: a
+// core package plans and declares, and a leaf serves or relays the traffic.
+func TestTheCoreNamesNoNetwork(t *testing.T) {
+	for _, f := range moduleFiles(t) {
+		if !isCore(f.dir) {
+			continue
+		}
+		for _, imp := range f.imports {
+			if networkImports[imp] {
+				t.Errorf("%s imports %s; a core package names no connection", f.path, imp)
+			}
+		}
+	}
+}
+
+// TestEveryLeafIsReal keeps the leaf rules from passing on an empty tree: each
+// axis has a leaf, and every host adapter exists.
+func TestEveryLeafIsReal(t *testing.T) {
+	leaves := map[string]bool{}
+	for _, f := range nonTest(moduleFiles(t)) {
+		if axis, _, ok := leafOf(f.dir); ok {
+			leaves[axis] = true
+			leaves[f.dir] = true
+		}
+	}
+	for _, axis := range axes {
+		if !leaves[axis] {
+			t.Errorf("the axis %s has no leaf", axis)
+		}
+	}
+	for _, adapter := range hostAdapters {
+		if !leaves[adapter] {
+			t.Errorf("the host adapter %s has no Go files", adapter)
+		}
+	}
+}
+
+// TestNoPackageImportsALeaf leaves the choice of a leaf to the registry or the
+// composition root of a consumer: no package of the library, and no leaf of
+// another axis, imports a leaf from its production code.
 func TestNoPackageImportsALeaf(t *testing.T) {
 	for _, f := range nonTest(moduleFiles(t)) {
 		for _, imp := range f.imports {
@@ -207,12 +314,13 @@ func TestNoPackageImportsALeaf(t *testing.T) {
 	}
 }
 
-// TestLeavesDoNotImportSiblings keeps each leaf to its own port: a leaf reaches
-// another variant of its axis only through the axis core.
+// TestLeavesDoNotImportSiblings keeps each leaf to its own port, in its tests
+// as well: a leaf reaches another variant of its axis only through the axis
+// core.
 func TestLeavesDoNotImportSiblings(t *testing.T) {
 	for _, f := range moduleFiles(t) {
 		axis, own, isLeaf := leafOf(f.dir)
-		if !isLeaf {
+		if !isLeaf || axis == "" {
 			continue
 		}
 		for _, imp := range f.imports {
@@ -225,8 +333,12 @@ func TestLeavesDoNotImportSiblings(t *testing.T) {
 }
 
 // TestNoPackageReadsTheClockOrPrints keeps time an input and output a value.
+// The OS adapter is the clock that a consumer passes in.
 func TestNoPackageReadsTheClockOrPrints(t *testing.T) {
 	for _, f := range nonTest(moduleFiles(t)) {
+		if f.dir == osAdapter {
+			continue
+		}
 		ast.Inspect(f.parsed, func(node ast.Node) bool {
 			selector, ok := node.(*ast.SelectorExpr)
 			if !ok {

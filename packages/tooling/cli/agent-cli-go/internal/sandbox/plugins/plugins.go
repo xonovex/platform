@@ -1,11 +1,10 @@
 // Package plugins is the sandbox composition root: it assembles the built-in
 // isolators and provisioners into a Registry. This is the ONLY place that imports
-// the concrete leaf packages (isolation/{none,bwrap,docker,seatbelt,
-// dockersandboxes,openshell}, provision/{none,command,nix}, credential/{env,file,
-// keychain,secretservice,pass}) — the core sandbox package depends only on the axis
-// ports. Adding
-// a plugin means a new leaf package plus one Register call here; the selection and
-// policy code never changes.
+// the concrete leaf packages of shared-launch-go (pkg/isolation/{none,bwrap,
+// docker,seatbelt,dockersandboxes,openshell}, pkg/provision/{none,command,nix},
+// pkg/credential/{env,file,keychain,secretservice,pass}); the sandbox core
+// depends only on the axis ports. Adding a plugin means a new leaf package plus
+// one Register call here; the selection and policy code never changes.
 package plugins
 
 import (
@@ -13,23 +12,23 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	credenv "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential/env"
+	credfile "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential/file"
+	credkeychain "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential/keychain"
+	credpass "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential/pass"
+	credsecretservice "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential/secretservice"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/bwrap"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/docker"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/dockersandboxes"
+	isonone "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/none"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/openshell"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation/seatbelt"
 	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision/command"
+	provnix "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision/nix"
+	provnone "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision/none"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
-	credenv "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/env"
-	credfile "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/file"
-	credkeychain "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/keychain"
-	credpass "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/pass"
-	credsecretservice "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/secretservice"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/bwrap"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/docker"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/dockersandboxes"
-	isonone "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/none"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/openshell"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/seatbelt"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/command"
-	provnix "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/nix"
-	provnone "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/none"
 )
 
 // Host is the union of the ports the built-in plugins consume.

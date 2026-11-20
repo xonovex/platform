@@ -9,13 +9,13 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/approval"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 const digest = "sha256:" + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-func terminal(answers ...string) *systemtest.Fake {
-	host := systemtest.New()
+func terminal(answers ...string) *oshosttest.Fake {
+	host := oshosttest.New()
 	host.Terminal = true
 	host.Input = answers
 	return host
@@ -70,7 +70,7 @@ func TestDecidePassesAFlagThroughAndNeverAsksWithoutATerminal(t *testing.T) {
 	if err != nil || approved != "sha256:given" || len(host.Input) != 1 {
 		t.Errorf("Decide(flag) = %q, %v, input left %v", approved, err, host.Input)
 	}
-	plain := systemtest.New()
+	plain := oshosttest.New()
 	approved, err = Decide(plain, io.Discard, digest, "")
 	if err != nil || approved != "" {
 		t.Errorf("Decide(no terminal) = %q, %v, want the empty approval", approved, err)
@@ -90,18 +90,18 @@ func TestDefaultFilePrefersAnAbsoluteXDGDataHome(t *testing.T) {
 
 func TestNewStoreNeedsACleanAbsoluteFile(t *testing.T) {
 	for _, file := range []string{"relative.json", "/a/../b.json", "/a//b.json"} {
-		if _, err := NewStore(systemtest.New(), file); err == nil {
+		if _, err := NewStore(oshosttest.New(), file); err == nil {
 			t.Errorf("NewStore(%q) error = nil", file)
 		}
 	}
-	store, err := NewStore(systemtest.New(), "/a/approvals.json")
+	store, err := NewStore(oshosttest.New(), "/a/approvals.json")
 	if err != nil || store.File() != "/a/approvals.json" {
 		t.Errorf("NewStore() = %+v, %v", store, err)
 	}
 }
 
 func TestAnEmptyStoreApprovesNothingAndApproveRecordsTheDigest(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	store, _ := NewStore(host, "/data/agent-cli/approvals.json")
 
 	if ok, err := store.Approved("kind", digest); ok || err != nil {
@@ -122,7 +122,7 @@ func TestAnEmptyStoreApprovesNothingAndApproveRecordsTheDigest(t *testing.T) {
 }
 
 func TestACorruptLedgerFailsClosed(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.AddFile("/a/approvals.json", "{", 0o600)
 	store, _ := NewStore(host, "/a/approvals.json")
 
@@ -139,7 +139,7 @@ func TestACorruptLedgerFailsClosed(t *testing.T) {
 
 // faulty fails one named operation of the host.
 type faulty struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	fail string
 }
 
@@ -180,20 +180,20 @@ func (f faulty) Rename(a, b string) error {
 
 func TestEveryFailureOfTheMachineStopsApprove(t *testing.T) {
 	for _, op := range []string{"read", "mkdir", "write", "rename"} {
-		store, _ := NewStore(faulty{Fake: systemtest.New(), fail: op}, "/a/approvals.json")
+		store, _ := NewStore(faulty{Fake: oshosttest.New(), fail: op}, "/a/approvals.json")
 		err := store.Approve(approval.Approved{Kind: "k", Subject: "s", Digest: digest})
 		if err == nil || !strings.Contains(err.Error(), op+" failed") {
 			t.Errorf("%s: Approve() error = %v", op, err)
 		}
 	}
-	store, _ := NewStore(faulty{Fake: systemtest.New(), fail: "read"}, "/a/approvals.json")
+	store, _ := NewStore(faulty{Fake: oshosttest.New(), fail: "read"}, "/a/approvals.json")
 	if _, err := store.Ledger(); err == nil {
 		t.Error("Ledger() ignored the read failure")
 	}
 }
 
 func TestApproveRefusesARecordTheLedgerCannotEncode(t *testing.T) {
-	store, _ := NewStore(systemtest.New(), "/a/approvals.json")
+	store, _ := NewStore(oshosttest.New(), "/a/approvals.json")
 	if err := store.Approve(approval.Approved{Kind: "", Digest: digest}); err == nil {
 		t.Error("Approve() accepted a record without a kind")
 	}

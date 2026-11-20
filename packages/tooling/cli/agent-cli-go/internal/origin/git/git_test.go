@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestAcceptsRepositoryURLs(t *testing.T) {
-	origin := New(systemtest.New())
+	origin := New(oshosttest.New())
 	for _, spec := range []string{
 		"https://github.com/org/repo.git", "https://github.com/org/repo#v1.2.3", "ssh://git@host/org/repo.git",
 		"file:///srv/repo", "git@github.com:org/repo.git", "git@github.com:org/repo.git#feature/x",
@@ -33,13 +33,13 @@ func cloneLine(url, ref string) string {
 		args = append(args, "--branch", ref)
 	}
 	args = append(args, "--", url, "/tmp/agent-cli-origin-1/checkout")
-	return systemtest.CommandLine("git", args...)
+	return oshosttest.CommandLine("git", args...)
 }
 
 func TestFetchClonesShallowlyAndResolvesTheCommit(t *testing.T) {
-	host := systemtest.New()
-	host.Outcomes[cloneLine("https://h/r.git", "v1")] = systemtest.Outcome{}
-	host.Outcomes[systemtest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = systemtest.Outcome{Stdout: "abc123\n"}
+	host := oshosttest.New()
+	host.Outcomes[cloneLine("https://h/r.git", "v1")] = oshosttest.Outcome{}
+	host.Outcomes[oshosttest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = oshosttest.Outcome{Stdout: "abc123\n"}
 	checkout, err := New(host).Fetch("https://h/r.git#v1")
 	if err != nil {
 		t.Fatal(err)
@@ -57,9 +57,9 @@ func TestFetchClonesShallowlyAndResolvesTheCommit(t *testing.T) {
 }
 
 func TestFetchWithoutARefClonesTheDefaultBranch(t *testing.T) {
-	host := systemtest.New()
-	host.Outcomes[cloneLine("git@h:o/r.git", "")] = systemtest.Outcome{}
-	host.Outcomes[systemtest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = systemtest.Outcome{Stdout: "def"}
+	host := oshosttest.New()
+	host.Outcomes[cloneLine("git@h:o/r.git", "")] = oshosttest.Outcome{}
+	host.Outcomes[oshosttest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = oshosttest.Outcome{Stdout: "def"}
 	checkout, err := New(host).Fetch("git@h:o/r.git")
 	if err != nil || checkout.Source != "git@h:o/r.git" || strings.Contains(strings.Join(host.Calls[0].Args, " "), "--branch") {
 		t.Errorf("checkout = %+v, %v, calls = %v", checkout, err, host.Calls)
@@ -68,30 +68,30 @@ func TestFetchWithoutARefClonesTheDefaultBranch(t *testing.T) {
 
 func TestFetchFailuresReleaseTheDirectory(t *testing.T) {
 	failure := errors.New("boom")
-	host := systemtest.New()
-	host.Outcomes[cloneLine("https://h/r.git", "")] = systemtest.Outcome{Err: failure}
+	host := oshosttest.New()
+	host.Outcomes[cloneLine("https://h/r.git", "")] = oshosttest.Outcome{Err: failure}
 	if _, err := New(host).Fetch("https://h/r.git"); !errors.Is(err, failure) || host.Exists("/tmp/agent-cli-origin-1") {
 		t.Errorf("clone failure: %v, exists = %v", err, host.Exists("/tmp/agent-cli-origin-1"))
 	}
 
-	host = systemtest.New()
-	host.Outcomes[cloneLine("https://h/r.git", "")] = systemtest.Outcome{}
-	host.Outcomes[systemtest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = systemtest.Outcome{Err: failure}
+	host = oshosttest.New()
+	host.Outcomes[cloneLine("https://h/r.git", "")] = oshosttest.Outcome{}
+	host.Outcomes[oshosttest.InDir("/tmp/agent-cli-origin-1/checkout", "git rev-parse HEAD")] = oshosttest.Outcome{Err: failure}
 	if _, err := New(host).Fetch("https://h/r.git"); !errors.Is(err, failure) || host.Exists("/tmp/agent-cli-origin-1") {
 		t.Errorf("rev-parse failure: %v, exists = %v", err, host.Exists("/tmp/agent-cli-origin-1"))
 	}
 
-	if _, err := New(systemtest.New()).Fetch("/not/a/url"); err == nil {
+	if _, err := New(oshosttest.New()).Fetch("/not/a/url"); err == nil {
 		t.Error("a non-URL passed")
 	}
 }
 
-type noTemp struct{ *systemtest.Fake }
+type noTemp struct{ *oshosttest.Fake }
 
 func (noTemp) MkdirTemp(string) (string, error) { return "", errors.New("no space") }
 
 func TestFetchFailsWithoutATemporaryDirectory(t *testing.T) {
-	if _, err := New(noTemp{systemtest.New()}).Fetch("https://h/r.git"); err == nil || !strings.Contains(err.Error(), "no space") {
+	if _, err := New(noTemp{oshosttest.New()}).Fetch("https://h/r.git"); err == nil || !strings.Contains(err.Error(), "no space") {
 		t.Errorf("error = %v", err)
 	}
 }

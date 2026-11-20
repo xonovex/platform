@@ -9,14 +9,14 @@ import (
 
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/egress/managed"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/cmd"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
 	originplugins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/overlay"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/herdr"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/tmux"
@@ -27,7 +27,7 @@ import (
 )
 
 func main() {
-	host := system.New(os.Stdin, os.Stdout, os.Stderr)
+	host := oshost.New(os.Stdin, os.Stdout, os.Stderr)
 	log := logging.FromEnvironment(host.Getenv, os.Stdout, os.Stderr)
 	origins := originplugins.DefaultRegistry(host)
 	deps := launch.Dependencies{
@@ -77,7 +77,7 @@ func main() {
 }
 
 // runStore opens the run record store in the state directory of the user.
-func runStore(host system.System) (record.Store, error) {
+func runStore(host oshost.System) (record.Store, error) {
 	home, err := host.UserHomeDir()
 	if err != nil {
 		return record.Store{}, err
@@ -86,7 +86,7 @@ func runStore(host system.System) (record.Store, error) {
 }
 
 // approvalStore opens the approval ledger of the user.
-func approvalStore(host system.System) (trust.Store, error) {
+func approvalStore(host oshost.System) (trust.Store, error) {
 	home, err := host.UserHomeDir()
 	if err != nil {
 		return trust.Store{}, err

@@ -11,26 +11,23 @@
 //   - TestSharedCoresImportNoLeaf: an axis shared/ package imports no leaf of
 //     any axis; bridges flow leaf -> other-axis/shared only.
 //   - TestConcreteLeavesHaveOneImporter: only the registry packages and the
-//     composition root import a concrete leaf.
+//     composition root import a concrete leaf of this module or of
+//     shared-launch-go.
 //   - TestLaunchLibraryImportsFollowTheTable: each package imports only the
 //     shared-launch-go packages its entry lists.
-//   - TestOnlySystemAdapterTouchesTheOperatingSystem: only internal/system
-//     imports os, os/exec, runtime or syscall.
+//   - TestNoInternalPackageTouchesTheOperatingSystem: no internal package
+//     imports os, os/exec, runtime or syscall; the composition root hands each
+//     the OS adapter of shared-launch-go.
 //   - TestInternalPackagesDoNotPrint: output goes through a logger or writer.
 //   - TestNoHarnessIsNamedOutsideTheAgentRegistry: the planner and the
-//     isolators compare the facts a harness declares, never its name.
-//   - TestCredentialValuesStayInsideSecret: a credential store hands the Secret
-//     on unrevealed.
+//     adapters compare the facts a harness declares, never its name.
 //   - TestApplicationCoreNamesNoAdapter: the launch core and the cobra adapter
 //     name no concrete plugin, no OS adapter, no origin leaf and no overlay
 //     adapter.
-//   - TestIsolationBuildsNoAgentCommand: an isolation confines the process the
-//     planner built and never builds the agent command line or its provider
-//     environment itself.
 //
 // The origin axis (internal/origin) has its own fitness tests beside it, and
-// shared-launch-go holds the tests of the selection layer, the ports and the
-// run spec.
+// shared-launch-go holds the tests of its isolation, provision, egress and
+// credential leaves, the selection layer, the ports and the run spec.
 package arch
 
 import (
@@ -49,7 +46,7 @@ import (
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
 
 // axisNames are the orthogonal axes, each a directory of a shared core and leaves.
-var axisNames = []string{"isolation", "provision", "network", "workspace", "terminal", "credential"}
+var axisNames = []string{"workspace", "terminal"}
 
 // internalRoot returns the absolute path of the internal/ directory.
 func internalRoot(t *testing.T) string {
@@ -124,34 +121,35 @@ func TestLeavesDoNotImportCompositionRoot(t *testing.T) {
 	}
 }
 
-// concrete names, for each leaf of this module, the only packages that may
-// import it from non-test code: a registry package or the composition root.
+// concrete names, for each leaf of this module and of shared-launch-go, the
+// only packages that may import it from non-test code: a registry package or
+// the composition root. A leaf of shared-launch-go is keyed by its import path.
 var concrete = map[string][]string{
-	"internal/isolation/none":            {"internal/sandbox/plugins"},
-	"internal/isolation/bwrap":           {"internal/sandbox/plugins"},
-	"internal/isolation/docker":          {"internal/sandbox/plugins"},
-	"internal/isolation/seatbelt":        {"internal/sandbox/plugins"},
-	"internal/isolation/dockersandboxes": {"internal/sandbox/plugins"},
-	"internal/isolation/openshell":       {"internal/sandbox/plugins"},
-	"internal/provision/none":            {"internal/sandbox/plugins"},
-	"internal/provision/command":         {"internal/sandbox/plugins"},
-	"internal/provision/nix":             {"internal/sandbox/plugins"},
-	"internal/credential/env":            {"internal/sandbox/plugins"},
-	"internal/credential/file":           {"internal/sandbox/plugins"},
-	"internal/credential/keychain":       {"internal/sandbox/plugins"},
-	"internal/credential/pass":           {"internal/sandbox/plugins"},
-	"internal/credential/secretservice":  {"internal/sandbox/plugins"},
-	"internal/origin/directory":          {"internal/origin/plugins"},
-	"internal/origin/git":                {"internal/origin/plugins"},
-	"internal/network/managed":           {"cmd/agent-cli"},
-	"internal/system":                    {"cmd/agent-cli"},
-	"internal/terminal/tmux":             {"cmd/agent-cli"},
-	"internal/terminal/herdr":            {"cmd/agent-cli"},
-	"internal/workspace/git":             {"cmd/agent-cli"},
-	"internal/workspace/jj":              {"cmd/agent-cli"},
-	"internal/origin/plugins":            {"cmd/agent-cli"},
-	"internal/overlay":                   {"cmd/agent-cli"},
-	"internal/sandbox/plugins":           {"cmd/agent-cli"},
+	launchLibrary + "/pkg/isolation/none":            {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/isolation/bwrap":           {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/isolation/docker":          {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/isolation/seatbelt":        {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/isolation/dockersandboxes": {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/isolation/openshell":       {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/provision/none":            {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/provision/command":         {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/provision/nix":             {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/credential/env":            {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/credential/file":           {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/credential/keychain":       {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/credential/pass":           {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/credential/secretservice":  {"internal/sandbox/plugins"},
+	launchLibrary + "/pkg/egress/managed":            {"cmd/agent-cli"},
+	launchLibrary + "/pkg/oshost":                    {"cmd/agent-cli"},
+	"internal/origin/directory":                      {"internal/origin/plugins"},
+	"internal/origin/git":                            {"internal/origin/plugins"},
+	"internal/terminal/tmux":                         {"cmd/agent-cli"},
+	"internal/terminal/herdr":                        {"cmd/agent-cli"},
+	"internal/workspace/git":                         {"cmd/agent-cli"},
+	"internal/workspace/jj":                          {"cmd/agent-cli"},
+	"internal/origin/plugins":                        {"cmd/agent-cli"},
+	"internal/overlay":                               {"cmd/agent-cli"},
+	"internal/sandbox/plugins":                       {"cmd/agent-cli"},
 }
 
 // packageImports returns the non-test imports of every package of the module,
@@ -184,18 +182,35 @@ func packageImports(t *testing.T) map[string][]string {
 	return out
 }
 
+// concreteKey returns the key of imp in the concrete table: the module-relative
+// directory of a package of this module, or the import path of any other.
+func concreteKey(imp string) string {
+	if rel, inside := strings.CutPrefix(imp, modPath+"/"); inside {
+		return rel
+	}
+	return imp
+}
+
 func TestConcreteLeavesHaveOneImporter(t *testing.T) {
 	imports := packageImports(t)
-	for leaf := range concrete {
+	for leaf, importers := range concrete {
+		if strings.HasPrefix(leaf, launchLibrary+"/") {
+			// A library leaf has no directory here; its registry must reach it.
+			for _, importer := range importers {
+				if !slices.ContainsFunc(imports[importer], func(imp string) bool { return imp == leaf }) {
+					t.Errorf("the concrete table names %s, which %s does not import", leaf, importer)
+				}
+			}
+			continue
+		}
 		if _, ok := imports[leaf]; !ok {
 			t.Errorf("the concrete table names %s, which has no Go files", leaf)
 		}
 	}
 	for dir, paths := range imports {
 		for _, imp := range paths {
-			leaf, inside := strings.CutPrefix(imp, modPath+"/")
-			if importers, isLeaf := concrete[leaf]; inside && isLeaf && !slices.Contains(importers, dir) {
-				t.Errorf("%s imports the concrete leaf %s; only %v may", dir, leaf, importers)
+			if importers, isLeaf := concrete[concreteKey(imp)]; isLeaf && !slices.Contains(importers, dir) {
+				t.Errorf("%s imports the concrete leaf %s; only %v may", dir, imp, importers)
 			}
 		}
 	}
@@ -208,26 +223,17 @@ const launchLibrary = "github.com/xonovex/platform/packages/library/shared-launc
 // shared-launch-go it may import from non-test code. A package missing here
 // imports none.
 var launchImports = map[string][]string{
-	"cmd/agent-cli":                      {"pkg/record"},
-	"internal/cmd":                       {"pkg/record"},
-	"internal/launch":                    {"pkg/credential", "pkg/isolation", "pkg/launch", "pkg/provision", "pkg/record", "pkg/sandbox"},
-	"internal/sandbox/plugins":           {"pkg/credential", "pkg/isolation", "pkg/provision", "pkg/sandbox"},
-	"internal/isolation/shared":          {"pkg/isolation"},
-	"internal/isolation/none":            {"pkg/isolation"},
-	"internal/isolation/bwrap":           {"pkg/isolation"},
-	"internal/isolation/docker":          {"pkg/isolation"},
-	"internal/isolation/seatbelt":        {"pkg/isolation"},
-	"internal/isolation/dockersandboxes": {"pkg/isolation"},
-	"internal/isolation/openshell":       {"pkg/isolation"},
-	"internal/network/managed":           {"pkg/isolation"},
-	"internal/provision/none":            {"pkg/provision"},
-	"internal/provision/command":         {"pkg/provision"},
-	"internal/provision/nix":             {"pkg/provision"},
-	"internal/credential/env":            {"pkg/credential"},
-	"internal/credential/file":           {"pkg/credential"},
-	"internal/credential/keychain":       {"pkg/credential"},
-	"internal/credential/pass":           {"pkg/credential"},
-	"internal/credential/secretservice":  {"pkg/credential"},
+	"cmd/agent-cli":   {"pkg/egress/managed", "pkg/oshost", "pkg/record"},
+	"internal/cmd":    {"pkg/record"},
+	"internal/launch": {"pkg/credential", "pkg/isolation", "pkg/launch", "pkg/provision", "pkg/record", "pkg/sandbox"},
+	"internal/sandbox/plugins": {
+		"pkg/credential", "pkg/isolation", "pkg/provision", "pkg/sandbox",
+		"pkg/isolation/none", "pkg/isolation/bwrap", "pkg/isolation/docker", "pkg/isolation/seatbelt",
+		"pkg/isolation/dockersandboxes", "pkg/isolation/openshell",
+		"pkg/provision/none", "pkg/provision/command", "pkg/provision/nix",
+		"pkg/credential/env", "pkg/credential/file", "pkg/credential/keychain", "pkg/credential/pass",
+		"pkg/credential/secretservice",
+	},
 }
 
 func TestLaunchLibraryImportsFollowTheTable(t *testing.T) {
@@ -283,14 +289,6 @@ func TestSharedCoresImportNoLeaf(t *testing.T) {
 	}
 }
 
-// topSegmentLast returns the final path segment (the default import identifier).
-func topSegmentLast(path string) string {
-	if i := strings.LastIndexByte(path, '/'); i >= 0 {
-		return path[i+1:]
-	}
-	return path
-}
-
 // productionFiles returns every non-test Go file under root.
 func productionFiles(t *testing.T, root string) []string {
 	var files []string
@@ -308,15 +306,11 @@ func productionFiles(t *testing.T, root string) []string {
 	return files
 }
 
-func TestOnlySystemAdapterTouchesTheOperatingSystem(t *testing.T) {
+func TestNoInternalPackageTouchesTheOperatingSystem(t *testing.T) {
 	root := internalRoot(t)
-	systemDir := filepath.Join(root, "system") + string(filepath.Separator)
 	banned := map[string]bool{"os": true, "os/exec": true, "runtime": true, "syscall": true}
 	fset := token.NewFileSet()
 	for _, file := range productionFiles(t, root) {
-		if strings.HasPrefix(file, systemDir) {
-			continue
-		}
 		f, err := parser.ParseFile(fset, file, nil, parser.ImportsOnly)
 		if err != nil {
 			t.Fatalf("parse %s: %v", file, err)
@@ -356,23 +350,24 @@ func TestInternalPackagesDoNotPrint(t *testing.T) {
 func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 	root := internalRoot(t)
 	adapters := []string{
-		modPath + "/internal/system",
+		launchLibrary + "/pkg/oshost",
+		launchLibrary + "/pkg/hostlaunch",
+		launchLibrary + "/pkg/isolation/none",
+		launchLibrary + "/pkg/isolation/bwrap",
+		launchLibrary + "/pkg/isolation/docker",
+		launchLibrary + "/pkg/isolation/seatbelt",
+		launchLibrary + "/pkg/isolation/dockersandboxes",
+		launchLibrary + "/pkg/isolation/openshell",
+		launchLibrary + "/pkg/egress/managed",
+		launchLibrary + "/pkg/credential/env",
+		launchLibrary + "/pkg/credential/file",
+		launchLibrary + "/pkg/credential/keychain",
+		launchLibrary + "/pkg/credential/secretservice",
+		launchLibrary + "/pkg/credential/pass",
+		launchLibrary + "/pkg/provision/none",
+		launchLibrary + "/pkg/provision/command",
+		launchLibrary + "/pkg/provision/nix",
 		modPath + "/internal/sandbox/plugins",
-		modPath + "/internal/isolation/none",
-		modPath + "/internal/isolation/bwrap",
-		modPath + "/internal/isolation/docker",
-		modPath + "/internal/isolation/seatbelt",
-		modPath + "/internal/isolation/dockersandboxes",
-		modPath + "/internal/isolation/openshell",
-		modPath + "/internal/network/managed",
-		modPath + "/internal/credential/env",
-		modPath + "/internal/credential/file",
-		modPath + "/internal/credential/keychain",
-		modPath + "/internal/credential/secretservice",
-		modPath + "/internal/credential/pass",
-		modPath + "/internal/provision/none",
-		modPath + "/internal/provision/command",
-		modPath + "/internal/provision/nix",
 		modPath + "/internal/workspace/git",
 		modPath + "/internal/workspace/jj",
 		modPath + "/internal/terminal/tmux",
@@ -423,69 +418,5 @@ func TestNoHarnessIsNamedOutsideTheAgentRegistry(t *testing.T) {
 				return true
 			})
 		}
-	}
-}
-
-// TestCredentialValuesStayInsideSecret locks the redaction boundary: the only
-// function that returns a credential as a plain string is Secret.Reveal and the
-// Reveal helper beside it, and no store leaf calls either, so a store can neither
-// print nor keep a plain value.
-func TestCredentialValuesStayInsideSecret(t *testing.T) {
-	root := internalRoot(t)
-	for leaf, dir := range leafDirs(t, filepath.Join(root, "credential")) {
-		if leaf == "shared" {
-			continue
-		}
-		for _, file := range productionFiles(t, dir) {
-			fset := token.NewFileSet()
-			f, err := parser.ParseFile(fset, file, nil, 0)
-			if err != nil {
-				t.Fatalf("parse %s: %v", file, err)
-			}
-			ast.Inspect(f, func(n ast.Node) bool {
-				if sel, ok := n.(*ast.SelectorExpr); ok && sel.Sel.Name == "Reveal" {
-					t.Errorf("%s calls Reveal; a store must hand the Secret on unrevealed", file)
-				}
-				return true
-			})
-		}
-	}
-}
-
-func TestIsolationBuildsNoAgentCommand(t *testing.T) {
-	root := internalRoot(t)
-	builders := map[string]map[string]bool{
-		"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents":    {"BuildArgs": true, "BuildEnv": true},
-		"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers": {"GetProviderCliArgs": true, "BuildProviderEnv": true},
-	}
-	agentcmd := "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, filepath.Join(root, "isolation")) {
-		f, err := parser.ParseFile(fset, file, nil, 0)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
-		}
-		alias := map[string]string{}
-		for _, im := range f.Imports {
-			path, _ := strconv.Unquote(im.Path.Value)
-			if path == agentcmd {
-				t.Errorf("%s imports the agent command builder %s", file, path)
-			}
-			name := topSegmentLast(path)
-			if im.Name != nil {
-				name = im.Name.Name
-			}
-			alias[name] = path
-		}
-		ast.Inspect(f, func(n ast.Node) bool {
-			sel, ok := n.(*ast.SelectorExpr)
-			if !ok {
-				return true
-			}
-			if x, ok := sel.X.(*ast.Ident); ok && builders[alias[x.Name]][sel.Sel.Name] {
-				t.Errorf("%s calls %s.%s; confine the planned process instead", file, x.Name, sel.Sel.Name)
-			}
-			return true
-		})
 	}
 }

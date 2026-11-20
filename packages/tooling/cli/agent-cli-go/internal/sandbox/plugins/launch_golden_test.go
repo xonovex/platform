@@ -15,10 +15,10 @@ import (
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox/plugins"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
@@ -43,22 +43,22 @@ const (
 	goldenCheckout = "/work/checkout"
 )
 
-// goldenHost is a systemtest.Fake whose every process succeeds, so a run of a
+// goldenHost is a oshosttest.Fake whose every process succeeds, so a run of a
 // real isolator reaches the launch of the agent and the test records it.
-type goldenHost struct{ *systemtest.Fake }
+type goldenHost struct{ *oshosttest.Fake }
 
 func (h goldenHost) Run(name string, args, env []string, dir string) (int, error) {
-	h.Calls = append(h.Calls, systemtest.Call{Kind: "run", Name: name, Args: args, Env: env, Dir: dir})
+	h.Calls = append(h.Calls, oshosttest.Call{Kind: "run", Name: name, Args: args, Env: env, Dir: dir})
 	return 0, nil
 }
 
 func (h goldenHost) Capture(name string, args []string, dir string) (string, error) {
-	h.Calls = append(h.Calls, systemtest.Call{Kind: "capture", Name: name, Args: args, Dir: dir})
+	h.Calls = append(h.Calls, oshosttest.Call{Kind: "capture", Name: name, Args: args, Dir: dir})
 	return "", nil
 }
 
 func newGoldenHost() goldenHost {
-	fake := systemtest.New()
+	fake := oshosttest.New()
 	fake.WorkingDir = "/work/repo"
 	fake.Env = map[string]string{
 		"PATH":           "/usr/bin:/bin",

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
@@ -16,22 +16,22 @@ const (
 )
 
 // onBranch is a host with jj on PATH whose repository at repoDir is on branch.
-func onBranch(branch string) *systemtest.Fake {
-	host := systemtest.New().AddExecutable("/usr/bin/jj")
+func onBranch(branch string) *oshosttest.Fake {
+	host := oshosttest.New().AddExecutable("/usr/bin/jj")
 	host.Env["PATH"] = "/usr/bin"
-	host.Outcomes[systemtest.InDir(repoDir, "git rev-parse --abbrev-ref HEAD")] = systemtest.Outcome{Stdout: branch + "\n"}
+	host.Outcomes[oshosttest.InDir(repoDir, "git rev-parse --abbrev-ref HEAD")] = oshosttest.Outcome{Stdout: branch + "\n"}
 	return host
 }
 
 func addLine(dir, revision string) string {
-	return systemtest.InDir(repoDir, "jj workspace add "+dir+" --revision "+revision)
+	return oshosttest.InDir(repoDir, "jj workspace add "+dir+" --revision "+revision)
 }
 
-func streamed(host *systemtest.Fake) []string {
+func streamed(host *oshosttest.Fake) []string {
 	var lines []string
 	for _, call := range host.Calls {
 		if call.Kind == "stream" {
-			lines = append(lines, systemtest.InDir(call.Dir, call.Line()))
+			lines = append(lines, oshosttest.InDir(call.Dir, call.Line()))
 		}
 	}
 	return lines
@@ -40,7 +40,7 @@ func streamed(host *systemtest.Fake) []string {
 func TestSetup_CreatesAWorkspaceFromTheCurrentBranch(t *testing.T) {
 	for _, verbose := range []bool{false, true} {
 		host := onBranch("main")
-		host.Outcomes[addLine(target, "main")] = systemtest.Outcome{}
+		host.Outcomes[addLine(target, "main")] = oshosttest.Outcome{}
 
 		dir, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, verbose)
 
@@ -58,7 +58,7 @@ func TestSetup_CreatesAWorkspaceFromTheCurrentBranch(t *testing.T) {
 
 func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
 	host := onBranch("main")
-	host.Outcomes[addLine(repoDir+"/checkout", "main")] = systemtest.Outcome{}
+	host.Outcomes[addLine(repoDir+"/checkout", "main")] = oshosttest.Outcome{}
 
 	dir, err := New(host, testLog).Setup(wsshared.Config{Dir: "checkout"}, repoDir, false)
 
@@ -90,7 +90,7 @@ func TestSetup_ReusesAnExistingWorkspaceWithoutRunningJJ(t *testing.T) {
 
 func TestSetup_PrefersAnExplicitSourceBranch(t *testing.T) {
 	host := onBranch("main")
-	host.Outcomes[addLine(target, "release")] = systemtest.Outcome{}
+	host.Outcomes[addLine(target, "release")] = oshosttest.Outcome{}
 
 	if _, err := New(host, testLog).Setup(wsshared.Config{Dir: target, SourceBranch: "release"}, repoDir, false); err != nil {
 		t.Fatalf("Setup() error = %v", err)
@@ -125,7 +125,7 @@ func TestSetup_RequiresASourceRevision(t *testing.T) {
 
 func TestSetup_ReportsAFailedWorkspaceAdd(t *testing.T) {
 	host := onBranch("main")
-	host.Outcomes[addLine(target, "main")] = systemtest.Outcome{Err: errors.New("exit status 1")}
+	host.Outcomes[addLine(target, "main")] = oshosttest.Outcome{Err: errors.New("exit status 1")}
 
 	_, err := New(host, testLog).Setup(wsshared.Config{Dir: target}, repoDir, false)
 
@@ -138,7 +138,7 @@ func TestAvailable(t *testing.T) {
 	if !New(onBranch("main"), testLog).Available() {
 		t.Error("Available() must be true when jj resolves on PATH")
 	}
-	if New(systemtest.New(), testLog).Available() {
+	if New(oshosttest.New(), testLog).Available() {
 		t.Error("Available() must be false when jj is absent")
 	}
 }

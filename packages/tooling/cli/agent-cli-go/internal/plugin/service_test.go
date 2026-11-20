@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	origin "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/shared"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 func install(t *testing.T, f fixture, spec string, allow ...libplugin.Capability) libplugin.Locked {
@@ -367,7 +367,7 @@ func TestEveryFailureOfTheMachineStopsTheCommand(t *testing.T) {
 	}
 	for name, step := range steps {
 		for _, op := range []string{"lstat", "readdir", "read", "write", "mkdir", "rename", "removeall"} {
-			f := newFixture(t, func(host *systemtest.Fake) Files { return faulty{host, failOn(op)} })
+			f := newFixture(t, func(host *oshosttest.Fake) Files { return faulty{host, failOn(op)} })
 			err := step(f)
 			if err == nil {
 				continue // the step never used this operation
@@ -440,7 +440,7 @@ func TestFailuresOfASingleStepStopTheCommand(t *testing.T) {
 	}
 
 	// A lock file that cannot be written after the files were stored.
-	h := newFixture(t, func(host *systemtest.Fake) Files {
+	h := newFixture(t, func(host *oshosttest.Fake) Files {
 		return faulty{host, func(op, p string) error {
 			if op == "rename" && strings.HasSuffix(p, "lock.json") {
 				return errInjected
@@ -487,7 +487,7 @@ func TestRemoveFailsClosedWhenTheLockCannotBeWritten(t *testing.T) {
 }
 
 func TestAListedPluginThatCannotBeReadStopsTheInstall(t *testing.T) {
-	f := newFixture(t, func(host *systemtest.Fake) Files {
+	f := newFixture(t, func(host *oshosttest.Fake) Files {
 		return faulty{host, func(op, p string) error {
 			if op == "readdir" && p == "/market/plugins/hello" {
 				return errInjected

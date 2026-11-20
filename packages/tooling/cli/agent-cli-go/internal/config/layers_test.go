@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestLoadLayersReadsManagedUserAndProject(t *testing.T) {
-	files := systemtest.New().
+	files := oshosttest.New().
 		AddFile("/etc/agent-cli/managed.yaml", "isolation: docker\nrequireKernelIsolation: true\n", 0o644).
 		AddFile(DefaultPath("/home/user"), "provider: glm\nbindPaths:\n  - /data\n", 0o600).
 		AddFile("/work/repo/.agent-cli.toml", "agent = \"codex\"\n", 0o644)
@@ -39,11 +39,11 @@ func TestLoadLayersReadsManagedUserAndProject(t *testing.T) {
 }
 
 func TestLoadLayersSkipsAbsentFiles(t *testing.T) {
-	inputs, err := LoadLayers(systemtest.New(), "", "/work")
+	inputs, err := LoadLayers(oshosttest.New(), "", "/work")
 	if err != nil || len(inputs) != 0 {
 		t.Fatalf("LoadLayers() = (%v, %v), want no layer and no error", inputs, err)
 	}
-	files := systemtest.New()
+	files := oshosttest.New()
 	files.ManagedDir = ""
 	if inputs, err := LoadLayers(files, "", ""); err != nil || len(inputs) != 0 {
 		t.Fatalf("LoadLayers(no dirs) = (%v, %v), want no layer", inputs, err)
@@ -51,7 +51,7 @@ func TestLoadLayersSkipsAbsentFiles(t *testing.T) {
 }
 
 func TestLoadLayersTakesTheExplicitFileAsTheUserLayer(t *testing.T) {
-	files := systemtest.New().
+	files := oshosttest.New().
 		AddFile(DefaultPath("/home/user"), "provider: glm\n", 0o600).
 		AddFile("/etc/mine.yaml", "provider: gemini\n", 0o600)
 
@@ -66,22 +66,22 @@ func TestLoadLayersTakesTheExplicitFileAsTheUserLayer(t *testing.T) {
 
 func TestLoadLayersRefusesAManagedFileOthersCanWrite(t *testing.T) {
 	for _, mode := range []fs.FileMode{0o666, 0o664, 0o646} {
-		files := systemtest.New().AddFile("/etc/agent-cli/managed.yaml", "isolation: docker\n", mode)
+		files := oshosttest.New().AddFile("/etc/agent-cli/managed.yaml", "isolation: docker\n", mode)
 		if _, err := LoadLayers(files, "", "/work"); err == nil || !strings.Contains(err.Error(), "writable") {
 			t.Errorf("mode %o: LoadLayers() error = %v, want a refusal of a writable policy", mode, err)
 		}
 	}
-	files := systemtest.New().AddFile("/work/.agent-cli.yaml", "agent: codex\n", 0o666)
+	files := oshosttest.New().AddFile("/work/.agent-cli.yaml", "agent: codex\n", 0o666)
 	if _, err := LoadLayers(files, "", "/work"); err != nil {
 		t.Errorf("a writable project file is not guarded, got %v", err)
 	}
 }
 
 func TestLoadLayersNamesTheFileOfAParseError(t *testing.T) {
-	cases := map[string]*systemtest.Fake{
-		"managed": systemtest.New().AddFile("/etc/agent-cli/managed.yaml", "colour: red\n", 0o644),
-		"user":    systemtest.New().AddFile(DefaultPath("/home/user"), "colour: red\n", 0o600),
-		"project": systemtest.New().AddFile("/work/.agent-cli.yml", "colour: red\n", 0o644),
+	cases := map[string]*oshosttest.Fake{
+		"managed": oshosttest.New().AddFile("/etc/agent-cli/managed.yaml", "colour: red\n", 0o644),
+		"user":    oshosttest.New().AddFile(DefaultPath("/home/user"), "colour: red\n", 0o600),
+		"project": oshosttest.New().AddFile("/work/.agent-cli.yml", "colour: red\n", 0o644),
 	}
 	for layer, files := range cases {
 		if _, err := LoadLayers(files, "", "/work"); err == nil || !strings.Contains(err.Error(), layer) {
@@ -91,7 +91,7 @@ func TestLoadLayersNamesTheFileOfAParseError(t *testing.T) {
 }
 
 func TestLoadLayersFailsWithoutAHome(t *testing.T) {
-	files := systemtest.New()
+	files := oshosttest.New()
 	files.HomeErr = errors.New("no home")
 	if _, err := LoadLayers(files, "", "/work"); err == nil || !strings.Contains(err.Error(), "home directory") {
 		t.Errorf("LoadLayers() error = %v, want a home lookup error", err)
@@ -99,7 +99,7 @@ func TestLoadLayersFailsWithoutAHome(t *testing.T) {
 }
 
 type failingFiles struct {
-	*systemtest.Fake
+	*oshosttest.Fake
 	statErr error
 	readErr error
 }
@@ -119,7 +119,7 @@ func (f failingFiles) ReadFile(path string) ([]byte, error) {
 }
 
 func TestLoadLayersReportsAnUnreadableFile(t *testing.T) {
-	base := systemtest.New().AddFile("/work/.agent-cli.yaml", "agent: codex\n", 0o644)
+	base := oshosttest.New().AddFile("/work/.agent-cli.yaml", "agent: codex\n", 0o644)
 	if _, err := LoadLayers(failingFiles{Fake: base, statErr: errors.New("denied")}, "", "/work"); err == nil || !strings.Contains(err.Error(), "denied") {
 		t.Errorf("stat failure: LoadLayers() error = %v, want it reported", err)
 	}

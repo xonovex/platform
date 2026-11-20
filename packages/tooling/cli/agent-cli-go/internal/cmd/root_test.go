@@ -16,11 +16,11 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	provshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	pluginorigins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
@@ -90,7 +90,7 @@ type testRoot struct {
 	out         bytes.Buffer
 	deps        launch.Dependencies
 	ports       PluginPorts
-	host        *systemtest.Fake
+	host        *oshosttest.Fake
 }
 
 func newTestRoot() *testRoot {
@@ -101,7 +101,7 @@ func newTestRoot() *testRoot {
 	for _, method := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker} {
 		registry.RegisterIsolator(method, func() isoshared.Isolator { return r.isolator })
 	}
-	r.host = systemtest.New()
+	r.host = oshosttest.New()
 	approvals, _ := trust.NewStore(r.host, trust.DefaultFile(r.host.Getenv, r.host.Home))
 	r.ports = PluginPorts{Host: r.host, Origins: pluginorigins.DefaultRegistry(r.host), Out: &r.out}
 	r.deps = launch.Dependencies{

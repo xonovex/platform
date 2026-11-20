@@ -8,7 +8,7 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
 	libplugin "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/plugin"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestDefaultDirPrefersAnAbsoluteXDGDataHome(t *testing.T) {
@@ -26,18 +26,18 @@ func TestDefaultDirPrefersAnAbsoluteXDGDataHome(t *testing.T) {
 
 func TestNewStoreNeedsACleanAbsoluteDirectory(t *testing.T) {
 	for _, dir := range []string{"", "rel", "/a/../b", "/a//b", "/a/"} {
-		if _, err := NewStore(systemtest.New(), dir); err == nil {
+		if _, err := NewStore(oshosttest.New(), dir); err == nil {
 			t.Errorf("NewStore(%q) passed", dir)
 		}
 	}
-	store, err := NewStore(systemtest.New(), "/s")
+	store, err := NewStore(oshosttest.New(), "/s")
 	if err != nil || store.Dir() != "/s" {
 		t.Errorf("NewStore = %v, %v", store, err)
 	}
 }
 
 func TestAnEmptyStoreHasAnEmptyLockAndRegistry(t *testing.T) {
-	store, _ := NewStore(systemtest.New(), "/s")
+	store, _ := NewStore(oshosttest.New(), "/s")
 	if lock, err := store.Lock(); err != nil || len(lock.Plugins) != 0 || lock.Version != libplugin.LockVersion {
 		t.Errorf("Lock = %+v, %v", lock, err)
 	}
@@ -47,7 +47,7 @@ func TestAnEmptyStoreHasAnEmptyLockAndRegistry(t *testing.T) {
 }
 
 func TestLockAndRegistryRoundTripThroughTheDisk(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	store, _ := NewStore(host, "/s")
 	digest := artifact.Tree{{Path: "a"}}.Digest()
 	lock := libplugin.EmptyLock().With(libplugin.Locked{Name: "a", Version: "1", Source: "/x", Digest: digest})
@@ -71,7 +71,7 @@ func TestLockAndRegistryRoundTripThroughTheDisk(t *testing.T) {
 }
 
 func TestACorruptLockOrRegistryFailsClosed(t *testing.T) {
-	host := systemtest.New().AddFile("/s/lock.json", "{", 0o600).AddFile("/s/marketplaces.json", "{", 0o600)
+	host := oshosttest.New().AddFile("/s/lock.json", "{", 0o600).AddFile("/s/marketplaces.json", "{", 0o600)
 	store, _ := NewStore(host, "/s")
 	if _, err := store.Lock(); err == nil {
 		t.Error("a corrupt lock passed")
@@ -89,7 +89,7 @@ func TestACorruptLockOrRegistryFailsClosed(t *testing.T) {
 }
 
 func TestUnreadableLockAndRegistryFilesFailClosed(t *testing.T) {
-	host := systemtest.New().AddFile("/s/lock.json", "x", 0o600).AddFile("/s/marketplaces.json", "x", 0o600)
+	host := oshosttest.New().AddFile("/s/lock.json", "x", 0o600).AddFile("/s/marketplaces.json", "x", 0o600)
 	store, _ := NewStore(faulty{host, failOn("read")}, "/s")
 	if _, err := store.Lock(); !errors.Is(err, errInjected) {
 		t.Errorf("Lock: %v", err)
@@ -102,7 +102,7 @@ func TestUnreadableLockAndRegistryFilesFailClosed(t *testing.T) {
 func TestWritesFailClosedOnEveryOperation(t *testing.T) {
 	tree := artifact.Tree{{Path: "a/run.sh", Executable: true, Content: []byte("x")}}
 	for _, op := range []string{"mkdir", "write", "rename"} {
-		store, _ := NewStore(faulty{systemtest.New(), failOn(op)}, "/s")
+		store, _ := NewStore(faulty{oshosttest.New(), failOn(op)}, "/s")
 		if err := store.SaveLock(libplugin.EmptyLock()); !errors.Is(err, errInjected) {
 			t.Errorf("SaveLock with %s failing: %v", op, err)
 		}
@@ -110,7 +110,7 @@ func TestWritesFailClosedOnEveryOperation(t *testing.T) {
 			t.Errorf("Put with %s failing: %v", op, err)
 		}
 	}
-	store, _ := NewStore(faulty{systemtest.New(), failOn("removeall")}, "/s")
+	store, _ := NewStore(faulty{oshosttest.New(), failOn("removeall")}, "/s")
 	if err := store.Put(tree); !errors.Is(err, errInjected) {
 		t.Errorf("Put with removeall failing: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestWritesFailClosedOnEveryOperation(t *testing.T) {
 		t.Errorf("Delete: %v", err)
 	}
 	// Only the nested directory of a file fails: the staging directory itself exists.
-	nested := faulty{systemtest.New(), func(op, p string) error {
+	nested := faulty{oshosttest.New(), func(op, p string) error {
 		if op == "mkdir" && strings.HasSuffix(p, "/a") {
 			return errInjected
 		}
@@ -131,7 +131,7 @@ func TestWritesFailClosedOnEveryOperation(t *testing.T) {
 }
 
 func TestPutKeepsAnExistingTreeAndGetVerifiesTheDigest(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	store, _ := NewStore(host, "/s")
 	tree, err := artifact.NewTree([]artifact.File{{Path: "skills/a/SKILL.md", Content: []byte("x")}, {Path: "run.sh", Executable: true, Content: []byte("y")}})
 	if err != nil {

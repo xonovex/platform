@@ -3,11 +3,11 @@ package plugins
 import (
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestDefaultRegistrySelectsADirectoryAndAGitRepository(t *testing.T) {
-	host := systemtest.New().AddDir("/work/plugin")
+	host := oshosttest.New().AddDir("/work/plugin")
 	registry := DefaultRegistry(host)
 	if len(registry) != 2 {
 		t.Fatalf("registry = %v", registry)

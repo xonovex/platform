@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 )
 
 func TestAcceptsAndFetchesAnExistingDirectory(t *testing.T) {
-	host := systemtest.New().AddDir("/abs/plugin").AddDir("/work/rel/plugin")
+	host := oshosttest.New().AddDir("/abs/plugin").AddDir("/work/rel/plugin")
 	origin := New(host)
 	for spec, want := range map[string]string{"/abs/plugin": "/abs/plugin", "/abs/plugin/": "/abs/plugin", "rel/plugin": "/work/rel/plugin"} {
 		if !origin.Accepts(spec) {
@@ -23,7 +23,7 @@ func TestAcceptsAndFetchesAnExistingDirectory(t *testing.T) {
 }
 
 func TestRefusesWhatIsNotADirectory(t *testing.T) {
-	host := systemtest.New().AddFile("/a/file", "x", 0o644)
+	host := oshosttest.New().AddFile("/a/file", "x", 0o644)
 	origin := New(host)
 	for _, spec := range []string{"", "/missing", "/a/file", "https://example.test/x.git"} {
 		if origin.Accepts(spec) {
@@ -35,12 +35,12 @@ func TestRefusesWhatIsNotADirectory(t *testing.T) {
 	}
 }
 
-type brokenCwd struct{ *systemtest.Fake }
+type brokenCwd struct{ *oshosttest.Fake }
 
 func (brokenCwd) Getwd() (string, error) { return "", errors.New("no cwd") }
 
 func TestAFailingWorkingDirectoryRefusesARelativeSource(t *testing.T) {
-	origin := New(brokenCwd{systemtest.New()})
+	origin := New(brokenCwd{oshosttest.New()})
 	if origin.Accepts("rel") {
 		t.Error("Accepts passed without a working directory")
 	}

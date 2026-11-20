@@ -17,18 +17,38 @@ fileGroups:
 tasks:
   go-test-coverage:
     env:
-      GO_COVERAGE_MIN: "99"
+      GO_COVERAGE_MIN: "93"
   go-package-coverage:
     script: |
       set -euo pipefail
       # Every package the module builds is named here. pkg/provision declares
-      # the provisioning port and holds no statements. AvailableIsolations in
-      # pkg/sandbox skips a lookup error that a listed method never returns.
+      # the provisioning port and holds no statements. pkg/oshost is the only
+      # package that touches the host, so go-test-integration covers it.
+      # AvailableIsolations in pkg/sandbox skips a lookup error that a listed
+      # method never returns.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./pkg/credential=100 \
+        ./pkg/credential/env=100 \
+        ./pkg/credential/file=100 \
+        ./pkg/credential/keychain=100 \
+        ./pkg/credential/pass=100 \
+        ./pkg/credential/secretservice=100 \
+        ./pkg/egress/managed=100 \
+        ./pkg/hostlaunch=98 \
         ./pkg/isolation=100 \
+        ./pkg/isolation/bwrap=98 \
+        ./pkg/isolation/docker=98 \
+        ./pkg/isolation/dockersandboxes=98 \
+        ./pkg/isolation/none=100 \
+        ./pkg/isolation/openshell=99 \
+        ./pkg/isolation/seatbelt=96 \
         ./pkg/launch=100 \
+        ./pkg/oshost=exempt \
+        ./pkg/oshost/oshosttest=99 \
         ./pkg/provision=exempt \
+        ./pkg/provision/command=100 \
+        ./pkg/provision/nix=99 \
+        ./pkg/provision/none=100 \
         ./pkg/record=100 \
         ./pkg/sandbox=97
     inputs:
@@ -64,3 +84,33 @@ tasks:
     options:
       cache: false
       mergeDeps: replace
+  # go-test-integration starts real programs, listens on real sockets and makes
+  # real temporary directories, so it is an integration tier rather than a
+  # ci-check gate. The nix closure test also needs NIXPROV_INTEGRATION=1 and
+  # NIXPROV_INTEGRATION_REV, and skips without them.
+  go-test-integration:
+    command:
+      - go
+      - test
+      - -tags=integration
+      - -v
+      - ./pkg/oshost/
+      - ./pkg/egress/managed/
+      - ./pkg/isolation/bwrap/
+      - ./pkg/provision/nix/
+    deps:
+      - go-build
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: false
+      runInCI: false
+  ci-integration:
+    command: noop
+    deps:
+      - go-test-integration
+    options:
+      cache: false
+      runInCI: false

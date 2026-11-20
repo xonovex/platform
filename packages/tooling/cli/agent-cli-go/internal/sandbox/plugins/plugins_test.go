@@ -9,12 +9,12 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	credshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/credential"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
 func TestDefaultRegistry(t *testing.T) {
-	reg := DefaultRegistry(systemtest.New(), testLog)
+	reg := DefaultRegistry(oshosttest.New(), testLog)
 
 	for _, m := range []isolation.IsolationMethod{
 		isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker,
@@ -78,7 +78,7 @@ func TestDefaultRegistry(t *testing.T) {
 }
 
 func TestDefaultCredentials(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.Env["SOURCE"] = "value"
 	registry := DefaultCredentials(host)
 	if got := strings.Join(registry.Schemes(), ","); got != "env,file,keychain,pass,secret-service" {

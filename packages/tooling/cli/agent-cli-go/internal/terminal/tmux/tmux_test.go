@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
@@ -111,11 +111,11 @@ func TestGenerateWindowName(t *testing.T) {
 }
 
 // gitHost records the git output of a repository at /src/xonovex/platform.
-func gitHost(workDir string) *systemtest.Fake {
-	host := systemtest.New()
-	host.Outcomes[systemtest.InDir(workDir, "git rev-parse --show-toplevel")] = systemtest.Outcome{Stdout: "/src/xonovex/platform\n"}
-	host.Outcomes[systemtest.InDir(workDir, "git rev-parse --abbrev-ref HEAD")] = systemtest.Outcome{Stdout: "main\n"}
-	host.Outcomes[systemtest.InDir(workDir, "git rev-parse --short HEAD")] = systemtest.Outcome{Stdout: "c89010f\n"}
+func gitHost(workDir string) *oshosttest.Fake {
+	host := oshosttest.New()
+	host.Outcomes[oshosttest.InDir(workDir, "git rev-parse --show-toplevel")] = oshosttest.Outcome{Stdout: "/src/xonovex/platform\n"}
+	host.Outcomes[oshosttest.InDir(workDir, "git rev-parse --abbrev-ref HEAD")] = oshosttest.Outcome{Stdout: "main\n"}
+	host.Outcomes[oshosttest.InDir(workDir, "git rev-parse --short HEAD")] = oshosttest.Outcome{Stdout: "c89010f\n"}
 	return host
 }
 
@@ -131,7 +131,7 @@ func TestGetGitInfo(t *testing.T) {
 	for _, missing := range []string{"git rev-parse --show-toplevel", "git rev-parse --abbrev-ref HEAD", "git rev-parse --short HEAD"} {
 		t.Run("returns nil without "+missing, func(t *testing.T) {
 			host := gitHost("/work")
-			host.Outcomes[systemtest.InDir("/work", missing)] = systemtest.Outcome{Err: errors.New("not a git repository")}
+			host.Outcomes[oshosttest.InDir("/work", missing)] = oshosttest.Outcome{Err: errors.New("not a git repository")}
 			if info := getGitInfo(host, "/work"); info != nil {
 				t.Errorf("getGitInfo() = %+v, want nil", info)
 			}
@@ -140,7 +140,7 @@ func TestGetGitInfo(t *testing.T) {
 }
 
 func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
-	host := systemtest.New().AddExecutable("/usr/bin/tmux")
+	host := oshosttest.New().AddExecutable("/usr/bin/tmux")
 	host.Env["PATH"] = "/usr/bin"
 
 	if !NewExecutor(host, testLog).IsAvailable() {
@@ -149,7 +149,7 @@ func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
 }
 
 func TestExecutorIsUnavailableWhenTmuxDoesNotResolve(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.Env["PATH"] = "/usr/bin"
 
 	if NewExecutor(host, testLog).IsAvailable() {
@@ -158,7 +158,7 @@ func TestExecutorIsUnavailableWhenTmuxDoesNotResolve(t *testing.T) {
 }
 
 func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	if NewExecutor(host, testLog).IsInside() {
 		t.Error("IsInside() = true, want false when TMUX is empty")
 	}
@@ -172,9 +172,9 @@ func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
 const launchScript = "/tmp/xonovex-agent-terminal-1.sh"
 
 // tmuxHost records a tmux whose session named "session" exists or not.
-func tmuxHost(sessionExists bool) *systemtest.Fake {
-	host := systemtest.New()
-	hasSession := systemtest.Outcome{}
+func tmuxHost(sessionExists bool) *oshosttest.Fake {
+	host := oshosttest.New()
+	hasSession := oshosttest.Outcome{}
 	if !sessionExists {
 		hasSession.Err = errors.New("no session")
 	}
@@ -182,7 +182,7 @@ func tmuxHost(sessionExists bool) *systemtest.Fake {
 	return host
 }
 
-func runCalls(host *systemtest.Fake) []string {
+func runCalls(host *oshosttest.Fake) []string {
 	var lines []string
 	for _, call := range host.Calls {
 		if call.Kind == "run" {
@@ -195,7 +195,7 @@ func runCalls(host *systemtest.Fake) []string {
 func TestExecutorExecuteCreatesADetachedSessionWithoutTheEnvironmentInItsArguments(t *testing.T) {
 	host := tmuxHost(false)
 	newSession := "tmux new-session -d -s session -n window -c /work sh " + launchScript
-	host.Outcomes[newSession] = systemtest.Outcome{}
+	host.Outcomes[newSession] = oshosttest.Outcome{}
 	secret := "provider-secret-value"
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
 
@@ -221,7 +221,7 @@ func TestExecutorExecuteCreatesADetachedSessionWithoutTheEnvironmentInItsArgumen
 func TestExecutorExecuteCreatesAnAttachedSession(t *testing.T) {
 	host := tmuxHost(false)
 	newSession := "tmux new-session -s session -n window -c /work sh " + launchScript
-	host.Outcomes[newSession] = systemtest.Outcome{}
+	host.Outcomes[newSession] = oshosttest.Outcome{}
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window"}
 
 	exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
@@ -247,7 +247,7 @@ func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			host := tmuxHost(true)
 			for _, line := range tt.want {
-				host.Outcomes[line] = systemtest.Outcome{}
+				host.Outcomes[line] = oshosttest.Outcome{}
 			}
 			config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: tt.detach}
 
@@ -266,11 +266,11 @@ func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
 func TestExecutorExecuteRemovesTheScriptWhenTmuxFails(t *testing.T) {
 	tests := []struct {
 		name     string
-		outcome  systemtest.Outcome
+		outcome  oshosttest.Outcome
 		wantCode int
 	}{
-		{"non-zero exit", systemtest.Outcome{ExitCode: 3}, 3},
-		{"start failure", systemtest.Outcome{Err: errors.New("exec failed")}, 1},
+		{"non-zero exit", oshosttest.Outcome{ExitCode: 3}, 3},
+		{"start failure", oshosttest.Outcome{Err: errors.New("exec failed")}, 1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -295,11 +295,11 @@ func TestExecutorExecuteReportsNonZeroWindowAndAttachCodes(t *testing.T) {
 	attach := "tmux attach-session -t session"
 	tests := []struct {
 		name     string
-		outcomes map[string]systemtest.Outcome
+		outcomes map[string]oshosttest.Outcome
 		wantCode int
 	}{
-		{"window fails", map[string]systemtest.Outcome{newWindow: {ExitCode: 2}}, 2},
-		{"attach fails", map[string]systemtest.Outcome{newWindow: {}, attach: {ExitCode: 4}}, 4},
+		{"window fails", map[string]oshosttest.Outcome{newWindow: {ExitCode: 2}}, 2},
+		{"attach fails", map[string]oshosttest.Outcome{newWindow: {}, attach: {ExitCode: 4}}, 4},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -320,9 +320,9 @@ func TestExecutorExecuteReportsNonZeroWindowAndAttachCodes(t *testing.T) {
 
 func TestExecutorExecuteNamesTheSessionAndWindowFromGit(t *testing.T) {
 	host := gitHost("/src/xonovex/platform")
-	host.Outcomes["tmux has-session -t xonovex-platform/main"] = systemtest.Outcome{Err: errors.New("no session")}
+	host.Outcomes["tmux has-session -t xonovex-platform/main"] = oshosttest.Outcome{Err: errors.New("no session")}
 	newSession := "tmux new-session -s xonovex-platform/main -n main/c89010f -c /src/xonovex/platform sh " + launchScript
-	host.Outcomes[newSession] = systemtest.Outcome{}
+	host.Outcomes[newSession] = oshosttest.Outcome{}
 
 	exitCode, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/src/xonovex/platform")
 

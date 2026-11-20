@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
@@ -16,14 +16,14 @@ var testLog = logging.New(io.Discard, io.Discard, false, false)
 
 const splitReply = `{"id":"1","result":{"type":"pane_info","pane":{"pane_id":"w1-3","tab_id":"t1"}}}`
 
-func insideHost() *systemtest.Fake {
-	host := systemtest.New()
+func insideHost() *oshosttest.Fake {
+	host := oshosttest.New()
 	host.Env["HERDR_ENV"] = "1"
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = systemtest.Outcome{Stdout: splitReply}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = oshosttest.Outcome{Stdout: splitReply}
 	return host
 }
 
-func calls(host *systemtest.Fake) []string {
+func calls(host *oshosttest.Fake) []string {
 	var lines []string
 	for _, call := range host.Calls {
 		lines = append(lines, call.Line())
@@ -32,7 +32,7 @@ func calls(host *systemtest.Fake) []string {
 }
 
 func TestExecutorIsAvailableWhenHerdrResolves(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	if NewExecutor(host, testLog).IsAvailable() {
 		t.Error("IsAvailable() = true without herdr")
 	}
@@ -44,7 +44,7 @@ func TestExecutorIsAvailableWhenHerdrResolves(t *testing.T) {
 }
 
 func TestExecutorIsInsideOnlyWhenHerdrSaysSo(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	for value, want := range map[string]bool{"": false, "0": false, "1": true} {
 		host.Env["HERDR_ENV"] = value
 		if got := NewExecutor(host, testLog).IsInside(); got != want {
@@ -54,7 +54,7 @@ func TestExecutorIsInsideOnlyWhenHerdrSaysSo(t *testing.T) {
 }
 
 func TestExecuteRefusesOutsideHerdrWithoutTouchingAnySession(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 
 	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
 
@@ -68,7 +68,7 @@ func TestExecuteRefusesOutsideHerdrWithoutTouchingAnySession(t *testing.T) {
 
 func TestExecuteSplitsTheCurrentPaneAndRunsTheLaunchScript(t *testing.T) {
 	host := insideHost()
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = systemtest.Outcome{}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{}
 
 	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude", "--model", "opus"}, []string{"TOKEN=s3cret"}, "/work")
 
@@ -89,10 +89,10 @@ func TestExecuteSplitsTheCurrentPaneAndRunsTheLaunchScript(t *testing.T) {
 }
 
 func TestExecuteKeepsTheFocusOfTheUserWhenDetached(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.Env["HERDR_ENV"] = "1"
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work", "--no-focus")] = systemtest.Outcome{Stdout: splitReply}
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = systemtest.Outcome{}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work", "--no-focus")] = oshosttest.Outcome{Stdout: splitReply}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{}
 
 	if code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{Detach: true}, []string{"claude"}, nil, "/work"); err != nil || code != 0 {
 		t.Fatalf("Execute() = (%d, %v)", code, err)
@@ -100,10 +100,10 @@ func TestExecuteKeepsTheFocusOfTheUserWhenDetached(t *testing.T) {
 }
 
 func TestExecuteOmitsTheDirectoryWhenThereIsNone(t *testing.T) {
-	host := systemtest.New()
+	host := oshosttest.New()
 	host.Env["HERDR_ENV"] = "1"
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right")] = systemtest.Outcome{Stdout: splitReply}
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = systemtest.Outcome{}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right")] = oshosttest.Outcome{Stdout: splitReply}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{}
 
 	if _, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, ""); err != nil {
 		t.Fatalf("Execute() error = %v", err)
@@ -112,7 +112,7 @@ func TestExecuteOmitsTheDirectoryWhenThereIsNone(t *testing.T) {
 
 func TestExecuteRemovesTheScriptWhenTheSplitFails(t *testing.T) {
 	host := insideHost()
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = systemtest.Outcome{Err: errors.New("no server")}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = oshosttest.Outcome{Err: errors.New("no server")}
 
 	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
 
@@ -126,9 +126,9 @@ func TestExecuteRemovesTheScriptWhenTheSplitFails(t *testing.T) {
 
 func TestExecuteRejectsAReplyWithoutAPane(t *testing.T) {
 	for name, reply := range map[string]string{"not json": "ok", "no pane": `{"result":{}}`} {
-		host := systemtest.New()
+		host := oshosttest.New()
 		host.Env["HERDR_ENV"] = "1"
-		host.Outcomes[systemtest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = systemtest.Outcome{Stdout: reply}
+		host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = oshosttest.Outcome{Stdout: reply}
 
 		if _, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work"); err == nil || !strings.Contains(err.Error(), "named no pane") {
 			t.Errorf("%s: Execute() error = %v, want a missing pane", name, err)
@@ -138,7 +138,7 @@ func TestExecuteRejectsAReplyWithoutAPane(t *testing.T) {
 
 func TestExecuteClosesThePaneThatCannotRunTheCommand(t *testing.T) {
 	host := insideHost()
-	host.Outcomes[systemtest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = systemtest.Outcome{Err: errors.New("pane gone")}
+	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{Err: errors.New("pane gone")}
 
 	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
 

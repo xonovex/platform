@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/oshost/oshosttest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/trust"
 )
 
@@ -151,7 +151,7 @@ func TestProvidersApproveStopsWhenTheLedgerCannotBeOpenedOrWritten(t *testing.T)
 }
 
 // homeless is a host whose home directory cannot be resolved.
-type homeless struct{ *systemtest.Fake }
+type homeless struct{ *oshosttest.Fake }
 
 func (homeless) UserHomeDir() (string, error) { return "", errors.New("no home") }
 
