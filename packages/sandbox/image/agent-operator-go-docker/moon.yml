@@ -10,13 +10,10 @@ fileGroups:
     - /packages/sandbox/operator/agent-operator-go/**/*.go
     - /packages/sandbox/operator/agent-operator-go/go.mod
     - /packages/sandbox/operator/agent-operator-go/go.sum
-    - /packages/library/shared-agent-go/**/*.go
-    - /packages/library/shared-agent-go/**/*.schema.json
-    - /packages/library/shared-agent-go/go.mod
-    - /packages/library/shared-agent-go/go.sum
-    - /packages/library/shared-core-go/**/*.go
-    - /packages/library/shared-core-go/go.mod
-    - /packages/library/shared-core-go/go.sum
+    - /packages/library/*-go/**/*.go
+    - /packages/library/*-go/**/*.json
+    - /packages/library/*-go/go.mod
+    - /packages/library/*-go/go.sum
 tasks:
   docker-build:
     script: bash packages/sandbox/image/agent-operator-go-docker/scripts/docker-build.sh "$workspaceRoot"
@@ -28,10 +25,6 @@ tasks:
       - /packages/sandbox/operator/agent-operator-go/Dockerfile
       - /packages/sandbox/operator/agent-operator-go/go.mod
       - /packages/sandbox/operator/agent-operator-go/go.sum
-      - /packages/library/shared-agent-go/go.mod
-      - /packages/library/shared-agent-go/go.sum
-      - /packages/library/shared-core-go/go.mod
-      - /packages/library/shared-core-go/go.sum
     outputs: []
     options:
       cache: false
@@ -47,10 +40,6 @@ tasks:
       - /packages/sandbox/operator/agent-operator-go/Dockerfile
       - /packages/sandbox/operator/agent-operator-go/go.mod
       - /packages/sandbox/operator/agent-operator-go/go.sum
-      - /packages/library/shared-agent-go/go.mod
-      - /packages/library/shared-agent-go/go.sum
-      - /packages/library/shared-core-go/go.mod
-      - /packages/library/shared-core-go/go.sum
     outputs: []
     options:
       cache: false

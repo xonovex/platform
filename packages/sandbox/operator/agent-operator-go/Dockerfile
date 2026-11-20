@@ -3,9 +3,8 @@ FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27.4-alpine3.24@sha256
 ARG TARGETARCH
 WORKDIR /src
 
-# Copy shared dependencies first (for layer caching)
-COPY packages/library/shared-core-go/go.mod packages/library/shared-core-go/go.sum* packages/library/shared-core-go/
-COPY packages/library/shared-agent-go/go.mod packages/library/shared-agent-go/go.sum* packages/library/shared-agent-go/
+# Copy every shared Go library: a module of the operator reaches any of them through its replace directives
+COPY packages/library/ packages/library/
 
 # Copy operator module and download dependencies
 COPY packages/sandbox/operator/agent-operator-go/go.mod packages/sandbox/operator/agent-operator-go/go.sum packages/sandbox/operator/agent-operator-go/
@@ -15,8 +14,6 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 # Copy source
 WORKDIR /src
-COPY packages/library/shared-core-go/ packages/library/shared-core-go/
-COPY packages/library/shared-agent-go/ packages/library/shared-agent-go/
 COPY packages/sandbox/operator/agent-operator-go/ packages/sandbox/operator/agent-operator-go/
 
 # Build static binary

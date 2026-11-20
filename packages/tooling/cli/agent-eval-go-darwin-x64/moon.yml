@@ -22,10 +22,10 @@ tasks:
       - /packages/tooling/cli/agent-eval-go/package.json
       - /packages/tooling/cli/agent-eval-go/go.mod
       - /packages/tooling/cli/agent-eval-go/go.sum
-      - /packages/library/shared-contract-go/**/*.go
-      - /packages/library/shared-contract-go/**/*.schema.json
-      - /packages/library/shared-contract-go/go.mod
-      - /packages/library/shared-contract-go/go.sum
+      - /packages/library/*-go/**/*.go
+      - /packages/library/*-go/**/*.json
+      - /packages/library/*-go/go.mod
+      - /packages/library/*-go/go.sum
     outputs:
       - bin/
     options:

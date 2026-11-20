@@ -4,8 +4,6 @@ tags:
   - shared
 language: go
 layer: library
-dependsOn:
-  - shared-core-go
 fileGroups:
   # The provider schema is embedded in pkg/providers, so a change to it
   # invalidates the build, the tests and the coverage runs.
@@ -50,9 +48,6 @@ tasks:
       - /packages/library/shared-agent-go/pkg/**/*.json
       - /packages/library/shared-agent-go/go.mod
       - /packages/library/shared-agent-go/go.sum
-      - /packages/library/shared-core-go/**/*.go
-      - /packages/library/shared-core-go/go.mod
-      - /packages/library/shared-core-go/go.sum
       - /.moon/scripts/check-go-package-coverage.sh
       - /.moon/scripts/strip-generated-coverage.sh
     options:
