@@ -10,6 +10,20 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/runconfig"
 )
 
+// nextRunID returns the id the record of a run that starts at started expects,
+// or none when the CLI keeps no records or cannot name one.
+func nextRunID(deps Dependencies, started time.Time) string {
+	if deps.Records == nil {
+		return ""
+	}
+	id, err := deps.Records.NextID(started)
+	if err != nil {
+		deps.Log.Warning("The run has no record id while it runs: " + err.Error())
+		return ""
+	}
+	return id
+}
+
 // writeRecord stores the record of a finished run. A store that fails costs the
 // run its record and never its result, so the failure is a warning.
 func writeRecord(deps Dependencies, res resolution, runID string, started time.Time, result outcome, runErr error) {

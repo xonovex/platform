@@ -199,7 +199,7 @@ func overlayCheck(deps Dependencies, plan Plan) Check {
 	check := Check{Name: "overlay", OK: true}
 	request := *plan.Overlay
 	request.DryRun = true
-	result, err := prepareOverlay(deps.Overlays, Plan{Overlay: &request})
+	result, err := prepareOverlay(deps.Overlays, &request)
 	if err != nil {
 		check.OK, check.Detail = false, err.Error()
 		return check

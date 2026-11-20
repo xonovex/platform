@@ -3,12 +3,10 @@ package launch
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/artifact"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/overlay"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
-	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 )
 
@@ -96,18 +94,6 @@ func planOverlay(options Options, agent *types.AgentConfig, cwd, sourceDir strin
 	return request, nil
 }
 
-// prepareOverlay builds the overlay of the plan. A run without one gets an empty
-// result whose Cleanup does nothing.
-func prepareOverlay(overlays Overlays, plan Plan) (OverlayResult, error) {
-	if plan.Overlay == nil {
-		return OverlayResult{Cleanup: func() {}}, nil
-	}
-	if overlays == nil {
-		return OverlayResult{}, errors.New("the overlay is not available in this build")
-	}
-	return overlays.Prepare(*plan.Overlay)
-}
-
 // applyOverlay adds the environment, the arguments and the mounts of the overlay
 // to run. The overlay arguments come right before userArgs, the arguments of the
 // user that end the argument vector of the process.
@@ -127,15 +113,4 @@ func insertBefore(argv []string, tail int, extra []string) []string {
 	out = append(out, argv[:at]...)
 	out = append(out, extra...)
 	return append(out, argv[at:]...)
-}
-
-// logOverlay reports the overlay of a dry run.
-func logOverlay(log logging.Logger, result OverlayResult) {
-	if len(result.Summary) == 0 {
-		return
-	}
-	log.Info("  Overlay:")
-	for _, line := range result.Summary {
-		log.Info("    " + strings.TrimSpace(line))
-	}
 }

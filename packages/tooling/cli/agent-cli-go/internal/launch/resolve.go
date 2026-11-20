@@ -113,12 +113,6 @@ type resolution struct {
 	planErr error
 }
 
-// ConfigEnv is the environment the configuration of a run is read through.
-// The trust gate asks its question on Out.
-func (d Dependencies) ConfigEnv() runconfig.Env {
-	return runconfig.Env{Host: d.Host, Validator: d.Validator, Out: d.Out}
-}
-
 // configRequest locates the configuration of the options.
 func configRequest(options Options) runconfig.Request {
 	return runconfig.Request{
