@@ -16,6 +16,7 @@ export const updateDependent = (
   packageName: string,
   newVersion: string,
   getGitVersion: () => string | undefined,
+  isReleased: (version: string) => boolean,
 ): DependentUpdate => {
   const pkg: PackageJson = {
     ...depPkg,
@@ -55,9 +56,11 @@ export const updateDependent = (
     };
   }
 
+  // A never-released dependent ships the rewritten reference in its first
+  // release at its current version, which keeps it in step with its own line.
   if (pkg.version && !pkg.private) {
     const gitVersion = getGitVersion();
-    if (gitVersion === pkg.version) {
+    if (gitVersion === pkg.version && isReleased(pkg.version)) {
       const oldVersion = pkg.version;
       pkg.version = bumpVersion(oldVersion, "patch");
       return {

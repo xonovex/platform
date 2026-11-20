@@ -13,6 +13,7 @@ import {
   type WorkspacePackage,
 } from "./lockstep.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
+import {releaseHistory} from "./release.js";
 
 interface LockstepOptions {
   readonly rootDir: string;
@@ -130,6 +131,7 @@ const runLockstep = (options: LockstepOptions): number => {
     bumpType: options.bumpType,
     preid: options.preid,
     exact: options.exact,
+    isReleased: releaseHistory(options.rootDir, options.git),
   });
   const label = options.dryRun ? "[dry-run] " : "[planned] ";
   const changes: FileChange[] = [];

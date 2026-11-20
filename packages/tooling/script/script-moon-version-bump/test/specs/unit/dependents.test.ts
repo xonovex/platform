@@ -14,6 +14,7 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
@@ -35,6 +36,7 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(false);
@@ -53,6 +55,7 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(false);
@@ -70,6 +73,7 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(false);
     expect(result.versionBumped).toBe(false);
@@ -87,6 +91,7 @@ describe("updateDependent", () => {
       "@xonovex/eslint-config",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
@@ -108,6 +113,7 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
@@ -125,6 +131,7 @@ describe("updateDependent", () => {
       "@xonovex/agent-cli-go-linux-x64",
       "1.1.0",
       () => "1.0.0",
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(true);
@@ -148,8 +155,36 @@ describe("updateDependent", () => {
       "@xonovex/core",
       "1.1.0",
       () => undefined as string | undefined,
+      () => true,
     );
     expect(result.depsChanged).toBe(true);
     expect(result.versionBumped).toBe(false);
+  });
+
+  it("keeps a never-released dependent at its version and moves its reference", () => {
+    const pkg = {
+      name: "@xonovex/agent-validate-go",
+      version: "0.1.0",
+      devDependencies: {"@xonovex/ts-config-cli": "0.2.0"},
+    };
+    const asked: string[] = [];
+    const result = updateDependent(
+      pkg,
+      "/path/to/agent-validate-go/package.json",
+      "@xonovex/ts-config-cli",
+      "0.2.1",
+      () => "0.1.0",
+      (version) => {
+        asked.push(version);
+        return false;
+      },
+    );
+    expect(asked).toEqual(["0.1.0"]);
+    expect(result.depsChanged).toBe(true);
+    expect(result.versionBumped).toBe(false);
+    expect(result.pkg.version).toBe("0.1.0");
+    expect(result.pkg.devDependencies?.["@xonovex/ts-config-cli"]).toBe(
+      "0.2.1",
+    );
   });
 });

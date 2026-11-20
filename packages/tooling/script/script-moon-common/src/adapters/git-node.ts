@@ -36,6 +36,7 @@ export const nodeGitRepository = (rootDir: string): GitRepository => {
     hasParent: (commit) =>
       git(["rev-list", "--parents", "-n", "1", commit]).trim().split(" ")
         .length > 1,
+    tags: () => parseGitLines(git(["tag", "--list"])),
     commitsSince: (since, path) =>
       parseCommitLog(
         git([

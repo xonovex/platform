@@ -6,6 +6,7 @@ import {updateDependent} from "./dependents.js";
 import type {FileChange} from "./file-transaction.js";
 import {getGitVersion, type VersionGit} from "./git.js";
 import {planChangelog, serializePackage} from "./package-changes.js";
+import {releaseHistory} from "./release.js";
 
 interface DependentUpdateOptions {
   readonly rootDir: string;
@@ -33,6 +34,7 @@ const planDependentUpdates = (
 ): DependentChangeSet => {
   let updated = 0;
   const changes: FileChange[] = [];
+  const isReleased = releaseHistory(options.rootDir, options.git);
   for (const dependentPath of options.packagePaths) {
     if (dependentPath === options.packagePath) continue;
     const dependent = readPkg(dependentPath, options.fs);
@@ -42,6 +44,7 @@ const planDependentUpdates = (
       options.packageName,
       options.newVersion,
       () => getGitVersion(options.rootDir, dependentPath, options.git),
+      (version) => isReleased(dependentPath, version),
     );
     if (!result.depsChanged) continue;
 

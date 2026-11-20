@@ -8,7 +8,7 @@ import {
   planDependentUpdates,
   type DependentUpdateOptions,
 } from "../../../src/dependents-command.js";
-import {commitAll, gitRepositories} from "../../util/git-repository.js";
+import {commitAll, git, gitRepositories} from "../../util/git-repository.js";
 
 const repository = gitRepositories();
 
@@ -55,6 +55,7 @@ const createRepository = (): {
     "export {};\n",
   );
   commitAll(root, "feat(consumer): add a capability");
+  git(root, ["tag", "consumer-v2.0.0"]);
   return {root, corePath, consumerPath, privatePath};
 };
 
@@ -105,6 +106,20 @@ describe("planDependentUpdates", () => {
     expect(changelog?.content).toContain(
       "- Updated dependency `@xonovex/core` to `1.1.0`",
     );
+  });
+
+  it("rewrites the reference of a never-released dependent and keeps its version", () => {
+    const {root, corePath, consumerPath} = createRepository();
+    git(root, ["tag", "--delete", "consumer-v2.0.0"]);
+
+    const result = planDependentUpdates(
+      dependentOptions(root, [corePath, consumerPath], corePath),
+    );
+
+    expect(result.updated).toBe(1);
+    expect(result.changes.map((change) => change.path)).toEqual([consumerPath]);
+    expect(result.changes[0]?.content).toContain('"@xonovex/core": "1.1.0"');
+    expect(result.changes[0]?.content).toContain('"version": "2.0.0"');
   });
 
   it("plans no file changes for a dry run", () => {

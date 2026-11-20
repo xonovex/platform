@@ -23,8 +23,9 @@ const workspacePackage = (
   headVersion: pkg.version,
 });
 
-// The members depend on each other, and the consumer pins one member exactly,
-// so a lockstep bump moves the consumer reference and patch-bumps it.
+// The members depend on each other, and the consumer pins one member exactly
+// and carries a release tag, so a lockstep bump moves the consumer reference and
+// patch-bumps it.
 const line = (): readonly WorkspacePackage[] => [
   workspacePackage("base", {
     name: "@xonovex/base",
@@ -68,6 +69,7 @@ const options = (
     commitsSince: () => [
       {hash: "abc1234", author: "Ada", message: "feat: add a capability"},
     ],
+    tags: () => ["consumer-v2.0.0"],
   }),
   fs: memoryFileSystem(),
   output: memoryOutput(),
@@ -108,6 +110,38 @@ describe("runLockstep", () => {
     expect(changelog?.content).toContain("## 0.2.0");
     expect(changelog?.content).toContain(
       "- Updated dependency `@xonovex/prettier` to `0.2.0`",
+    );
+  });
+
+  it("moves the reference of a never-released dependent in the same write and keeps its version", () => {
+    const applied: FileChange[][] = [];
+    const output = memoryOutput();
+    const released = options(applied);
+
+    runLockstep(
+      options(applied, {
+        output,
+        git: {...released.git, tags: () => []},
+      }),
+    );
+
+    expect(applied).toHaveLength(1);
+    expect(pathsOf(applied[0])).toEqual(
+      [
+        manifestPath("base"),
+        "/repo/packages/base/CHANGELOG.md",
+        manifestPath("prettier"),
+        "/repo/packages/prettier/CHANGELOG.md",
+        manifestPath("consumer"),
+      ].toSorted(),
+    );
+    const consumer = applied[0]?.find(
+      (change) => change.path === manifestPath("consumer"),
+    );
+    expect(consumer?.content).toContain('"@xonovex/base": "0.2.0"');
+    expect(consumer?.content).toContain('"version": "2.0.0"');
+    expect(output.stdoutLines().join("\n")).toContain(
+      "@xonovex/consumer: 1 reference(s) updated (version unchanged)",
     );
   });
 

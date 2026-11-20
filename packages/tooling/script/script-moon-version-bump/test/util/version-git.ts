@@ -1,8 +1,8 @@
 import type {VersionGit} from "../../src/git.js";
 
 /**
- * A repository with no history: no file at any commit, no path history, and no
- * commits. A case overrides the reads it depends on.
+ * A repository with no history: no file at any commit, no path history, no
+ * commits, and no tags. A case overrides the reads it depends on.
  */
 export const emptyHistory = (
   overrides: Partial<VersionGit> = {},
@@ -11,6 +11,7 @@ export const emptyHistory = (
   pathHistory: () => [],
   hasParent: () => false,
   commitsSince: () => [],
+  tags: () => [],
   ...overrides,
 });
 

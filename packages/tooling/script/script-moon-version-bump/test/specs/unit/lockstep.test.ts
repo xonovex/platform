@@ -6,6 +6,9 @@ import {
   type WorkspacePackage,
 } from "../../../src/lockstep.js";
 
+// Every package of these fixtures counts as released unless a case says not.
+const always = (): boolean => true;
+
 const workspacePackage = (
   directory: string,
   pkg: PackageJson,
@@ -57,6 +60,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.targetVersion).toBe("0.2.0");
@@ -80,6 +84,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.members.map((member) => member.name)).toEqual([
@@ -108,6 +113,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.baseVersion).toBe("0.1.22");
@@ -153,6 +159,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.members[0]?.pkg.optionalDependencies).toEqual({
@@ -188,6 +195,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.dependents).toHaveLength(1);
@@ -222,6 +230,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     const byName = new Map(
@@ -260,6 +269,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.dependents.map((dependent) => dependent.name)).toEqual([
@@ -288,6 +298,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.dependents[0]?.newVersion).toBe("1.4.1");
@@ -316,6 +327,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.dependents[0]?.newVersion).toBeUndefined();
@@ -342,6 +354,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     const nameless = plan.dependents.find((dependent) =>
@@ -378,6 +391,7 @@ describe("planLockstep", () => {
       bumpType: "minor",
       preid: undefined,
       exact: undefined,
+      isReleased: always,
     });
 
     expect(plan.dependents).toEqual([]);
@@ -394,6 +408,7 @@ describe("planLockstep", () => {
         bumpType: "patch",
         preid: undefined,
         exact: "1.0.0",
+        isReleased: always,
       }).targetVersion,
     ).toBe("1.0.0");
     expect(
@@ -403,6 +418,7 @@ describe("planLockstep", () => {
         bumpType: "minor",
         preid: "beta",
         exact: undefined,
+        isReleased: always,
       }).targetVersion,
     ).toBe("0.2.0-beta.0");
   });
@@ -415,6 +431,7 @@ describe("planLockstep", () => {
         bumpType: "minor",
         preid: undefined,
         exact: undefined,
+        isReleased: always,
       }),
     ).toThrow("needs at least one package");
   });
@@ -428,6 +445,7 @@ describe("planLockstep", () => {
         bumpType: "minor",
         preid: undefined,
         exact: undefined,
+        isReleased: always,
       }),
     ).toThrow("unknown lockstep package @xonovex/missing");
 
@@ -438,6 +456,7 @@ describe("planLockstep", () => {
         bumpType: "minor",
         preid: undefined,
         exact: undefined,
+        isReleased: always,
       }),
     ).toThrow("ambiguous lockstep package @xonovex/prettier-config");
 
@@ -448,7 +467,113 @@ describe("planLockstep", () => {
         bumpType: "minor",
         preid: undefined,
         exact: undefined,
+        isReleased: always,
       }),
     ).toThrow("missing a name or version");
+  });
+
+  it("keeps a never-released dependent at its version and moves its exact reference", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("launcher", {
+        name: "@xonovex/launcher",
+        version: "0.1.0",
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+        optionalDependencies: {"@xonovex/launcher-linux-x64": "0.1.0"},
+      }),
+      workspacePackage("launcher-linux-x64", {
+        name: "@xonovex/launcher-linux-x64",
+        version: "0.1.0",
+      }),
+      workspacePackage("released", {
+        name: "@xonovex/released",
+        version: "2.3.0",
+        devDependencies: {"@xonovex/prettier-config": "0.1.22"},
+      }),
+    ];
+    const asked: string[] = [];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "patch",
+      preid: undefined,
+      exact: undefined,
+      isReleased: (path, version) => {
+        asked.push(`${path}@${version}`);
+        return !path.includes("launcher");
+      },
+    });
+
+    const byName = new Map(
+      plan.dependents.map((dependent) => [dependent.name, dependent]),
+    );
+    const launcher = byName.get("@xonovex/launcher");
+    expect(launcher?.newVersion).toBeUndefined();
+    expect(launcher?.previousVersion).toBeUndefined();
+    expect(launcher?.pkg).toEqual({
+      name: "@xonovex/launcher",
+      version: "0.1.0",
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+      optionalDependencies: {"@xonovex/launcher-linux-x64": "0.1.0"},
+    });
+    expect(launcher?.referenceCount).toBe(1);
+    expect(byName.get("@xonovex/released")?.newVersion).toBe("2.3.1");
+    expect(byName.has("@xonovex/launcher-linux-x64")).toBe(false);
+    expect(asked).toContain("/repo/packages/launcher/package.json@0.1.0");
+    expect(asked).toContain("/repo/packages/released/package.json@2.3.0");
+  });
+
+  it("moves members that reference each other with the line, released or not", () => {
+    const asked: string[] = [];
+
+    const plan = planLockstep({
+      packages: cyclicLine(),
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "patch",
+      preid: undefined,
+      exact: undefined,
+      isReleased: (path) => {
+        asked.push(path);
+        return false;
+      },
+    });
+
+    expect(asked).toEqual([]);
+    expect(plan.members.map((member) => member.pkg.version)).toEqual([
+      "0.1.23",
+      "0.1.23",
+    ]);
+    expect(plan.dependents).toEqual([]);
+  });
+
+  it("ends propagation at a never-released dependent", () => {
+    const packages = [
+      ...cyclicLine(),
+      workspacePackage("fresh", {
+        name: "@xonovex/fresh",
+        version: "0.1.0",
+        devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+      }),
+      workspacePackage("holder", {
+        name: "@xonovex/holder",
+        version: "1.0.0",
+        dependencies: {"@xonovex/fresh": "0.1.0"},
+      }),
+    ];
+
+    const plan = planLockstep({
+      packages,
+      names: ["@xonovex/eslint-config-base", "@xonovex/prettier-config"],
+      bumpType: "patch",
+      preid: undefined,
+      exact: undefined,
+      isReleased: (path) => !path.includes("fresh"),
+    });
+
+    expect(plan.dependents.map((dependent) => dependent.name)).toEqual([
+      "@xonovex/fresh",
+    ]);
+    expect(plan.dependents[0]?.newVersion).toBeUndefined();
   });
 });

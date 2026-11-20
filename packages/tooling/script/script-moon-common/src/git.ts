@@ -19,6 +19,8 @@ export interface GitRepository {
   /** The hashes of the commits that touched path, newest first. */
   readonly pathHistory: (path: string) => readonly string[];
   readonly hasParent: (commit: string) => boolean;
+  /** The names of every tag in the repository. */
+  readonly tags: () => readonly string[];
   /**
    * The commits reachable from HEAD that touched path, newest first. A defined
    * since excludes since and every commit it reaches.

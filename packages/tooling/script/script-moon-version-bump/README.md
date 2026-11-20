@@ -43,7 +43,7 @@ Use these options to select the version, affected packages, and changelog behavi
 For a single package, the command applies these changes in order:
 
 1. Bumps the version in `package.json`
-2. Updates all workspace packages that depend on this package
+2. Updates all workspace packages that depend on this package, and patch-bumps each one that was released (see [Released dependents](#released-dependents))
 3. Generates a `CHANGELOG.md` entry from conventional commits since the last version change, and marks each commit whose type carries the `!` breaking-change marker with a `**Breaking:**` prefix
 4. Skips changelog generation when the version was already bumped (idempotency)
 
@@ -56,11 +56,21 @@ npx moon run workspace-config:version-bump-lockstep -- \
   --lockstep eslint-config-base,prettier-config,ts-config-base --type minor --dry-run
 ```
 
-A member is named by its package name (`@xonovex/prettier-config`) or by its project directory (`prettier-config`). The run works from any directory inside the workspace; the moon task above runs it from the workspace root. The per-project `<project>:version-bump` task bumps one package; a release line goes through the workspace task instead of a loop over that task. Run it with `--dry-run` first: the preview names every member, every reference that moves, and every dependent the run patch-bumps.
+A member is named by its package name (`@xonovex/prettier-config`) or by its project directory (`prettier-config`). The run works from any directory inside the workspace; the moon task above runs it from the workspace root. The per-project `<project>:version-bump` task bumps one package; a release line goes through the workspace task instead of a loop over that task. Run it with `--dry-run` first: the preview names every member, every reference that moves, and every dependent the run patch-bumps; a dependent the run does not bump shows `(version unchanged)`.
 
 Semantics:
 
 - The target version is derived from the highest committed version among the members, so a member a peer already patch-bumped in the worktree is lifted to the shared version instead of dragging the line down.
 - Every member is written at the target version, and every exact reference to a member is rewritten, including `optionalDependencies` such as the platform packages of `agent-cli-go`.
-- A package outside the set that holds a reference to a member has that reference rewritten too, and follows the single-package dependent rule: it is patch-bumped once for the whole set when it is public and not already bumped in the worktree, and left at its version when it is private or already bumped. Propagation runs to a fixed point: a patch-bumped dependent is itself held by exact references elsewhere, so those move as well and their holders follow the same rule, until nothing changes. A dependent that keeps its version, because it is private or already bumped, ends the chain.
+- A package outside the set that holds a reference to a member has that reference rewritten too, in the same transaction, and follows the single-package dependent rule: it is patch-bumped once for the whole set when it is public, not already bumped in the worktree, and released, and left at its version when it is private, already bumped, or never released. Propagation runs to a fixed point: a patch-bumped dependent is itself held by exact references elsewhere, so those move as well and their holders follow the same rule, until nothing changes. A dependent that keeps its version ends the chain.
+- A member always moves to the target version, whether it was released or not, and so does every reference that one member holds to another.
 - Each member whose version actually moves gains a `## <version>` changelog section built from the conventional commits since its previous release, followed by the `Updated dependency ... to X` bullets for every internal reference that differs from `HEAD`. Re-running the same lockstep is a no-op and does not stack a second section.
+
+## Released dependents
+
+A dependent is patch-bumped only when Git records a release of it, so a package that was never released keeps its version and ships the rewritten reference in its first release. This keeps a launcher that was never released in step with its platform packages. Git records a release in one of two ways:
+
+- **Version history**: a committed `package.json` of the package holds a version other than its committed version. A version moves only through a version bump, which ships as a release.
+- **Release tag**: a tag `<project directory>-v<version>` exists, such as `agent-cli-go-v0.2.0`. A GitHub release writes this tag, which also records a first release that kept its initial version.
+
+A package with neither record counts as never released. The check reads only the local repository, so fetch the tags before a release run.

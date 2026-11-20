@@ -71,4 +71,16 @@ describe("nodeGitRepository", () => {
       repository.commitsSince(undefined, "pkg").map((record) => record.hash),
     ).toEqual([third, first]);
   });
+
+  it("lists every tag and none in a repository without tags", () => {
+    commit("a.txt", "one", "feat: first");
+    const repository = nodeGitRepository(root);
+
+    expect(repository.tags()).toEqual([]);
+
+    git("tag", "tool-v0.1.0");
+    git("tag", "tool-v0.2.0");
+
+    expect(repository.tags()).toEqual(["tool-v0.1.0", "tool-v0.2.0"]);
+  });
 });

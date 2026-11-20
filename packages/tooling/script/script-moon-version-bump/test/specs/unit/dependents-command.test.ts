@@ -26,8 +26,8 @@ const MANIFESTS = {
   unrelated: {name: "@xonovex/unrelated", version: "1.0.0"},
 } as const;
 
-// HEAD holds every manifest unchanged, so a referencing public package is due
-// a patch bump.
+// HEAD holds every manifest unchanged and every package carries a release tag,
+// so a referencing public package is due a patch bump.
 const options = (
   overrides: Partial<DependentUpdateOptions> = {},
 ): DependentUpdateOptions => ({
@@ -50,6 +50,10 @@ const options = (
         ]),
       ),
     ),
+    tags: () =>
+      Object.entries(MANIFESTS).map(
+        ([name, manifest]) => `${name}-v${manifest.version}`,
+      ),
   }),
   fs: memoryFileSystem({
     files: Object.fromEntries(
@@ -120,6 +124,7 @@ describe("planDependentUpdates", () => {
           readFile: manifestsAtHead({
             "packages/anonymous/package.json": {version: "1.0.0"},
           }),
+          tags: () => ["anonymous-v1.0.0"],
         }),
       }),
     );
@@ -128,5 +133,20 @@ describe("planDependentUpdates", () => {
       result.changes.find((change) => change.path.endsWith("CHANGELOG.md"))
         ?.content,
     ).toContain(`# ${path}`);
+  });
+
+  it("rewrites the reference of a never-released dependent and keeps its version", () => {
+    const result = planDependentUpdates(
+      options({git: emptyHistory({readFile: options().git.readFile})}),
+    );
+
+    expect(result.changes.map((change) => change.path).toSorted()).toEqual(
+      [manifestPath("consumer"), manifestPath("internal")].toSorted(),
+    );
+    const consumer = result.changes.find(
+      (change) => change.path === manifestPath("consumer"),
+    );
+    expect(consumer?.content).toContain('"@xonovex/core": "1.1.0"');
+    expect(consumer?.content).toContain('"version": "2.0.0"');
   });
 });

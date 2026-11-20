@@ -8,7 +8,7 @@ import {
 /** The git reads a version bump makes. */
 export type VersionGit = Pick<
   GitRepository,
-  "readFile" | "pathHistory" | "hasParent" | "commitsSince"
+  "readFile" | "pathHistory" | "hasParent" | "commitsSince" | "tags"
 >;
 
 /** The manifest at pkgPath as HEAD holds it, or undefined when HEAD lacks it. */

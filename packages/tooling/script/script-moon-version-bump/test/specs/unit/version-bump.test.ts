@@ -27,7 +27,8 @@ const workspace = (packages: Readonly<Record<string, unknown>>): FileSystem =>
   });
 
 // Answers the HEAD reads getGitVersion makes. A path without a version is
-// absent at HEAD, which is how a never-committed package looks. The history
+// absent at HEAD, which is how a never-committed package looks. Each committed
+// package carries a release tag, so a dependent counts as released. The history
 // reads throw, so a case that plans a changelog must supply its own.
 const gitAtHead = (versions: Readonly<Record<string, string>>): VersionGit => ({
   readFile: (commit, path) => {
@@ -45,6 +46,10 @@ const gitAtHead = (versions: Readonly<Record<string, string>>): VersionGit => ({
   commitsSince: () => {
     throw new Error("unexpected history read");
   },
+  tags: () =>
+    Object.entries(versions).map(
+      ([path, version]) => `${basename(dirname(path))}-v${version}`,
+    ),
 });
 
 // applyChanges installs into the same tree the reads come from, so a case can

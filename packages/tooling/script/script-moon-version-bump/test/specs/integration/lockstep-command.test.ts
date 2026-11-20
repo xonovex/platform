@@ -19,7 +19,7 @@ const repository = gitRepositories();
 type Manifest = Readonly<Record<string, unknown>>;
 type Manifests = Readonly<Record<string, Manifest>>;
 
-const configLine = (version: string): Manifests => ({
+const configMembers = (version: string): Manifests => ({
   "eslint-config-base": {
     name: "@xonovex/eslint-config-base",
     version,
@@ -30,6 +30,10 @@ const configLine = (version: string): Manifests => ({
     version,
     dependencies: {"@xonovex/eslint-config-base": version},
   },
+});
+
+const configLine = (version: string): Manifests => ({
+  ...configMembers(version),
   consumer: {
     name: "@xonovex/consumer",
     version: "1.4.0",
@@ -44,6 +48,34 @@ const configLine = (version: string): Manifests => ({
     name: "@xonovex/downstream-consumer",
     version: "3.0.0",
     dependencies: {"@xonovex/consumer": "1.4.0"},
+  },
+});
+
+// The consumers above keep one version, so only their release tags record that
+// they were released.
+const CONFIG_RELEASES = ["consumer-v1.4.0", "downstream-consumer-v3.0.0"];
+
+// A launcher that was never released holds an exact reference to a member next
+// to its own platform package. Of the two released dependents, one records its
+// release as a version that moved between the commits, the other as a tag.
+const releaseLine = (version: string): Manifests => ({
+  ...configMembers(version),
+  launcher: {
+    name: "@xonovex/launcher",
+    version: "0.1.0",
+    devDependencies: {"@xonovex/eslint-config-base": version},
+    optionalDependencies: {"@xonovex/launcher-linux-x64": "0.1.0"},
+  },
+  "launcher-linux-x64": {name: "@xonovex/launcher-linux-x64", version: "0.1.0"},
+  "versioned-consumer": {
+    name: "@xonovex/versioned-consumer",
+    version: version === "0.1.21" ? "1.0.0" : "1.1.0",
+    devDependencies: {"@xonovex/prettier-config": version},
+  },
+  "tagged-consumer": {
+    name: "@xonovex/tagged-consumer",
+    version: "2.0.0",
+    devDependencies: {"@xonovex/eslint-config-base": version},
   },
 });
 
@@ -76,7 +108,10 @@ const writeManifests = (root: string, manifests: Manifests): void => {
   }
 };
 
-const createRepository = (line: (version: string) => Manifests): string => {
+const createRepository = (
+  line: (version: string) => Manifests,
+  releaseTags: readonly string[] = [],
+): string => {
   const root = repository("version-lockstep-");
   mkdirSync(join(root, ".moon"));
   writeManifests(root, line("0.1.21"));
@@ -90,6 +125,7 @@ const createRepository = (line: (version: string) => Manifests): string => {
     );
   }
   commitAll(root, "feat(line): add a shared capability");
+  for (const tag of releaseTags) git(root, ["tag", tag]);
   return root;
 };
 
@@ -135,7 +171,7 @@ const changelogAt = (root: string, directory: string): string =>
 
 describe("runLockstep", () => {
   it("moves a dependency cycle to one version in a single write", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     const exitCode = runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"]),
@@ -153,7 +189,7 @@ describe("runLockstep", () => {
   });
 
   it("records the shared version and its dependency updates in each changelog", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"]),
@@ -173,7 +209,7 @@ describe("runLockstep", () => {
   });
 
   it("lifts a member a peer already patch-bumped to the shared version", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
     writeManifests(root, {
       "eslint-config-base": {
         name: "@xonovex/eslint-config-base",
@@ -192,7 +228,7 @@ describe("runLockstep", () => {
   });
 
   it("patch-bumps an out-of-set dependent once and moves both references", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"]),
@@ -209,7 +245,7 @@ describe("runLockstep", () => {
   });
 
   it("propagates a patch-bumped dependent to its own dependents", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"]),
@@ -225,7 +261,7 @@ describe("runLockstep", () => {
   });
 
   it("keeps out-of-set references untouched with --no-dependents", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
@@ -258,7 +294,7 @@ describe("runLockstep", () => {
   });
 
   it("repeats without stacking a second changelog entry", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
     const names = ["eslint-config-base", "prettier-config"];
 
     runLockstep(lockstepOptions(root, names));
@@ -270,7 +306,7 @@ describe("runLockstep", () => {
   });
 
   it("writes nothing during a dry run", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
@@ -289,7 +325,7 @@ describe("runLockstep", () => {
   });
 
   it("honours an explicit changelog base ref and filename", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
     const base = git(root, ["rev-parse", "HEAD~1"]);
 
     runLockstep(
@@ -308,7 +344,7 @@ describe("runLockstep", () => {
   });
 
   it("skips changelog generation on request", () => {
-    const root = createRepository(configLine);
+    const root = createRepository(configLine, CONFIG_RELEASES);
 
     runLockstep(
       lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
@@ -320,5 +356,92 @@ describe("runLockstep", () => {
     expect(
       readdirSync(join(root, "packages", "eslint-config-base")),
     ).not.toContain("CHANGELOG.md");
+  });
+
+  it("keeps a never-released dependent at its version and moves its exact reference", () => {
+    const root = createRepository(releaseLine, ["tagged-consumer-v2.0.0"]);
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        bumpType: "patch",
+      }),
+    );
+
+    expect(manifestAt(root, "launcher")).toEqual({
+      name: "@xonovex/launcher",
+      version: "0.1.0",
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+      optionalDependencies: {"@xonovex/launcher-linux-x64": "0.1.0"},
+    });
+    expect(readdirSync(join(root, "packages", "launcher"))).not.toContain(
+      "CHANGELOG.md",
+    );
+    expect(manifestAt(root, "launcher-linux-x64").version).toBe("0.1.0");
+  });
+
+  it("still patch-bumps a dependent whose version moved or that carries a release tag", () => {
+    const root = createRepository(releaseLine, ["tagged-consumer-v2.0.0"]);
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        bumpType: "patch",
+      }),
+    );
+
+    expect(manifestAt(root, "versioned-consumer")).toMatchObject({
+      version: "1.1.1",
+      devDependencies: {"@xonovex/prettier-config": "0.1.23"},
+    });
+    expect(changelogAt(root, "versioned-consumer")).toContain("## 1.1.1");
+    expect(manifestAt(root, "tagged-consumer")).toMatchObject({
+      version: "2.0.1",
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+    });
+    expect(changelogAt(root, "tagged-consumer")).toContain("## 2.0.1");
+  });
+
+  it("moves members that reference each other with the line, released or not", () => {
+    const root = createRepository(releaseLine);
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        bumpType: "patch",
+      }),
+    );
+
+    expect(manifestAt(root, "eslint-config-base")).toMatchObject({
+      version: "0.1.23",
+      devDependencies: {"@xonovex/prettier-config": "0.1.23"},
+    });
+    expect(manifestAt(root, "prettier-config")).toMatchObject({
+      version: "0.1.23",
+      dependencies: {"@xonovex/eslint-config-base": "0.1.23"},
+    });
+    expect(manifestAt(root, "tagged-consumer").version).toBe("2.0.0");
+  });
+
+  it("names the never-released dependent and writes nothing on a dry run", () => {
+    const root = createRepository(releaseLine, ["tagged-consumer-v2.0.0"]);
+    const output = memoryOutput();
+
+    runLockstep(
+      lockstepOptions(root, ["eslint-config-base", "prettier-config"], {
+        bumpType: "patch",
+        dryRun: true,
+        output,
+      }),
+    );
+
+    const printed = output.stdoutLines().join("\n");
+    expect(printed).toContain(
+      "@xonovex/launcher: 1 reference(s) updated (version unchanged)",
+    );
+    expect(printed).toContain(
+      "@xonovex/tagged-consumer: 1 reference(s) updated (2.0.0 -> 2.0.1)",
+    );
+    expect(manifestAt(root, "launcher")).toMatchObject({
+      devDependencies: {"@xonovex/eslint-config-base": "0.1.22"},
+    });
+    expect(git(root, ["status", "--porcelain"])).toBe("");
   });
 });

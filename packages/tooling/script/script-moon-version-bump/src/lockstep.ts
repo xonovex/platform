@@ -1,6 +1,7 @@
 import {basename, dirname} from "node:path";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {bumpVersion, compareVersions, type BumpType} from "./bump.js";
+import type {ReleasePredicate} from "./release.js";
 
 interface WorkspacePackage {
   readonly path: string;
@@ -38,6 +39,7 @@ interface LockstepRequest {
   readonly bumpType: BumpType;
   readonly preid: string | undefined;
   readonly exact: string | undefined;
+  readonly isReleased: ReleasePredicate;
 }
 
 interface ResolvedMember {
@@ -166,14 +168,20 @@ const selectBaseVersion = (members: readonly ResolvedMember[]): string => {
   );
 };
 
-// A dependent earns a version of its own only when it is publishable and the
-// worktree has not already bumped it away from its committed version.
-const dependentVersionOf = (entry: WorkspacePackage): string | undefined => {
+// A dependent earns a version of its own only when it is publishable, the
+// worktree has not already bumped it away from its committed version, and it was
+// released: a never-released package ships the rewritten reference in its first
+// release at its current version, which keeps it in step with its own line.
+const dependentVersionOf = (
+  entry: WorkspacePackage,
+  isReleased: ReleasePredicate,
+): string | undefined => {
   const currentVersion = entry.pkg.version;
   if (
     currentVersion === undefined ||
     entry.pkg.private === true ||
-    entry.headVersion !== currentVersion
+    entry.headVersion !== currentVersion ||
+    !isReleased(entry.path, currentVersion)
   )
     return undefined;
   return bumpVersion(currentVersion, "patch");
@@ -186,6 +194,7 @@ const resolveVersions = (
   packages: readonly WorkspacePackage[],
   memberPaths: ReadonlySet<string>,
   memberVersions: ReadonlyMap<string, string>,
+  isReleased: ReleasePredicate,
 ): ReadonlyMap<string, string> => {
   const resolved = new Map(memberVersions);
   let settled = false;
@@ -202,7 +211,7 @@ const resolveVersions = (
         rewriteReferences(entry.pkg, resolved).changed === 0
       )
         continue;
-      const newVersion = dependentVersionOf(entry);
+      const newVersion = dependentVersionOf(entry, isReleased);
       if (newVersion === undefined) continue;
       resolved.set(name, newVersion);
       settled = false;
@@ -245,6 +254,7 @@ const planLockstep = (request: LockstepRequest): LockstepPlan => {
     request.packages,
     memberPaths,
     new Map(members.map((member) => [member.name, targetVersion])),
+    request.isReleased,
   );
 
   const memberPlans = members.map((member) => ({

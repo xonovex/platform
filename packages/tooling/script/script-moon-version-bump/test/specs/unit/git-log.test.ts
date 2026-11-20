@@ -1,6 +1,7 @@
 import {describe, expect, it} from "vitest";
 import {
   findChangelogRange,
+  findPreviousVersionCommit,
   getCommitsSince,
   isIncludedType,
   parseConventionalCommit,
@@ -29,6 +30,7 @@ const recordedGit = (recording: {
         }),
   hasParent: (commit) => (recording.parents ?? []).includes(commit),
   commitsSince: recording.commits ?? (() => []),
+  tags: () => [],
 });
 
 describe("parseConventionalCommit", () => {
@@ -68,6 +70,27 @@ describe("isIncludedType", () => {
     expect(isIncludedType("feat")).toBe(true);
     expect(isIncludedType("chore")).toBe(false);
     expect(isIncludedType("chore", new Set(["chore"]))).toBe(true);
+  });
+});
+
+describe("findPreviousVersionCommit", () => {
+  it("finds the newest commit that holds another version", () => {
+    const git = recordedGit({
+      hashes: ["c4", "c3", "c2", "c1"],
+      versions: {c4: "0.2.0", c3: "0.2.0", c2: "0.1.0", c1: "0.0.1"},
+      absent: ["c3"],
+    });
+
+    expect(findPreviousVersionCommit(PKG, "0.2.0", git)).toBe("c2");
+  });
+
+  it("finds none for a package that only ever held one version", () => {
+    const git = recordedGit({
+      hashes: ["c2", "c1"],
+      versions: {c2: "0.1.0", c1: "0.1.0"},
+    });
+
+    expect(findPreviousVersionCommit(PKG, "0.1.0", git)).toBeUndefined();
   });
 });
 

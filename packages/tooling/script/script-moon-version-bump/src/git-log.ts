@@ -34,6 +34,36 @@ const isIncludedType = (
   includedTypes?: ReadonlySet<string>,
 ): boolean => (includedTypes ?? INCLUDED_TYPES).has(type);
 
+// The first of hashes, newest first, whose manifest at path holds a version
+// other than version.
+const firstOtherVersion = (
+  path: string,
+  hashes: readonly string[],
+  version: string,
+  git: Pick<GitRepository, "readFile">,
+): string | undefined =>
+  hashes.find((hash) => {
+    const oldPkgJson = git.readFile(hash, path);
+    return (
+      oldPkgJson !== undefined &&
+      parsePackageJson(oldPkgJson, `${hash}:${path}`).version !== version
+    );
+  });
+
+/**
+ * The newest commit whose manifest in pkgDir holds a version other than
+ * version, or undefined when every committed manifest holds it: the package
+ * was never versioned.
+ */
+const findPreviousVersionCommit = (
+  pkgDir: string,
+  version: string,
+  git: Pick<GitRepository, "pathHistory" | "readFile">,
+): string | undefined => {
+  const path = `${pkgDir}/package.json`;
+  return firstOtherVersion(path, git.pathHistory(path), version, git);
+};
+
 const findChangelogRange = (
   pkgDir: string,
   currentVersion: string,
@@ -42,15 +72,8 @@ const findChangelogRange = (
   // The first historical package version that differs bounds the current release.
   const path = `${pkgDir}/package.json`;
   const hashes = git.pathHistory(path);
-
-  for (const hash of hashes) {
-    const oldPkgJson = git.readFile(hash, path);
-    if (oldPkgJson === undefined) continue;
-    const oldVersion = parsePackageJson(oldPkgJson, `${hash}:${path}`).version;
-    if (oldVersion !== currentVersion) {
-      return {since: hash};
-    }
-  }
+  const previous = firstOtherVersion(path, hashes, currentVersion, git);
+  if (previous !== undefined) return {since: previous};
 
   // A never-versioned package starts before the commit that introduced it, and
   // a root commit has no parent to name, so its range is the whole history.
@@ -85,6 +108,7 @@ const getCommitsSince = (
 
 export {
   findChangelogRange,
+  findPreviousVersionCommit,
   getCommitsSince,
   parseConventionalCommit,
   isIncludedType,
