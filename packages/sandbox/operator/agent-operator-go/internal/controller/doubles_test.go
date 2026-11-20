@@ -7,9 +7,16 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	launchiso "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	launchprov "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-launch-go/pkg/sandbox"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/launch"
 	provshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provision/shared"
 	wsshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
@@ -52,11 +59,26 @@ func (l *eventLog) reasons() []string {
 	return reasons
 }
 
-// stubHarness runs the agent type as the binary with the provider args.
-type stubHarness struct{ agent agentv1alpha1.AgentType }
+// podDouble is a confinement that bounds the agent like a pod.
+type podDouble struct{}
 
-func (h stubHarness) Command(_ *agentv1alpha1.AgentRun, providerCliArgs []string) ([]string, []string, error) {
-	return []string{string(h.agent)}, append([]string{}, providerCliArgs...), nil
+func (podDouble) PinnedProvision(provision.ProvisionMethod, bool, string) bool { return true }
+func (podDouble) HidesHost(bool, string) bool                                  { return true }
+func (podDouble) KernelIsolated(string) bool                                   { return true }
+func (podDouble) ConfinesNetwork() bool                                        { return true }
+func (podDouble) EgressTransport() network.EgressTransport                     { return network.TransportNone }
+func (podDouble) Bounded() bool                                                { return true }
+func (podDouble) AcceptsHostBinds() bool                                       { return false }
+
+// imageDouble is a provisioner that leaves every tool to the image.
+type imageDouble struct{}
+
+func (imageDouble) Contribute(launchprov.Input) (provision.Contribution, error) {
+	return provision.Contribution{}, nil
+}
+func (imageDouble) Pinned() bool { return false }
+func (imageDouble) CheckAgent(provision.Contribution, *types.AgentConfig) (bool, error) {
+	return false, nil
 }
 
 // stubVCS is a VCS strategy whose scripts carry the workspace type.
@@ -77,23 +99,26 @@ func (t stubToolchain) Image() string { return t.image }
 
 func (stubToolchain) Pinned() bool { return true }
 
-// stubRegistry registers the claude and opencode harnesses, the git and jj
-// workspaces and an image-only toolchain.
+// stubRegistry registers the harnesses of the shipped agent facts, a pod
+// sandbox, the git and jj workspaces and an image-only toolchain.
 type stubRegistry struct{}
+
+func (stubRegistry) Harness(agent agentv1alpha1.AgentType) (*types.AgentConfig, error) {
+	return agents.GetAgent(types.AgentType(agent))
+}
+
+func (stubRegistry) Sandbox([]string) launch.Sandbox {
+	registry := sandbox.NewRegistry[launchiso.Confinement]().
+		RegisterIsolator("pod", func() launchiso.Confinement { return podDouble{} }).
+		RegisterProvisioner(provision.ProvisionNone, func() launchprov.Provisioner { return imageDouble{} })
+	return launch.Sandbox{Registry: registry, Isolation: "pod", Provision: provision.ProvisionNone}
+}
 
 func (stubRegistry) ResolveToolchain(spec *agentv1alpha1.ToolchainSpec) provshared.Toolchain {
 	if spec == nil || spec.Nix == nil {
 		return nil
 	}
 	return stubToolchain{image: spec.Nix.Image}
-}
-
-func (stubRegistry) ResolveHarnessCommand(agent agentv1alpha1.AgentType) (harnessshared.CommandBuilder, error) {
-	switch agent {
-	case agentv1alpha1.AgentTypeClaude, agentv1alpha1.AgentTypeOpencode:
-		return stubHarness{agent: agent}, nil
-	}
-	return nil, fmt.Errorf("unknown agent type %q", agent)
 }
 
 func (stubRegistry) ResolveVCSStrategy(wsType agentv1alpha1.WorkspaceType) (wsshared.VCSStrategy, error) {
@@ -119,6 +144,7 @@ func newRunHarness(objects ...any) runHarness {
 		Store:      h.store,
 		Toolchains: stubRegistry{},
 		Harnesses:  stubRegistry{},
+		Sandboxes:  stubRegistry{},
 		VCS:        stubRegistry{},
 		Events:     h.events,
 		Clock:      h.clock,

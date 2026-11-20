@@ -26,11 +26,11 @@ var sharedAxes = map[string]reflect.Type{
 }
 
 // operatorOnlyAxes are the deliberate asymmetries: true for an axis only the
-// operator realizes, false for one it must not have. The operator renders the
-// harness command and the provider environment into a Job itself, and it runs
-// pods, not terminals.
+// operator realizes, false for one it must not have. The operator resolves the
+// provider of a run from its own resources, takes the harness from the shared
+// agent facts, and runs pods, not terminals.
 var operatorOnlyAxes = map[string]bool{
-	"harness":  true,
+	"harness":  false,
 	"provider": true,
 	"terminal": false,
 }

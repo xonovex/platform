@@ -1,0 +1,125 @@
+metadata:
+  labels:
+    agent.xonovex.com/agent-type: claude
+    app.kubernetes.io/component: agent-run
+    app.kubernetes.io/instance: golden-run
+    app.kubernetes.io/name: agent-operator
+  name: golden-run
+  namespace: default
+spec:
+  activeDeadlineSeconds: 3600
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        agent.xonovex.com/agent-type: claude
+        app.kubernetes.io/component: agent-run
+        app.kubernetes.io/instance: golden-run
+        app.kubernetes.io/name: agent-operator
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - --permission-mode
+        - bypassPermissions
+        - -p
+        - Review the codebase
+        command:
+        - claude
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
+        image: ghcr.io/xonovex/agent@sha256:abc
+        name: agent
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /home/agent
+          name: home
+        workingDir: /workspace
+      initContainers:
+      - args:
+        - -c
+        - |
+          set -e
+          cd /workspace
+          git clone --branch 'main' --single-branch --depth 1 -- 'https://github.com/example/repo.git' .
+          post-clone git
+        command:
+        - sh
+        env:
+        - name: HOME
+          value: /home/agent
+        - name: XDG_CONFIG_HOME
+          value: /home/agent/.config
+        - name: XDG_CACHE_HOME
+          value: /home/agent/.cache
+        - name: XDG_STATE_HOME
+          value: /home/agent/.local/state
+        image: ghcr.io/xonovex/agent@sha256:abc
+        name: git-clone
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace
+        - mountPath: /home/agent
+          name: home
+        - mountPath: /tmp
+          name: tmp
+      restartPolicy: Never
+      runtimeClassName: gvisor
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: agent-runner
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: golden-pvc
+      - emptyDir: {}
+        name: tmp
+      - emptyDir: {}
+        name: home
+  ttlSecondsAfterFinished: 3600
+status: {}

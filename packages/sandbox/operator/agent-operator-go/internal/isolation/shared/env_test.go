@@ -5,12 +5,13 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
 func TestBuildEnvVars_Empty(t *testing.T) {
 	run := &agentv1alpha1.AgentRun{}
-	envVars := buildEnvVars(run, nil)
+	envVars := buildEnvVars(run, nil, isoshared.Process{})
 
 	if len(envVars) != 0 {
 		t.Errorf("len(envVars) = %d, want 0", len(envVars))
@@ -24,7 +25,7 @@ func TestBuildEnvVars_ProviderOnly(t *testing.T) {
 		{Name: "KEY2", Value: "val2"},
 	}
 
-	envVars := buildEnvVars(run, providerEnv)
+	envVars := buildEnvVars(run, providerEnv, isoshared.Process{})
 
 	envMap := make(map[string]string)
 	for _, e := range envVars {
@@ -48,7 +49,7 @@ func TestBuildEnvVars_SpecEnv(t *testing.T) {
 		},
 	}
 
-	envVars := buildEnvVars(run, nil)
+	envVars := buildEnvVars(run, nil, isoshared.Process{})
 
 	if len(envVars) != 1 {
 		t.Fatalf("len(envVars) = %d, want 1", len(envVars))
@@ -70,7 +71,7 @@ func TestBuildEnvVars_CombinesProviderAndSpec(t *testing.T) {
 		{Name: "PROVIDER_VAR", Value: "from-provider"},
 	}
 
-	envVars := buildEnvVars(run, providerEnv)
+	envVars := buildEnvVars(run, providerEnv, isoshared.Process{})
 
 	envMap := make(map[string]string)
 	for _, e := range envVars {

@@ -9,6 +9,7 @@ import (
 
 	ctrl "sigs.k8s.io/controller-runtime"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/controller"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
@@ -55,7 +56,7 @@ func (systemClock) Now() time.Time { return time.Now() }
 func SetupControllers(mgr ctrl.Manager, config Config) error {
 	store := kube.NewStore(mgr.GetClient())
 	events := kube.NewEventRecorder(mgr.GetEventRecorder(eventSource))
-	registry := plugins.Registry{}
+	registry := plugins.New(agents.Embedded())
 	reconcilers := []struct {
 		name  string
 		setup func(ctrl.Manager) error
@@ -64,6 +65,7 @@ func SetupControllers(mgr ctrl.Manager, config Config) error {
 			Store:      store,
 			Toolchains: registry,
 			Harnesses:  registry,
+			Sandboxes:  registry,
 			VCS:        registry,
 			Events:     events,
 			Clock:      systemClock{},
@@ -97,7 +99,7 @@ func SetupControllers(mgr ctrl.Manager, config Config) error {
 // may name.
 func SetupWebhooks(mgr ctrl.Manager, presets providers.Catalog) error {
 	store := kube.NewStore(mgr.GetClient())
-	registry := plugins.Registry{}
+	registry := plugins.New(agents.Embedded())
 	webhooks := []struct {
 		name  string
 		setup func(ctrl.Manager) error

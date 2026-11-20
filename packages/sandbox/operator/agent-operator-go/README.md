@@ -77,7 +77,7 @@ Use these fields to define or reference each execution concern and its runtime l
 | `workspace` | object | Inline workspace config (mutually exclusive with `workspaceRef`) |
 | `toolchainRef` | string | Name of an AgentToolchain in the same namespace |
 | `toolchain` | object | Inline toolchain config (mutually exclusive with `toolchainRef`) |
-| `prompt` | string | Task prompt for headless execution |
+| `prompt` | string | Task prompt for headless execution; the harness must declare a non-interactive run, and the prompt must not start with `-` |
 | `resources` | object | K8s resource requirements applied to the agent and its init containers |
 | `timeout` | duration | Positive max run duration (default: `1h`) |
 | `env` | list | Additional environment variables; Secret refs require policy allowlisting |
@@ -112,7 +112,7 @@ Use these fields to set defaults that an `AgentRun` can inherit through `harness
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `type` | string | Agent type (`claude`, `opencode`) |
+| `type` | string | Agent type of the shared agent facts (`claude`, `codex`, `copilot`, `kiro`, `opencode`, `pi`) |
 | `defaultProvider` | string | Default provider name |
 | `defaultImage` | string | Default digest-pinned agent image |
 | `defaultResources` | object | Default resource requirements |
@@ -155,8 +155,8 @@ Use these fields to select a provider preset or define its credential and enviro
 | `displayName` | string | Human-readable name |
 | `authTokenSecretRef` | object | Secret reference for the auth token |
 | `authTokenEnv` | string | Credential destination; supplied by the provider file of a preset when omitted |
-| `environment` | map | Environment variables to set |
-| `cliArgs` | list | Additional CLI arguments |
+| `environment` | map | Environment variables to set; only for an agent that reads the provider environment |
+| `cliArgs` | list | Additional CLI arguments; only for an agent that takes provider arguments |
 
 ### AgentWorkspace
 

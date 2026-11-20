@@ -501,7 +501,7 @@ func TestE2E_Kata_FullCycleWithGitClone(t *testing.T) {
 	}
 
 	// Prompt args
-	wantArgs := []string{"--permission-mode", "bypassPermissions", "--print", "--prompt", "echo test-prompt"}
+	wantArgs := []string{"--permission-mode", "bypassPermissions", "-p", "echo test-prompt"}
 	if len(mainC.Args) != len(wantArgs) {
 		t.Errorf("main container args = %v, want %v", mainC.Args, wantArgs)
 	} else {

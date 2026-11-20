@@ -1,25 +1,29 @@
-// Package provider is the provider axis: it resolves an AgentRun's model-provider
-// configuration (inline or referenced) into the environment the agent container
-// needs while preserving Secret references.
+// Package provider is the provider axis: it resolves the model provider of an
+// AgentRun (inline or referenced) into the route of the shared plan, and renders
+// the environment of that route with Secret references, never Secret values.
 package provider
 
 import (
 	"context"
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	sharedtypes "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
-// ResolvedProvider contains the environment and command arguments contributed by a model provider.
-type ResolvedProvider struct {
-	Environment []corev1.EnvVar
-	CliArgs     []string
+// Route is the model provider of a run and the Secret that holds its
+// credential. Provider is nil when the run names no provider; AuthSecret is nil
+// when the provider takes no credential.
+type Route struct {
+	Provider   *sharedtypes.ModelProvider
+	AuthSecret *agentv1alpha1.SecretKeyRef
 }
 
 // Reader reads the AgentProvider and the Secret a provider resolution names.
@@ -28,137 +32,130 @@ type Reader interface {
 	GetSecret(ctx context.Context, key types.NamespacedName) (*corev1.Secret, error)
 }
 
-// ResolveProvider resolves the provider configuration for an agent execution. A
-// presetRef names a portable provider of presets, the catalog the operator loaded
-// from its providers directory.
-func ResolveProvider(ctx context.Context, reader Reader, presets providers.Catalog, run *agentv1alpha1.AgentRun, defaultProvider string) (ResolvedProvider, error) {
-	env := make(map[string]string)
-
-	// Use inline provider if specified.
+// ResolveProvider resolves the provider route of a run: the inline provider,
+// else the AgentProvider the run names, else defaultProvider. A presetRef names
+// a portable provider of presets, the catalog the operator loaded from its
+// providers directory.
+func ResolveProvider(ctx context.Context, reader Reader, presets providers.Catalog, run *agentv1alpha1.AgentRun, defaultProvider string) (Route, error) {
 	if run.Spec.Provider != nil {
-		return resolveInlineProvider(ctx, reader, presets, run.Namespace, run.Spec.Provider)
+		spec := run.Spec.Provider
+		route, err := buildRoute(presets, providerFields{
+			name: spec.PresetRef, presetRef: spec.PresetRef, agentType: spec.AgentType,
+			authSecret: spec.AuthSecretRef, authTokenEnv: spec.AuthTokenEnv, environment: spec.Environment, cliArgs: spec.CliArgs,
+		})
+		if err != nil {
+			return Route{}, err
+		}
+		if err := validateAuthToken(ctx, reader, run.Namespace, route); err != nil {
+			return Route{}, fmt.Errorf("failed to resolve inline auth token: %w", err)
+		}
+		return route, nil
 	}
 
-	// Use provider ref if specified.
 	providerRef := run.Spec.ProviderRef
 	if providerRef == "" {
-		providerRef = defaultProvider // from harness
+		providerRef = defaultProvider
 	}
 	if providerRef == "" {
-		return ResolvedProvider{}, nil
+		return Route{}, nil
 	}
-
 	provider, err := reader.GetAgentProvider(ctx, types.NamespacedName{Name: providerRef, Namespace: run.Namespace})
 	if err != nil {
-		return ResolvedProvider{}, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
+		return Route{}, fmt.Errorf("failed to get provider %s: %w", providerRef, err)
 	}
-
-	preset, err := mergePreset(env, presets, provider.Spec.PresetRef, provider.Spec.AgentType)
+	spec := provider.Spec
+	route, err := buildRoute(presets, providerFields{
+		name: providerRef, displayName: spec.DisplayName, presetRef: spec.PresetRef, agentType: spec.AgentType,
+		authSecret: spec.AuthTokenSecretRef, authTokenEnv: spec.AuthTokenEnv, environment: spec.Environment, cliArgs: spec.CliArgs,
+	})
 	if err != nil {
-		return ResolvedProvider{}, err
+		return Route{}, err
 	}
-	cliArgs := append(preset.cliArgs, provider.Spec.CliArgs...)
-
-	// Copy environment from provider spec (overrides preset).
-	for k, v := range provider.Spec.Environment {
-		env[k] = v
+	if err := validateAuthToken(ctx, reader, run.Namespace, route); err != nil {
+		return Route{}, fmt.Errorf("failed to resolve auth token: %w", err)
 	}
-
-	authTokenEnv := provider.Spec.AuthTokenEnv
-	if authTokenEnv == "" {
-		authTokenEnv = preset.authTokenEnv
-	}
-	if err := validateAuthToken(ctx, reader, run.Namespace, authTokenEnv, provider.Spec.AuthTokenSecretRef, env); err != nil {
-		return ResolvedProvider{}, fmt.Errorf("failed to resolve auth token: %w", err)
-	}
-
-	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, provider.Spec.AuthTokenSecretRef), CliArgs: cliArgs}, nil
+	return route, nil
 }
 
-func resolveInlineProvider(ctx context.Context, reader Reader, presets providers.Catalog, namespace string, spec *agentv1alpha1.ProviderSpec) (ResolvedProvider, error) {
-	env := make(map[string]string)
-
-	preset, err := mergePreset(env, presets, spec.PresetRef, spec.AgentType)
-	if err != nil {
-		return ResolvedProvider{}, err
-	}
-	cliArgs := append(preset.cliArgs, spec.CliArgs...)
-
-	for k, v := range spec.Environment {
-		env[k] = v
-	}
-
-	authTokenEnv := spec.AuthTokenEnv
-	if authTokenEnv == "" {
-		authTokenEnv = preset.authTokenEnv
-	}
-	if err := validateAuthToken(ctx, reader, namespace, authTokenEnv, spec.AuthSecretRef, env); err != nil {
-		return ResolvedProvider{}, fmt.Errorf("failed to resolve inline auth token: %w", err)
-	}
-
-	return ResolvedProvider{Environment: environmentVariables(env, authTokenEnv, spec.AuthSecretRef), CliArgs: cliArgs}, nil
+// providerFields are the fields an inline provider and an AgentProvider share.
+type providerFields struct {
+	name, displayName, presetRef, agentType, authTokenEnv string
+	authSecret                                            *agentv1alpha1.SecretKeyRef
+	environment                                           map[string]string
+	cliArgs                                               []string
 }
 
-func environmentVariables(values map[string]string, authTokenEnv string, authSecretRef *agentv1alpha1.SecretKeyRef) []corev1.EnvVar {
-	keys := make([]string, 0, len(values))
-	for key := range values {
-		keys = append(keys, key)
+// buildRoute layers the fields of a provider over its preset: the environment
+// overrides the preset environment, the arguments follow the preset arguments,
+// and authTokenEnv overrides the credential target of the preset. The route
+// names a credential target only when a Secret holds the credential, and never
+// a host variable: the kubelet reads the credential from the Secret.
+func buildRoute(presets providers.Catalog, fields providerFields) (Route, error) {
+	agentType := sharedtypes.AgentType(fields.agentType)
+	if agentType == "" {
+		agentType = sharedtypes.AgentClaude
 	}
-	sort.Strings(keys)
+	route := &sharedtypes.ModelProvider{Name: fields.name, DisplayName: fields.displayName, AgentType: agentType, Portable: true, Environment: map[string]string{}}
+	if route.Name == "" {
+		route.Name = "inline"
+	}
+	credentialTarget := ""
+	if fields.presetRef != "" {
+		preset, err := presets.ResolvePortable(fields.presetRef, agentType)
+		if err != nil {
+			return Route{}, fmt.Errorf("provider preset %q is unavailable for agent type %q: %w", fields.presetRef, agentType, err)
+		}
+		maps.Copy(route.Environment, preset.Environment)
+		route.CliArgs = slices.Clone(preset.CliArgs)
+		route.Slots = slices.Clone(preset.Slots)
+		credentialTarget = preset.CredentialTargetEnv
+	}
+	maps.Copy(route.Environment, fields.environment)
+	route.CliArgs = append(route.CliArgs, fields.cliArgs...)
+	if fields.authTokenEnv != "" {
+		credentialTarget = fields.authTokenEnv
+	}
+	if fields.authSecret != nil {
+		route.CredentialTargetEnv = credentialTarget
+	}
+	return Route{Provider: route, AuthSecret: fields.authSecret}, nil
+}
 
-	env := make([]corev1.EnvVar, 0, len(values)+1)
-	for _, key := range keys {
-		env = append(env, corev1.EnvVar{Name: key, Value: values[key]})
+// Environment renders the provider environment agent reads from route: the
+// planned values sorted by name, then the credential as a reference to its
+// Secret.
+func Environment(agent *sharedtypes.AgentConfig, route Route) []corev1.EnvVar {
+	plan := agentcmd.PlanProviderEnv(agent, route.Provider)
+	env := make([]corev1.EnvVar, 0, len(plan.Values)+1)
+	for _, name := range slices.Sorted(maps.Keys(plan.Values)) {
+		env = append(env, corev1.EnvVar{Name: name, Value: plan.Values[name]})
 	}
-	if authSecretRef != nil {
+	if plan.Credential.Env != "" && route.AuthSecret != nil {
 		env = append(env, corev1.EnvVar{
-			Name: authTokenEnv,
+			Name: plan.Credential.Env,
 			ValueFrom: &corev1.EnvVarSource{SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: authSecretRef.Name},
-				Key:                  authSecretRef.Key,
+				LocalObjectReference: corev1.LocalObjectReference{Name: route.AuthSecret.Name},
+				Key:                  route.AuthSecret.Key,
 			}},
 		})
 	}
 	return env
 }
 
-type presetConfig struct {
-	authTokenEnv string
-	cliArgs      []string
-}
-
-func mergePreset(env map[string]string, presets providers.Catalog, presetRef, agentType string) (presetConfig, error) {
-	if presetRef == "" {
-		return presetConfig{}, nil
-	}
-	at := sharedtypes.AgentType(agentType)
-	if at == "" {
-		at = sharedtypes.AgentClaude
-	}
-	preset, err := presets.ResolvePortable(presetRef, at)
-	if err != nil {
-		return presetConfig{}, fmt.Errorf("provider preset %q is unavailable for agent type %q: %w", presetRef, at, err)
-	}
-	for k, v := range preset.Environment {
-		env[k] = v
-	}
-	return presetConfig{
-		authTokenEnv: preset.CredentialTargetEnv,
-		cliArgs:      append([]string{}, preset.CliArgs...),
-	}, nil
-}
-
-func validateAuthToken(ctx context.Context, reader Reader, namespace, authTokenEnv string, ref *agentv1alpha1.SecretKeyRef, environment map[string]string) error {
-	if ref == nil {
+// validateAuthToken checks that the Secret of a route has a target variable
+// that no plain variable of the route sets, and that the Secret holds its key.
+func validateAuthToken(ctx context.Context, reader Reader, namespace string, route Route) error {
+	if route.AuthSecret == nil {
 		return nil
 	}
-	if authTokenEnv == "" {
+	target := route.Provider.CredentialTargetEnv
+	if target == "" {
 		return fmt.Errorf("authTokenEnv is required when an auth token Secret is configured")
 	}
-	if _, exists := environment[authTokenEnv]; exists {
-		return fmt.Errorf("environment variable %q conflicts with the auth token Secret", authTokenEnv)
+	if _, exists := route.Provider.Environment[target]; exists {
+		return fmt.Errorf("environment variable %q conflicts with the auth token Secret", target)
 	}
-	return validateSecretKey(ctx, reader, namespace, ref)
+	return validateSecretKey(ctx, reader, namespace, route.AuthSecret)
 }
 
 func validateSecretKey(ctx context.Context, reader Reader, namespace string, ref *agentv1alpha1.SecretKeyRef) error {

@@ -2,34 +2,40 @@ package shared
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	corev1 "k8s.io/api/core/v1"
 
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	sharedlaunch "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 	wsshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
-// buildEnvVars builds environment variables for the agent container.
-func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar) []corev1.EnvVar {
+// buildEnvVars builds the environment of the agent container: the provider
+// environment, the environment of the planned process, then the environment of
+// the run, which overrides both.
+func buildEnvVars(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, process isoshared.Process) []corev1.EnvVar {
 	envVars := append([]corev1.EnvVar{}, providerEnv...)
-
-	// Add spec environment variables (these override provider env).
-	envVars = append(envVars, run.Spec.Env...)
-
-	return envVars
+	for _, entry := range process.Env {
+		name, value, _ := strings.Cut(entry, "=")
+		envVars = append(envVars, corev1.EnvVar{Name: name, Value: value})
+	}
+	return append(envVars, run.Spec.Env...)
 }
 
-// buildAgentCommand builds the agent command with the harness command builder.
-func buildAgentCommand(run *agentv1alpha1.AgentRun, harness harnessshared.CommandBuilder, providerCliArgs []string) ([]string, []string, error) {
-	if harness == nil {
-		return nil, nil, fmt.Errorf("build agent command: no harness command builder")
+// agentCommand splits the planned argument vector into the command and the
+// arguments of the agent container.
+func agentCommand(process isoshared.Process) ([]string, []string, error) {
+	if len(process.Argv) == 0 {
+		return nil, nil, fmt.Errorf("build agent command: the plan holds no agent process")
 	}
-	command, args, err := harness.Command(run, providerCliArgs)
-	if err != nil {
-		return nil, nil, fmt.Errorf("build agent command: %w", err)
+	var args []string
+	if len(process.Argv) > 1 {
+		args = slices.Clone(process.Argv[1:])
 	}
-	return command, args, nil
+	return []string{process.Argv[0]}, args, nil
 }
 
 // buildInitContainers builds init containers for standalone runs (clone into the
@@ -65,9 +71,9 @@ func buildInitContainers(run *agentv1alpha1.AgentRun, image string, strategy wss
 }
 
 // buildMainContainers builds the main agent container for standalone runs.
-func buildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, image string, harness harnessshared.CommandBuilder, sc *corev1.SecurityContext) ([]corev1.Container, error) {
-	env := buildEnvVars(run, providerEnv)
-	command, args, err := buildAgentCommand(run, harness, providerCliArgs)
+func buildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, spec sharedlaunch.Spec, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+	process := spec.Run.Process
+	command, args, err := agentCommand(process)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +81,11 @@ func buildMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVa
 	return []corev1.Container{
 		{
 			Name:       "agent",
-			Image:      image,
+			Image:      spec.Run.Image,
 			Command:    command,
 			Args:       args,
-			Env:        env,
-			WorkingDir: wsshared.WorkspaceMountPath,
+			Env:        buildEnvVars(run, providerEnv, process),
+			WorkingDir: process.Dir,
 			VolumeMounts: []corev1.VolumeMount{
 				{Name: wsshared.WorkspaceVolumeName, MountPath: wsshared.WorkspaceMountPath},
 				{Name: "tmp", MountPath: "/tmp"},
@@ -110,14 +116,14 @@ func buildWorktreeInitContainers(run *agentv1alpha1.AgentRun, image string, stra
 }
 
 // buildWorkspaceMainContainers builds the main agent container for workspace-based
-// runs (working dir is the per-run worktree; shared volumes are mounted).
-func buildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, providerCliArgs []string, image string, harness harnessshared.CommandBuilder, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
-	env := buildEnvVars(run, providerEnv)
-	command, args, err := buildAgentCommand(run, harness, providerCliArgs)
+// runs (the planned work directory is the per-run worktree; shared volumes are
+// mounted).
+func buildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []corev1.EnvVar, spec sharedlaunch.Spec, sharedVolumes []agentv1alpha1.SharedVolumeSpec, sharedVolumePVCs map[string]string, sc *corev1.SecurityContext) ([]corev1.Container, error) {
+	process := spec.Run.Process
+	command, args, err := agentCommand(process)
 	if err != nil {
 		return nil, err
 	}
-	worktreePath := wsshared.WorktreePath(run.Name)
 
 	volumeMounts := []corev1.VolumeMount{
 		{Name: wsshared.WorkspaceVolumeName, MountPath: wsshared.WorkspaceMountPath},
@@ -132,11 +138,11 @@ func buildWorkspaceMainContainers(run *agentv1alpha1.AgentRun, providerEnv []cor
 	return []corev1.Container{
 		{
 			Name:            "agent",
-			Image:           image,
+			Image:           spec.Run.Image,
 			Command:         command,
 			Args:            args,
-			Env:             env,
-			WorkingDir:      worktreePath,
+			Env:             buildEnvVars(run, providerEnv, process),
+			WorkingDir:      process.Dir,
 			VolumeMounts:    volumeMounts,
 			SecurityContext: DefaultContainerSecurityContext(sc),
 		},

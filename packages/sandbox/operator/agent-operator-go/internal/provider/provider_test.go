@@ -9,7 +9,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
+	sharedtypes "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/test/testutil"
 )
@@ -33,6 +35,17 @@ func findEnvVar(t testing.TB, env []corev1.EnvVar, name string) corev1.EnvVar {
 	return corev1.EnvVar{}
 }
 
+// claudeEnv renders the provider environment of route for the claude harness,
+// which reads the provider environment.
+func claudeEnv(t testing.TB, route Route) []corev1.EnvVar {
+	t.Helper()
+	agent, err := agents.GetAgent(sharedtypes.AgentClaude)
+	if err != nil {
+		t.Fatalf("harness facts: %v", err)
+	}
+	return Environment(agent, route)
+}
+
 func envValue(t testing.TB, env []corev1.EnvVar, name string) string {
 	t.Helper()
 	return findEnvVar(t, env, name).Value
@@ -49,7 +62,7 @@ func TestResolveProvider_NoProvider(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if len(env.Environment) != 0 {
+	if len(claudeEnv(t, env)) != 0 {
 		t.Errorf("env = %v, want empty", env)
 	}
 }
@@ -73,10 +86,10 @@ func TestResolveProvider_InlineProvider(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+	if got := envValue(t, claudeEnv(t, env), "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
-	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got != "3000000" {
+	if got := envValue(t, claudeEnv(t, env), "API_TIMEOUT_MS"); got != "3000000" {
 		t.Errorf("API_TIMEOUT_MS = %q, want %q", got, "3000000")
 	}
 }
@@ -111,7 +124,7 @@ func TestResolveProvider_InlineProviderWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	auth := findEnvVar(t, env.Environment, "ANTHROPIC_AUTH_TOKEN")
+	auth := findEnvVar(t, claudeEnv(t, env), "ANTHROPIC_AUTH_TOKEN")
 	if auth.Value != "" {
 		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
 	}
@@ -141,7 +154,7 @@ func TestResolveProvider_DoesNotMaterializeSecretValue(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	for _, variable := range env.Environment {
+	for _, variable := range claudeEnv(t, env) {
 		if variable.Value == secretValue {
 			t.Fatalf("resolved environment materialized secret value in %q", variable.Name)
 		}
@@ -172,7 +185,7 @@ func TestResolveProvider_ProviderRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
+	if got := envValue(t, claudeEnv(t, env), "ANTHROPIC_BASE_URL"); got != "http://proxy:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://proxy:8080")
 	}
 }
@@ -211,7 +224,7 @@ func TestResolveProvider_ProviderRefWithSecret(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	auth := findEnvVar(t, env.Environment, "ANTHROPIC_AUTH_TOKEN")
+	auth := findEnvVar(t, claudeEnv(t, env), "ANTHROPIC_AUTH_TOKEN")
 	if auth.Value != "" {
 		t.Errorf("ANTHROPIC_AUTH_TOKEN value = %q, want empty", auth.Value)
 	}
@@ -322,7 +335,7 @@ func TestResolveProvider_DefaultFromHarness(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "FROM_HARNESS"); got != "true" {
+	if got := envValue(t, claudeEnv(t, env), "FROM_HARNESS"); got != "true" {
 		t.Errorf("FROM_HARNESS = %q, want %q", got, "true")
 	}
 }
@@ -348,7 +361,7 @@ func TestResolveProvider_PresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got == "" {
+	if got := envValue(t, claudeEnv(t, env), "ANTHROPIC_BASE_URL"); got == "" {
 		t.Error("expected ANTHROPIC_BASE_URL from preset, got empty")
 	}
 }
@@ -377,11 +390,11 @@ func TestResolveProvider_PresetRefOverriddenByEnvironment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://custom:9999" {
+	if got := envValue(t, claudeEnv(t, env), "ANTHROPIC_BASE_URL"); got != "http://custom:9999" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want %q", got, "http://custom:9999")
 	}
 	// Preset's other env vars should still be present
-	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got == "" {
+	if got := envValue(t, claudeEnv(t, env), "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset, got empty")
 	}
 }
@@ -430,10 +443,10 @@ func TestResolveProvider_InlinePresetRef(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	if got := envValue(t, env.Environment, "ANTHROPIC_BASE_URL"); got != "http://override:8080" {
+	if got := envValue(t, claudeEnv(t, env), "ANTHROPIC_BASE_URL"); got != "http://override:8080" {
 		t.Errorf("ANTHROPIC_BASE_URL = %q, want override", got)
 	}
-	if got := envValue(t, env.Environment, "API_TIMEOUT_MS"); got == "" {
+	if got := envValue(t, claudeEnv(t, env), "API_TIMEOUT_MS"); got == "" {
 		t.Error("expected API_TIMEOUT_MS from preset")
 	}
 }
@@ -472,7 +485,7 @@ func TestResolveProvider_InjectsAuthTokenIntoExplicitDestinationWithoutBaseURL(t
 	if err != nil {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
-	auth := findEnvVar(t, env.Environment, "CUSTOM_PROVIDER_TOKEN")
+	auth := findEnvVar(t, claudeEnv(t, env), "CUSTOM_PROVIDER_TOKEN")
 	if auth.ValueFrom == nil || auth.ValueFrom.SecretKeyRef == nil {
 		t.Fatal("CUSTOM_PROVIDER_TOKEN must reference the configured Secret")
 	}
@@ -499,8 +512,8 @@ func TestResolveProvider_MergesPresetAndExplicitCliArgs(t *testing.T) {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
 	want := []string{"--model", testutil.PresetArgsModel, "--model", "custom/model"}
-	if !slices.Equal(resolved.CliArgs, want) {
-		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
+	if !slices.Equal(resolved.Provider.CliArgs, want) {
+		t.Errorf("CliArgs = %v, want %v", resolved.Provider.CliArgs, want)
 	}
 }
 
@@ -520,8 +533,8 @@ func TestResolveProvider_InlinePresetContributesCliArgs(t *testing.T) {
 		t.Fatalf("ResolveProvider() error = %v", err)
 	}
 	want := []string{"--model", testutil.PresetArgsModel}
-	if !slices.Equal(resolved.CliArgs, want) {
-		t.Errorf("CliArgs = %v, want %v", resolved.CliArgs, want)
+	if !slices.Equal(resolved.Provider.CliArgs, want) {
+		t.Errorf("CliArgs = %v, want %v", resolved.Provider.CliArgs, want)
 	}
 }
 
@@ -552,5 +565,64 @@ func TestResolveProvider_LocalOnlyPresetIsRefused(t *testing.T) {
 
 	if !errors.Is(err, providers.ErrLocalOnly) {
 		t.Errorf("ResolveProvider() error = %v, want it to wrap ErrLocalOnly", err)
+	}
+}
+
+func TestResolveProvider_BuildsTheRouteOfTheSharedPlan(t *testing.T) {
+	run := &agentv1alpha1.AgentRun{
+		ObjectMeta: metav1.ObjectMeta{Name: "test", Namespace: "default"},
+		Spec:       agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{PresetRef: "portable-route"}},
+	}
+
+	route, err := ResolveProvider(context.Background(), testutil.NewMemoryStore(), testutil.NewPresets(), run, "")
+
+	if err != nil {
+		t.Fatalf("ResolveProvider() error = %v", err)
+	}
+	p := route.Provider
+	if p.Name != "portable-route" || p.AgentType != sharedtypes.AgentClaude || !p.Portable {
+		t.Errorf("route = %+v, want the portable-route preset for claude", p)
+	}
+	if p.CredentialTargetEnv != "" || p.CredentialSourceEnv != "" || route.AuthSecret != nil {
+		t.Errorf("credential = %q from %q, secret %v, want none: no Secret holds the credential", p.CredentialTargetEnv, p.CredentialSourceEnv, route.AuthSecret)
+	}
+}
+
+func TestResolveProvider_NamesTheProviderOfARouteAndAnUnnamedInlineRoute(t *testing.T) {
+	stored := &agentv1alpha1.AgentProvider{ObjectMeta: metav1.ObjectMeta{Name: "team", Namespace: "default"}}
+	reader := testutil.NewMemoryStore(stored)
+	byRef := &agentv1alpha1.AgentRun{ObjectMeta: metav1.ObjectMeta{Namespace: "default"}, Spec: agentv1alpha1.AgentRunSpec{ProviderRef: "team"}}
+	inline := &agentv1alpha1.AgentRun{ObjectMeta: metav1.ObjectMeta{Namespace: "default"}, Spec: agentv1alpha1.AgentRunSpec{Provider: &agentv1alpha1.ProviderSpec{}}}
+
+	referenced, err := ResolveProvider(context.Background(), reader, testutil.NewPresets(), byRef, "")
+	if err != nil || referenced.Provider.Name != "team" {
+		t.Errorf("referenced route = %+v, %v, want the name team", referenced.Provider, err)
+	}
+	unnamed, err := ResolveProvider(context.Background(), reader, testutil.NewPresets(), inline, "")
+	if err != nil || unnamed.Provider.Name != "inline" {
+		t.Errorf("inline route = %+v, %v, want the name inline", unnamed.Provider, err)
+	}
+}
+
+func TestEnvironment_RendersNothingForAnAgentThatReadsNoProviderEnvironment(t *testing.T) {
+	agent, err := agents.GetAgent(sharedtypes.AgentOpencode)
+	if err != nil {
+		t.Fatalf("harness facts: %v", err)
+	}
+	route := Route{
+		Provider:   &sharedtypes.ModelProvider{Name: "p", Environment: map[string]string{"A": "1"}, CredentialTargetEnv: "TOKEN"},
+		AuthSecret: &agentv1alpha1.SecretKeyRef{Name: "s", Key: "k"},
+	}
+
+	if env := Environment(agent, route); len(env) != 0 {
+		t.Errorf("Environment() = %v, want none", env)
+	}
+}
+
+func TestEnvironment_RendersACredentialTargetOnlyFromASecret(t *testing.T) {
+	route := Route{Provider: &sharedtypes.ModelProvider{Name: "p", CredentialTargetEnv: "TOKEN"}}
+
+	if env := claudeEnv(t, route); len(env) != 0 {
+		t.Errorf("Environment() = %v, want none: no Secret holds the credential", env)
 	}
 }

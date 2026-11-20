@@ -231,9 +231,36 @@ func TestAgentRunReconcile_ResolutionFailureMarksRunFailed(t *testing.T) {
 	}
 }
 
-// A harness type the registry does not know stops the run before any Job.
+// A run the shared planner cannot plan stops before any Job: an unknown
+// harness, a prompt to a harness with no non-interactive run, and a prompt the
+// harness would read as an option.
+func TestAgentRunReconcile_FailsWhenTheRunCannotBePlanned(t *testing.T) {
+	for name, run := range map[string]*agentv1alpha1.AgentRun{
+		"unknown harness":          runnableAgentRun("solo", testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: "mystery"})),
+		"interactive harness":      runnableAgentRun("solo", testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: agentv1alpha1.AgentTypeOpencode})),
+		"prompt read as an option": runnableAgentRun("solo", testutil.WithPrompt("--dangerous")),
+	} {
+		t.Run(name, func(t *testing.T) {
+			h := newRunHarness(run)
+
+			reconcileRun(t, h, "solo")
+
+			if message := phaseMessage(getRun(t, h, "solo"), agentv1alpha1.AgentRunPhaseFailed); !strings.HasPrefix(message, "ExecutionPlanFailed: ") {
+				t.Errorf("message = %q, want ExecutionPlanFailed", message)
+			}
+			if h.store.JobCount() != 0 {
+				t.Error("a Job was created for a run with no plan")
+			}
+		})
+	}
+}
+
+// A workspace type the registry does not know stops the run before any Job.
 func TestAgentRunReconcile_FailsWhenTheJobCannotBeBuilt(t *testing.T) {
-	h := newRunHarness(runnableAgentRun("solo", testutil.WithHarness(&agentv1alpha1.AgentSpec{Type: "mystery"})))
+	h := newRunHarness(runnableAgentRun("solo", testutil.WithWorkspace(&agentv1alpha1.WorkspaceSpec{
+		Type:       "mystery",
+		Repository: agentv1alpha1.RepositorySpec{URL: "https://example.com/repo.git"},
+	})))
 
 	reconcileRun(t, h, "solo")
 
@@ -242,23 +269,43 @@ func TestAgentRunReconcile_FailsWhenTheJobCannotBeBuilt(t *testing.T) {
 		t.Errorf("message = %q, want JobBuildFailed", message)
 	}
 	if h.store.JobCount() != 0 {
-		t.Error("a Job was created for an unknown harness")
+		t.Error("a Job was created for an unknown workspace type")
+	}
+}
+
+// The agent container runs the argument vector of the shared plan: the
+// sandbox arguments of the harness, then its non-interactive arguments and the
+// prompt.
+func TestAgentRunReconcile_RunsThePlannedProcess(t *testing.T) {
+	h := newRunHarness(runnableAgentRun("solo"))
+
+	reconcileRun(t, h, "solo")
+
+	container := getJob(t, h.store, "solo").Spec.Template.Spec.Containers[0]
+	if !slices.Equal(container.Command, []string{"claude"}) {
+		t.Errorf("command = %v, want [claude]", container.Command)
+	}
+	if want := []string{"--permission-mode", "bypassPermissions", "-p", "do the thing"}; !slices.Equal(container.Args, want) {
+		t.Errorf("args = %v, want %v", container.Args, want)
+	}
+	if container.WorkingDir != "/workspace" {
+		t.Errorf("workingDir = %q, want /workspace", container.WorkingDir)
 	}
 }
 
 func TestAgentRunReconcile_AppliesHarnessDefaults(t *testing.T) {
 	harness := testutil.NewAgentHarness("default", "claude",
-		testutil.WithHarnessType(agentv1alpha1.AgentTypeOpencode),
-		testutil.WithDefaultImage("ghcr.io/xonovex/opencode:pinned"))
+		testutil.WithHarnessType("codex"),
+		testutil.WithDefaultImage("ghcr.io/xonovex/codex:pinned"))
 	h := newRunHarness(harness, runnableAgentRun("solo", testutil.WithHarnessRef("claude"), testutil.WithImage("")))
 
 	reconcileRun(t, h, "solo")
 
 	container := getJob(t, h.store, "solo").Spec.Template.Spec.Containers[0]
-	if container.Image != "ghcr.io/xonovex/opencode:pinned" {
+	if container.Image != "ghcr.io/xonovex/codex:pinned" {
 		t.Errorf("image = %q, want the harness default", container.Image)
 	}
-	if !slices.Equal(container.Command, []string{"opencode"}) {
+	if !slices.Equal(container.Command, []string{"codex"}) {
 		t.Errorf("command = %v, want the harness type", container.Command)
 	}
 }

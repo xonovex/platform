@@ -24,9 +24,10 @@ var updateGolden = flag.Bool("update-golden", false, "regenerate pod-spec golden
 var goldenFiles embed.FS
 
 // goldenJobs returns representative Jobs whose full serialized pod spec is frozen
-// in testdata/*.golden.yaml. The goldens were generated from the post-merge
-// builder, so they lock the pod spec against FUTURE drift; the merge itself is
-// verified by the field-assertion tests in this package (job_test, workspace_job_test).
+// in testdata/*.golden.yaml. Each Job is built from a plan of the shared planner
+// with the shipped harness facts, so the goldens lock the argument vector the
+// pod runs as well as the pod spec; the field-assertion tests in this package
+// (job_test, workspace_job_test) verify each field.
 func goldenJobs(t *testing.T) map[string]*batchv1.Job {
 	stdRun := func() *agentv1alpha1.AgentRun {
 		return &agentv1alpha1.AgentRun{
@@ -38,6 +39,10 @@ func goldenJobs(t *testing.T) map[string]*batchv1.Job {
 			},
 		}
 	}
+	promptRun := stdRun()
+	promptRun.Spec.Prompt = "Review the codebase"
+	gvisor := "gvisor"
+	promptRun.Spec.RuntimeClassName = &gvisor
 	wsRun := &agentv1alpha1.AgentRun{
 		ObjectMeta: metav1.ObjectMeta{Name: "golden-ws-run", Namespace: "default"},
 		Spec:       agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"},
@@ -48,6 +53,8 @@ func goldenJobs(t *testing.T) map[string]*batchv1.Job {
 		"workspace-git": mustBuildJob(t, wsRun, nil, "my-workspace-ws", "node:trixie-slim", time.Hour,
 			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil,
 			&WorkspaceBinding{WorktreeBranch: "feature", WorkspaceRef: "my-workspace"}),
+		"standalone-claude-prompt": mustBuildJob(t, promptRun, nil, "golden-pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour,
+			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil),
 		"nix-image": mustBuildJob(t, stdRun(), nil, "golden-pvc", "ghcr.io/xonovex/agent@sha256:abc", time.Hour,
 			agentv1alpha1.AgentTypeClaude, agentv1alpha1.WorkspaceTypeGit, nil, nil),
 	}

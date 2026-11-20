@@ -14,6 +14,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
+	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/launch"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provider"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/resolver"
 )
@@ -22,7 +23,8 @@ import (
 type AgentRunDependencies struct {
 	Store      RunStore
 	Toolchains ToolchainResolver
-	Harnesses  HarnessResolver
+	Harnesses  launch.Harnesses
+	Sandboxes  launch.Sandboxes
 	VCS        VCSResolver
 	Events     EventRecorder
 	Clock      Clock
@@ -132,7 +134,7 @@ func (r *AgentRunReconciler) resolveExecution(ctx context.Context, run *agentv1a
 	if harness != nil {
 		defaultProvider = harness.Spec.DefaultProvider
 	}
-	resolvedProvider, err := provider.ResolveProvider(ctx, r.deps.Store, r.deps.Presets, run, defaultProvider)
+	route, err := provider.ResolveProvider(ctx, r.deps.Store, r.deps.Presets, run, defaultProvider)
 	if err != nil {
 		return nil, fmt.Errorf("ProviderResolutionFailed: %w", err)
 	}
@@ -140,7 +142,23 @@ func (r *AgentRunReconciler) resolveExecution(ctx context.Context, run *agentv1a
 	if err != nil {
 		return nil, fmt.Errorf("ToolchainResolutionFailed: %w", err)
 	}
-	return planExecution(run, harness, resolvedProvider, r.deps.Toolchains.ResolveToolchain(toolchain))
+	execution, err := planExecution(run, harness, route, r.deps.Toolchains.ResolveToolchain(toolchain))
+	if err != nil {
+		return nil, err
+	}
+	// Admission evaluated the guarantees of the run against the AgentPolicy of
+	// its namespace, so the controller plans with no approved runtime class and
+	// reads only the process of the plan.
+	spec, err := launch.Plan(r.deps.Sandboxes.Sandbox(nil), r.deps.Harnesses, run, launch.Execution{
+		AgentType: execution.agentType,
+		Image:     execution.image,
+		Provider:  route.Provider,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("ExecutionPlanFailed: %w", err)
+	}
+	execution.spec = spec
+	return execution, nil
 }
 
 func (r *AgentRunReconciler) reconcileExecution(ctx context.Context, run *agentv1alpha1.AgentRun, execution *runExecution, volume runVolume) (ctrl.Result, error) {
@@ -210,27 +228,20 @@ func (r *AgentRunReconciler) reconcileExecution(ctx context.Context, run *agentv
 	return observation.result, nil
 }
 
-// buildJob resolves the harness and VCS leaves of the run and builds its Job.
+// buildJob resolves the VCS leaf of the run and builds its Job from the plan.
 func (r *AgentRunReconciler) buildJob(run *agentv1alpha1.AgentRun, execution *runExecution, volume runVolume) (*batchv1.Job, error) {
-	harness, err := r.deps.Harnesses.ResolveHarnessCommand(execution.agentType)
-	if err != nil {
-		return nil, fmt.Errorf("resolve harness command for agent type %q: %w", execution.agentType, err)
-	}
 	vcs, err := r.deps.VCS.ResolveVCSStrategy(volume.workspaceType)
 	if err != nil {
 		return nil, fmt.Errorf("resolve VCS strategy for workspace type %q: %w", volume.workspaceType, err)
 	}
 	job, err := isoshared.BuildJob(run, isoshared.RunJob{
-		ProviderEnv:     execution.providerEnv,
-		ProviderCliArgs: execution.providerCliArgs,
-		PVCName:         volume.pvcName,
-		Image:           execution.image,
-		Timeout:         execution.defaults.Timeout,
-		AgentType:       execution.agentType,
-		Harness:         harness,
-		VCS:             vcs,
-		TTL:             execution.defaults.TTL,
-		Workspace:       volume.binding,
+		Spec:        execution.spec,
+		ProviderEnv: provider.Environment(execution.spec.Agent, execution.route),
+		PVCName:     volume.pvcName,
+		Timeout:     execution.defaults.Timeout,
+		VCS:         vcs,
+		TTL:         execution.defaults.TTL,
+		Workspace:   volume.binding,
 	}, r.deps.JobPolicy)
 	if err != nil {
 		return nil, err

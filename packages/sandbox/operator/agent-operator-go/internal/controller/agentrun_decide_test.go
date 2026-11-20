@@ -178,7 +178,7 @@ func TestSharedWorkspaceVolume_SelectsTheWorktreeBranches(t *testing.T) {
 	}
 }
 
-func providerless() provider.ResolvedProvider { return provider.ResolvedProvider{} }
+func providerless() provider.Route { return provider.Route{} }
 
 func failedJobStatus(message string) batchv1.JobStatus {
 	return batchv1.JobStatus{Conditions: []batchv1.JobCondition{{Type: batchv1.JobFailed, Status: corev1.ConditionTrue, Message: message}}}

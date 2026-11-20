@@ -11,6 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 
+	sharedlaunch "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	isoshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/network/shared"
@@ -40,19 +41,20 @@ func runSettled(run *agentv1alpha1.AgentRun) bool {
 	return false
 }
 
-// runExecution is the resolved input of the agent Job of one run.
+// runExecution is the resolved input of the agent Job of one run. spec is the
+// shared plan of the run, set once the run is planned.
 type runExecution struct {
-	agentType       agentv1alpha1.AgentType
-	providerEnv     []corev1.EnvVar
-	providerCliArgs []string
-	defaults        resolver.ResolvedDefaults
-	image           string
+	agentType agentv1alpha1.AgentType
+	route     provider.Route
+	defaults  resolver.ResolvedDefaults
+	image     string
+	spec      sharedlaunch.Spec
 }
 
 // planExecution applies the harness defaults to run and decides the image and
 // agent type its Job uses. toolchain is the provision leaf of the run's
 // toolchain spec, or nil.
-func planExecution(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.AgentHarness, resolvedProvider provider.ResolvedProvider, toolchain provshared.Toolchain) (*runExecution, error) {
+func planExecution(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.AgentHarness, route provider.Route, toolchain provshared.Toolchain) (*runExecution, error) {
 	agentType := agentv1alpha1.AgentTypeClaude
 	if harness != nil {
 		agentType = harness.Spec.Type
@@ -69,11 +71,10 @@ func planExecution(run *agentv1alpha1.AgentRun, harness *agentv1alpha1.AgentHarn
 		return nil, fmt.Errorf("RuntimeClassResolutionFailed: admission did not resolve a sandboxed runtimeClassName")
 	}
 	return &runExecution{
-		agentType:       agentType,
-		providerEnv:     resolvedProvider.Environment,
-		providerCliArgs: resolvedProvider.CliArgs,
-		defaults:        defaults,
-		image:           image,
+		agentType: agentType,
+		route:     route,
+		defaults:  defaults,
+		image:     image,
 	}, nil
 }
 

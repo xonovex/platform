@@ -11,8 +11,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	sharedlaunch "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 	wsshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/workspace/shared"
 )
 
@@ -42,20 +42,17 @@ func resolveTTL(ttl *int32, policy JobPolicy) *int32 {
 	return &defaultTTL
 }
 
-// RunJob is the resolved input of the agent Job of one AgentRun. Harness and VCS
-// are the leaves the composition root resolved for the run's agent and
-// workspace types.
+// RunJob is the resolved input of the agent Job of one AgentRun. Spec is the
+// shared plan of the run: the agent process, the pod image and the runtime
+// class. VCS is the leaf the composition root resolved for the workspace type.
 type RunJob struct {
-	ProviderEnv     []corev1.EnvVar
-	ProviderCliArgs []string
-	PVCName         string
-	Image           string
-	Timeout         time.Duration
-	AgentType       agentv1alpha1.AgentType
-	Harness         harnessshared.CommandBuilder
-	VCS             wsshared.VCSStrategy
-	TTL             *int32
-	Workspace       *WorkspaceBinding
+	Spec        sharedlaunch.Spec
+	ProviderEnv []corev1.EnvVar
+	PVCName     string
+	Timeout     time.Duration
+	VCS         wsshared.VCSStrategy
+	TTL         *int32
+	Workspace   *WorkspaceBinding
 }
 
 // WorkspaceBinding is the workspace diff fed into the unified Job builder. A nil
@@ -102,14 +99,18 @@ func repositoryCredentialsVolume(ref *agentv1alpha1.SecretKeyRef) corev1.Volume 
 	}
 }
 
-// BuildJob creates the Kubernetes Job for an AgentRun. It is the single pod
-// realizer: a nil input.Workspace produces the standalone Job, a non-nil one
-// produces the workspace-based Job. input.PVCName is the workspace PVC the pod
-// mounts.
+// BuildJob creates the Kubernetes Job for an AgentRun from its plan. It is the
+// single pod realizer: a nil input.Workspace produces the standalone Job, a
+// non-nil one produces the workspace-based Job. input.PVCName is the workspace
+// PVC the pod mounts.
 func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*batchv1.Job, error) {
 	if input.Timeout <= 0 {
 		return nil, fmt.Errorf("timeout must be greater than zero")
 	}
+	if input.Spec.Agent == nil {
+		return nil, fmt.Errorf("build Job: the plan names no agent")
+	}
+	image := input.Spec.Run.Image
 	activeDeadlineSeconds := int64(math.Ceil(input.Timeout.Seconds()))
 	backoffLimit := int32(0)
 
@@ -117,7 +118,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*bat
 		"app.kubernetes.io/name":       "agent-operator",
 		"app.kubernetes.io/instance":   run.Name,
 		"app.kubernetes.io/component":  "agent-run",
-		"agent.xonovex.com/agent-type": string(input.AgentType),
+		"agent.xonovex.com/agent-type": string(input.Spec.Agent.Type),
 	}
 
 	volumes := []corev1.Volume{pvcVolume(wsshared.WorkspaceVolumeName, input.PVCName)}
@@ -131,9 +132,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*bat
 			}
 		}
 		volumes = append(volumes, tmpVolume())
-		initContainers = buildWorktreeInitContainers(run, input.Image, input.VCS, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
+		initContainers = buildWorktreeInitContainers(run, image, input.VCS, ws.WorktreeBranch, ws.SourceBranch, run.Spec.SecurityContext)
 		var err error
-		mainContainers, err = buildWorkspaceMainContainers(run, input.ProviderEnv, input.ProviderCliArgs, input.Image, input.Harness, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
+		mainContainers, err = buildWorkspaceMainContainers(run, input.ProviderEnv, input.Spec, ws.SharedVolumes, ws.SharedVolumePVCs, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}
@@ -142,9 +143,9 @@ func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*bat
 		if run.Spec.Workspace != nil && run.Spec.Workspace.Repository.CredentialsSecretRef != nil {
 			volumes = append(volumes, repositoryCredentialsVolume(run.Spec.Workspace.Repository.CredentialsSecretRef))
 		}
-		initContainers = buildInitContainers(run, input.Image, input.VCS, run.Spec.SecurityContext)
+		initContainers = buildInitContainers(run, image, input.VCS, run.Spec.SecurityContext)
 		var err error
-		mainContainers, err = buildMainContainers(run, input.ProviderEnv, input.ProviderCliArgs, input.Image, input.Harness, run.Spec.SecurityContext)
+		mainContainers, err = buildMainContainers(run, input.ProviderEnv, input.Spec, run.Spec.SecurityContext)
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +173,7 @@ func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*bat
 					Volumes:          volumes,
 					NodeSelector:     run.Spec.NodeSelector,
 					Tolerations:      run.Spec.Tolerations,
-					RuntimeClassName: run.Spec.RuntimeClassName,
+					RuntimeClassName: runtimeClassName(input.Spec.Run.Runtime),
 				},
 			},
 		},
@@ -181,6 +182,14 @@ func BuildJob(run *agentv1alpha1.AgentRun, input RunJob, policy JobPolicy) (*bat
 	applyPodHardening(&job.Spec.Template.Spec, run.Spec.Resources)
 
 	return job, nil
+}
+
+// runtimeClassName is the runtime class of the pod, nil for the default runtime.
+func runtimeClassName(runtime string) *string {
+	if runtime == "" {
+		return nil
+	}
+	return &runtime
 }
 
 // BuildWorkspaceInitJob creates the Job that clones the repository into the

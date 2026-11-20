@@ -1,11 +1,14 @@
 package shared
 
 import (
+	"slices"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	isoshared "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/isolation"
+	sharedlaunch "github.com/xonovex/platform/packages/library/shared-launch-go/pkg/launch"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 )
 
@@ -69,7 +72,7 @@ func TestBuildMainContainers_WithoutNix(t *testing.T) {
 	}
 }
 
-func TestBuildMainContainers_RunsTheHarnessCommand(t *testing.T) {
+func TestBuildMainContainers_RunsThePlannedProcess(t *testing.T) {
 	run := workspaceRun()
 	run.ObjectMeta = metav1.ObjectMeta{Name: "test"}
 	run.Spec.Prompt = "Fix the tests"
@@ -82,31 +85,54 @@ func TestBuildMainContainers_RunsTheHarnessCommand(t *testing.T) {
 	if c.Name != "agent" {
 		t.Errorf("name = %q, want %q", c.Name, "agent")
 	}
-	if len(c.Command) != 1 || c.Command[0] != "claude" {
-		t.Errorf("command = %v, want the harness command [claude]", c.Command)
+	if !slices.Equal(c.Command, []string{"claude"}) {
+		t.Errorf("command = %v, want the harness binary [claude]", c.Command)
 	}
-	if len(c.Args) != 2 || c.Args[0] != "--prompt" || c.Args[1] != "Fix the tests" {
-		t.Errorf("args = %v, want the harness args", c.Args)
+	if want := []string{"--permission-mode", "bypassPermissions", "-p", "Fix the tests"}; !slices.Equal(c.Args, want) {
+		t.Errorf("args = %v, want %v", c.Args, want)
+	}
+	if c.Image != "image:latest" {
+		t.Errorf("image = %q, want the planned image", c.Image)
 	}
 	if c.WorkingDir != "/workspace" {
 		t.Errorf("workingDir = %q, want %q", c.WorkingDir, "/workspace")
 	}
 }
 
-func TestBuildMainContainers_PassesProviderArgsToTheHarness(t *testing.T) {
-	providerCliArgs := []string{"--model", "google/gemini-2.5-pro"}
+func TestBuildMainContainers_SplitsTheArgumentVectorAndKeepsTheProcessEnvironment(t *testing.T) {
+	spec := sharedlaunch.Spec{Run: isoshared.RunConfig{Image: "image", Process: isoshared.Process{
+		Argv: []string{"opencode", "--model", "google/gemini-2.5-pro"},
+		Env:  []string{"PLANNED=1"},
+		Dir:  "/workspace",
+	}}}
+	run := workspaceRun()
+	run.Spec.Env = []corev1.EnvVar{{Name: "RUN", Value: "2"}}
 
-	containers, err := buildMainContainers(workspaceRun(), nil, providerCliArgs, "image", stubHarness{agent: agentv1alpha1.AgentTypeOpencode}, nil)
+	containers, err := buildMainContainers(run, []corev1.EnvVar{{Name: "PROVIDER", Value: "0"}}, spec, nil)
 
 	if err != nil {
 		t.Fatalf("buildMainContainers() error = %v", err)
 	}
 	c := containers[0]
-	if c.Command[0] != "opencode" {
-		t.Errorf("command = %v, want [opencode]", c.Command)
+	if !slices.Equal(c.Command, []string{"opencode"}) || !slices.Equal(c.Args, []string{"--model", "google/gemini-2.5-pro"}) {
+		t.Errorf("command, args = %v, %v, want [opencode] [--model google/gemini-2.5-pro]", c.Command, c.Args)
 	}
-	if len(c.Args) != 2 || c.Args[0] != "--model" || c.Args[1] != "google/gemini-2.5-pro" {
-		t.Errorf("args = %v, want [--model google/gemini-2.5-pro]", c.Args)
+	var names []string
+	for _, env := range c.Env {
+		names = append(names, env.Name+"="+env.Value)
+	}
+	if want := []string{"PROVIDER=0", "PLANNED=1", "RUN=2"}; !slices.Equal(names, want) {
+		t.Errorf("env = %v, want %v: provider, planned process, then the run", names, want)
+	}
+}
+
+func TestBuildMainContainers_ABareBinaryHasNoArgs(t *testing.T) {
+	spec := sharedlaunch.Spec{Run: isoshared.RunConfig{Process: isoshared.Process{Argv: []string{"copilot"}}}}
+
+	containers, err := buildWorkspaceMainContainers(workspaceRun(), nil, spec, nil, nil, nil)
+
+	if err != nil || containers[0].Args != nil {
+		t.Fatalf("args = %v, %v, want none", containers[0].Args, err)
 	}
 }
 
@@ -175,17 +201,11 @@ func TestBuildMainContainers_TmpVolumeMount(t *testing.T) {
 	}
 }
 
-func TestBuildMainContainers_SurfacesAHarnessFailure(t *testing.T) {
-	if _, err := buildMainContainers(workspaceRun(), nil, nil, "image", failingHarness{}, nil); err == nil {
-		t.Fatal("expected the harness failure to return an error")
+func TestBuildMainContainers_RefusesAPlanWithNoProcess(t *testing.T) {
+	if _, err := buildMainContainers(workspaceRun(), nil, sharedlaunch.Spec{}, nil); err == nil {
+		t.Fatal("expected a plan with no process to return an error")
 	}
-	if _, err := buildWorkspaceMainContainers(workspaceRun(), nil, nil, "image", failingHarness{}, nil, nil, nil); err == nil {
-		t.Fatal("expected the harness failure to return an error")
-	}
-}
-
-func TestBuildMainContainers_RequiresAHarness(t *testing.T) {
-	if _, err := buildMainContainers(workspaceRun(), nil, nil, "image", nil, nil); err == nil {
-		t.Fatal("expected a missing harness to return an error")
+	if _, err := buildWorkspaceMainContainers(workspaceRun(), nil, sharedlaunch.Spec{}, nil, nil, nil); err == nil {
+		t.Fatal("expected a plan with no process to return an error")
 	}
 }

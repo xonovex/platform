@@ -10,8 +10,9 @@ const (
 	// AgentServiceAccountName is the dedicated zero-RBAC ServiceAccount for agent
 	// pods. The agent runs untrusted code and never calls the Kubernetes API.
 	AgentServiceAccountName = "agent-runner"
-	// agentHome matches the uid-1000 HOME baked into the nix agent image.
-	agentHome      = "/home/agent"
+	// AgentHome is the home directory of the agent, the uid-1000 HOME baked
+	// into the nix agent image.
+	AgentHome      = "/home/agent"
 	homeVolumeName = "home"
 	agentFSGroup   = int64(1000)
 )
@@ -92,12 +93,12 @@ func applyPodHardening(spec *corev1.PodSpec, resources corev1.ResourceRequiremen
 
 func hardenContainer(container *corev1.Container, resources corev1.ResourceRequirements) {
 	container.Resources = *resources.DeepCopy()
-	ensureVolumeMount(container, corev1.VolumeMount{Name: homeVolumeName, MountPath: agentHome})
+	ensureVolumeMount(container, corev1.VolumeMount{Name: homeVolumeName, MountPath: AgentHome})
 	ensureVolumeMount(container, corev1.VolumeMount{Name: "tmp", MountPath: "/tmp"})
-	setEnvironment(container, "HOME", agentHome)
-	setEnvironment(container, "XDG_CONFIG_HOME", agentHome+"/.config")
-	setEnvironment(container, "XDG_CACHE_HOME", agentHome+"/.cache")
-	setEnvironment(container, "XDG_STATE_HOME", agentHome+"/.local/state")
+	setEnvironment(container, "HOME", AgentHome)
+	setEnvironment(container, "XDG_CONFIG_HOME", AgentHome+"/.config")
+	setEnvironment(container, "XDG_CACHE_HOME", AgentHome+"/.cache")
+	setEnvironment(container, "XDG_STATE_HOME", AgentHome+"/.local/state")
 }
 
 func ensureVolumeMount(container *corev1.Container, mount corev1.VolumeMount) {

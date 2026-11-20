@@ -132,3 +132,16 @@ func TestWorktreeScriptAndName_DefaultsWithoutAStrategy(t *testing.T) {
 		t.Errorf("script = %q, want only the preamble", script)
 	}
 }
+
+func TestWorkDirIsTheWorktreeOfASharedWorkspace(t *testing.T) {
+	standalone := &agentv1alpha1.AgentRun{}
+	standalone.Name = "run"
+	if got := WorkDir(standalone); got != WorkspaceMountPath {
+		t.Errorf("WorkDir(standalone) = %q, want %q", got, WorkspaceMountPath)
+	}
+	shared := standalone.DeepCopy()
+	shared.Spec.WorkspaceRef = "workspace"
+	if got := WorkDir(shared); got != WorktreeBasePath+"/run" {
+		t.Errorf("WorkDir(shared) = %q, want the worktree of the run", got)
+	}
+}

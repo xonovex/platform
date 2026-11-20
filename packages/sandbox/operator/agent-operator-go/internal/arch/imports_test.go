@@ -20,9 +20,9 @@ const module = "github.com/xonovex/platform/packages/sandbox/operator/agent-oper
 
 // leaves are the concrete variants of the operator axes.
 var leaves = []string{
-	"internal/harness/claude",
-	"internal/harness/opencode",
+	"internal/isolation/kube",
 	"internal/provision/nix",
+	"internal/provision/none",
 	"internal/workspace/git",
 	"internal/workspace/jj",
 }

@@ -50,7 +50,7 @@ digraph AgentOperatorArchitecture {
     agentharness [
       label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
         <TR><TD><B>AgentHarness</B></TD></TR>
-        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type: claude | opencode</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="8" COLOR="#555">type: claude | codex | copilot | kiro | opencode | pi</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultProvider, defaultImage</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultTimeout, defaultRuntimeClassName</FONT></TD></TR>
         <TR><TD><FONT POINT-SIZE="8" COLOR="#555">defaultResources, env</FONT></TD></TR>
@@ -129,7 +129,7 @@ digraph AgentOperatorArchitecture {
         label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
           <TR><TD><B>2. ResolveProvider</B></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">inline → providerRef → harness default → empty</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">reads auth token from K8s Secret</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">checks the auth token Secret, passes a SecretKeyRef</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#d1c4e9", fontsize=9
       ];
@@ -144,7 +144,7 @@ digraph AgentOperatorArchitecture {
         label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
           <TR><TD><B>5. BuildJob</B></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">BuildInitContainers (git-clone script)</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">BuildMainContainers (agent command)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">BuildMainContainers (planned argv)</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">BuildEnvVars (provider + spec merge)</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#c5cae9", fontsize=9
@@ -253,9 +253,9 @@ digraph AgentOperatorArchitecture {
       main_ctr [
         label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
           <TR><TD><B>Main: agent</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">argv of the shared plan (agent facts)</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">claude --permission-mode bypassPermissions</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">  [--print --prompt "task..."]</FONT></TD></TR>
-          <TR><TD><FONT POINT-SIZE="8">or: opencode [cliArgs...]</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="8">  [-p "task..."]</FONT></TD></TR>
           <TR><TD><FONT POINT-SIZE="8">workingDir: /workspace</FONT></TD></TR>
         </TABLE>>,
         fillcolor="#64b5f6"

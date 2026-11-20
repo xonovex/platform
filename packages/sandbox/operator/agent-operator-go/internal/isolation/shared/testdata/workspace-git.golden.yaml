@@ -21,7 +21,10 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-      - command:
+      - args:
+        - --permission-mode
+        - bypassPermissions
+        command:
         - claude
         env:
         - name: HOME

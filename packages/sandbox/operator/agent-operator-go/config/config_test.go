@@ -14,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"sigs.k8s.io/yaml"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/plugins"
@@ -77,7 +78,7 @@ func TestSampleAgentRunPassesAdmissionWithSamplePolicyAndProvider(t *testing.T) 
 		Data:       map[string][]byte{"api-key": []byte("test-token")},
 	}
 	store := testutil.NewMemoryStore(policy, provider, secret)
-	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.Registry{}, providers.Catalog{})
+	admissionWebhook := agentwebhook.NewAgentRunWebhook(store, store, plugins.New(agents.Embedded()), providers.Catalog{})
 
 	warnings, err := admissionWebhook.ValidateCreate(context.Background(), run)
 
@@ -94,7 +95,7 @@ func TestSampleAgentToolchainPassesAdmission(t *testing.T) {
 		"<nixpkgsRev>": strings.Repeat("b", 40),
 		"<digest>":     strings.Repeat("a", 64),
 	})
-	toolchainWebhook := agentwebhook.NewAgentToolchainWebhook(plugins.Registry{})
+	toolchainWebhook := agentwebhook.NewAgentToolchainWebhook(plugins.New(agents.Embedded()))
 
 	warnings, err := toolchainWebhook.ValidateCreate(context.Background(), toolchain)
 
@@ -110,7 +111,7 @@ func TestSampleAgentHarnessPassesAdmission(t *testing.T) {
 	harness := decodeSample[agentv1alpha1.AgentHarness](t, "agentharness_sample.yaml", map[string]string{
 		"<digest>": strings.Repeat("a", 64),
 	})
-	harnessWebhook := agentwebhook.NewAgentHarnessWebhook(plugins.Registry{})
+	harnessWebhook := agentwebhook.NewAgentHarnessWebhook(plugins.New(agents.Embedded()))
 
 	warnings, err := harnessWebhook.ValidateCreate(context.Background(), harness)
 

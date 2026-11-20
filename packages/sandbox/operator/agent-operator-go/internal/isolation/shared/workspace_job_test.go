@@ -54,7 +54,7 @@ func TestBuildWorkspaceInitJob_Basic(t *testing.T) {
 	if len(container.Resources.Requests) == 0 || len(container.Resources.Limits) == 0 {
 		t.Error("workspace init container must have resource requests and limits")
 	}
-	if !hasMount(container.VolumeMounts, homeVolumeName, agentHome) || !hasMount(container.VolumeMounts, "tmp", "/tmp") {
+	if !hasMount(container.VolumeMounts, homeVolumeName, AgentHome) || !hasMount(container.VolumeMounts, "tmp", "/tmp") {
 		t.Error("workspace init container must have writable HOME and /tmp mounts")
 	}
 }
@@ -107,7 +107,7 @@ func TestBuildWorkspaceInitJob_WithRuntimeClassName(t *testing.T) {
 }
 
 func worktreeRun() *agentv1alpha1.AgentRun {
-	return &agentv1alpha1.AgentRun{ObjectMeta: metav1.ObjectMeta{Name: "agent-1"}}
+	return &agentv1alpha1.AgentRun{ObjectMeta: metav1.ObjectMeta{Name: "agent-1"}, Spec: agentv1alpha1.AgentRunSpec{WorkspaceRef: "my-workspace"}}
 }
 
 func TestBuildWorktreeInitContainers_Basic(t *testing.T) {

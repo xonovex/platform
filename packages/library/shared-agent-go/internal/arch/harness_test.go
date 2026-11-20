@@ -36,7 +36,6 @@ const layoutCode = "library/shared-agent-go/pkg/overlay"
 var harnessCode = []string{
 	"library/shared-agent-go/pkg/agents",
 	"tooling/cli/agent-eval-go/internal/harness",
-	"sandbox/operator/agent-operator-go/internal/harness",
 }
 
 // fact is one value of the shipped facts.

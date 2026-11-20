@@ -279,7 +279,7 @@ func TestBuildJob_RejectsNonPositiveTimeout(t *testing.T) {
 		}},
 	}
 
-	_, err := BuildJob(run, RunJob{PVCName: "pvc", Image: "image", AgentType: agentv1alpha1.AgentTypeClaude, Harness: stubHarness{}, VCS: stubVCS{}}, DefaultJobPolicy())
+	_, err := BuildJob(run, RunJob{Spec: planFor(t, run, agentv1alpha1.AgentTypeClaude, "image"), PVCName: "pvc", VCS: stubVCS{}}, DefaultJobPolicy())
 
 	if err == nil {
 		t.Fatal("BuildJob() error = nil, want non-positive timeout error")
@@ -294,7 +294,7 @@ func TestBuildJob_RoundsSubsecondTimeoutUp(t *testing.T) {
 		}},
 	}
 
-	job, err := BuildJob(run, RunJob{PVCName: "pvc", Image: "image", Timeout: time.Millisecond, AgentType: agentv1alpha1.AgentTypeClaude, Harness: stubHarness{}, VCS: stubVCS{}}, DefaultJobPolicy())
+	job, err := BuildJob(run, RunJob{Spec: planFor(t, run, agentv1alpha1.AgentTypeClaude, "image"), PVCName: "pvc", Timeout: time.Millisecond, VCS: stubVCS{}}, DefaultJobPolicy())
 
 	if err != nil {
 		t.Fatalf("BuildJob() error = %v", err)

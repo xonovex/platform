@@ -55,6 +55,15 @@ func WorktreePath(runName string) string {
 	return fmt.Sprintf("%s/%s", WorktreeBasePath, runName)
 }
 
+// WorkDir returns the directory the agent of a run works in: its worktree of a
+// shared workspace, or the workspace mount of a standalone run.
+func WorkDir(run *agentv1alpha1.AgentRun) string {
+	if run.Spec.WorkspaceRef != "" {
+		return WorktreePath(run.Name)
+	}
+	return WorkspaceMountPath
+}
+
 // WorktreeScriptAndName builds the worktree-creation script for worktreePath and
 // returns the init-container name for the strategy (resolved by the composition
 // root). A nil strategy yields the default git-worktree name and no worktree step.

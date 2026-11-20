@@ -11,7 +11,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	agentv1alpha1 "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/api/v1alpha1"
-	harnessshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/harness/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provider"
 	provshared "github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/sandbox/operator/agent-operator-go/internal/resolver"
@@ -32,11 +31,6 @@ type EventRecorder interface {
 // the type is not registered.
 type ToolchainResolver interface {
 	ResolveToolchain(spec *agentv1alpha1.ToolchainSpec) provshared.Toolchain
-}
-
-// HarnessResolver resolves the harness leaf of an agent type.
-type HarnessResolver interface {
-	ResolveHarnessCommand(agent agentv1alpha1.AgentType) (harnessshared.CommandBuilder, error)
 }
 
 // VCSResolver resolves the workspace leaf of a workspace type.
