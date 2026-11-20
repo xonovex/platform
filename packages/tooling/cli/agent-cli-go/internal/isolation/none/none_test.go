@@ -20,7 +20,7 @@ func cfg(net netshared.Mode) isoshared.RunConfig {
 
 func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
 	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeProxy} {
-		i := NewIsolator()
+		i := NewIsolator(testLog)
 		c := provision.Contribution{}
 		if code, err := i.Run(cfg(net), c); err == nil || code == 0 {
 			t.Errorf("Run(network=%q) = (%d, %v), want fail-closed error (none cannot restrict egress)", net, code, err)
@@ -36,7 +36,7 @@ func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
 
 func TestNone_CommandNoPermissionBypass(t *testing.T) {
 	// Host execution must NOT inject the sandbox permission bypass (Sandbox=false).
-	cmd, err := NewIsolator().Command(cfg(netshared.ModeHost), provision.Contribution{})
+	cmd, err := NewIsolator(testLog).Command(cfg(netshared.ModeHost), provision.Contribution{})
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
@@ -54,7 +54,7 @@ func TestNone_AppliesContribution(t *testing.T) {
 		Env:          map[string]string{"FOO": "bar"},
 		InitCommands: []string{"echo hi"},
 	}
-	cmd, env, err := NewIsolator().hostCommand(cfg(netshared.ModeHost), c)
+	cmd, env, err := NewIsolator(testLog).hostCommand(cfg(netshared.ModeHost), c)
 	if err != nil {
 		t.Fatalf("hostCommand() error = %v", err)
 	}
@@ -88,17 +88,40 @@ func TestNone_CommandRejectsMissingProviderToken(t *testing.T) {
 		CredentialSourceEnv: "MISSING_NONE_TEST_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
 	}
-	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
 
 func TestNone_Capabilities(t *testing.T) {
-	i := NewIsolator()
+	i := NewIsolator(testLog)
 	if i.HidesHost(false, "img") {
 		t.Error("none always exposes the host")
 	}
 	if i.KernelIsolated("runsc") {
 		t.Error("none has no kernel boundary")
+	}
+}
+
+func TestNone_CommandRejectsUnknownAgentType(t *testing.T) {
+	config := cfg(netshared.ModeHost)
+	config.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
+
+	if _, err := NewIsolator(testLog).Command(config, provision.Contribution{}); err == nil {
+		t.Fatal("Command() error = nil, want unknown agent type error")
+	}
+}
+
+// Host execution has no image and no boundary, so availability is constant and
+// immutability is exactly the provisioner's.
+func TestNone_AvailableAndPinnedProvision(t *testing.T) {
+	isolator := NewIsolator(testLog)
+	if available, err := isolator.Available(); !available || err != nil {
+		t.Errorf("Available() = (%v, %v), want (true, nil)", available, err)
+	}
+	for _, pinned := range []bool{true, false} {
+		if got := isolator.PinnedProvision(provision.ProvisionNix, pinned, ""); got != pinned {
+			t.Errorf("PinnedProvision(pinned=%v) = %v, want %v", pinned, got, pinned)
+		}
 	}
 }

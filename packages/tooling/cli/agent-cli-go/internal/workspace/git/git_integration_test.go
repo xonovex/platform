@@ -45,7 +45,7 @@ func TestSetup_CreatesAndReusesNewBranchWorktree(t *testing.T) {
 	target := filepath.Join(t.TempDir(), "worktree")
 	config := wsshared.Config{Branch: "feature/new", SourceBranch: "main", Dir: target}
 
-	result, err := New(wsshared.NewExecRunner()).Setup(config, repoDir, true)
+	result, err := New(wsshared.NewExecRunner(), testLog).Setup(config, repoDir, true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -59,7 +59,7 @@ func TestSetup_CreatesAndReusesNewBranchWorktree(t *testing.T) {
 		t.Errorf("mergeBackTo = %q, want main", mergeBackTo)
 	}
 
-	reused, err := New(wsshared.NewExecRunner()).Setup(config, repoDir, true)
+	reused, err := New(wsshared.NewExecRunner(), testLog).Setup(config, repoDir, true)
 	if err != nil {
 		t.Fatalf("Setup(reuse) error = %v", err)
 	}
@@ -72,14 +72,14 @@ func TestSetup_ReusesSiblingWorktreeFromWorktreeRepositoryDirectory(t *testing.T
 	repoDir := initializeRepository(t)
 	firstWorktree := filepath.Join(t.TempDir(), "first")
 	secondWorktree := filepath.Join(t.TempDir(), "second")
-	if _, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/first", SourceBranch: "main", Dir: firstWorktree}, repoDir, false); err != nil {
+	if _, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/first", SourceBranch: "main", Dir: firstWorktree}, repoDir, false); err != nil {
 		t.Fatalf("create first worktree: %v", err)
 	}
-	if _, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/second", SourceBranch: "main", Dir: secondWorktree}, repoDir, false); err != nil {
+	if _, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/second", SourceBranch: "main", Dir: secondWorktree}, repoDir, false); err != nil {
 		t.Fatalf("create second worktree: %v", err)
 	}
 
-	result, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/second", Dir: secondWorktree}, firstWorktree, false)
+	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/second", Dir: secondWorktree}, firstWorktree, false)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -93,7 +93,7 @@ func TestSetup_CreatesWorktreeForExistingBranch(t *testing.T) {
 	runGit(t, repoDir, "branch", "existing", "main")
 	target := filepath.Join(t.TempDir(), "worktree")
 
-	result, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "existing", Dir: target}, repoDir, true)
+	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "existing", Dir: target}, repoDir, true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -109,7 +109,7 @@ func TestSetup_RejectsExistingNonWorktree(t *testing.T) {
 	repoDir := initializeRepository(t)
 	target := t.TempDir()
 
-	_, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, false)
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, false)
 	if err == nil || !strings.Contains(err.Error(), "not a worktree") {
 		t.Fatalf("Setup() error = %v, want non-worktree error", err)
 	}
@@ -118,11 +118,11 @@ func TestSetup_RejectsExistingNonWorktree(t *testing.T) {
 func TestSetup_RejectsWorktreeOnWrongBranch(t *testing.T) {
 	repoDir := initializeRepository(t)
 	target := filepath.Join(t.TempDir(), "worktree")
-	if _, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "actual", SourceBranch: "main", Dir: target}, repoDir, false); err != nil {
+	if _, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "actual", SourceBranch: "main", Dir: target}, repoDir, false); err != nil {
 		t.Fatalf("create fixture worktree: %v", err)
 	}
 
-	_, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "expected", Dir: target}, repoDir, false)
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "expected", Dir: target}, repoDir, false)
 	if err == nil || !strings.Contains(err.Error(), "wrong branch") {
 		t.Fatalf("Setup() error = %v, want wrong-branch error", err)
 	}
@@ -132,11 +132,11 @@ func TestSetup_RejectsWorktreeFromDifferentRepository(t *testing.T) {
 	firstRepo := initializeRepository(t)
 	secondRepo := initializeRepository(t)
 	target := filepath.Join(t.TempDir(), "worktree")
-	if _, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/first", SourceBranch: "main", Dir: target}, firstRepo, false); err != nil {
+	if _, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/first", SourceBranch: "main", Dir: target}, firstRepo, false); err != nil {
 		t.Fatalf("create fixture worktree: %v", err)
 	}
 
-	_, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "feature/first", Dir: target}, secondRepo, false)
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "feature/first", Dir: target}, secondRepo, false)
 	if err == nil || !strings.Contains(err.Error(), "different repository") {
 		t.Fatalf("Setup() error = %v, want different-repository error", err)
 	}
@@ -146,7 +146,7 @@ func TestSetup_NonRepoReturnsError(t *testing.T) {
 	repoDir := t.TempDir()
 	config := wsshared.Config{Branch: "test-branch", Dir: filepath.Join(t.TempDir(), "worktree")}
 
-	if _, err := New(wsshared.NewExecRunner()).Setup(config, repoDir, false); err == nil {
+	if _, err := New(wsshared.NewExecRunner(), testLog).Setup(config, repoDir, false); err == nil {
 		t.Fatal("Setup() error = nil, want non-repository error")
 	}
 }

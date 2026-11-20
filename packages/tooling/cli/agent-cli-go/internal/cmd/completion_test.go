@@ -12,11 +12,10 @@ func (failingCompletionWriter) Write(_ []byte) (int, error) {
 }
 
 func TestCompletionCommand_PropagatesWriterError(t *testing.T) {
-	previous := completionCmd.OutOrStdout()
-	completionCmd.SetOut(failingCompletionWriter{})
-	t.Cleanup(func() { completionCmd.SetOut(previous) })
+	completion := newCompletionCommand()
+	completion.SetOut(failingCompletionWriter{})
 
-	if err := completionCmd.RunE(completionCmd, []string{"bash"}); err == nil {
+	if err := completion.RunE(completion, []string{"bash"}); err == nil {
 		t.Fatal("completion command ignored the output error")
 	}
 }

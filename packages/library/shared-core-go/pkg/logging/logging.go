@@ -2,91 +2,78 @@ package logging
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/colors"
 )
 
-// LogInfo logs an info message with blue color
-func LogInfo(args ...any) {
-	msg := formatArgs(args...)
-	if colors.IsColorSupported() {
-		fmt.Fprintln(os.Stderr, colors.WithBlue("[INFO]")+" "+msg)
-	} else {
-		fmt.Fprintln(os.Stderr, "[INFO] "+msg)
-	}
+// Logger writes leveled messages to err and section or check output to out.
+// It owns no global state: the writers, the debug gate and the color switch
+// are inputs.
+type Logger struct {
+	out   io.Writer
+	err   io.Writer
+	debug bool
+	color bool
 }
 
-// LogSuccess logs a success message with green color
-func LogSuccess(args ...any) {
-	msg := formatArgs(args...)
-	if colors.IsColorSupported() {
-		fmt.Fprintln(os.Stderr, colors.WithGreen("[SUCCESS]")+" "+msg)
-	} else {
-		fmt.Fprintln(os.Stderr, "[SUCCESS] "+msg)
-	}
+// New returns a Logger over the given sinks. Debug messages are dropped unless
+// debug is true, and ANSI colors are written only when color is true.
+func New(out, err io.Writer, debug, color bool) Logger {
+	return Logger{out: out, err: err, debug: debug, color: color}
 }
 
-// LogWarning logs a warning message with yellow color
-func LogWarning(args ...any) {
-	msg := formatArgs(args...)
-	if colors.IsColorSupported() {
-		fmt.Fprintln(os.Stderr, colors.WithYellow("[WARNING]")+" "+msg)
-	} else {
-		fmt.Fprintln(os.Stderr, "[WARNING] "+msg)
-	}
+// FromEnvironment returns a Logger whose debug gate and color switch come from
+// the DEBUG, TERM and NO_COLOR variables that getenv resolves.
+func FromEnvironment(getenv func(string) string, out, err io.Writer) Logger {
+	return New(out, err, getenv("DEBUG") != "", colors.Supported(getenv("TERM"), getenv("NO_COLOR")))
 }
 
-// LogError logs an error message with red color
-func LogError(args ...any) {
-	msg := formatArgs(args...)
-	if colors.IsColorSupported() {
-		fmt.Fprintln(os.Stderr, colors.WithRed("[ERROR]")+" "+msg)
-	} else {
-		fmt.Fprintln(os.Stderr, "[ERROR] "+msg)
-	}
+// Info logs an info message with blue color.
+func (l Logger) Info(args ...any) {
+	l.logLevel("[INFO]", colors.Blue, args)
 }
 
-// LogDebug logs a debug message with purple color (only if DEBUG env var is set)
-func LogDebug(args ...any) {
-	if os.Getenv("DEBUG") == "" {
+// Success logs a success message with green color.
+func (l Logger) Success(args ...any) {
+	l.logLevel("[SUCCESS]", colors.Green, args)
+}
+
+// Warning logs a warning message with yellow color.
+func (l Logger) Warning(args ...any) {
+	l.logLevel("[WARNING]", colors.Yellow, args)
+}
+
+// Error logs an error message with red color.
+func (l Logger) Error(args ...any) {
+	l.logLevel("[ERROR]", colors.Red, args)
+}
+
+// Debug logs a debug message with purple color when the debug gate is open.
+func (l Logger) Debug(args ...any) {
+	if !l.debug {
 		return
 	}
-	msg := formatArgs(args...)
-	if colors.IsColorSupported() {
-		fmt.Fprintln(os.Stderr, colors.WithPurple("[DEBUG]")+" "+msg)
-	} else {
-		fmt.Fprintln(os.Stderr, "[DEBUG] "+msg)
-	}
+	l.logLevel("[DEBUG]", colors.Purple, args)
 }
 
-// PrintSection prints a formatted section header
-func PrintSection(title string, content string) {
-	if colors.IsColorSupported() {
-		fmt.Printf("\n%s\n", colors.WithCyan(title))
-		fmt.Printf("%s\n", colors.WithCyan(strings.Repeat("=", len(title))))
-	} else {
-		fmt.Printf("\n%s\n", title)
-		fmt.Printf("%s\n", strings.Repeat("=", len(title)))
-	}
+// Section prints a formatted section header followed by optional content.
+func (l Logger) Section(title string, content string) {
+	l.println(l.out, "")
+	l.println(l.out, l.paint(title, colors.Cyan))
+	l.println(l.out, l.paint(strings.Repeat("=", len(title)), colors.Cyan))
 	if content != "" {
-		fmt.Println(content)
+		l.println(l.out, content)
 	}
 }
 
-// PrintSubsection prints a subsection header
-func PrintSubsection(title string) {
-	if colors.IsColorSupported() {
-		fmt.Printf("\n%s\n", colors.WithBlue(title))
-		if len(title) > 0 {
-			fmt.Printf("%s\n", colors.WithBlue(strings.Repeat("-", len(title))))
-		}
-	} else {
-		fmt.Printf("\n%s\n", title)
-		if len(title) > 0 {
-			fmt.Printf("%s\n", strings.Repeat("-", len(title)))
-		}
+// Subsection prints a subsection header.
+func (l Logger) Subsection(title string) {
+	l.println(l.out, "")
+	l.println(l.out, l.paint(title, colors.Blue))
+	if len(title) > 0 {
+		l.println(l.out, l.paint(strings.Repeat("-", len(title)), colors.Blue))
 	}
 }
 
@@ -105,39 +92,40 @@ const (
 	StatusInfo    CheckStatus = "INFO"
 )
 
-// CheckResult prints a check result with appropriate color
-func CheckResult(checkName string, status CheckStatus, details string) {
-	symbol := "•"
-	var color string
+// CheckResult prints a check result with the color of its status.
+func (l Logger) CheckResult(checkName string, status CheckStatus, details string) {
+	symbol, color := checkStyle(status)
+	l.println(l.out, l.paint(symbol+" "+checkName, color))
+	if details != "" {
+		l.println(l.out, l.paint("    "+details, colors.Purple))
+	}
+}
 
+func checkStyle(status CheckStatus) (symbol, color string) {
 	switch status {
 	case StatusPass, StatusOK, StatusSuccess:
-		symbol = "✓"
-		color = colors.Green
+		return "✓", colors.Green
 	case StatusFail, StatusError, StatusFailed:
-		symbol = "✗"
-		color = colors.Red
+		return "✗", colors.Red
 	case StatusWarn, StatusWarning:
-		symbol = "⚠"
-		color = colors.Yellow
+		return "⚠", colors.Yellow
 	case StatusInfo:
-		symbol = "ℹ"
-		color = colors.Blue
+		return "ℹ", colors.Blue
+	default:
+		return "•", ""
 	}
+}
 
-	if colors.IsColorSupported() {
-		fmt.Println(colors.Colorize(symbol+" "+checkName, color))
-	} else {
-		fmt.Println(symbol + " " + checkName)
-	}
+func (l Logger) logLevel(tag, color string, args []any) {
+	l.println(l.err, l.paint(tag, color)+" "+formatArgs(args...))
+}
 
-	if details != "" {
-		if colors.IsColorSupported() {
-			fmt.Println(colors.WithPurple("    " + details))
-		} else {
-			fmt.Println("    " + details)
-		}
-	}
+func (l Logger) paint(text, color string) string {
+	return colors.Colorize(text, color, l.color)
+}
+
+func (l Logger) println(w io.Writer, line string) {
+	_, _ = fmt.Fprintln(w, line)
 }
 
 func formatArgs(args ...any) string {

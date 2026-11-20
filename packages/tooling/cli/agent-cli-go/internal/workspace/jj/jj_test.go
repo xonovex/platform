@@ -48,7 +48,7 @@ func TestSetup_CreatesAWorkspaceFromTheCurrentBranch(t *testing.T) {
 	runner := onBranch("main")
 	target := filepath.Join(t.TempDir(), "workspace")
 
-	dir, err := New(runner).Setup(wsshared.Config{Dir: target}, t.TempDir(), false)
+	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: target}, t.TempDir(), false)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -66,7 +66,7 @@ func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
 	runner := onBranch("main")
 	repoDir := t.TempDir()
 
-	dir, err := New(runner).Setup(wsshared.Config{Dir: "checkout"}, repoDir, false)
+	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: "checkout"}, repoDir, false)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -79,7 +79,7 @@ func TestSetup_ReusesAnExistingWorkspaceWithoutRunningJJ(t *testing.T) {
 	runner := onBranch("main")
 	existing := t.TempDir()
 
-	dir, err := New(runner).Setup(wsshared.Config{Dir: existing}, t.TempDir(), true)
+	dir, err := New(runner, testLog).Setup(wsshared.Config{Dir: existing}, t.TempDir(), true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -95,7 +95,7 @@ func TestSetup_PrefersAnExplicitSourceBranch(t *testing.T) {
 	runner := onBranch("main")
 	target := filepath.Join(t.TempDir(), "workspace")
 
-	if _, err := New(runner).Setup(
+	if _, err := New(runner, testLog).Setup(
 		wsshared.Config{Dir: target, SourceBranch: "release"}, t.TempDir(), false,
 	); err != nil {
 		t.Fatalf("Setup() error = %v", err)
@@ -109,7 +109,7 @@ func TestSetup_RequiresJJOnPath(t *testing.T) {
 	runner := onBranch("main")
 	runner.absent = map[string]bool{"jj": true}
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "not installed") {
@@ -122,7 +122,7 @@ func TestSetup_RequiresASourceRevision(t *testing.T) {
 	// workspace from.
 	runner := onBranch("HEAD")
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "source revision") {
@@ -134,7 +134,7 @@ func TestSetup_ReportsAFailedWorkspaceAdd(t *testing.T) {
 	runner := onBranch("main")
 	runner.streamErr = errors.New("exit status 1")
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Dir: filepath.Join(t.TempDir(), "workspace")}, t.TempDir(), false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "jj workspace add failed") {
@@ -143,10 +143,10 @@ func TestSetup_ReportsAFailedWorkspaceAdd(t *testing.T) {
 }
 
 func TestAvailable(t *testing.T) {
-	if !New(&fakeRunner{}).Available() {
+	if !New(&fakeRunner{}, testLog).Available() {
 		t.Error("Available() must be true when jj resolves on PATH")
 	}
-	if New(&fakeRunner{absent: map[string]bool{"jj": true}}).Available() {
+	if New(&fakeRunner{absent: map[string]bool{"jj": true}}, testLog).Available() {
 		t.Error("Available() must be false when jj is absent")
 	}
 }

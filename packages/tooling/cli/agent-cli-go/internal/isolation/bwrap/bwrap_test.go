@@ -40,7 +40,7 @@ func canonicalPath(t *testing.T, path string) string {
 
 func bwrapCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
 	t.Helper()
-	command, err := NewIsolator().Command(cfg, c)
+	command, err := NewIsolator(testLog).Command(cfg, c)
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
@@ -145,7 +145,7 @@ func TestBwrap_NetworkExplicit(t *testing.T) {
 	if !argHas(args, "--share-net") || argHas(args, "--unshare-net") {
 		t.Error("network host must --share-net and not --unshare-net")
 	}
-	if _, err := NewIsolator().Command(claudeCfg(t, netshared.ModeProxy, false, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+	if _, err := NewIsolator(testLog).Command(claudeCfg(t, netshared.ModeProxy, false, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
 		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
@@ -160,7 +160,7 @@ func TestBwrap_AppliesContribution(t *testing.T) {
 		InitCommands: []string{"echo hi"},
 	}
 	args := bwrapCommand(t, claudeCfg(t, netshared.ModeNone, false, work), c)
-	env, err := NewIsolator().sandboxEnv(claudeCfg(t, netshared.ModeNone, false, work), c, work)
+	env, err := NewIsolator(testLog).sandboxEnv(claudeCfg(t, netshared.ModeNone, false, work), c, work)
 	if err != nil {
 		t.Fatalf("sandboxEnv() error = %v", err)
 	}
@@ -196,7 +196,7 @@ func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	work := t.TempDir()
 	cfg := claudeCfg(t, netshared.ModeNone, false, work)
 	cfg.RoBindPaths = []string{work + "/missing"}
-	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing bind error")
 	}
 
@@ -205,7 +205,7 @@ func TestBwrap_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 		CredentialSourceEnv: "MISSING_BWRAP_TEST_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
 	}
-	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
@@ -238,7 +238,7 @@ func argHasTriple(args []string, a, b, c string) bool {
 }
 
 func TestBwrap_Capabilities(t *testing.T) {
-	i := NewIsolator()
+	i := NewIsolator(testLog)
 	if !i.HidesHost(false, "") {
 		t.Error("bwrap deny-default must hide host tools")
 	}
@@ -247,5 +247,14 @@ func TestBwrap_Capabilities(t *testing.T) {
 	}
 	if i.KernelIsolated("runsc") {
 		t.Error("bwrap is never a kernel boundary")
+	}
+}
+
+func TestBwrap_CommandRejectsUnknownAgentType(t *testing.T) {
+	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
+	cfg.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
+
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
+		t.Fatal("Command() error = nil, want unknown agent type error")
 	}
 }

@@ -13,7 +13,7 @@ func TestSpawnSandboxInDirUsesDirectoryAndEnvironment(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "result")
 	command := []string{"-c", "printf '%s:%s' \"$PWD\" \"$SANDBOX_VALUE\" > \"$1\"", "sh", outputPath}
 
-	exitCode, err := SpawnSandboxInDir("sh", command, append(os.Environ(), "SANDBOX_VALUE=ready"), workDir, "spawn test", false)
+	exitCode, err := SpawnSandboxInDir(testLog, "sh", command, append(os.Environ(), "SANDBOX_VALUE=ready"), workDir, "spawn test")
 
 	if err != nil || exitCode != 0 {
 		t.Fatalf("SpawnSandboxInDir() exitCode = %d, error = %v", exitCode, err)
@@ -28,7 +28,7 @@ func TestSpawnSandboxInDirUsesDirectoryAndEnvironment(t *testing.T) {
 }
 
 func TestSpawnSandboxReturnsChildExitCode(t *testing.T) {
-	exitCode, err := SpawnSandbox("sh", []string{"-c", "exit 7"}, os.Environ(), "spawn test", false)
+	exitCode, err := SpawnSandbox(testLog, "sh", []string{"-c", "exit 7"}, os.Environ(), "spawn test")
 
 	if err != nil || exitCode != 7 {
 		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v, want 7, nil", exitCode, err)
@@ -36,7 +36,7 @@ func TestSpawnSandboxReturnsChildExitCode(t *testing.T) {
 }
 
 func TestSpawnSandboxReportsStartFailure(t *testing.T) {
-	exitCode, err := SpawnSandbox("/missing/xonovex-command", nil, os.Environ(), "start sandbox", true)
+	exitCode, err := SpawnSandbox(testLog, "/missing/xonovex-command", nil, os.Environ(), "start sandbox")
 
 	if exitCode != 1 || err == nil || !strings.Contains(err.Error(), "start sandbox") {
 		t.Fatalf("SpawnSandbox() exitCode = %d, error = %v, want prefixed start error", exitCode, err)

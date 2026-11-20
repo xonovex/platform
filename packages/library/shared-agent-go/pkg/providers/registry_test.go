@@ -88,11 +88,13 @@ func TestGetProviderNamesReturnsSortedProviderNames(t *testing.T) {
 	}
 }
 
-func TestBuildProviderEnvInjectsAuthenticationTokenIntoCopy(t *testing.T) {
-	t.Setenv("CLI_PROXY_API_KEY", "secret")
+func mapGetenv(env map[string]string) Getenv {
+	return func(key string) string { return env[key] }
+}
 
+func TestBuildProviderEnvInjectsAuthenticationTokenIntoCopy(t *testing.T) {
 	provider := geminiProvider()
-	env, err := BuildProviderEnv(provider)
+	env, err := BuildProviderEnv(provider, mapGetenv(map[string]string{"CLI_PROXY_API_KEY": "secret"}))
 	if err != nil {
 		t.Fatalf("BuildProviderEnv() error = %v", err)
 	}
@@ -106,9 +108,7 @@ func TestBuildProviderEnvInjectsAuthenticationTokenIntoCopy(t *testing.T) {
 }
 
 func TestBuildProviderEnvRejectsMissingAuthenticationToken(t *testing.T) {
-	t.Setenv("ZAI_AUTH_TOKEN", "")
-
-	_, err := BuildProviderEnv(glmProvider())
+	_, err := BuildProviderEnv(glmProvider(), mapGetenv(nil))
 	if err == nil || !strings.Contains(err.Error(), "ZAI_AUTH_TOKEN") {
 		t.Fatalf("BuildProviderEnv() error = %v, want missing-token error", err)
 	}
@@ -120,7 +120,7 @@ func TestBuildProviderEnvRejectsIncompleteCredentialMapping(t *testing.T) {
 		CredentialSourceEnv: "SOURCE_TOKEN",
 	}
 
-	_, err := BuildProviderEnv(provider)
+	_, err := BuildProviderEnv(provider, mapGetenv(nil))
 
 	if err == nil {
 		t.Fatal("BuildProviderEnv() error = nil, want incomplete credential mapping error")
@@ -128,14 +128,13 @@ func TestBuildProviderEnvRejectsIncompleteCredentialMapping(t *testing.T) {
 }
 
 func TestBuildProviderEnvSupportsCredentialWithoutPresetEnvironment(t *testing.T) {
-	t.Setenv("CUSTOM_SOURCE_TOKEN", "secret")
 	provider := &types.ModelProvider{
 		Name:                "custom",
 		CredentialSourceEnv: "CUSTOM_SOURCE_TOKEN",
 		CredentialTargetEnv: "CUSTOM_TARGET_TOKEN",
 	}
 
-	env, err := BuildProviderEnv(provider)
+	env, err := BuildProviderEnv(provider, mapGetenv(map[string]string{"CUSTOM_SOURCE_TOKEN": "secret"}))
 
 	if err != nil {
 		t.Fatalf("BuildProviderEnv() error = %v", err)
@@ -146,7 +145,7 @@ func TestBuildProviderEnvSupportsCredentialWithoutPresetEnvironment(t *testing.T
 }
 
 func TestBuildProviderEnvAllowsProviderWithoutAuthenticationToken(t *testing.T) {
-	env, err := BuildProviderEnv(geminiOpencodeProvider())
+	env, err := BuildProviderEnv(geminiOpencodeProvider(), mapGetenv(nil))
 	if err != nil {
 		t.Fatalf("BuildProviderEnv() error = %v", err)
 	}

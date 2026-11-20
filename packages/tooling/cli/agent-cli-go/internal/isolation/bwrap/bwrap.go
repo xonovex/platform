@@ -12,6 +12,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
@@ -28,10 +29,10 @@ import (
 //
 // bwrap and default runc are attack-surface reduction, not a kernel trust
 // boundary (see KernelIsolated); no-new-privs and cap-drop are bwrap defaults.
-type Isolator struct{}
+type Isolator struct{ log logging.Logger }
 
 // NewIsolator creates a bwrap isolator.
-func NewIsolator() *Isolator { return &Isolator{} }
+func NewIsolator(log logging.Logger) *Isolator { return &Isolator{log: log} }
 
 // Available reports whether bwrap is installed.
 func (i *Isolator) Available() (bool, error) {
@@ -63,7 +64,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox("bwrap", args, env, "Bubblewrap sandbox", cfg.Verbose)
+	return isoshared.SpawnSandbox(i.log, "bwrap", args, env, "Bubblewrap sandbox")
 }
 
 // Command returns the full bwrap command (for display / terminal wrappers).
@@ -195,7 +196,10 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	// Agent command, wrapped with the provisioner's init commands.
 	args = append(args, "--")
-	agentCmd := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
+	agentCmd, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
+	if err != nil {
+		return nil, err
+	}
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
 	return args, nil
@@ -235,7 +239,7 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	env["PATH"] = strings.Join(pathEntries, ":")
 
 	// Provider tokens + contribution env + custom env.
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, os.Getenv)
 	if err != nil {
 		return nil, err
 	}

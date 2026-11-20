@@ -32,13 +32,13 @@ func TestParseNetwork(t *testing.T) {
 }
 
 func TestResolveAxes_ProxyFailsClosed(t *testing.T) {
-	if _, err := resolveAxes(flags{network: "proxy"}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
-		t.Fatalf("resolveAxes(proxy) error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
+	if _, err := resolveAxes(testRegistry, flags{network: "proxy"}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+		t.Fatalf("resolveAxes(testRegistry, proxy) error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
 
 func TestResolveAxes_DockerRuntimeWiresKernelIsolation(t *testing.T) {
-	axes, err := resolveAxes(flags{isolation: "docker", isolationDockerRuntime: "runsc"})
+	axes, err := resolveAxes(testRegistry, flags{isolation: "docker", isolationDockerRuntime: "runsc"})
 	if err != nil {
 		t.Fatalf("resolveAxes = %v", err)
 	}
@@ -51,7 +51,7 @@ func TestResolveAxes_DockerRuntimeWiresKernelIsolation(t *testing.T) {
 }
 
 func TestResolveAxes_PinnedComboDefault(t *testing.T) {
-	axes, err := resolveAxes(flags{requirePinnedProvision: true})
+	axes, err := resolveAxes(testRegistry, flags{requirePinnedProvision: true})
 	if err != nil {
 		t.Fatalf("resolveAxes = %v", err)
 	}
@@ -63,7 +63,7 @@ func TestResolveAxes_PinnedComboDefault(t *testing.T) {
 func TestPrepareWorkspaceDryRunDoesNotCreateDirectory(t *testing.T) {
 	repoDir := t.TempDir()
 	target := filepath.Join(repoDir, "worktree")
-	workspace, err := prepareWorkspace(runOptions{
+	workspace, err := prepareWorkspace(testLog, runOptions{
 		worktreeBranch: "feature/dry-run",
 		worktreeDir:    target,
 		vcs:            "git",
@@ -86,7 +86,7 @@ func TestPrepareWorkspaceDryRunDoesNotCreateDirectory(t *testing.T) {
 func TestPrepareWorkspaceWithoutWorktreeUsesSourceDirectory(t *testing.T) {
 	workDir := t.TempDir()
 
-	workspace, err := prepareWorkspace(runOptions{}, workDir, false)
+	workspace, err := prepareWorkspace(testLog, runOptions{}, workDir, false)
 
 	if err != nil {
 		t.Fatalf("prepareWorkspace() error = %v", err)
@@ -122,7 +122,7 @@ func TestRunAgentDryRunBuildsHostCommand(t *testing.T) {
 		dryRun:    true,
 	}
 
-	err := runAgent(command, []string{"review"}, options)
+	err := runAgent(command, []string{"review"}, options, testLog)
 
 	if err != nil {
 		t.Fatalf("runAgent() error = %v", err)
@@ -151,7 +151,7 @@ func TestRunAgentRejectsMalformedCustomEnvironment(t *testing.T) {
 		customEnv: []string{"MISSING_EQUALS"},
 	}
 
-	err := runAgent(command, nil, options)
+	err := runAgent(command, nil, options, testLog)
 
 	if err == nil || !strings.Contains(err.Error(), "must use KEY=VALUE") {
 		t.Fatalf("runAgent() error = %v, want custom environment validation error", err)
@@ -162,7 +162,7 @@ func TestRunAgentRejectsUnknownAgent(t *testing.T) {
 	command := &cobra.Command{}
 	command.Flags().Bool("verbose", false, "")
 
-	err := runAgent(command, nil, runOptions{agent: "unknown"})
+	err := runAgent(command, nil, runOptions{agent: "unknown"}, testLog)
 
 	if err == nil {
 		t.Fatal("runAgent() error = nil, want unknown-agent error")
@@ -170,7 +170,7 @@ func TestRunAgentRejectsUnknownAgent(t *testing.T) {
 }
 
 func TestResolveProviderPrefersCommandOption(t *testing.T) {
-	provider, err := resolveProvider(types.AgentClaude, "gemini", "glm")
+	provider, err := resolveProvider(testLog, types.AgentClaude, "gemini", "glm")
 
 	if err != nil {
 		t.Fatalf("resolveProvider() error = %v", err)
@@ -181,7 +181,7 @@ func TestResolveProviderPrefersCommandOption(t *testing.T) {
 }
 
 func TestResolveProviderRejectsUnknownProvider(t *testing.T) {
-	provider, err := resolveProvider(types.AgentClaude, "unknown", "")
+	provider, err := resolveProvider(testLog, types.AgentClaude, "unknown", "")
 
 	if err == nil || provider != nil {
 		t.Fatalf("resolveProvider() = (%+v, %v), want nil provider and error", provider, err)
@@ -305,7 +305,7 @@ func TestValidateAgentExecutableRejectsNixClosureWithoutAgent(t *testing.T) {
 func TestExecuteWithTerminalRejectsUnknownType(t *testing.T) {
 	options := runOptions{terminal: "unknown"}
 
-	err := executeWithTerminal(resolvedAxes{}, isoshared.RunConfig{}, provision.Contribution{}, t.TempDir(), false, options)
+	err := executeWithTerminal(testLog, resolvedAxes{}, isoshared.RunConfig{}, provision.Contribution{}, t.TempDir(), false, options)
 
 	if err == nil {
 		t.Fatal("executeWithTerminal() error = nil, want unknown-terminal error")
@@ -324,14 +324,14 @@ func TestResolveAxes_DockerPinnedPolicyRequiresDigest(t *testing.T) {
 
 	pinned := base
 	pinned.image = "ghcr.io/xonovex/agent@sha256:" + digest
-	if _, err := resolveAxes(pinned); err != nil {
-		t.Fatalf("resolveAxes(digest image) error = %v", err)
+	if _, err := resolveAxes(testRegistry, pinned); err != nil {
+		t.Fatalf("resolveAxes(testRegistry, digest image) error = %v", err)
 	}
 
 	mutable := base
 	mutable.image = "ghcr.io/xonovex/agent:latest"
-	if _, err := resolveAxes(mutable); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
-		t.Fatalf("resolveAxes(mutable image) error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
+	if _, err := resolveAxes(testRegistry, mutable); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
+		t.Fatalf("resolveAxes(testRegistry, mutable image) error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
 }
 

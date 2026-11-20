@@ -30,7 +30,7 @@ func installFakeJJ(t *testing.T, body string) {
 func TestSetup_ReusesExistingWorkspace(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	result, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Branch: "test-branch", Dir: tmpDir}, t.TempDir(), true)
+	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Branch: "test-branch", Dir: tmpDir}, t.TempDir(), true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -53,7 +53,7 @@ func TestSetup_CreatesWorkspace(t *testing.T) {
 	repoDir := t.TempDir()
 	target := "workspace"
 
-	result, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{SourceBranch: "main", Dir: target}, repoDir, true)
+	result, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{SourceBranch: "main", Dir: target}, repoDir, true)
 	if err != nil {
 		t.Fatalf("Setup() error = %v", err)
 	}
@@ -73,7 +73,7 @@ func TestSetup_CreatesWorkspace(t *testing.T) {
 func TestSetup_ReportsWorkspaceCommandFailure(t *testing.T) {
 	installFakeJJ(t, "exit 7")
 
-	_, err := New(wsshared.NewExecRunner()).Setup(
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(
 		wsshared.Config{SourceBranch: "main", Dir: "workspace"},
 		t.TempDir(),
 		false,
@@ -86,7 +86,7 @@ func TestSetup_ReportsWorkspaceCommandFailure(t *testing.T) {
 func TestSetup_RequiresJJ(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 
-	_, err := New(wsshared.NewExecRunner()).Setup(
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(
 		wsshared.Config{SourceBranch: "main", Dir: "workspace"},
 		t.TempDir(),
 		false,
@@ -99,7 +99,7 @@ func TestSetup_RequiresJJ(t *testing.T) {
 func TestSetup_RequiresSourceRevision(t *testing.T) {
 	installFakeJJ(t, "exit 0")
 
-	_, err := New(wsshared.NewExecRunner()).Setup(wsshared.Config{Dir: "workspace"}, t.TempDir(), false)
+	_, err := New(wsshared.NewExecRunner(), testLog).Setup(wsshared.Config{Dir: "workspace"}, t.TempDir(), false)
 	if err == nil || !strings.Contains(err.Error(), "failed to determine source revision") {
 		t.Fatalf("Setup() error = %v, want source-revision error", err)
 	}
@@ -107,12 +107,12 @@ func TestSetup_RequiresSourceRevision(t *testing.T) {
 
 func TestAvailable_ResolvesTheRealJJOnPath(t *testing.T) {
 	installFakeJJ(t, "exit 0")
-	if !New(wsshared.NewExecRunner()).Available() {
+	if !New(wsshared.NewExecRunner(), testLog).Available() {
 		t.Error("Available() = false, want true")
 	}
 
 	t.Setenv("PATH", t.TempDir())
-	if New(wsshared.NewExecRunner()).Available() {
+	if New(wsshared.NewExecRunner(), testLog).Available() {
 		t.Error("Available() = true without jj, want false")
 	}
 }

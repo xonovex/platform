@@ -4,6 +4,10 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
+func opencode() Agent {
+	return Agent{Config: opencodeAgent, BuildArgs: BuildOpencodeArgs, BuildEnv: BuildOpencodeEnv}
+}
+
 func opencodeAgent() *types.AgentConfig {
 	return &types.AgentConfig{
 		Type:        types.AgentOpencode,

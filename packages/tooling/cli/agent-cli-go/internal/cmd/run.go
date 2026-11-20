@@ -67,7 +67,7 @@ type runOptions struct {
 	requireKernelIsolation      bool
 }
 
-func newRunCommand() *cobra.Command {
+func newRunCommand(log logging.Logger) *cobra.Command {
 	options := runOptions{
 		agent:     "claude",
 		isolation: "none",
@@ -82,7 +82,7 @@ func newRunCommand() *cobra.Command {
 		Short: "Run an AI coding agent",
 		Long:  `Run an AI coding agent with specified provider and sandbox options.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runAgent(cmd, args, options)
+			return runAgent(cmd, args, options, log)
 		},
 	}
 
@@ -132,12 +132,6 @@ func newRunCommand() *cobra.Command {
 	return cmd
 }
 
-var runCmd = newRunCommand()
-
-func init() {
-	rootCmd.AddCommand(runCmd)
-}
-
 // flags is the axis-resolution view of the run flags. It is the input to
 // resolveAxes, keeping the resolution testable without a live cobra command.
 type flags struct {
@@ -183,7 +177,7 @@ type resolvedAxes struct {
 // rejects unregistered ones); network is a closed enum validated here. When a
 // pinned toolchain is required but no cell was chosen explicitly, the pinned combo
 // (bwrap × nix) is selected.
-func resolveAxes(f flags) (resolvedAxes, error) {
+func resolveAxes(reg *sandbox.Registry, f flags) (resolvedAxes, error) {
 	isoStr, provStr, netStr := f.isolation, f.provision, f.network
 	if isoStr == "" {
 		isoStr = "none"
@@ -207,7 +201,6 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 		isoName, provName = isolation.IsolationBwrap, provision.ProvisionNix
 	}
 
-	reg := plugins.DefaultRegistry()
 	req := sandbox.Request{
 		Isolation:      isoName,
 		Provision:      provName,
@@ -234,13 +227,13 @@ func resolveAxes(f flags) (resolvedAxes, error) {
 	}, nil
 }
 
-func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
+func runAgent(cmd *cobra.Command, args []string, options runOptions, log logging.Logger) error {
 	verbose, _ := cmd.Flags().GetBool("verbose")
 
 	agent, err := agents.GetAgent(types.AgentType(options.agent))
 	if err != nil {
-		logging.LogError(err.Error())
-		logging.LogInfo("Available agents: " + fmt.Sprint(agents.GetAgentTypes()))
+		log.Error(err.Error())
+		log.Info("Available agents: " + fmt.Sprint(agents.GetAgentTypes()))
 		return err
 	}
 
@@ -249,7 +242,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	provider, err := resolveProvider(agent.Type, options.provider, fileConfig.Provider)
+	provider, err := resolveProvider(log, agent.Type, options.provider, fileConfig.Provider)
 	if err != nil {
 		return err
 	}
@@ -266,7 +259,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		return fmt.Errorf("resolve work directory %q: %w", workDir, err)
 	}
 
-	workspace, err := prepareWorkspace(options, workDir, verbose)
+	workspace, err := prepareWorkspace(log, options, workDir, verbose)
 	if err != nil {
 		return err
 	}
@@ -274,7 +267,8 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, fileConfig.BindPaths...), options.bindPaths...), workspace.sourceRepoDir)
 	roBindPaths := append(append([]string{}, fileConfig.RoBindPaths...), options.roBindPaths...)
 
-	axes, err := resolveAxes(flags{
+	registry := plugins.DefaultRegistry(log)
+	axes, err := resolveAxes(registry, flags{
 		isolation:                   options.isolation,
 		provision:                   options.provision,
 		network:                     options.network,
@@ -295,8 +289,8 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 
 	available, err := axes.Isolation.Available()
 	if err != nil || !available {
-		logging.LogError(fmt.Sprintf("Isolation method %s is not available", axes.IsolationName))
-		logging.LogInfo(fmt.Sprintf("Available isolations: %v", sandbox.AvailableIsolations(plugins.DefaultRegistry())))
+		log.Error(fmt.Sprintf("Isolation method %s is not available", axes.IsolationName))
+		log.Info(fmt.Sprintf("Available isolations: %v", sandbox.AvailableIsolations(registry)))
 		return fmt.Errorf("isolation method %s is not available", axes.IsolationName)
 	}
 
@@ -337,7 +331,6 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 		Agent:           agent,
 		Provider:        provider,
 		AgentArgs:       args,
-		Verbose:         verbose,
 	}
 
 	// Construct the command before choosing a dispatch path. This shared
@@ -349,11 +342,11 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 	}
 
 	if options.dryRun {
-		return printDryRun(axes, command, agent, provider, args, workspace.displayDir)
+		return printDryRun(log, axes, command, agent, provider, args, workspace.displayDir)
 	}
 
 	if options.terminal != "" {
-		return executeWithTerminal(axes, runCfg, contribution, workspace.executionDir, verbose, options)
+		return executeWithTerminal(log, axes, runCfg, contribution, workspace.executionDir, verbose, options)
 	}
 
 	exitCode, err := axes.Isolation.Run(runCfg, contribution)
@@ -368,7 +361,7 @@ func runAgent(cmd *cobra.Command, args []string, options runOptions) error {
 
 // resolveProvider resolves the model provider from the flag, falling back to the
 // file config's provider.
-func resolveProvider(agentType types.AgentType, optionProvider, fileProvider string) (*types.ModelProvider, error) {
+func resolveProvider(log logging.Logger, agentType types.AgentType, optionProvider, fileProvider string) (*types.ModelProvider, error) {
 	name := optionProvider
 	if name == "" {
 		name = fileProvider
@@ -378,8 +371,8 @@ func resolveProvider(agentType types.AgentType, optionProvider, fileProvider str
 	}
 	provider, err := providers.GetProvider(name, agentType)
 	if err != nil {
-		logging.LogError(err.Error())
-		logging.LogInfo("Available providers: " + fmt.Sprint(providers.GetProviderNames(agentType)))
+		log.Error(err.Error())
+		log.Info("Available providers: " + fmt.Sprint(providers.GetProviderNames(agentType)))
 		return nil, err
 	}
 	return provider, nil
@@ -392,7 +385,7 @@ type preparedWorkspace struct {
 }
 
 // prepareWorkspace validates and optionally creates the requested workspace.
-func prepareWorkspace(options runOptions, workDir string, verbose bool) (preparedWorkspace, error) {
+func prepareWorkspace(log logging.Logger, options runOptions, workDir string, verbose bool) (preparedWorkspace, error) {
 	if options.worktreeBranch == "" {
 		return preparedWorkspace{
 			sourceRepoDir: workDir,
@@ -428,9 +421,9 @@ func prepareWorkspace(options runOptions, workDir string, verbose bool) (prepare
 	}
 
 	runner := wsshared.NewExecRunner()
-	var vcs wsshared.VCS = git.New(runner)
+	var vcs wsshared.VCS = git.New(runner, log)
 	if vcsType == wsp.VCSJujutsu {
-		vcs = jj.New(runner)
+		vcs = jj.New(runner, log)
 	}
 
 	created, err := vcs.Setup(wsshared.Config{
@@ -519,16 +512,16 @@ func contributionContainsExecutable(contribution provision.Contribution, binary 
 }
 
 // executeWithTerminal runs the resolved cell inside a terminal wrapper.
-func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, workDir string, verbose bool, options runOptions) error {
+func executeWithTerminal(log logging.Logger, axes resolvedAxes, runCfg isoshared.RunConfig, contribution provision.Contribution, workDir string, verbose bool, options runOptions) error {
 	terminalType := termshared.TerminalType(options.terminal)
-	executor := terminal.GetExecutor(terminalType)
+	executor := terminal.GetExecutor(terminalType, log)
 	if executor == nil {
-		logging.LogError(fmt.Sprintf("Unknown terminal type: %s", options.terminal))
-		logging.LogInfo(fmt.Sprintf("Available types: %v", terminal.GetAvailableTypes()))
+		log.Error(fmt.Sprintf("Unknown terminal type: %s", options.terminal))
+		log.Info(fmt.Sprintf("Available types: %v", terminal.GetAvailableTypes(log)))
 		return fmt.Errorf("unknown terminal type: %s", options.terminal)
 	}
 	if !executor.IsAvailable() {
-		logging.LogError(fmt.Sprintf("Terminal type %s is not available (not installed)", options.terminal))
+		log.Error(fmt.Sprintf("Terminal type %s is not available (not installed)", options.terminal))
 		return fmt.Errorf("terminal type %s is not available", options.terminal)
 	}
 
@@ -548,10 +541,10 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 	}
 
 	if verbose {
-		logging.LogInfo("Using terminal wrapper: " + options.terminal)
+		log.Info("Using terminal wrapper: " + options.terminal)
 	}
 
-	exitCode, err := executor.Execute(terminalConfig, fullCommand, env, workDir, verbose)
+	exitCode, err := executor.Execute(terminalConfig, fullCommand, env, workDir)
 	if err != nil {
 		return err
 	}
@@ -562,19 +555,19 @@ func executeWithTerminal(axes resolvedAxes, runCfg isoshared.RunConfig, contribu
 }
 
 // printDryRun displays what would be executed without running it.
-func printDryRun(axes resolvedAxes, command []string, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
-	logging.LogInfo("Dry run - would execute:")
+func printDryRun(log logging.Logger, axes resolvedAxes, command []string, agent *types.AgentConfig, provider *types.ModelProvider, args []string, workDir string) error {
+	log.Info("Dry run - would execute:")
 
 	if axes.IsolationName == isolation.IsolationNone {
-		logging.LogInfo("  Agent: " + agent.DisplayName)
+		log.Info("  Agent: " + agent.DisplayName)
 		if provider != nil {
-			logging.LogInfo("  Provider: " + provider.DisplayName)
+			log.Info("  Provider: " + provider.DisplayName)
 		}
-		logging.LogInfo("  Work directory: " + workDir)
+		log.Info("  Work directory: " + workDir)
 		if len(args) > 0 {
-			logging.LogInfo("  Arguments: " + fmt.Sprintf("%v", args))
+			log.Info("  Arguments: " + fmt.Sprintf("%v", args))
 		} else {
-			logging.LogInfo("  Arguments: (none)")
+			log.Info("  Arguments: (none)")
 		}
 	}
 

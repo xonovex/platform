@@ -11,10 +11,16 @@ import (
 )
 
 // Workspace is the jj VCS variant: it creates or reuses a jj workspace.
-type Workspace struct{ runner wsshared.Runner }
+type Workspace struct {
+	runner wsshared.Runner
+	log    logging.Logger
+}
 
-// New creates the jj workspace variant over the given process runner.
-func New(runner wsshared.Runner) *Workspace { return &Workspace{runner: runner} }
+// New creates the jj workspace variant over the given process runner, writing
+// through log.
+func New(runner wsshared.Runner, log logging.Logger) *Workspace {
+	return &Workspace{runner: runner, log: log}
+}
 
 // Available reports whether the jj binary is on PATH.
 func (w Workspace) Available() bool { return w.runner.Available("jj") }
@@ -30,7 +36,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	// Reuse an existing workspace directory.
 	if _, err := os.Stat(resolvedDir); err == nil {
 		if verbose {
-			logging.LogInfo(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
+			w.log.Info(fmt.Sprintf("Reusing existing jj workspace at %s", config.Dir))
 		}
 		return resolvedDir, nil
 	}
@@ -48,7 +54,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	}
 
 	if verbose {
-		logging.LogInfo(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
+		w.log.Info(fmt.Sprintf("Creating jj workspace at %s from %s", config.Dir, sourceBranch))
 	}
 
 	if err := w.runner.Stream("jj", []string{"workspace", "add", resolvedDir, "--revision", sourceBranch}, repoDir); err != nil {
@@ -56,7 +62,7 @@ func (w Workspace) Setup(config wsshared.Config, repoDir string, verbose bool) (
 	}
 
 	if verbose {
-		logging.LogSuccess("jj workspace created successfully")
+		w.log.Success("jj workspace created successfully")
 	}
 	return resolvedDir, nil
 }

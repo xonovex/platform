@@ -192,7 +192,7 @@ func TestBuildShellCommand(t *testing.T) {
 func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
 	installFakeTmux(t, false)
 
-	if !NewExecutor().IsAvailable() {
+	if !NewExecutor(testLog).IsAvailable() {
 		t.Error("IsAvailable() = false, want true when tmux resolves on PATH")
 	}
 }
@@ -200,19 +200,19 @@ func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
 func TestExecutorIsUnavailableWhenTmuxDoesNotResolve(t *testing.T) {
 	t.Setenv("PATH", t.TempDir())
 
-	if NewExecutor().IsAvailable() {
+	if NewExecutor(testLog).IsAvailable() {
 		t.Error("IsAvailable() = true, want false when tmux does not resolve on PATH")
 	}
 }
 
 func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
 	t.Setenv("TMUX", "")
-	if NewExecutor().IsInside() {
+	if NewExecutor(testLog).IsInside() {
 		t.Error("IsInside() = true, want false when TMUX is empty")
 	}
 
 	t.Setenv("TMUX", "/tmp/tmux-1000/default,123,0")
-	if !NewExecutor().IsInside() {
+	if !NewExecutor(testLog).IsInside() {
 		t.Error("IsInside() = false, want true when TMUX is set")
 	}
 }
@@ -221,7 +221,7 @@ func TestExecutorExecuteKeepsEnvironmentOutOfTmuxArguments(t *testing.T) {
 	tmuxArguments := installFakeTmux(t, false)
 	outputPath := filepath.Join(t.TempDir(), "result")
 	secret := "provider-secret-value"
-	executor := NewExecutor()
+	executor := NewExecutor(testLog)
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
 
 	exitCode, err := executor.Execute(
@@ -229,7 +229,6 @@ func TestExecutorExecuteKeepsEnvironmentOutOfTmuxArguments(t *testing.T) {
 		[]string{"/bin/sh", "-c", "printf '%s' \"$PROVIDER_TOKEN\" > \"$1\"", "sh", outputPath},
 		[]string{"PROVIDER_TOKEN=" + secret},
 		t.TempDir(),
-		true,
 	)
 
 	if err != nil || exitCode != 0 {
@@ -257,10 +256,10 @@ func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
 	if err != nil {
 		t.Fatalf("resolve true executable: %v", err)
 	}
-	executor := NewExecutor()
+	executor := NewExecutor(testLog)
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
 
-	exitCode, err := executor.Execute(config, []string{truePath}, nil, t.TempDir(), false)
+	exitCode, err := executor.Execute(config, []string{truePath}, nil, t.TempDir())
 
 	if err != nil || exitCode != 0 {
 		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)

@@ -4,30 +4,31 @@
 package terminal
 
 import (
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/tmux"
 )
 
 // GetExecutor returns a terminal executor for the specified type, or nil when no
 // wrapper applies (TerminalNone or an unknown type).
-func GetExecutor(terminalType termshared.TerminalType) termshared.TerminalExecutor {
+func GetExecutor(terminalType termshared.TerminalType, log logging.Logger) termshared.TerminalExecutor {
 	switch terminalType {
 	case termshared.TerminalTmux:
-		return tmux.NewExecutor()
+		return tmux.NewExecutor(log)
 	default:
 		return nil
 	}
 }
 
 // GetAvailableTypes returns all terminal types that are currently available.
-func GetAvailableTypes() []termshared.TerminalType {
+func GetAvailableTypes(log logging.Logger) []termshared.TerminalType {
 	allTypes := []termshared.TerminalType{
 		termshared.TerminalTmux,
 	}
 
 	available := make([]termshared.TerminalType, 0, len(allTypes))
 	for _, t := range allTypes {
-		executor := GetExecutor(t)
+		executor := GetExecutor(t, log)
 		if executor != nil && executor.IsAvailable() {
 			available = append(available, t)
 		}

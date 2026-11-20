@@ -1,9 +1,5 @@
 package colors
 
-import (
-	"os"
-)
-
 // ANSI color codes
 const (
 	Reset  = "\033[0m"
@@ -18,62 +14,19 @@ const (
 	NC     = Reset // No Color alias
 )
 
-// IsColorSupported checks if terminal supports color output
-func IsColorSupported() bool {
-	term := os.Getenv("TERM")
+// Supported reports whether a terminal that sets TERM and NO_COLOR as given
+// accepts color output.
+func Supported(term, noColor string) bool {
 	if term == "" || term == "dumb" {
 		return false
 	}
-	if os.Getenv("NO_COLOR") != "" {
-		return false
-	}
-	return true
+	return noColor == ""
 }
 
-// Colorize wraps text with color codes if supported
-func Colorize(text, color string) string {
-	if !IsColorSupported() {
+// Colorize wraps text with the color code when enabled and returns it unchanged otherwise.
+func Colorize(text, color string, enabled bool) string {
+	if !enabled {
 		return text
 	}
 	return color + text + Reset
-}
-
-// WithRed returns red colored text
-func WithRed(text string) string {
-	return Colorize(text, Red)
-}
-
-// WithGreen returns green colored text
-func WithGreen(text string) string {
-	return Colorize(text, Green)
-}
-
-// WithYellow returns yellow colored text
-func WithYellow(text string) string {
-	return Colorize(text, Yellow)
-}
-
-// WithBlue returns blue colored text
-func WithBlue(text string) string {
-	return Colorize(text, Blue)
-}
-
-// WithPurple returns purple colored text
-func WithPurple(text string) string {
-	return Colorize(text, Purple)
-}
-
-// WithCyan returns cyan colored text
-func WithCyan(text string) string {
-	return Colorize(text, Cyan)
-}
-
-// WithGray returns gray colored text
-func WithGray(text string) string {
-	return Colorize(text, Gray)
-}
-
-// WithBold returns bold text
-func WithBold(text string) string {
-	return Colorize(text, Bold)
 }

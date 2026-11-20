@@ -4,6 +4,10 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
+func claude() Agent {
+	return Agent{Config: claudeAgent, BuildArgs: BuildClaudeArgs, BuildEnv: BuildClaudeEnv}
+}
+
 func claudeAgent() *types.AgentConfig {
 	return &types.AgentConfig{
 		Type:        types.AgentClaude,

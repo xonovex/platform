@@ -39,7 +39,7 @@ func canonicalPath(t *testing.T, path string) string {
 
 func dockerCommand(t *testing.T, cfg isoshared.RunConfig, c provision.Contribution) []string {
 	t.Helper()
-	command, err := NewIsolator().Command(cfg, c)
+	command, err := NewIsolator(testLog).Command(cfg, c)
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
@@ -152,7 +152,7 @@ func TestDocker_NetworkExplicit(t *testing.T) {
 	if args := dockerCommand(t, dockerCfg(t, netshared.ModeHost, work), provision.Contribution{}); !argHasPair(args, "--network", "host") {
 		t.Error("network host must emit --network host")
 	}
-	if _, err := NewIsolator().Command(dockerCfg(t, netshared.ModeProxy, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
+	if _, err := NewIsolator(testLog).Command(dockerCfg(t, netshared.ModeProxy, work), provision.Contribution{}); !errors.Is(err, netshared.ErrProxyEnforcementUnavailable) {
 		t.Errorf("network proxy error = %v, want %v", err, netshared.ErrProxyEnforcementUnavailable)
 	}
 }
@@ -179,7 +179,7 @@ func TestDocker_AppliesContribution(t *testing.T) {
 		Env:         map[string]string{"FOO": "bar"},
 	}
 	args := dockerCommand(t, dockerCfg(t, netshared.ModeNone, work), c)
-	env, err := NewIsolator().containerEnv(dockerCfg(t, netshared.ModeNone, work), c)
+	env, err := NewIsolator(testLog).containerEnv(dockerCfg(t, netshared.ModeNone, work), c)
 	if err != nil {
 		t.Fatalf("containerEnv() error = %v", err)
 	}
@@ -204,7 +204,7 @@ func TestDocker_AppliesContribution(t *testing.T) {
 }
 
 func TestDocker_Capabilities(t *testing.T) {
-	i := NewIsolator()
+	i := NewIsolator(testLog)
 	if !i.HidesHost(false, "") {
 		t.Error("docker with the digest-pinned default image hides host-equivalent tools")
 	}
@@ -227,7 +227,7 @@ func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 	work := t.TempDir()
 	cfg := dockerCfg(t, netshared.ModeNone, work)
 	cfg.BindPaths = []string{work + "/missing"}
-	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing bind error")
 	}
 
@@ -236,7 +236,7 @@ func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
 		CredentialSourceEnv: "MISSING_DOCKER_TEST_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
 	}
-	if _, err := NewIsolator().Command(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing provider token error")
 	}
 }
@@ -255,5 +255,14 @@ func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 
 	if strings.Contains(strings.Join(command, " "), secret) {
 		t.Fatal("docker command arguments contain the provider secret")
+	}
+}
+
+func TestDocker_CommandRejectsUnknownAgentType(t *testing.T) {
+	cfg := dockerCfg(t, netshared.ModeNone, t.TempDir())
+	cfg.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
+
+	if _, err := NewIsolator(testLog).Command(cfg, provision.Contribution{}); err == nil {
+		t.Fatal("Command() error = nil, want unknown agent type error")
 	}
 }

@@ -2,24 +2,24 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 )
 
+// version is set at link time through -ldflags -X.
 var version = "dev"
 
-var rootCmd = &cobra.Command{
-	Use:   "agent-cli",
-	Short: "Unified CLI for running AI coding agents",
-	Long: `agent-cli is a unified CLI tool for running AI coding agents
+// NewRootCommand builds the agent-cli command tree over the given logger.
+func NewRootCommand(log logging.Logger) *cobra.Command {
+	root := &cobra.Command{
+		Use:   "agent-cli",
+		Short: "Unified CLI for running AI coding agents",
+		Long: `agent-cli is a unified CLI tool for running AI coding agents
 with multiple model providers and sandbox options.`,
-	Version: version,
-}
-
-// Execute runs the root command
-func Execute() error {
-	return rootCmd.Execute()
-}
-
-func init() {
-	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
-	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode")
+		Version: version,
+	}
+	root.PersistentFlags().BoolP("verbose", "v", false, "Enable verbose output")
+	root.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode")
+	root.AddCommand(newRunCommand(log), newCompletionCommand())
+	return root
 }

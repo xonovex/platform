@@ -39,8 +39,6 @@ type RunConfig struct {
 	Agent     *types.AgentConfig
 	Provider  *types.ModelProvider
 	AgentArgs []string
-
-	Verbose bool
 }
 
 // Isolator confines the agent process and applies a Provisioner's Contribution

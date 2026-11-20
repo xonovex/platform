@@ -36,7 +36,7 @@ func TestGetExecutor(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := GetExecutor(tt.terminalType)
+			result := GetExecutor(tt.terminalType, testLog)
 			if tt.expectNil && result != nil {
 				t.Errorf("GetExecutor(%q) = %v, want nil", tt.terminalType, result)
 			}
@@ -50,19 +50,19 @@ func TestGetExecutor(t *testing.T) {
 func TestGetAvailableTypesReportsTmuxWhenItResolves(t *testing.T) {
 	withTmuxOnPath(t, true)
 
-	available := GetAvailableTypes()
+	available := GetAvailableTypes(testLog)
 
 	if !slices.Contains(available, termshared.TerminalTmux) {
-		t.Errorf("GetAvailableTypes() = %v, want it to include %q", available, termshared.TerminalTmux)
+		t.Errorf("GetAvailableTypes(testLog) = %v, want it to include %q", available, termshared.TerminalTmux)
 	}
 }
 
 func TestGetAvailableTypesOmitsTmuxWhenItDoesNotResolve(t *testing.T) {
 	withTmuxOnPath(t, false)
 
-	available := GetAvailableTypes()
+	available := GetAvailableTypes(testLog)
 
 	if slices.Contains(available, termshared.TerminalTmux) {
-		t.Errorf("GetAvailableTypes() = %v, want it to omit %q", available, termshared.TerminalTmux)
+		t.Errorf("GetAvailableTypes(testLog) = %v, want it to omit %q", available, termshared.TerminalTmux)
 	}
 }

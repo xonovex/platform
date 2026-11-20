@@ -11,7 +11,7 @@ import (
 )
 
 func TestDefaultRegistry(t *testing.T) {
-	reg := DefaultRegistry()
+	reg := DefaultRegistry(testLog)
 
 	for _, m := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker} {
 		if _, err := reg.Isolator(m); err != nil {

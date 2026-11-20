@@ -12,10 +12,16 @@ import (
 )
 
 // Worktree is the git VCS variant: it creates or reuses a git worktree.
-type Worktree struct{ runner wsshared.Runner }
+type Worktree struct {
+	runner wsshared.Runner
+	log    logging.Logger
+}
 
-// New creates the git worktree variant over the given process runner.
-func New(runner wsshared.Runner) *Worktree { return &Worktree{runner: runner} }
+// New creates the git worktree variant over the given process runner, writing
+// through log.
+func New(runner wsshared.Runner, log logging.Logger) *Worktree {
+	return &Worktree{runner: runner, log: log}
+}
 
 // Available reports true: git worktrees are always usable in a git repo.
 func (Worktree) Available() bool { return true }
@@ -132,36 +138,36 @@ func (w Worktree) Setup(config wsshared.Config, repoDir string, verbose bool) (s
 	existing := checkExisting(w.runner, config.Dir, repoDir)
 	if existing.Exists {
 		if !existing.IsWorktree {
-			logging.LogError(fmt.Sprintf("Directory %s exists but is not a git worktree", config.Dir))
+			w.log.Error(fmt.Sprintf("Directory %s exists but is not a git worktree", config.Dir))
 			return "", fmt.Errorf("directory exists but is not a worktree: %s", config.Dir)
 		}
 		if !existing.IsForThisRepo {
-			logging.LogError(fmt.Sprintf("Worktree %s exists but belongs to a different repository", config.Dir))
+			w.log.Error(fmt.Sprintf("Worktree %s exists but belongs to a different repository", config.Dir))
 			return "", fmt.Errorf("worktree belongs to different repository: %s", config.Dir)
 		}
 		if existing.CurrentBranch != "" && existing.CurrentBranch != config.Branch {
-			logging.LogError(fmt.Sprintf("Worktree %s exists on branch '%s', expected '%s'",
+			w.log.Error(fmt.Sprintf("Worktree %s exists on branch '%s', expected '%s'",
 				config.Dir, existing.CurrentBranch, config.Branch))
 			return "", fmt.Errorf("worktree on wrong branch: expected '%s', found '%s'",
 				config.Branch, existing.CurrentBranch)
 		}
 		if verbose {
-			logging.LogInfo(fmt.Sprintf("Reusing existing worktree at %s on branch %s", config.Dir, config.Branch))
+			w.log.Info(fmt.Sprintf("Reusing existing worktree at %s on branch %s", config.Dir, config.Branch))
 		}
 		return resolvedDir, nil
 	}
 
 	if branchExists(w.runner, config.Branch, repoDir) {
 		if verbose {
-			logging.LogInfo(fmt.Sprintf("Creating worktree at %s for existing branch %s", config.Dir, config.Branch))
+			w.log.Info(fmt.Sprintf("Creating worktree at %s for existing branch %s", config.Dir, config.Branch))
 		}
 		if err := createWorktreeForExistingBranch(w.runner, config.Dir, config.Branch, repoDir); err != nil {
-			logging.LogError(fmt.Sprintf("Failed to create worktree: %v", err))
+			w.log.Error(fmt.Sprintf("Failed to create worktree: %v", err))
 			return "", err
 		}
 		if verbose {
-			logging.LogInfo("Worktree created successfully for existing branch")
-			logging.LogInfo(fmt.Sprintf("  Branch: %s", config.Branch))
+			w.log.Info("Worktree created successfully for existing branch")
+			w.log.Info(fmt.Sprintf("  Branch: %s", config.Branch))
 		}
 		return resolvedDir, nil
 	}
@@ -175,22 +181,22 @@ func (w Worktree) Setup(config wsshared.Config, repoDir string, verbose bool) (s
 	}
 
 	if verbose {
-		logging.LogInfo(fmt.Sprintf("Creating worktree at %s on new branch %s from %s",
+		w.log.Info(fmt.Sprintf("Creating worktree at %s on new branch %s from %s",
 			config.Dir, config.Branch, sourceBranch))
 	}
 	if err := createWorktreeWithNewBranch(w.runner, config.Dir, config.Branch, sourceBranch, repoDir); err != nil {
-		logging.LogError(fmt.Sprintf("Failed to create worktree: %v", err))
+		w.log.Error(fmt.Sprintf("Failed to create worktree: %v", err))
 		return "", err
 	}
 	if err := setMergeBackConfig(w.runner, config.Branch, sourceBranch, repoDir); err != nil {
-		logging.LogError(fmt.Sprintf("Failed to set mergeBackTo config: %v", err))
+		w.log.Error(fmt.Sprintf("Failed to set mergeBackTo config: %v", err))
 		return "", err
 	}
 	if verbose {
-		logging.LogSuccess("Worktree created successfully")
-		logging.LogInfo(fmt.Sprintf("  Branch: %s", config.Branch))
-		logging.LogInfo(fmt.Sprintf("  Source: %s", sourceBranch))
-		logging.LogInfo(fmt.Sprintf("  mergeBackTo: %s", sourceBranch))
+		w.log.Success("Worktree created successfully")
+		w.log.Info(fmt.Sprintf("  Branch: %s", config.Branch))
+		w.log.Info(fmt.Sprintf("  Source: %s", sourceBranch))
+		w.log.Info(fmt.Sprintf("  mergeBackTo: %s", sourceBranch))
 	}
 	return resolvedDir, nil
 }

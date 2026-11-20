@@ -21,11 +21,11 @@ type gitInfo struct {
 }
 
 // Executor implements tmux terminal wrapper
-type Executor struct{}
+type Executor struct{ log logging.Logger }
 
-// NewExecutor creates a new tmux executor
-func NewExecutor() *Executor {
-	return &Executor{}
+// NewExecutor creates a new tmux executor writing through log.
+func NewExecutor(log logging.Logger) *Executor {
+	return &Executor{log: log}
 }
 
 // IsAvailable checks if tmux is installed
@@ -40,7 +40,7 @@ func (e *Executor) IsInside() bool {
 }
 
 // Execute runs the command in a tmux session
-func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string, verbose bool) (int, error) {
+func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (int, error) {
 	// Generate session and window names if not provided
 	sessionName := config.SessionName
 	if sessionName == "" {
@@ -62,7 +62,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 
 	if sessionExists {
 		// Add new window to existing session
-		exitCode, err := e.addWindow(sessionName, windowName, workDir, launchScript, config.Detach, verbose)
+		exitCode, err := e.addWindow(sessionName, windowName, workDir, launchScript, config.Detach)
 		if err != nil || exitCode != 0 {
 			_ = os.Remove(launchScript)
 		}
@@ -70,7 +70,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 	}
 
 	// Create new session
-	exitCode, err := e.createSession(sessionName, windowName, workDir, launchScript, config.Detach, verbose)
+	exitCode, err := e.createSession(sessionName, windowName, workDir, launchScript, config.Detach)
 	if err != nil || exitCode != 0 {
 		_ = os.Remove(launchScript)
 	}
@@ -170,7 +170,7 @@ func sanitizeName(name string) string {
 }
 
 // createSession creates a new tmux session
-func (e *Executor) createSession(sessionName, windowName, workDir, launchScript string, detach bool, verbose bool) (int, error) {
+func (e *Executor) createSession(sessionName, windowName, workDir, launchScript string, detach bool) (int, error) {
 	args := []string{"new-session"}
 
 	if detach {
@@ -184,9 +184,7 @@ func (e *Executor) createSession(sessionName, windowName, workDir, launchScript 
 		"sh", launchScript,
 	)
 
-	if verbose {
-		logging.LogDebug("Creating tmux session: " + sessionName)
-	}
+	e.log.Debug("Creating tmux session: " + sessionName)
 
 	cmd := exec.Command("tmux", args...)
 	cmd.Stdin = os.Stdin
@@ -203,15 +201,15 @@ func (e *Executor) createSession(sessionName, windowName, workDir, launchScript 
 
 	// If detached, print session info
 	if detach {
-		logging.LogInfo("Started tmux session: " + sessionName)
-		logging.LogInfo("Attach with: tmux attach-session -t " + sessionName)
+		e.log.Info("Started tmux session: " + sessionName)
+		e.log.Info("Attach with: tmux attach-session -t " + sessionName)
 	}
 
 	return 0, nil
 }
 
 // addWindow adds a new window to an existing tmux session
-func (e *Executor) addWindow(sessionName, windowName, workDir, launchScript string, detach bool, verbose bool) (int, error) {
+func (e *Executor) addWindow(sessionName, windowName, workDir, launchScript string, detach bool) (int, error) {
 	// Create new window in existing session
 	args := []string{
 		"new-window",
@@ -221,9 +219,7 @@ func (e *Executor) addWindow(sessionName, windowName, workDir, launchScript stri
 		"sh", launchScript,
 	}
 
-	if verbose {
-		logging.LogDebug("Adding window to tmux session: " + sessionName)
-	}
+	e.log.Debug("Adding window to tmux session: " + sessionName)
 
 	cmd := exec.Command("tmux", args...)
 	cmd.Stdin = os.Stdin
@@ -240,22 +236,20 @@ func (e *Executor) addWindow(sessionName, windowName, workDir, launchScript stri
 
 	// Attach to session if not detaching
 	if !detach {
-		return e.attachSession(sessionName, verbose)
+		return e.attachSession(sessionName)
 	}
 
-	logging.LogInfo("Added window to tmux session: " + sessionName)
-	logging.LogInfo("Attach with: tmux attach-session -t " + sessionName)
+	e.log.Info("Added window to tmux session: " + sessionName)
+	e.log.Info("Attach with: tmux attach-session -t " + sessionName)
 
 	return 0, nil
 }
 
 // attachSession attaches to an existing tmux session
-func (e *Executor) attachSession(sessionName string, verbose bool) (int, error) {
+func (e *Executor) attachSession(sessionName string) (int, error) {
 	args := []string{"attach-session", "-t", sessionName}
 
-	if verbose {
-		logging.LogDebug("Attaching to tmux session: " + sessionName)
-	}
+	e.log.Debug("Attaching to tmux session: " + sessionName)
 
 	cmd := exec.Command("tmux", args...)
 	cmd.Stdin = os.Stdin

@@ -78,3 +78,24 @@ func TestBuildOpencodeEnvIsEmpty(t *testing.T) {
 		t.Fatalf("BuildOpencodeEnv() = %v, want empty environment", got)
 	}
 }
+
+func TestLookupReturnsBehaviorOfEachAgentType(t *testing.T) {
+	for _, agentType := range GetAgentTypes() {
+		agent, err := Lookup(agentType)
+		if err != nil {
+			t.Fatalf("Lookup(%s) error = %v", agentType, err)
+		}
+		if agent.Config().Type != agentType {
+			t.Errorf("Lookup(%s).Config().Type = %s", agentType, agent.Config().Type)
+		}
+		if agent.BuildArgs == nil || agent.BuildEnv == nil {
+			t.Errorf("Lookup(%s) has a nil builder", agentType)
+		}
+	}
+}
+
+func TestLookupRejectsUnknownType(t *testing.T) {
+	if _, err := Lookup(types.AgentType("unknown")); err == nil {
+		t.Fatal("Lookup() error = nil, want unknown agent type error")
+	}
+}

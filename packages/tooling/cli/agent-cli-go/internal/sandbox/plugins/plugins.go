@@ -9,6 +9,7 @@ package plugins
 import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/bwrap"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/docker"
 	isonone "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/none"
@@ -20,12 +21,13 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 )
 
-// DefaultRegistry returns a Registry with the built-in isolators and provisioners.
-func DefaultRegistry() *sandbox.Registry {
+// DefaultRegistry returns a Registry with the built-in isolators and
+// provisioners, each writing through log.
+func DefaultRegistry(log logging.Logger) *sandbox.Registry {
 	return sandbox.NewRegistry().
-		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return isonone.NewIsolator() }).
-		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return bwrap.NewIsolator() }).
-		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return docker.NewIsolator() }).
+		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return isonone.NewIsolator(log) }).
+		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return bwrap.NewIsolator(log) }).
+		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return docker.NewIsolator(log) }).
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return provnone.New() }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return command.New() }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return provnix.New() })

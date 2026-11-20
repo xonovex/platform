@@ -27,7 +27,7 @@ func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T
 	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
 	homeDir := canonicalPath(t, cfg.HomeDir)
 
-	env, err := NewIsolator().processEnv(cfg, provision.Contribution{})
+	env, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("processEnv() error = %v", err)
@@ -47,7 +47,7 @@ func TestProcessEnv_ReportsAnUnresolvableWorkDir(t *testing.T) {
 	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
 	cfg.HomeDir = filepath.Join(t.TempDir(), "absent")
 
-	if _, err := NewIsolator().processEnv(cfg, provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail when the home directory cannot be resolved")
 	}
 }
@@ -58,7 +58,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 	cfg := claudeCfg(t, netshared.ModeNone, false, t.TempDir())
 	homeDir := canonicalPath(t, cfg.HomeDir)
 
-	command, env, err := NewIsolator().TerminalCommand(cfg, provision.Contribution{})
+	command, env, err := NewIsolator(testLog).TerminalCommand(cfg, provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("TerminalCommand() error = %v", err)
@@ -78,7 +78,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
 	cfg := claudeCfg(t, netshared.ModeNone, false, filepath.Join(t.TempDir(), "absent"))
 
-	if _, _, err := NewIsolator().TerminalCommand(
+	if _, _, err := NewIsolator(testLog).TerminalCommand(
 		cfg, provision.Contribution{},
 	); err == nil {
 		t.Fatal("TerminalCommand() must fail when the work directory cannot be resolved")
@@ -88,7 +88,7 @@ func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
 // bwrap contributes no tools of its own, so immutability is exactly the
 // provisioner's.
 func TestPinnedProvision_MirrorsTheProvisioner(t *testing.T) {
-	isolator := NewIsolator()
+	isolator := NewIsolator(testLog)
 	for _, pinned := range []bool{true, false} {
 		if got := isolator.PinnedProvision(provision.ProvisionNix, pinned, ""); got != pinned {
 			t.Errorf("PinnedProvision(pinned=%v) = %v, want %v", pinned, got, pinned)
@@ -97,7 +97,7 @@ func TestPinnedProvision_MirrorsTheProvisioner(t *testing.T) {
 }
 
 func TestAvailable_TracksTheBwrapBinaryOnPath(t *testing.T) {
-	isolator := NewIsolator()
+	isolator := NewIsolator(testLog)
 
 	t.Setenv("PATH", t.TempDir())
 	absent, err := isolator.Available()

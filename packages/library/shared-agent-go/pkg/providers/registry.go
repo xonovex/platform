@@ -3,29 +3,34 @@ package providers
 import (
 	"fmt"
 	"maps"
-	"os"
 	"slices"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
+// Getenv resolves an environment variable and returns the empty string when it is unset.
+type Getenv func(key string) string
+
+// presets returns the preset constructors of an agent type by name. A new agent
+// type adds one file that defines its presets and one case here.
+func presets(agentType types.AgentType) map[string]func() *types.ModelProvider {
+	switch agentType {
+	case types.AgentClaude:
+		return claudePresets()
+	case types.AgentOpencode:
+		return opencodePresets()
+	default:
+		return nil
+	}
+}
+
 // GetProvider retrieves a fresh provider configuration by name and agent type.
 func GetProvider(name string, agentType types.AgentType) (*types.ModelProvider, error) {
-	var provider *types.ModelProvider
-	switch {
-	case agentType == types.AgentClaude && name == "gemini":
-		provider = geminiProvider()
-	case agentType == types.AgentClaude && name == "gemini-claude":
-		provider = geminiClaudeProvider()
-	case agentType == types.AgentClaude && name == "glm":
-		provider = glmProvider()
-	case agentType == types.AgentClaude && name == "gpt5-codex":
-		provider = gpt5CodexProvider()
-	case agentType == types.AgentOpencode && name == "gemini":
-		provider = geminiOpencodeProvider()
-	default:
+	build, ok := presets(agentType)[name]
+	if !ok {
 		return nil, fmt.Errorf("unknown provider: %s for agent %s", name, agentType)
 	}
+	provider := build()
 	provider.Environment = maps.Clone(provider.Environment)
 	provider.CliArgs = slices.Clone(provider.CliArgs)
 	return provider, nil
@@ -43,20 +48,16 @@ func GetPortableProvider(name string, agentType types.AgentType) (*types.ModelPr
 	return provider, nil
 }
 
-// GetProviderNames returns all provider names for an agent type.
+// GetProviderNames returns all provider names for an agent type in sorted order.
 func GetProviderNames(agentType types.AgentType) []string {
-	switch agentType {
-	case types.AgentClaude:
-		return []string{"gemini", "gemini-claude", "glm", "gpt5-codex"}
-	case types.AgentOpencode:
-		return []string{"gemini"}
-	default:
-		return []string{}
-	}
+	names := slices.AppendSeq([]string{}, maps.Keys(presets(agentType)))
+	slices.Sort(names)
+	return names
 }
 
-// BuildProviderEnv builds environment variables from provider config
-func BuildProviderEnv(provider *types.ModelProvider) (map[string]string, error) {
+// BuildProviderEnv builds environment variables from provider config, reading
+// the credential through getenv.
+func BuildProviderEnv(provider *types.ModelProvider, getenv Getenv) (map[string]string, error) {
 	env := maps.Clone(provider.Environment)
 	if env == nil {
 		env = make(map[string]string)
@@ -66,7 +67,7 @@ func BuildProviderEnv(provider *types.ModelProvider) (map[string]string, error) 
 		if provider.CredentialSourceEnv == "" || provider.CredentialTargetEnv == "" {
 			return nil, fmt.Errorf("provider %q must define both credential source and target environment variables", provider.Name)
 		}
-		authToken := os.Getenv(provider.CredentialSourceEnv)
+		authToken := getenv(provider.CredentialSourceEnv)
 		if authToken == "" {
 			return nil, fmt.Errorf("missing authentication token: %s environment variable is not set", provider.CredentialSourceEnv)
 		}

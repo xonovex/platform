@@ -67,7 +67,7 @@ func TestSetup_ReusesAWorktreeOnTheExpectedBranch(t *testing.T) {
 		key(target, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "feature/x",
 	}}
 
-	dir, err := New(runner).Setup(
+	dir, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, true,
 	)
 	if err != nil {
@@ -84,7 +84,7 @@ func TestSetup_ReusesAWorktreeOnTheExpectedBranch(t *testing.T) {
 func TestSetup_RejectsADirectoryThatIsNotAWorktree(t *testing.T) {
 	target := t.TempDir()
 
-	_, err := New(&fakeRunner{}).Setup(
+	_, err := New(&fakeRunner{}, testLog).Setup(
 		wsshared.Config{Branch: "feature/x", Dir: target}, t.TempDir(), false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "not a worktree") {
@@ -102,7 +102,7 @@ func TestSetup_RejectsAWorktreeFromADifferentRepository(t *testing.T) {
 		commonDir(repoDir): shared,
 	}}
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "different repository") {
@@ -121,7 +121,7 @@ func TestSetup_RejectsAWorktreeOnTheWrongBranch(t *testing.T) {
 		key(target, "git", []string{"rev-parse", "--abbrev-ref", "HEAD"}): "main",
 	}}
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/x", Dir: target}, repoDir, false,
 	)
 	if err == nil || !strings.Contains(err.Error(), "wrong branch") {
@@ -137,7 +137,7 @@ func TestSetup_CreatesAWorktreeForAnExistingBranch(t *testing.T) {
 		key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/existing"}): "abc123",
 	}}
 
-	dir, err := New(runner).Setup(
+	dir, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "existing", Dir: target}, repoDir, true,
 	)
 	if err != nil {
@@ -167,7 +167,7 @@ func TestSetup_CreatesANewBranchWorktreeAndRecordsMergeBackTo(t *testing.T) {
 		},
 	}
 
-	dir, err := New(runner).Setup(
+	dir, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/new", Dir: target}, repoDir, true,
 	)
 	if err != nil {
@@ -196,7 +196,7 @@ func TestSetup_PrefersAnExplicitSourceBranch(t *testing.T) {
 		},
 	}
 
-	if _, err := New(runner).Setup(
+	if _, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/new", Dir: target, SourceBranch: "release"},
 		repoDir, false,
 	); err != nil {
@@ -219,7 +219,7 @@ func TestSetup_RequiresASourceBranch(t *testing.T) {
 		},
 	}
 
-	_, err := New(runner).Setup(
+	_, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "feature/new", Dir: filepath.Join(t.TempDir(), "worktree")},
 		repoDir, false,
 	)
@@ -234,7 +234,7 @@ func TestSetup_ResolvesARelativeDirectoryAgainstTheRepository(t *testing.T) {
 		key(repoDir, "git", []string{"rev-parse", "--verify", "refs/heads/existing"}): "abc123",
 	}}
 
-	dir, err := New(runner).Setup(
+	dir, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "existing", Dir: "checkout"}, repoDir, false,
 	)
 	if err != nil {
@@ -257,7 +257,7 @@ func TestSetup_ReportsAFailedWorktreeAdd(t *testing.T) {
 		},
 	}
 
-	if _, err := New(runner).Setup(
+	if _, err := New(runner, testLog).Setup(
 		wsshared.Config{Branch: "existing", Dir: target}, repoDir, false,
 	); err == nil {
 		t.Fatal("Setup() must surface a failed worktree add")
@@ -265,7 +265,7 @@ func TestSetup_ReportsAFailedWorktreeAdd(t *testing.T) {
 }
 
 func TestAvailable(t *testing.T) {
-	if !New(&fakeRunner{}).Available() {
+	if !New(&fakeRunner{}, testLog).Available() {
 		t.Error("git worktree variant must always report available")
 	}
 }

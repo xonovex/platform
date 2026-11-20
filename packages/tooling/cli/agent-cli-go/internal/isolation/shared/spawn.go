@@ -13,16 +13,14 @@ import (
 // SpawnSandbox spawns a sandbox process and waits for completion. The process
 // inherits the caller's working directory; isolators that need a specific cwd
 // (e.g. host execution) use SpawnSandboxInDir.
-func SpawnSandbox(command string, args []string, env []string, errorPrefix string, verbose bool) (int, error) {
-	return SpawnSandboxInDir(command, args, env, "", errorPrefix, verbose)
+func SpawnSandbox(log logging.Logger, command string, args []string, env []string, errorPrefix string) (int, error) {
+	return SpawnSandboxInDir(log, command, args, env, "", errorPrefix)
 }
 
 // SpawnSandboxInDir spawns a process in dir (empty = inherit the caller's cwd)
 // and waits for completion, returning the child exit code.
-func SpawnSandboxInDir(command string, args []string, env []string, dir string, errorPrefix string, verbose bool) (int, error) {
-	if verbose {
-		logging.LogDebug(fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
-	}
+func SpawnSandboxInDir(log logging.Logger, command string, args []string, env []string, dir string, errorPrefix string) (int, error) {
+	log.Debug(fmt.Sprintf("Executing: %s %s", command, strings.Join(args, " ")))
 
 	cmd := exec.Command(command, args...)
 	cmd.Dir = dir

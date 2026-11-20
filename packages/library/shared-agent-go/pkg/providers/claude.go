@@ -4,6 +4,16 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
+// claudePresets returns the preset constructors for the Claude agent by name.
+func claudePresets() map[string]func() *types.ModelProvider {
+	return map[string]func() *types.ModelProvider{
+		"gemini":        geminiProvider,
+		"gemini-claude": geminiClaudeProvider,
+		"glm":           glmProvider,
+		"gpt5-codex":    gpt5CodexProvider,
+	}
+}
+
 func geminiProvider() *types.ModelProvider {
 	return &types.ModelProvider{
 		Name:                "gemini",

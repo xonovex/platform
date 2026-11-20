@@ -13,6 +13,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
@@ -22,10 +23,10 @@ import (
 // tools or restrict network egress. The agent runs WITHOUT the sandbox
 // permission bypass: there is no isolation boundary, so it keeps its normal host
 // permission prompts.
-type Isolator struct{}
+type Isolator struct{ log logging.Logger }
 
 // NewIsolator creates a host (no-isolation) isolator.
-func NewIsolator() *Isolator { return &Isolator{} }
+func NewIsolator(log logging.Logger) *Isolator { return &Isolator{log: log} }
 
 // Available always reports true — direct host execution is always possible.
 func (i *Isolator) Available() (bool, error) { return true, nil }
@@ -49,7 +50,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandboxInDir(cmd[0], cmd[1:], env, cfg.WorkDir, "host execution", cfg.Verbose)
+	return isoshared.SpawnSandboxInDir(i.log, cmd[0], cmd[1:], env, cfg.WorkDir, "host execution")
 }
 
 // Command returns the host command (for display / terminal wrappers).
@@ -74,25 +75,19 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if _, err := isoshared.ResolveDirectory(cfg.WorkDir, "work directory"); err != nil {
 		return nil, nil, err
 	}
+	behavior, err := agents.Lookup(cfg.Agent.Type)
+	if err != nil {
+		return nil, nil, err
+	}
 	var providerCliArgs []string
-	agentEnv := map[string]string{}
 	if cfg.Provider != nil {
 		providerCliArgs = providers.GetProviderCliArgs(cfg.Provider)
-		var err error
-		agentEnv, err = agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
-		if err != nil {
-			return nil, nil, err
-		}
 	}
-	execOpts := types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs}
-
-	var agentArgs []string
-	switch cfg.Agent.Type {
-	case types.AgentClaude:
-		agentArgs = agents.BuildClaudeArgs(cfg.AgentArgs, execOpts)
-	case types.AgentOpencode:
-		agentArgs = agents.BuildOpencodeArgs(cfg.AgentArgs, execOpts)
+	agentEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, os.Getenv)
+	if err != nil {
+		return nil, nil, err
 	}
+	agentArgs := behavior.BuildArgs(cfg.AgentArgs, types.AgentExecOptions{Sandbox: false, ProviderCliArgs: providerCliArgs})
 
 	cmd := append([]string{cfg.Agent.Binary}, agentArgs...)
 	cmd = isoshared.WrapWithInitCommands(cmd, c.InitCommands)

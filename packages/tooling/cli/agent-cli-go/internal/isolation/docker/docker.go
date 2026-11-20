@@ -15,6 +15,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
@@ -40,10 +41,10 @@ const (
 //
 // Default runc is attack-surface reduction; a sandboxed runtime (runsc/gVisor)
 // is the kernel boundary (see KernelIsolated), wired via RunConfig.Runtime.
-type Isolator struct{}
+type Isolator struct{ log logging.Logger }
 
 // NewIsolator creates a docker isolator.
-func NewIsolator() *Isolator { return &Isolator{} }
+func NewIsolator(log logging.Logger) *Isolator { return &Isolator{log: log} }
 
 // Available reports whether the docker daemon is reachable.
 func (i *Isolator) Available() (bool, error) {
@@ -86,7 +87,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox("docker", args, env, "Docker sandbox", cfg.Verbose)
+	return isoshared.SpawnSandbox(i.log, "docker", args, env, "Docker sandbox")
 }
 
 // Command returns the full docker command (for display / terminal wrappers).
@@ -216,7 +217,10 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args = append(args, resolveImage(cfg.Image))
 
 	// Agent command, wrapped with the provisioner's init commands.
-	agentCmd := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
+	agentCmd, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
+	if err != nil {
+		return nil, err
+	}
 	args = append(args, isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)...)
 
 	return args, nil
@@ -253,7 +257,7 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider)
+	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, os.Getenv)
 	if err != nil {
 		return nil, err
 	}

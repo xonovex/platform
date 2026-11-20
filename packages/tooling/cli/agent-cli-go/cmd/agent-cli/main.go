@@ -8,8 +8,9 @@ import (
 )
 
 func main() {
-	if err := cmd.Execute(); err != nil {
-		logging.LogError(err.Error())
+	log := logging.FromEnvironment(os.Getenv, os.Stdout, os.Stderr)
+	if err := cmd.NewRootCommand(log).Execute(); err != nil {
+		log.Error(err.Error())
 		os.Exit(1)
 	}
 }

@@ -23,5 +23,5 @@ type TerminalConfig struct {
 type TerminalExecutor interface {
 	IsAvailable() bool
 	IsInside() bool
-	Execute(config *TerminalConfig, command []string, env []string, workDir string, verbose bool) (int, error)
+	Execute(config *TerminalConfig, command []string, env []string, workDir string) (int, error)
 }
