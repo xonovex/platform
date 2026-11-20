@@ -1,6 +1,6 @@
 ---
 name: configuring-harness-integrations
-description: "Use when adding, reviewing, comparing, or removing a guardrail, hook, plugin, or extension for an agent harness, whichever harness it is. Triggers on a capability matrix, a semantic intent mapped to native events, a guarantee boundary, transactional onboarding, preview before apply, explicit authorization, disable and rollback, configuration drift, or a deterministic hook versus a model evaluator versus a specialist agent, even when the user doesn't say 'harness'. Not for one harness's native events, settings syntax, or trust rules."
+description: "Use when comparing agent harnesses or applying the contract every harness shares: a versioned capability matrix of semantic intents, a guarantee boundary, the preview-then-apply lifecycle with explicit authorization, rollback and drift, or the executor class of a hook (deterministic command, model evaluator, specialist agent). Triggers on which harnesses can block an action, matrix identity fields, mapping an intent to native events across harnesses, onboarding or rolling back one integration on several harnesses, even when the user doesn't say 'harness'. Not for setting up or debugging one named product such as Claude Code, Codex, Copilot, Kiro, OpenCode, or Pi: its own configuring skill owns its events, settings, and syntax."
 ---
 
 # Harness Integrations
