@@ -28,16 +28,6 @@ func TestGetDefaultDir(t *testing.T) {
 	}
 }
 
-func TestBuildBindPaths(t *testing.T) {
-	if got := BuildBindPaths([]string{"/a"}, ""); len(got) != 1 {
-		t.Errorf("BuildBindPaths with empty repo = %v, want unchanged", got)
-	}
-	got := BuildBindPaths([]string{"/a"}, "/repo")
-	if len(got) != 2 || got[1] != "/repo" {
-		t.Errorf("BuildBindPaths = %v, want source repo appended", got)
-	}
-}
-
 // TestVCSType_ConsumedFromShared confirms the CLI consumes the VCSType enum from
 // the shared module (no local redefinition).
 func TestVCSType_ConsumedFromShared(t *testing.T) {

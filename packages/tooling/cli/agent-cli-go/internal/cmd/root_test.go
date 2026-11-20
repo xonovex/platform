@@ -55,6 +55,7 @@ func (r *recordingIsolator) EgressTransport() network.EgressTransport {
 	return network.TransportUnixSocket
 }
 func (r *recordingIsolator) ConfinesNetwork() bool                { return true }
+func (r *recordingIsolator) Bounded() bool                        { return true }
 func (r *recordingIsolator) CheckAgent(isoshared.RunConfig) error { return nil }
 
 type recordingProvisioner struct{ input provshared.Input }
@@ -93,7 +94,7 @@ type testRoot struct {
 
 func newTestRoot() *testRoot {
 	r := &testRoot{bridge: &recordingBridge{}, isolator: &recordingIsolator{}, provisioner: &recordingProvisioner{}}
-	registry := sandbox.NewRegistry().
+	registry := sandbox.NewRegistry[isoshared.Isolator]().
 		RegisterProvisioner(provision.ProvisionNone, func() provshared.Provisioner { return r.provisioner }).
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return r.provisioner })
 	for _, method := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationBwrap, isolation.IsolationDocker} {
@@ -155,14 +156,14 @@ func TestRunCommandBindsTheFlagsIntoTheRun(t *testing.T) {
 		t.Fatalf("run error = %v", err)
 	}
 	run := r.isolator.run
-	if run.Agent.Binary != "opencode" || run.WorkDir != "/src" || run.Image != "agent@sha256:abc" || run.Runtime != "runsc" {
+	if run.Agent.Binary != "opencode" || run.Process.Dir != "/src" || run.Image != "agent@sha256:abc" || run.Runtime != "runsc" {
 		t.Errorf("RunConfig = %+v", run)
 	}
-	if run.Network != "none" || !slices.Equal(run.RoBindPaths, []string{"/data"}) || !slices.Equal(run.CustomEnv, []string{"A=1"}) {
-		t.Errorf("network, binds, env = %q %v %v", run.Network, run.RoBindPaths, run.CustomEnv)
+	if run.Network != "none" || !slices.Equal(run.RoBindPaths, []string{"/data"}) || !slices.Equal(run.Process.Env, []string{"A=1"}) {
+		t.Errorf("network, binds, env = %q %v %v", run.Network, run.RoBindPaths, run.Process.Env)
 	}
-	if !slices.Equal(run.AgentArgs, []string{"review", "--fast"}) {
-		t.Errorf("AgentArgs = %v", run.AgentArgs)
+	if !slices.Equal(run.Process.Argv[len(run.Process.Argv)-2:], []string{"review", "--fast"}) {
+		t.Errorf("Process.Argv = %v, want the user arguments last", run.Process.Argv)
 	}
 	if !slices.Equal(r.provisioner.input.InitCommands, []string{"npm ci"}) {
 		t.Errorf("InitCommands = %v", r.provisioner.input.InitCommands)

@@ -33,7 +33,7 @@ func cfg(net network.NetworkMethod) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:   registeredAgent(types.AgentClaude),
 		HomeDir: "/home/user",
-		WorkDir: "/work",
+		Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/work"},
 		Network: net,
 	}
 }
@@ -58,17 +58,13 @@ func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
 	}
 }
 
-func TestNone_CommandNoPermissionBypass(t *testing.T) {
-	// Host execution must NOT inject the sandbox permission bypass (Sandbox=false).
+func TestNone_CommandIsTheProcessUnchanged(t *testing.T) {
 	cmd, err := NewIsolator(newHost(), testLog).Command(cfg(network.NetworkHost), provision.Contribution{})
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
-	if cmd[0] != "claude" {
-		t.Fatalf("command[0] = %q, want claude", cmd[0])
-	}
-	if strings.Contains(strings.Join(cmd, " "), "bypassPermissions") {
-		t.Error("host execution must not bypass permissions")
+	if !slices.Equal(cmd, []string{"claude", "review"}) {
+		t.Errorf("command = %v, want the argument vector of the process", cmd)
 	}
 }
 
@@ -111,10 +107,9 @@ func TestNone_PathEntriesWithoutAHostPath(t *testing.T) {
 func TestNone_MergesHostProviderAndCustomEnvironment(t *testing.T) {
 	host := newHost()
 	host.Env["HOST_ONLY"] = "kept"
-	host.Env["SOURCE_TOKEN"] = "secret"
 	config := cfg(network.NetworkHost)
-	config.Provider = &types.ModelProvider{CredentialSourceEnv: "SOURCE_TOKEN", CredentialTargetEnv: "AGENT_PROVIDER_TOKEN"}
-	config.CustomEnv = []string{"CUSTOM=1"}
+	config.ProviderEnv = map[string]string{"AGENT_PROVIDER_TOKEN": "secret"}
+	config.Process.Env = []string{"CUSTOM=1"}
 
 	_, env, err := NewIsolator(host, testLog).TerminalCommand(config, provision.Contribution{})
 
@@ -130,7 +125,7 @@ func TestNone_MergesHostProviderAndCustomEnvironment(t *testing.T) {
 
 func TestNone_CommandRejectsMalformedCustomEnvironment(t *testing.T) {
 	config := cfg(network.NetworkHost)
-	config.CustomEnv = []string{"MISSING_EQUALS"}
+	config.Process.Env = []string{"MISSING_EQUALS"}
 
 	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
 		t.Fatal("Command() error = nil, want custom environment error")
@@ -139,27 +134,16 @@ func TestNone_CommandRejectsMalformedCustomEnvironment(t *testing.T) {
 
 func TestNone_CommandRejectsMissingWorkDirectory(t *testing.T) {
 	config := cfg(network.NetworkHost)
-	config.WorkDir = "/missing"
+	config.Process.Dir = "/missing"
 
 	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
 		t.Fatal("Command() error = nil, want work directory error")
 	}
 }
 
-func TestNone_CommandRejectsMissingProviderToken(t *testing.T) {
-	cfg := cfg(network.NetworkHost)
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "MISSING_NONE_TEST_TOKEN",
-		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
-	}
-	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
-		t.Error("Command() error = nil, want missing provider token error")
-	}
-}
-
 func TestNone_RunSpawnsTheAgentInTheWorkDirectory(t *testing.T) {
 	host := newHost()
-	host.Outcomes["claude"] = systemtest.Outcome{ExitCode: 3}
+	host.Outcomes["claude review"] = systemtest.Outcome{ExitCode: 3}
 
 	code, err := NewIsolator(host, testLog).Run(cfg(network.NetworkHost), provision.Contribution{})
 
@@ -182,6 +166,9 @@ func TestNone_Capabilities(t *testing.T) {
 	if i.ConfinesNetwork() {
 		t.Error("none has no network namespace")
 	}
+	if i.Bounded() {
+		t.Error("none sets no boundary around the agent")
+	}
 }
 
 func TestNone_CheckAgentLooksUpTheHostPath(t *testing.T) {
@@ -197,15 +184,6 @@ func TestNone_CheckAgentLooksUpTheHostPath(t *testing.T) {
 	}
 }
 
-func TestNone_CommandRejectsUnknownAgentType(t *testing.T) {
-	config := cfg(network.NetworkHost)
-	config.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
-
-	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
-		t.Fatal("Command() error = nil, want unknown agent type error")
-	}
-}
-
 // Host execution has no image and no boundary, so availability is constant and
 // immutability is exactly the provisioner's.
 func TestNone_AvailableAndPinnedProvision(t *testing.T) {
@@ -217,33 +195,6 @@ func TestNone_AvailableAndPinnedProvision(t *testing.T) {
 		if got := isolator.PinnedProvision(provision.ProvisionNix, pinned, ""); got != pinned {
 			t.Errorf("PinnedProvision(pinned=%v) = %v, want %v", pinned, got, pinned)
 		}
-	}
-}
-
-func TestNone_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
-	tests := []struct {
-		agent types.AgentType
-		want  []string
-	}{
-		{types.AgentCodex, []string{"codex", "go"}},
-		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
-		{types.AgentCopilot, []string{"copilot", "go"}},
-		{types.AgentPi, []string{"pi", "go"}},
-	}
-	for _, test := range tests {
-		t.Run(string(test.agent), func(t *testing.T) {
-			c := cfg(network.NetworkHost)
-			c.Agent = registeredAgent(test.agent)
-			c.AgentArgs = []string{"go"}
-
-			cmd, err := NewIsolator(newHost(), testLog).Command(c, provision.Contribution{})
-			if err != nil {
-				t.Fatalf("Command() error = %v", err)
-			}
-			if !slices.Equal(cmd, test.want) {
-				t.Errorf("command = %v, want %v (no sandbox arguments on the host)", cmd, test.want)
-			}
-		})
 	}
 }
 

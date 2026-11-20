@@ -51,7 +51,7 @@ func TestProcessEnv_ReportsAnUnresolvableHomeDir(t *testing.T) {
 
 func TestProcessEnv_ReportsAMalformedCustomEnvironment(t *testing.T) {
 	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.CustomEnv = []string{"MISSING_EQUALS"}
+	cfg.Process.Env = []string{"MISSING_EQUALS"}
 
 	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail on a malformed custom environment")
@@ -83,7 +83,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
 	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.WorkDir = "/work/absent"
+	cfg.Process.Dir = "/work/absent"
 
 	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("TerminalCommand() must fail when the work directory cannot be resolved")

@@ -57,6 +57,9 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 // the allowlist proxy.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportLoopback }
 
+// Bounded reports true: the profile confines what the agent writes and reaches.
+func (i *Isolator) Bounded() bool { return true }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {
@@ -71,7 +74,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.WorkDir, "Seatbelt sandbox")
+	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "Seatbelt sandbox")
 }
 
 // Command returns the sandbox-exec command (for display and terminal wrappers).
@@ -94,7 +97,7 @@ func (i *Isolator) command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	if err != nil {
 		return nil, nil, err
 	}
-	agent, env, err := isoshared.HostExecution(i.host, cfg, c, true)
+	agent, env, err := isoshared.HostExecution(i.host, cfg, c)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -107,7 +110,7 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 	if err != nil {
 		return profileSpec{}, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return profileSpec{}, err
 	}

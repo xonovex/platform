@@ -13,8 +13,8 @@ import (
 
 // Isolator runs the agent directly on the host — no namespace boundary. It
 // applies the provisioner's Contribution (PATH/env/init) but cannot hide host
-// tools or restrict network egress. The agent runs WITHOUT the sandbox
-// permission bypass: there is no isolation boundary, so it keeps its normal host
+// tools or restrict network egress. It declares itself unbounded, so the agent
+// runs WITHOUT the sandbox permission bypass and keeps its normal host
 // permission prompts.
 type Isolator struct {
 	host isoshared.Host
@@ -48,6 +48,10 @@ func (i *Isolator) ConfinesNetwork() bool { return false }
 // through an allowlist.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportNone }
 
+// Bounded reports false: with no boundary the agent keeps its own permission
+// prompts.
+func (i *Isolator) Bounded() bool { return false }
+
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
 	if _, err := i.host.LookPath(cfg.Agent.Binary); err != nil {
@@ -63,7 +67,7 @@ func (i *Isolator) Run(cfg isoshared.RunConfig, c provision.Contribution) (int, 
 	if err != nil {
 		return 1, err
 	}
-	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.WorkDir, "host execution")
+	return isoshared.SpawnSandbox(i.host, i.log, cmd[0], cmd[1:], env, cfg.Process.Dir, "host execution")
 }
 
 // Command returns the host command (for display / terminal wrappers).
@@ -85,8 +89,8 @@ func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution
 	if cfg.Network != network.NetworkHost {
 		return nil, nil, fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", cfg.Network)
 	}
-	if _, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory"); err != nil {
+	if _, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory"); err != nil {
 		return nil, nil, err
 	}
-	return isoshared.HostExecution(i.host, cfg, c, false)
+	return isoshared.HostExecution(i.host, cfg, c)
 }

@@ -56,8 +56,8 @@ func flagInput(options Options) config.Input {
 
 // applyResolved folds the merged configuration into the options of the run. It
 // replaces each list with the merged one, which already holds the entries of the
-// command line, and marks every axis a layer chose, so the pinned default yields
-// to it.
+// command line, and records whether a layer chose an isolation or provision
+// axis, so the pinned default yields to it.
 func applyResolved(options Options, resolved config.Resolved) Options {
 	for key, target := range map[config.Key]*string{
 		config.KeyAgent:     &options.Agent,
@@ -72,8 +72,8 @@ func applyResolved(options Options, resolved config.Resolved) Options {
 		}
 	}
 	for _, key := range []config.Key{config.KeyIsolation, config.KeyProvision} {
-		if resolved.Has(key) {
-			options.Explicit = options.Explicit.With(key)
+		if options.Explicit.Has(key) || resolved.Has(key) {
+			options.ExplicitAxes = true
 		}
 	}
 	options.Models = resolved.Items(config.KeyModels)
@@ -120,7 +120,7 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 		return resolution{}, fmt.Errorf("failed to load providers: %w", err)
 	}
 	effective.Catalog = providers.NewCatalog(set.Documents...)
-	effective.ProviderDirs = set.Dirs
+	effective.UserProviderDir = userProviderDir(set.Dirs)
 	if effective.ModelOverrides, err = parseModelOverrides(merged.Sourced(config.KeyModels)); err != nil {
 		return resolution{}, fmt.Errorf("resolve configuration: %w", err)
 	}
@@ -146,6 +146,18 @@ func resolve(deps Dependencies, options Options, advisory bool) (resolution, err
 	}
 	plan, err := build(effective, cwd, home, deps.Sandboxes)
 	return resolution{config: merged, plan: plan, planErr: err}, nil
+}
+
+// userProviderDir is the provider directory of the user layer, or empty when
+// no user layer has one.
+func userProviderDir(dirs []config.ProviderDir) string {
+	path := ""
+	for _, dir := range dirs {
+		if dir.Layer == config.LayerUser {
+			path = dir.Path
+		}
+	}
+	return path
 }
 
 // approvedDigest asks the approvals whether the digest is approved; a build

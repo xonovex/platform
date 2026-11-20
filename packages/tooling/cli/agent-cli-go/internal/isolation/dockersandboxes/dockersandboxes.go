@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
@@ -70,6 +69,9 @@ func (i *Isolator) ConfinesNetwork() bool { return false }
 
 // EgressTransport declares none: an allowlist cannot be installed.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportNone }
+
+// Bounded reports true: the microVM confines what the agent writes.
+func (i *Isolator) Bounded() bool { return true }
 
 // CheckAgent has nothing to check: the agent binary lives in the sandbox image.
 func (i *Isolator) CheckAgent(isoshared.RunConfig) error { return nil }
@@ -169,15 +171,7 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	case len(c.PathEntries) > 0:
 		return plan{}, fmt.Errorf("%w: a provisioned tool directory cannot reach the sandbox PATH", ErrUnsupported)
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
-	if err != nil {
-		return plan{}, err
-	}
-	command, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
-	if err != nil {
-		return plan{}, err
-	}
-	agentEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return plan{}, err
 	}
@@ -185,7 +179,7 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	if err != nil {
 		return plan{}, err
 	}
-	values := envutil.MergeEnvMaps(agentEnv, runEnv, c.Env)
+	values := envutil.MergeEnvMaps(cfg.ProviderEnv, runEnv, c.Env)
 
 	mounts := []string{workDir}
 	for _, path := range cfg.BindPaths {
@@ -222,6 +216,6 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 		exec = append(exec, "-e", variable)
 	}
 	exec = append(exec, name)
-	exec = append(exec, command...)
+	exec = append(exec, cfg.Process.Argv...)
 	return plan{name: name, create: create, exec: exec, values: values}, nil
 }

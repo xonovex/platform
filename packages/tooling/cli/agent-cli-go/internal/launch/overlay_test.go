@@ -84,7 +84,7 @@ func TestExecuteAppliesTheOverlayBeforeTheUserArguments(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 	run := f.sandbox.isolator.commandRun
-	if !slices.Equal(run.AgentArgs, []string{"--add-dir", "/tmp/o", "review"}) || !slices.Contains(run.CustomEnv, "A=1") || !slices.Contains(run.RoBindPaths, "/tmp/o") || !slices.Contains(run.BindPaths, "/tmp/w") {
+	if !slices.Equal(run.Process.Argv, []string{"claude", "--permission-mode", "bypassPermissions", "--add-dir", "/tmp/o", "review"}) || !slices.Contains(run.Process.Env, "A=1") || !slices.Contains(run.RoBindPaths, "/tmp/o") || !slices.Contains(run.BindPaths, "/tmp/w") {
 		t.Errorf("run = %+v", run)
 	}
 	if !overlays.called || !overlays.cleaned || overlays.request.DryRun {

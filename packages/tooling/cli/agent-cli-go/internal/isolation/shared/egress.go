@@ -76,12 +76,12 @@ func ProxyEnv(address string) map[string]string {
 	return env
 }
 
-// RunEnv merges the custom environment, the credential values and, for the
-// loopback transport, the proxy environment of cfg. The last source wins, and the
+// RunEnv merges the environment of the process, the credential values and, for
+// the loopback transport, the proxy environment of cfg. The last source wins, and the
 // proxy environment wins over the caller so a managed run cannot be pointed away
 // from its proxy by a custom variable.
 func RunEnv(cfg RunConfig) (map[string]string, error) {
-	custom, err := envutil.ParseCustomEnv(cfg.CustomEnv)
+	custom, err := envutil.ParseCustomEnv(cfg.Process.Env)
 	if err != nil {
 		return nil, err
 	}

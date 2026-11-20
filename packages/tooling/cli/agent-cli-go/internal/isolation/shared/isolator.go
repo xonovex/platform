@@ -1,8 +1,9 @@
-// Package shared is the isolation axis core: the Isolator port, the Host port
-// the isolators consume, the neutral RunConfig the composition root hands every
-// isolator, and the path checks they share. It names no concrete
-// isolator (none/bwrap/docker) and no sibling axis leaf; the per-isolator network
-// flags live in isolation/<type>/network.go bridge files.
+// Package shared is the isolation axis core: the Confinement and Launcher
+// ports, the Host port the isolators consume, the Process and the neutral
+// RunConfig the composition root hands every isolator, and the path checks they
+// share. It names no concrete isolator (none/bwrap/docker) and no sibling axis
+// leaf; the per-isolator network flags live in isolation/<type>/network.go
+// bridge files.
 package shared
 
 import (
@@ -11,15 +12,27 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
-// RunConfig carries the run-wide inputs every isolator needs to launch the
-// agent. Every path in it is absolute, and HomeDir is always set. The
+// Process is the agent process of a run: its argument vector, its environment
+// as KEY=VALUE entries, and its working directory. The planner computes it from
+// the facts of the agent, and an isolation confines it without changing what it
+// runs.
+type Process struct {
+	Argv []string
+	Env  []string
+	Dir  string
+}
+
+// RunConfig carries the run-wide inputs every isolator needs to confine the
+// agent process. Every path in it is absolute, and HomeDir is always set. The
 // per-isolator knobs (bwrap HostPassthrough, docker Image and Runtime) sit
 // here because the composition root builds the isolators before the flags are
 // parsed.
 type RunConfig struct {
 	HomeDir string
-	WorkDir string
 	RepoDir string
+	// Process is the agent process to confine. Its Dir is the work directory,
+	// which the isolation binds read-write and starts the process in.
+	Process Process
 
 	// Network is the egress mode; the isolator emits its own network flags via its
 	// network.go bridge.
@@ -37,30 +50,21 @@ type RunConfig struct {
 
 	BindPaths   []string
 	RoBindPaths []string
-	CustomEnv   []string
-	// Secrets are credential values resolved for this run. They reach the agent as
-	// environment variables only, never as an argument, a file or a log line.
-	Secrets map[string]string
+	// ProviderEnv is the environment of the provider route, resolved for this run
+	// from the host. Secrets are credential values resolved for this run. Both
+	// reach the agent as environment variables only, never as an argument, a file
+	// or a log line.
+	ProviderEnv map[string]string
+	Secrets     map[string]string
 
-	Agent     *types.AgentConfig
-	Provider  *types.ModelProvider
-	AgentArgs []string
+	Agent    *types.AgentConfig
+	Provider *types.ModelProvider
 }
 
-// Isolator confines the agent process and applies a Provisioner's Contribution
-// via its own mechanism (bwrap binds / docker -v / direct host exec). It applies
-// the network mode explicitly and declares its host-tools / kernel-isolation
-// capabilities so the policy engine never names a concrete isolator.
-type Isolator interface {
-	Available() (bool, error)
-	Run(cfg RunConfig, c provision.Contribution) (int, error)
-	Command(cfg RunConfig, c provision.Contribution) ([]string, error)
-	// TerminalCommand returns the command AND the environment to launch it under a
-	// terminal wrapper. Isolators that bake the environment into the command
-	// (bwrap/docker) return the host environment; the host (none) isolator, which
-	// bakes nothing, returns the agent command with its full resolved environment
-	// (provider tokens, custom env, and the provisioner's PATH/env).
-	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string, err error)
+// Confinement declares what an isolation guarantees, so the policy engine and
+// the selection never name a concrete isolator. It holds no way to start a
+// process: an executor that launches the agent elsewhere implements only this.
+type Confinement interface {
 	// PinnedProvision reports whether all tool inputs used by this isolator are
 	// immutable. Image-based isolators must account for the image as well as any
 	// separate provisioner contribution.
@@ -81,8 +85,33 @@ type Isolator interface {
 	// managed run on an isolator that declares none, and a managed run satisfies
 	// the egress guarantee only through a declared transport.
 	EgressTransport() network.EgressTransport
+	// Bounded reports whether a boundary surrounds the agent, so the planner
+	// starts the agent without its own permission prompts.
+	Bounded() bool
+}
+
+// Launcher starts a confined agent process on this machine and applies a
+// Provisioner's Contribution through its own mechanism (bwrap binds, docker -v,
+// direct host exec). It applies the network mode explicitly.
+type Launcher interface {
+	// Available reports whether the isolation tool is installed on this machine.
+	Available() (bool, error)
 	// CheckAgent reports an error when the base of this isolator, the host or
 	// the image, cannot supply the agent executable for cfg. It applies only
 	// when the provisioner supplies no tools.
 	CheckAgent(cfg RunConfig) error
+	Run(cfg RunConfig, c provision.Contribution) (int, error)
+	Command(cfg RunConfig, c provision.Contribution) ([]string, error)
+	// TerminalCommand returns the command AND the environment to launch it under a
+	// terminal wrapper. Isolators that bake the environment into the command
+	// (bwrap/docker) return the host environment; the host (none) isolator, which
+	// bakes nothing, returns the agent command with its full resolved environment
+	// (provider tokens, custom env, and the provisioner's PATH/env).
+	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string, err error)
+}
+
+// Isolator is an isolation this CLI both declares and launches.
+type Isolator interface {
+	Confinement
+	Launcher
 }

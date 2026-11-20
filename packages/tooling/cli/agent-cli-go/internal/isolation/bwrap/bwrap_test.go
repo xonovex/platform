@@ -37,7 +37,7 @@ func newHost() *systemtest.Fake {
 func claudeCfg(net network.NetworkMethod, passthrough bool) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:           registeredAgent(types.AgentClaude),
-		WorkDir:         "/work",
+		Process:         isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/work"},
 		HomeDir:         "/home/user",
 		Network:         net,
 		HostPassthrough: passthrough,
@@ -276,14 +276,14 @@ func TestBwrap_CommandRejectsUnresolvablePaths(t *testing.T) {
 		mutate func(*isoshared.RunConfig, *provision.Contribution)
 	}{
 		{"home", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.HomeDir = "/missing" }},
-		{"work", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.WorkDir = "/missing" }},
+		{"work", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.Process.Dir = "/missing" }},
 		{"repo", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.RepoDir = "/missing" }},
 		{"closure", func(_ *isoshared.RunConfig, p *provision.Contribution) {
 			p.RoBindPaths = []string{"/nix/store/missing"}
 		}},
 		{"read-write bind", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.BindPaths = []string{"/missing"} }},
 		{"read-only bind", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.RoBindPaths = []string{"/missing"} }},
-		{"custom env", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.CustomEnv = []string{"MISSING_EQUALS"} }},
+		{"custom env", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.Process.Env = []string{"MISSING_EQUALS"} }},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -297,27 +297,11 @@ func TestBwrap_CommandRejectsUnresolvablePaths(t *testing.T) {
 	}
 }
 
-func TestBwrap_CommandRejectsMissingProviderToken(t *testing.T) {
-	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "MISSING_BWRAP_TEST_TOKEN",
-		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
-	}
-	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
-		t.Error("Command() error = nil, want missing provider token error")
-	}
-}
-
 func TestBwrap_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	const secret = "bwrap-secret-must-not-appear"
 	host := newHost()
-	host.Env["BWRAP_TEST_TOKEN"] = secret
 	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "BWRAP_TEST_TOKEN",
-		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
-		Environment:         map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
-	}
+	cfg.ProviderEnv = map[string]string{"ANTHROPIC_AUTH_TOKEN": secret, "ANTHROPIC_BASE_URL": "http://proxy.example"}
 
 	command := bwrapCommand(t, host, cfg, provision.Contribution{})
 
@@ -355,7 +339,7 @@ func TestBwrap_RunSpawnsBwrapWithTheProcessEnvironment(t *testing.T) {
 func TestBwrap_RunReportsPreparationErrors(t *testing.T) {
 	host := newHost()
 	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.WorkDir = "/missing"
+	cfg.Process.Dir = "/missing"
 	if code, err := NewIsolator(host, testLog).Run(cfg, provision.Contribution{}); err == nil || code != 1 {
 		t.Errorf("Run(missing work) = (%d, %v), want (1, error)", code, err)
 	}
@@ -378,6 +362,9 @@ func TestBwrap_Capabilities(t *testing.T) {
 	if !i.ConfinesNetwork() {
 		t.Error("bwrap unshares the network namespace")
 	}
+	if !i.Bounded() {
+		t.Error("bwrap bounds the agent")
+	}
 }
 
 func TestBwrap_CheckAgent(t *testing.T) {
@@ -396,37 +383,13 @@ func TestBwrap_CheckAgent(t *testing.T) {
 	}
 }
 
-func TestBwrap_CommandRejectsUnknownAgentType(t *testing.T) {
-	cfg := claudeCfg(network.NetworkNone, false)
-	cfg.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
+func TestBwrap_CommandEndsWithTheProcess(t *testing.T) {
+	c := claudeCfg(network.NetworkHost, false)
+	c.Process.Argv = []string{"codex", "--sandbox", "danger-full-access", "go"}
 
-	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
-		t.Fatal("Command() error = nil, want unknown agent type error")
-	}
-}
+	command := bwrapCommand(t, newHost(), c, provision.Contribution{})
 
-func TestBwrap_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
-	tests := []struct {
-		agent types.AgentType
-		want  []string
-	}{
-		{types.AgentCodex, []string{"codex", "--sandbox", "danger-full-access", "go"}},
-		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
-		{types.AgentCopilot, []string{"copilot", "go"}},
-		{types.AgentPi, []string{"pi", "go"}},
-	}
-	for _, test := range tests {
-		t.Run(string(test.agent), func(t *testing.T) {
-			c := claudeCfg(network.NetworkHost, false)
-			c.Agent = registeredAgent(test.agent)
-			c.AgentArgs = []string{"go"}
-
-			command := bwrapCommand(t, newHost(), c, provision.Contribution{})
-
-			tail := command[len(command)-len(test.want):]
-			if !slices.Equal(tail, test.want) {
-				t.Errorf("command tail = %v, want %v", tail, test.want)
-			}
-		})
+	if tail := command[len(command)-len(c.Process.Argv)-1:]; !slices.Equal(tail, append([]string{"--"}, c.Process.Argv...)) {
+		t.Errorf("command tail = %v, want -- and the argument vector of the process", tail)
 	}
 }

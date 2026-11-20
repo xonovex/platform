@@ -38,7 +38,7 @@ func newHost() *systemtest.Fake {
 func dockerCfg(net network.NetworkMethod) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:   registeredAgent(types.AgentClaude),
-		WorkDir: "/work",
+		Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/work"},
 		HomeDir: "/home/user",
 		Network: net,
 	}
@@ -251,36 +251,25 @@ func TestDocker_Capabilities(t *testing.T) {
 	if !i.ConfinesNetwork() {
 		t.Error("docker applies --network none")
 	}
+	if !i.Bounded() {
+		t.Error("docker bounds the agent")
+	}
 }
 
-func TestDocker_CommandRejectsMissingBindAndProviderToken(t *testing.T) {
+func TestDocker_CommandRejectsAMissingBind(t *testing.T) {
 	host := newHost()
 	cfg := dockerCfg(network.NetworkNone)
 	cfg.BindPaths = []string{"/work/missing"}
 	if _, err := NewIsolator(host, testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("Command() error = nil, want missing bind error")
 	}
-
-	cfg.BindPaths = nil
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "MISSING_DOCKER_TEST_TOKEN",
-		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
-	}
-	if _, err := NewIsolator(host, testLog).Command(cfg, provision.Contribution{}); err == nil {
-		t.Error("Command() error = nil, want missing provider token error")
-	}
 }
 
 func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	const secret = "docker-secret-must-not-appear"
 	host := newHost()
-	host.Env["DOCKER_TEST_TOKEN"] = secret
 	cfg := dockerCfg(network.NetworkNone)
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "DOCKER_TEST_TOKEN",
-		CredentialTargetEnv: "ANTHROPIC_AUTH_TOKEN",
-		Environment:         map[string]string{"ANTHROPIC_BASE_URL": "http://proxy.example"},
-	}
+	cfg.ProviderEnv = map[string]string{"ANTHROPIC_AUTH_TOKEN": secret, "ANTHROPIC_BASE_URL": "http://proxy.example"}
 
 	command := dockerCommand(t, host, cfg, provision.Contribution{})
 
@@ -296,15 +285,6 @@ func TestDocker_CommandKeepsProviderSecretOutOfArguments(t *testing.T) {
 	}
 }
 
-func TestDocker_CommandRejectsUnknownAgentType(t *testing.T) {
-	cfg := dockerCfg(network.NetworkNone)
-	cfg.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
-
-	if _, err := NewIsolator(newHost(), testLog).Command(cfg, provision.Contribution{}); err == nil {
-		t.Fatal("Command() error = nil, want unknown agent type error")
-	}
-}
-
 func TestDocker_MountsTheSourceRepositoryAndCallerPaths(t *testing.T) {
 	host := newHost().AddDir("/repo").AddDir("/data/rw").AddFile("/data/ro.txt", "x", 0o600)
 	cfg := dockerCfg(network.NetworkNone)
@@ -312,7 +292,6 @@ func TestDocker_MountsTheSourceRepositoryAndCallerPaths(t *testing.T) {
 	cfg.BindPaths = []string{"/data/rw"}
 	cfg.RoBindPaths = []string{"/data/ro.txt"}
 	cfg.Image = digestPinnedImage
-	cfg.AgentArgs = []string{"review"}
 
 	args := dockerCommand(t, host, cfg, provision.Contribution{InitCommands: []string{"echo hi"}})
 
@@ -341,7 +320,7 @@ func TestDocker_CommandRejectsUnresolvablePaths(t *testing.T) {
 		mutate func(*isoshared.RunConfig, *provision.Contribution)
 	}{
 		{"home", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.HomeDir = "/missing" }},
-		{"work", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.WorkDir = "/missing" }},
+		{"work", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.Process.Dir = "/missing" }},
 		{"repo", func(c *isoshared.RunConfig, _ *provision.Contribution) { c.RepoDir = "/missing" }},
 		{"closure", func(_ *isoshared.RunConfig, p *provision.Contribution) {
 			p.RoBindPaths = []string{"/nix/store/missing"}
@@ -386,8 +365,8 @@ func TestDocker_RunSpawnsDockerWithTheProcessEnvironment(t *testing.T) {
 
 func TestDocker_RunReportsPreparationErrors(t *testing.T) {
 	for name, mutate := range map[string]func(*isoshared.RunConfig){
-		"arguments":   func(c *isoshared.RunConfig) { c.WorkDir = "/missing" },
-		"environment": func(c *isoshared.RunConfig) { c.CustomEnv = []string{"MISSING_EQUALS"} },
+		"arguments":   func(c *isoshared.RunConfig) { c.Process.Dir = "/missing" },
+		"environment": func(c *isoshared.RunConfig) { c.Process.Env = []string{"MISSING_EQUALS"} },
 	} {
 		t.Run(name, func(t *testing.T) {
 			host := newHost()
@@ -432,28 +411,14 @@ func TestDocker_CheckAgent(t *testing.T) {
 	}
 }
 
-func TestDocker_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
-	tests := []struct {
-		agent types.AgentType
-		want  []string
-	}{
-		{types.AgentCodex, []string{"codex", "--sandbox", "danger-full-access", "go"}},
-		{types.AgentKiro, []string{"kiro-cli-chat", "chat", "--agent-engine", "v3", "go"}},
-		{types.AgentCopilot, []string{"copilot", "go"}},
-		{types.AgentPi, []string{"pi", "go"}},
-	}
-	for _, test := range tests {
-		t.Run(string(test.agent), func(t *testing.T) {
-			c := dockerCfg(network.NetworkHost)
-			c.Agent = registeredAgent(test.agent)
-			c.AgentArgs = []string{"go"}
+func TestDocker_CommandEndsWithTheImageAndTheProcess(t *testing.T) {
+	c := dockerCfg(network.NetworkHost)
+	c.Image = digestPinnedImage
+	c.Process.Argv = []string{"codex", "--sandbox", "danger-full-access", "go"}
 
-			command := dockerCommand(t, newHost(), c, provision.Contribution{})
+	command := dockerCommand(t, newHost(), c, provision.Contribution{})
 
-			tail := command[len(command)-len(test.want):]
-			if !slices.Equal(tail, test.want) {
-				t.Errorf("command tail = %v, want %v", tail, test.want)
-			}
-		})
+	if tail := command[len(command)-len(c.Process.Argv)-1:]; !slices.Equal(tail, append([]string{digestPinnedImage}, c.Process.Argv...)) {
+		t.Errorf("command tail = %v, want the image and the argument vector of the process", tail)
 	}
 }

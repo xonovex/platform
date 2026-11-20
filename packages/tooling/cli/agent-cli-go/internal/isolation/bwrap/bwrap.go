@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
@@ -65,6 +64,9 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 // namespace interface, and reaches the allowlist proxy through a bound socket.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportUnixSocket }
 
+// Bounded reports true: the namespaces confine what the agent writes and reaches.
+func (i *Isolator) Bounded() bool { return true }
+
 // CheckAgent requires host passthrough, because deny-default bwrap exposes no
 // host tool, and then the agent executable on the PATH it passes through.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
@@ -114,7 +116,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return nil, err
 	}
@@ -213,12 +215,8 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 
 	args = append(args, "--chdir", workDir)
 
-	// Agent command, wrapped with the provisioner's init commands.
-	agentCmd, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
-	if err != nil {
-		return nil, err
-	}
-	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
+	// Agent process, wrapped with the provisioner's init commands.
+	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
 	// Managed egress: bind the proxy socket directory and the bridge executable,
 	// and run the command under the bridge.
 	if cfg.Network == network.NetworkManaged {
@@ -249,8 +247,8 @@ func (i *Isolator) processEnv(cfg isoshared.RunConfig, c provision.Contribution)
 }
 
 // sandboxEnv builds the explicit environment allowlist for inside the sandbox:
-// HOME/PATH/TMPDIR/SHELL, the contribution's env, the provider tokens, and the
-// caller's custom env. API keys reach the sandbox only through this allowlist.
+// HOME/PATH/TMPDIR/SHELL, the provider tokens, the contribution's env, and the
+// environment of the process. API keys reach the sandbox only through this allowlist.
 func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution, homeDir string) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   homeDir,
@@ -269,12 +267,8 @@ func (i *Isolator) sandboxEnv(cfg isoshared.RunConfig, c provision.Contribution,
 	}
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	// Provider tokens + contribution env + custom env.
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
-	if err != nil {
-		return nil, err
-	}
-	for k, v := range providerEnv {
+	// Provider tokens + contribution env + process env.
+	for k, v := range cfg.ProviderEnv {
 		env[k] = v
 	}
 	for k, v := range c.Env {

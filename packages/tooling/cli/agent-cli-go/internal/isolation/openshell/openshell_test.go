@@ -43,7 +43,7 @@ func cfg(t *testing.T, mode network.NetworkMethod) isoshared.RunConfig {
 	if err != nil {
 		t.Fatal(err)
 	}
-	run := isoshared.RunConfig{Agent: agent, WorkDir: "/home/dev/work", HomeDir: "/home/dev", Network: mode, Image: pinned}
+	run := isoshared.RunConfig{Agent: agent, Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/home/dev/work"}, HomeDir: "/home/dev", Network: mode, Image: pinned}
 	if mode == network.NetworkManaged {
 		run.Egress = isoshared.EgressRoute{Transport: network.TransportPolicy, Allow: allowlist(t, "api.example.com", "*.cdn.example.com:8443")}
 	}
@@ -120,15 +120,15 @@ func TestPolicyRefusals(t *testing.T) {
 
 func TestCommandExecsInTheUploadedDirectory(t *testing.T) {
 	run := cfg(t, network.NetworkNone)
-	run.CustomEnv = []string{"MODE=fast"}
+	run.Process.Env = []string{"MODE=fast"}
 	command, err := NewIsolator(newHost(), testLog).Command(run, provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
 	}
 	line := strings.Join(command, " ")
-	want := "openshell sandbox exec --name agent-cli-1 --workdir /sandbox/work --no-tty --env MODE=fast -- claude"
-	if !strings.HasPrefix(line, want) {
-		t.Errorf("command = %q, want prefix %q", line, want)
+	want := "openshell sandbox exec --name agent-cli-1 --workdir /sandbox/work --no-tty --env MODE=fast -- claude review"
+	if line != want {
+		t.Errorf("command = %q, want %q", line, want)
 	}
 }
 
@@ -288,15 +288,13 @@ func TestRefusals(t *testing.T) {
 	roBind.RoBindPaths = []string{"/home/dev"}
 	host := cfg(t, network.NetworkHost)
 	missingWork := cfg(t, network.NetworkNone)
-	missingWork.WorkDir = "/missing"
-	badAgent := cfg(t, network.NetworkNone)
-	badAgent.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
+	missingWork.Process.Dir = "/missing"
 	badEnv := cfg(t, network.NetworkNone)
-	badEnv.CustomEnv = []string{"not-an-assignment"}
+	badEnv.Process.Env = []string{"not-an-assignment"}
 	for name, run := range map[string]isoshared.RunConfig{
 		"no image": noImage, "image with hyphen": dashImage, "secrets": secrets, "provider": provider,
 		"bind": bind, "read-only bind": roBind, "host mode": host, "missing work": missingWork,
-		"unknown agent": badAgent, "bad env": badEnv,
+		"bad env": badEnv,
 	} {
 		if _, err := NewIsolator(newHost(), testLog).Command(run, provision.Contribution{}); err == nil {
 			t.Errorf("%s: Command succeeded", name)
@@ -339,7 +337,7 @@ func TestCapabilities(t *testing.T) {
 	if !i.PinnedProvision(provision.ProvisionNix, true, pinned) {
 		t.Error("a pinned image with a pinned provisioner is pinned")
 	}
-	if i.KernelIsolated("runsc") || !i.ConfinesNetwork() || i.EgressTransport() != network.TransportPolicy {
+	if i.KernelIsolated("runsc") || !i.ConfinesNetwork() || i.EgressTransport() != network.TransportPolicy || !i.Bounded() {
 		t.Error("openshell declares a policy transport and no verified kernel boundary")
 	}
 	if err := i.CheckAgent(cfg(t, network.NetworkNone)); err != nil {

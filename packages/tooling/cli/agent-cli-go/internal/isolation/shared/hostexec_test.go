@@ -5,62 +5,55 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
-func claudeConfig(t *testing.T) RunConfig {
-	t.Helper()
-	agent, err := agents.GetAgent(types.AgentClaude)
-	if err != nil {
-		t.Fatal(err)
+func agentConfig() RunConfig {
+	return RunConfig{
+		Agent:   &types.AgentConfig{Type: "agent", Binary: "agent"},
+		Process: Process{Argv: []string{"agent", "--flag", "review"}, Dir: "/work"},
+		HomeDir: "/home/user",
 	}
-	return RunConfig{Agent: agent, WorkDir: "/work", HomeDir: "/home/user"}
 }
 
 func TestHostExecutionBuildsTheCommandAndEnvironment(t *testing.T) {
 	host := systemtest.New()
 	host.Env["PATH"] = "/usr/bin"
 	host.Env["KEEP"] = "yes"
-	cfg := claudeConfig(t)
-	cfg.CustomEnv = []string{"CUSTOM=1"}
+	host.Env["SHADOWED"] = "host"
+	cfg := agentConfig()
+	cfg.Process.Env = []string{"CUSTOM=1", "SHADOWED=custom"}
+	cfg.ProviderEnv = map[string]string{"ROUTE": "provider", "SHADOWED": "provider"}
 	cfg.Secrets = map[string]string{"TOKEN": "s3cret"}
 	c := provision.Contribution{Env: map[string]string{"FROM_TOOL": "1"}, PathEntries: []string{"/nix/bin"}, InitCommands: []string{"prepare"}}
 
-	command, env, err := HostExecution(host, cfg, c, true)
+	command, env, err := HostExecution(host, cfg, c)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if command[0] != "sh" || !strings.Contains(strings.Join(command, " "), "prepare") {
-		t.Errorf("command = %v, want init commands before the agent", command)
+	if command[0] != "sh" || !strings.Contains(strings.Join(command, " "), "prepare && exec 'agent' '--flag' 'review'") {
+		t.Errorf("command = %v, want init commands before the agent process", command)
 	}
-	for _, want := range []string{"KEEP=yes", "CUSTOM=1", "TOKEN=s3cret", "FROM_TOOL=1", "PATH=/nix/bin:/usr/bin"} {
+	for _, want := range []string{"KEEP=yes", "CUSTOM=1", "ROUTE=provider", "SHADOWED=custom", "TOKEN=s3cret", "FROM_TOOL=1", "PATH=/nix/bin:/usr/bin"} {
 		if !slices.Contains(env, want) {
 			t.Errorf("env lacks %q: %v", want, env)
 		}
 	}
 }
 
-func TestHostExecutionSandboxFlagReachesTheAgentArguments(t *testing.T) {
-	host := systemtest.New()
-	plain, _, err := HostExecution(host, claudeConfig(t), provision.Contribution{}, false)
-	if err != nil {
-		t.Fatal(err)
-	}
-	boxed, _, err := HostExecution(host, claudeConfig(t), provision.Contribution{}, true)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if slices.Equal(plain, boxed) {
-		t.Errorf("the sandbox flag must change the agent arguments: %v", plain)
+func TestHostExecutionRunsTheProcessUnchanged(t *testing.T) {
+	cfg := agentConfig()
+	command, _, err := HostExecution(systemtest.New(), cfg, provision.Contribution{})
+	if err != nil || !slices.Equal(command, cfg.Process.Argv) {
+		t.Errorf("command = %v, %v, want the argument vector of the process", command, err)
 	}
 }
 
 func TestHostExecutionPathWithoutHostPath(t *testing.T) {
 	host := systemtest.New()
-	_, env, err := HostExecution(host, claudeConfig(t), provision.Contribution{PathEntries: []string{"/nix/bin"}}, false)
+	_, env, err := HostExecution(host, agentConfig(), provision.Contribution{PathEntries: []string{"/nix/bin"}})
 	if err != nil || !slices.Contains(env, "PATH=/nix/bin") {
 		t.Errorf("env = %v, %v", env, err)
 	}
@@ -68,19 +61,14 @@ func TestHostExecutionPathWithoutHostPath(t *testing.T) {
 
 func TestHostExecutionFailures(t *testing.T) {
 	host := systemtest.New()
-	cfg := claudeConfig(t)
-	cfg.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
-	if _, _, err := HostExecution(host, cfg, provision.Contribution{}, false); err == nil {
-		t.Error("an unknown agent must fail")
+	cfg := agentConfig()
+	cfg.Process.Argv = nil
+	if _, _, err := HostExecution(host, cfg, provision.Contribution{}); err == nil || !strings.Contains(err.Error(), "no command") {
+		t.Errorf("a process without a command must fail: %v", err)
 	}
-	cfg = claudeConfig(t)
-	cfg.CustomEnv = []string{"no-equals"}
-	if _, _, err := HostExecution(host, cfg, provision.Contribution{}, false); err == nil {
-		t.Error("an invalid custom variable must fail")
-	}
-	cfg = claudeConfig(t)
-	cfg.Provider = &types.ModelProvider{Name: "route", AgentType: types.AgentClaude, CredentialSourceEnv: "ROUTE_KEY", CredentialTargetEnv: "AGENT_KEY"}
-	if _, _, err := HostExecution(host, cfg, provision.Contribution{}, false); err == nil {
-		t.Error("a provider whose credential is not set must fail")
+	cfg = agentConfig()
+	cfg.Process.Env = []string{"no-equals"}
+	if _, _, err := HostExecution(host, cfg, provision.Contribution{}); err == nil {
+		t.Error("an invalid process variable must fail")
 	}
 }

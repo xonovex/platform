@@ -6,7 +6,6 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 )
 
 const digestPinnedImage = "ghcr.io/xonovex/agent@sha256:" +
@@ -38,23 +37,9 @@ func TestProcessEnv_CarriesTheHostEnvironment(t *testing.T) {
 	}
 }
 
-// The container HOME is fixed, so the environment fails on an unresolvable
-// provider credential rather than on directories.
-func TestProcessEnv_ReportsAnUnresolvableProviderToken(t *testing.T) {
-	cfg := dockerCfg(network.NetworkNone)
-	cfg.Provider = &types.ModelProvider{
-		CredentialSourceEnv: "MISSING_DOCKER_PROCESS_ENV_TOKEN",
-		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
-	}
-
-	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
-		t.Fatal("processEnv() must fail when the provider token cannot be resolved")
-	}
-}
-
 func TestProcessEnv_ReportsMalformedCustomEnvironment(t *testing.T) {
 	cfg := dockerCfg(network.NetworkNone)
-	cfg.CustomEnv = []string{"not-a-key-value-pair"}
+	cfg.Process.Env = []string{"not-a-key-value-pair"}
 
 	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
 		t.Fatal("processEnv() must fail on a malformed custom environment entry")
@@ -83,7 +68,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
 	cfg := dockerCfg(network.NetworkNone)
-	cfg.WorkDir = "/work/absent"
+	cfg.Process.Dir = "/work/absent"
 
 	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(
 		cfg, provision.Contribution{},

@@ -8,7 +8,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
@@ -94,6 +93,10 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 // and reaches the allowlist proxy through a bound socket.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportUnixSocket }
 
+// Bounded reports true: the container confines what the agent writes and
+// reaches.
+func (i *Isolator) Bounded() bool { return true }
+
 // CheckAgent rejects the default image, which does not contain an agent; a
 // caller-supplied image is trusted to contain it.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
@@ -140,7 +143,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	if err != nil {
 		return nil, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return nil, err
 	}
@@ -250,12 +253,8 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// Image (pinned by the caller; falls back to the shared default).
 	args = append(args, resolveImage(cfg.Image))
 
-	// Agent command, wrapped with the provisioner's init commands.
-	agentCmd, err := agentcmd.BuildAgentCommand(cfg.Agent, cfg.Provider, cfg.AgentArgs, "")
-	if err != nil {
-		return nil, err
-	}
-	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
+	// Agent process, wrapped with the provisioner's init commands.
+	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
 	if cfg.Network == network.NetworkManaged {
 		command = isoshared.WrapWithBridge(route, command)
 	}
@@ -280,7 +279,7 @@ func resolveImage(image string) string {
 }
 
 // containerEnv builds the container environment: HOME/TMPDIR/SHELL/PATH, the
-// contribution's env, the provider tokens, and the caller's custom env.
+// provider tokens, the contribution's env, and the environment of the process.
 func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contribution) (map[string]string, error) {
 	env := map[string]string{
 		"HOME":   containerHome,
@@ -295,11 +294,7 @@ func (i *Isolator) containerEnv(cfg isoshared.RunConfig, c provision.Contributio
 	pathEntries = append(pathEntries, "/usr/local/bin", "/usr/bin", "/bin")
 	env["PATH"] = strings.Join(pathEntries, ":")
 
-	providerEnv, err := agentcmd.BuildProviderEnv(cfg.Agent, cfg.Provider, i.host.Getenv)
-	if err != nil {
-		return nil, err
-	}
-	for k, v := range providerEnv {
+	for k, v := range cfg.ProviderEnv {
 		env[k] = v
 	}
 	for k, v := range c.Env {

@@ -75,8 +75,8 @@ func TestNewPlanResolvesTheDefaultRun(t *testing.T) {
 	if p.IsolationName != isolation.IsolationNone || p.Isolator == nil || p.Provisioner == nil {
 		t.Errorf("selection = %s %v %v, want none with both plugins", p.IsolationName, p.Isolator, p.Provisioner)
 	}
-	if p.SourceDir != "/work/repo" || p.Run.WorkDir != "/work/repo" || p.Run.RepoDir != "/work/repo" {
-		t.Errorf("directories = %q %q %q, want /work/repo", p.SourceDir, p.Run.WorkDir, p.Run.RepoDir)
+	if p.SourceDir != "/work/repo" || p.Run.Process.Dir != "/work/repo" || p.Run.RepoDir != "/work/repo" {
+		t.Errorf("directories = %q %q %q, want /work/repo", p.SourceDir, p.Run.Process.Dir, p.Run.RepoDir)
 	}
 	if p.Run.HomeDir != "/home/user" || p.Run.Network != network.NetworkHost {
 		t.Errorf("home, network = %q, %q", p.Run.HomeDir, p.Run.Network)
@@ -84,8 +84,11 @@ func TestNewPlanResolvesTheDefaultRun(t *testing.T) {
 	if !slices.Equal(p.Run.BindPaths, []string{"/work/repo"}) || p.Run.RoBindPaths != nil {
 		t.Errorf("binds = %v %v, want only the source directory", p.Run.BindPaths, p.Run.RoBindPaths)
 	}
-	if !slices.Equal(p.Run.AgentArgs, []string{"review"}) || p.Checkout != nil || p.Terminal != nil {
-		t.Errorf("args, checkout, terminal = %v %v %v", p.Run.AgentArgs, p.Checkout, p.Terminal)
+	if !slices.Equal(p.AgentArgs, []string{"review"}) || p.Checkout != nil || p.Terminal != nil {
+		t.Errorf("args, checkout, terminal = %v %v %v", p.AgentArgs, p.Checkout, p.Terminal)
+	}
+	if !slices.Equal(p.Run.Process.Argv, []string{"claude", "review"}) || len(p.Run.Process.Env) != 0 {
+		t.Errorf("process = %+v, want claude review with no custom environment", p.Run.Process)
 	}
 	if !p.DryRun || !p.Verbose || p.DisplayDir() != "/work/repo" {
 		t.Errorf("dry run, verbose, display = %v %v %q", p.DryRun, p.Verbose, p.DisplayDir())
@@ -188,8 +191,8 @@ func TestNewPlanPlacesTheDefaultCheckoutBesideTheSource(t *testing.T) {
 	if !strings.HasPrefix(p.Checkout.Dir, "/work/repo-") || p.DisplayDir() != p.Checkout.Dir {
 		t.Errorf("Checkout.Dir = %q, DisplayDir = %q", p.Checkout.Dir, p.DisplayDir())
 	}
-	if p.Run.WorkDir != "/work/repo" {
-		t.Errorf("Run.WorkDir = %q, want the source until the checkout exists", p.Run.WorkDir)
+	if p.Run.Process.Dir != "/work/repo" {
+		t.Errorf("Run.Process.Dir = %q, want the source until the checkout exists", p.Run.Process.Dir)
 	}
 }
 
@@ -218,13 +221,12 @@ func TestNewPlanSelectsThePinnedPairOnlyWithoutAnExplicitAxis(t *testing.T) {
 		t.Errorf("NixSource = %+v, want a packages source", p.Provision.NixSource)
 	}
 
-	options.Explicit = options.Explicit.With(config.KeyIsolation)
+	options.Explicit = config.KeysOf(config.KeyIsolation)
 	if _, err := plan(t, options, config.FileConfig{}); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
 		t.Fatalf("explicit isolation error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
 
-	options.Explicit = nil
-	options.Explicit = options.Explicit.With(config.KeyProvision)
+	options.Explicit = config.KeysOf(config.KeyProvision)
 	if _, err := plan(t, options, config.FileConfig{}); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
 		t.Fatalf("explicit provision error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
@@ -331,8 +333,7 @@ func TestNewPlanPassesTheDockerRuntimeToTheKernelPolicy(t *testing.T) {
 func TestNewPlanRequiresADigestImageForAPinnedDockerRun(t *testing.T) {
 	options := baseOptions()
 	options.Isolation = "docker"
-	options.Explicit = options.Explicit.With(config.KeyIsolation)
-	options.Explicit = options.Explicit.With(config.KeyProvision)
+	options.Explicit = config.KeysOf(config.KeyIsolation, config.KeyProvision)
 	options.Policy.RequirePinnedProvision = true
 
 	options.Image = "ghcr.io/xonovex/agent:latest"
@@ -462,8 +463,8 @@ func TestNewPlanMergesTheCustomEnvironment(t *testing.T) {
 	p := mustPlan(t, options, config.FileConfig{CustomEnv: []string{"A=1", "B=file"}})
 
 	for _, want := range []string{"A=1", "B=flag", "C=3"} {
-		if !slices.Contains(p.Run.CustomEnv, want) {
-			t.Errorf("CustomEnv = %v, want %s", p.Run.CustomEnv, want)
+		if !slices.Contains(p.Run.Process.Env, want) {
+			t.Errorf("Process.Env = %v, want %s", p.Run.Process.Env, want)
 		}
 	}
 }

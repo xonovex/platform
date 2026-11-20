@@ -21,6 +21,7 @@ import (
 type fakeIsolator struct {
 	unavailable  bool
 	noNetwork    bool
+	unbounded    bool
 	checkErr     error
 	command      []string
 	commandErr   error
@@ -60,6 +61,7 @@ func (f *fakeIsolator) HidesHost(passthrough bool, _ string) bool { return !pass
 func (f *fakeIsolator) KernelIsolated(runtime string) bool        { return runtime == "runsc" }
 func (f *fakeIsolator) EgressTransport() network.EgressTransport  { return network.TransportUnixSocket }
 func (f *fakeIsolator) ConfinesNetwork() bool                     { return !f.noNetwork }
+func (f *fakeIsolator) Bounded() bool                             { return !f.unbounded }
 
 func (f *fakeIsolator) CheckAgent(isoshared.RunConfig) error {
 	f.checked = true
@@ -125,15 +127,15 @@ func (f *fakeTerminal) Execute(config *termshared.TerminalConfig, command, env [
 type testSandbox struct {
 	isolator    *fakeIsolator
 	provisioner *fakeProvisioner
-	registry    *sandbox.Registry
+	registry    *sandbox.Registry[isoshared.Isolator]
 }
 
 func newTestSandbox() testSandbox {
 	iso := &fakeIsolator{command: []string{"agent", "run"}}
-	nonConfining := &fakeIsolator{noNetwork: true, command: []string{"agent"}}
+	nonConfining := &fakeIsolator{noNetwork: true, unbounded: true, command: []string{"agent"}}
 	prov := &fakeProvisioner{}
 	pinned := &fakeProvisioner{pinned: true, handled: true}
-	registry := sandbox.NewRegistry().
+	registry := sandbox.NewRegistry[isoshared.Isolator]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return nonConfining }).
 		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return iso }).
 		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return iso }).

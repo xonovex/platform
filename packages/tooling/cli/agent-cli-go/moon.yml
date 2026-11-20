@@ -72,9 +72,9 @@ tasks:
       # composition root and internal/system the operating-system adapter; both
       # are covered by go-integration, because a unit test may not start a
       # process or touch a file. The shared package of provision declares
-      # interfaces and holds no statements. Every other package reaches
-      # the machine through a port, so the unit tier covers it with
-      # internal/system/systemtest.
+      # interfaces and runspec declares the run spec; neither holds
+      # statements. Every other package reaches the machine through a port, so
+      # the unit tier covers it with internal/system/systemtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
         ./cmd/agent-cli=exempt \
         ./internal/cmd=97 \
@@ -100,13 +100,14 @@ tasks:
         ./internal/provision/none=100 \
         ./internal/provision/shared=exempt \
         ./internal/record=100 \
+        ./internal/runspec=exempt \
         ./internal/isolation/bwrap=98 \
         ./internal/isolation/docker=98 \
-        ./internal/isolation/dockersandboxes=96 \
+        ./internal/isolation/dockersandboxes=98 \
         ./internal/isolation/none=100 \
         ./internal/isolation/openshell=99 \
         ./internal/isolation/seatbelt=96 \
-        ./internal/isolation/shared=96 \
+        ./internal/isolation/shared=98 \
         ./internal/sandbox=97 \
         ./internal/sandbox/plugins=100 \
         ./internal/schematest=92 \

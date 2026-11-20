@@ -14,7 +14,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
@@ -94,6 +93,10 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 
 // EgressTransport declares the policy: the gateway enforces the allowlist.
 func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportPolicy }
+
+// Bounded reports true: the sandbox on the gateway confines what the agent
+// writes and reaches.
+func (i *Isolator) Bounded() bool { return true }
 
 // CheckAgent requires an image, because the sandbox starts from it and the agent
 // must be in it.
@@ -222,15 +225,11 @@ func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name 
 	if err != nil {
 		return plan{}, err
 	}
-	workDir, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory")
+	workDir, err := isoshared.ResolveDirectory(i.host, cfg.Process.Dir, "work directory")
 	if err != nil {
 		return plan{}, err
 	}
-	command, err := agentcmd.BuildAgentCommand(cfg.Agent, nil, cfg.AgentArgs, "")
-	if err != nil {
-		return plan{}, err
-	}
-	command = isoshared.WrapWithInitCommands(command, c.InitCommands)
+	command := isoshared.WrapWithInitCommands(cfg.Process.Argv, c.InitCommands)
 	env, err := isoshared.RunEnv(cfg)
 	if err != nil {
 		return plan{}, err

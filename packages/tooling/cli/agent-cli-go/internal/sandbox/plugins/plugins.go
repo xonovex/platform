@@ -43,8 +43,8 @@ type Host interface {
 
 // DefaultRegistry returns a Registry with the built-in isolators and
 // provisioners over host, each writing through log.
-func DefaultRegistry(host Host, log logging.Logger) *sandbox.Registry {
-	return sandbox.NewRegistry().
+func DefaultRegistry(host Host, log logging.Logger) *sandbox.Registry[isoshared.Isolator] {
+	return sandbox.NewRegistry[isoshared.Isolator]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return isonone.NewIsolator(host, log) }).
 		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return bwrap.NewIsolator(host, log) }).
 		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return docker.NewIsolator(host, log) }).

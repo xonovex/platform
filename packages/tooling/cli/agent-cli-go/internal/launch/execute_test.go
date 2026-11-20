@@ -71,7 +71,7 @@ func TestExecuteRunsTheAgentInTheSourceDirectory(t *testing.T) {
 		t.Fatalf("Execute() error = %v", err)
 	}
 	iso := f.sandbox.isolator
-	if !iso.ran || iso.commandRun.WorkDir != "/work/repo" || iso.commandRun.HomeDir != "/home/user" {
+	if !iso.ran || iso.commandRun.Process.Dir != "/work/repo" || iso.commandRun.HomeDir != "/home/user" {
 		t.Errorf("isolator ran = %v with %+v", iso.ran, iso.commandRun)
 	}
 	if !iso.checked || len(f.vcs.configs) != 0 || f.terminal.executed {
@@ -199,8 +199,8 @@ func TestExecuteRunsInTheCreatedCheckout(t *testing.T) {
 		t.Fatalf("Setup calls = %+v in %v", f.vcs.configs, f.vcs.repos)
 	}
 	run := f.sandbox.isolator.commandRun
-	if run.WorkDir != "/work/created" || run.RepoDir != "/work/repo" {
-		t.Errorf("RunConfig directories = %q %q, want the checkout and the source", run.WorkDir, run.RepoDir)
+	if run.Process.Dir != "/work/created" || run.RepoDir != "/work/repo" {
+		t.Errorf("RunConfig directories = %q %q, want the checkout and the source", run.Process.Dir, run.RepoDir)
 	}
 }
 

@@ -171,18 +171,14 @@ func TestEveryKeyHasASpecAndAnEntry(t *testing.T) {
 	}
 }
 
-func TestKeysIsAnImmutableSet(t *testing.T) {
-	base := KeysOf(KeyAgent)
-	extended := base.With(KeyNetwork)
+func TestKeysHoldsTheKeysItWasBuiltFrom(t *testing.T) {
+	set := KeysOf(KeyAgent, KeyNetwork)
 
-	if !base.Has(KeyAgent) || base.Has(KeyNetwork) {
-		t.Errorf("With changed the set it was called on: %v", base)
-	}
-	if !extended.Has(KeyAgent) || !extended.Has(KeyNetwork) || extended.Has(KeyProvider) {
-		t.Errorf("With = %v, want the old keys and the new one", extended)
+	if !set.Has(KeyAgent) || !set.Has(KeyNetwork) || set.Has(KeyProvider) {
+		t.Errorf("KeysOf = %v, want agent and network only", set)
 	}
 	var none Keys
-	if none.Has(KeyAgent) || !none.With(KeyAgent).Has(KeyAgent) {
-		t.Error("the zero set must be an empty set that can grow")
+	if none.Has(KeyAgent) {
+		t.Error("the zero set must be empty")
 	}
 }

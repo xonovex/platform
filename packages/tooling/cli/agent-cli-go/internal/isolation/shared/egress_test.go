@@ -70,21 +70,21 @@ func TestProxyEnvCoversBothCases(t *testing.T) {
 }
 
 func TestRunEnvMergesInOrder(t *testing.T) {
-	cfg := RunConfig{CustomEnv: []string{"A=custom", "B=custom"}, Secrets: map[string]string{"B": "secret"}}
+	cfg := RunConfig{Process: Process{Env: []string{"A=custom", "B=custom"}}, Secrets: map[string]string{"B": "secret"}}
 	env, err := RunEnv(cfg)
 	if err != nil || env["A"] != "custom" || env["B"] != "secret" {
 		t.Errorf("RunEnv = %v, %v; want a credential to win over custom env", env, err)
 	}
-	if _, bad := RunEnv(RunConfig{CustomEnv: []string{"no-equals"}}); bad == nil {
+	if _, bad := RunEnv(RunConfig{Process: Process{Env: []string{"no-equals"}}}); bad == nil {
 		t.Error("an invalid custom variable must fail")
 	}
 }
 
 func TestRunEnvProxyWinsOverTheCaller(t *testing.T) {
 	cfg := RunConfig{
-		Network:   network.NetworkManaged,
-		Egress:    EgressRoute{Transport: network.TransportLoopback, Proxy: "127.0.0.1:40000"},
-		CustomEnv: []string{"HTTPS_PROXY=http://elsewhere:1"},
+		Network: network.NetworkManaged,
+		Egress:  EgressRoute{Transport: network.TransportLoopback, Proxy: "127.0.0.1:40000"},
+		Process: Process{Env: []string{"HTTPS_PROXY=http://elsewhere:1"}},
 	}
 	env, err := RunEnv(cfg)
 	if err != nil || env["HTTPS_PROXY"] != "http://127.0.0.1:40000" {

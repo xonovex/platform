@@ -20,15 +20,6 @@ func KeysOf(keys ...Key) Keys {
 // Has reports whether key is in the set.
 func (k Keys) Has(key Key) bool { _, ok := k[key]; return ok }
 
-// With returns a copy of the set that also holds key.
-func (k Keys) With(key Key) Keys {
-	set := KeysOf(key)
-	for existing := range k {
-		set[existing] = struct{}{}
-	}
-	return set
-}
-
 // Value is the content of one key in one layer: text for a replace key, items for
 // an append key, a flag for a require key.
 type Value struct {

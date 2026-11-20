@@ -29,6 +29,15 @@ package sandbox
 //   - TestApplicationCoreNamesNoAdapter — the launch core and the cobra adapter
 //     name no concrete plugin, no OS adapter, no origin leaf, no overlay adapter,
 //     and (for launch) no cobra and no plugin store.
+//   - TestConfinementCannotStartAProcess — a sandbox declaration holds no way to
+//     start the agent, so selection and policy need no launcher.
+//   - TestPortableSpecReachesNoCLIConcern — the run spec, directly or through any
+//     package of this module, imports no command, terminal, workspace, origin,
+//     plugin, overlay, record or configuration package, and the planner core file
+//     beside it imports none of those either.
+//   - TestIsolationBuildsNoAgentCommand — an isolation confines the process the
+//     planner built and never builds the agent command line or its provider
+//     environment itself.
 //
 // The origin axis (internal/origin) has its own fitness tests beside it.
 //
@@ -45,6 +54,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 )
 
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
@@ -258,7 +269,7 @@ func topSegmentLast(path string) string {
 }
 
 func TestRegistryFactoriesAreLazy(t *testing.T) {
-	if reflect.TypeOf(IsolatorFactory(nil)).Kind() != reflect.Func {
+	if reflect.TypeOf(IsolatorFactory[isoshared.Confinement](nil)).Kind() != reflect.Func {
 		t.Error("IsolatorFactory must be a func()-typed factory (lazy binding)")
 	}
 	if reflect.TypeOf(ProvisionerFactory(nil)).Kind() != reflect.Func {
@@ -424,5 +435,122 @@ func TestCredentialValuesStayInsideSecret(t *testing.T) {
 				return true
 			})
 		}
+	}
+}
+
+func TestConfinementCannotStartAProcess(t *testing.T) {
+	confinement := reflect.TypeFor[isoshared.Confinement]()
+	launcher := reflect.TypeFor[isoshared.Launcher]()
+	if launcher.NumMethod() == 0 {
+		t.Fatal("Launcher declares no method")
+	}
+	for i := range launcher.NumMethod() {
+		name := launcher.Method(i).Name
+		if _, found := confinement.MethodByName(name); found {
+			t.Errorf("Confinement declares the launcher method %s", name)
+		}
+	}
+	for _, name := range []string{"Run", "Command", "TerminalCommand", "CheckAgent", "Available"} {
+		if _, found := confinement.MethodByName(name); found {
+			t.Errorf("Confinement declares %s", name)
+		}
+	}
+}
+
+// cliConcerns are the packages of this module a portable run spec must not reach.
+var cliConcerns = []string{
+	modPath + "/internal/cmd",
+	modPath + "/internal/terminal",
+	modPath + "/internal/workspace",
+	modPath + "/internal/origin",
+	modPath + "/internal/plugin",
+	modPath + "/internal/overlay",
+	modPath + "/internal/record",
+	modPath + "/internal/config",
+	modPath + "/internal/launch",
+	modPath + "/internal/sandbox",
+	modPath + "/internal/system",
+	"github.com/spf13/cobra",
+}
+
+func isCLIConcern(path string) bool {
+	for _, concern := range cliConcerns {
+		if path == concern || strings.HasPrefix(path, concern+"/") {
+			return true
+		}
+	}
+	return false
+}
+
+func TestPortableSpecReachesNoCLIConcern(t *testing.T) {
+	root := internalRoot(t)
+	moduleDir := filepath.Dir(root)
+	seen := map[string]bool{}
+	queue := []string{modPath + "/internal/runspec"}
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		if seen[current] {
+			continue
+		}
+		seen[current] = true
+		for _, imp := range dirImports(t, filepath.Join(moduleDir, strings.TrimPrefix(current, modPath+"/"))) {
+			if isCLIConcern(imp) {
+				t.Errorf("internal/runspec reaches %s through %s", imp, current)
+			}
+			if strings.HasPrefix(imp, modPath+"/") {
+				queue = append(queue, imp)
+			}
+		}
+	}
+
+	file := filepath.Join(root, "launch", "spec.go")
+	f, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
+	if err != nil {
+		t.Fatalf("parse %s: %v", file, err)
+	}
+	for _, im := range f.Imports {
+		path, _ := strconv.Unquote(im.Path.Value)
+		if isCLIConcern(path) && path != modPath+"/internal/sandbox" {
+			t.Errorf("%s imports %s", file, path)
+		}
+	}
+}
+
+func TestIsolationBuildsNoAgentCommand(t *testing.T) {
+	root := internalRoot(t)
+	builders := map[string]map[string]bool{
+		"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents":    {"BuildArgs": true, "BuildEnv": true},
+		"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers": {"GetProviderCliArgs": true, "BuildProviderEnv": true},
+	}
+	agentcmd := "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
+	fset := token.NewFileSet()
+	for _, file := range productionFiles(t, filepath.Join(root, "isolation")) {
+		f, err := parser.ParseFile(fset, file, nil, 0)
+		if err != nil {
+			t.Fatalf("parse %s: %v", file, err)
+		}
+		alias := map[string]string{}
+		for _, im := range f.Imports {
+			path, _ := strconv.Unquote(im.Path.Value)
+			if path == agentcmd {
+				t.Errorf("%s imports the agent command builder %s", file, path)
+			}
+			name := topSegmentLast(path)
+			if im.Name != nil {
+				name = im.Name.Name
+			}
+			alias[name] = path
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			sel, ok := n.(*ast.SelectorExpr)
+			if !ok {
+				return true
+			}
+			if x, ok := sel.X.(*ast.Ident); ok && builders[alias[x.Name]][sel.Sel.Name] {
+				t.Errorf("%s calls %s.%s; confine the planned process instead", file, x.Name, sel.Sel.Name)
+			}
+			return true
+		})
 	}
 }

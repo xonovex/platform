@@ -50,15 +50,3 @@ func GetCurrentBranchSync(host Host, cwd string) string {
 	}
 	return result
 }
-
-// BuildBindPaths adds the worktree source repo to the bind paths so the sandbox
-// can reach the shared .git directory.
-func BuildBindPaths(basePaths []string, sourceRepoDir string) []string {
-	if sourceRepoDir == "" {
-		return basePaths
-	}
-	paths := make([]string, 0, len(basePaths)+1)
-	paths = append(paths, basePaths...)
-	paths = append(paths, sourceRepoDir)
-	return paths
-}

@@ -13,10 +13,11 @@ import (
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
-// fakeIsolator / fakeProvisioner let the registry + Select + policy be unit-tested
-// without importing the concrete plugin packages.
-type fakeIsolator struct {
-	available bool
+// fakeConfinement / fakeProvisioner let the registry + Select + policy be
+// unit-tested without importing the concrete plugin packages. The selection
+// tests register a Confinement alone, which proves that selection needs no
+// Launcher.
+type fakeConfinement struct {
 	hidesHost bool
 	kernelIso bool
 	// sharesNetwork makes the double unable to confine the network; the zero
@@ -27,6 +28,26 @@ type fakeIsolator struct {
 	noTransport bool
 }
 
+func (f fakeConfinement) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
+	return provisionerPinned
+}
+func (f fakeConfinement) HidesHost(_ bool, _ string) bool { return f.hidesHost }
+func (f fakeConfinement) KernelIsolated(_ string) bool    { return f.kernelIso }
+func (f fakeConfinement) EgressTransport() network.EgressTransport {
+	if f.noTransport {
+		return network.TransportNone
+	}
+	return network.TransportUnixSocket
+}
+func (f fakeConfinement) ConfinesNetwork() bool { return !f.sharesNetwork }
+func (f fakeConfinement) Bounded() bool         { return true }
+
+// fakeIsolator adds a Launcher to the confinement, for the availability probe.
+type fakeIsolator struct {
+	fakeConfinement
+	available bool
+}
+
 func (f fakeIsolator) Available() (bool, error)                                     { return f.available, nil }
 func (f fakeIsolator) Run(isoshared.RunConfig, provision.Contribution) (int, error) { return 0, nil }
 func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) ([]string, error) {
@@ -35,21 +56,7 @@ func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) ([]st
 func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
 	return nil, nil, nil
 }
-func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, _ string) bool {
-	return provisionerPinned
-}
-func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
-func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
-func (f fakeIsolator) EgressTransport() network.EgressTransport {
-	if f.noTransport {
-		return network.TransportNone
-	}
-	return network.TransportUnixSocket
-}
-func (f fakeIsolator) ConfinesNetwork() bool { return !f.sharesNetwork }
-func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error {
-	return nil
-}
+func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error { return nil }
 
 type fakeProvisioner struct{ pinned bool }
 
@@ -61,9 +68,9 @@ func (f fakeProvisioner) CheckAgent(provision.Contribution, *types.AgentConfig) 
 	return false, nil
 }
 
-func testRegistry(iso fakeIsolator, prov fakeProvisioner) *Registry {
-	return NewRegistry().
-		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Isolator { return iso }).
+func testRegistry(iso fakeConfinement, prov fakeProvisioner) *Registry[isoshared.Confinement] {
+	return NewRegistry[isoshared.Confinement]().
+		RegisterIsolator(isolation.IsolationBwrap, func() isoshared.Confinement { return iso }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return prov })
 }
 
@@ -72,7 +79,7 @@ func bwrapNixReq() Request {
 }
 
 func TestSelect_ResolvesRegisteredPlugins(t *testing.T) {
-	reg := testRegistry(fakeIsolator{available: true, hidesHost: true}, fakeProvisioner{pinned: true})
+	reg := testRegistry(fakeConfinement{hidesHost: true}, fakeProvisioner{pinned: true})
 	choice, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{})
 	if err != nil || choice.Isolator == nil || choice.Provisioner == nil {
 		t.Fatalf("Select = (%v, %v), want non-nil plugins", choice, err)
@@ -80,7 +87,7 @@ func TestSelect_ResolvesRegisteredPlugins(t *testing.T) {
 }
 
 func TestEvaluate_ReportsGuaranteesWithoutDemandingThem(t *testing.T) {
-	reg := testRegistry(fakeIsolator{available: true, hidesHost: true}, fakeProvisioner{pinned: true})
+	reg := testRegistry(fakeConfinement{hidesHost: true}, fakeProvisioner{pinned: true})
 	choice, err := Evaluate(reg, bwrapNixReq())
 	if err != nil {
 		t.Fatalf("Evaluate() error = %v", err)
@@ -97,7 +104,7 @@ func TestEvaluate_ReportsGuaranteesWithoutDemandingThem(t *testing.T) {
 }
 
 func TestSelect_UnregisteredFailsClosed(t *testing.T) {
-	reg := testRegistry(fakeIsolator{}, fakeProvisioner{})
+	reg := testRegistry(fakeConfinement{}, fakeProvisioner{})
 	if _, err := Select(reg, Request{Isolation: "firejail", Provision: provision.ProvisionNix}, policy.SandboxPolicy{}); !errors.Is(err, ErrNoIsolator) {
 		t.Errorf("unregistered isolation err = %v, want ErrNoIsolator", err)
 	}
@@ -109,17 +116,17 @@ func TestSelect_UnregisteredFailsClosed(t *testing.T) {
 func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 	cases := []struct {
 		name    string
-		iso     fakeIsolator
+		iso     fakeConfinement
 		prov    fakeProvisioner
 		net     network.NetworkMethod
 		pol     policy.SandboxPolicy
 		wantErr error
 	}{
-		{"pinned unmet", fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: false}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true}, policy.ErrPinnedProvisionUnmet},
-		{"host-tools unmet", fakeIsolator{hidesHost: false}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequireHostToolsUnreachable: true}, policy.ErrHostToolsReachable},
-		{"egress unmet (host net)", fakeIsolator{}, fakeProvisioner{}, network.NetworkHost, policy.SandboxPolicy{RequireEgressRestricted: true}, policy.ErrEgressUnrestricted},
-		{"kernel unmet", fakeIsolator{kernelIso: false}, fakeProvisioner{}, network.NetworkNone, policy.SandboxPolicy{RequireKernelIsolation: true}, policy.ErrKernelIsolationUnmet},
-		{"all met", fakeIsolator{hidesHost: true, kernelIso: true}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true}, nil},
+		{"pinned unmet", fakeConfinement{hidesHost: true}, fakeProvisioner{pinned: false}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true}, policy.ErrPinnedProvisionUnmet},
+		{"host-tools unmet", fakeConfinement{hidesHost: false}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequireHostToolsUnreachable: true}, policy.ErrHostToolsReachable},
+		{"egress unmet (host net)", fakeConfinement{}, fakeProvisioner{}, network.NetworkHost, policy.SandboxPolicy{RequireEgressRestricted: true}, policy.ErrEgressUnrestricted},
+		{"kernel unmet", fakeConfinement{kernelIso: false}, fakeProvisioner{}, network.NetworkNone, policy.SandboxPolicy{RequireKernelIsolation: true}, policy.ErrKernelIsolationUnmet},
+		{"all met", fakeConfinement{hidesHost: true, kernelIso: true}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true}, nil},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -141,7 +148,7 @@ func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 }
 
 func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
-	reg := testRegistry(fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: true})
+	reg := testRegistry(fakeConfinement{hidesHost: true}, fakeProvisioner{pinned: true})
 	req := bwrapNixReq()
 	req.HasCustomBinds = true
 
@@ -153,7 +160,7 @@ func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
 }
 
 func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
-	reg := testRegistry(fakeIsolator{sharesNetwork: true}, fakeProvisioner{})
+	reg := testRegistry(fakeConfinement{sharesNetwork: true}, fakeProvisioner{})
 
 	if _, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{}); err == nil {
 		t.Fatal("Select(network none, shared network) error = nil, want a confinement error")
@@ -169,22 +176,22 @@ func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
 func TestSelect_ManagedEgressNeedsATransport(t *testing.T) {
 	req := bwrapNixReq()
 	req.Network = network.NetworkManaged
-	noTransport := testRegistry(fakeIsolator{available: true, noTransport: true}, fakeProvisioner{})
+	noTransport := testRegistry(fakeConfinement{noTransport: true}, fakeProvisioner{})
 	if _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, network.ErrManagedEgressUnenforceable) {
 		t.Errorf("an isolator without a transport must refuse managed whatever the policy: %v", err)
 	}
-	withTransport := testRegistry(fakeIsolator{available: true}, fakeProvisioner{})
+	withTransport := testRegistry(fakeConfinement{}, fakeProvisioner{})
 	if _, err := Select(withTransport, req, policy.SandboxPolicy{RequireEgressRestricted: true}); err != nil {
 		t.Errorf("managed over a transport must satisfy RequireEgressRestricted: %v", err)
 	}
-	sharing := testRegistry(fakeIsolator{available: true, sharesNetwork: true}, fakeProvisioner{})
+	sharing := testRegistry(fakeConfinement{sharesNetwork: true}, fakeProvisioner{})
 	if _, err := Select(sharing, req, policy.SandboxPolicy{}); err == nil {
 		t.Error("an isolator that cannot confine the network must refuse managed")
 	}
 }
 
 func TestAvailableIsolations(t *testing.T) {
-	reg := NewRegistry().
+	reg := NewRegistry[isoshared.Isolator]().
 		RegisterIsolator(isolation.IsolationNone, func() isoshared.Isolator { return fakeIsolator{available: true} }).
 		RegisterIsolator(isolation.IsolationDocker, func() isoshared.Isolator { return fakeIsolator{available: false} })
 	avail := AvailableIsolations(reg)

@@ -27,7 +27,7 @@ func claudeCfg(mode network.NetworkMethod) isoshared.RunConfig {
 	if err != nil {
 		panic(err)
 	}
-	return isoshared.RunConfig{Agent: agent, WorkDir: "/Users/dev/work", HomeDir: "/Users/dev", Network: mode}
+	return isoshared.RunConfig{Agent: agent, Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/Users/dev/work"}, HomeDir: "/Users/dev", Network: mode}
 }
 
 func profileOf(t *testing.T, host *systemtest.Fake, cfg isoshared.RunConfig, c provision.Contribution) string {
@@ -131,7 +131,7 @@ func TestCommandRefusals(t *testing.T) {
 	badRepo := claudeCfg(network.NetworkHost)
 	badRepo.RepoDir = "/missing"
 	badWork := claudeCfg(network.NetworkHost)
-	badWork.WorkDir = "/missing"
+	badWork.Process.Dir = "/missing"
 	badHome := claudeCfg(network.NetworkHost)
 	badHome.HomeDir = "/missing"
 	unknownMode := claudeCfg("other")
@@ -154,17 +154,17 @@ func TestCommandRefusals(t *testing.T) {
 	if _, err := NewIsolator(unsafe, testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("a path with a quote must not enter the profile")
 	}
-	badAgent := claudeCfg(network.NetworkHost)
-	badAgent.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
-	if _, err := NewIsolator(newHost(), testLog).Command(badAgent, provision.Contribution{}); err == nil {
-		t.Error("an unknown agent must fail")
+	noCommand := claudeCfg(network.NetworkHost)
+	noCommand.Process.Argv = nil
+	if _, err := NewIsolator(newHost(), testLog).Command(noCommand, provision.Contribution{}); err == nil {
+		t.Error("a process without a command must fail")
 	}
 }
 
 func TestCapabilities(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
-	if i.HidesHost(false, "") || i.KernelIsolated("") || !i.ConfinesNetwork() {
-		t.Error("seatbelt hides no host, is no kernel boundary, and confines the network")
+	if i.HidesHost(false, "") || i.KernelIsolated("") || !i.ConfinesNetwork() || !i.Bounded() {
+		t.Error("seatbelt hides no host, is no kernel boundary, confines the network and bounds the agent")
 	}
 	if i.EgressTransport() != network.TransportLoopback {
 		t.Errorf("transport = %q", i.EgressTransport())

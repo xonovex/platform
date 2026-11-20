@@ -109,13 +109,24 @@ func prepareOverlay(overlays Overlays, plan Plan) (OverlayResult, error) {
 }
 
 // applyOverlay adds the environment, the arguments and the mounts of the overlay
-// to run. The overlay arguments come before the arguments of the user.
-func applyOverlay(run isoshared.RunConfig, result OverlayResult) isoshared.RunConfig {
-	run.CustomEnv = append(append([]string{}, run.CustomEnv...), result.Environment...)
-	run.AgentArgs = append(append([]string{}, result.Arguments...), run.AgentArgs...)
+// to run. The overlay arguments come right before userArgs, the arguments of the
+// user that end the argument vector of the process.
+func applyOverlay(run isoshared.RunConfig, userArgs []string, result OverlayResult) isoshared.RunConfig {
+	run.Process.Env = append(append([]string{}, run.Process.Env...), result.Environment...)
+	run.Process.Argv = insertBefore(run.Process.Argv, len(userArgs), result.Arguments)
 	run.BindPaths = append(append([]string{}, run.BindPaths...), result.BindPaths...)
 	run.RoBindPaths = append(append([]string{}, run.RoBindPaths...), result.RoBindPaths...)
 	return run
+}
+
+// insertBefore returns a copy of argv with extra placed before its last tail
+// elements.
+func insertBefore(argv []string, tail int, extra []string) []string {
+	at := len(argv) - tail
+	out := make([]string, 0, len(argv)+len(extra))
+	out = append(out, argv[:at]...)
+	out = append(out, extra...)
+	return append(out, argv[at:]...)
 }
 
 // logOverlay reports the overlay of a dry run.

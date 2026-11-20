@@ -46,22 +46,23 @@ func cfg() isoshared.RunConfig {
 	if err != nil {
 		panic(err)
 	}
-	return isoshared.RunConfig{Agent: agent, WorkDir: "/home/dev/work", HomeDir: "/home/dev", Network: network.NetworkHost}
+	return isoshared.RunConfig{Agent: agent, Process: isoshared.Process{Argv: []string{"claude", "review"}, Dir: "/home/dev/work"}, HomeDir: "/home/dev", Network: network.NetworkHost}
 }
 
 func TestCommandNamesTheSandboxAndPassesEnvironmentByName(t *testing.T) {
 	run := cfg()
 	run.Secrets = map[string]string{"API_KEY": "s3cret"}
-	run.CustomEnv = []string{"MODE=fast"}
+	run.Process.Env = []string{"MODE=fast"}
+	run.ProviderEnv = map[string]string{"ROUTE_AUTH": "route-token"}
 	command, err := NewIsolator(newHost(), testLog).Command(run, provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
 	}
 	line := strings.Join(command, " ")
-	if !strings.HasPrefix(line, "sbx exec -i -t -w /home/dev/work -e API_KEY -e MODE agent-cli-1 claude") {
+	if line != "sbx exec -i -t -w /home/dev/work -e API_KEY -e MODE -e ROUTE_AUTH agent-cli-1 claude review" {
 		t.Errorf("command = %q", line)
 	}
-	if strings.Contains(line, "s3cret") {
+	if strings.Contains(line, "s3cret") || strings.Contains(line, "route-token") {
 		t.Error("a credential value must never appear in an argument")
 	}
 }
@@ -97,7 +98,7 @@ func TestRunCreatesExecutesAndRemoves(t *testing.T) {
 		t.Error("the credential must reach sbx exec through its environment")
 	}
 	for _, line := range lines {
-		if strings.Contains(line, "s3cret") {
+		if strings.Contains(line, "s3cret") || strings.Contains(line, "route-token") {
 			t.Errorf("a credential value reached an argument: %q", line)
 		}
 	}
@@ -185,14 +186,14 @@ func TestRefusals(t *testing.T) {
 	badRoBind := cfg()
 	badRoBind.RoBindPaths = []string{"/missing"}
 	badWork := cfg()
-	badWork.WorkDir = "/missing"
-	badAgent := cfg()
-	badAgent.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
+	badWork.Process.Dir = "/missing"
+	badEnv := cfg()
+	badEnv.Process.Env = []string{"not-an-assignment"}
 	colon := cfg()
 	colon.BindPaths = []string{"/home/dev/a:b"}
 	for name, run := range map[string]isoshared.RunConfig{
 		"none": none, "managed": managed, "missing bind": badBind, "missing ro bind": badRoBind,
-		"missing work": badWork, "unknown agent": badAgent, "colon": colon,
+		"missing work": badWork, "bad env": badEnv, "colon": colon,
 	} {
 		host := newHost().AddDir("/home/dev/a:b")
 		if _, err := NewIsolator(host, testLog).Command(run, provision.Contribution{}); err == nil {
@@ -225,7 +226,7 @@ func TestMountable(t *testing.T) {
 
 func TestCapabilitiesFailClosed(t *testing.T) {
 	i := NewIsolator(newHost(), testLog)
-	if i.HidesHost(true, "img") || i.KernelIsolated("runsc") || i.ConfinesNetwork() || i.PinnedProvision(provision.ProvisionNix, true, "img") {
+	if i.HidesHost(true, "img") || i.KernelIsolated("runsc") || i.ConfinesNetwork() || i.PinnedProvision(provision.ProvisionNix, true, "img") || !i.Bounded() {
 		t.Error("docker-sandboxes must claim none of the guarantees it cannot verify")
 	}
 	if i.EgressTransport() != network.TransportNone {

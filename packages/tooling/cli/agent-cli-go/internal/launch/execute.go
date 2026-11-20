@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
@@ -22,12 +23,14 @@ import (
 )
 
 // Host is the port the executor consumes to locate the run and to time it: the
-// working directory, the home directory, the configuration files and the clock.
+// working directory, the home directory, the configuration files, the
+// environment the provider route reads its credential from, and the clock.
 type Host interface {
 	config.Files
 	// ReadDir returns the entries of a directory, sorted by name.
 	ReadDir(path string) ([]fs.DirEntry, error)
 	Getwd() (string, error)
+	Getenv(key string) string
 	Now() time.Time
 }
 
@@ -55,7 +58,7 @@ type Dependencies struct {
 	Log  logging.Logger
 	// Out receives the command line of a dry run.
 	Out       io.Writer
-	Sandboxes *sandbox.Registry
+	Sandboxes *sandbox.Registry[isoshared.Isolator]
 	// Egress starts managed network enforcement; it may be nil for a build that
 	// offers no managed egress, and a managed run then fails.
 	Egress EgressOpener
@@ -137,7 +140,7 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 	}()
 
 	result.overlay = overlayResult.Sources
-	run := applyOverlay(plan.Run, overlayResult)
+	run := applyOverlay(plan.Run, plan.AgentArgs, overlayResult)
 	run.Secrets, err = credentialValues(deps.Credentials, plan)
 	if err != nil {
 		return result, err
@@ -155,7 +158,7 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 		if err != nil {
 			return result, err
 		}
-		run.WorkDir = dir
+		run.Process.Dir = dir
 	}
 
 	contribution, err := plan.Provisioner.Contribute(plan.Provision)
@@ -170,6 +173,9 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 		if err := plan.Isolator.CheckAgent(run); err != nil {
 			return result, err
 		}
+	}
+	if run.ProviderEnv, err = agentcmd.BuildProviderEnv(plan.Agent, plan.Provider, deps.Host.Getenv); err != nil {
+		return result, fmt.Errorf("prepare sandbox command: %w", err)
 	}
 	command, err := plan.Isolator.Command(run, contribution)
 	if err != nil {
@@ -192,7 +198,7 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 			keepOverlay = true
 			deps.Log.Info("The overlay stays at " + overlayResult.Root + " while the terminal session runs; remove it afterwards")
 		}
-		if result.code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.WorkDir); err != nil {
+		if result.code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.Process.Dir); err != nil {
 			return result, err
 		}
 	} else if result.code, err = plan.Isolator.Run(run, contribution); err != nil {
@@ -296,8 +302,8 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 		}
 	}
 	log.Info("  Work directory: " + plan.DisplayDir())
-	if len(plan.Run.AgentArgs) > 0 {
-		log.Info(fmt.Sprintf("  Arguments: %v", plan.Run.AgentArgs))
+	if len(plan.AgentArgs) > 0 {
+		log.Info(fmt.Sprintf("  Arguments: %v", plan.AgentArgs))
 	} else {
 		log.Info("  Arguments: (none)")
 	}
