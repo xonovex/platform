@@ -10,13 +10,13 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	pluginorigins "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/origin/plugins"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
@@ -51,8 +51,8 @@ func (r *recordingIsolator) PinnedProvision(provision.ProvisionMethod, bool, str
 }
 func (r *recordingIsolator) HidesHost(bool, string) bool { return true }
 func (r *recordingIsolator) KernelIsolated(string) bool  { return true }
-func (r *recordingIsolator) EgressTransport() netshared.Transport {
-	return netshared.TransportUnixSocket
+func (r *recordingIsolator) EgressTransport() network.EgressTransport {
+	return network.TransportUnixSocket
 }
 func (r *recordingIsolator) ConfinesNetwork() bool                { return true }
 func (r *recordingIsolator) CheckAgent(isoshared.RunConfig) error { return nil }
@@ -333,7 +333,7 @@ func TestRunCommandBindsTheNetworkAndCredentialFlags(t *testing.T) {
 
 type recordingOpener struct{}
 
-func (recordingOpener) Open(transport netshared.Transport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
+func (recordingOpener) Open(transport network.EgressTransport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
 	return isoshared.EgressRoute{Transport: transport, Allow: allow}, func() {}, nil
 }
 

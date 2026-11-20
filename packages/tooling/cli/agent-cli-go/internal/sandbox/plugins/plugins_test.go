@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
@@ -44,14 +44,14 @@ func TestDefaultRegistry(t *testing.T) {
 	// reaches the allowlist; the registry never names one.
 	capabilities := map[isolation.IsolationMethod]struct {
 		confines  bool
-		transport netshared.Transport
+		transport network.EgressTransport
 	}{
-		isolation.IsolationNone:            {false, netshared.TransportNone},
-		isolation.IsolationBwrap:           {true, netshared.TransportUnixSocket},
-		isolation.IsolationDocker:          {true, netshared.TransportUnixSocket},
-		isolation.IsolationSeatbelt:        {true, netshared.TransportLoopback},
-		isolation.IsolationDockerSandboxes: {false, netshared.TransportNone},
-		isolation.IsolationOpenShell:       {true, netshared.TransportPolicy},
+		isolation.IsolationNone:            {false, network.TransportNone},
+		isolation.IsolationBwrap:           {true, network.TransportUnixSocket},
+		isolation.IsolationDocker:          {true, network.TransportUnixSocket},
+		isolation.IsolationSeatbelt:        {true, network.TransportLoopback},
+		isolation.IsolationDockerSandboxes: {false, network.TransportNone},
+		isolation.IsolationOpenShell:       {true, network.TransportPolicy},
 	}
 	for m, want := range capabilities {
 		iso, _ := reg.Isolator(m)
@@ -61,7 +61,7 @@ func TestDefaultRegistry(t *testing.T) {
 	}
 	for _, m := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationDockerSandboxes} {
 		_, err := sandbox.Select(reg,
-			sandbox.Request{Isolation: m, Provision: provision.ProvisionNone, Network: netshared.ModeManaged},
+			sandbox.Request{Isolation: m, Provision: provision.ProvisionNone, Network: network.NetworkManaged},
 			policy.SandboxPolicy{RequireEgressRestricted: true})
 		if err == nil {
 			t.Errorf("Select(%s, managed, require-egress-restricted) must fail closed", m)
@@ -71,7 +71,7 @@ func TestDefaultRegistry(t *testing.T) {
 	// A real cell selects, and the pinned guarantee is satisfied by the nix plugin's
 	// own capability — the policy engine never names nix.
 	if _, err := sandbox.Select(reg,
-		sandbox.Request{Isolation: isolation.IsolationBwrap, Provision: provision.ProvisionNix, Network: netshared.ModeNone},
+		sandbox.Request{Isolation: isolation.IsolationBwrap, Provision: provision.ProvisionNix, Network: network.NetworkNone},
 		policy.SandboxPolicy{RequirePinnedProvision: true}); err != nil {
 		t.Errorf("Select(bwrap×nix, require-pinned) = %v, want nil", err)
 	}

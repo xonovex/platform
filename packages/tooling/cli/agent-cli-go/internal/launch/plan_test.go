@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
@@ -78,7 +78,7 @@ func TestNewPlanResolvesTheDefaultRun(t *testing.T) {
 	if p.SourceDir != "/work/repo" || p.Run.WorkDir != "/work/repo" || p.Run.RepoDir != "/work/repo" {
 		t.Errorf("directories = %q %q %q, want /work/repo", p.SourceDir, p.Run.WorkDir, p.Run.RepoDir)
 	}
-	if p.Run.HomeDir != "/home/user" || p.Run.Network != netshared.ModeHost {
+	if p.Run.HomeDir != "/home/user" || p.Run.Network != network.NetworkHost {
 		t.Errorf("home, network = %q, %q", p.Run.HomeDir, p.Run.Network)
 	}
 	if !slices.Equal(p.Run.BindPaths, []string{"/work/repo"}) || p.Run.RoBindPaths != nil {
@@ -235,7 +235,7 @@ func TestNewPlanRejectsTheRetiredProxyNetwork(t *testing.T) {
 	options.Isolation = "bwrap"
 	options.Network = "proxy"
 
-	var invalid *netshared.InvalidModeError
+	var invalid *network.InvalidModeError
 	if _, err := plan(t, options, config.FileConfig{}); !errors.As(err, &invalid) {
 		t.Fatalf("NewPlan() error = %v, want an invalid network mode", err)
 	}
@@ -247,7 +247,7 @@ func TestNewPlanBuildsTheManagedRoute(t *testing.T) {
 	options.Network = "managed"
 	options.AllowHosts = []string{"api.example.com"}
 	p := mustPlan(t, options, config.FileConfig{AllowHosts: []string{"*.cdn.example.com:8443"}})
-	if p.Run.Network != netshared.ModeManaged || p.Run.Egress.Transport != netshared.TransportUnixSocket {
+	if p.Run.Network != network.NetworkManaged || p.Run.Egress.Transport != network.TransportUnixSocket {
 		t.Errorf("network, transport = %q, %q", p.Run.Network, p.Run.Egress.Transport)
 	}
 	if len(p.Allow.Rules()) != 2 || !p.Allow.Allows("api.example.com", 443) || !p.Allow.Allows("x.cdn.example.com", 8443) {
@@ -307,7 +307,7 @@ func TestNewPlanRejectsARestrictedNetworkForAnIsolationThatCannotConfineIt(t *te
 	}
 
 	options.Isolation = "bwrap"
-	if p := mustPlan(t, options, config.FileConfig{}); p.Run.Network != netshared.ModeNone {
+	if p := mustPlan(t, options, config.FileConfig{}); p.Run.Network != network.NetworkNone {
 		t.Errorf("Run.Network = %q, want none", p.Run.Network)
 	}
 }
@@ -518,7 +518,7 @@ func TestNewPlanRejectsAnUnregisteredAxis(t *testing.T) {
 func TestNewPlanDefaultsEmptyAxes(t *testing.T) {
 	p := mustPlan(t, Options{Agent: "claude", VCS: "git"}, config.FileConfig{})
 
-	if p.IsolationName != isolation.IsolationNone || p.Run.Network != netshared.ModeHost {
+	if p.IsolationName != isolation.IsolationNone || p.Run.Network != network.NetworkHost {
 		t.Errorf("defaults = %s %s, want none and host", p.IsolationName, p.Run.Network)
 	}
 	if _, ok := any(p.Provisioner).(*fakeProvisioner); !ok || p.Provisioner.Pinned() {

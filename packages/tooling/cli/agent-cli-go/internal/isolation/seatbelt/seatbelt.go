@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // program is the macOS command that runs a process under a profile.
@@ -56,7 +56,7 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 
 // EgressTransport declares loopback: the profile allows only the loopback port of
 // the allowlist proxy.
-func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportLoopback }
+func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportLoopback }
 
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
@@ -113,8 +113,8 @@ func (i *Isolator) spec(cfg isoshared.RunConfig, c provision.Contribution) (prof
 		return profileSpec{}, err
 	}
 	spec := profileSpec{Home: home, Network: cfg.Network, Writable: []string{workDir}, Readable: []string{workDir}}
-	if cfg.Network == netshared.ModeManaged {
-		if cfg.Egress.Transport != netshared.TransportLoopback {
+	if cfg.Network == network.NetworkManaged {
+		if cfg.Egress.Transport != network.TransportLoopback {
 			return profileSpec{}, fmt.Errorf("managed egress under seatbelt needs the loopback transport, not %q", cfg.Egress.Transport)
 		}
 		if err := cfg.Egress.Validate(); err != nil {

@@ -11,11 +11,11 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // program is the Docker Sandboxes command line tool.
@@ -69,7 +69,7 @@ func (i *Isolator) KernelIsolated(string) bool { return false }
 func (i *Isolator) ConfinesNetwork() bool { return false }
 
 // EgressTransport declares none: an allowlist cannot be installed.
-func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportNone }
+func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportNone }
 
 // CheckAgent has nothing to check: the agent binary lives in the sandbox image.
 func (i *Isolator) CheckAgent(isoshared.RunConfig) error { return nil }
@@ -162,7 +162,7 @@ func mountable(path string) error {
 
 func (i *Isolator) plan(cfg isoshared.RunConfig, c provision.Contribution, name string) (plan, error) {
 	switch {
-	case cfg.Network != netshared.ModeHost:
+	case cfg.Network != network.NetworkHost:
 		return plan{}, fmt.Errorf("%w: network mode %q", ErrUnsupported, cfg.Network)
 	case len(c.InitCommands) > 0:
 		return plan{}, fmt.Errorf("%w: the sandbox starts the agent itself, so initialization commands cannot run before it", ErrUnsupported)

@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // Host is the port the service consumes: the listeners and temporary files of the
@@ -38,7 +38,7 @@ const shutdownTimeout = 2 * time.Second
 // private directory; the loopback transport listens on an ephemeral port of the
 // host loopback. The policy transport runs no proxy: the sandbox runtime enforces
 // the allowlist, so its route only carries it.
-func (s Service) Open(transport netshared.Transport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
+func (s Service) Open(transport network.EgressTransport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
 	route := isoshared.EgressRoute{Transport: transport, Allow: allow}
 	if !transport.RunsProxy() {
 		return route, func() {}, route.Validate()
@@ -46,7 +46,7 @@ func (s Service) Open(transport netshared.Transport, allow egress.Allowlist) (is
 	cleanup := func() {}
 	var listener net.Listener
 	switch transport {
-	case netshared.TransportUnixSocket:
+	case network.TransportUnixSocket:
 		bridge, err := s.Host.Executable()
 		if err != nil {
 			return isoshared.EgressRoute{}, nil, fmt.Errorf("locate the bridge executable: %w", err)

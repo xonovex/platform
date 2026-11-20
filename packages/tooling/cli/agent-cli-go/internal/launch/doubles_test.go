@@ -4,10 +4,10 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
@@ -58,7 +58,7 @@ func (f *fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerP
 
 func (f *fakeIsolator) HidesHost(passthrough bool, _ string) bool { return !passthrough }
 func (f *fakeIsolator) KernelIsolated(runtime string) bool        { return runtime == "runsc" }
-func (f *fakeIsolator) EgressTransport() netshared.Transport      { return netshared.TransportUnixSocket }
+func (f *fakeIsolator) EgressTransport() network.EgressTransport  { return network.TransportUnixSocket }
 func (f *fakeIsolator) ConfinesNetwork() bool                     { return !f.noNetwork }
 
 func (f *fakeIsolator) CheckAgent(isoshared.RunConfig) error {

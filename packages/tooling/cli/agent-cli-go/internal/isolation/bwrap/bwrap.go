@@ -9,11 +9,11 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // Isolator confines the agent with bubblewrap namespaces and applies a
@@ -64,7 +64,7 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 
 // EgressTransport declares the unix socket: a managed run has no network
 // namespace interface, and reaches the allowlist proxy through a bound socket.
-func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportUnixSocket }
+func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportUnixSocket }
 
 // CheckAgent requires host passthrough, because deny-default bwrap exposes no
 // host tool, and then the agent executable on the PATH it passes through.
@@ -222,7 +222,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
 	// Managed egress: bind the proxy socket directory and the bridge executable,
 	// and run the command under the bridge.
-	if cfg.Network == netshared.ModeManaged {
+	if cfg.Network == network.NetworkManaged {
 		route, err := isoshared.ResolveBridge(i.host, cfg.Egress)
 		if err != nil {
 			return nil, err

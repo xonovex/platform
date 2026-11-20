@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 )
 
 // The values that decide how strongly the gateway holds a sandbox. The gateway
@@ -66,7 +66,7 @@ type endpoint struct {
 // renderPolicy returns the sandbox policy document of a run. A none run has an
 // empty network policy, which the gateway reads as deny all; a managed run lists
 // each allowlist rule as an endpoint that any binary may reach.
-func renderPolicy(mode netshared.Mode, allow egress.Allowlist) ([]byte, error) {
+func renderPolicy(mode network.NetworkMethod, allow egress.Allowlist) ([]byte, error) {
 	document := policyDocument{
 		Version:         1,
 		Filesystem:      filesystemPolicy{IncludeWorkdir: true, ReadWrite: []string{nullDevice}},
@@ -74,11 +74,11 @@ func renderPolicy(mode netshared.Mode, allow egress.Allowlist) ([]byte, error) {
 		NetworkPolicies: map[string]networkPolicy{},
 	}
 	switch mode {
-	case netshared.ModeNone:
+	case network.NetworkNone:
 		readOnly, readWrite := systemPaths()
 		document.Filesystem.ReadOnly = readOnly
 		document.Filesystem.ReadWrite = append(document.Filesystem.ReadWrite, readWrite...)
-	case netshared.ModeManaged:
+	case network.NetworkManaged:
 		rules := allow.Rules()
 		if len(rules) == 0 {
 			return nil, fmt.Errorf("a managed policy needs an allowlist")

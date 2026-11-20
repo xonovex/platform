@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 func envValue(env []string, key string) (string, bool) {
@@ -24,7 +24,7 @@ func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T
 	host := newHost()
 	host.Env["XONOVEX_PROCESS_ENV_PROBE"] = "host-value"
 
-	env, err := NewIsolator(host, testLog).processEnv(claudeCfg(netshared.ModeNone, false), provision.Contribution{})
+	env, err := NewIsolator(host, testLog).processEnv(claudeCfg(network.NetworkNone, false), provision.Contribution{})
 
 	if err != nil {
 		t.Fatalf("processEnv() error = %v", err)
@@ -41,7 +41,7 @@ func TestProcessEnv_MergesTheSandboxAllowlistOverTheHostEnvironment(t *testing.T
 }
 
 func TestProcessEnv_ReportsAnUnresolvableHomeDir(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg := claudeCfg(network.NetworkNone, false)
 	cfg.HomeDir = "/home/absent"
 
 	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
@@ -50,7 +50,7 @@ func TestProcessEnv_ReportsAnUnresolvableHomeDir(t *testing.T) {
 }
 
 func TestProcessEnv_ReportsAMalformedCustomEnvironment(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg := claudeCfg(network.NetworkNone, false)
 	cfg.CustomEnv = []string{"MISSING_EQUALS"}
 
 	if _, err := NewIsolator(newHost(), testLog).processEnv(cfg, provision.Contribution{}); err == nil {
@@ -62,7 +62,7 @@ func TestProcessEnv_ReportsAMalformedCustomEnvironment(t *testing.T) {
 // it must be launched with, so the two must stay consistent.
 func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 	host := newHost()
-	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg := claudeCfg(network.NetworkNone, false)
 
 	command, env, err := NewIsolator(host, testLog).TerminalCommand(cfg, provision.Contribution{})
 
@@ -82,7 +82,7 @@ func TestTerminalCommand_ReturnsTheCommandAndItsEnvironment(t *testing.T) {
 }
 
 func TestTerminalCommand_ReportsAnUnresolvableDirectory(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeNone, false)
+	cfg := claudeCfg(network.NetworkNone, false)
 	cfg.WorkDir = "/work/absent"
 
 	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg, provision.Contribution{}); err == nil {

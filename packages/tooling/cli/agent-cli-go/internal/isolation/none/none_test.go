@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -29,7 +29,7 @@ func newHost() *systemtest.Fake {
 	return host
 }
 
-func cfg(net netshared.Mode) isoshared.RunConfig {
+func cfg(net network.NetworkMethod) isoshared.RunConfig {
 	return isoshared.RunConfig{
 		Agent:   registeredAgent(types.AgentClaude),
 		HomeDir: "/home/user",
@@ -39,7 +39,7 @@ func cfg(net netshared.Mode) isoshared.RunConfig {
 }
 
 func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
-	for _, net := range []netshared.Mode{netshared.ModeNone, netshared.ModeManaged} {
+	for _, net := range []network.NetworkMethod{network.NetworkNone, network.NetworkManaged} {
 		host := newHost()
 		i := NewIsolator(host, testLog)
 		c := provision.Contribution{}
@@ -60,7 +60,7 @@ func TestNone_FailsClosedOnNetworkRestriction(t *testing.T) {
 
 func TestNone_CommandNoPermissionBypass(t *testing.T) {
 	// Host execution must NOT inject the sandbox permission bypass (Sandbox=false).
-	cmd, err := NewIsolator(newHost(), testLog).Command(cfg(netshared.ModeHost), provision.Contribution{})
+	cmd, err := NewIsolator(newHost(), testLog).Command(cfg(network.NetworkHost), provision.Contribution{})
 	if err != nil {
 		t.Fatalf("Command() error = %v", err)
 	}
@@ -78,7 +78,7 @@ func TestNone_AppliesContribution(t *testing.T) {
 		Env:          map[string]string{"FOO": "bar"},
 		InitCommands: []string{"echo hi"},
 	}
-	cmd, env, err := NewIsolator(newHost(), testLog).hostCommand(cfg(netshared.ModeHost), c)
+	cmd, env, err := NewIsolator(newHost(), testLog).hostCommand(cfg(network.NetworkHost), c)
 	if err != nil {
 		t.Fatalf("hostCommand() error = %v", err)
 	}
@@ -101,7 +101,7 @@ func TestNone_PathEntriesWithoutAHostPath(t *testing.T) {
 	host := newHost()
 	delete(host.Env, "PATH")
 
-	_, env, err := NewIsolator(host, testLog).hostCommand(cfg(netshared.ModeHost), provision.Contribution{PathEntries: []string{"/nix/store/abc/bin"}})
+	_, env, err := NewIsolator(host, testLog).hostCommand(cfg(network.NetworkHost), provision.Contribution{PathEntries: []string{"/nix/store/abc/bin"}})
 
 	if err != nil || !slices.Contains(env, "PATH=/nix/store/abc/bin") {
 		t.Fatalf("hostCommand() = (%v, %v), want PATH of the contribution only", env, err)
@@ -112,7 +112,7 @@ func TestNone_MergesHostProviderAndCustomEnvironment(t *testing.T) {
 	host := newHost()
 	host.Env["HOST_ONLY"] = "kept"
 	host.Env["SOURCE_TOKEN"] = "secret"
-	config := cfg(netshared.ModeHost)
+	config := cfg(network.NetworkHost)
 	config.Provider = &types.ModelProvider{CredentialSourceEnv: "SOURCE_TOKEN", CredentialTargetEnv: "AGENT_PROVIDER_TOKEN"}
 	config.CustomEnv = []string{"CUSTOM=1"}
 
@@ -129,7 +129,7 @@ func TestNone_MergesHostProviderAndCustomEnvironment(t *testing.T) {
 }
 
 func TestNone_CommandRejectsMalformedCustomEnvironment(t *testing.T) {
-	config := cfg(netshared.ModeHost)
+	config := cfg(network.NetworkHost)
 	config.CustomEnv = []string{"MISSING_EQUALS"}
 
 	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
@@ -138,7 +138,7 @@ func TestNone_CommandRejectsMalformedCustomEnvironment(t *testing.T) {
 }
 
 func TestNone_CommandRejectsMissingWorkDirectory(t *testing.T) {
-	config := cfg(netshared.ModeHost)
+	config := cfg(network.NetworkHost)
 	config.WorkDir = "/missing"
 
 	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
@@ -147,7 +147,7 @@ func TestNone_CommandRejectsMissingWorkDirectory(t *testing.T) {
 }
 
 func TestNone_CommandRejectsMissingProviderToken(t *testing.T) {
-	cfg := cfg(netshared.ModeHost)
+	cfg := cfg(network.NetworkHost)
 	cfg.Provider = &types.ModelProvider{
 		CredentialSourceEnv: "MISSING_NONE_TEST_TOKEN",
 		CredentialTargetEnv: "AGENT_PROVIDER_TOKEN",
@@ -161,7 +161,7 @@ func TestNone_RunSpawnsTheAgentInTheWorkDirectory(t *testing.T) {
 	host := newHost()
 	host.Outcomes["claude"] = systemtest.Outcome{ExitCode: 3}
 
-	code, err := NewIsolator(host, testLog).Run(cfg(netshared.ModeHost), provision.Contribution{})
+	code, err := NewIsolator(host, testLog).Run(cfg(network.NetworkHost), provision.Contribution{})
 
 	if err != nil || code != 3 {
 		t.Fatalf("Run() = (%d, %v), want (3, nil)", code, err)
@@ -188,17 +188,17 @@ func TestNone_CheckAgentLooksUpTheHostPath(t *testing.T) {
 	host := newHost()
 	i := NewIsolator(host, testLog)
 
-	if err := i.CheckAgent(cfg(netshared.ModeHost)); err == nil || !strings.Contains(err.Error(), "not available on host PATH") {
+	if err := i.CheckAgent(cfg(network.NetworkHost)); err == nil || !strings.Contains(err.Error(), "not available on host PATH") {
 		t.Fatalf("CheckAgent(missing) error = %v, want host PATH error", err)
 	}
 	host.AddExecutable("/usr/bin/claude")
-	if err := i.CheckAgent(cfg(netshared.ModeHost)); err != nil {
+	if err := i.CheckAgent(cfg(network.NetworkHost)); err != nil {
 		t.Fatalf("CheckAgent(present) error = %v", err)
 	}
 }
 
 func TestNone_CommandRejectsUnknownAgentType(t *testing.T) {
-	config := cfg(netshared.ModeHost)
+	config := cfg(network.NetworkHost)
 	config.Agent = &types.AgentConfig{Type: "unknown", Binary: "unknown"}
 
 	if _, err := NewIsolator(newHost(), testLog).Command(config, provision.Contribution{}); err == nil {
@@ -232,7 +232,7 @@ func TestNone_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(string(test.agent), func(t *testing.T) {
-			c := cfg(netshared.ModeHost)
+			c := cfg(network.NetworkHost)
 			c.Agent = registeredAgent(test.agent)
 			c.AgentArgs = []string{"go"}
 
@@ -248,7 +248,7 @@ func TestNone_CommandFollowsTheDeclaredFactsOfEachHarness(t *testing.T) {
 }
 
 func TestNone_DeclaresNoEgressTransport(t *testing.T) {
-	if got := NewIsolator(newHost(), testLog).EgressTransport(); got != netshared.TransportNone {
+	if got := NewIsolator(newHost(), testLog).EgressTransport(); got != network.TransportNone {
 		t.Errorf("EgressTransport() = %q, want none: host execution has no boundary to route traffic through", got)
 	}
 }

@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // fakeOpener records the managed egress a run starts and stops.
 type fakeOpener struct {
-	transport netshared.Transport
+	transport network.EgressTransport
 	allow     egress.Allowlist
 	route     isoshared.EgressRoute
 	err       error
@@ -21,7 +21,7 @@ type fakeOpener struct {
 	stopped   int
 }
 
-func (o *fakeOpener) Open(transport netshared.Transport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
+func (o *fakeOpener) Open(transport network.EgressTransport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error) {
 	o.opened++
 	o.transport, o.allow = transport, allow
 	if o.err != nil {
@@ -39,14 +39,14 @@ func managedOptions() Options {
 
 func TestExecuteStartsManagedEgressAndStopsItAfterTheRun(t *testing.T) {
 	f := newExecuteFixture()
-	opener := &fakeOpener{route: isoshared.EgressRoute{Transport: netshared.TransportUnixSocket, Socket: "/run/e/p.sock", Bridge: "/bin/agent-cli"}}
+	opener := &fakeOpener{route: isoshared.EgressRoute{Transport: network.TransportUnixSocket, Socket: "/run/e/p.sock", Bridge: "/bin/agent-cli"}}
 	deps := f.deps()
 	deps.Egress = opener
 	if err := Execute(deps, managedOptions()); err != nil {
 		t.Fatalf("Execute() error = %v", err)
 	}
 	iso := f.sandbox.isolator
-	if opener.transport != netshared.TransportUnixSocket || !opener.allow.Allows("api.example.com", 443) {
+	if opener.transport != network.TransportUnixSocket || !opener.allow.Allows("api.example.com", 443) {
 		t.Errorf("opened for %q %v", opener.transport, opener.allow.Rules())
 	}
 	if iso.commandRun.Egress.Socket != "/run/e/p.sock" || !iso.ran {

@@ -10,11 +10,11 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agentcmd"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // containerHome is the synthetic, writable HOME inside the container. The host
@@ -92,7 +92,7 @@ func (i *Isolator) ConfinesNetwork() bool { return true }
 
 // EgressTransport declares the unix socket: a managed run has --network none,
 // and reaches the allowlist proxy through a bound socket.
-func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportUnixSocket }
+func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportUnixSocket }
 
 // CheckAgent rejects the default image, which does not contain an agent; a
 // caller-supplied image is trusted to contain it.
@@ -224,7 +224,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	// Managed egress: bind the proxy socket directory and the bridge executable;
 	// the command runs under the bridge below.
 	var route isoshared.EgressRoute
-	if cfg.Network == netshared.ModeManaged {
+	if cfg.Network == network.NetworkManaged {
 		route, err = isoshared.ResolveBridge(i.host, cfg.Egress)
 		if err != nil {
 			return nil, err
@@ -256,7 +256,7 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 		return nil, err
 	}
 	command := isoshared.WrapWithInitCommands(agentCmd, c.InitCommands)
-	if cfg.Network == netshared.ModeManaged {
+	if cfg.Network == network.NetworkManaged {
 		command = isoshared.WrapWithBridge(route, command)
 	}
 	args = append(args, command...)

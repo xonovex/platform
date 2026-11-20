@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // newRunCommand binds the run flags into launch.Options and executes them
@@ -139,7 +139,7 @@ func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Depen
 		return isolationNames(deps), cobra.ShellCompDirectiveNoFileComp
 	})
 	_ = cmd.RegisterFlagCompletionFunc("network", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
-		return []string{string(netshared.ModeHost), string(netshared.ModeNone), string(netshared.ModeManaged)}, cobra.ShellCompDirectiveNoFileComp
+		return []string{string(network.NetworkHost), string(network.NetworkNone), string(network.NetworkManaged)}, cobra.ShellCompDirectiveNoFileComp
 	})
 	_ = cmd.RegisterFlagCompletionFunc("terminal", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 		return terminalNames(deps), cobra.ShellCompDirectiveNoFileComp

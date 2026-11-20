@@ -86,7 +86,6 @@ tasks:
         ./internal/credential/shared=100 \
         ./internal/launch=99 \
         ./internal/network/managed=100 \
-        ./internal/network/shared=100 \
         ./internal/origin=exempt \
         ./internal/origin/directory=100 \
         ./internal/origin/git=100 \

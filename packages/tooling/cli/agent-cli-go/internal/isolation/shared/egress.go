@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/envutil"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // BridgeListen is the loopback address the in-sandbox bridge listens on. A
@@ -17,7 +17,7 @@ const BridgeListen = "127.0.0.1:3128"
 
 // EgressRoute is the route the traffic of a managed run takes.
 type EgressRoute struct {
-	Transport netshared.Transport
+	Transport network.EgressTransport
 	// Allow is the allowlist: the proxy enforces it for a proxy transport, and the
 	// sandbox runtime enforces it for the policy transport.
 	Allow egress.Allowlist
@@ -33,15 +33,15 @@ type EgressRoute struct {
 // Validate reports whether the route holds what its transport needs.
 func (r EgressRoute) Validate() error {
 	switch r.Transport {
-	case netshared.TransportUnixSocket:
+	case network.TransportUnixSocket:
 		if !filepath.IsAbs(r.Socket) || !filepath.IsAbs(r.Bridge) {
 			return fmt.Errorf("managed egress over a unix socket needs an absolute socket and bridge executable")
 		}
-	case netshared.TransportLoopback:
+	case network.TransportLoopback:
 		if r.Proxy == "" {
 			return fmt.Errorf("managed egress over loopback needs the proxy address")
 		}
-	case netshared.TransportPolicy:
+	case network.TransportPolicy:
 		if len(r.Allow.Rules()) == 0 {
 			return fmt.Errorf("managed egress by policy needs an allowlist")
 		}
@@ -86,7 +86,7 @@ func RunEnv(cfg RunConfig) (map[string]string, error) {
 		return nil, err
 	}
 	env := envutil.MergeEnvMaps(custom, cfg.Secrets)
-	if cfg.Network == netshared.ModeManaged && cfg.Egress.Transport == netshared.TransportLoopback {
+	if cfg.Network == network.NetworkManaged && cfg.Egress.Transport == network.TransportLoopback {
 		env = envutil.MergeEnvMaps(env, ProxyEnv(cfg.Egress.Proxy))
 	}
 	return env, nil
@@ -95,7 +95,7 @@ func RunEnv(cfg RunConfig) (map[string]string, error) {
 // ResolveBridge validates a unix-socket route against the host: the socket
 // directory and the bridge executable must exist, and both paths come back clean.
 func ResolveBridge(fsys FileSystem, route EgressRoute) (EgressRoute, error) {
-	if route.Transport != netshared.TransportUnixSocket {
+	if route.Transport != network.TransportUnixSocket {
 		return EgressRoute{}, fmt.Errorf("transport %q does not run the bridge", route.Transport)
 	}
 	if err := route.Validate(); err != nil {

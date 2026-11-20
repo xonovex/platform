@@ -11,6 +11,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
@@ -22,7 +23,6 @@ import (
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
@@ -252,7 +252,7 @@ func buildPlan(options Options, cwd, home string, registry *sandbox.Registry, en
 // no other network mode takes any, because the hosts would then restrict nothing.
 func planAllowlist(selected selection, options Options) (egress.Allowlist, error) {
 	texts := options.AllowHosts
-	if selected.network != netshared.ModeManaged {
+	if selected.network != network.NetworkManaged {
 		if len(texts) > 0 {
 			return egress.Allowlist{}, fmt.Errorf("allowed hosts need --network managed, not %s", selected.network)
 		}
@@ -269,7 +269,7 @@ func planAllowlist(selected selection, options Options) (egress.Allowlist, error
 // isolator declared and the allowlist. The executor fills in the socket or the
 // proxy address when it starts the proxy.
 func plannedRoute(selected selection, allow egress.Allowlist) isoshared.EgressRoute {
-	if selected.network != netshared.ModeManaged {
+	if selected.network != network.NetworkManaged {
 		return isoshared.EgressRoute{}
 	}
 	return isoshared.EgressRoute{Transport: selected.isolator.EgressTransport(), Allow: allow}
@@ -320,7 +320,7 @@ func planCheckout(options Options, sourceDir string) (*Checkout, error) {
 type selection struct {
 	isolation    isolation.IsolationMethod
 	provision    provision.ProvisionMethod
-	network      netshared.Mode
+	network      network.NetworkMethod
 	isolator     isoshared.Isolator
 	provisioner  provshared.Provisioner
 	capabilities policy.Capabilities
@@ -333,7 +333,7 @@ type selection struct {
 func selectAxes(options Options, registry *sandbox.Registry, enforce bool) (selection, error) {
 	isolationName := isolation.IsolationMethod(orDefault(options.Isolation, string(isolation.IsolationNone)))
 	provisionName := provision.ProvisionMethod(orDefault(options.Provision, string(provision.ProvisionNone)))
-	network, err := netshared.ParseMode(orDefault(options.Network, string(netshared.ModeHost)))
+	network, err := network.ParseMode(orDefault(options.Network, string(network.NetworkHost)))
 	if err != nil {
 		return selection{}, err
 	}

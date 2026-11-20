@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
@@ -46,7 +46,7 @@ type Recorder interface {
 // proxy for a transport that needs one. It returns the route the isolator
 // applies, and a stop function that ends the enforcement.
 type EgressOpener interface {
-	Open(transport netshared.Transport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error)
+	Open(transport network.EgressTransport, allow egress.Allowlist) (isoshared.EgressRoute, func(), error)
 }
 
 // Dependencies are the ports and plugin sets one run executes through.
@@ -142,7 +142,7 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 	if err != nil {
 		return result, err
 	}
-	if plan.Run.Network == netshared.ModeManaged {
+	if plan.Run.Network == network.NetworkManaged {
 		route, stop, err := openEgress(deps.Egress, plan)
 		if err != nil {
 			return result, err
@@ -330,7 +330,7 @@ func logProvenance(log logging.Logger, provenance []string) {
 // it holds.
 func logNetwork(log logging.Logger, plan Plan) {
 	log.Info("  Network: " + string(plan.Run.Network))
-	if plan.Run.Network == netshared.ModeManaged {
+	if plan.Run.Network == network.NetworkManaged {
 		var hosts []string
 		for _, rule := range plan.Allow.Rules() {
 			hosts = append(hosts, rule.String())

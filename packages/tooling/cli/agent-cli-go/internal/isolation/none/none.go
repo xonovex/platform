@@ -5,10 +5,10 @@ package none
 import (
 	"fmt"
 
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // Isolator runs the agent directly on the host — no namespace boundary. It
@@ -46,7 +46,7 @@ func (i *Isolator) ConfinesNetwork() bool { return false }
 
 // EgressTransport declares none: host execution has no boundary to route traffic
 // through an allowlist.
-func (i *Isolator) EgressTransport() netshared.Transport { return netshared.TransportNone }
+func (i *Isolator) EgressTransport() network.EgressTransport { return network.TransportNone }
 
 // CheckAgent requires the agent executable on the PATH of the host.
 func (i *Isolator) CheckAgent(cfg isoshared.RunConfig) error {
@@ -82,7 +82,7 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 
 // hostCommand builds the host command and environment, applying the Contribution.
 func (i *Isolator) hostCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
-	if cfg.Network != netshared.ModeHost {
+	if cfg.Network != network.NetworkHost {
 		return nil, nil, fmt.Errorf("isolation=none cannot restrict network egress (network=%q); use bwrap or docker", cfg.Network)
 	}
 	if _, err := isoshared.ResolveDirectory(i.host, cfg.WorkDir, "work directory"); err != nil {

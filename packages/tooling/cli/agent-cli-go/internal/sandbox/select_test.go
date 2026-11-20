@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
@@ -40,11 +40,11 @@ func (f fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPi
 }
 func (f fakeIsolator) HidesHost(_ bool, _ string) bool { return f.hidesHost }
 func (f fakeIsolator) KernelIsolated(_ string) bool    { return f.kernelIso }
-func (f fakeIsolator) EgressTransport() netshared.Transport {
+func (f fakeIsolator) EgressTransport() network.EgressTransport {
 	if f.noTransport {
-		return netshared.TransportNone
+		return network.TransportNone
 	}
-	return netshared.TransportUnixSocket
+	return network.TransportUnixSocket
 }
 func (f fakeIsolator) ConfinesNetwork() bool { return !f.sharesNetwork }
 func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error {
@@ -68,7 +68,7 @@ func testRegistry(iso fakeIsolator, prov fakeProvisioner) *Registry {
 }
 
 func bwrapNixReq() Request {
-	return Request{Isolation: isolation.IsolationBwrap, Provision: provision.ProvisionNix, Network: netshared.ModeNone}
+	return Request{Isolation: isolation.IsolationBwrap, Provision: provision.ProvisionNix, Network: network.NetworkNone}
 }
 
 func TestSelect_ResolvesRegisteredPlugins(t *testing.T) {
@@ -111,15 +111,15 @@ func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 		name    string
 		iso     fakeIsolator
 		prov    fakeProvisioner
-		net     netshared.Mode
+		net     network.NetworkMethod
 		pol     policy.SandboxPolicy
 		wantErr error
 	}{
-		{"pinned unmet", fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: false}, netshared.ModeNone, policy.SandboxPolicy{RequirePinnedProvision: true}, policy.ErrPinnedProvisionUnmet},
-		{"host-tools unmet", fakeIsolator{hidesHost: false}, fakeProvisioner{pinned: true}, netshared.ModeNone, policy.SandboxPolicy{RequireHostToolsUnreachable: true}, policy.ErrHostToolsReachable},
-		{"egress unmet (host net)", fakeIsolator{}, fakeProvisioner{}, netshared.ModeHost, policy.SandboxPolicy{RequireEgressRestricted: true}, policy.ErrEgressUnrestricted},
-		{"kernel unmet", fakeIsolator{kernelIso: false}, fakeProvisioner{}, netshared.ModeNone, policy.SandboxPolicy{RequireKernelIsolation: true}, policy.ErrKernelIsolationUnmet},
-		{"all met", fakeIsolator{hidesHost: true, kernelIso: true}, fakeProvisioner{pinned: true}, netshared.ModeNone, policy.SandboxPolicy{RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true}, nil},
+		{"pinned unmet", fakeIsolator{hidesHost: true}, fakeProvisioner{pinned: false}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true}, policy.ErrPinnedProvisionUnmet},
+		{"host-tools unmet", fakeIsolator{hidesHost: false}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequireHostToolsUnreachable: true}, policy.ErrHostToolsReachable},
+		{"egress unmet (host net)", fakeIsolator{}, fakeProvisioner{}, network.NetworkHost, policy.SandboxPolicy{RequireEgressRestricted: true}, policy.ErrEgressUnrestricted},
+		{"kernel unmet", fakeIsolator{kernelIso: false}, fakeProvisioner{}, network.NetworkNone, policy.SandboxPolicy{RequireKernelIsolation: true}, policy.ErrKernelIsolationUnmet},
+		{"all met", fakeIsolator{hidesHost: true, kernelIso: true}, fakeProvisioner{pinned: true}, network.NetworkNone, policy.SandboxPolicy{RequirePinnedProvision: true, RequireHostToolsUnreachable: true, RequireEgressRestricted: true, RequireKernelIsolation: true}, nil},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -160,7 +160,7 @@ func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
 	}
 
 	req := bwrapNixReq()
-	req.Network = netshared.ModeHost
+	req.Network = network.NetworkHost
 	if _, err := Select(reg, req, policy.SandboxPolicy{}); err != nil {
 		t.Fatalf("Select(network host, shared network) error = %v, want nil", err)
 	}
@@ -168,9 +168,9 @@ func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
 
 func TestSelect_ManagedEgressNeedsATransport(t *testing.T) {
 	req := bwrapNixReq()
-	req.Network = netshared.ModeManaged
+	req.Network = network.NetworkManaged
 	noTransport := testRegistry(fakeIsolator{available: true, noTransport: true}, fakeProvisioner{})
-	if _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, netshared.ErrManagedEgressUnenforceable) {
+	if _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, network.ErrManagedEgressUnenforceable) {
 		t.Errorf("an isolator without a transport must refuse managed whatever the policy: %v", err)
 	}
 	withTransport := testRegistry(fakeIsolator{available: true}, fakeProvisioner{})

@@ -1,4 +1,4 @@
-package shared
+package network
 
 import (
 	"errors"
@@ -27,29 +27,11 @@ func TestInvalidModeErrorNamesTheModes(t *testing.T) {
 	}
 }
 
-func TestEgressRestricted(t *testing.T) {
-	cases := []struct {
-		mode      Mode
-		transport Transport
-		want      bool
-	}{
-		{ModeHost, TransportUnixSocket, false},
-		{ModeNone, TransportNone, true},
-		{ModeManaged, TransportNone, false},
-		{ModeManaged, TransportLoopback, true},
-	}
-	for _, c := range cases {
-		if got := EgressRestricted(c.mode, c.transport); got != c.want {
-			t.Errorf("EgressRestricted(%q, %q) = %t, want %t", c.mode, c.transport, got, c.want)
-		}
-	}
-}
-
 func TestNeedsConfinement(t *testing.T) {
-	if NeedsConfinement(ModeHost) {
+	if NeedsConfinement(NetworkHost) {
 		t.Error("NeedsConfinement(host) = true, want false")
 	}
-	for _, m := range []Mode{ModeNone, ModeManaged} {
+	for _, m := range []NetworkMethod{NetworkNone, NetworkManaged} {
 		if !NeedsConfinement(m) {
 			t.Errorf("NeedsConfinement(%q) = false, want true", m)
 		}
@@ -57,15 +39,15 @@ func TestNeedsConfinement(t *testing.T) {
 }
 
 func TestCheckManaged(t *testing.T) {
-	if err := CheckManaged(ModeManaged, TransportNone); !errors.Is(err, ErrManagedEgressUnenforceable) {
+	if err := CheckManaged(NetworkManaged, TransportNone); !errors.Is(err, ErrManagedEgressUnenforceable) {
 		t.Errorf("CheckManaged(managed, none) = %v, want %v", err, ErrManagedEgressUnenforceable)
 	}
 	for _, c := range []struct {
-		mode      Mode
-		transport Transport
-	}{{ModeManaged, TransportPolicy}, {ModeNone, TransportNone}, {ModeHost, TransportNone}} {
-		if err := CheckManaged(c.mode, c.transport); err != nil {
-			t.Errorf("CheckManaged(%q, %q) = %v, want nil", c.mode, c.transport, err)
+		method    NetworkMethod
+		transport EgressTransport
+	}{{NetworkManaged, TransportPolicy}, {NetworkNone, TransportNone}, {NetworkHost, TransportNone}} {
+		if err := CheckManaged(c.method, c.transport); err != nil {
+			t.Errorf("CheckManaged(%q, %q) = %v, want nil", c.method, c.transport, err)
 		}
 	}
 }

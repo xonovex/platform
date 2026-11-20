@@ -6,9 +6,9 @@
 package shared
 
 import (
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
 
 // RunConfig carries the run-wide inputs every isolator needs to launch the
@@ -23,7 +23,7 @@ type RunConfig struct {
 
 	// Network is the egress mode; the isolator emits its own network flags via its
 	// network.go bridge.
-	Network netshared.Mode
+	Network network.NetworkMethod
 	// Egress is the route of a managed run: the allowlist and, for a transport
 	// that runs a proxy, where to reach it. It is the zero value for any other mode.
 	Egress EgressRoute
@@ -80,7 +80,7 @@ type Isolator interface {
 	// allowlist, or TransportNone when it has no such route. Select refuses a
 	// managed run on an isolator that declares none, and a managed run satisfies
 	// the egress guarantee only through a declared transport.
-	EgressTransport() netshared.Transport
+	EgressTransport() network.EgressTransport
 	// CheckAgent reports an error when the base of this isolator, the host or
 	// the image, cannot supply the agent executable for cfg. It applies only
 	// when the provisioner supplies no tools.

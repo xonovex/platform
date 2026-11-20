@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 )
 
@@ -45,7 +45,7 @@ func openProxy(t *testing.T, rules ...string) isoRoute {
 		t.Fatal(err)
 	}
 	host := system.New(os.Stdin, io.Discard, io.Discard)
-	route, stop, err := Service{Host: host, Log: integrationLog}.Open(netshared.TransportUnixSocket, allow)
+	route, stop, err := Service{Host: host, Log: integrationLog}.Open(network.TransportUnixSocket, allow)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +148,7 @@ func TestProxyRefusesALoopbackHostNameEvenWhenAllowed(t *testing.T) {
 func TestStopRemovesTheSocket(t *testing.T) {
 	host := system.New(os.Stdin, io.Discard, io.Discard)
 	allow, _ := egress.NewAllowlist([]string{"api.example.com"})
-	route, stop, err := Service{Host: host, Log: integrationLog}.Open(netshared.TransportUnixSocket, allow)
+	route, stop, err := Service{Host: host, Log: integrationLog}.Open(network.TransportUnixSocket, allow)
 	if err != nil {
 		t.Fatal(err)
 	}

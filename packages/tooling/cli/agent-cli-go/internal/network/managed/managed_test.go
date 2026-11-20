@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -290,11 +290,11 @@ func TestServiceRunsAUnixSocketProxyAndCleansUp(t *testing.T) {
 	host := systemtest.New()
 	host.ExecutablePath = "/opt/agent-cli"
 	service := Service{Host: host, Log: testLog}
-	route, stop, err := service.Open(netshared.TransportUnixSocket, allowlist(t, "api.example.com"))
+	route, stop, err := service.Open(network.TransportUnixSocket, allowlist(t, "api.example.com"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if route.Bridge != "/opt/agent-cli" || !strings.HasSuffix(route.Socket, "/proxy.sock") || route.Transport != netshared.TransportUnixSocket {
+	if route.Bridge != "/opt/agent-cli" || !strings.HasSuffix(route.Socket, "/proxy.sock") || route.Transport != network.TransportUnixSocket {
 		t.Fatalf("route = %+v", route)
 	}
 	listener, ok := host.Listener("unix", route.Socket)
@@ -324,7 +324,7 @@ func TestServiceRunsAUnixSocketProxyAndCleansUp(t *testing.T) {
 
 func TestServiceRunsALoopbackProxy(t *testing.T) {
 	host := systemtest.New()
-	route, stop, err := Service{Host: host, Log: testLog}.Open(netshared.TransportLoopback, allowlist(t, "api.example.com"))
+	route, stop, err := Service{Host: host, Log: testLog}.Open(network.TransportLoopback, allowlist(t, "api.example.com"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -336,15 +336,15 @@ func TestServiceRunsALoopbackProxy(t *testing.T) {
 
 func TestServicePolicyTransportRunsNoProxy(t *testing.T) {
 	host := systemtest.New()
-	route, stop, err := Service{Host: host, Log: testLog}.Open(netshared.TransportPolicy, allowlist(t, "api.example.com"))
+	route, stop, err := Service{Host: host, Log: testLog}.Open(network.TransportPolicy, allowlist(t, "api.example.com"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	stop()
-	if route.Transport != netshared.TransportPolicy || len(route.Allow.Rules()) != 1 {
+	if route.Transport != network.TransportPolicy || len(route.Allow.Rules()) != 1 {
 		t.Errorf("route = %+v", route)
 	}
-	if _, _, err := (Service{Host: host, Log: testLog}).Open(netshared.TransportPolicy, egress.Allowlist{}); err == nil {
+	if _, _, err := (Service{Host: host, Log: testLog}).Open(network.TransportPolicy, egress.Allowlist{}); err == nil {
 		t.Error("a policy route without an allowlist must fail")
 	}
 }
@@ -352,16 +352,16 @@ func TestServicePolicyTransportRunsNoProxy(t *testing.T) {
 func TestServiceFailures(t *testing.T) {
 	list := allowlist(t, "api.example.com")
 	noExecutable := systemtest.New()
-	if _, _, err := (Service{Host: noExecutable, Log: testLog}).Open(netshared.TransportUnixSocket, list); err == nil {
+	if _, _, err := (Service{Host: noExecutable, Log: testLog}).Open(network.TransportUnixSocket, list); err == nil {
 		t.Error("a missing executable must fail")
 	}
 	noListen := systemtest.New()
 	noListen.ExecutablePath = "/opt/agent-cli"
 	noListen.ListenErr = errors.New("address in use")
-	if _, _, err := (Service{Host: noListen, Log: testLog}).Open(netshared.TransportUnixSocket, list); err == nil {
+	if _, _, err := (Service{Host: noListen, Log: testLog}).Open(network.TransportUnixSocket, list); err == nil {
 		t.Error("a failed unix listen must fail")
 	}
-	if _, _, err := (Service{Host: noListen, Log: testLog}).Open(netshared.TransportLoopback, list); err == nil {
+	if _, _, err := (Service{Host: noListen, Log: testLog}).Open(network.TransportLoopback, list); err == nil {
 		t.Error("a failed loopback listen must fail")
 	}
 	if len(noListen.Calls) != 0 {
@@ -378,7 +378,7 @@ func (failingTempHost) MkdirTemp(string) (string, error) { return "", errors.New
 func TestServiceFailsWhenTheSocketDirectoryCannotBeMade(t *testing.T) {
 	fake := systemtest.New()
 	fake.ExecutablePath = "/opt/agent-cli"
-	if _, _, err := (Service{Host: failingTempHost{fake}, Log: testLog}).Open(netshared.TransportUnixSocket, allowlist(t, "api.example.com")); err == nil {
+	if _, _, err := (Service{Host: failingTempHost{fake}, Log: testLog}).Open(network.TransportUnixSocket, allowlist(t, "api.example.com")); err == nil {
 		t.Error("a failed temporary directory must fail")
 	}
 }

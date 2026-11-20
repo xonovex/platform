@@ -11,10 +11,10 @@ import (
 	"sort"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/isolation"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/policy"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 )
 
@@ -92,7 +92,7 @@ func (r *Registry) IsolationMethods() []isolation.IsolationMethod {
 type Request struct {
 	Isolation      isolation.IsolationMethod
 	Provision      provision.ProvisionMethod
-	Network        netshared.Mode
+	Network        network.NetworkMethod
 	Passthrough    bool
 	Runtime        string
 	Image          string
@@ -122,11 +122,11 @@ func Evaluate(reg *Registry, req Request) (Choice, error) {
 	if err != nil {
 		return Choice{}, err
 	}
-	if netshared.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
+	if network.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
 		return Choice{}, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
 	}
 	transport := iso.EgressTransport()
-	if err := netshared.CheckManaged(req.Network, transport); err != nil {
+	if err := network.CheckManaged(req.Network, transport); err != nil {
 		return Choice{}, fmt.Errorf("isolation=%s: %w", req.Isolation, err)
 	}
 	return Choice{
@@ -135,7 +135,7 @@ func Evaluate(reg *Registry, req Request) (Choice, error) {
 		Capabilities: policy.Capabilities{
 			Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
 			HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
-			EgressRestricted:     netshared.EgressRestricted(req.Network, transport),
+			EgressRestricted:     network.EgressRestricted(req.Network, transport),
 			KernelIsolated:       iso.KernelIsolated(req.Runtime),
 		},
 	}, nil

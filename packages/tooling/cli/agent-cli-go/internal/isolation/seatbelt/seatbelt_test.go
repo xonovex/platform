@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -22,7 +22,7 @@ func newHost() *systemtest.Fake {
 	return host.AddExecutable("/usr/bin/claude").AddExecutable("/usr/bin/sandbox-exec")
 }
 
-func claudeCfg(mode netshared.Mode) isoshared.RunConfig {
+func claudeCfg(mode network.NetworkMethod) isoshared.RunConfig {
 	agent, err := agents.GetAgent(types.AgentClaude)
 	if err != nil {
 		panic(err)
@@ -43,7 +43,7 @@ func profileOf(t *testing.T, host *systemtest.Fake, cfg isoshared.RunConfig, c p
 }
 
 func TestCommandDeniesWritesAndHidesHome(t *testing.T) {
-	profile := profileOf(t, newHost(), claudeCfg(netshared.ModeHost), provision.Contribution{})
+	profile := profileOf(t, newHost(), claudeCfg(network.NetworkHost), provision.Contribution{})
 	for _, want := range []string{
 		"(version 1)\n(allow default)\n(deny file-write*)",
 		`(subpath "/Users/dev/work")`,
@@ -64,7 +64,7 @@ func TestCommandDeniesWritesAndHidesHome(t *testing.T) {
 }
 
 func TestCommandRunsTheAgentAfterTheProfile(t *testing.T) {
-	command, err := NewIsolator(newHost(), testLog).Command(claudeCfg(netshared.ModeHost), provision.Contribution{})
+	command, err := NewIsolator(newHost(), testLog).Command(claudeCfg(network.NetworkHost), provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestCommandRunsTheAgentAfterTheProfile(t *testing.T) {
 
 func TestCommandAddsConfigBindsAndRepo(t *testing.T) {
 	host := newHost().AddDir("/Users/dev/.claude").AddFile("/Users/dev/.claude.json", "{}", 0o600).AddDir("/Users/dev/repo").AddDir("/Users/dev/extra").AddDir("/opt/tools")
-	cfg := claudeCfg(netshared.ModeHost)
+	cfg := claudeCfg(network.NetworkHost)
 	cfg.RepoDir = "/Users/dev/repo"
 	cfg.BindPaths = []string{"/Users/dev/extra"}
 	cfg.RoBindPaths = []string{"/opt/tools"}
@@ -92,12 +92,12 @@ func TestCommandAddsConfigBindsAndRepo(t *testing.T) {
 }
 
 func TestCommandNetworkModes(t *testing.T) {
-	none := profileOf(t, newHost(), claudeCfg(netshared.ModeNone), provision.Contribution{})
+	none := profileOf(t, newHost(), claudeCfg(network.NetworkNone), provision.Contribution{})
 	if !strings.Contains(none, "(deny network*)") || strings.Contains(none, "allow network-outbound") {
 		t.Errorf("none must deny all network:\n%s", none)
 	}
-	cfg := claudeCfg(netshared.ModeManaged)
-	cfg.Egress = isoshared.EgressRoute{Transport: netshared.TransportLoopback, Proxy: "127.0.0.1:40123"}
+	cfg := claudeCfg(network.NetworkManaged)
+	cfg.Egress = isoshared.EgressRoute{Transport: network.TransportLoopback, Proxy: "127.0.0.1:40123"}
 	managed := profileOf(t, newHost(), cfg, provision.Contribution{})
 	if !strings.Contains(managed, `(allow network-outbound (remote ip "localhost:40123"))`) {
 		t.Errorf("managed must allow only the proxy port:\n%s", managed)
@@ -108,8 +108,8 @@ func TestCommandNetworkModes(t *testing.T) {
 }
 
 func TestCommandSetsTheProxyEnvironmentWhenManaged(t *testing.T) {
-	cfg := claudeCfg(netshared.ModeManaged)
-	cfg.Egress = isoshared.EgressRoute{Transport: netshared.TransportLoopback, Proxy: "127.0.0.1:40123"}
+	cfg := claudeCfg(network.NetworkManaged)
+	cfg.Egress = isoshared.EgressRoute{Transport: network.TransportLoopback, Proxy: "127.0.0.1:40123"}
 	_, env, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg, provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
@@ -120,19 +120,19 @@ func TestCommandSetsTheProxyEnvironmentWhenManaged(t *testing.T) {
 }
 
 func TestCommandRefusals(t *testing.T) {
-	managed := claudeCfg(netshared.ModeManaged)
+	managed := claudeCfg(network.NetworkManaged)
 	wrongTransport := managed
-	wrongTransport.Egress = isoshared.EgressRoute{Transport: netshared.TransportUnixSocket, Socket: "/s", Bridge: "/b"}
+	wrongTransport.Egress = isoshared.EgressRoute{Transport: network.TransportUnixSocket, Socket: "/s", Bridge: "/b"}
 	noRoute := managed
-	badBind := claudeCfg(netshared.ModeHost)
+	badBind := claudeCfg(network.NetworkHost)
 	badBind.BindPaths = []string{"relative"}
-	badRoBind := claudeCfg(netshared.ModeHost)
+	badRoBind := claudeCfg(network.NetworkHost)
 	badRoBind.RoBindPaths = []string{"/missing"}
-	badRepo := claudeCfg(netshared.ModeHost)
+	badRepo := claudeCfg(network.NetworkHost)
 	badRepo.RepoDir = "/missing"
-	badWork := claudeCfg(netshared.ModeHost)
+	badWork := claudeCfg(network.NetworkHost)
 	badWork.WorkDir = "/missing"
-	badHome := claudeCfg(netshared.ModeHost)
+	badHome := claudeCfg(network.NetworkHost)
 	badHome.HomeDir = "/missing"
 	unknownMode := claudeCfg("other")
 	cases := map[string]isoshared.RunConfig{
@@ -145,16 +145,16 @@ func TestCommandRefusals(t *testing.T) {
 			t.Errorf("%s: Command succeeded", name)
 		}
 	}
-	if _, err := NewIsolator(newHost(), testLog).Command(claudeCfg(netshared.ModeHost), provision.Contribution{RoBindPaths: []string{"/missing"}}); err == nil {
+	if _, err := NewIsolator(newHost(), testLog).Command(claudeCfg(network.NetworkHost), provision.Contribution{RoBindPaths: []string{"/missing"}}); err == nil {
 		t.Error("a missing provisioned bind must fail")
 	}
 	unsafe := newHost().AddDir("/Users/dev/we\"ird")
-	cfg := claudeCfg(netshared.ModeHost)
+	cfg := claudeCfg(network.NetworkHost)
 	cfg.BindPaths = []string{"/Users/dev/we\"ird"}
 	if _, err := NewIsolator(unsafe, testLog).Command(cfg, provision.Contribution{}); err == nil {
 		t.Error("a path with a quote must not enter the profile")
 	}
-	badAgent := claudeCfg(netshared.ModeHost)
+	badAgent := claudeCfg(network.NetworkHost)
 	badAgent.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
 	if _, err := NewIsolator(newHost(), testLog).Command(badAgent, provision.Contribution{}); err == nil {
 		t.Error("an unknown agent must fail")
@@ -166,7 +166,7 @@ func TestCapabilities(t *testing.T) {
 	if i.HidesHost(false, "") || i.KernelIsolated("") || !i.ConfinesNetwork() {
 		t.Error("seatbelt hides no host, is no kernel boundary, and confines the network")
 	}
-	if i.EgressTransport() != netshared.TransportLoopback {
+	if i.EgressTransport() != network.TransportLoopback {
 		t.Errorf("transport = %q", i.EgressTransport())
 	}
 	if !i.PinnedProvision(provision.ProvisionNix, true, "") || i.PinnedProvision(provision.ProvisionNone, false, "") {
@@ -183,10 +183,10 @@ func TestAvailableAndCheckAgent(t *testing.T) {
 	if ok, _ := NewIsolator(bare, testLog).Available(); ok {
 		t.Error("sandbox-exec is missing")
 	}
-	if err := NewIsolator(newHost(), testLog).CheckAgent(claudeCfg(netshared.ModeHost)); err != nil {
+	if err := NewIsolator(newHost(), testLog).CheckAgent(claudeCfg(network.NetworkHost)); err != nil {
 		t.Errorf("CheckAgent = %v", err)
 	}
-	if err := NewIsolator(bare, testLog).CheckAgent(claudeCfg(netshared.ModeHost)); err == nil {
+	if err := NewIsolator(bare, testLog).CheckAgent(claudeCfg(network.NetworkHost)); err == nil {
 		t.Error("a missing agent must fail")
 	}
 }
@@ -194,7 +194,7 @@ func TestAvailableAndCheckAgent(t *testing.T) {
 func TestRunExecutesTheProfileCommand(t *testing.T) {
 	host := newHost()
 	isolator := NewIsolator(host, testLog)
-	cfg := claudeCfg(netshared.ModeNone)
+	cfg := claudeCfg(network.NetworkNone)
 	command, err := isolator.Command(cfg, provision.Contribution{})
 	if err != nil {
 		t.Fatal(err)
@@ -228,20 +228,20 @@ func TestQuote(t *testing.T) {
 
 func TestNetworkRulesRejectsABadProxy(t *testing.T) {
 	for _, address := range []string{"", "nohost", "127.0.0.1:x", "127.0.0.1:0", "127.0.0.1:70000"} {
-		if _, err := networkRules(profileSpec{Network: netshared.ModeManaged, ProxyAddress: address}); err == nil {
+		if _, err := networkRules(profileSpec{Network: network.NetworkManaged, ProxyAddress: address}); err == nil {
 			t.Errorf("proxy %q accepted", address)
 		}
 	}
 }
 
 func TestRenderProfileRejectsAnUnsafePath(t *testing.T) {
-	if _, err := renderProfile(profileSpec{Writable: []string{"/a\"b"}, Network: netshared.ModeHost}); err == nil {
+	if _, err := renderProfile(profileSpec{Writable: []string{"/a\"b"}, Network: network.NetworkHost}); err == nil {
 		t.Error("an unsafe writable path must fail")
 	}
-	if _, err := renderProfile(profileSpec{Home: "/h\"", Network: netshared.ModeHost}); err == nil {
+	if _, err := renderProfile(profileSpec{Home: "/h\"", Network: network.NetworkHost}); err == nil {
 		t.Error("an unsafe home must fail")
 	}
-	if _, err := renderProfile(profileSpec{Home: "/h", Readable: []string{"x"}, Network: netshared.ModeHost}); err == nil {
+	if _, err := renderProfile(profileSpec{Home: "/h", Readable: []string{"x"}, Network: network.NetworkHost}); err == nil {
 		t.Error("an unsafe readable path must fail")
 	}
 	if _, err := renderProfile(profileSpec{Network: "other"}); err == nil {

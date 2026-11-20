@@ -10,11 +10,11 @@ import (
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -37,15 +37,15 @@ func allowlist(t *testing.T, rules ...string) egress.Allowlist {
 	return list
 }
 
-func cfg(t *testing.T, mode netshared.Mode) isoshared.RunConfig {
+func cfg(t *testing.T, mode network.NetworkMethod) isoshared.RunConfig {
 	t.Helper()
 	agent, err := agents.GetAgent(types.AgentClaude)
 	if err != nil {
 		t.Fatal(err)
 	}
 	run := isoshared.RunConfig{Agent: agent, WorkDir: "/home/dev/work", HomeDir: "/home/dev", Network: mode, Image: pinned}
-	if mode == netshared.ModeManaged {
-		run.Egress = isoshared.EgressRoute{Transport: netshared.TransportPolicy, Allow: allowlist(t, "api.example.com", "*.cdn.example.com:8443")}
+	if mode == network.NetworkManaged {
+		run.Egress = isoshared.EgressRoute{Transport: network.TransportPolicy, Allow: allowlist(t, "api.example.com", "*.cdn.example.com:8443")}
 	}
 	return run
 }
@@ -66,7 +66,7 @@ func script(t *testing.T, host *systemtest.Fake, run isoshared.RunConfig) *plan 
 }
 
 func TestPolicyForANoneRunDeniesTheNetwork(t *testing.T) {
-	data, err := renderPolicy(netshared.ModeNone, egress.Allowlist{})
+	data, err := renderPolicy(network.NetworkNone, egress.Allowlist{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +83,7 @@ func TestPolicyForANoneRunDeniesTheNetwork(t *testing.T) {
 }
 
 func TestPolicyForAManagedRunListsTheAllowlist(t *testing.T) {
-	data, err := renderPolicy(netshared.ModeManaged, allowlist(t, "api.example.com", "*.cdn.example.com:8443"))
+	data, err := renderPolicy(network.NetworkManaged, allowlist(t, "api.example.com", "*.cdn.example.com:8443"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,16 +110,16 @@ func TestPolicyForAManagedRunListsTheAllowlist(t *testing.T) {
 }
 
 func TestPolicyRefusals(t *testing.T) {
-	if _, err := renderPolicy(netshared.ModeManaged, egress.Allowlist{}); err == nil {
+	if _, err := renderPolicy(network.NetworkManaged, egress.Allowlist{}); err == nil {
 		t.Error("a managed policy without hosts must fail")
 	}
-	if _, err := renderPolicy(netshared.ModeHost, egress.Allowlist{}); !errors.Is(err, ErrUnsupported) {
+	if _, err := renderPolicy(network.NetworkHost, egress.Allowlist{}); !errors.Is(err, ErrUnsupported) {
 		t.Errorf("host mode error = %v, want ErrUnsupported", err)
 	}
 }
 
 func TestCommandExecsInTheUploadedDirectory(t *testing.T) {
-	run := cfg(t, netshared.ModeNone)
+	run := cfg(t, network.NetworkNone)
 	run.CustomEnv = []string{"MODE=fast"}
 	command, err := NewIsolator(newHost(), testLog).Command(run, provision.Contribution{})
 	if err != nil {
@@ -133,7 +133,7 @@ func TestCommandExecsInTheUploadedDirectory(t *testing.T) {
 }
 
 func TestRunLifecycle(t *testing.T) {
-	run := cfg(t, netshared.ModeManaged)
+	run := cfg(t, network.NetworkManaged)
 	host := newHost()
 	script(t, host, run)
 	code, err := NewIsolator(host, testLog).Run(run, provision.Contribution{})
@@ -158,7 +158,7 @@ func TestRunLifecycle(t *testing.T) {
 }
 
 func TestRunDownloadsAndDeletesAfterAFailedAgent(t *testing.T) {
-	run := cfg(t, netshared.ModeNone)
+	run := cfg(t, network.NetworkNone)
 	host := newHost()
 	p := script(t, host, run)
 	host.Outcomes[systemtest.CommandLine(program, p.exec...)] = systemtest.Outcome{ExitCode: 5}
@@ -175,7 +175,7 @@ func TestRunDownloadsAndDeletesAfterAFailedAgent(t *testing.T) {
 
 func TestRunFailures(t *testing.T) {
 	boom := errors.New("boom")
-	run := cfg(t, netshared.ModeNone)
+	run := cfg(t, network.NetworkNone)
 	cases := map[string]func(*systemtest.Fake, *plan){
 		"list": func(h *systemtest.Fake, _ *plan) {
 			h.Outcomes["openshell sandbox list --names"] = systemtest.Outcome{Err: boom}
@@ -207,7 +207,7 @@ func TestRunFailures(t *testing.T) {
 }
 
 func TestRunWarnsWhenTheSandboxCannotBeDeleted(t *testing.T) {
-	run := cfg(t, netshared.ModeNone)
+	run := cfg(t, network.NetworkNone)
 	host := newHost()
 	p := script(t, host, run)
 	host.Outcomes[systemtest.CommandLine(program, p.remove...)] = systemtest.Outcome{Err: errors.New("busy")}
@@ -240,7 +240,7 @@ func (f failingHost) WriteFile(path string, data []byte, perm fs.FileMode) error
 }
 
 func TestRunFailsWhenThePolicyCannotBeWritten(t *testing.T) {
-	run := cfg(t, netshared.ModeNone)
+	run := cfg(t, network.NetworkNone)
 	host := newHost()
 	script(t, host, run)
 	for name, h := range map[string]failingHost{
@@ -260,7 +260,7 @@ func TestRunFailsWhenEveryNameIsTaken(t *testing.T) {
 		names = append(names, "agent-cli-"+strings.TrimLeft(strings.Repeat("0", 4)+itoa(n), "0"))
 	}
 	host.Outcomes["openshell sandbox list --names"] = systemtest.Outcome{Stdout: strings.Join(names, "\n")}
-	if _, err := NewIsolator(host, testLog).Run(cfg(t, netshared.ModeNone), provision.Contribution{}); err == nil {
+	if _, err := NewIsolator(host, testLog).Run(cfg(t, network.NetworkNone), provision.Contribution{}); err == nil {
 		t.Error("Run must fail without a free name")
 	}
 }
@@ -274,24 +274,24 @@ func itoa(n int) string {
 }
 
 func TestRefusals(t *testing.T) {
-	noImage := cfg(t, netshared.ModeNone)
+	noImage := cfg(t, network.NetworkNone)
 	noImage.Image = ""
-	dashImage := cfg(t, netshared.ModeNone)
+	dashImage := cfg(t, network.NetworkNone)
 	dashImage.Image = "-rm"
-	secrets := cfg(t, netshared.ModeNone)
+	secrets := cfg(t, network.NetworkNone)
 	secrets.Secrets = map[string]string{"K": "v"}
-	provider := cfg(t, netshared.ModeNone)
+	provider := cfg(t, network.NetworkNone)
 	provider.Provider = &types.ModelProvider{}
-	bind := cfg(t, netshared.ModeNone)
+	bind := cfg(t, network.NetworkNone)
 	bind.BindPaths = []string{"/home/dev"}
-	roBind := cfg(t, netshared.ModeNone)
+	roBind := cfg(t, network.NetworkNone)
 	roBind.RoBindPaths = []string{"/home/dev"}
-	host := cfg(t, netshared.ModeHost)
-	missingWork := cfg(t, netshared.ModeNone)
+	host := cfg(t, network.NetworkHost)
+	missingWork := cfg(t, network.NetworkNone)
 	missingWork.WorkDir = "/missing"
-	badAgent := cfg(t, netshared.ModeNone)
+	badAgent := cfg(t, network.NetworkNone)
 	badAgent.Agent = &types.AgentConfig{Type: "nope", Binary: "nope"}
-	badEnv := cfg(t, netshared.ModeNone)
+	badEnv := cfg(t, network.NetworkNone)
 	badEnv.CustomEnv = []string{"not-an-assignment"}
 	for name, run := range map[string]isoshared.RunConfig{
 		"no image": noImage, "image with hyphen": dashImage, "secrets": secrets, "provider": provider,
@@ -306,20 +306,20 @@ func TestRefusals(t *testing.T) {
 		"path entries": {PathEntries: []string{"/opt/bin"}},
 		"ro bind":      {RoBindPaths: []string{"/opt"}},
 	} {
-		if _, err := NewIsolator(newHost(), testLog).Command(cfg(t, netshared.ModeNone), c); !errors.Is(err, ErrUnsupported) {
+		if _, err := NewIsolator(newHost(), testLog).Command(cfg(t, network.NetworkNone), c); !errors.Is(err, ErrUnsupported) {
 			t.Errorf("%s: error = %v", name, err)
 		}
 	}
 	if _, err := NewIsolator(newHost(), testLog).Run(noImage, provision.Contribution{}); err == nil {
 		t.Error("Run without an image must fail")
 	}
-	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg(t, netshared.ModeNone), provision.Contribution{}); !errors.Is(err, ErrUnsupported) {
+	if _, _, err := NewIsolator(newHost(), testLog).TerminalCommand(cfg(t, network.NetworkNone), provision.Contribution{}); !errors.Is(err, ErrUnsupported) {
 		t.Errorf("TerminalCommand error = %v", err)
 	}
 }
 
 func TestInitCommandsRunBeforeTheAgent(t *testing.T) {
-	command, err := NewIsolator(newHost(), testLog).Command(cfg(t, netshared.ModeNone), provision.Contribution{InitCommands: []string{"prepare"}})
+	command, err := NewIsolator(newHost(), testLog).Command(cfg(t, network.NetworkNone), provision.Contribution{InitCommands: []string{"prepare"}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -339,10 +339,10 @@ func TestCapabilities(t *testing.T) {
 	if !i.PinnedProvision(provision.ProvisionNix, true, pinned) {
 		t.Error("a pinned image with a pinned provisioner is pinned")
 	}
-	if i.KernelIsolated("runsc") || !i.ConfinesNetwork() || i.EgressTransport() != netshared.TransportPolicy {
+	if i.KernelIsolated("runsc") || !i.ConfinesNetwork() || i.EgressTransport() != network.TransportPolicy {
 		t.Error("openshell declares a policy transport and no verified kernel boundary")
 	}
-	if err := i.CheckAgent(cfg(t, netshared.ModeNone)); err != nil {
+	if err := i.CheckAgent(cfg(t, network.NetworkNone)); err != nil {
 		t.Errorf("CheckAgent = %v", err)
 	}
 	if ok, _ := i.Available(); !ok {

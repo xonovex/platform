@@ -9,11 +9,11 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
 )
 
@@ -46,7 +46,7 @@ func cfg() isoshared.RunConfig {
 	if err != nil {
 		panic(err)
 	}
-	return isoshared.RunConfig{Agent: agent, WorkDir: "/home/dev/work", HomeDir: "/home/dev", Network: netshared.ModeHost}
+	return isoshared.RunConfig{Agent: agent, WorkDir: "/home/dev/work", HomeDir: "/home/dev", Network: network.NetworkHost}
 }
 
 func TestCommandNamesTheSandboxAndPassesEnvironmentByName(t *testing.T) {
@@ -177,9 +177,9 @@ func itoa(n int) string {
 
 func TestRefusals(t *testing.T) {
 	none := cfg()
-	none.Network = netshared.ModeNone
+	none.Network = network.NetworkNone
 	managed := cfg()
-	managed.Network = netshared.ModeManaged
+	managed.Network = network.NetworkManaged
 	badBind := cfg()
 	badBind.BindPaths = []string{"/missing"}
 	badRoBind := cfg()
@@ -228,7 +228,7 @@ func TestCapabilitiesFailClosed(t *testing.T) {
 	if i.HidesHost(true, "img") || i.KernelIsolated("runsc") || i.ConfinesNetwork() || i.PinnedProvision(provision.ProvisionNix, true, "img") {
 		t.Error("docker-sandboxes must claim none of the guarantees it cannot verify")
 	}
-	if i.EgressTransport() != netshared.TransportNone {
+	if i.EgressTransport() != network.TransportNone {
 		t.Errorf("transport = %q, want none", i.EgressTransport())
 	}
 	if err := i.CheckAgent(cfg()); err != nil {

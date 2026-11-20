@@ -15,9 +15,9 @@ import (
 	"testing"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
-	netenum "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/managed"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system"
 )
 
@@ -106,7 +106,7 @@ func TestBwrapSandboxReachesOnlyTheAllowedHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	route, stop, err := netshared.Service{Host: machine, Log: logging.New(io.Discard, io.Discard, false, false)}.Open(netenum.TransportUnixSocket, allow)
+	route, stop, err := managed.Service{Host: machine, Log: logging.New(io.Discard, io.Discard, false, false)}.Open(network.TransportUnixSocket, allow)
 	if err != nil {
 		t.Fatal(err)
 	}

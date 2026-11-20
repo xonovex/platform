@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/network"
 )
 
 // systemWritable are the places every process writes: the null device, the
@@ -26,7 +26,7 @@ type profileSpec struct {
 	Home string
 	// Readable are the places inside Home that the run names and the agent reads.
 	Readable []string
-	Network  netshared.Mode
+	Network  network.NetworkMethod
 	// ProxyAddress is the host:port of the loopback proxy, for a managed run.
 	ProxyAddress string
 }
@@ -118,11 +118,11 @@ func renderProfile(spec profileSpec) (string, error) {
 // address is denied by the kernel.
 func networkRules(spec profileSpec) (string, error) {
 	switch spec.Network {
-	case netshared.ModeHost:
+	case network.NetworkHost:
 		return "", nil
-	case netshared.ModeNone:
+	case network.NetworkNone:
 		return "(deny network*)\n", nil
-	case netshared.ModeManaged:
+	case network.NetworkManaged:
 		_, port, err := net.SplitHostPort(spec.ProxyAddress)
 		if err != nil {
 			return "", fmt.Errorf("managed egress needs the proxy address: %w", err)
