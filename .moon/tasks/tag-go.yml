@@ -1,7 +1,9 @@
 $schema: https://moonrepo.dev/schemas/v2/tasks.json
+# A module with no external requirement has no go.sum, so the go.sum input is
+# optional.
 implicitInputs:
   - go.mod
-  - go.sum
+  - file://go.sum?optional
 fileGroups:
   sources:
     - "**/*.go"
@@ -22,7 +24,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - go.mod
-      - go.sum
+      - file://go.sum?optional
     outputs: []
     options:
       cache: true
@@ -119,7 +121,7 @@ tasks:
       - tidy
     inputs:
       - go.mod
-      - go.sum
+      - file://go.sum?optional
     outputs:
       - go.mod
       - go.sum
