@@ -80,6 +80,9 @@ func newWorkspace(t *testing.T) *workspace {
 	if err := os.Chmod(filepath.Join(w.bin, "claude"), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	if err := os.MkdirAll(filepath.Join(w.root, "home"), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	w.write(t, "work/agentic.json", projectFile)
 	sum := sha256.Sum256([]byte(projectFile))
 	w.digest = "sha256:" + hex.EncodeToString(sum[:])
@@ -110,7 +113,7 @@ func (w *workspace) run(t *testing.T, args ...string) result {
 	command := exec.CommandContext(ctx, binary(t), args...)
 	command.Dir = filepath.Join(w.root, "work")
 	command.Env = append(os.Environ(), "PATH="+w.bin+string(os.PathListSeparator)+os.Getenv("PATH"), "FAKE_CLAUDE_LOG="+w.log,
-		"XDG_CONFIG_HOME="+filepath.Join(w.root, "config"), "XDG_STATE_HOME="+filepath.Join(w.root, "state"))
+		"HOME="+filepath.Join(w.root, "home"), "XDG_CONFIG_HOME="+filepath.Join(w.root, "config"), "XDG_STATE_HOME="+filepath.Join(w.root, "state"))
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	err := command.Run()
