@@ -1,5 +1,6 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {describe, expect, it} from "vitest";
 import {
   planChangelog,
   serializePackage,
@@ -29,16 +30,8 @@ const request = (
     ],
   }),
   fs: memoryFileSystem(),
+  output: memoryOutput(),
   ...overrides,
-});
-
-beforeEach(() => {
-  vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.spyOn(console, "log").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 describe("serializePackage", () => {
@@ -108,9 +101,9 @@ describe("planChangelog", () => {
   });
 
   it("prints the entry and plans no change on a dry run", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const output = memoryOutput();
 
-    expect(planChangelog(request({dryRun: true}))).toBeUndefined();
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("## 1.1.0"));
+    expect(planChangelog(request({dryRun: true, output}))).toBeUndefined();
+    expect(output.stdoutLines().join("\n")).toContain("## 1.1.0");
   });
 });

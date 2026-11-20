@@ -1,5 +1,6 @@
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
-import {logInfo} from "@xonovex/script-moon-common/logging";
+import {infoLine} from "@xonovex/script-moon-common/logging";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {updateDependent} from "./dependents.js";
 import type {FileChange} from "./file-transaction.js";
@@ -19,6 +20,7 @@ interface DependentUpdateOptions {
   readonly includedTypes: ReadonlySet<string> | undefined;
   readonly git: VersionGit;
   readonly fs: FileSystem;
+  readonly output: Output;
 }
 
 interface DependentChangeSet {
@@ -45,8 +47,10 @@ const planDependentUpdates = (
 
     if (result.versionBumped) {
       const label = options.dryRun ? "[dry-run] " : "[planned] ";
-      logInfo(
-        `${label}${dependent.name ?? dependentPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
+      options.output.stdout(
+        infoLine(
+          `${label}${dependent.name ?? dependentPath}: ${String(result.oldVersion)} -> ${String(result.newVersion)} (dependency updated)`,
+        ),
       );
     }
     if (!options.dryRun) {
@@ -76,6 +80,7 @@ const planDependentUpdates = (
         includedTypes: options.includedTypes,
         git: options.git,
         fs: options.fs,
+        output: options.output,
       });
       if (changelog !== undefined) changes.push(changelog);
     }

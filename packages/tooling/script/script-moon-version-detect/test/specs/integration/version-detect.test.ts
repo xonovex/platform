@@ -5,7 +5,8 @@ import {join} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {afterEach, beforeEach, describe, expect, it} from "vitest";
 import {main} from "../../../src/version-detect.js";
 
 // Drives main through the real git and disk adapters against a fresh repository.
@@ -38,22 +39,22 @@ describe("version detect", () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
     rmSync(root, {recursive: true, force: true});
   });
 
   it("prints the projects whose version differs from the ref", () => {
     writeManifest("1.1.0");
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const output = memoryOutput();
 
     const code = main(["--ref", "HEAD"], join(root, "packages"), {
       openRepository: nodeGitRepository,
       listProjects: () => [{id: "example", source: "packages/example"}],
       fs: nodeFileSystem,
+      output,
     });
 
     expect(code).toBe(0);
-    expect(log).toHaveBeenCalledWith(JSON.stringify(["example"]));
+    expect(output.stdoutLines()).toEqual([JSON.stringify(["example"])]);
   });
 
   it("fails for a ref that names no commit", () => {
@@ -62,6 +63,7 @@ describe("version detect", () => {
         openRepository: nodeGitRepository,
         listProjects: () => [],
         fs: nodeFileSystem,
+        output: memoryOutput(),
       }),
     ).toThrow();
   });

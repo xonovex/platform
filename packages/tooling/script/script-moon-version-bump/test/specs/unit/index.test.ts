@@ -1,13 +1,14 @@
+import {errorLine} from "@xonovex/script-moon-common/logging";
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-const {logErrorMock, mainMock} = vi.hoisted(() => ({
-  logErrorMock: vi.fn(),
+const {stderrMock, mainMock} = vi.hoisted(() => ({
+  stderrMock: vi.fn<(line: string) => void>(),
   mainMock: vi.fn<(...args: readonly unknown[]) => number>(),
 }));
 
 vi.mock("../../../src/version-bump.js", () => ({main: mainMock}));
-vi.mock("@xonovex/script-moon-common/logging", () => ({
-  logError: logErrorMock,
+vi.mock("@xonovex/script-moon-common/adapters/output-node", () => ({
+  processOutput: {stdout: vi.fn(), stderr: stderrMock},
 }));
 
 const originalExitCode = process.exitCode;
@@ -36,7 +37,7 @@ describe("version bump entry point", () => {
       process.cwd(),
     ]);
     expect(process.exitCode).toBe(0);
-    expect(logErrorMock).not.toHaveBeenCalled();
+    expect(stderrMock).not.toHaveBeenCalled();
   });
 
   it("logs a thrown error and exits non-zero", async () => {
@@ -46,8 +47,8 @@ describe("version bump entry point", () => {
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith(
-      "no package.json found in current directory",
+    expect(stderrMock).toHaveBeenCalledWith(
+      errorLine("no package.json found in current directory"),
     );
     expect(process.exitCode).toBe(1);
   });
@@ -60,7 +61,7 @@ describe("version bump entry point", () => {
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith("broken");
+    expect(stderrMock).toHaveBeenCalledWith(errorLine("broken"));
     expect(process.exitCode).toBe(1);
   });
 });

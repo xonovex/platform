@@ -3,6 +3,7 @@ import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
 import {queryMoonProjects} from "@xonovex/script-moon-common/adapters/moon-query-node";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {applyFileChangesOnDisk} from "../../../src/adapters/file-transaction-node.js";
@@ -22,6 +23,7 @@ const nodeDependencies: VersionBumpDependencies = {
   openRepository: nodeGitRepository,
   listProjects: queryMoonProjects,
   fs: nodeFileSystem,
+  output: memoryOutput(),
   applyChanges: applyFileChangesOnDisk,
 };
 

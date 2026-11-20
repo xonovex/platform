@@ -1,11 +1,12 @@
 import {join} from "node:path";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
-import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
+import {infoLine, successLine} from "@xonovex/script-moon-common/logging";
 import {
   packageJsonPaths,
   type MoonProject,
 } from "@xonovex/script-moon-common/moon-query";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {bumpVersion, type BumpType} from "./bump.js";
@@ -42,6 +43,7 @@ export interface VersionBumpDependencies {
   readonly openRepository: (rootDir: string) => VersionGit;
   readonly listProjects: (rootDir: string) => readonly MoonProject[];
   readonly fs: FileSystem;
+  readonly output: Output;
   // How the planned changes are installed. The transaction owns the ordering and
   // the rollback; supplying it here lets a run be planned without a disk.
   readonly applyChanges: (changes: readonly FileChange[]) => void;
@@ -52,7 +54,7 @@ export const main = (
   workingDirectory: string,
   dependencies: VersionBumpDependencies,
 ): number => {
-  const {applyChanges, fs, listProjects, openRepository} = dependencies;
+  const {applyChanges, fs, listProjects, openRepository, output} = dependencies;
   const listPackagePaths = (rootDir: string): readonly string[] =>
     packageJsonPaths(rootDir, listProjects(rootDir), fs);
   const args = parseCliArgs(
@@ -109,7 +111,7 @@ export const main = (
     argv,
   );
   if (args.kind === "help") {
-    console.log(args.text);
+    output.stdout(args.text);
     return 0;
   }
   const {values, positionals} = args;
@@ -153,6 +155,7 @@ export const main = (
       includedTypes,
       git,
       fs,
+      output,
       applyChanges,
     });
   }
@@ -180,16 +183,22 @@ export const main = (
   if (gitVersion === undefined || gitVersion === oldVersion) {
     newVersion = exact ?? bumpVersion(oldVersion, bumpType, preid);
     if (dryRun) {
-      logInfo(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
+      output.stdout(
+        infoLine(`[dry-run] ${pkg.name}: ${oldVersion} -> ${newVersion}`),
+      );
     } else {
       changes.push({
         path: pkgPath,
         content: serializePackage({...pkg, version: newVersion}),
       });
-      logInfo(`[planned] ${pkg.name}: ${oldVersion} -> ${newVersion}`);
+      output.stdout(
+        infoLine(`[planned] ${pkg.name}: ${oldVersion} -> ${newVersion}`),
+      );
     }
   } else {
-    logInfo(`${pkg.name}: already bumped (${oldVersion}), skipping.`);
+    output.stdout(
+      infoLine(`${pkg.name}: already bumped (${oldVersion}), skipping.`),
+    );
     newVersion = oldVersion;
   }
 
@@ -208,6 +217,7 @@ export const main = (
         gitBase,
         includedTypes,
         git,
+        output,
       });
   changes.push(...dependentChanges.changes);
 
@@ -225,6 +235,7 @@ export const main = (
       includedTypes,
       git,
       fs,
+      output,
     });
     if (changelog !== undefined) changes.push(changelog);
   }
@@ -232,8 +243,10 @@ export const main = (
   if (!dryRun) applyChanges(changes);
 
   const prefix = dryRun ? "[dry-run] Would bump" : "Bumped";
-  logSuccess(
-    `${prefix} ${pkg.name} to ${newVersion}, updated deps in ${String(dependentChanges.updated)} file(s).`,
+  output.stdout(
+    successLine(
+      `${prefix} ${pkg.name} to ${newVersion}, updated deps in ${String(dependentChanges.updated)} file(s).`,
+    ),
   );
   return 0;
 };

@@ -2,6 +2,7 @@ import {mkdirSync, readdirSync, readFileSync, writeFileSync} from "node:fs";
 import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {nodeGitRepository} from "@xonovex/script-moon-common/adapters/git-node";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import {describe, expect, it} from "vitest";
 import {applyFileChangesOnDisk} from "../../../src/adapters/file-transaction-node.js";
@@ -109,6 +110,7 @@ const lockstepOptions = (
 ): LockstepOptions => ({
   git: nodeGitRepository(root),
   fs: nodeFileSystem,
+  output: memoryOutput(),
   applyChanges: applyFileChangesOnDisk,
   rootDir: root,
   packages: workspacePackages(root),

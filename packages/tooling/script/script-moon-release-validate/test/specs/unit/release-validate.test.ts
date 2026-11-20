@@ -1,20 +1,18 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {describe, expect, it} from "vitest";
 import {main} from "../../../src/release-validate.js";
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 const emptyRepository = {trackedFiles: () => [], ignoredPaths: () => []};
 
 describe("main", () => {
   it("prints each failure and returns 1 when a check fails", () => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const output = memoryOutput();
     const opened: string[] = [];
 
     const code = main("/repo/packages", {
       fs: memoryFileSystem({directories: ["/repo/.moon", "/repo/packages"]}),
+      output,
       openRepository: (rootDir) => {
         opened.push(rootDir);
         return emptyRepository;
@@ -23,16 +21,17 @@ describe("main", () => {
 
     expect(code).toBe(1);
     expect(opened).toEqual(["/repo"]);
-    expect(error).toHaveBeenCalledWith(
-      expect.stringMatching(/^Release validation failed: 2\/2 checks$/u),
+    expect(output.stdoutLines()).toEqual([]);
+    expect(output.stderrLines()[0]).toBe(
+      "Release validation failed: 2/2 checks",
     );
-    expect(error).toHaveBeenCalledWith(
-      expect.stringContaining("- .claude-plugin/marketplace.json"),
+    expect(output.stderrLines()[1]).toContain(
+      "- .claude-plugin/marketplace.json",
     );
   });
 
   it("prints a summary and returns 0 when every check passes", () => {
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const output = memoryOutput();
     const marketplace = JSON.stringify({
       metadata: {version: "1.0.0"},
       plugins: [],
@@ -74,14 +73,16 @@ jobs:
           "/repo/packages/tool/package.json": JSON.stringify({name: "tool"}),
         },
       }),
+      output,
       openRepository: () => emptyRepository,
     });
 
     expect(code).toBe(0);
-    expect(log).toHaveBeenCalledWith(
+    expect(output.stderrLines()).toEqual([]);
+    expect(output.stdoutLines()).toEqual([
       expect.stringMatching(
         /^Release validation passed: \d+ checks, 0 lockstep packages$/u,
       ),
-    );
+    ]);
   });
 });

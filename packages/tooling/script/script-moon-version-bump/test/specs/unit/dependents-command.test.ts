@@ -1,5 +1,6 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {describe, expect, it} from "vitest";
 import {
   planDependentUpdates,
   type DependentUpdateOptions,
@@ -58,16 +59,8 @@ const options = (
       ]),
     ),
   }),
+  output: memoryOutput(),
   ...overrides,
-});
-
-beforeEach(() => {
-  vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.spyOn(console, "log").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 describe("planDependentUpdates", () => {

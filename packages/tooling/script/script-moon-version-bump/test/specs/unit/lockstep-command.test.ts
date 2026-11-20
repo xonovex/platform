@@ -1,6 +1,7 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import type {FileChange} from "../../../src/file-transaction.js";
 import {
   readWorkspacePackages,
@@ -69,6 +70,7 @@ const options = (
     ],
   }),
   fs: memoryFileSystem(),
+  output: memoryOutput(),
   applyChanges: (changes) => {
     applied.push([...changes]);
   },
@@ -77,15 +79,6 @@ const options = (
 
 const pathsOf = (changes: readonly FileChange[] | undefined): string[] =>
   (changes ?? []).map((change) => change.path).toSorted();
-
-beforeEach(() => {
-  vi.spyOn(console, "error").mockImplementation(() => {});
-  vi.spyOn(console, "log").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 describe("runLockstep", () => {
   it("applies the manifests and changelogs of members and dependents at once", () => {
@@ -130,12 +123,12 @@ describe("runLockstep", () => {
 
   it("prints the changelog entries and applies nothing on a dry run", () => {
     const applied: FileChange[][] = [];
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const output = memoryOutput();
 
-    runLockstep(options(applied, {dryRun: true}));
+    runLockstep(options(applied, {dryRun: true, output}));
 
     expect(applied).toEqual([]);
-    expect(log).toHaveBeenCalledWith(expect.stringContaining("## 0.2.0"));
+    expect(output.stdoutLines().join("\n")).toContain("## 0.2.0");
   });
 
   it("writes no changelog for a member already at the target version", () => {

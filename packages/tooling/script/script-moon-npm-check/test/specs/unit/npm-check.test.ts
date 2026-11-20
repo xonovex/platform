@@ -1,5 +1,6 @@
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type NpmCheckDependencies} from "../../../src/npm-check.js";
 
 const ROOT = "/repo/packages/example";
@@ -27,29 +28,25 @@ const dependencies = (
     },
   }),
   listPackedFiles: () => packed,
+  output,
 });
 
-// Everything the run printed, on either stream, one call per line.
-let printed: string[];
+// Everything the run printed, on either stream, one entry per line.
+let output = memoryOutput();
 
-const record = (...parts: readonly unknown[]): void => {
-  printed.push(parts.map(String).join(" "));
-};
+const printed = (): string[] => [
+  ...output.stdoutLines(),
+  ...output.stderrLines(),
+];
 
 beforeEach(() => {
-  printed = [];
-  vi.spyOn(console, "error").mockImplementation(record);
-  vi.spyOn(console, "log").mockImplementation(record);
-});
-
-afterEach(() => {
-  vi.restoreAllMocks();
+  output = memoryOutput();
 });
 
 describe("main", () => {
   it("prints the help text on --help", () => {
     expect(main(["--help"], ROOT, dependencies(PUBLISHABLE))).toBe(0);
-    expect(printed.join("\n")).toContain("moon-npm-check");
+    expect(printed().join("\n")).toContain("moon-npm-check");
   });
 
   it("skips a private package without packing it", () => {
@@ -69,9 +66,10 @@ describe("main", () => {
       main([], ROOT, {
         fs: memoryFileSystem(),
         listPackedFiles: () => [],
+        output,
       }),
     ).toBe(1);
-    expect(printed.join("\n")).toContain("Failed to parse package.json");
+    expect(printed().join("\n")).toContain("Failed to parse package.json");
   });
 
   it("fails when the packed files cannot be listed", () => {
@@ -83,7 +81,7 @@ describe("main", () => {
         },
       }),
     ).toBe(1);
-    expect(printed.join("\n")).toContain(
+    expect(printed().join("\n")).toContain(
       "Failed to inspect packed package: Error: npm pack failed: offline",
     );
   });
@@ -96,9 +94,9 @@ describe("main", () => {
         dependencies(PUBLISHABLE, ["package.json", "dist/index.js"]),
       ),
     ).toBe(1);
-    const output = printed.join("\n");
-    expect(output).toContain("@xonovex/example is not ready for publishing");
-    expect(output).toContain(
+    const lines = printed().join("\n");
+    expect(lines).toContain("@xonovex/example is not ready for publishing");
+    expect(lines).toContain(
       'Packed file "dist/index.js" imports missing relative target: "./missing.js"',
     );
   });
@@ -107,7 +105,7 @@ describe("main", () => {
     const {name: _name, ...unnamed} = PUBLISHABLE;
 
     expect(main([], ROOT, dependencies(unnamed))).toBe(1);
-    expect(printed.join("\n")).toContain(
+    expect(printed().join("\n")).toContain(
       `${ROOT}/package.json is not ready for publishing`,
     );
   });
@@ -117,7 +115,7 @@ describe("main", () => {
     ready.fs.writeFile(`${ROOT}/dist/index.js`, "export {};\n");
 
     expect(main([], ROOT, ready)).toBe(0);
-    expect(printed.join("\n")).toContain(
+    expect(printed().join("\n")).toContain(
       "@xonovex/example@1.0.0 is ready for publishing",
     );
   });

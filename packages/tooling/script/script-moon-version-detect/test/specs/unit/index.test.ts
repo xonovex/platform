@@ -1,13 +1,14 @@
+import {errorLine} from "@xonovex/script-moon-common/logging";
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-const {logErrorMock, mainMock} = vi.hoisted(() => ({
-  logErrorMock: vi.fn(),
+const {stderrMock, mainMock} = vi.hoisted(() => ({
+  stderrMock: vi.fn<(line: string) => void>(),
   mainMock: vi.fn<(...args: readonly unknown[]) => number>(),
 }));
 
 vi.mock("../../../src/version-detect.js", () => ({main: mainMock}));
-vi.mock("@xonovex/script-moon-common/logging", () => ({
-  logError: logErrorMock,
+vi.mock("@xonovex/script-moon-common/adapters/output-node", () => ({
+  processOutput: {stdout: vi.fn(), stderr: stderrMock},
 }));
 
 const originalExitCode = process.exitCode;
@@ -42,7 +43,7 @@ describe("version detect entry point", () => {
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith("git failed");
+    expect(stderrMock).toHaveBeenCalledWith(errorLine("git failed"));
     expect(process.exitCode).toBe(1);
   });
 
@@ -54,7 +55,7 @@ describe("version detect entry point", () => {
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith("broken");
+    expect(stderrMock).toHaveBeenCalledWith(errorLine("broken"));
     expect(process.exitCode).toBe(1);
   });
 });

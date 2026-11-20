@@ -1,6 +1,7 @@
 import {dirname, join, relative} from "node:path";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
-import {logInfo} from "@xonovex/script-moon-common/logging";
+import {infoLine} from "@xonovex/script-moon-common/logging";
+import type {Output} from "@xonovex/script-moon-common/output";
 import type {PackageJson} from "@xonovex/script-moon-common/package-json";
 import {
   determineBumpLevel,
@@ -25,6 +26,7 @@ interface ChangelogRequest {
   readonly includedTypes: ReadonlySet<string> | undefined;
   readonly git: VersionGit;
   readonly fs: FileSystem;
+  readonly output: Output;
 }
 
 const serializePackage = (pkg: PackageJson): string =>
@@ -39,8 +41,10 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
       : {since: request.gitBase};
 
   if (range === undefined) {
-    logInfo(
-      `${request.packageName}: no previous version found, skipping changelog.`,
+    request.output.stdout(
+      infoLine(
+        `${request.packageName}: no previous version found, skipping changelog.`,
+      ),
     );
     return undefined;
   }
@@ -56,10 +60,12 @@ const planChangelog = (request: ChangelogRequest): FileChange | undefined => {
   );
 
   if (request.dryRun) {
-    logInfo(
-      `[dry-run] Changelog entry for ${request.packageName}@${request.newVersion}:`,
+    request.output.stdout(
+      infoLine(
+        `[dry-run] Changelog entry for ${request.packageName}@${request.newVersion}:`,
+      ),
     );
-    console.log(entry);
+    request.output.stdout(entry);
     return undefined;
   }
   const changelogPath = join(dirname(request.packagePath), filename);

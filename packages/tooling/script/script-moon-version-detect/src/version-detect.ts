@@ -2,6 +2,7 @@ import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
 import type {GitRepository} from "@xonovex/script-moon-common/git";
 import type {MoonProject} from "@xonovex/script-moon-common/moon-query";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
 import {detectVersionChanges} from "./detect.js";
 
@@ -11,6 +12,7 @@ export interface VersionDetectDependencies {
   ) => Pick<GitRepository, "resolveCommit" | "readFile">;
   readonly listProjects: (rootDir: string) => readonly MoonProject[];
   readonly fs: FileSystem;
+  readonly output: Output;
 }
 
 const cliSpec = {
@@ -34,7 +36,7 @@ export const main = (
 ): number => {
   const args = parseCliArgs(cliSpec, argv);
   if (args.kind === "help") {
-    console.log(args.text);
+    dependencies.output.stdout(args.text);
     return 0;
   }
   const ref =
@@ -48,6 +50,6 @@ export const main = (
     repository,
     dependencies.fs,
   );
-  console.log(JSON.stringify(changed));
+  dependencies.output.stdout(JSON.stringify(changed));
   return 0;
 };

@@ -1,14 +1,10 @@
 import {afterEach, describe, expect, it, vi} from "vitest";
 
-const {logErrorMock, mainMock} = vi.hoisted(() => ({
-  logErrorMock: vi.fn(),
+const {mainMock} = vi.hoisted(() => ({
   mainMock: vi.fn<(...args: readonly unknown[]) => number>(),
 }));
 
 vi.mock("../../../src/npm-check.js", () => ({main: mainMock}));
-vi.mock("@xonovex/script-moon-common/logging", () => ({
-  logError: logErrorMock,
-}));
 
 const originalExitCode = process.exitCode;
 
@@ -21,6 +17,7 @@ const runEntryPoint = async (): Promise<void> => {
 afterEach(() => {
   process.exitCode = originalExitCode;
   vi.resetModules();
+  vi.restoreAllMocks();
   vi.clearAllMocks();
 });
 
@@ -37,18 +34,20 @@ describe("npm check entry point", () => {
     expect(process.exitCode).toBe(1);
   });
 
-  it("logs a thrown error and exits non-zero", async () => {
+  it("writes a thrown error to stderr and exits non-zero", async () => {
+    const stderr = vi.spyOn(process.stderr, "write").mockReturnValue(true);
     mainMock.mockImplementation(() => {
       throw new Error("broken");
     });
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith("broken");
+    expect(stderr).toHaveBeenCalledWith(expect.stringContaining("broken"));
     expect(process.exitCode).toBe(1);
   });
 
   it("stringifies a thrown value that is not an error", async () => {
+    const stderr = vi.spyOn(process.stderr, "write").mockReturnValue(true);
     const thrown: unknown = "broken";
     mainMock.mockImplementation(() => {
       throw thrown;
@@ -56,7 +55,7 @@ describe("npm check entry point", () => {
 
     await runEntryPoint();
 
-    expect(logErrorMock).toHaveBeenCalledWith("broken");
+    expect(stderr).toHaveBeenCalledWith(expect.stringContaining("broken"));
     expect(process.exitCode).toBe(1);
   });
 });

@@ -1,5 +1,6 @@
 import type {FileSystem} from "@xonovex/script-moon-common/file-system";
-import {logInfo, logSuccess} from "@xonovex/script-moon-common/logging";
+import {infoLine, successLine} from "@xonovex/script-moon-common/logging";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {readPkg} from "@xonovex/script-moon-common/package-json";
 import type {BumpType} from "./bump.js";
 import {detectDepUpdates} from "./dep-updates.js";
@@ -28,6 +29,7 @@ interface LockstepOptions {
   readonly includedTypes: ReadonlySet<string> | undefined;
   readonly git: VersionGit;
   readonly fs: FileSystem;
+  readonly output: Output;
   readonly applyChanges: (changes: readonly FileChange[]) => void;
 }
 
@@ -73,6 +75,7 @@ const planMemberChanges = (
     includedTypes: options.includedTypes,
     git: options.git,
     fs: options.fs,
+    output: options.output,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;
@@ -114,6 +117,7 @@ const planDependentChanges = (
     includedTypes: options.includedTypes,
     git: options.git,
     fs: options.fs,
+    output: options.output,
   });
   if (changelog !== undefined) changes.push(changelog);
   return changes;
@@ -131,8 +135,10 @@ const runLockstep = (options: LockstepOptions): number => {
   const changes: FileChange[] = [];
 
   for (const member of plan.members) {
-    logInfo(
-      `${label}${member.name}: ${member.previousVersion} -> ${plan.targetVersion} (lockstep, base ${plan.baseVersion})`,
+    options.output.stdout(
+      infoLine(
+        `${label}${member.name}: ${member.previousVersion} -> ${plan.targetVersion} (lockstep, base ${plan.baseVersion})`,
+      ),
     );
     changes.push(...planMemberChanges(options, member, plan.targetVersion));
   }
@@ -143,8 +149,10 @@ const runLockstep = (options: LockstepOptions): number => {
       dependent.newVersion === undefined
         ? "version unchanged"
         : `${String(dependent.previousVersion)} -> ${dependent.newVersion}`;
-    logInfo(
-      `${label}${dependent.name}: ${String(dependent.referenceCount)} reference(s) updated (${versionNote})`,
+    options.output.stdout(
+      infoLine(
+        `${label}${dependent.name}: ${String(dependent.referenceCount)} reference(s) updated (${versionNote})`,
+      ),
     );
     changes.push(...planDependentChanges(options, dependent));
   }
@@ -152,8 +160,10 @@ const runLockstep = (options: LockstepOptions): number => {
   if (!options.dryRun) options.applyChanges(changes);
 
   const prefix = options.dryRun ? "[dry-run] Would bump" : "Bumped";
-  logSuccess(
-    `${prefix} ${String(plan.members.length)} package(s) to ${plan.targetVersion}, updated deps in ${String(dependents.length)} file(s).`,
+  options.output.stdout(
+    successLine(
+      `${prefix} ${String(plan.members.length)} package(s) to ${plan.targetVersion}, updated deps in ${String(dependents.length)} file(s).`,
+    ),
   );
   return 0;
 };

@@ -1,4 +1,4 @@
-// These log helpers restate the ones in shared-core rather than importing them.
+// These log lines restate the ones in shared-core rather than importing them.
 // shared-core is tagged npm, so its npm-check, publish, and version tasks depend
 // on the script packages; a script package that depended on shared-core would
 // close that loop and moon would reject the project graph with would_cycle.
@@ -10,7 +10,7 @@ const C = {
   NC: "\u001B[0m",
 } as const;
 
-/** A log line for the Output port, the same text the matching log helper prints. */
+/** A log line for the Output port: a colored level tag, then the message. */
 export const infoLine = (message: string): string =>
   `${C.BLUE}[INFO]${C.NC} ${message}`;
 
@@ -22,19 +22,3 @@ export const warningLine = (message: string): string =>
 
 export const errorLine = (message: string): string =>
   `${C.RED}[ERROR]${C.NC} ${message}`;
-
-export const logInfo = (...args: unknown[]): void => {
-  console.log(`${C.BLUE}[INFO]${C.NC}`, ...args);
-};
-
-export const logSuccess = (...args: unknown[]): void => {
-  console.log(`${C.GREEN}[SUCCESS]${C.NC}`, ...args);
-};
-
-export const logWarning = (...args: unknown[]): void => {
-  console.log(`${C.YELLOW}[WARNING]${C.NC}`, ...args);
-};
-
-export const logError = (...args: unknown[]): void => {
-  console.error(`${C.RED}[ERROR]${C.NC}`, ...args);
-};

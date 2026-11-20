@@ -1,14 +1,11 @@
 import {basename, dirname, join, relative} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it} from "vitest";
 import type {FileChange} from "../../../src/file-transaction.js";
 import type {VersionGit} from "../../../src/git.js";
 import {main, type VersionBumpDependencies} from "../../../src/version-bump.js";
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 const ROOT = "/repo";
 
@@ -56,9 +53,11 @@ const dependencies = (
   git: VersionGit,
   paths: readonly string[],
   fs: FileSystem,
+  output = memoryOutput(),
 ): VersionBumpDependencies => ({
   openRepository: () => git,
   fs,
+  output,
   listProjects: () =>
     paths.map((path) => ({
       id: basename(dirname(path)),
@@ -72,18 +71,16 @@ const dependencies = (
 describe("main", () => {
   it("prints the help text and plans nothing on --help", () => {
     const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
-    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    const output = memoryOutput();
 
     const code = main(
       ["--help"],
       join(ROOT, "packages", "core"),
-      dependencies(gitAtHead({}), [packagePath("core")], fs),
+      dependencies(gitAtHead({}), [packagePath("core")], fs, output),
     );
 
     expect(code).toBe(0);
-    expect(log).toHaveBeenCalledWith(
-      expect.stringContaining("moon-version-bump"),
-    );
+    expect(output.stdoutLines()[0]).toContain("moon-version-bump");
     expect(JSON.parse(fs.readText(packagePath("core")))).toMatchObject({
       version: "1.2.3",
     });
@@ -94,7 +91,6 @@ describe("main", () => {
       core: {name: "@xonovex/core", version: "1.2.3"},
     });
     const corePath = packagePath("core");
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     const code = main(
       ["--type", "minor", "--no-changelog"],
@@ -117,7 +113,6 @@ describe("main", () => {
       core: {name: "@xonovex/core", version: "2.0.0"},
     });
     const corePath = packagePath("core");
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     const code = main(
       ["--no-changelog"],
@@ -142,7 +137,6 @@ describe("main", () => {
     });
     const corePath = packagePath("core");
     const before = fs.readText(corePath);
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     const code = main(
       ["--dry-run", "--no-changelog"],
@@ -163,7 +157,6 @@ describe("main", () => {
       core: {name: "@xonovex/core", version: "1.2.3"},
     });
     const corePath = packagePath("core");
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     main(
       ["--exact", "4.5.6", "--no-changelog"],
@@ -191,7 +184,6 @@ describe("main", () => {
     });
     const corePath = packagePath("core");
     const consumerPath = packagePath("consumer");
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     main(
       ["--type", "minor", "--no-changelog"],
@@ -222,7 +214,6 @@ describe("main", () => {
     });
     const corePath = packagePath("core");
     const consumerPath = packagePath("consumer");
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     main(
       ["--type", "minor", "--no-changelog", "--no-dependents"],
@@ -241,7 +232,6 @@ describe("main", () => {
 
   it("rejects a malformed exact version", () => {
     const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
@@ -254,7 +244,6 @@ describe("main", () => {
 
   it("rejects an unknown bump type", () => {
     const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
@@ -267,7 +256,6 @@ describe("main", () => {
 
   it("rejects a directory with no package.json", () => {
     const fs = workspace({});
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() => main([], ROOT, dependencies(gitAtHead({}), [], fs))).toThrow(
       "no package.json found",
@@ -276,7 +264,6 @@ describe("main", () => {
 
   it("rejects a manifest missing a name or version", () => {
     const fs = workspace({core: {description: "no identity"}});
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     expect(() =>
       main(
@@ -290,7 +277,6 @@ describe("main", () => {
   it("writes a changelog of the chosen commit types since the given base", () => {
     const fs = workspace({core: {name: "@xonovex/core", version: "1.2.3"}});
     const corePath = packagePath("core");
-    vi.spyOn(console, "error").mockImplementation(() => {});
     const since: (string | undefined)[] = [];
 
     main(
@@ -326,7 +312,6 @@ describe("main", () => {
       core: {name: "@xonovex/core", version: "1.2.3"},
       extra: {name: "@xonovex/extra", version: "1.0.0"},
     });
-    vi.spyOn(console, "error").mockImplementation(() => {});
 
     const code = main(
       ["--lockstep", "@xonovex/core,@xonovex/extra", "--no-changelog"],
