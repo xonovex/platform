@@ -10,6 +10,12 @@
     "packages/runtime/plugin/*",
     "packages/tooling/cli/agent-cli-go",
     "packages/tooling/cli/agent-cli-go-github",
+    "packages/tooling/cli/agent-validate-go",
+    "packages/tooling/cli/agent-validate-go-github",
+    "packages/tooling/cli/agent-audit-go",
+    "packages/tooling/cli/agent-audit-go-github",
+    "packages/tooling/cli/agent-eval-go",
+    "packages/tooling/cli/agent-eval-go-github",
     "packages/tooling/script/*",
     "packages/sandbox/image/*"
   ],

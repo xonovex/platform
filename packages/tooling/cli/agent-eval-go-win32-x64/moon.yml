@@ -1,0 +1,43 @@
+$schema: https://moonrepo.dev/schemas/v2/project.json
+id: agent-eval-go-win32-x64
+language: go
+layer: unknown
+tags:
+  - npm
+env:
+  GOOS: windows
+  GOARCH: amd64
+  CGO_ENABLED: "0"
+  BIN_EXT: ".exe"
+tasks:
+  go-build:
+    script: |
+      set -euo pipefail
+      version="$(node -p "require('$workspaceRoot/packages/tooling/cli/agent-eval-go/package.json').version")"
+      mkdir -p bin
+      cd "$workspaceRoot/packages/tooling/cli/agent-eval-go"
+      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/tooling/cli/agent-eval-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-eval-go${BIN_EXT}" ./cmd/agent-eval
+    inputs:
+      - /packages/tooling/cli/agent-eval-go/**/*.go
+      - /packages/tooling/cli/agent-eval-go/package.json
+      - /packages/tooling/cli/agent-eval-go/go.mod
+      - /packages/tooling/cli/agent-eval-go/go.sum
+      - /packages/library/shared-contract-go/**/*.go
+      - /packages/library/shared-contract-go/**/*.schema.json
+      - /packages/library/shared-contract-go/go.mod
+      - /packages/library/shared-contract-go/go.sum
+    outputs:
+      - bin/
+    options:
+      cache: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - go-build
+    options:
+      cache: false
+  npm-publish:
+    deps:
+      - go-build
+    options:
+      mergeDeps: prepend

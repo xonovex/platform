@@ -1,0 +1,21 @@
+{
+  "name": "@xonovex/agent-eval-go-github",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub release orchestration for agent-eval-go",
+  "optionalDependencies": {
+    "@xonovex/agent-eval-go-darwin-arm64": "0.1.0",
+    "@xonovex/agent-eval-go-darwin-x64": "0.1.0",
+    "@xonovex/agent-eval-go-linux-arm64": "0.1.0",
+    "@xonovex/agent-eval-go-linux-x64": "0.1.0",
+    "@xonovex/agent-eval-go-win32-x64": "0.1.0"
+  },
+  "keywords": [
+    "xonovex",
+    "agent",
+    "eval",
+    "cli",
+    "go",
+    "github"
+  ]
+}

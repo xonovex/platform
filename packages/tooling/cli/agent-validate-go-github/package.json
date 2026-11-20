@@ -1,0 +1,21 @@
+{
+  "name": "@xonovex/agent-validate-go-github",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub release orchestration for agent-validate-go",
+  "optionalDependencies": {
+    "@xonovex/agent-validate-go-darwin-arm64": "0.1.0",
+    "@xonovex/agent-validate-go-darwin-x64": "0.1.0",
+    "@xonovex/agent-validate-go-linux-arm64": "0.1.0",
+    "@xonovex/agent-validate-go-linux-x64": "0.1.0",
+    "@xonovex/agent-validate-go-win32-x64": "0.1.0"
+  },
+  "keywords": [
+    "xonovex",
+    "agent",
+    "validate",
+    "cli",
+    "go",
+    "github"
+  ]
+}

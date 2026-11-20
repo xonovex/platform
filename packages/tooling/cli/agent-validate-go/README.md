@@ -2,6 +2,14 @@
 
 Use this command to validate skills, plugins, marketplaces, instructions, hooks, commands, agents and repository files. It is a Go binary that reads the repository and reports findings as text or SARIF.
 
+## Installation
+
+Install the command globally from npm. The package selects the binary for the platform; the supported platforms are Linux and macOS on x64 and arm64, and Windows on x64.
+
+```bash
+npm install -g @xonovex/agent-validate-go
+```
+
 ## Usage
 
 ```bash

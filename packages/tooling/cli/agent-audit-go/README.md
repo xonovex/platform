@@ -2,6 +2,14 @@
 
 Use this CLI to audit the source catalogs of skills and documents, compare a catalog with a base ref, and convert a `SOURCES.md` into `sources.json`.
 
+## Installation
+
+Install the command globally from npm. The package selects the binary for the platform; the supported platforms are Linux and macOS on x64 and arm64, and Windows on x64.
+
+```bash
+npm install -g @xonovex/agent-audit-go
+```
+
 ## Commands
 
 | Command | Does |

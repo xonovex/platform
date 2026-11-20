@@ -1,0 +1,50 @@
+{
+  "name": "@xonovex/agent-audit-go",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/tooling/cli/agent-audit-go"
+  },
+  "files": [
+    "dist/bin.js",
+    "dist/bin.js.map",
+    "dist/launcher.js",
+    "dist/launcher.js.map"
+  ],
+  "bin": {
+    "agent-audit": "dist/bin.js",
+    "agent-audit-go": "dist/bin.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@xonovex/eslint-config-cli": "0.2.0",
+    "@xonovex/ts-config-cli": "0.2.0",
+    "@xonovex/vitest-config-node": "0.2.0"
+  },
+  "optionalDependencies": {
+    "@xonovex/agent-audit-go-linux-x64": "0.1.0",
+    "@xonovex/agent-audit-go-linux-arm64": "0.1.0",
+    "@xonovex/agent-audit-go-darwin-x64": "0.1.0",
+    "@xonovex/agent-audit-go-darwin-arm64": "0.1.0",
+    "@xonovex/agent-audit-go-win32-x64": "0.1.0"
+  },
+  "description": "Agent source catalog audit CLI (Go implementation)",
+  "type": "module",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/tooling/cli/agent-audit-go#readme",
+  "keywords": [
+    "xonovex",
+    "agent",
+    "audit",
+    "cli",
+    "go"
+  ]
+}

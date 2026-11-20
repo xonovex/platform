@@ -19,6 +19,7 @@ tasks:
       go build -ldflags="-s -w -X github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-cli-go${BIN_EXT}" ./cmd/agent-cli
     inputs:
       - /packages/tooling/cli/agent-cli-go/**/*.go
+      - /packages/tooling/cli/agent-cli-go/**/*.schema.json
       - /packages/tooling/cli/agent-cli-go/package.json
       - /packages/tooling/cli/agent-cli-go/go.mod
       - /packages/tooling/cli/agent-cli-go/go.sum

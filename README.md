@@ -11,6 +11,9 @@ Choose the component that matches the task. Skills provide instructions and supp
 | Task | Start here |
 | --- | --- |
 | Run Claude Code or OpenCode locally | [Agent CLI](packages/tooling/cli/agent-cli-go/README.md) |
+| Validate skills, plugins and instructions | [Agent Validate](packages/tooling/cli/agent-validate-go/README.md) |
+| Audit the sources of skills and documents | [Agent Audit](packages/tooling/cli/agent-audit-go/README.md) |
+| Measure skills and instructions with model evals | [Agent Eval](packages/tooling/cli/agent-eval-go/README.md) |
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
 | Install skills | [Plugin catalog](#agent-plugins) |
 | Take a change from research to delivery | [Workflow guide and diagram](packages/runtime/plugin/plugin-workflow/README.md) |
@@ -36,6 +39,18 @@ Select isolation, provisioning, and network behavior independently. Use `agent-c
 ![Three Claude Code agents in a tiled tmux session, each in its own git worktree: one under bwrap, one under bwrap with a Nix-provisioned toolchain, and one under Docker, routed to two different model providers](packages/asset/asset-images/multiple-agents.png)
 
 Each pane is a separate worktree with its own axis combination and provider, so concurrent agents do not share a checkout or sandbox.
+
+### Validation, Audit and Eval Tools
+
+Install the commands that check the plugin catalog and your own skills. Each command is a separate npm package with a binary for each supported platform.
+
+```bash
+npm install -g @xonovex/agent-validate-go @xonovex/agent-audit-go @xonovex/agent-eval-go
+agent-validate --strict
+agent-audit sources packages/runtime/plugin
+```
+
+`agent-eval` calls a model, so it runs only when you start it and spends the budget you pass.
 
 ### Agent Kubernetes Operator
 

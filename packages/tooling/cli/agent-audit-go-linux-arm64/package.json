@@ -1,0 +1,38 @@
+{
+  "name": "@xonovex/agent-audit-go-linux-arm64",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/tooling/cli/agent-audit-go-linux-arm64"
+  },
+  "files": [
+    "bin"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "description": "Linux arm64 binary for @xonovex/agent-audit-go",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/tooling/cli/agent-audit-go-linux-arm64#readme",
+  "keywords": [
+    "xonovex",
+    "agent",
+    "audit",
+    "cli",
+    "go",
+    "linux",
+    "arm64"
+  ]
+}

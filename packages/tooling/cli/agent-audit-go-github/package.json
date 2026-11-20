@@ -1,0 +1,21 @@
+{
+  "name": "@xonovex/agent-audit-go-github",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub release orchestration for agent-audit-go",
+  "optionalDependencies": {
+    "@xonovex/agent-audit-go-darwin-arm64": "0.1.0",
+    "@xonovex/agent-audit-go-darwin-x64": "0.1.0",
+    "@xonovex/agent-audit-go-linux-arm64": "0.1.0",
+    "@xonovex/agent-audit-go-linux-x64": "0.1.0",
+    "@xonovex/agent-audit-go-win32-x64": "0.1.0"
+  },
+  "keywords": [
+    "xonovex",
+    "agent",
+    "audit",
+    "cli",
+    "go",
+    "github"
+  ]
+}

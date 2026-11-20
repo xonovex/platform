@@ -2,6 +2,14 @@
 
 Use this CLI to measure whether skills load when they should, whether they improve answers, whether an instruction rule changes what an agent does, and how a flow of agents performs, and to convert the legacy eval files of skills into eval documents.
 
+## Installation
+
+Install the command globally from npm. The package selects the binary for the platform; the supported platforms are Linux and macOS on x64 and arm64, and Windows on x64.
+
+```bash
+npm install -g @xonovex/agent-eval-go
+```
+
 ## Commands
 
 | Command | Measures |

@@ -1,0 +1,43 @@
+$schema: https://moonrepo.dev/schemas/v2/project.json
+id: agent-audit-go-linux-x64
+language: go
+layer: unknown
+tags:
+  - npm
+env:
+  GOOS: linux
+  GOARCH: amd64
+  CGO_ENABLED: "0"
+  BIN_EXT: ""
+tasks:
+  go-build:
+    script: |
+      set -euo pipefail
+      version="$(node -p "require('$workspaceRoot/packages/tooling/cli/agent-audit-go/package.json').version")"
+      mkdir -p bin
+      cd "$workspaceRoot/packages/tooling/cli/agent-audit-go"
+      go build -ldflags="-s -w -X github.com/xonovex/platform/packages/tooling/cli/agent-audit-go/internal/cmd.version=$version" -o "$projectRoot/bin/agent-audit-go${BIN_EXT}" ./cmd/agent-audit
+    inputs:
+      - /packages/tooling/cli/agent-audit-go/**/*.go
+      - /packages/tooling/cli/agent-audit-go/package.json
+      - /packages/tooling/cli/agent-audit-go/go.mod
+      - /packages/tooling/cli/agent-audit-go/go.sum
+      - /packages/library/shared-contract-go/**/*.go
+      - /packages/library/shared-contract-go/**/*.schema.json
+      - /packages/library/shared-contract-go/go.mod
+      - /packages/library/shared-contract-go/go.sum
+    outputs:
+      - bin/
+    options:
+      cache: true
+  ci-check:
+    command: echo 'ci-check complete'
+    deps:
+      - go-build
+    options:
+      cache: false
+  npm-publish:
+    deps:
+      - go-build
+    options:
+      mergeDeps: prepend

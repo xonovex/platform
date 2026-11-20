@@ -1,0 +1,38 @@
+{
+  "name": "@xonovex/agent-eval-go-darwin-arm64",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xonovex/platform.git",
+    "directory": "packages/tooling/cli/agent-eval-go-darwin-arm64"
+  },
+  "files": [
+    "bin"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "description": "macOS arm64 binary for @xonovex/agent-eval-go",
+  "author": "Xonovex",
+  "bugs": {
+    "url": "https://github.com/xonovex/platform/issues"
+  },
+  "homepage": "https://github.com/xonovex/platform/tree/main/packages/tooling/cli/agent-eval-go-darwin-arm64#readme",
+  "keywords": [
+    "xonovex",
+    "agent",
+    "eval",
+    "cli",
+    "go",
+    "darwin",
+    "arm64"
+  ]
+}
