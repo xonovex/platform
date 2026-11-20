@@ -13,7 +13,7 @@ import (
 func TestSourcesLoaderEndToEnd(t *testing.T) {
 	fsys := memfs.New(map[string]string{
 		"skill/sources.json": `{"version":1,"sources":[
-			{"id":"spec","kind":"http","title":"Spec","url":"https://e.test/spec","reviewedAt":"2026-01-01","reviewAfter":"2026-02-01","claims":[{"id":"c","statement":"s","anchor":"intro"}]}]}`,
+			{"id":"spec","kind":"http","title":"Spec","urls":["https://e.test/spec"],"reviewedAt":"2026-01-01","reviewAfter":"2026-02-01","claims":[{"id":"c","statement":"s","anchor":"intro"}]}]}`,
 		"skill/sources.d/extra.json": `{"version":1,"sources":[
 			{"id":"repo","kind":"repository","title":"Repo","path":"docs","reviewedAt":"2026-01-01","supersededBy":"spec"}]}`,
 	})

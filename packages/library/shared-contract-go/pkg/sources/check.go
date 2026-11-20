@@ -112,6 +112,7 @@ func checkClaims(c Catalog) []findings.Finding {
 	var out []findings.Finding
 	for _, s := range c.Sources {
 		seen := map[string]bool{}
+		unanchored := 0
 		for _, claim := range s.Claims {
 			if seen[claim.ID] {
 				out = append(out, finding(findings.Fail, CodeDuplicateClaim, s.File,
@@ -119,9 +120,12 @@ func checkClaims(c Catalog) []findings.Finding {
 			}
 			seen[claim.ID] = true
 			if claim.Anchor == "" {
-				out = append(out, finding(findings.Warn, CodeClaimUnanchored, s.File,
-					fmt.Sprintf("claim %q of source %q has no anchor", claim.ID, s.ID)))
+				unanchored++
 			}
+		}
+		if unanchored > 0 {
+			out = append(out, finding(findings.Warn, CodeClaimUnanchored, s.File,
+				fmt.Sprintf("%d of %d claims of source %q have no anchor", unanchored, len(s.Claims), s.ID)))
 		}
 	}
 	return out

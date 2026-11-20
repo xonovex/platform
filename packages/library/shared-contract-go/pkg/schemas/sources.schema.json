@@ -7,17 +7,30 @@
   "properties": {
     "$schema": {"type": "string"},
     "version": {"$ref": "common.schema.json#/$defs/version"},
+    "title": {
+      "description": "The heading of the catalog.",
+      "$ref": "common.schema.json#/$defs/text"
+    },
+    "preamble": {
+      "description": "Prose that introduces the catalog and belongs to no single source.",
+      "$ref": "common.schema.json#/$defs/text"
+    },
     "sources": {
       "type": "array",
       "items": {"$ref": "#/$defs/source"}
+    },
+    "notes": {
+      "description": "Prose sections that describe how the catalog is kept and belong to no single source.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/note"}
     }
   },
   "required": ["version", "sources"],
   "additionalProperties": false,
   "$defs": {
     "kind": {
-      "description": "How an audit reads the source: a git repository, an http document, a file on disk, a web page, or a repository path.",
-      "enum": ["git", "http", "filesystem", "web", "repository"]
+      "description": "How an audit reads the source: a git checkout, an http document, a file on disk, a web page, a repository path, or repository-original material with no address.",
+      "enum": ["git", "http", "filesystem", "web", "repository", "original"]
     },
     "claim": {
       "type": "object",
@@ -36,17 +49,84 @@
       "required": ["id", "statement"],
       "additionalProperties": false
     },
+    "watch": {
+      "description": "A path of a checkout whose changes since the pinned commit affect the files that draw on it.",
+      "type": "object",
+      "properties": {
+        "path": {"$ref": "common.schema.json#/$defs/relativePath"},
+        "feeds": {
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/relativePath"},
+          "uniqueItems": true
+        }
+      },
+      "required": ["path"],
+      "additionalProperties": false
+    },
+    "note": {
+      "type": "object",
+      "properties": {
+        "title": {"$ref": "common.schema.json#/$defs/text"},
+        "text": {"$ref": "common.schema.json#/$defs/text"},
+        "after": {
+          "description": "The id of the source this section follows. A section without it comes before the first source.",
+          "$ref": "common.schema.json#/$defs/identifier"
+        }
+      },
+      "required": ["title", "text"],
+      "additionalProperties": false
+    },
     "source": {
       "type": "object",
       "properties": {
         "id": {"$ref": "common.schema.json#/$defs/identifier"},
         "kind": {"$ref": "#/$defs/kind"},
         "title": {"$ref": "common.schema.json#/$defs/text"},
-        "url": {"$ref": "common.schema.json#/$defs/url"},
+        "citation": {
+          "description": "How the source is cited when that differs from the heading, such as the title of a book.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "urls": {
+          "description": "The documents that make up the source, in the order their digest is taken.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/url"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "urlNotes": {
+          "description": "The lines of a URL list that say more than a bare URL, verbatim, so the wording survives next to the fetch list.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/text"}
+        },
         "path": {"$ref": "common.schema.json#/$defs/relativePath"},
         "ref": {
           "description": "The git commit, tag or branch that pins a git source.",
           "$ref": "common.schema.json#/$defs/text"
+        },
+        "checkout": {
+          "description": "The local clone of the upstream repository, relative to the directory of the catalog.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "version": {
+          "description": "The release of the upstream the feeds were written against.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "commit": {
+          "description": "The upstream commit the feeds were written against.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        },
+        "watch": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/watch"}
+        },
+        "contentSha256": {
+          "description": "The digest of the fetched documents, in the order of urls or of the file that path names.",
+          "$ref": "common.schema.json#/$defs/digest"
+        },
+        "outputSha256": {
+          "description": "The digest of the output of the commands that were run to read a program-defined source.",
+          "$ref": "common.schema.json#/$defs/digest"
         },
         "provenance": {
           "description": "How the source was obtained when it has no address of its own.",
@@ -56,24 +136,44 @@
         "reviewAfter": {"$ref": "common.schema.json#/$defs/date"},
         "supersededBy": {"$ref": "common.schema.json#/$defs/identifier"},
         "feeds": {
-          "description": "The files that draw on this source.",
+          "description": "The files that draw on this source, relative to the directory of the catalog.",
           "type": "array",
           "items": {"$ref": "common.schema.json#/$defs/relativePath"},
           "uniqueItems": true
         },
+        "coversAllReferences": {
+          "description": "True when every reference file of the catalog draws on this source.",
+          "type": "boolean"
+        },
+        "usage": {
+          "description": "How the feeds use the source, one statement for each use.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/text"}
+        },
         "claims": {
           "type": "array",
           "items": {"$ref": "#/$defs/claim"}
+        },
+        "remarks": {
+          "description": "Prose about the source that fits no other field.",
+          "$ref": "common.schema.json#/$defs/text"
         }
       },
       "required": ["id", "kind", "title", "reviewedAt"],
       "allOf": [
         {
           "if": {
-            "properties": {"kind": {"enum": ["git", "http", "web"]}},
+            "properties": {"kind": {"enum": ["http", "web"]}},
             "required": ["kind"]
           },
-          "then": {"required": ["url"]}
+          "then": {"required": ["urls"]}
+        },
+        {
+          "if": {
+            "properties": {"kind": {"const": "git"}},
+            "required": ["kind"]
+          },
+          "then": {"required": ["checkout"]}
         },
         {
           "if": {
@@ -81,6 +181,15 @@
             "required": ["kind"]
           },
           "then": {"required": ["path"]}
+        },
+        {
+          "if": {
+            "properties": {"kind": {"const": "original"}},
+            "required": ["kind"]
+          },
+          "then": {
+            "anyOf": [{"required": ["provenance"]}, {"required": ["urlNotes"]}]
+          }
         }
       ],
       "additionalProperties": false

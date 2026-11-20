@@ -96,6 +96,13 @@ func TestCheck(t *testing.T) {
 			want:    []string{sources.CodeClaimUnanchored},
 			level:   findings.Warn,
 		},
+		{
+			name:    "unanchored claims count once for each source",
+			sources: []sources.Source{{ID: "a", Claims: []sources.Claim{{ID: "c"}, {ID: "d"}, {ID: "e", Anchor: "x"}}}},
+			want:    []string{sources.CodeClaimUnanchored},
+			level:   findings.Warn,
+			mention: "2 of 3 claims",
+		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

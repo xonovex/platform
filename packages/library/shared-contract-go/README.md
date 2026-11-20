@@ -27,7 +27,7 @@ Each schema has an `$id` under `https://schemas.xonovex.com/agent/`.
 
 | Schema | Describes |
 | --- | --- |
-| `sources.schema.json` | Sources with kind, review dates, supersession and claims |
+| `sources.schema.json` | Sources with kind, addresses, pins, digests, watched paths, review dates, supersession, claims and the prose of a legacy `SOURCES.md` |
 | `eval-trigger.schema.json` | Prompts that should or should not load a skill |
 | `eval-output.schema.json` | Cases that compare a run with and without a skill |
 | `eval-instruction.schema.json` | Cases that run an instruction present, absent or ablated |

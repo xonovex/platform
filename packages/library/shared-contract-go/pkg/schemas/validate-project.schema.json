@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent/validate-project.schema.json",
+  "title": "Validate project file",
+  "description": "The agentic.validate.json file of a repository: which checks run, where each one looks, and how severe its findings are.",
+  "type": "object",
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"$ref": "common.schema.json#/$defs/version"},
+    "skip": {
+      "description": "Directory names that no check descends into, in addition to the default skip list.",
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/text"},
+      "uniqueItems": true
+    },
+    "checks": {
+      "description": "The settings of each check by name. A check that is not listed runs with its defaults.",
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/check"}
+    }
+  },
+  "required": ["version"],
+  "additionalProperties": false,
+  "$defs": {
+    "check": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "False switches the check off.",
+          "type": "boolean"
+        },
+        "paths": {
+          "description": "The directories or files the check reads, relative to the repository root. They replace the defaults of the check.",
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "common.schema.json#/$defs/relativePath"},
+          "uniqueItems": true
+        },
+        "level": {
+          "description": "The most severe level a finding of the check keeps. A finding above it is reported at this level.",
+          "enum": ["warn", "drift", "fail"]
+        },
+        "options": {
+          "description": "The options of the check. Each check defines and validates its own.",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

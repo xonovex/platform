@@ -1,8 +1,6 @@
 package sources
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"path"
@@ -120,14 +118,8 @@ func (l Loader) loadFile(file string) ([]Source, []findings.Finding, error) {
 		return nil, problems, nil
 	}
 
-	var document struct {
-		Schema  string   `json:"$schema"`
-		Version int      `json:"version"`
-		Sources []Source `json:"sources"`
-	}
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&document); err != nil {
+	document, err := Decode(data)
+	if err != nil {
 		// The schema accepted the file, so a decode failure means the Go
 		// model and the schema disagree: a fault of the contract itself.
 		return nil, nil, fmt.Errorf("decode %s: %w", file, err)

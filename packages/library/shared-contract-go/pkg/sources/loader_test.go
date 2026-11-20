@@ -37,7 +37,7 @@ func (s *scripted) Validate(schemaID string, document []byte) ([]jsonschema.Viol
 func file(ids ...string) string {
 	var items []string
 	for _, id := range ids {
-		items = append(items, `{"id":"`+id+`","kind":"web","title":"t","url":"https://e.test","reviewedAt":"2026-01-01"}`)
+		items = append(items, `{"id":"`+id+`","kind":"web","title":"t","urls":["https://e.test"],"reviewedAt":"2026-01-01"}`)
 	}
 	return `{"version":1,"sources":[` + strings.Join(items, ",") + `]}`
 }
@@ -48,7 +48,7 @@ func TestLoadMergesRootAndShardsInOrder(t *testing.T) {
 		FS: memfs.New(map[string]string{
 			"d/sources.json":            file("root"),
 			"d/sources.d/b.json":        file("b"),
-			"d/sources.d/a.json":        `{"$schema":"x","version":1,"sources":[{"id":"a","kind":"git","title":"t","url":"https://e.test","ref":"v1","reviewedAt":"2026-01-01","feeds":["f.md"],"claims":[{"id":"c","statement":"s","anchor":"h","evidence":"e"}]}]}`,
+			"d/sources.d/a.json":        `{"$schema":"x","version":1,"sources":[{"id":"a","kind":"git","title":"t","checkout":"c","urls":["https://e.test"],"ref":"v1","reviewedAt":"2026-01-01","feeds":["f.md"],"claims":[{"id":"c","statement":"s","anchor":"h","evidence":"e"}]}]}`,
 			"d/sources.d/notes.txt":     "ignored",
 			"d/sources.d/nested/x.json": file("ignored"),
 		}),
