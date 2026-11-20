@@ -28,6 +28,14 @@
       "types": "./src/adapters/moon-query-node.ts",
       "default": "./dist/src/adapters/moon-query-node.js"
     },
+    "./adapters/output-memory": {
+      "types": "./src/adapters/output-memory.ts",
+      "default": "./dist/src/adapters/output-memory.js"
+    },
+    "./adapters/output-node": {
+      "types": "./src/adapters/output-node.ts",
+      "default": "./dist/src/adapters/output-node.js"
+    },
     "./batches": {
       "types": "./src/batches.ts",
       "default": "./dist/src/batches.js"
@@ -67,6 +75,10 @@
     "./moon-query": {
       "types": "./src/moon-query.ts",
       "default": "./dist/src/moon-query.js"
+    },
+    "./output": {
+      "types": "./src/output.ts",
+      "default": "./dist/src/output.js"
     },
     "./package-json": {
       "types": "./src/package-json.ts",
