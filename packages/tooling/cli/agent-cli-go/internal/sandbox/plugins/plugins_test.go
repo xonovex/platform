@@ -60,7 +60,7 @@ func TestDefaultRegistry(t *testing.T) {
 		}
 	}
 	for _, m := range []isolation.IsolationMethod{isolation.IsolationNone, isolation.IsolationDockerSandboxes} {
-		_, _, err := sandbox.Select(reg,
+		_, err := sandbox.Select(reg,
 			sandbox.Request{Isolation: m, Provision: provision.ProvisionNone, Network: netshared.ModeManaged},
 			policy.SandboxPolicy{RequireEgressRestricted: true})
 		if err == nil {
@@ -70,7 +70,7 @@ func TestDefaultRegistry(t *testing.T) {
 
 	// A real cell selects, and the pinned guarantee is satisfied by the nix plugin's
 	// own capability — the policy engine never names nix.
-	if _, _, err := sandbox.Select(reg,
+	if _, err := sandbox.Select(reg,
 		sandbox.Request{Isolation: isolation.IsolationBwrap, Provision: provision.ProvisionNix, Network: netshared.ModeNone},
 		policy.SandboxPolicy{RequirePinnedProvision: true}); err != nil {
 		t.Errorf("Select(bwrap×nix, require-pinned) = %v, want nil", err)

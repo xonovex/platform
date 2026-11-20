@@ -70,8 +70,8 @@ tasks:
       # Every package the module builds is named here. cmd/agent-cli is the
       # composition root and internal/system the operating-system adapter; both
       # are covered by go-integration, because a unit test may not start a
-      # process or touch a file. The shared packages of provision and terminal
-      # declare interfaces and hold no statements. Every other package reaches
+      # process or touch a file. The shared package of provision declares
+      # interfaces and holds no statements. Every other package reaches
       # the machine through a port, so the unit tier covers it with
       # internal/system/systemtest.
       bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
@@ -98,6 +98,7 @@ tasks:
         ./internal/provision/nix=99 \
         ./internal/provision/none=100 \
         ./internal/provision/shared=exempt \
+        ./internal/record=100 \
         ./internal/isolation/bwrap=98 \
         ./internal/isolation/docker=98 \
         ./internal/isolation/dockersandboxes=96 \
@@ -107,9 +108,11 @@ tasks:
         ./internal/isolation/shared=96 \
         ./internal/sandbox=97 \
         ./internal/sandbox/plugins=100 \
+        ./internal/schematest=92 \
         ./internal/system=exempt \
         ./internal/system/systemtest=99 \
-        ./internal/terminal/shared=exempt \
+        ./internal/terminal/herdr=100 \
+        ./internal/terminal/shared=100 \
         ./internal/terminal/tmux=100 \
         ./internal/workspace/git=98 \
         ./internal/workspace/jj=100 \

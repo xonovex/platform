@@ -1,7 +1,8 @@
-package tmux
+package shared
 
 import (
 	"fmt"
+	"io/fs"
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
@@ -51,16 +52,23 @@ func isShellReservedVariable(name string) bool {
 	}
 }
 
-// createLaunchScript writes a private, self-deleting script that installs the
+// ScriptHost is the port the launch script is written through.
+type ScriptHost interface {
+	CreateTemp(pattern string) (string, error)
+	WriteFile(path string, data []byte, perm fs.FileMode) error
+	Remove(path string) error
+}
+
+// LaunchScript writes a private, self-deleting script that installs the
 // requested environment before replacing itself with the agent command.
-func createLaunchScript(host Host, command []string, env []string) (string, error) {
+func LaunchScript(host ScriptHost, command []string, env []string) (string, error) {
 	if len(command) == 0 {
-		return "", fmt.Errorf("tmux command is required")
+		return "", fmt.Errorf("terminal command is required")
 	}
 
-	path, err := host.CreateTemp("xonovex-agent-tmux-*.sh")
+	path, err := host.CreateTemp("xonovex-agent-terminal-*.sh")
 	if err != nil {
-		return "", fmt.Errorf("create tmux launch script: %w", err)
+		return "", fmt.Errorf("create terminal launch script: %w", err)
 	}
 
 	var script strings.Builder
@@ -76,12 +84,21 @@ func createLaunchScript(host Host, command []string, env []string) (string, erro
 		script.WriteByte('\n')
 	}
 	script.WriteString("exec ")
-	script.WriteString(buildShellCommand(command))
+	script.WriteString(ShellCommand(command))
 	script.WriteByte('\n')
 
 	if err := host.WriteFile(path, []byte(script.String()), 0o600); err != nil {
 		_ = host.Remove(path)
-		return "", fmt.Errorf("write tmux launch script: %w", err)
+		return "", fmt.Errorf("write terminal launch script: %w", err)
 	}
 	return path, nil
+}
+
+// ShellCommand quotes each argument and joins them into one shell command.
+func ShellCommand(args []string) string {
+	quoted := make([]string, len(args))
+	for i, arg := range args {
+		quoted[i] = shell.Quote(arg)
+	}
+	return strings.Join(quoted, " ")
 }

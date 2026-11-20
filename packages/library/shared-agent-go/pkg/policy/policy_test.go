@@ -38,3 +38,33 @@ func TestEnforcePolicy(t *testing.T) {
 		})
 	}
 }
+
+func TestEvaluateReportsEveryGuarantee(t *testing.T) {
+	outcomes := Evaluate(Capabilities{Pinned: true, KernelIsolated: true}, SandboxPolicy{RequireHostToolsUnreachable: true, RequireEgressRestricted: true})
+	want := []struct {
+		guarantee Guarantee
+		required  bool
+		provided  bool
+		unmet     error
+	}{
+		{GuaranteePinnedProvision, false, true, nil},
+		{GuaranteeHostToolsUnreachable, true, false, ErrHostToolsReachable},
+		{GuaranteeEgressRestricted, true, false, ErrEgressUnrestricted},
+		{GuaranteeKernelIsolation, false, true, nil},
+	}
+	if len(outcomes) != len(want) {
+		t.Fatalf("Evaluate() returned %d outcomes, want %d", len(outcomes), len(want))
+	}
+	for index, outcome := range outcomes {
+		w := want[index]
+		if outcome.Guarantee != w.guarantee || outcome.Required != w.required || outcome.Provided != w.provided {
+			t.Errorf("outcome %d = %+v, want %+v", index, outcome, w)
+		}
+		if w.unmet == nil && (outcome.Err != nil || !outcome.Met()) {
+			t.Errorf("%s: Err = %v, Met = %v, want a met guarantee", outcome.Guarantee, outcome.Err, outcome.Met())
+		}
+		if w.unmet != nil && (!errors.Is(outcome.Err, w.unmet) || outcome.Met()) {
+			t.Errorf("%s: Err = %v, want errors.Is %v", outcome.Guarantee, outcome.Err, w.unmet)
+		}
+	}
+}

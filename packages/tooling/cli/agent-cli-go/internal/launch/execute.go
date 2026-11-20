@@ -5,6 +5,7 @@ import (
 	"io"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/egress"
 	wsp "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/workspace"
@@ -13,16 +14,23 @@ import (
 	credshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/credential/shared"
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
 )
 
-// Host is the port the executor consumes to locate the run: the working
-// directory, the home directory and the configuration file.
+// Host is the port the executor consumes to locate the run and to time it: the
+// working directory, the home directory, the configuration files and the clock.
 type Host interface {
 	config.Files
 	Getwd() (string, error)
+	Now() time.Time
+}
+
+// Recorder stores the record of a finished run and returns its id.
+type Recorder interface {
+	Write(record.Record) (string, error)
 }
 
 // EgressOpener starts the enforcement of a managed network run: the allowlist
@@ -46,7 +54,9 @@ type Dependencies struct {
 	// without credential stores, and a run that binds a credential then fails.
 	Credentials *credshared.Registry
 	// Overlays builds the artifact overlay; it may be nil for a build without one.
-	Overlays   Overlays
+	Overlays Overlays
+	// Records stores the run record; it may be nil for a build that keeps none.
+	Records    Recorder
 	Workspaces map[wsp.VCSType]wsshared.VCS
 	Terminals  map[termshared.TerminalType]termshared.TerminalExecutor
 }
@@ -57,45 +67,54 @@ type ExitError struct{ Code int }
 
 func (e ExitError) Error() string { return fmt.Sprintf("agent exited with code %d", e.Code) }
 
-// Execute plans the run from options and carries it out. Every check that can
-// fail runs before the checkout is created, and the sandbox command is built
-// before the dispatch, so a dry run, a terminal run and a direct run reject the
-// same invalid inputs.
+// Execute resolves the configuration layers and plans the run from options, then
+// carries it out. Every check that can fail runs before the checkout is created,
+// and the sandbox command is built before the dispatch, so a dry run, a terminal
+// run and a direct run reject the same invalid inputs. A run that is not a dry
+// run leaves a run record.
 func Execute(deps Dependencies, options Options) error {
-	file, err := config.Load(deps.Host, options.Config)
-	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
-	}
-	cwd, err := deps.Host.Getwd()
-	if err != nil {
-		return fmt.Errorf("resolve current working directory: %w", err)
-	}
-	home := file.HomeDir
-	if home == "" {
-		if home, err = deps.Host.UserHomeDir(); err != nil {
-			return fmt.Errorf("resolve user home directory: %w", err)
-		}
-	}
-
-	plan, err := NewPlan(options, file, cwd, home, deps.Sandboxes)
+	res, err := resolve(deps, options, false)
 	if err != nil {
 		return err
 	}
+	if res.planErr != nil {
+		return res.planErr
+	}
+	started := deps.Host.Now()
+	result, err := carryOut(deps, res)
+	if !res.plan.DryRun {
+		writeRecord(deps, res, started, result, err)
+	}
+	return err
+}
+
+// outcome is what a run did: whether the agent, or its terminal wrapper, ran to an
+// exit code, that code, and the sources of the overlay.
+type outcome struct {
+	started bool
+	code    int
+	overlay []OverlaySource
+}
+
+// carryOut runs the plan. Its outcome is meaningful even when it returns an error.
+func carryOut(deps Dependencies, res resolution) (outcome, error) {
+	plan := res.plan
+	var result outcome
 	if available, err := plan.Isolator.Available(); err != nil || !available {
-		return fmt.Errorf("isolation method %s is not available; available isolations: %v", plan.IsolationName, sandbox.AvailableIsolations(deps.Sandboxes))
+		return result, fmt.Errorf("isolation method %s is not available; available isolations: %v", plan.IsolationName, sandbox.AvailableIsolations(deps.Sandboxes))
 	}
 	terminal, err := selectTerminal(deps.Terminals, plan.Terminal)
 	if err != nil {
-		return err
+		return result, err
 	}
 	vcs, err := selectWorkspace(deps.Workspaces, plan.Checkout)
 	if err != nil {
-		return err
+		return result, err
 	}
 
 	overlayResult, err := prepareOverlay(deps.Overlays, plan)
 	if err != nil {
-		return err
+		return result, err
 	}
 	// A terminal session outlives this process, so its overlay stays on disk.
 	keepOverlay := false
@@ -105,15 +124,16 @@ func Execute(deps Dependencies, options Options) error {
 		}
 	}()
 
+	result.overlay = overlayResult.Sources
 	run := applyOverlay(plan.Run, overlayResult)
 	run.Secrets, err = credentialValues(deps.Credentials, plan)
 	if err != nil {
-		return err
+		return result, err
 	}
 	if plan.Run.Network == netshared.ModeManaged {
 		route, stop, err := openEgress(deps.Egress, plan)
 		if err != nil {
-			return err
+			return result, err
 		}
 		defer stop()
 		run.Egress = route
@@ -121,38 +141,37 @@ func Execute(deps Dependencies, options Options) error {
 	if vcs != nil && !plan.DryRun {
 		dir, err := vcs.Setup(plan.Checkout.Config, plan.SourceDir, plan.Verbose)
 		if err != nil {
-			return err
+			return result, err
 		}
 		run.WorkDir = dir
 	}
 
 	contribution, err := plan.Provisioner.Contribute(plan.Provision)
 	if err != nil {
-		return err
+		return result, err
 	}
 	handled, err := plan.Provisioner.CheckAgent(contribution, plan.Agent)
 	if err != nil {
-		return err
+		return result, err
 	}
 	if !handled {
 		if err := plan.Isolator.CheckAgent(run); err != nil {
-			return err
+			return result, err
 		}
 	}
 	command, err := plan.Isolator.Command(run, contribution)
 	if err != nil {
-		return fmt.Errorf("prepare sandbox command: %w", err)
+		return result, fmt.Errorf("prepare sandbox command: %w", err)
 	}
 
 	if plan.DryRun {
-		return printDryRun(deps.Log, deps.Out, plan, overlayResult, command)
+		return result, printDryRun(deps.Log, deps.Out, plan, overlayResult, res.config.Provenance(), command)
 	}
 
-	var code int
 	if terminal != nil {
 		fullCommand, env, err := plan.Isolator.TerminalCommand(run, contribution)
 		if err != nil {
-			return fmt.Errorf("prepare terminal command: %w", err)
+			return result, fmt.Errorf("prepare terminal command: %w", err)
 		}
 		if plan.Verbose {
 			deps.Log.Info("Using terminal wrapper: " + string(plan.Terminal.Type))
@@ -161,20 +180,17 @@ func Execute(deps Dependencies, options Options) error {
 			keepOverlay = true
 			deps.Log.Info("The overlay stays at " + overlayResult.Root + " while the terminal session runs; remove it afterwards")
 		}
-		code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.WorkDir)
-		if err != nil {
-			return err
+		if result.code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.WorkDir); err != nil {
+			return result, err
 		}
-	} else {
-		code, err = plan.Isolator.Run(run, contribution)
-		if err != nil {
-			return err
-		}
+	} else if result.code, err = plan.Isolator.Run(run, contribution); err != nil {
+		return result, err
 	}
-	if code != 0 {
-		return ExitError{Code: code}
+	result.started = true
+	if result.code != 0 {
+		return result, ExitError{Code: result.code}
 	}
-	return nil
+	return result, nil
 }
 
 // credentialValues resolves the credential bindings of the run. A dry run
@@ -255,7 +271,7 @@ func selectWorkspace(workspaces map[wsp.VCSType]wsshared.VCS, checkout *Checkout
 }
 
 // printDryRun reports the run and writes the sandbox command line to out.
-func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayResult, command []string) error {
+func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayResult, provenance, command []string) error {
 	log.Info("Dry run - would execute:")
 	log.Info("  Agent: " + plan.Agent.DisplayName)
 	log.Info("  Protocol: " + describeProtocol(plan.Agent))
@@ -272,6 +288,7 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 	}
 	logOverlay(log, overlay)
 	logNetwork(log, plan)
+	logProvenance(log, provenance)
 	if len(command) == 0 {
 		return nil
 	}
@@ -279,6 +296,18 @@ func printDryRun(log logging.Logger, out io.Writer, plan Plan, overlay OverlayRe
 		return fmt.Errorf("write dry run: %w", err)
 	}
 	return nil
+}
+
+// logProvenance reports, one line per configuration value, the layer that decided
+// it.
+func logProvenance(log logging.Logger, provenance []string) {
+	if len(provenance) == 0 {
+		return
+	}
+	log.Info("  Configuration:")
+	for _, line := range provenance {
+		log.Info("    " + line)
+	}
 }
 
 // logNetwork reports the network mode, the allowed hosts and the credential

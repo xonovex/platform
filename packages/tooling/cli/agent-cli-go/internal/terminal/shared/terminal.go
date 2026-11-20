@@ -5,8 +5,9 @@ package shared
 type TerminalType string
 
 const (
-	TerminalNone TerminalType = ""
-	TerminalTmux TerminalType = "tmux"
+	TerminalNone  TerminalType = ""
+	TerminalTmux  TerminalType = "tmux"
+	TerminalHerdr TerminalType = "herdr"
 )
 
 // TerminalConfig holds terminal wrapper configuration.

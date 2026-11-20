@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.xonovex.com/agent-cli/run-record.schema.json",
+  "title": "agent-cli run record",
+  "description": "One run of agent-cli: what ran, on which axes, under which guarantees. It holds credential names and never their values.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "startedAt",
+    "endedAt",
+    "status",
+    "agent",
+    "axes",
+    "guarantees",
+    "overlay",
+    "credentials",
+    "workDir",
+    "config"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "id": {"type": "string", "pattern": "^[0-9]{8}T[0-9]{6}Z(-[0-9]+)?$"},
+    "startedAt": {"type": "string", "format": "date-time"},
+    "endedAt": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["exited", "failed-to-start"]},
+    "exitCode": {
+      "type": "integer",
+      "description": "Exit code of the agent, or of the terminal wrapper when the run used one."
+    },
+    "error": {"type": "string"},
+    "agent": {
+      "type": "object",
+      "required": ["name", "versionProbe"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "versionProbe": {
+          "type": "string",
+          "description": "Command line that prints the agent version."
+        },
+        "provider": {"type": "string"}
+      }
+    },
+    "axes": {
+      "type": "object",
+      "required": ["isolation", "provision", "network", "workspace"],
+      "additionalProperties": false,
+      "properties": {
+        "isolation": {"type": "string", "minLength": 1},
+        "provision": {"type": "string", "minLength": 1},
+        "network": {"type": "string", "minLength": 1},
+        "workspace": {
+          "type": "object",
+          "required": ["mode"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": {"enum": ["in-place", "checkout"]},
+            "vcs": {"type": "string"},
+            "branch": {"type": "string"}
+          }
+        },
+        "terminal": {"type": "string"}
+      }
+    },
+    "guarantees": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "required", "provided"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"},
+          "provided": {"type": "boolean"}
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "required": ["plugins", "directories"],
+      "additionalProperties": false,
+      "properties": {
+        "plugins": {"type": "array", "items": {"$ref": "#/$defs/digest"}},
+        "directories": {"type": "array", "items": {"$ref": "#/$defs/digest"}}
+      }
+    },
+    "credentials": {
+      "type": "array",
+      "description": "Names of the environment variables that received a credential. Never the values.",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "workDir": {"type": "string"},
+    "config": {
+      "type": "object",
+      "required": ["sources", "decided"],
+      "additionalProperties": false,
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["layer"],
+            "additionalProperties": false,
+            "properties": {
+              "layer": {"enum": ["managed", "user", "project", "flags"]},
+              "path": {"type": "string"}
+            }
+          }
+        },
+        "decided": {
+          "type": "object",
+          "description": "For each configuration key, the layers that decided its value.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {"enum": ["managed", "user", "project", "flags"]}
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "exited"}}},
+      "then": {"required": ["exitCode"]}
+    },
+    {
+      "if": {"properties": {"status": {"const": "failed-to-start"}}},
+      "then": {"required": ["error"], "not": {"required": ["exitCode"]}}
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "object",
+      "required": ["name", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

@@ -99,38 +99,59 @@ type Request struct {
 	HasCustomBinds bool
 }
 
-// Select resolves the isolator and provisioner for a request and enforces the
-// policy fail-closed. Registry membership is the validity check; the resolved
-// plugins declare their own capabilities, so the policy engine never names a
-// concrete isolator or provisioner. A network mode that needs confinement
-// fails for an isolator that cannot confine the network, and a managed run fails
-// for an isolator that declares no egress transport, whatever the policy.
-func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (isoshared.Isolator, provshared.Provisioner, error) {
+// Choice is the sandbox a Request resolves to: the isolator and the provisioner
+// with the guarantees they establish together for that request.
+type Choice struct {
+	Isolator     isoshared.Isolator
+	Provisioner  provshared.Provisioner
+	Capabilities policy.Capabilities
+}
+
+// Evaluate resolves the isolator and provisioner for a request and computes the
+// guarantees they establish, without demanding any. Registry membership is the
+// validity check; the resolved plugins declare their own capabilities, so this
+// layer never names a concrete isolator or provisioner. A network mode that needs
+// confinement fails for an isolator that cannot confine the network, and a managed
+// run fails for an isolator that declares no egress transport, whatever the policy.
+func Evaluate(reg *Registry, req Request) (Choice, error) {
 	iso, err := reg.Isolator(req.Isolation)
 	if err != nil {
-		return nil, nil, err
+		return Choice{}, err
 	}
 	prov, err := reg.Provisioner(req.Provision)
 	if err != nil {
-		return nil, nil, err
+		return Choice{}, err
 	}
 	if netshared.NeedsConfinement(req.Network) && !iso.ConfinesNetwork() {
-		return nil, nil, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
+		return Choice{}, fmt.Errorf("isolation=%s cannot restrict network egress (network=%q); select an isolation that confines the network", req.Isolation, req.Network)
 	}
 	transport := iso.EgressTransport()
 	if err := netshared.CheckManaged(req.Network, transport); err != nil {
-		return nil, nil, fmt.Errorf("isolation=%s: %w", req.Isolation, err)
+		return Choice{}, fmt.Errorf("isolation=%s: %w", req.Isolation, err)
 	}
-	caps := policy.Capabilities{
-		Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
-		HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
-		EgressRestricted:     netshared.EgressRestricted(req.Network, transport),
-		KernelIsolated:       iso.KernelIsolated(req.Runtime),
+	return Choice{
+		Isolator:    iso,
+		Provisioner: prov,
+		Capabilities: policy.Capabilities{
+			Pinned:               iso.PinnedProvision(req.Provision, prov.Pinned(), req.Image),
+			HostToolsUnreachable: iso.HidesHost(req.Passthrough, req.Image) && !req.HasCustomBinds,
+			EgressRestricted:     netshared.EgressRestricted(req.Network, transport),
+			KernelIsolated:       iso.KernelIsolated(req.Runtime),
+		},
+	}, nil
+}
+
+// Select resolves the choice of a request and enforces the policy fail-closed:
+// it refuses a request whose guarantees fall short of what the policy demands.
+func Select(reg *Registry, req Request, pol policy.SandboxPolicy) (Choice, error) {
+	choice, err := Evaluate(reg, req)
+	if err != nil {
+		return Choice{}, err
 	}
-	if err := policy.EnforcePolicy(caps, pol); err != nil {
-		return nil, nil, err
+	if err := policy.EnforcePolicy(choice.Capabilities, pol); err != nil {
+		return Choice{}, err
 	}
-	return iso, prov, nil
+	return choice, nil
 }
 
 // AvailableIsolations returns the registered isolation methods whose isolator is

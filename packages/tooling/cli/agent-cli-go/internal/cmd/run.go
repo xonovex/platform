@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -9,6 +10,7 @@ import (
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/agents"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/providers"
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/types"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/config"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/launch"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 )
@@ -16,15 +18,7 @@ import (
 // newRunCommand binds the run flags into launch.Options and executes them
 // through deps.
 func newRunCommand(deps launch.Dependencies) *cobra.Command {
-	options := launch.Options{
-		Agent:     "claude",
-		Isolation: "none",
-		Provision: "none",
-		Network:   "host",
-		NixSource: "packages",
-		NixShell:  "default",
-		VCS:       "git",
-	}
+	options := defaultOptions()
 	cmd := &cobra.Command{
 		Use:   "run [agent-args...]",
 		Short: "Run an AI coding agent",
@@ -32,8 +26,7 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			run := options
 			run.Verbose, _ = cmd.Flags().GetBool("verbose")
-			run.IsolationSet = cmd.Flags().Changed("isolation")
-			run.ProvisionSet = cmd.Flags().Changed("provision")
+			run.Explicit = chosenKeys(cmd)
 			run.AgentArgs = args
 			err := launch.Execute(deps, run)
 			// The agent reported its own failure; the CLI passes on only the code.
@@ -46,6 +39,45 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 		},
 	}
 
+	bindRunFlags(cmd, &options, deps)
+	cmd.Flags().BoolVarP(&options.DryRun, "dry-run", "n", false, "Show configuration without executing")
+	return cmd
+}
+
+// defaultOptions are the options a run holds before any flag or layer changes
+// them.
+func defaultOptions() launch.Options {
+	return launch.Options{
+		Agent:     "claude",
+		Isolation: "none",
+		Provision: "none",
+		Network:   "host",
+		NixSource: "packages",
+		NixShell:  "default",
+		VCS:       "git",
+	}
+}
+
+// chosenKeys are the configuration keys whose flags the user set. A flag that
+// keeps its default must yield to the file layers.
+func chosenKeys(cmd *cobra.Command) config.Keys {
+	chosen := config.Keys{}
+	for flag, key := range map[string]config.Key{
+		"agent":     config.KeyAgent,
+		"isolation": config.KeyIsolation,
+		"provision": config.KeyProvision,
+		"network":   config.KeyNetwork,
+	} {
+		if cmd.Flags().Changed(flag) {
+			chosen[key] = struct{}{}
+		}
+	}
+	return chosen
+}
+
+// bindRunFlags binds the flags that describe a run, which `run` and `preflight`
+// share, into options and registers their completions.
+func bindRunFlags(cmd *cobra.Command, options *launch.Options, deps launch.Dependencies) {
 	flags := cmd.Flags()
 	// Bare axis selectors.
 	flags.StringVarP(&options.Agent, "agent", "a", options.Agent, "Agent to run ("+strings.Join(agentNames(), ", ")+")")
@@ -78,12 +110,11 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	flags.StringSliceVar(&options.OverlayDirs, "overlay-dir", nil, "Directory of skills, agents, commands and AGENTS.md to overlay on the run (repeatable)")
 	flags.StringVar(&options.Store, "store", "", "Plugin store directory (default: $XDG_DATA_HOME/agent-cli/plugins)")
 	flags.StringSliceVar(&options.CustomEnv, "env", nil, "Environment variables (KEY=VALUE)")
-	flags.StringVarP(&options.Terminal, "terminal", "t", "", "Terminal wrapper (tmux)")
-	flags.StringVar(&options.TerminalSession, "terminal-session", "", "Custom tmux session name")
-	flags.StringVar(&options.TerminalWindow, "terminal-window", "", "Custom tmux window name")
-	flags.BoolVar(&options.TerminalDetach, "terminal-detach", false, "Run in background (detach from terminal)")
+	flags.StringVarP(&options.Terminal, "terminal", "t", "", "Terminal wrapper (tmux, herdr)")
+	flags.StringVar(&options.TerminalSession, "terminal-session", "", "Custom tmux session name (tmux only)")
+	flags.StringVar(&options.TerminalWindow, "terminal-window", "", "Custom tmux window name (tmux only)")
+	flags.BoolVar(&options.TerminalDetach, "terminal-detach", false, "Run in background (detach from terminal; herdr keeps the focus where it is)")
 	flags.StringVar(&options.VCS, "vcs", options.VCS, "VCS type for worktree (git, jj)")
-	flags.BoolVarP(&options.DryRun, "dry-run", "n", false, "Show configuration without executing")
 
 	// Independent policy guarantees.
 	flags.BoolVar(&options.Policy.RequirePinnedProvision, "require-pinned-provision", false,
@@ -109,11 +140,12 @@ func newRunCommand(deps launch.Dependencies) *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc("network", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 		return []string{string(netshared.ModeHost), string(netshared.ModeNone), string(netshared.ModeManaged)}, cobra.ShellCompDirectiveNoFileComp
 	})
+	_ = cmd.RegisterFlagCompletionFunc("terminal", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+		return terminalNames(deps), cobra.ShellCompDirectiveNoFileComp
+	})
 	_ = cmd.RegisterFlagCompletionFunc("credential", func(_ *cobra.Command, _ []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return credentialCandidates(deps, toComplete), cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
 	})
-
-	return cmd
 }
 
 // isolationNames lists the isolations the build registers.
@@ -125,6 +157,16 @@ func isolationNames(deps launch.Dependencies) []string {
 	for _, method := range deps.Sandboxes.IsolationMethods() {
 		names = append(names, string(method))
 	}
+	return names
+}
+
+// terminalNames lists the terminal wrappers the build registers.
+func terminalNames(deps launch.Dependencies) []string {
+	names := make([]string, 0, len(deps.Terminals))
+	for name := range deps.Terminals {
+		names = append(names, string(name))
+	}
+	sort.Strings(names)
 	return names
 }
 

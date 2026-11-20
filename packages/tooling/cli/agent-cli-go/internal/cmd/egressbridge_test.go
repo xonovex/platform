@@ -16,7 +16,7 @@ func TestEgressBridgeCommandIsHiddenAndPassesItsArguments(t *testing.T) {
 	if r.bridge.socket != "/run/p.sock" || r.bridge.listen != "127.0.0.1:3128" || !slices.Equal(r.bridge.command, []string{"agent", "--flag"}) {
 		t.Errorf("bridge = %+v", r.bridge)
 	}
-	root := NewRootCommand(r.deps, r.ports, r.bridge)
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	found, _, err := root.Find([]string{"egress-bridge"})
 	if err != nil || !found.Hidden {
 		t.Errorf("egress-bridge must be a hidden command: %v, %v", found, err)

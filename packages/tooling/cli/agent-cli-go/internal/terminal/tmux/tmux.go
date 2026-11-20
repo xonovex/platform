@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/logging"
-	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/shell"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
@@ -69,7 +68,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 		windowName = generateWindowName(workDir, getGitInfo(e.host, workDir))
 	}
 
-	launchScript, err := createLaunchScript(e.host, command, env)
+	launchScript, err := termshared.LaunchScript(e.host, command, env)
 	if err != nil {
 		return 1, err
 	}
@@ -228,13 +227,4 @@ func (e *Executor) attachSession(sessionName string) (int, error) {
 	e.log.Debug("Attaching to tmux session: " + sessionName)
 
 	return e.host.Run("tmux", args, nil, "")
-}
-
-// buildShellCommand builds a shell command from arguments
-func buildShellCommand(args []string) string {
-	quoted := make([]string, len(args))
-	for i, arg := range args {
-		quoted[i] = shell.Quote(arg)
-	}
-	return strings.Join(quoted, " ")
 }

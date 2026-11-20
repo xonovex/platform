@@ -9,6 +9,7 @@ import (
 	isoshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/isolation/shared"
 	netshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/network/shared"
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
+	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/record"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 	wsshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/workspace/shared"
@@ -140,4 +141,15 @@ func newTestSandbox() testSandbox {
 		RegisterProvisioner(provision.ProvisionCommand, func() provshared.Provisioner { return prov }).
 		RegisterProvisioner(provision.ProvisionNix, func() provshared.Provisioner { return pinned })
 	return testSandbox{isolator: iso, provisioner: prov, registry: registry}
+}
+
+// fakeRecorder keeps the records it is given.
+type fakeRecorder struct {
+	records []record.Record
+	err     error
+}
+
+func (f *fakeRecorder) Write(r record.Record) (string, error) {
+	f.records = append(f.records, r)
+	return "20261120T120000Z", f.err
 }

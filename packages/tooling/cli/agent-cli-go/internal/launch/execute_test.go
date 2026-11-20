@@ -23,6 +23,7 @@ type executeFixture struct {
 	sandbox  testSandbox
 	vcs      *fakeVCS
 	terminal *fakeTerminal
+	records  *fakeRecorder
 	out      bytes.Buffer
 	log      bytes.Buffer
 }
@@ -35,6 +36,7 @@ func newExecuteFixture() *executeFixture {
 		sandbox:  newTestSandbox(),
 		vcs:      &fakeVCS{dir: "/work/created"},
 		terminal: &fakeTerminal{},
+		records:  &fakeRecorder{},
 	}
 }
 
@@ -44,6 +46,7 @@ func (f *executeFixture) deps() Dependencies {
 		Log:        logging.New(&f.log, &f.log, false, false),
 		Out:        &f.out,
 		Sandboxes:  f.sandbox.registry,
+		Records:    f.records,
 		Workspaces: map[wsp.VCSType]wsshared.VCS{wsp.VCSGit: f.vcs},
 		Terminals:  map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: f.terminal},
 	}

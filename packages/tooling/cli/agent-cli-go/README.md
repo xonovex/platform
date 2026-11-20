@@ -37,6 +37,17 @@ agent-cli run --worktree-branch feature/my-feature
 
 # Run with terminal wrapper
 agent-cli run -t tmux
+agent-cli run -t herdr --terminal-detach
+
+# Check that a run could start, without starting it
+agent-cli preflight --isolation bwrap --require-kernel-isolation
+
+# Read the record of a past run
+agent-cli runs list
+agent-cli runs show latest --json
+
+# Print a JSON Schema
+agent-cli schema config
 ```
 
 ## Commands
@@ -69,7 +80,7 @@ Options:
   --require-kernel-isolation   Require a kernel-isolating runtime such as runsc
   -w, --work-dir <dir>         Working directory
   --worktree-branch <branch>   Create worktree with branch
-  -t, --terminal <wrapper>     Terminal wrapper: tmux
+  -t, --terminal <wrapper>     Terminal wrapper: tmux, herdr
   -c, --config <file>          Load configuration from file
   --plugin <name>              Overlay an installed plugin on the run (repeatable)
   --overlay-dir <dir>          Overlay a directory of skills, agents, commands and AGENTS.md (repeatable)
@@ -116,7 +127,7 @@ The proxy refuses a host name that resolves to a loopback, private or link-local
 | `secret-service` | `service` or `service/account` | A Linux secret service, through `secret-tool`. |
 | `pass` | entry name | The first line of a `pass` entry. |
 
-A terminal wrapper (`--terminal tmux`) installs the environment through a private launch script that deletes itself, so a credential reaches the terminal session through that script.
+A terminal wrapper (`--terminal tmux` or `--terminal herdr`) installs the environment through a private launch script that deletes itself, so a credential reaches the terminal session through that script.
 
 ### Agents
 
@@ -158,6 +169,38 @@ Each agent declares its facts, and the planner and the isolators compare those f
 - The overlay directory is removed when the run ends. A run with `--terminal` keeps it for the terminal session, and the CLI prints its path.
 - The overlay changes none of the four `--require-*` guarantees: the mount holds only the files of the plugins.
 
+### Terminals
+
+| Terminal | Runs the agent in | Notes |
+| --- | --- | --- |
+| `tmux` | a tmux session and window | `--terminal-session` and `--terminal-window` name them. The run attaches unless `--terminal-detach` is set. |
+| `herdr` | a pane beside the current herdr pane | Needs the CLI to run in a herdr pane (`HERDR_ENV=1`). It never attaches to a herdr session the CLI does not run in. `--terminal-detach` keeps the focus where it is. The command returns when herdr has accepted the command, not when the agent ends, so the run record shows exit code 0. |
+
+### preflight
+
+Use `preflight` to resolve a run and report whether it could start. It takes the flags of `run` that describe a run and the same configuration layers, and it starts nothing, reads no credential and writes no overlay.
+
+```
+agent-cli preflight [run flags] [--json]
+```
+
+The report lists each axis choice with the layer that made it, each guarantee with the reason it holds or fails, and each check of the host: the isolation tool, the terminal, the version control, the credential stores and the plugins of the overlay. Exit code 0 means the run could start, 1 means it could not, and 2 means the command line was wrong.
+
+### runs
+
+Every run that is not a dry run leaves a JSON record in `$XDG_STATE_HOME/agent-cli/runs` (default `~/.local/state/agent-cli/runs`), readable by its owner only. A record holds the agent and its version probe, the choice on each axis, each guarantee with its outcome, the digest of each plugin and overlay directory, the names of the credentials, the work directory, the exit code and the layers that decided each configuration key. It never holds a credential value. A run that fails before the agent starts leaves a record with the error and no exit code.
+
+```
+agent-cli runs list [--json]
+agent-cli runs show <id|latest> [--json]
+```
+
+A store that cannot be written costs the run its record and never its result: the CLI prints a warning.
+
+### schema
+
+Use `schema` to print a JSON Schema (draft 2020-12): `agent-cli schema config` for the configuration file and `agent-cli schema run-record` for a run record. `agent-cli schema` lists the names.
+
 ### plugin
 
 Use `plugin` to manage the plugins that a run can overlay. A plugin is a directory with a manifest (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` or `plugin.json`) and any of `skills/`, `agents/`, `commands/` and `AGENTS.md`.
@@ -189,7 +232,7 @@ agent-cli marketplace remove <name>
 
 ### completion
 
-Use `completion` to generate a completion script for the current shell. It completes agents, providers, isolations, network modes and `--credential` schemes.
+Use `completion` to generate a completion script for the current shell. It completes agents, providers, isolations, network modes, terminals, `--credential` schemes, schema names and run ids.
 
 ```bash
 # Bash
@@ -204,10 +247,26 @@ agent-cli completion fish | source
 
 ## Configuration
 
-Create a YAML, JSON, or TOML file when run defaults must be reusable. File values provide defaults. Repeated command-line bind and environment flags append to their file equivalents.
+Create a YAML, JSON, or TOML file when run defaults must be reusable. The CLI merges up to four layers, and `--dry-run` and `preflight` show which layer decided each value.
+
+| Layer | Where | Role |
+| --- | --- | --- |
+| managed | `managed.yaml`, `managed.yml` or `managed.toml` in `/etc/agent-cli` (`/Library/Application Support/agent-cli` on macOS, `%ProgramData%\agent-cli` on Windows) | An administrator sets a value that no other layer can change. The CLI refuses a file that group or others can write. |
+| user | `~/.config/sandboxed-claude/config` or the file of `--config` | The defaults of the user. |
+| project | `.agent-cli.yaml`, `.agent-cli.yml` or `.agent-cli.toml` in the work directory | The defaults of a repository. It can set only keys that cannot widen access: `agent`, `provider` and the four `require*` keys. |
+| flags | the command line | The choice of one run. |
+
+Each key has one merge rule, listed by `agent-cli schema config`:
+
+- `replace` (`agent`, `provider`, `isolation`, `provision`, `network`, `homeDir`): the managed value wins, then the flag, then the project, then the user. A flag that contradicts a managed value is an error.
+- `append` (`bindPaths`, `roBindPaths`, `customEnv`, `allowHosts`, `credentials`): the items of every layer join, user first and managed last, without duplicates.
+- `require` (`requirePinnedProvision`, `requireHostToolsUnreachable`, `requireEgressRestricted`, `requireKernelIsolation`): a guarantee that any layer demands stays demanded.
 
 ```yaml
+agent: claude
 provider: gemini
+isolation: bwrap
+network: managed
 homeDir: /home/user
 bindPaths:
   - /home/user/projects
@@ -220,9 +279,10 @@ allowHosts:
   - '*.example.com:8443'
 credentials:
   - ANTHROPIC_API_KEY=keychain:anthropic/work
+requireEgressRestricted: true
 ```
 
-Load the file with `--config`.
+Load a user file with `--config`.
 
 ```bash
 agent-cli run -c config.yaml

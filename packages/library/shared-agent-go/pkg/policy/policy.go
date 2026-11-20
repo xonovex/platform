@@ -63,21 +63,64 @@ type SandboxPolicy struct {
 	RequireKernelIsolation bool
 }
 
+// Guarantee names one isolation guarantee a policy can demand.
+type Guarantee string
+
+// The guarantees of a sandbox, in the order EnforcePolicy checks them.
+const (
+	GuaranteePinnedProvision      Guarantee = "pinned-provision"
+	GuaranteeHostToolsUnreachable Guarantee = "host-tools-unreachable"
+	GuaranteeEgressRestricted     Guarantee = "egress-restricted"
+	GuaranteeKernelIsolation      Guarantee = "kernel-isolation"
+)
+
+// Outcome is the evaluation of one guarantee: whether the policy demands it,
+// whether the selected sandbox provides it, and why a demand is unmet.
+type Outcome struct {
+	Guarantee Guarantee
+	// Required reports that the policy demands the guarantee.
+	Required bool
+	// Provided reports that the selected sandbox establishes the guarantee.
+	Provided bool
+	// Err is the named policy error of a demand that is not provided, nil
+	// otherwise. It carries the reason.
+	Err error
+}
+
+// Met reports that the policy holds for the guarantee: it is provided, or the
+// policy does not demand it.
+func (o Outcome) Met() bool { return !o.Required || o.Provided }
+
+// Evaluate reports every guarantee against the capabilities, in the order
+// EnforcePolicy checks them. It reports a demand that is not provided in Err and
+// never stops at the first one.
+func Evaluate(caps Capabilities, pol SandboxPolicy) []Outcome {
+	outcomes := []Outcome{
+		{Guarantee: GuaranteePinnedProvision, Required: pol.RequirePinnedProvision, Provided: caps.Pinned,
+			Err: fmt.Errorf("provisioning is not pinned (require-pinned-provision needs nix or a pinned image): %w", ErrPinnedProvisionUnmet)},
+		{Guarantee: GuaranteeHostToolsUnreachable, Required: pol.RequireHostToolsUnreachable, Provided: caps.HostToolsUnreachable,
+			Err: fmt.Errorf("the selected isolation leaves host tools reachable: %w", ErrHostToolsReachable)},
+		{Guarantee: GuaranteeEgressRestricted, Required: pol.RequireEgressRestricted, Provided: caps.EgressRestricted,
+			Err: fmt.Errorf("the network method does not restrict egress (require-egress-restricted needs none, or managed on an isolator that forces the allowlist): %w", ErrEgressUnrestricted)},
+		{Guarantee: GuaranteeKernelIsolation, Required: pol.RequireKernelIsolation, Provided: caps.KernelIsolated,
+			Err: fmt.Errorf("the selected isolation gives no kernel boundary (require-kernel-isolation needs docker --runtime runsc/gVisor or a sandboxed runtimeClass): %w", ErrKernelIsolationUnmet)},
+	}
+	for index := range outcomes {
+		if outcomes[index].Met() {
+			outcomes[index].Err = nil
+		}
+	}
+	return outcomes
+}
+
 // EnforcePolicy validates the provided capabilities against the demanded
 // guarantees, failing CLOSED: it returns a distinct named error (wrapped with
 // context) for the first unmet guarantee and never silently downgrades.
 func EnforcePolicy(caps Capabilities, pol SandboxPolicy) error {
-	if pol.RequirePinnedProvision && !caps.Pinned {
-		return fmt.Errorf("provisioning is not pinned (require-pinned-provision needs nix or a pinned image): %w", ErrPinnedProvisionUnmet)
-	}
-	if pol.RequireHostToolsUnreachable && !caps.HostToolsUnreachable {
-		return fmt.Errorf("the selected isolation leaves host tools reachable: %w", ErrHostToolsReachable)
-	}
-	if pol.RequireEgressRestricted && !caps.EgressRestricted {
-		return fmt.Errorf("the network method does not restrict egress (require-egress-restricted needs none, or managed on an isolator that forces the allowlist): %w", ErrEgressUnrestricted)
-	}
-	if pol.RequireKernelIsolation && !caps.KernelIsolated {
-		return fmt.Errorf("the selected isolation gives no kernel boundary (require-kernel-isolation needs docker --runtime runsc/gVisor or a sandboxed runtimeClass): %w", ErrKernelIsolationUnmet)
+	for _, outcome := range Evaluate(caps, pol) {
+		if outcome.Err != nil {
+			return outcome.Err
+		}
 	}
 	return nil
 }

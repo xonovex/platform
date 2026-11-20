@@ -11,9 +11,11 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 func newTestSystem(stdin string) (System, *bytes.Buffer, *bytes.Buffer) {
@@ -257,5 +259,28 @@ func TestExecutableReturnsTheTestBinary(t *testing.T) {
 	path, err := s.Executable()
 	if err != nil || !filepath.IsAbs(path) {
 		t.Errorf("Executable() = %q, %v", path, err)
+	}
+}
+
+func TestNowAndTheManagedConfigDirectory(t *testing.T) {
+	s, _, _ := newTestSystem("")
+
+	if drift := time.Since(s.Now()); drift < -time.Minute || drift > time.Minute {
+		t.Errorf("Now() is %v away from the clock", drift)
+	}
+	dir := s.ManagedConfigDir()
+	switch runtime.GOOS {
+	case "darwin":
+		if dir != "/Library/Application Support/agent-cli" {
+			t.Errorf("ManagedConfigDir() = %q", dir)
+		}
+	case "windows":
+		if filepath.Base(dir) != "agent-cli" {
+			t.Errorf("ManagedConfigDir() = %q", dir)
+		}
+	default:
+		if dir != "/etc/agent-cli" {
+			t.Errorf("ManagedConfigDir() = %q", dir)
+		}
 	}
 }

@@ -73,18 +73,35 @@ func bwrapNixReq() Request {
 
 func TestSelect_ResolvesRegisteredPlugins(t *testing.T) {
 	reg := testRegistry(fakeIsolator{available: true, hidesHost: true}, fakeProvisioner{pinned: true})
-	iso, prov, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{})
-	if err != nil || iso == nil || prov == nil {
-		t.Fatalf("Select = (%v, %v, %v), want non-nil plugins", iso, prov, err)
+	choice, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{})
+	if err != nil || choice.Isolator == nil || choice.Provisioner == nil {
+		t.Fatalf("Select = (%v, %v), want non-nil plugins", choice, err)
+	}
+}
+
+func TestEvaluate_ReportsGuaranteesWithoutDemandingThem(t *testing.T) {
+	reg := testRegistry(fakeIsolator{available: true, hidesHost: true}, fakeProvisioner{pinned: true})
+	choice, err := Evaluate(reg, bwrapNixReq())
+	if err != nil {
+		t.Fatalf("Evaluate() error = %v", err)
+	}
+	if !choice.Capabilities.Pinned || !choice.Capabilities.HostToolsUnreachable || choice.Capabilities.KernelIsolated {
+		t.Errorf("Capabilities = %+v, want pinned and host tools unreachable, no kernel boundary", choice.Capabilities)
+	}
+	if _, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{RequireKernelIsolation: true}); !errors.Is(err, policy.ErrKernelIsolationUnmet) {
+		t.Errorf("Select(require kernel isolation) error = %v, want %v", err, policy.ErrKernelIsolationUnmet)
+	}
+	if _, err := Evaluate(reg, Request{Isolation: "firejail", Provision: provision.ProvisionNix}); !errors.Is(err, ErrNoIsolator) {
+		t.Errorf("Evaluate(unregistered) error = %v, want %v", err, ErrNoIsolator)
 	}
 }
 
 func TestSelect_UnregisteredFailsClosed(t *testing.T) {
 	reg := testRegistry(fakeIsolator{}, fakeProvisioner{})
-	if _, _, err := Select(reg, Request{Isolation: "firejail", Provision: provision.ProvisionNix}, policy.SandboxPolicy{}); !errors.Is(err, ErrNoIsolator) {
+	if _, err := Select(reg, Request{Isolation: "firejail", Provision: provision.ProvisionNix}, policy.SandboxPolicy{}); !errors.Is(err, ErrNoIsolator) {
 		t.Errorf("unregistered isolation err = %v, want ErrNoIsolator", err)
 	}
-	if _, _, err := Select(reg, Request{Isolation: isolation.IsolationBwrap, Provision: "apt"}, policy.SandboxPolicy{}); !errors.Is(err, ErrNoProvisioner) {
+	if _, err := Select(reg, Request{Isolation: isolation.IsolationBwrap, Provision: "apt"}, policy.SandboxPolicy{}); !errors.Is(err, ErrNoProvisioner) {
 		t.Errorf("unregistered provision err = %v, want ErrNoProvisioner", err)
 	}
 }
@@ -109,7 +126,7 @@ func TestSelect_PolicyFromPluginCapabilities(t *testing.T) {
 			reg := testRegistry(tc.iso, tc.prov)
 			req := bwrapNixReq()
 			req.Network = tc.net
-			_, _, err := Select(reg, req, tc.pol)
+			_, err := Select(reg, req, tc.pol)
 			if tc.wantErr == nil {
 				if err != nil {
 					t.Fatalf("Select = %v, want nil", err)
@@ -128,7 +145,7 @@ func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
 	req := bwrapNixReq()
 	req.HasCustomBinds = true
 
-	_, _, err := Select(reg, req, policy.SandboxPolicy{RequireHostToolsUnreachable: true})
+	_, err := Select(reg, req, policy.SandboxPolicy{RequireHostToolsUnreachable: true})
 
 	if !errors.Is(err, policy.ErrHostToolsReachable) {
 		t.Fatalf("Select() error = %v, want %v", err, policy.ErrHostToolsReachable)
@@ -138,13 +155,13 @@ func TestSelect_RejectsCustomBindsWhenHostToolsMustBeUnreachable(t *testing.T) {
 func TestSelect_RejectsConfinedNetworkWithoutANetworkNamespace(t *testing.T) {
 	reg := testRegistry(fakeIsolator{sharesNetwork: true}, fakeProvisioner{})
 
-	if _, _, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{}); err == nil {
+	if _, err := Select(reg, bwrapNixReq(), policy.SandboxPolicy{}); err == nil {
 		t.Fatal("Select(network none, shared network) error = nil, want a confinement error")
 	}
 
 	req := bwrapNixReq()
 	req.Network = netshared.ModeHost
-	if _, _, err := Select(reg, req, policy.SandboxPolicy{}); err != nil {
+	if _, err := Select(reg, req, policy.SandboxPolicy{}); err != nil {
 		t.Fatalf("Select(network host, shared network) error = %v, want nil", err)
 	}
 }
@@ -153,15 +170,15 @@ func TestSelect_ManagedEgressNeedsATransport(t *testing.T) {
 	req := bwrapNixReq()
 	req.Network = netshared.ModeManaged
 	noTransport := testRegistry(fakeIsolator{available: true, noTransport: true}, fakeProvisioner{})
-	if _, _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, netshared.ErrManagedEgressUnenforceable) {
+	if _, err := Select(noTransport, req, policy.SandboxPolicy{}); !errors.Is(err, netshared.ErrManagedEgressUnenforceable) {
 		t.Errorf("an isolator without a transport must refuse managed whatever the policy: %v", err)
 	}
 	withTransport := testRegistry(fakeIsolator{available: true}, fakeProvisioner{})
-	if _, _, err := Select(withTransport, req, policy.SandboxPolicy{RequireEgressRestricted: true}); err != nil {
+	if _, err := Select(withTransport, req, policy.SandboxPolicy{RequireEgressRestricted: true}); err != nil {
 		t.Errorf("managed over a transport must satisfy RequireEgressRestricted: %v", err)
 	}
 	sharing := testRegistry(fakeIsolator{available: true, sharesNetwork: true}, fakeProvisioner{})
-	if _, _, err := Select(sharing, req, policy.SandboxPolicy{}); err == nil {
+	if _, err := Select(sharing, req, policy.SandboxPolicy{}); err == nil {
 		t.Error("an isolator that cannot confine the network must refuse managed")
 	}
 }

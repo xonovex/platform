@@ -38,8 +38,24 @@ type OverlayResult struct {
 	RoBindPaths []string
 	// Summary describes what was placed and what was skipped, one line each.
 	Summary []string
+	// Sources are the plugins and directories the overlay drew on, each with the
+	// digest of its content.
+	Sources []OverlaySource
 	// Cleanup removes the overlay. It is never nil.
 	Cleanup func()
+}
+
+// Overlay source kinds.
+const (
+	SourcePlugin    = "plugin"
+	SourceDirectory = "directory"
+)
+
+// OverlaySource is one source of the overlay and the digest of its content.
+type OverlaySource struct {
+	Kind   string
+	Name   string
+	Digest string
 }
 
 // Overlays is the port that builds the overlay of a run.

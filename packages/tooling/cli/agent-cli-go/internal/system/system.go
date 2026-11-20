@@ -19,6 +19,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 )
 
 // System launches child processes on the given standard streams.
@@ -44,6 +45,23 @@ func (System) Getwd() (string, error) { return os.Getwd() }
 
 // UserHomeDir returns the home directory of the current user.
 func (System) UserHomeDir() (string, error) { return os.UserHomeDir() }
+
+// Now returns the current time.
+func (System) Now() time.Time { return time.Now() }
+
+// ManagedConfigDir returns the directory of the system-wide configuration that
+// an administrator manages: /etc/agent-cli, or the machine-wide application data
+// directory of macOS and Windows.
+func (System) ManagedConfigDir() string {
+	switch runtime.GOOS {
+	case "darwin":
+		return "/Library/Application Support/agent-cli"
+	case "windows":
+		return filepath.Join(os.Getenv("ProgramData"), "agent-cli")
+	default:
+		return "/etc/agent-cli"
+	}
+}
 
 // Getuid returns the user id of this process.
 func (System) Getuid() int { return os.Getuid() }

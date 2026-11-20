@@ -139,46 +139,6 @@ func TestGetGitInfo(t *testing.T) {
 	}
 }
 
-func TestBuildShellCommand_QuotesAllArgs(t *testing.T) {
-	result := buildShellCommand([]string{"echo", "hello"})
-	if result != "'echo' 'hello'" {
-		t.Errorf("buildShellCommand quoted = %q, want %q", result, "'echo' 'hello'")
-	}
-}
-
-func TestBuildShellCommand(t *testing.T) {
-	tests := []struct {
-		name     string
-		args     []string
-		expected string
-	}{
-		{
-			name:     "simple command",
-			args:     []string{"echo", "hello"},
-			expected: "'echo' 'hello'",
-		},
-		{
-			name:     "command with path",
-			args:     []string{"/usr/bin/claude", "--model", "opus"},
-			expected: "'/usr/bin/claude' '--model' 'opus'",
-		},
-		{
-			name:     "command with spaces in arg",
-			args:     []string{"echo", "hello world"},
-			expected: "'echo' 'hello world'",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := buildShellCommand(tt.args)
-			if result != tt.expected {
-				t.Errorf("buildShellCommand(%v) = %q, want %q", tt.args, result, tt.expected)
-			}
-		})
-	}
-}
-
 func TestExecutorIsAvailableWhenTmuxResolves(t *testing.T) {
 	host := systemtest.New().AddExecutable("/usr/bin/tmux")
 	host.Env["PATH"] = "/usr/bin"
@@ -209,7 +169,7 @@ func TestExecutorIsInsideReadsTheTmuxEnvironment(t *testing.T) {
 	}
 }
 
-const launchScript = "/tmp/xonovex-agent-tmux-1.sh"
+const launchScript = "/tmp/xonovex-agent-terminal-1.sh"
 
 // tmuxHost records a tmux whose session named "session" exists or not.
 func tmuxHost(sessionExists bool) *systemtest.Fake {

@@ -22,6 +22,16 @@ func TestNewDescribesAUser(t *testing.T) {
 	}
 }
 
+func TestNewHasAClockAndAManagedConfigDirectory(t *testing.T) {
+	f := New()
+	if got := f.Now(); got.IsZero() || !got.Equal(f.Clock) {
+		t.Errorf("Now() = %v, want the fixed Clock", got)
+	}
+	if got := f.ManagedConfigDir(); got != "/etc/agent-cli" {
+		t.Errorf("ManagedConfigDir() = %q, want /etc/agent-cli", got)
+	}
+}
+
 func TestEnvironment(t *testing.T) {
 	f := New()
 	f.Env["B"] = "2"

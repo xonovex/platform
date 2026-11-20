@@ -1,4 +1,7 @@
-// Package config loads the CLI's optional file configuration (YAML/TOML/key=value).
+// Package config loads the configuration of the CLI from its layers and merges
+// them. A layer is a file (YAML, TOML or key=value) or the command line; each key
+// declares its own merge rule as data in Specs, so no layer and no key is named
+// by the merge itself.
 package config
 
 import (
@@ -13,10 +16,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// FileConfig represents configuration loaded from file.
+// FileConfig is the content of one configuration file. Every field is one key of
+// Specs; a field left empty means the file does not set the key.
 type FileConfig struct {
-	Provider    string   `yaml:"provider" toml:"provider"`
-	HomeDir     string   `yaml:"homeDir" toml:"homeDir"`
+	Agent     string `yaml:"agent" toml:"agent"`
+	Provider  string `yaml:"provider" toml:"provider"`
+	Isolation string `yaml:"isolation" toml:"isolation"`
+	Provision string `yaml:"provision" toml:"provision"`
+	Network   string `yaml:"network" toml:"network"`
+	HomeDir   string `yaml:"homeDir" toml:"homeDir"`
+
 	BindPaths   []string `yaml:"bindPaths" toml:"bindPaths"`
 	RoBindPaths []string `yaml:"roBindPaths" toml:"roBindPaths"`
 	CustomEnv   []string `yaml:"customEnv" toml:"customEnv"`
@@ -26,12 +35,50 @@ type FileConfig struct {
 	// Credentials bind an environment variable to a credential store entry, as
 	// "NAME=scheme:locator". The file holds where a credential is, never its value.
 	Credentials []string `yaml:"credentials" toml:"credentials"`
+
+	RequirePinnedProvision      bool `yaml:"requirePinnedProvision" toml:"requirePinnedProvision"`
+	RequireHostToolsUnreachable bool `yaml:"requireHostToolsUnreachable" toml:"requireHostToolsUnreachable"`
+	RequireEgressRestricted     bool `yaml:"requireEgressRestricted" toml:"requireEgressRestricted"`
+	RequireKernelIsolation      bool `yaml:"requireKernelIsolation" toml:"requireKernelIsolation"`
+}
+
+// Entries returns the keys the file sets.
+func (f FileConfig) Entries() Entries {
+	entries := Entries{}
+	for key, text := range map[Key]string{
+		KeyAgent: f.Agent, KeyProvider: f.Provider, KeyIsolation: f.Isolation,
+		KeyProvision: f.Provision, KeyNetwork: f.Network, KeyHomeDir: f.HomeDir,
+	} {
+		if text != "" {
+			entries[key] = Value{Text: text}
+		}
+	}
+	for key, items := range map[Key][]string{
+		KeyBindPaths: f.BindPaths, KeyRoBindPaths: f.RoBindPaths, KeyCustomEnv: f.CustomEnv,
+		KeyAllowHosts: f.AllowHosts, KeyCredentials: f.Credentials,
+	} {
+		if len(items) > 0 {
+			entries[key] = Value{Items: items}
+		}
+	}
+	for key, on := range map[Key]bool{
+		KeyRequirePinnedProvision: f.RequirePinnedProvision, KeyRequireHostToolsUnreachable: f.RequireHostToolsUnreachable,
+		KeyRequireEgressRestricted: f.RequireEgressRestricted, KeyRequireKernelIsolation: f.RequireKernelIsolation,
+	} {
+		if on {
+			entries[key] = Value{On: true}
+		}
+	}
+	return entries
 }
 
 // Files is the port the loader reads the configuration through.
 type Files interface {
 	ReadFile(path string) ([]byte, error)
+	Stat(path string) (fs.FileInfo, error)
 	UserHomeDir() (string, error)
+	// ManagedConfigDir is the directory of the system-wide configuration.
+	ManagedConfigDir() string
 }
 
 // DefaultPath returns the default configuration path under home.

@@ -21,12 +21,14 @@ import (
 	provshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/provision/shared"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/sandbox"
 	"github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/system/systemtest"
+	termshared "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go/internal/terminal/shared"
 )
 
 // recordingIsolator records the RunConfig the command line produced; it runs
 // with exitCode and is pinned for every request.
 type recordingIsolator struct {
 	exitCode int
+	unpinned bool
 	run      isoshared.RunConfig
 }
 
@@ -44,7 +46,7 @@ func (r *recordingIsolator) TerminalCommand(isoshared.RunConfig, provision.Contr
 	return nil, nil, nil
 }
 func (r *recordingIsolator) PinnedProvision(provision.ProvisionMethod, bool, string) bool {
-	return true
+	return !r.unpinned
 }
 func (r *recordingIsolator) HidesHost(bool, string) bool { return true }
 func (r *recordingIsolator) KernelIsolated(string) bool  { return true }
@@ -108,7 +110,7 @@ func newTestRoot() *testRoot {
 }
 
 func (r *testRoot) execute(args ...string) error {
-	root := NewRootCommand(r.deps, r.ports, r.bridge)
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	root.SetArgs(args)
 	root.SetOut(io.Discard)
 	root.SetErr(io.Discard)
@@ -116,7 +118,7 @@ func (r *testRoot) execute(args ...string) error {
 }
 
 func TestNewRootCommandRegistersSubcommandsAndFlags(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
 
 	for _, name := range []string{"run", "completion"} {
 		if command, _, err := root.Find([]string{name}); err != nil || command.Name() != name {
@@ -185,7 +187,7 @@ func TestRunCommandYieldsToThePinnedPairOnlyWithoutAnExplicitAxis(t *testing.T) 
 func TestRunCommandSilencesTheAgentExitCode(t *testing.T) {
 	r := newTestRoot()
 	r.isolator.exitCode = 4
-	root := NewRootCommand(r.deps, r.ports, r.bridge)
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	root.SetArgs([]string{"run"})
 	var output bytes.Buffer
 	root.SetOut(&output)
@@ -205,7 +207,7 @@ func TestRunCommandSilencesTheAgentExitCode(t *testing.T) {
 
 func TestRunCommandReportsOtherErrorsWithUsage(t *testing.T) {
 	r := newTestRoot()
-	root := NewRootCommand(r.deps, r.ports, r.bridge)
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	root.SetArgs([]string{"run", "--agent", "unknown"})
 	var output bytes.Buffer
 	root.SetOut(&output)
@@ -245,7 +247,7 @@ func TestRunCommandRejectsAnUnknownAgentAndAProviderForALoginAgent(t *testing.T)
 }
 
 func TestRunCommandHelpListsEveryHarness(t *testing.T) {
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
 	run, _, _ := root.Find([]string{"run"})
 
 	usage := run.Flags().Lookup("agent").Usage
@@ -260,7 +262,7 @@ func TestRunCommandHelpListsEveryHarness(t *testing.T) {
 // complete returns the candidates the shell completion offers for args.
 func complete(t *testing.T, args ...string) []string {
 	t.Helper()
-	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, &recordingBridge{})
+	root := NewRootCommand(newTestRoot().deps, PluginPorts{}, RecordPorts{}, &recordingBridge{})
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)
@@ -333,7 +335,7 @@ func TestCompletionOffersCredentialSchemesAfterTheVariableName(t *testing.T) {
 	r.deps.Credentials = credshared.NewRegistry().
 		Register("env", func() credshared.Store { return nil }).
 		Register("pass", func() credshared.Store { return nil })
-	root := NewRootCommand(r.deps, r.ports, r.bridge)
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
 	var out bytes.Buffer
 	root.SetOut(&out)
 	root.SetErr(io.Discard)
@@ -354,5 +356,21 @@ func TestCompletionOffersCredentialSchemesAfterTheVariableName(t *testing.T) {
 	}
 	if got := isolationNames(launch.Dependencies{}); got != nil {
 		t.Errorf("a build without isolations offers nothing: %v", got)
+	}
+}
+
+func TestCompletionOffersTheRegisteredTerminals(t *testing.T) {
+	r := newTestRoot()
+	r.deps.Terminals = map[termshared.TerminalType]termshared.TerminalExecutor{termshared.TerminalTmux: nil, termshared.TerminalHerdr: nil}
+	root := NewRootCommand(r.deps, r.ports, RecordPorts{}, r.bridge)
+	var out bytes.Buffer
+	root.SetOut(&out)
+	root.SetErr(io.Discard)
+	root.SetArgs([]string{"__complete", "run", "--terminal", ""})
+	if err := root.Execute(); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(out.String(), "herdr\ntmux\n") {
+		t.Errorf("terminal completion = %q, want herdr and tmux", out.String())
 	}
 }

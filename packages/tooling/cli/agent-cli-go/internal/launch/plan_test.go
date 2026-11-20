@@ -29,9 +29,23 @@ func baseOptions() Options {
 	}
 }
 
+// fold merges the file as the user layer under the command line, the way resolve
+// does, so a plan test drives the same options as a run.
+func fold(t *testing.T, options Options, file config.FileConfig) Options {
+	t.Helper()
+	merged, err := config.Merge([]config.Input{
+		{Layer: config.LayerUser, Origin: "test", Entries: file.Entries()},
+		flagInput(options),
+	})
+	if err != nil {
+		t.Fatalf("Merge() error = %v", err)
+	}
+	return applyResolved(options, merged)
+}
+
 func plan(t *testing.T, options Options, file config.FileConfig) (Plan, error) {
 	t.Helper()
-	return NewPlan(options, file, "/work/repo", "/home/user", newTestSandbox().registry)
+	return NewPlan(fold(t, options, file), "/work/repo", "/home/user", newTestSandbox().registry)
 }
 
 func mustPlan(t *testing.T, options Options, file config.FileConfig) Plan {
@@ -200,13 +214,13 @@ func TestNewPlanSelectsThePinnedPairOnlyWithoutAnExplicitAxis(t *testing.T) {
 		t.Errorf("NixSource = %+v, want a packages source", p.Provision.NixSource)
 	}
 
-	options.IsolationSet = true
+	options.Explicit = options.Explicit.With(config.KeyIsolation)
 	if _, err := plan(t, options, config.FileConfig{}); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
 		t.Fatalf("explicit isolation error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
 
-	options.IsolationSet = false
-	options.ProvisionSet = true
+	options.Explicit = nil
+	options.Explicit = options.Explicit.With(config.KeyProvision)
 	if _, err := plan(t, options, config.FileConfig{}); !errors.Is(err, policy.ErrPinnedProvisionUnmet) {
 		t.Fatalf("explicit provision error = %v, want %v", err, policy.ErrPinnedProvisionUnmet)
 	}
@@ -313,8 +327,8 @@ func TestNewPlanPassesTheDockerRuntimeToTheKernelPolicy(t *testing.T) {
 func TestNewPlanRequiresADigestImageForAPinnedDockerRun(t *testing.T) {
 	options := baseOptions()
 	options.Isolation = "docker"
-	options.IsolationSet = true
-	options.ProvisionSet = true
+	options.Explicit = options.Explicit.With(config.KeyIsolation)
+	options.Explicit = options.Explicit.With(config.KeyProvision)
 	options.Policy.RequirePinnedProvision = true
 
 	options.Image = "ghcr.io/xonovex/agent:latest"

@@ -1,4 +1,4 @@
-package tmux
+package shared
 
 import (
 	"errors"
@@ -55,16 +55,16 @@ func TestCreateLaunchScriptWritesAPrivateSelfDeletingScript(t *testing.T) {
 	host := systemtest.New()
 	secret := "token with '$HOME' and a newline\nvalue"
 
-	path, err := createLaunchScript(host, []string{"claude", "--model", "opus"}, []string{
+	path, err := LaunchScript(host, []string{"claude", "--model", "opus"}, []string{
 		"SAFE_VALUE=" + secret,
 		"BAD;touch /tmp/injected=value",
 	})
 
 	if err != nil {
-		t.Fatalf("createLaunchScript() error = %v", err)
+		t.Fatalf("LaunchScript() error = %v", err)
 	}
-	if !strings.HasPrefix(path, "/tmp/xonovex-agent-tmux-") || !strings.HasSuffix(path, ".sh") {
-		t.Errorf("launch script path = %q, want the xonovex-agent-tmux-*.sh pattern", path)
+	if !strings.HasPrefix(path, "/tmp/xonovex-agent-terminal-") || !strings.HasSuffix(path, ".sh") {
+		t.Errorf("launch script path = %q, want the xonovex-agent-terminal-*.sh pattern", path)
 	}
 	if strings.Contains(path, secret) {
 		t.Fatal("launch script path contains secret")
@@ -91,30 +91,70 @@ func TestCreateLaunchScriptWritesAPrivateSelfDeletingScript(t *testing.T) {
 
 func TestCreateLaunchScriptRequiresCommand(t *testing.T) {
 	host := systemtest.New()
-	if _, err := createLaunchScript(host, nil, nil); err == nil {
-		t.Fatal("createLaunchScript(nil, nil) error = nil, want error")
+	if _, err := LaunchScript(host, nil, nil); err == nil {
+		t.Fatal("LaunchScript(nil, nil) error = nil, want error")
 	}
 }
 
 func TestCreateLaunchScriptReportsCreateFailure(t *testing.T) {
 	host := failingHost{Fake: systemtest.New(), createErr: errors.New("disk full")}
 
-	_, err := createLaunchScript(host, []string{"claude"}, nil)
+	_, err := LaunchScript(host, []string{"claude"}, nil)
 
-	if err == nil || !strings.Contains(err.Error(), "create tmux launch script") {
-		t.Fatalf("createLaunchScript() error = %v, want create failure", err)
+	if err == nil || !strings.Contains(err.Error(), "create terminal launch script") {
+		t.Fatalf("LaunchScript() error = %v, want create failure", err)
 	}
 }
 
 func TestCreateLaunchScriptRemovesTheFileOnWriteFailure(t *testing.T) {
 	host := failingHost{Fake: systemtest.New(), writeErr: errors.New("disk full")}
 
-	_, err := createLaunchScript(host, []string{"claude"}, nil)
+	_, err := LaunchScript(host, []string{"claude"}, nil)
 
-	if err == nil || !strings.Contains(err.Error(), "write tmux launch script") {
-		t.Fatalf("createLaunchScript() error = %v, want write failure", err)
+	if err == nil || !strings.Contains(err.Error(), "write terminal launch script") {
+		t.Fatalf("LaunchScript() error = %v, want write failure", err)
 	}
-	if host.Exists("/tmp/xonovex-agent-tmux-1.sh") {
+	if host.Exists("/tmp/xonovex-agent-terminal-1.sh") {
 		t.Error("launch script remains after a write failure")
+	}
+}
+
+func TestBuildShellCommand_QuotesAllArgs(t *testing.T) {
+	result := ShellCommand([]string{"echo", "hello"})
+	if result != "'echo' 'hello'" {
+		t.Errorf("ShellCommand quoted = %q, want %q", result, "'echo' 'hello'")
+	}
+}
+
+func TestBuildShellCommand(t *testing.T) {
+	tests := []struct {
+		name     string
+		args     []string
+		expected string
+	}{
+		{
+			name:     "simple command",
+			args:     []string{"echo", "hello"},
+			expected: "'echo' 'hello'",
+		},
+		{
+			name:     "command with path",
+			args:     []string{"/usr/bin/claude", "--model", "opus"},
+			expected: "'/usr/bin/claude' '--model' 'opus'",
+		},
+		{
+			name:     "command with spaces in arg",
+			args:     []string{"echo", "hello world"},
+			expected: "'echo' 'hello world'",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ShellCommand(tt.args)
+			if result != tt.expected {
+				t.Errorf("ShellCommand(%v) = %q, want %q", tt.args, result, tt.expected)
+			}
+		})
 	}
 }

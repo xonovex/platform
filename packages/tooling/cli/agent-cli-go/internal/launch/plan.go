@@ -40,10 +40,10 @@ type Options struct {
 	Isolation string
 	Provision string
 	Network   string
-	// IsolationSet and ProvisionSet report whether the user chose the axis; an
-	// unchosen pair yields to the pinned default under RequirePinnedProvision.
-	IsolationSet bool
-	ProvisionSet bool
+	// Explicit holds the keys a layer chose, as opposed to the defaults of the
+	// flags. An unchosen isolation and provision pair yields to the pinned default
+	// under RequirePinnedProvision.
+	Explicit config.Keys
 
 	IsolationBwrapPassthrough bool
 	IsolationDockerRuntime    string
@@ -67,7 +67,10 @@ type Options struct {
 	OverlayDirs []string
 	Store       string
 
-	Config      string
+	// Config is the file of the user layer; empty selects the default file.
+	Config string
+	// HomeDir is the home directory of the sandbox; empty selects the user's.
+	HomeDir     string
 	BindPaths   []string
 	RoBindPaths []string
 	CustomEnv   []string
@@ -102,6 +105,7 @@ type Plan struct {
 	Agent         *types.AgentConfig
 	Provider      *types.ModelProvider
 	IsolationName isolation.IsolationMethod
+	ProvisionName provision.ProvisionMethod
 	Isolator      isoshared.Isolator
 	Provisioner   provshared.Provisioner
 	Provision     provshared.Input
@@ -115,6 +119,10 @@ type Plan struct {
 	Allow egress.Allowlist
 	// Credentials are the credential bindings the executor resolves at run time.
 	Credentials []credshared.Binding
+	// Capabilities are the guarantees the selected sandbox establishes, and Policy
+	// the guarantees the run demands of it.
+	Capabilities policy.Capabilities
+	Policy       policy.SandboxPolicy
 	// Run launches in SourceDir; the executor moves it into a created checkout.
 	Run      isoshared.RunConfig
 	Terminal *termshared.TerminalConfig
@@ -122,16 +130,33 @@ type Plan struct {
 	Verbose  bool
 }
 
-// NewPlan resolves options against the file configuration, the working
-// directory and the home directory of the CLI, and selects the isolator and the
-// provisioner from registry under the requested policy. It fails closed on any
-// invalid choice or unmet guarantee and performs no I/O.
-func NewPlan(options Options, file config.FileConfig, cwd, home string, registry *sandbox.Registry) (Plan, error) {
+// NewPlan resolves options, which already carry every configuration layer,
+// against the working directory and the home directory of the CLI, and selects
+// the isolator and the provisioner from registry under the requested policy. It
+// fails closed on any invalid choice or unmet guarantee and performs no I/O.
+func NewPlan(options Options, cwd, home string, registry *sandbox.Registry) (Plan, error) {
+	return buildPlan(options, cwd, home, registry, true)
+}
+
+// evaluatePolicy evaluates each guarantee of the policy against the capabilities
+// of the selected sandbox.
+func evaluatePolicy(plan Plan) []policy.Outcome {
+	return policy.Evaluate(plan.Capabilities, plan.Policy)
+}
+
+// advisoryPlan is NewPlan without the demand: it resolves the same plan whether
+// or not the sandbox meets the policy, and leaves the guarantees to the caller,
+// which reports each of them. Every other invalid choice still fails.
+func advisoryPlan(options Options, cwd, home string, registry *sandbox.Registry) (Plan, error) {
+	return buildPlan(options, cwd, home, registry, false)
+}
+
+func buildPlan(options Options, cwd, home string, registry *sandbox.Registry, enforce bool) (Plan, error) {
 	agent, err := agents.GetAgent(types.AgentType(options.Agent))
 	if err != nil {
 		return Plan{}, fmt.Errorf("%w; available agents: %v", err, agents.GetAgentTypes())
 	}
-	provider, err := resolveProvider(agent, options.Provider, file.Provider)
+	provider, err := resolveProvider(agent, options.Provider)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -149,7 +174,7 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		return Plan{}, err
 	}
 
-	selection, err := selectAxes(options, file, registry)
+	selection, err := selectAxes(options, registry, enforce)
 	if err != nil {
 		return Plan{}, err
 	}
@@ -158,30 +183,31 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 	if err != nil {
 		return Plan{}, err
 	}
-	customEnv, err := envutil.ParseCustomEnv(append(append([]string{}, file.CustomEnv...), options.CustomEnv...))
+	customEnv, err := envutil.ParseCustomEnv(options.CustomEnv)
 	if err != nil {
 		return Plan{}, fmt.Errorf("invalid custom environment: %w", err)
 	}
 
-	allow, err := planAllowlist(selection, options, file)
+	allow, err := planAllowlist(selection, options)
 	if err != nil {
 		return Plan{}, err
 	}
-	bindings, err := credshared.ParseBindings(append(append([]string{}, file.Credentials...), options.Credentials...))
+	bindings, err := credshared.ParseBindings(options.Credentials)
 	if err != nil {
 		return Plan{}, err
 	}
 
 	homeDir := home
-	if file.HomeDir != "" {
-		homeDir = file.HomeDir
+	if options.HomeDir != "" {
+		homeDir = options.HomeDir
 	}
-	bindPaths := wsshared.BuildBindPaths(append(append([]string{}, file.BindPaths...), options.BindPaths...), sourceDir)
+	bindPaths := wsshared.BuildBindPaths(options.BindPaths, sourceDir)
 
 	return Plan{
 		Agent:         agent,
 		Provider:      provider,
 		IsolationName: selection.isolation,
+		ProvisionName: selection.provision,
 		Isolator:      selection.isolator,
 		Provisioner:   selection.provisioner,
 		Provision:     input,
@@ -190,6 +216,8 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 		Overlay:       overlayRequest,
 		Allow:         allow,
 		Credentials:   bindings,
+		Capabilities:  selection.capabilities,
+		Policy:        options.Policy,
 		Run: isoshared.RunConfig{
 			HomeDir:         absolute(cwd, homeDir),
 			WorkDir:         sourceDir,
@@ -200,7 +228,7 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 			Image:           options.Image,
 			Runtime:         options.IsolationDockerRuntime,
 			BindPaths:       absoluteAll(cwd, bindPaths),
-			RoBindPaths:     absoluteAll(cwd, append(append([]string{}, file.RoBindPaths...), options.RoBindPaths...)),
+			RoBindPaths:     absoluteAll(cwd, options.RoBindPaths),
 			CustomEnv:       envutil.EnvMapToSlice(customEnv),
 			Agent:           agent,
 			Provider:        provider,
@@ -214,8 +242,8 @@ func NewPlan(options Options, file config.FileConfig, cwd, home string, registry
 
 // planAllowlist parses the allowed hosts. A managed run needs at least one, and
 // no other network mode takes any, because the hosts would then restrict nothing.
-func planAllowlist(selected selection, options Options, file config.FileConfig) (egress.Allowlist, error) {
-	texts := append(append([]string{}, file.AllowHosts...), options.AllowHosts...)
+func planAllowlist(selected selection, options Options) (egress.Allowlist, error) {
+	texts := options.AllowHosts
 	if selected.network != netshared.ModeManaged {
 		if len(texts) > 0 {
 			return egress.Allowlist{}, fmt.Errorf("allowed hosts need --network managed, not %s", selected.network)
@@ -248,14 +276,9 @@ func (p Plan) DisplayDir() string {
 	return p.SourceDir
 }
 
-// resolveProvider resolves the model provider from the flag, falling back to the
-// file config's provider. An agent that uses its own login takes no provider, so
-// a named one fails before the preset lookup.
-func resolveProvider(agent *types.AgentConfig, optionProvider, fileProvider string) (*types.ModelProvider, error) {
-	name := optionProvider
-	if name == "" {
-		name = fileProvider
-	}
+// resolveProvider resolves the model provider by name. An agent that uses its own
+// login takes no provider, so a named one fails before the preset lookup.
+func resolveProvider(agent *types.AgentConfig, name string) (*types.ModelProvider, error) {
 	if name == "" {
 		return nil, nil
 	}
@@ -303,46 +326,55 @@ func planCheckout(options Options, sourceDir string) (*Checkout, error) {
 }
 
 type selection struct {
-	isolation   isolation.IsolationMethod
-	provision   provision.ProvisionMethod
-	network     netshared.Mode
-	isolator    isoshared.Isolator
-	provisioner provshared.Provisioner
+	isolation    isolation.IsolationMethod
+	provision    provision.ProvisionMethod
+	network      netshared.Mode
+	isolator     isoshared.Isolator
+	provisioner  provshared.Provisioner
+	capabilities policy.Capabilities
 }
 
 // selectAxes resolves the confinement axes. The registry is the source of truth
 // for valid isolation and provision methods (Select rejects unregistered ones);
 // network is a closed enum validated here. When a pinned toolchain is required
 // but no axis was chosen explicitly, the pinned pair (bwrap, nix) is selected.
-func selectAxes(options Options, file config.FileConfig, registry *sandbox.Registry) (selection, error) {
+func selectAxes(options Options, registry *sandbox.Registry, enforce bool) (selection, error) {
 	isolationName := isolation.IsolationMethod(orDefault(options.Isolation, string(isolation.IsolationNone)))
 	provisionName := provision.ProvisionMethod(orDefault(options.Provision, string(provision.ProvisionNone)))
 	network, err := netshared.ParseMode(orDefault(options.Network, string(netshared.ModeHost)))
 	if err != nil {
 		return selection{}, err
 	}
-	if options.Policy.RequirePinnedProvision && !options.IsolationSet && !options.ProvisionSet {
+	if options.Policy.RequirePinnedProvision && !options.Explicit.Has(config.KeyIsolation) && !options.Explicit.Has(config.KeyProvision) {
 		isolationName, provisionName = isolation.IsolationBwrap, provision.ProvisionNix
 	}
 
-	isolator, provisioner, err := sandbox.Select(registry, sandbox.Request{
+	request := sandbox.Request{
 		Isolation:      isolationName,
 		Provision:      provisionName,
 		Network:        network,
 		Passthrough:    options.IsolationBwrapPassthrough,
 		Runtime:        options.IsolationDockerRuntime,
 		Image:          options.Image,
-		HasCustomBinds: len(file.BindPaths)+len(options.BindPaths)+len(file.RoBindPaths)+len(options.RoBindPaths) > 0,
-	}, options.Policy)
+		HasCustomBinds: len(options.BindPaths)+len(options.RoBindPaths) > 0,
+	}
+	choose := sandbox.Evaluate
+	if enforce {
+		choose = func(registry *sandbox.Registry, request sandbox.Request) (sandbox.Choice, error) {
+			return sandbox.Select(registry, request, options.Policy)
+		}
+	}
+	choice, err := choose(registry, request)
 	if err != nil {
 		return selection{}, err
 	}
 	return selection{
-		isolation:   isolationName,
-		provision:   provisionName,
-		network:     network,
-		isolator:    isolator,
-		provisioner: provisioner,
+		isolation:    isolationName,
+		provision:    provisionName,
+		network:      network,
+		isolator:     choice.Isolator,
+		provisioner:  choice.Provisioner,
+		capabilities: choice.Capabilities,
 	}, nil
 }
 

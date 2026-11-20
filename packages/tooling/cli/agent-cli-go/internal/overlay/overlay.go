@@ -46,7 +46,7 @@ func (b Builder) Prepare(request launch.OverlayRequest) (launch.OverlayResult, e
 	if err != nil {
 		return launch.OverlayResult{}, err
 	}
-	set, err := b.gather(request)
+	set, sources, err := b.gather(request)
 	if err != nil {
 		return launch.OverlayResult{}, err
 	}
@@ -62,36 +62,51 @@ func (b Builder) Prepare(request launch.OverlayRequest) (launch.OverlayResult, e
 		return launch.OverlayResult{}, err
 	}
 	result.Cleanup = cleanup
+	result.Sources = sources
 	return result, nil
 }
 
 // gather reads the artifacts of the installed plugins and of the directories and
-// merges them. Two sources that define one artifact name fail the merge.
-func (b Builder) gather(request launch.OverlayRequest) (artifact.Set, error) {
+// merges them, and lists each source with the digest of its content. Two sources
+// that define one artifact name fail the merge.
+func (b Builder) gather(request launch.OverlayRequest) (artifact.Set, []launch.OverlaySource, error) {
 	var sets []artifact.Set
+	var sources []launch.OverlaySource
 	if len(request.Plugins) > 0 {
 		service, err := b.service(request.Store)
 		if err != nil {
-			return artifact.Set{}, err
+			return artifact.Set{}, nil, err
+		}
+		locked, err := service.Locked(request.Plugins)
+		if err != nil {
+			return artifact.Set{}, nil, err
+		}
+		for _, record := range locked {
+			sources = append(sources, launch.OverlaySource{Kind: launch.SourcePlugin, Name: record.Name, Digest: record.Digest})
 		}
 		set, err := service.Load(request.Plugins)
 		if err != nil {
-			return artifact.Set{}, err
+			return artifact.Set{}, nil, err
 		}
 		sets = append(sets, set)
 	}
 	for _, dir := range request.Directories {
 		tree, err := origin.ReadTree(b.Host, dir)
 		if err != nil {
-			return artifact.Set{}, fmt.Errorf("overlay directory %s: %w", dir, err)
+			return artifact.Set{}, nil, fmt.Errorf("overlay directory %s: %w", dir, err)
 		}
 		set, err := artifact.FromTree(dir, tree)
 		if err != nil {
-			return artifact.Set{}, fmt.Errorf("overlay directory %s: %w", dir, err)
+			return artifact.Set{}, nil, fmt.Errorf("overlay directory %s: %w", dir, err)
 		}
 		sets = append(sets, set)
+		sources = append(sources, launch.OverlaySource{Kind: launch.SourceDirectory, Name: dir, Digest: tree.Digest()})
 	}
-	return artifact.Merge(sets...)
+	merged, err := artifact.Merge(sets...)
+	if err != nil {
+		return artifact.Set{}, nil, err
+	}
+	return merged, sources, nil
 }
 
 func (b Builder) service(dir string) (plugin.Service, error) {

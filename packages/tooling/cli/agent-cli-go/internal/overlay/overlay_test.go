@@ -3,6 +3,7 @@ package overlay
 import (
 	"errors"
 	"io/fs"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -131,6 +132,15 @@ func TestPrepareWritesTheOverlayOfAPluginAndADirectory(t *testing.T) {
 	if info, _ := h.Stat(result.Root + "/.claude/skills/greet/run.sh"); info.Mode().Perm() != 0o755 {
 		t.Errorf("run.sh mode = %v", info.Mode())
 	}
+	if len(result.Sources) != 2 || result.Sources[0].Kind != launch.SourcePlugin || result.Sources[0].Name != "hello" ||
+		result.Sources[1].Kind != launch.SourceDirectory || result.Sources[1].Name != "/extras" {
+		t.Errorf("sources = %+v, want the plugin and the directory", result.Sources)
+	}
+	for _, source := range result.Sources {
+		if !artifact.ValidDigest(source.Digest) {
+			t.Errorf("source %s digest = %q, want a sha256 digest", source.Name, source.Digest)
+		}
+	}
 	if len(result.Summary) != 1 || !strings.Contains(result.Summary[0], "placed 4 files") {
 		t.Errorf("summary = %v", result.Summary)
 	}
@@ -231,6 +241,23 @@ func TestPrepareFailsClosed(t *testing.T) {
 		},
 		"plugin not installed": func(t *testing.T) (Builder, launch.OverlayRequest) {
 			return builder(host{Fake: machine()}), request(t, types.AgentClaude)
+		},
+		"tampered plugin": func(t *testing.T) (Builder, launch.OverlayRequest) {
+			h := host{Fake: machine()}
+			b := builder(h)
+			installHello(t, b)
+			lock, err := h.ReadFile(store + "/lock.json")
+			if err != nil {
+				t.Fatalf("read the lock: %v", err)
+			}
+			digest := regexp.MustCompile(`sha256:([0-9a-f]{64})`).FindSubmatch(lock)
+			if digest == nil {
+				t.Fatalf("no digest in the lock %s", lock)
+			}
+			if err := h.WriteFile(store+"/content/"+string(digest[1])+"/skills/greet/SKILL.md", []byte("tampered"), 0o644); err != nil {
+				t.Fatal(err)
+			}
+			return b, request(t, types.AgentClaude)
 		},
 		"no home": func(t *testing.T) (Builder, launch.OverlayRequest) {
 			fake := machine()

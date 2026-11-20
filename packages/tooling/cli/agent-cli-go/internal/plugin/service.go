@@ -230,11 +230,7 @@ func (s Service) Remove(name string) error {
 // whose manifest names another plugin, or that carries a capability the user did
 // not grant at install time.
 func (s Service) Load(names []string) (artifact.Set, error) {
-	lock, err := s.Store.Lock()
-	if err != nil {
-		return artifact.Set{}, err
-	}
-	closure, err := lock.Closure(names)
+	closure, err := s.Locked(names)
 	if err != nil {
 		return artifact.Set{}, err
 	}
@@ -247,6 +243,16 @@ func (s Service) Load(names []string) (artifact.Set, error) {
 		sets = append(sets, set)
 	}
 	return artifact.Merge(sets...)
+}
+
+// Locked returns the lock records of the named plugins and of every plugin they
+// depend on, each with the digest of its stored content.
+func (s Service) Locked(names []string) ([]plugin.Locked, error) {
+	lock, err := s.Store.Lock()
+	if err != nil {
+		return nil, err
+	}
+	return lock.Closure(names)
 }
 
 func (s Service) load(record plugin.Locked) (artifact.Set, error) {
