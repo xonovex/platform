@@ -87,7 +87,7 @@ func contracts() map[string]contract {
 			valid: []string{
 				`{"version":1,"skill":"using-hono","queries":[
 					{"id":"q1","prompt":"add a route","shouldTrigger":true,"split":"train","tags":["api"]},
-					{"id":"q2","promptFile":"prompts/long.md","shouldTrigger":false,"split":"validation"}]}`,
+					{"id":"q2","promptFile":"prompts/long.md","shouldTrigger":false,"split":"validation","rationale":"names another skill"}]}`,
 			},
 			invalid: []invalid{
 				{"no queries", `{"version":1,"skill":"s","queries":[]}`, "/queries"},
@@ -95,16 +95,18 @@ func contracts() map[string]contract {
 				{"neither prompt form", `{"version":1,"skill":"s","queries":[{"id":"q","shouldTrigger":true,"split":"train"}]}`, "/queries/0"},
 				{"unknown split", `{"version":1,"skill":"s","queries":[{"id":"q","prompt":"a","shouldTrigger":true,"split":"dev"}]}`, "/queries/0/split"},
 				{"unknown field", `{"version":1,"skill":"s","queries":[{"id":"q","prompt":"a","shouldTrigger":true,"split":"train","other":1}]}`, "/queries/0/other"},
+				{"empty rationale", `{"version":1,"skill":"s","queries":[{"id":"q","prompt":"a","shouldTrigger":true,"split":"train","rationale":""}]}`, "/queries/0/rationale"},
 			},
 		},
 		schemas.EvalOutput: {
 			valid: []string{
-				`{"version":1,"skill":"s","judge":{"harness":"claude","model":"m","rubric":"r"},"cases":[
+				`{"version":1,"skill":"s","tier":"moderate","judge":{"harness":"claude","model":"m","rubric":"r"},"cases":[
 					{"id":"c1","prompt":"do it","gate":"required","fixtures":[{"path":"a.txt","content":"x"},{"path":"b.txt","contentFile":"fixtures/b.txt"}],
 					 "expect":[{"kind":"filesystem","path":"out.md","check":"contains","value":"x"},{"kind":"llm","criterion":"is clear","threshold":0.8}]}]}`,
 			},
 			invalid: []invalid{
 				{"no expectations", `{"version":1,"skill":"s","cases":[{"id":"c","prompt":"p","gate":"required","expect":[]}]}`, "/cases/0/expect"},
+				{"unknown tier", `{"version":1,"skill":"s","tier":"lenient","cases":[{"id":"c","prompt":"p","gate":"required","expect":[{"kind":"llm","criterion":"x"}]}]}`, "/tier"},
 				{"unknown gate", `{"version":1,"skill":"s","cases":[{"id":"c","prompt":"p","gate":"soft","expect":[{"kind":"llm","criterion":"x"}]}]}`, "/cases/0/gate"},
 				{"fixture with both contents", `{"version":1,"skill":"s","cases":[{"id":"c","prompt":"p","gate":"required","fixtures":[{"path":"a","content":"x","contentFile":"b"}],"expect":[{"kind":"llm","criterion":"x"}]}]}`, "/cases/0/fixtures/0"},
 			},
@@ -153,11 +155,12 @@ func contracts() map[string]contract {
 		schemas.Results: {
 			valid: []string{
 				`{"version":1,"runId":"run-1","protocol":"instruction","profile":"cheap","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","finishedAt":"2026-01-01T10:05:00Z","status":"complete",
-				  "cases":[{"id":"c1","condition":"present","outcome":"passed","score":1,"durationMs":1200,"usage":` + usageJSON + `,"predicates":[{"kind":"session","passed":true,"detail":"saw it"}]},
+				  "cases":[{"id":"c1","condition":"present","outcome":"passed","score":1,"controlScore":0.25,"runs":3,"selected":["target","none","target"],"skillTriggered":true,"durationMs":1200,"usage":` + usageJSON + `,"predicates":[{"kind":"session","passed":true,"detail":"saw it"}]},
 				           {"id":"c2","outcome":"errored","error":"timeout"}],"usage":` + usageJSON + `}`,
-				`{"version":1,"runId":"run-2","protocol":"trigger","profile":"p","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","status":"incomplete","cases":[]}`,
+				`{"version":1,"runId":"run-2","protocol":"trigger","profile":"p","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","status":"incomplete","stop":"budget","cases":[]}`,
 			},
 			invalid: []invalid{
+				{"unknown stop reason", `{"version":1,"runId":"r","protocol":"trigger","profile":"p","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","status":"incomplete","stop":"boredom","cases":[]}`, "/stop"},
 				{"complete without finish time", `{"version":1,"runId":"r","protocol":"trigger","profile":"p","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","status":"complete","cases":[]}`, ""},
 				{"errored without error", `{"version":1,"runId":"r","protocol":"trigger","profile":"p","inputsDigest":"` + digest + `","startedAt":"2026-01-01T10:00:00Z","status":"incomplete","cases":[{"id":"c","outcome":"errored"}]}`, "/cases/0"},
 				{"short digest", `{"version":1,"runId":"r","protocol":"trigger","profile":"p","inputsDigest":"sha256:abc","startedAt":"2026-01-01T10:00:00Z","status":"incomplete","cases":[]}`, "/inputsDigest"},

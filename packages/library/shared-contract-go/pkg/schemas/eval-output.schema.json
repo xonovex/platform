@@ -8,6 +8,7 @@
     "$schema": {"type": "string"},
     "version": {"$ref": "common.schema.json#/$defs/version"},
     "skill": {"$ref": "common.schema.json#/$defs/identifier"},
+    "tier": {"$ref": "#/$defs/tier"},
     "judge": {"$ref": "#/$defs/judge"},
     "cases": {
       "type": "array",
@@ -18,6 +19,10 @@
   "required": ["version", "skill", "cases"],
   "additionalProperties": false,
   "$defs": {
+    "tier": {
+      "description": "How strict the quality gate is: the lowest with-skill pass rate and the lowest gain over the run without the skill.",
+      "enum": ["aggressive", "moderate", "conservative"]
+    },
     "gate": {
       "description": "A required case fails the run when it fails. An advisory case only reports.",
       "enum": ["required", "advisory"]

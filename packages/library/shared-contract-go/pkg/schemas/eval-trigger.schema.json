@@ -28,6 +28,10 @@
         "id": {"$ref": "common.schema.json#/$defs/identifier"},
         "shouldTrigger": {"type": "boolean"},
         "split": {"$ref": "#/$defs/split"},
+        "rationale": {
+          "description": "Why the query should or should not load the skill.",
+          "$ref": "common.schema.json#/$defs/text"
+        },
         "tags": {
           "type": "array",
           "items": {"$ref": "common.schema.json#/$defs/identifier"},

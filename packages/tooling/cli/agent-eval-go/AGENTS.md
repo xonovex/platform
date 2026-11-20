@@ -1,0 +1,12 @@
+# Agent Eval Go
+
+Measure skills, instruction files and agent flows against real models, keeping each concern in its own package behind a port.
+
+- Keep the axes independent: a harness turns one request into a command line and one stream into an `Observation`, a protocol turns an eval document into units and a verdict, a predicate checks what a run showed, and `run` drives the units under a budget with checkpoints. A package imports only what `internal/arch` lists for it, and the test fails a package missing from that table.
+- Add a harness, a protocol or a predicate kind as one package plus one line in `internal/registry`, the only file that names a concrete leaf. A leaf never imports a sibling. A protocol sees observations and predicates, never a harness.
+- Reach the machine only through a port: `internal/process` for programs, `internal/scratch` for throwaway directories, and `shared-contract-go` `fs` for files. Only `cmd/agent-eval`, `internal/process/osexec` and `internal/scratch/osscratch` import the host, and only `cmd/agent-eval` reads the clock. Unit tests use `memfs`, `processtest`, `scratchtest` and `protocoltest`, and never start a model.
+- Treat an infrastructure fault as a fault, not a result. A failed harness run, an unreadable file or a bad flag voids the run: `results.json` gets status `invalid`, the exit status is 2, and a partial run never reads as a pass. A budget stop is not a fault: the run is `incomplete`, the exit status is 3, and `--resume` finishes it from the checkpoint.
+- Keep the caps in `internal/settings` and `internal/budget`: at most 3 runs, concurrency 2, 24 model runs and 2 US dollars per invocation by default, with a per-run budget and timeout for each role. A flag overrides the environment, the environment overrides the project file, and the project file overrides the default.
+- Keep every harness run hermetic: no user settings, no MCP servers, no session persistence, and only the skills the request offers. Add a flag to the hermetic set in the harness leaf, and cover it with its unit test.
+- Change a document shape in `shared-contract-go` first, then in `internal/model`; `internal/document` validates every read and write against the schema.
+- `ci-check` runs the fast gates, including per-package coverage floors and the `arch` tests. `ci-integration` builds the binary and runs the `integration` tests against a fake `claude` program and the legacy eval files of the plugins; it starts real processes, spends no model budget, and stays out of CI.

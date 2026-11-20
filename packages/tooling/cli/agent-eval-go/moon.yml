@@ -1,0 +1,121 @@
+$schema: https://moonrepo.dev/schemas/v2/project.json
+language: go
+layer: application
+tags:
+  - go
+  - cli
+dependsOn:
+  - shared-contract-go
+tasks:
+  go-test-coverage:
+    env:
+      GO_COVERAGE_MIN: "92"
+  go-package-coverage:
+    script: |
+      set -euo pipefail
+      # Every package the module builds is named here. cmd/agent-eval is the
+      # composition root, and internal/process/osexec and
+      # internal/scratch/osscratch are the host adapters; go-integration covers
+      # all three, because a unit test may not start a process or touch the
+      # disk. internal/process and internal/scratch declare an interface and
+      # hold no statements. Every other package reaches the machine through a
+      # port, so the unit tier covers it with memfs, processtest, scratchtest and
+      # protocoltest.
+      bash "$workspaceRoot/.moon/scripts/check-go-package-coverage.sh" \
+        ./cmd/agent-eval=exempt \
+        ./internal/ablation=100 \
+        ./internal/baseline=97 \
+        ./internal/budget=100 \
+        ./internal/catalog=94 \
+        ./internal/cmd=92 \
+        ./internal/cost=96 \
+        ./internal/document=98 \
+        ./internal/execute=92 \
+        ./internal/harness=100 \
+        ./internal/harness/claude=96 \
+        ./internal/harness/codex=100 \
+        ./internal/judge=100 \
+        ./internal/migrate=91 \
+        ./internal/model=100 \
+        ./internal/predicate=100 \
+        ./internal/predicate/filesystem=100 \
+        ./internal/predicate/llm=100 \
+        ./internal/predicate/session=100 \
+        ./internal/process=exempt \
+        ./internal/process/osexec=exempt \
+        ./internal/process/processtest=100 \
+        ./internal/protocol=98 \
+        ./internal/protocol/instruction=100 \
+        ./internal/protocol/orchestration=96 \
+        ./internal/protocol/output=98 \
+        ./internal/protocol/protocoltest=exempt \
+        ./internal/protocol/routing=98 \
+        ./internal/protocol/trigger=100 \
+        ./internal/registry=100 \
+        ./internal/report=100 \
+        ./internal/run=98 \
+        ./internal/scratch=exempt \
+        ./internal/scratch/osscratch=exempt \
+        ./internal/scratch/scratchtest=100 \
+        ./internal/settings=95 \
+        ./internal/store=96
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - /.moon/scripts/check-go-package-coverage.sh
+      - /.moon/scripts/strip-generated-coverage.sh
+    options:
+      cache: true
+      runInCI: true
+  coverage:
+    deps:
+      - go-package-coverage
+  # The architecture tests read the source tree, so they carry the arch build
+  # tag and run here instead of in go-test.
+  go-test-arch:
+    command:
+      - go
+      - test
+      - -tags=arch
+      - ./internal/arch/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+    outputs: []
+    options:
+      cache: true
+  test:
+    command: noop
+    deps:
+      - go-test
+      - go-test-arch
+    options:
+      cache: false
+      mergeDeps: replace
+  # go-integration builds the real binary and runs it against a temporary
+  # directory and a fake claude program on PATH, and converts every legacy eval
+  # file of the plugins, so it is an integration tier rather than a ci-check
+  # gate. It starts real processes and spends no model budget.
+  go-integration:
+    script: |
+      set -euo pipefail
+      binary="$projectRoot/dist/agent-eval"
+      go build -o "$binary" ./cmd/agent-eval
+      AGENT_EVAL_BINARY="$binary" go test -tags=integration ./test/integration/
+    inputs:
+      - "@globs(sources)"
+      - "@globs(tests)"
+      - go.mod
+      - go.sum
+      - /packages/runtime/plugin/**/evals.json
+      - /packages/runtime/plugin/**/eval-queries.json
+    options:
+      cache: false
+      runInCI: false
+  ci-integration:
+    command: noop
+    deps:
+      - go-integration
+    options:
+      cache: false
+      runInCI: false

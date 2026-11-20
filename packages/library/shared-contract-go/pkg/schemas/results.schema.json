@@ -13,6 +13,10 @@
     "inputsDigest": {"$ref": "common.schema.json#/$defs/digest"},
     "startedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
     "finishedAt": {"$ref": "common.schema.json#/$defs/timestamp"},
+    "stop": {
+      "description": "Why an incomplete or invalid run ended early: the budget ran out, or an infrastructure fault voided it.",
+      "enum": ["budget", "infrastructure"]
+    },
     "status": {
       "description": "complete holds a verdict; incomplete awaits a resume; invalid means an infrastructure fault voids the run.",
       "enum": ["complete", "incomplete", "invalid"]
@@ -50,6 +54,17 @@
         "condition": {"$ref": "common.schema.json#/$defs/condition"},
         "outcome": {"enum": ["passed", "failed", "errored"]},
         "score": {"$ref": "common.schema.json#/$defs/ratio"},
+        "controlScore": {
+          "description": "The pass rate of the present expectations when the run held the instruction absent or ablated.",
+          "$ref": "common.schema.json#/$defs/ratio"
+        },
+        "runs": {"$ref": "common.schema.json#/$defs/positiveCount"},
+        "selected": {
+          "description": "How each run ended: the target skill, a named competitor, the output limit or nothing.",
+          "type": "array",
+          "items": {"$ref": "common.schema.json#/$defs/text"}
+        },
+        "skillTriggered": {"type": "boolean"},
         "durationMs": {"$ref": "common.schema.json#/$defs/count"},
         "usage": {"$ref": "common.schema.json#/$defs/usage"},
         "predicates": {
