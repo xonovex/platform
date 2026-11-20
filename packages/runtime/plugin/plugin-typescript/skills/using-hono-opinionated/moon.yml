@@ -3,8 +3,3 @@ language: unknown
 tags: [skill]
 dependsOn:
   - skill-using-hono
-tasks:
-  build:
-    command: echo 'build complete'
-    options:
-      cache: false

@@ -3,8 +3,3 @@ language: unknown
 tags: [skill]
 dependsOn:
   - skill-writing-c99
-tasks:
-  build:
-    command: echo 'build complete'
-    options:
-      cache: false
