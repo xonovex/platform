@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "required": [
+    "type",
+    "schema",
+    "work",
+    "title",
+    "base",
+    "head",
+    "verdict",
+    "verdict_matches"
+  ],
+  "properties": {
+    "type": {"const": "Workflow Pull Request Description"},
+    "schema": {"const": "workflow/pull-request/1"},
+    "work": {"$ref": "workflow/common#/$defs/workId"},
+    "title": {"type": "string", "minLength": 1},
+    "base": {"type": "string", "minLength": 1},
+    "head": {"type": "string", "minLength": 1},
+    "verdict": {
+      "oneOf": [
+        {"const": "none"},
+        {
+          "allOf": [
+            {"$ref": "workflow/common#/$defs/conceptId"},
+            {"x-concept": "verdicts/"}
+          ]
+        }
+      ]
+    },
+    "verdict_matches": {"type": "boolean"}
+  },
+  "allOf": [
+    {"$ref": "workflow/common#/$defs/header"},
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "verdict": {"const": "none"},
+            "verdict_matches": {"const": false}
+          }
+        },
+        {"properties": {"verdict": {"pattern": "^verdicts/"}}}
+      ]
+    }
+  ]
+}

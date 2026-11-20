@@ -9,7 +9,7 @@ import {
   isDirectory,
   isFile,
   resolveClaudePluginDirectories,
-  resolveGuideDirectory,
+  resolveSkillDirectory,
 } from "../../../src/fs.js";
 
 const ROOT = "/catalog";
@@ -25,17 +25,16 @@ const pluginPath = (directory: string): string =>
 const tree = (value: MemoryTree) => memoryFileSystem(value);
 
 describe("filesystem helpers", () => {
-  it("finds a skill's grouped plugin and accepts its command directory", () => {
+  it("finds a skill's grouped plugin", () => {
     const plugin = join(ROOT, "plugin-core");
-    const guide = join(plugin, "skills", "git-guide");
+    const skill = join(plugin, "skills", "using-git");
     const fs = tree({
       files: {
         [pluginPath(plugin)]: manifest("xonovex-core", {skills: "./skills/"}),
-        [join(plugin, "commands", "git-commit.md")]: "command",
-        [join(guide, "SKILL.md")]: "skill",
+        [join(skill, "SKILL.md")]: "skill",
       },
     });
-    expect(findPluginDirectory(guide, fs)).toBe(plugin);
+    expect(findPluginDirectory(skill, fs)).toBe(plugin);
     expect(findPluginDirectory(join(plugin, "guide"), fs)).toBe(plugin);
     expect(resolveClaudePluginDirectories(plugin, fs)).toEqual([plugin]);
   });
@@ -49,22 +48,22 @@ describe("filesystem helpers", () => {
     expect(isFile(ROOT, fs)).toBe(false);
   });
 
-  it("resolves a guide at the base", () => {
+  it("resolves a skill at the base", () => {
     const fs = tree({files: {[join(ROOT, "SKILL.md")]: "guide"}});
 
-    expect(resolveGuideDirectory(ROOT, fs)).toBe(ROOT);
+    expect(resolveSkillDirectory(ROOT, fs)).toBe(ROOT);
   });
 
-  it("resolves a guide one level below the base", () => {
+  it("resolves a skill one level below the base", () => {
     const fs = tree({files: {[join(ROOT, "guide", "SKILL.md")]: "guide"}});
 
-    expect(resolveGuideDirectory(ROOT, fs)).toBe(join(ROOT, "guide"));
+    expect(resolveSkillDirectory(ROOT, fs)).toBe(join(ROOT, "guide"));
   });
 
-  it("falls back to the base when nothing below it holds a guide", () => {
+  it("falls back to the base when nothing below it holds a skill", () => {
     const fs = tree({directories: [join(ROOT, "empty")]});
 
-    expect(resolveGuideDirectory(ROOT, fs)).toBe(ROOT);
+    expect(resolveSkillDirectory(ROOT, fs)).toBe(ROOT);
   });
 
   it("rejects an ambiguous package", () => {
@@ -75,7 +74,7 @@ describe("filesystem helpers", () => {
       },
     });
 
-    expect(() => resolveGuideDirectory(ROOT, fs)).toThrow("multiple SKILL.md");
+    expect(() => resolveSkillDirectory(ROOT, fs)).toThrow("multiple SKILL.md");
   });
 
   it("resolves local Claude plugin dependencies before the target", () => {
@@ -150,6 +149,20 @@ describe("filesystem helpers", () => {
 
     expect(() => resolveClaudePluginDirectories(target, fs)).toThrow(
       "contains hooks",
+    );
+  });
+
+  it("rejects a plugin that holds a commands directory", () => {
+    const plugin = join(ROOT, "plugin-core");
+    const fs = tree({
+      files: {
+        [pluginPath(plugin)]: manifest("xonovex-core", {skills: "./skills/"}),
+        [join(plugin, "commands", "run.md")]: "command",
+      },
+    });
+
+    expect(() => resolveClaudePluginDirectories(plugin, fs)).toThrow(
+      "contains commands",
     );
   });
 

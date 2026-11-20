@@ -164,7 +164,7 @@ export interface EvaluatorDependencies {
   readonly fs: FileSystem;
   // Removes a previous run's verdicts so a rerun cannot be read as this run's.
   readonly discard: (path: string) => void;
-  // Where relative paths and the guide are resolved from. A run uses the process
+  // Where relative paths and the skill are resolved from. A run uses the process
   // directory; a test names a directory in its own tree.
   readonly workingDirectory?: string;
   // Whether the harness CLI can be run. A run probes PATH; a test answers from
@@ -211,7 +211,7 @@ export const main = async (
     withArgs: config.withArgs,
     withoutArgs: config.withoutArgs,
     cwd: config.cwd,
-    guideDirectory: config.guideDirectory,
+    skillDirectory: config.skillDirectory,
     harness: config.harness,
     timeout: config.timeout,
     target: config.skillName,

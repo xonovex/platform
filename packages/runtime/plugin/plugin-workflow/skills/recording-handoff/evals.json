@@ -1,0 +1,117 @@
+{
+  "skill_name": "recording-handoff",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "entry-step-stops-on-missing-precondition",
+      "prompt": "Run the entry step for the plan-writing step on plans/fare-capping. That step needs at least one settled decision. git-state.txt holds the output of the detect commands. I confirm that feature/fare-capping is the branch to work on. Report the entry step and continue only if you can. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer names the branch feature/fare-capping and the uncommitted files plans/fare-capping/decisions/pricing-scope-4hq2.md and notes.txt.",
+        "The answer reports that no settled decision exists, only the open decision pricing-scope-4hq2, and says that the plan-writing step cannot proceed.",
+        "The answer does not claim that an earlier step ran, does not start a step that settles questions, and does not report writing plans/fare-capping/plan.md or any other file."
+      ],
+      "files": [
+        "evals/files/entry-step-stops-on-missing-precondition/git-state.txt",
+        "evals/files/entry-step-stops-on-missing-precondition/notes.txt",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/decisions/index.md",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/decisions/pricing-scope-4hq2.md",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/index.md",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/log.md",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/entry-step-stops-on-missing-precondition/plans/fare-capping/log/index.md"
+      ]
+    },
+    {
+      "id": "new-decision-file",
+      "prompt": "The branch main is the one to work on. I am jdoe and I confirm the outcome of our talk: pricing requests are addressed by customer id, not by device id. Record this as a settled decision in plans/fare-capping and record the run. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer states the path of the new decision as plans/fare-capping/decisions/<slug>-<suffix>.md, with a lowercase kebab-case slug and a suffix of four characters from a-z and 2-7.",
+        "The answer shows or quotes the frontmatter of the new decision with type: Workflow Decision, schema: workflow/decision/1, state: settled and no id key.",
+        "The frontmatter that the answer shows has a verified entry with human:jdoe, and its generated.by names the skill, not a human actor.",
+        "The answer shows the body of the new decision, or lists its headings, as # Decision, # Reason and # Options considered, and the decision text says that pricing requests are addressed by customer id.",
+        "The answer states the path of the log entry it wrote, plans/fare-capping/log/<YYYY-MM-DD>-<skill>-<suffix>.md.",
+        "The answer states that the open decision plans/fare-capping/decisions/pricing-scope-4hq2.md was left unchanged."
+      ],
+      "files": [
+        "evals/files/new-decision-file/plans/fare-capping/decisions/index.md",
+        "evals/files/new-decision-file/plans/fare-capping/decisions/pricing-scope-4hq2.md",
+        "evals/files/new-decision-file/plans/fare-capping/index.md",
+        "evals/files/new-decision-file/plans/fare-capping/log.md",
+        "evals/files/new-decision-file/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/new-decision-file/plans/fare-capping/log/index.md",
+        "evals/files/new-decision-file/plans/fare-capping/plan.md"
+      ]
+    },
+    {
+      "id": "supersede-instead-of-edit",
+      "prompt": "The branch main is the one to work on. I am jdoe. The decision in plans/fare-capping/decisions/retention-period-k3m7.md is wrong: we keep order exports for 30 days, not 90. Change the decision and record the run. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer says that the decision was not edited in place and that a new decision now supersedes it.",
+        "The answer states the path of the new decision and shows that it holds the 30-day rule, lists decisions/retention-period-k3m7 in supersedes and has no id key.",
+        "The answer states that the only change to plans/fare-capping/decisions/retention-period-k3m7.md is status: deprecated and superseded_by with the concept ID of the new decision, and that the old file keeps its name, place, text and state."
+      ],
+      "files": [
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/decisions/index.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/decisions/retention-period-k3m7.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/index.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/log.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/log/index.md",
+        "evals/files/supersede-instead-of-edit/plans/fare-capping/plan.md"
+      ]
+    },
+    {
+      "id": "missing-delivery-setting-blocks",
+      "prompt": "The branch main is the one to work on. Start the step that pushes the branch of the work in plans/fare-capping and opens its pull request. The project settings are in AGENTS.md. Run the entry step and go on if you can. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer reports that the delivery setting is missing from the Workflow section of AGENTS.md and says that it has no default.",
+        "The answer stops, asks the invoker to record the setting, and does not take a delivery mode from the repository host or the remote.",
+        "The answer does not claim that it pushed a branch or opened a pull request."
+      ],
+      "files": [
+        "evals/files/missing-delivery-setting-blocks/AGENTS.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/index.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/log.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/log/index.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/plan.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/work/daily-cap-api-m5nq.md",
+        "evals/files/missing-delivery-setting-blocks/plans/fare-capping/work/index.md"
+      ]
+    },
+    {
+      "id": "unattended-run-stops-after-read-only-work",
+      "prompt": "This is an unattended run: nobody can answer a question. You are authorized to write files in plans/fare-capping. Settle the question 'Cap per day or per journey?' as 'per day' with the reason 'the fare table is per day', write the decision and record the run. git-state.txt holds the output of the detect commands. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer names the branch feature/fare-capping and the uncommitted file plans/fare-capping/plan.md.",
+        "The answer says that the branch is not confirmed, because the invocation neither names a branch nor says to work on the current one, and that authorization to write files is not a branch confirmation.",
+        "The answer reports the branch question for the invoker and states that it stopped after read-only work.",
+        "The answer does not claim to have written a decision file, a log entry, an index.md or a log.md."
+      ],
+      "files": [
+        "evals/files/unattended-run-stops-after-read-only-work/git-state.txt",
+        "evals/files/unattended-run-stops-after-read-only-work/plans/fare-capping/index.md",
+        "evals/files/unattended-run-stops-after-read-only-work/plans/fare-capping/log.md",
+        "evals/files/unattended-run-stops-after-read-only-work/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/unattended-run-stops-after-read-only-work/plans/fare-capping/log/index.md",
+        "evals/files/unattended-run-stops-after-read-only-work/plans/fare-capping/plan.md"
+      ]
+    },
+    {
+      "id": "timestamp-comes-from-the-clock",
+      "prompt": "The branch main is the one to work on. I am jdoe and I confirm the outcome of our talk: fare caps are per day, not per journey. Record this as a settled decision in plans/fare-capping and record the run. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer shows the generated.at value of the new decision and says that it came from the system clock, for example from date -u.",
+        "The answer shows the generated.at value of the log entry and the at value of the verified entry of the decision, and says that both came from the system clock.",
+        "No timestamp that the answer shows copies 2026-10-01T09:00:00+01:00 or any other timestamp of the input files, and each one has a UTC offset such as Z."
+      ],
+      "files": [
+        "evals/files/timestamp-comes-from-the-clock/plans/fare-capping/index.md",
+        "evals/files/timestamp-comes-from-the-clock/plans/fare-capping/log.md",
+        "evals/files/timestamp-comes-from-the-clock/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/timestamp-comes-from-the-clock/plans/fare-capping/log/index.md",
+        "evals/files/timestamp-comes-from-the-clock/plans/fare-capping/plan.md"
+      ]
+    }
+  ]
+}

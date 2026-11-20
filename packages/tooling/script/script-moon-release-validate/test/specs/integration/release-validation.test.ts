@@ -8,7 +8,7 @@ import {validateRelease} from "../../../src/release-validation.js";
 
 const VERSION = "1.2.3";
 const PACKAGE_PATH = "packages/runtime/plugin/plugin-test";
-const COMMAND_PATH = "packages/runtime/plugin/plugin-commands";
+const EXTRA_PATH = "packages/runtime/plugin/plugin-extra";
 const SCRIPT_PATH = "packages/tooling/script/script-test";
 
 const writeText = (root: string, path: string, content: string): void => {
@@ -44,30 +44,30 @@ const createFixture = (): string => {
     source: `./${PACKAGE_PATH}`,
     description: "Test skill",
   };
-  const commandPackageManifest = {
-    name: "@xonovex/plugin-commands",
+  const extraPackageManifest = {
+    name: "@xonovex/plugin-extra",
     version: VERSION,
-    description: "Test command",
+    description: "Test extra skill",
   };
-  const commandPluginManifest = {
-    name: "xonovex-commands",
+  const extraPluginManifest = {
+    name: "xonovex-extra",
     version: VERSION,
-    description: "Test command",
+    description: "Test extra skill",
     skills: "./skills/",
   };
-  const commandEntry = {
-    name: "xonovex-commands",
-    source: `./${COMMAND_PATH}`,
-    description: "Test command",
+  const extraEntry = {
+    name: "xonovex-extra",
+    source: `./${EXTRA_PATH}`,
+    description: "Test extra skill",
   };
   const claudeMarketplace = {
     metadata: {version: VERSION},
-    plugins: [skillEntry, commandEntry],
+    plugins: [skillEntry, extraEntry],
   };
 
   writeJson(root, ".claude-plugin/marketplace.json", claudeMarketplace);
   writeJson(root, ".agents/plugins/marketplace.json", {
-    plugins: [skillEntry, commandEntry],
+    plugins: [skillEntry, extraEntry],
   });
   writeJson(root, `${PACKAGE_PATH}/package.json`, packageManifest);
   writeJson(root, `${PACKAGE_PATH}/plugin.json`, pluginManifest);
@@ -81,28 +81,28 @@ const createFixture = (): string => {
   });
   writeText(
     root,
-    `${PACKAGE_PATH}/skills/test-guide/SKILL.md`,
+    `${PACKAGE_PATH}/skills/using-test/SKILL.md`,
     "# Test skill\n",
   );
-  writeJson(root, `${COMMAND_PATH}/package.json`, commandPackageManifest);
-  writeJson(root, `${COMMAND_PATH}/plugin.json`, commandPluginManifest);
-  writeJson(root, `${COMMAND_PATH}/.claude-plugin/plugin.json`, {
-    ...commandPluginManifest,
+  writeJson(root, `${EXTRA_PATH}/package.json`, extraPackageManifest);
+  writeJson(root, `${EXTRA_PATH}/plugin.json`, extraPluginManifest);
+  writeJson(root, `${EXTRA_PATH}/.claude-plugin/plugin.json`, {
+    ...extraPluginManifest,
     skills: "./skills/",
   });
-  writeJson(root, `${COMMAND_PATH}/.codex-plugin/plugin.json`, {
-    ...commandPluginManifest,
+  writeJson(root, `${EXTRA_PATH}/.codex-plugin/plugin.json`, {
+    ...extraPluginManifest,
     skills: "./skills/",
   });
   writeText(
     root,
-    `${COMMAND_PATH}/skills/command-guide/SKILL.md`,
-    "# Command skill\n",
+    `${EXTRA_PATH}/skills/using-extra/SKILL.md`,
+    "# Extra skill\n",
   );
   writeJson(root, "package-lock.json", {
     packages: {
       [PACKAGE_PATH]: {version: VERSION},
-      [COMMAND_PATH]: {version: VERSION},
+      [EXTRA_PATH]: {version: VERSION},
     },
   });
   writeText(root, "README.md", "# Test repository\n");
@@ -267,14 +267,14 @@ tasks:
       source: `./${PACKAGE_PATH}`,
       description: "Test skill",
     };
-    const command = {
-      name: "xonovex-commands",
-      source: `./${COMMAND_PATH}`,
-      description: "Test command",
+    const extra = {
+      name: "xonovex-extra",
+      source: `./${EXTRA_PATH}`,
+      description: "Test extra skill",
     };
     writeJson(root, ".claude-plugin/marketplace.json", {
       metadata: {version: VERSION},
-      plugins: [duplicate, duplicate, command],
+      plugins: [duplicate, duplicate, extra],
     });
 
     try {
@@ -315,13 +315,13 @@ tasks:
     }
   });
 
-  it("rejects a skill manifest path that does not resolve to its guide", () => {
+  it("rejects a skill manifest path that does not resolve to its skill", () => {
     const root = createFixture();
     writeJson(root, `${PACKAGE_PATH}/.codex-plugin/plugin.json`, {
       name: "xonovex-test",
       version: VERSION,
       description: "Test skill",
-      skills: "./old-guide",
+      skills: "./using-old",
     });
 
     try {
@@ -331,7 +331,7 @@ tasks:
         `${PACKAGE_PATH} Codex manifest skill paths match ./skills/`,
       );
       expect(result.failures).toContain(
-        `${PACKAGE_PATH} manifest skill path is direct: ./old-guide`,
+        `${PACKAGE_PATH} manifest skill path is direct: ./using-old`,
       );
     } finally {
       rmSync(root, {recursive: true, force: true});

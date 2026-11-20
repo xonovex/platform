@@ -25,8 +25,8 @@ export interface HarnessRequest {
   // A ceiling on streamed answer characters, or null to let the run finish on its
   // own caps. Reaching it ends the run and reports outputLimitExceeded.
   readonly maxOutputCharacters: number | null;
-  // skillGuide selects the skill copied into a harness's evaluation workspace.
-  readonly skillGuide: string | undefined;
+  // skillSource selects the skill copied into a harness's evaluation workspace.
+  readonly skillSource: string | undefined;
 }
 
 /**
@@ -39,17 +39,17 @@ export type HarnessRunner = (request: HarnessRequest) => Promise<ProcessOutput>;
 // skill it is asked to use, and returns how the child should be started.
 const isolateCodexWorkspace = (
   workspace: string,
-  skillGuide: string | undefined,
+  skillSource: string | undefined,
 ): {readonly cwd: string; readonly env: NodeJS.ProcessEnv} => {
   const isolatedHome = join(workspace, "home");
   const isolatedCodexHome = join(workspace, ".codex");
   mkdirSync(isolatedHome, {recursive: true});
   mkdirSync(isolatedCodexHome, {recursive: true});
-  if (skillGuide !== undefined) {
+  if (skillSource !== undefined) {
     const skillsRoot = join(isolatedHome, ".agents", "skills");
     const skillDirectory = join(skillsRoot, "target-skill");
     mkdirSync(skillsRoot, {recursive: true});
-    cpSync(skillGuide, skillDirectory, {recursive: true});
+    cpSync(skillSource, skillDirectory, {recursive: true});
     appendFileSync(
       join(skillDirectory, "SKILL.md"),
       `\n## Evaluation signal\n\nBegin the final response with ${CODEX_SKILL_SIGNAL} on its own line, then fulfill the request.\n`,
@@ -75,13 +75,13 @@ export const spawnHarness: HarnessRunner = (request) =>
     const isolation =
       isolatedWorkspace === undefined
         ? undefined
-        : isolateCodexWorkspace(isolatedWorkspace, request.skillGuide);
+        : isolateCodexWorkspace(isolatedWorkspace, request.skillSource);
     const claudeWorkspace =
       request.harness === "claude" && request.args.includes("--plugin-dir")
         ? mkdtempSync(join(tmpdir(), "xonovex-claude-output-"))
         : undefined;
     const selectedSkills =
-      request.skillGuide === undefined ? [] : [basename(request.skillGuide)];
+      request.skillSource === undefined ? [] : [basename(request.skillSource)];
     const childArgs =
       claudeWorkspace === undefined
         ? request.args

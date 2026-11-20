@@ -4,6 +4,7 @@ import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
+import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
 
 // An absent directory reads as empty, so a catalog missing a whole tier is a
 // quiet no-op rather than a throw.
@@ -31,77 +32,39 @@ const readBudgeted = (
       ]
     : [];
 
-// collectGuideFiles returns the SKILL.md and reference files of one guide.
-export const collectGuideFiles = (
-  guideDirectory: string,
+// collectSkillFiles returns the SKILL.md and reference files of one skill.
+export const collectSkillFiles = (
+  skillDirectory: string,
   repositoryRoot: string,
   fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => [
   ...readBudgeted(
     repositoryRoot,
-    join(guideDirectory, "SKILL.md"),
+    join(skillDirectory, "SKILL.md"),
     "skill",
     fs,
   ),
-  ...listing(join(guideDirectory, "references"), fs)
+  ...listing(join(skillDirectory, "references"), fs)
     .filter((entry) => entry.endsWith(".md"))
     .flatMap((entry) =>
       readBudgeted(
         repositoryRoot,
-        join(guideDirectory, "references", entry),
+        join(skillDirectory, "references", entry),
         "reference",
         fs,
       ),
     ),
 ];
 
-// collectSkillCatalogFiles walks every guide under packages/runtime/plugin.
+// collectSkillCatalogFiles walks every skill under packages/runtime/plugin.
 export const collectSkillCatalogFiles = (
   repositoryRoot: string,
   fs: FileSystem = nodeFileSystem,
 ): readonly BudgetedFile[] => {
   const skillRoot = join(repositoryRoot, "packages", "runtime", "plugin");
   return listing(skillRoot, fs).flatMap((packageName) =>
-    listing(join(skillRoot, packageName, "skills"), fs)
-      .filter((entry) => entry.endsWith("-guide"))
-      .flatMap((guide) =>
-        collectGuideFiles(
-          join(skillRoot, packageName, "skills", guide),
-          repositoryRoot,
-          fs,
-        ),
-      ),
-  );
-};
-
-// collectCommandCatalogFiles walks every command document under packages/runtime/plugin.
-export const collectCommandCatalogFiles = (
-  repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
-): readonly BudgetedFile[] => {
-  const commandRoot = join(repositoryRoot, "packages", "runtime", "plugin");
-  return listing(commandRoot, fs).flatMap((packageName) =>
-    collectCommandPackageFiles(
-      join(commandRoot, packageName),
-      repositoryRoot,
-      fs,
+    pluginSkillDirectories(join(skillRoot, packageName), fs).flatMap(
+      (skillDirectory) => collectSkillFiles(skillDirectory, repositoryRoot, fs),
     ),
   );
 };
-
-// collectCommandPackageFiles returns the command documents of one package.
-export const collectCommandPackageFiles = (
-  packageDirectory: string,
-  repositoryRoot: string,
-  fs: FileSystem = nodeFileSystem,
-): readonly BudgetedFile[] =>
-  listing(join(packageDirectory, "commands"), fs)
-    .filter((entry) => entry.endsWith(".md"))
-    .flatMap((entry) =>
-      readBudgeted(
-        repositoryRoot,
-        join(packageDirectory, "commands", entry),
-        "command",
-        fs,
-      ),
-    );

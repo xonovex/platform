@@ -32,7 +32,7 @@
     {
       "name": "xonovex-native",
       "source": "./packages/runtime/plugin/plugin-native",
-      "description": "Write C99 and build portable native systems with explicit memory, concurrency, and data layouts."
+      "description": "Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts."
     },
     {
       "name": "xonovex-platform",
@@ -47,7 +47,7 @@
     {
       "name": "xonovex-workflow",
       "source": "./packages/runtime/plugin/plugin-workflow",
-      "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session."
+      "description": "Take a change from research to validated delivery in one directory of files that every step reads and writes."
     },
     {
       "name": "xonovex-writing",

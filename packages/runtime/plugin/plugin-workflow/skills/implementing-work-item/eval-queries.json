@@ -1,0 +1,134 @@
+[
+  {
+    "query": "implement work/capped-total-api-7k2f, tell me what runs in parallel before you start, and leave everything uncommitted",
+    "rationale": "implement one ready work item, with a stated task split",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "grab the next ready item for loyalty-service and build it, make sure what it depends on is finished first",
+    "rationale": "pick up the next ready item and check blockers",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "build work/points-balance-endpoint-3m4q in its own worktree and run whatever checks its criteria list",
+    "rationale": "build a work file in its worktree and run its named checks",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "split the capped-total item into tasks, cap.py is shared so those go in order and export.py can run alongside",
+    "rationale": "sequence tasks that share a file",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "no subagents here, so do the saved-searches work item yourself step by step and write the implementation notes",
+    "rationale": "in-order work when no worker can start, with notes",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "build the receipt export story from its work file, run the acceptance checks and say which criteria you could not check",
+    "rationale": "build and self-check against criteria",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "implement work/night-fare-cap-5r6s on branch pricing-service/feature/night-fare-cap, no commits please",
+    "rationale": "implement a work item on its own branch uncommitted",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the work item says round down per decision 4h2k, so build it and note where in src/cap.py that decision shows up",
+    "rationale": "decision notes with locations",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "pick up the ready item for the offline till sync, brief a worker per part with a model and effort each and recheck what they send back yourself",
+    "rationale": "delegate per concern and verify the result",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "carry on with work/fare-rules-model-3m4q, it is the ready one, and write the notes when it is done",
+    "rationale": "carry out a ready work file and record notes",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "make a worktree for pricing-service/feature/capped-total-api-7k2f off main so I can start on it",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the night-fare-cap branch is merged, remove its old worktree and delete the branch",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I built work/capped-total-api-7k2f, check it against its criteria from a fresh context and give me a verdict",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "did the capped-total change really meet c1 to c3? re-run the tests on your own and write down the verdict",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "turn the three rows in the loyalty outline into full work files with criteria, repository and dependencies",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "that session taught us a few things about the cap rounding, add them as rules to AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "turn what we learned building the cap logic into a reusable skill with a SKILL.md",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "work is done and checked, give me the commit message and command for pricing-service",
+    "rationale": "near miss owned by preparing-delivery",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "push pricing-service/feature/capped-total-api-7k2f to GitHub and open the pull request",
+    "rationale": "near miss owned by using-github",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "write a user story for riders who want to see a daily capped total, with acceptance criteria",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "review the diff on pricing-service/feature/capped-total-api-7k2f for bugs and list what you find",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "did work/saved-searches-4t7p meet its criteria? only look at the diff and run the checks, report failures but dont touch src/search.ts",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

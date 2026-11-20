@@ -1,0 +1,116 @@
+[
+  {
+    "query": "is this user story good? \"As a rider I want to pay for my trip\": does it pass INVEST?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "core INVEST evaluation of a user story"
+  },
+  {
+    "query": "this story is too big for a sprint, how do I split it into smaller stories?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "story splitting: SPIDR / flowchart territory"
+  },
+  {
+    "query": "what does SPIDR stand for and when do I use a spike to split a story?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "SPIDR splitting techniques owned here"
+  },
+  {
+    "query": "help me write acceptance criteria for the checkout story covering edge cases and errors",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "acceptance criteria coverage is owned by user-stories"
+  },
+  {
+    "query": "explain the 3 Cs: card, conversation, confirmation, for our stories",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "the 3 Cs model is owned here"
+  },
+  {
+    "query": "what's a walking skeleton and how do I slice this feature vertically instead of by layer?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "vertical slicing / walking skeleton owned by user-stories"
+  },
+  {
+    "query": "our backlog refinement is a mess. When is a story actually ready and who sizes it?",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "backlog refinement and readiness owned here"
+  },
+  {
+    "query": "rewrite this story using the As a / I want / so that template: \"Logged-in shoppers need a way to save a card so checkout is faster next time.\"",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "the story template is owned by user-stories"
+  },
+  {
+    "query": "break these tasks down so each one is SMART: \"improve checkout performance\", \"clean up the payment module\", \"add better logging\".",
+    "should_trigger": true,
+    "split": "validation",
+    "rationale": "SMART tasks are the task-level companion owned here"
+  },
+  {
+    "query": "write the Given-When-Then scenarios in a Cucumber feature file for this behaviour",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: Gherkin notation and feature files are owned by applying-bdd"
+  },
+  {
+    "query": "should I use a mock or a stub for the payment gateway in this test?",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: test-double choice is owned by authoring-tests"
+  },
+  {
+    "query": "define the bounded contexts and ubiquitous language for our payments domain",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: domain modelling and ubiquitous language are owned by applying-ddd"
+  },
+  {
+    "query": "break this epic into a parent plan and child plans with explicit parallel groups",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: plan decomposition is owned by defining-work-items"
+  },
+  {
+    "query": "these two stories keep breaking each other: analyse the coupling between the modules",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: coupling theory behind Independent is owned by analyzing-connascence"
+  },
+  {
+    "query": "help me run a three amigos session and write Given-When-Then scenarios for the checkout story before we code",
+    "rationale": "near miss owned by applying-bdd",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "we're adopting DDD. What are the tactical building blocks and which of them are aggregates?",
+    "rationale": "near miss owned by applying-ddd",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I have a Hono app configured with `app.use('*', cors())`. Write a Vitest test that verifies the CORS preflight (OPTIONS) request to `/api/users` with an Origin header succeeds and that the Access-Control-Allow-Origin header is returned.",
+    "rationale": "near miss: a Vitest API question",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "should a subplan be capped at seven tasks, and what if one task is bigger?",
+    "rationale": "validation near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "cut the address-lookup migration by outcome not by platform, hang the items under work/address-lookup-rollout-k3ne. propose first",
+    "rationale": "near miss owned by defining-work-items",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

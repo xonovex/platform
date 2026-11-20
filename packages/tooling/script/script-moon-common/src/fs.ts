@@ -11,7 +11,7 @@ export const isDirectory = (
   fs: FileSystem = nodeFileSystem,
 ): boolean => fs.isDirectory(path);
 
-export const resolveGuideDirectory = (
+export const resolveSkillDirectory = (
   base: string,
   fs: FileSystem = nodeFileSystem,
 ): string => {
@@ -29,10 +29,10 @@ export const resolveGuideDirectory = (
 };
 
 export const findPluginDirectory = (
-  guideDirectory: string,
+  skillDirectory: string,
   fs: FileSystem = nodeFileSystem,
 ): string => {
-  const parent = dirname(guideDirectory);
+  const parent = dirname(skillDirectory);
   return fs.isFile(join(dirname(parent), ".claude-plugin", "plugin.json"))
     ? dirname(parent)
     : parent;
@@ -95,7 +95,7 @@ const readClaudePluginManifest = (
     throw new Error(`Claude plugin skills are invalid: ${manifestPath}`);
   }
   const executableComponents = [
-    ...(grouped ? [] : ["commands"]),
+    "commands",
     "agents",
     "hooks",
     ".mcp.json",

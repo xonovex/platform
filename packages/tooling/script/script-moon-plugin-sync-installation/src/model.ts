@@ -5,6 +5,9 @@ export interface Plugin {
   readonly name: string;
   readonly version: string;
   readonly dependencies: readonly string[];
+  // companions are the plugins that a skill of this plugin hands off to and
+  // that the manifest does not declare as a dependency.
+  readonly companions: readonly string[];
   readonly harnesses: readonly Harness[];
 }
 

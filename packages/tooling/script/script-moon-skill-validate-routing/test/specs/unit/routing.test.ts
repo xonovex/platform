@@ -18,14 +18,15 @@ interface CatalogSkill {
 const writeCatalog = (skills: readonly CatalogSkill[]): FileSystem => {
   const files: Record<string, string> = {};
   for (const skill of skills) {
-    const guide = join(
+    const directory = join(
       ROOT,
       `plugin-${skill.name}`,
       "skills",
-      `${skill.name}-guide`,
+      `using-${skill.name}`,
     );
-    files[join(guide, "SKILL.md")] = `---\nname: ${skill.name}-guide\n---\n`;
-    files[join(guide, "eval-queries.json")] = JSON.stringify(skill.queries);
+    files[join(directory, "SKILL.md")] =
+      `---\nname: using-${skill.name}\n---\n`;
+    files[join(directory, "eval-queries.json")] = JSON.stringify(skill.queries);
   }
   return memoryFileSystem({files});
 };
@@ -109,7 +110,7 @@ describe("routing owners check", () => {
     expect(
       log.mock.calls.map((call) => String(call.at(0))).join("\n"),
     ).toContain(
-      'owner-guide and rival-guide both mark "contested query" should_trigger',
+      'using-owner and using-rival both mark "contested query" should_trigger',
     );
   });
 
@@ -121,7 +122,7 @@ describe("routing owners check", () => {
         queries: [
           {
             query: "settle the option",
-            rationale: "settling it is the owner-decide operation",
+            rationale: "settling it is the `owner-decide` operation",
             should_trigger: true,
             split: "validation" as const,
           },
@@ -140,7 +141,7 @@ describe("routing owners check", () => {
     expect(main([ROOT], fs)).toBe(1);
     expect(
       log.mock.calls.map((call) => String(call.at(0))).join("\n"),
-    ).toContain("owner-guide cites the 'owner-decide' operation");
+    ).toContain("using-owner cites the 'owner-decide' operation");
   });
 
   it("reports an unreadable catalog root", () => {

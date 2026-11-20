@@ -30,9 +30,9 @@ const triggeredOn = (text: string): TriggerOutcome =>
 
 const DIRECTORY = "/skill";
 
-// The guide a run resolves from, holding the SKILL.md that names the skill and
+// The skill a run resolves from, holding the SKILL.md that names the skill and
 // the queries the evaluator scores.
-const guideTree = (extra: Readonly<Record<string, string>> = {}): FileSystem =>
+const skillTree = (extra: Readonly<Record<string, string>> = {}): FileSystem =>
   memoryFileSystem({
     files: {
       [join(DIRECTORY, "SKILL.md")]:
@@ -76,7 +76,7 @@ describe("main", () => {
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 
     await expect(
-      main(["a", "b", "all", "extra"], dependencies(guideTree())),
+      main(["a", "b", "all", "extra"], dependencies(skillTree())),
     ).rejects.toThrow('process.exit unexpectedly called with "2"');
 
     vi.restoreAllMocks();
@@ -89,7 +89,7 @@ const PLUGIN_DIRECTORY = join(DIRECTORY, "plugin");
 const QUERIES_FILE = join(DIRECTORY, "eval-queries.json");
 
 const evaluatorTree = (): FileSystem =>
-  guideTree({
+  skillTree({
     [join(PLUGIN_DIRECTORY, ".claude-plugin", "plugin.json")]: JSON.stringify({
       name: "test-plugin",
       version: "0.0.0",

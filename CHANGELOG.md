@@ -1,9 +1,31 @@
 # Changelog
 
-Release notes for the plugin catalog line: the `packages/skill/*` and
-`packages/command/*` plugins versioned in lockstep with
-`.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The
-agent line keeps its own notes in `packages/agent/agent-cli-go/CHANGELOG.md`.
+Release notes for the plugin catalog line: the `packages/runtime/plugin/*` plugins versioned in lockstep with `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`. The agent CLI keeps its own notes in `packages/tooling/cli/*/CHANGELOG.md`.
+
+## 6.0.0 - 2026-11-20
+
+10 grouped plugins with 86 skills. Previous catalog version: 5.3.0.
+
+### Breaking changes
+
+- The 77 individual `xonovex-skill-*` and `xonovex-command-*` plugins are removed. Ten grouped plugins hold the skills: `xonovex-agentic`, `xonovex-core`, `xonovex-game-engine`, `xonovex-integrations`, `xonovex-languages`, `xonovex-native`, `xonovex-platform`, `xonovex-typescript`, `xonovex-workflow` and `xonovex-writing`.
+- The slash commands are removed. Each skill takes the request directly.
+- The skills have gerund names, for example `using-git`, `reviewing-code` and `writing-typescript`; the `-guide` names are removed.
+- The workflow plugin is replaced by a port of the ns workflow. It keeps each change in a directory of files that each of its twelve steps reads and writes, from `researching-change` to `validating-work-package`.
+- `delegating-plan` and `distilling-plan` are removed.
+- `reflecting-on-sessions` is removed. `authoring-instructions` and `authoring-skills` turn the lessons of a session into rules and skills.
+- `debugging-native-code` is in `xonovex-native`.
+- `writing-lua-opinionated` is part of `writing-lua`.
+
+### Added
+
+- `evaluating-skills` runs the trigger and output evaluations of a skill, separate from `authoring-skills`.
+- The skill evaluations use Claude Haiku 5.5 to generate and Claude Sonnet 5.5 to judge.
+
+### Changed
+
+- Each description leads with the task in the words of a user. The catalog descriptions total 34,593 characters, down from 41,044.
+- The skill validator fails a description above 820 characters.
 
 ## 5.3.0 - 2026-08-29
 

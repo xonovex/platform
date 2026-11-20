@@ -50,7 +50,7 @@ const RULES: readonly ProsePunctuationRule[] = [
   },
 ];
 
-// Text file types that carry prose in skill and command packages: guides and
+// Text file types that carry prose in skill plugin packages: skills and
 // references, manifests and eval fixtures, bundled scripts, and asset templates.
 export const PROSE_FILE_EXTENSIONS: readonly string[] = [
   ".json",

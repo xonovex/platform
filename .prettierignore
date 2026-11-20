@@ -113,5 +113,12 @@ docs/_build/
 .assetsignore
 
 # Skill eval run artifacts
-*-guide-workspace/
+*-workspace/
 .skill-eval-results/
+
+# The generated index.md and log.md of the workflow example bundle use the * list marker that the bundle format defines.
+packages/runtime/plugin/plugin-workflow/examples/saved-searches/
+
+# The generated index.md and log.md of the bundles in workflow eval fixtures use the * list marker that the bundle format defines.
+packages/runtime/plugin/plugin-workflow/skills/*/evals/files/**/index.md
+packages/runtime/plugin/plugin-workflow/skills/*/evals/files/**/log.md

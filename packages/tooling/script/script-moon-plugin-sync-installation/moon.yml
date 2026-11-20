@@ -47,6 +47,8 @@ tasks:
       - /packages/runtime/plugin/**/README.md
       - /packages/runtime/plugin/**/.claude-plugin/plugin.json
       - /packages/runtime/plugin/**/.codex-plugin/plugin.json
+      - /packages/runtime/plugin/*/skills/*/SKILL.md
+      - /packages/runtime/plugin/*/skills/*/references/*.md
     options:
       cache: false
       runFromWorkspaceRoot: true

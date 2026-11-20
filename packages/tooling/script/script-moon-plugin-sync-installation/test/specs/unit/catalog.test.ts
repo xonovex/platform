@@ -35,6 +35,7 @@ describe("loadPlugins", () => {
           name: "xonovex-core",
           version: "5.3.0",
           dependencies: [],
+          companions: [],
           harnesses: ["Claude Code"],
         },
       ],
@@ -53,6 +54,7 @@ describe("loadPlugins", () => {
       name: "xonovex-workflow",
       version: "5.3.0",
       dependencies: ["xonovex-agentic", "xonovex-core"],
+      companions: [],
       harnesses: ["Claude Code", "Codex"],
     });
   });
@@ -109,5 +111,48 @@ describe("loadPlugins", () => {
       },
     });
     expect(() => loadPlugins(ROOT, fs)).toThrow("Path escapes");
+  });
+
+  it("names each undeclared plugin that a skill hands off to", () => {
+    const native: PluginFixture = {
+      name: "xonovex-native",
+      directory: "packages/runtime/plugin/plugin-native",
+      version: "5.3.0",
+      claude: true,
+      codex: false,
+      skills: {"skills/managing-memory/SKILL.md": "# Memory\n"},
+    };
+    const core: PluginFixture = {
+      ...claudeOnly,
+      skills: {
+        "skills/using-git/SKILL.md": "# Git\n",
+        "skills/reviewing-code/SKILL.md": "# Review\n",
+      },
+    };
+    const engine: PluginFixture = {
+      name: "xonovex-game-engine",
+      directory: "packages/runtime/plugin/plugin-game-engine",
+      version: "5.3.0",
+      dependencies: ["xonovex-native"],
+      claude: true,
+      codex: false,
+      skills: {
+        "skills/mixing-audio/SKILL.md":
+          "# Audio\n\nSee **managing-memory** and **mixing-audio**.\n",
+        "skills/mixing-audio/references/a.md":
+          "# A\n\nCommit with **using-git**, not using-docker or **using-unknown-tool**.\n",
+      },
+    };
+    const catalog = loadPlugins(
+      ROOT,
+      repositoryFileSystem([native, core, engine]),
+    );
+    expect(
+      catalog.plugins.map(({name, companions}) => [name, companions]),
+    ).toEqual([
+      ["xonovex-core", []],
+      ["xonovex-game-engine", ["xonovex-core"]],
+      ["xonovex-native", []],
+    ]);
   });
 });

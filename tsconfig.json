@@ -27,7 +27,7 @@
       "path": "./packages/tooling/cli/agent-cli-go"
     },
     {
-      "path": "./packages/tooling/script/script-moon-command-validate"
+      "path": "./packages/tooling/script/script-moon-plugin-validate"
     },
     {
       "path": "./packages/tooling/script/script-moon-common"

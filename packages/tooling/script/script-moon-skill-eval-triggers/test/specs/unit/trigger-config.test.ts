@@ -41,9 +41,9 @@ const failureMessage = (
 
 const DIRECTORY = "/skill";
 
-// The guide a run resolves from: its SKILL.md, its queries, and the plugin
+// The skill a run resolves from: its SKILL.md, its queries, and the plugin
 // manifest a Claude run loads the skill through.
-const guideTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
+const skillTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
   memoryFileSystem({
     files: {
       ...(skill
@@ -71,7 +71,7 @@ describe("trigger configuration", () => {
   let fs: FileSystem;
 
   beforeEach(() => {
-    fs = guideTree();
+    fs = skillTree();
   });
 
   const resolveConfig = (
@@ -99,7 +99,7 @@ describe("trigger configuration", () => {
       threshold: 0.5,
       budget: 0.05,
       harness: "claude",
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-5-5",
       harnessExecutable: "/bin/claude",
       queryCount: 2,
       maxBatchModelRuns: 6,
@@ -196,7 +196,7 @@ describe("trigger configuration", () => {
       "invalid evaluator options",
     );
 
-    fs = guideTree({skill: false});
+    fs = skillTree({skill: false});
     expect(failureMessage(resolveConfig(), "usage")).toContain(
       "arguments are required: skill_name",
     );
@@ -265,19 +265,19 @@ describe("trigger configuration", () => {
   ): string => {
     const catalogRoot = join(directory, "catalog");
     for (const entry of entries) {
-      const guideDirectory = join(
+      const skillDirectory = join(
         catalogRoot,
         entry.directory,
         "skills",
         entry.name,
       );
-      fs.makeDirectory(guideDirectory);
+      fs.makeDirectory(skillDirectory);
       fs.writeFile(
-        join(guideDirectory, "SKILL.md"),
+        join(skillDirectory, "SKILL.md"),
         `---\nname: ${entry.name}\n---\n`,
       );
       fs.writeFile(
-        join(guideDirectory, "eval-queries.json"),
+        join(skillDirectory, "eval-queries.json"),
         JSON.stringify(entry.queries),
       );
     }

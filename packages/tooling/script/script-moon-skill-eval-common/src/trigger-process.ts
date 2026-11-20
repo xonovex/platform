@@ -25,14 +25,14 @@ const TRIGGER_TIMEOUT_MS = 60_000;
 interface CodexTriggerOptions {
   readonly args: readonly string[];
   readonly executable: string;
-  readonly guideDirectory: string;
+  readonly skillDirectory: string;
   readonly query: string;
   readonly shortName: string;
-  readonly candidateGuides?: readonly CodexCandidateGuide[];
+  readonly skillCandidates?: readonly CodexCandidateSkill[];
 }
 
-export interface CodexCandidateGuide {
-  readonly guideDirectory: string;
+export interface CodexCandidateSkill {
+  readonly skillDirectory: string;
   readonly shortName: string;
 }
 
@@ -117,19 +117,18 @@ export const checkCodexTriggered = (
   mkdirSync(skillsDirectory, {recursive: true});
   mkdirSync(isolatedHome, {recursive: true});
   mkdirSync(isolatedCodexHome, {recursive: true});
-  const candidateGuides = options.candidateGuides ?? [
-    {guideDirectory: options.guideDirectory, shortName: options.shortName},
+  const skillCandidates = options.skillCandidates ?? [
+    {skillDirectory: options.skillDirectory, shortName: options.shortName},
   ];
-  for (const candidate of candidateGuides) {
+  for (const candidate of skillCandidates) {
     cpSync(
-      candidate.guideDirectory,
+      candidate.skillDirectory,
       join(skillsDirectory, candidate.shortName),
       {recursive: true},
     );
   }
-  const skillDirectory = join(skillsDirectory, options.shortName);
   appendFileSync(
-    join(skillDirectory, "SKILL.md"),
+    join(skillsDirectory, options.shortName, "SKILL.md"),
     `\n## Evaluation signal\n\nWhen this skill applies, reply with exactly ${CODEX_TRIGGER_SIGNAL}.\n`,
   );
 

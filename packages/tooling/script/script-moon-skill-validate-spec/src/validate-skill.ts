@@ -7,10 +7,14 @@ import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
-import {resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
+import {resolveSkillDirectory} from "@xonovex/script-moon-common/fs";
 import {scanProsePunctuation} from "@xonovex/script-moon-common/prose-punctuation";
+import {
+  isSkillName,
+  SKILL_NAME_RULE,
+} from "@xonovex/script-moon-common/skill-name";
 import {findWorkspaceRoot} from "@xonovex/script-moon-common/workspace";
-import {checkGuideDrift} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
+import {checkSkillDrift} from "@xonovex/script-moon-skill-catalog-common/drift-lints";
 import {checkReferenceFileLinks} from "@xonovex/script-moon-skill-catalog-common/reference-file-links";
 import {parse as parseYaml} from "yaml";
 import {checkCatalogFiles} from "./catalog-files.js";
@@ -26,7 +30,7 @@ const HEADING_RE = /^#{1,6} /m;
 const CODE_FENCE_OPEN_RE = /^```([\w+-]+)?[^\S\n]*$/gm;
 const LOAD_WHEN_RE = /load when/i;
 const EXTERNAL_REFERENCES_HEADING_RE = /^## +External References\b/im;
-const RESERVED_VENDOR_ADAPTER_NAMES = new Set(["claude-code-guide"]);
+const RESERVED_VENDOR_ADAPTER_NAMES = new Set(["configuring-claude-code"]);
 
 const HARNESS_PATTERNS: readonly [RegExp, string][] = [
   // Proprietary tool / function / mode names
@@ -112,7 +116,7 @@ const resolveTarget = (
   const target = resolve(arg);
   let skill: string;
   if (fs.isDirectory(target)) {
-    skill = join(resolveGuideDirectory(target, fs), "SKILL.md");
+    skill = join(resolveSkillDirectory(target, fs), "SKILL.md");
   } else if (fs.isFile(target)) {
     skill = target;
   } else {
@@ -225,9 +229,14 @@ const checkName = (
       `frontmatter: name '${name}' is not kebab-case ` +
         `(regex ^[a-z0-9]+(-[a-z0-9]+)*$)`,
     );
+  } else if (!isSkillName(name)) {
+    report.addFail(
+      `frontmatter: name '${name}' is not a gerund and then its object ` +
+        `(regex ${SKILL_NAME_RULE})`,
+    );
   } else if (name === parentName) {
     report.addPass(
-      `name: '${name}' (${String(name.length)} chars, kebab-case, matches parent dir)`,
+      `name: '${name}' (${String(name.length)} chars, gerund first, matches parent dir)`,
     );
   } else {
     report.addFail(
@@ -250,23 +259,24 @@ const checkName = (
   }
 };
 
+// The routing run on the workflow skills kept descriptions of up to this
+// length; the specification allows 1,024.
+const DESCRIPTION_LIMIT = 820;
+
 const checkDescription = (fm: Frontmatter, report: Report): void => {
   const desc = fm.description;
   if (!desc) {
     report.addFail("frontmatter: missing 'description'");
   } else if (typeof desc === "string") {
     const descLen = desc.length;
-    if (descLen > 1024) {
+    if (descLen > DESCRIPTION_LIMIT) {
       report.addFail(
-        `description: ${String(descLen)} chars (>1024 spec limit)`,
+        `description: ${String(descLen)} chars (over the ${String(DESCRIPTION_LIMIT)}-character catalog limit)`,
       );
-    } else if (descLen > 820) {
-      report.addWarn(
-        `description: ${String(descLen)} chars (>80% of 1024 limit; consider trimming)`,
-      );
-      report.addPass(`description present (${String(descLen)} chars)`);
     } else {
-      report.addPass(`description: ${String(descLen)} chars (under 1024)`);
+      report.addPass(
+        `description: ${String(descLen)} chars (within ${String(DESCRIPTION_LIMIT)})`,
+      );
     }
 
     if (/^\s*use (?:this skill )?when/i.test(desc)) {
@@ -808,7 +818,7 @@ export const main = (
   const repositoryRoot = workspaceRootOrUndefined(skillDir, fs);
   if (repositoryRoot !== undefined) {
     const driftMode = resolveDriftLintMode(process.env[DRIFT_LINT_MODE_ENV]);
-    const drift = checkGuideDrift(skillDir, repositoryRoot, fs);
+    const drift = checkSkillDrift(skillDir, repositoryRoot, fs);
     for (const error of drift.manifestErrors) report.addFail(error);
     for (const finding of drift.findings) {
       if (driftMode === "enforce") report.addFail(finding);

@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": ["type", "schema"],
+  "properties": {
+    "type": {"const": "Workflow Plan"},
+    "schema": {"const": "workflow/plan/1"},
+    "owners": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "repositories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "resource"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "resource": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "skills_to_consult": {"$ref": "common.schema.json#/$defs/skillNames"}
+  },
+  "allOf": [{"$ref": "common.schema.json#/$defs/header"}]
+}

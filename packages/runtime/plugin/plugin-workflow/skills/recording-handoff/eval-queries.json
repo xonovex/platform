@@ -1,0 +1,122 @@
+[
+  {
+    "query": "before we start: which branch are shop-api and pricing-svc on, anything uncommitted? and check plans/fare-capping validates",
+    "rationale": "the entry step at the start of a workflow step",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I dropped a new decision into the fare-capping folder by hand, regenerate index.md and log.md so they're not stale",
+    "rationale": "generated indexes and the log, without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "plan-bundle.py validate says 'relation key holds a file name' on work/daily-cap-api-m5nq.md, what's wrong with it?",
+    "rationale": "reading a validator finding about a relation key",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "the retention decision says 90 days, it should be 30. just edit decisions/retention-period-k3m7.md",
+    "rationale": "a request to edit an append-only decision; the skill routes it to a superseding decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "what goes on the end of a new decision filename? can I just number them 001, 002?",
+    "rationale": "file names and suffixes, without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "put saved-searches under the agentic family folder next to roadmap.md, first log entry, then validate it",
+    "rationale": "starting a change in a family directory, without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "new change: loyalty-points. set up the folder and the first log entry, nothing else yet",
+    "rationale": "starting a new change, without the word plan",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "add the Workflow section to AGENTS.md: plans dir, shop-api and shop-web repos, delivery mode pull-request",
+    "rationale": "project Workflow settings",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the rate limiter work item has to wait on the open token-expiry decision, how do I set readiness and depends_on in its frontmatter?",
+    "rationale": "work item frontmatter with readiness and relation keys",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "can I write human:jdoe in verified on a decision the agent drafted and nobody looked at yet?",
+    "rationale": "actor prefixes and trust in frontmatter",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "write an ADR in docs/adr for picking Postgres over DynamoDB for the orders service, with the rejected options",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "commit what's in plans/fare-capping with a conventional commit message",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "make me a worktree for feature/daily-cap off main so I can keep my current checkout",
+    "rationale": "near miss owned by using-git",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "my SKILL.md frontmatter fails validation, the description has to start with 'Use when' and the name must match the folder",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "we fought the bundle validator all session, turn what we learned into a rule in CLAUDE.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the checkout story is way too big, split it into INVEST stories with acceptance criteria",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "write the PR description for feature/daily-cap, what changed and how I tested it",
+    "rationale": "near miss owned by authoring-pull-requests",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add our build, test and lint commands to AGENTS.md so new people find them",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "write a README for shop-api with install, usage and contributing sections",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "push feature/fare-capping and open the PR on GitHub with the reviewers from CODEOWNERS",
+    "rationale": "near miss owned by using-github",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

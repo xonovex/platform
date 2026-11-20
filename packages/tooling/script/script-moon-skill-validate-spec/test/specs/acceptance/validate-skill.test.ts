@@ -4,7 +4,7 @@ import {join, resolve} from "node:path";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import {main as validateSkill} from "../../../src/validate-skill.js";
 
-// These validate the catalog's own code-quality-guide skill rather than a
+// These validate the catalog's own auditing-code-quality skill rather than a
 // fixture, so they state what the repository's content must satisfy. The rules
 // themselves are covered against built trees in the unit tier.
 const temporaryDirectories: string[] = [];
@@ -21,7 +21,7 @@ describe("the live skill catalog", () => {
   it("validates a complete repository skill", () => {
     const skill = resolve(
       import.meta.dirname,
-      "../../../../../../runtime/plugin/plugin-core/skills/code-quality-guide",
+      "../../../../../../runtime/plugin/plugin-core/skills/auditing-code-quality",
     );
     vi.spyOn(console, "log").mockImplementation(() => {});
 
@@ -36,39 +36,39 @@ describe("the live skill catalog", () => {
     const root = mkdtempSync(join(tmpdir(), "skill-drift-"));
     temporaryDirectories.push(root);
     mkdirSync(join(root, ".moon"));
-    const guide = join(
+    const skillDirectory = join(
       root,
       "packages",
       "runtime",
       "plugin",
       "plugin-core",
       "skills",
-      "code-quality-guide",
+      "auditing-code-quality",
     );
     mkdirSync(join(root, "packages", "runtime", "plugin"), {recursive: true});
     cpSync(
       resolve(
         import.meta.dirname,
-        "../../../../../../runtime/plugin/plugin-core/skills/code-quality-guide",
+        "../../../../../../runtime/plugin/plugin-core/skills/auditing-code-quality",
       ),
-      guide,
+      skillDirectory,
       {recursive: true},
     );
     writeFileSync(
       join(root, "budgets.json"),
       JSON.stringify({
-        "packages/runtime/plugin/plugin-core/skills/code-quality-guide/SKILL.md": 1,
+        "packages/runtime/plugin/plugin-core/skills/auditing-code-quality/SKILL.md": 1,
       }),
       "utf8",
     );
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    expect(validateSkill(["--strict", guide])).toBe(0);
+    expect(validateSkill(["--strict", skillDirectory])).toBe(0);
     expect(log.mock.calls.flat().join("\n")).toContain("[DRIFT] budget:");
 
     process.env.XONOVEX_LINT_MODE = "enforce";
     try {
-      expect(validateSkill(["--strict", guide])).toBe(1);
+      expect(validateSkill(["--strict", skillDirectory])).toBe(1);
     } finally {
       delete process.env.XONOVEX_LINT_MODE;
     }
@@ -76,7 +76,7 @@ describe("the live skill catalog", () => {
   it("allows the catalog's explicit Claude Code adapter name", () => {
     const skill = resolve(
       import.meta.dirname,
-      "../../../../../../runtime/plugin/plugin-agentic/skills/claude-code-guide",
+      "../../../../../../runtime/plugin/plugin-agentic/skills/configuring-claude-code",
     );
     vi.spyOn(console, "log").mockImplementation(() => {});
 

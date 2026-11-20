@@ -6,7 +6,7 @@ import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
-import {resolveGuideDirectory} from "@xonovex/script-moon-common/fs";
+import {resolveSkillDirectory} from "@xonovex/script-moon-common/fs";
 import {parseArgs, type ParsedArgs} from "./args.js";
 import {
   hasReferenceMapping,
@@ -138,9 +138,9 @@ const resolveSourcesFile = (
     if (fs.isFile(join(target, "SOURCES.md"))) {
       return join(target, "SOURCES.md");
     }
-    const guideDir = resolveGuideDirectory(target);
-    if (fs.isFile(join(guideDir, "SOURCES.md"))) {
-      return join(guideDir, "SOURCES.md");
+    const skillDir = resolveSkillDirectory(target);
+    if (fs.isFile(join(skillDir, "SOURCES.md"))) {
+      return join(skillDir, "SOURCES.md");
     }
   }
   return undefined;

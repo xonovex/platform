@@ -1,0 +1,128 @@
+[
+  {
+    "query": "Team Payments answered on the retry limit, I pasted it as a FIXME in plans/retry-policy/plan.md. Fold it in and release whatever work was waiting on that decision.",
+    "rationale": "operator notes folded into the plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I dropped 11 FIXME notes into plan.md. Go through them and tell me for each one: applied, partly, not applied or handed on, and keep what each note said",
+    "rationale": "operator notes with a disposition each",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "critique of the import plan is done. go through the findings, apply what the evidence backs and tell me why you skipped the rest",
+    "rationale": "critique findings processed",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "new research says the cap applies before discounts, not after. figure out which parts of the plan and work files leaned on the old claim and fix them",
+    "rationale": "research correction reaches the plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "research/gateway-limits-r6t3 says the gateway sheds load after 2 requests, not 4. reopen the retry decision as a new one and put the work that used it back to waiting",
+    "rationale": "a research correction reopens a decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "a few of my FIXMEs are questions like 'is this a regression?'. answer them from the code, only touch the plan if the answer changes a decision, and give me a table of what happened to each",
+    "rationale": "notes that are questions answered",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "we dropped the phased rollout on the billing-api. take it out of the objective, the success criteria and the work files, and keep what my notes about it said",
+    "rationale": "a rejected design removed everywhere",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "the review showed the storage decision rests on a wrong assumption. stop stating it as settled and park the work that depends on it",
+    "rationale": "a critique finding reopens a decision and puts work back to waiting",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "apply my notes in plans/export-service/plan.md and the work files, then tell me what changed for each note",
+    "rationale": "apply operator notes",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the research file has six open questions. walk me through them one by one and write down each answer I give",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "all decisions are recorded. write the plan for the ledger migration with objective, scope and success criteria",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "draw how payment, gateway and ledger talk to each other and render it next to the plan",
+    "rationale": "near miss owned by illustrating-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "be a skeptic on the finished plan: what could fail, what is missing? write the findings down but leave the plan alone",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "poke holes in the loyalty-service plan before the owners sign it off. which success criteria could pass while it is still broken?",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the plan is agreed and the first work item is ready. implement it on feature/retry-policy and run its tests",
+    "rationale": "near miss owned by implementing-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "before we change anything, find out what export-service does today when the profile endpoint returns a 404",
+    "rationale": "near miss owned by researching-change",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "what we hit this session taught us a few things, turn those lessons into rules for AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "turn what we learned in this session about the release checklist into a reusable skill",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "write the plan for cache-layer from research/cache-facts-c3d4.md and the cache-store decision, only the settled picture please, none of the rejected stuff",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "try to falsify the success criteria in the notifications rollout, can anyone actually observe them?",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "what's left after this package? one seed per chunk of remaining work, with the current state evidenced and what gates it",
+    "rationale": "near miss owned by validating-work-package",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

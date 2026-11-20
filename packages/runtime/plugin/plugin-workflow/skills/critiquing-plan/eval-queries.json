@@ -1,0 +1,146 @@
+[
+  {
+    "query": "plans/fare-capping/plan.md is done, red-team it before alex signs off",
+    "rationale": "red-team review of a written plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "pre-mortem on the checkout-v2 rollout doc: assume it blew up in six months, what went wrong?",
+    "rationale": "pre-mortem lens without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "poke holes in the orders-db migration approach before we approve it",
+    "rationale": "adversarial review before approval without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "what could go wrong with the plan for moving search onto opensearch? don't change it, just give me the risks graded by severity",
+    "rationale": "graded findings without revising",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "get a fresh agent that didn't write it to review plans/rate-limits/plan.md, blind first and then with the decisions",
+    "rationale": "independent two-pass review",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "steelman the weakest section of the invoice-feed plan, what's the smallest change that would make it hold up",
+    "rationale": "steelman lens",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "I wrote plans/saved-searches myself so I'm biased. can something independent stress-test its assumptions before sign-off?",
+    "rationale": "independent stress test of assumptions",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "try to falsify the success criteria in the notifications rollout, can anyone actually observe them?",
+    "rationale": "falsify lens without the word plan",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the plan got revised yesterday after the last review, critique the new version from scratch",
+    "rationale": "a new critique of a revised plan",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "which inputs or orderings does the cache-layer proposal miss? grade each one",
+    "rationale": "missed inputs and sequences without the word plan",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "apply the critique findings to plans/fare-capping/plan.md and tighten the success criteria",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "I left FIXME notes all over plans/invoice-feed, fold them into the plan and the work files",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "the review raised three open questions about retention, go through them with me one at a time",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "interview me about the unresolved choices for the payout schedule before anything gets written",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "review the diff on my pricing-service branch for bugs before I open the PR",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "look over the changes to src/cap.kt for race conditions and missing error handling",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "check that the daily-cap-api work item meets its acceptance criteria in its worktree",
+    "rationale": "near miss owned by validating-work-item",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "all items of the loyalty package are merged, did we actually hit the success criteria? write the close-out",
+    "rationale": "near miss owned by validating-work-package",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "research and decisions for invoice-feed are in, write plan.md and outline the work",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "this session kept going wrong the same way, turn those lessons into rules in our AGENTS.md",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "review the description of my new SKILL.md, I think it triggers on too many prompts",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "I want a fourth option for the cache question: keep it in redis but one per region. check that against cache-gateway before you recommend anything",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "reporting module cleanup: quality research is done and the decisions are recorded. write up the objective, in and out of scope and measurable success criteria, plus draft work files for each team",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "critique of the import plan is done. go through the findings, apply what the evidence backs and tell me why you skipped the rest",
+    "rationale": "near miss owned by revising-plan",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

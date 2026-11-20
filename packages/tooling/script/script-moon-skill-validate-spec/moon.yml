@@ -24,7 +24,7 @@ tasks:
       cache: false
   ts-test:
     inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/assets/**/*
+      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/assets/**/*
       # index.test.ts validates these two skills as they stand in the catalog, so
       # an edit to either must invalidate this project's cached result.
       - /packages/runtime/plugin/plugin-core/**/*
@@ -36,7 +36,7 @@ tasks:
       TS_COVERAGE_MIN_BRANCHES: "60"
       TS_COVERAGE_MIN_STATEMENTS: "75"
     inputs:
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/assets/**/*
+      - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/assets/**/*
       # index.test.ts validates these two skills as they stand in the catalog, so
       # an edit to either must invalidate this project's cached result.
       - /packages/runtime/plugin/plugin-core/**/*

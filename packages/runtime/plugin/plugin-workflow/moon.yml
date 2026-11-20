@@ -1,16 +1,29 @@
 $schema: https://moonrepo.dev/schemas/v2/project.json
 language: unknown
-tags: [plugin, command, diagram]
+tags: [plugin, diagram]
 tasks:
   ci-check:
     deps:
-      - command-validate
       - build
       - format-check
       - diagram-role-check
       - graph-build
-      - skill-plan:ci-check
-      - skill-reflect:ci-check
+      - skill-critiquing-plan:ci-check
+      - skill-defining-work-items:ci-check
+      - skill-illustrating-plan:ci-check
+      - skill-implementing-work-item:ci-check
+      - skill-preparing-delivery:ci-check
+      - skill-recording-handoff:ci-check
+      - skill-researching-change:ci-check
+      - skill-revising-plan:ci-check
+      - skill-settling-questions:ci-check
+      - skill-validating-work-item:ci-check
+      - skill-validating-work-package:ci-check
+      - skill-writing-plan:ci-check
+      - example-validate
+      - example-index-check
+      - example-log-check
+      - validator-test
     options:
       mergeDeps: append
   graph-build:
@@ -33,3 +46,53 @@ tasks:
       - "diagrams/*.png"
     options:
       cache: false
+  example-validate:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        validate,
+        examples/saved-searches,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  example-index-check:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        index,
+        examples/saved-searches,
+        --check,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  example-log-check:
+    command:
+      [
+        uv,
+        run,
+        --script,
+        skills/recording-handoff/scripts/plan-bundle.py,
+        log,
+        examples/saved-searches,
+        --check,
+      ]
+    inputs:
+      - "examples/**/*"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"
+  validator-test:
+    command: [python3, -m, unittest, discover, -s, test/specs/unit]
+    inputs:
+      - "test/specs/unit/**/*.py"
+      - "skills/*/scripts/*.py"
+      - "skills/*/assets/schemas/*.json"

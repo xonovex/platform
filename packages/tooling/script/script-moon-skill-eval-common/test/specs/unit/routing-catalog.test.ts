@@ -19,22 +19,22 @@ interface Skill {
   readonly references?: readonly string[];
 }
 
-// A catalog is a set of grouped plugins, each holding guides with their queries
+// A catalog is a set of grouped plugins, each holding skills with their queries
 // and, optionally, the reference files an operation rationale can name.
 const catalog = (...skills: readonly Skill[]): FileSystem => {
   const files: Record<string, string> = {};
   for (const {name, plugin: group = name, queries, references = []} of skills) {
     const plugin = join(ROOT, `plugin-${group}`);
-    const guide = join(plugin, "skills", `${name}-guide`);
+    const skill = join(plugin, "skills", `using-${name}`);
     files[join(plugin, ".claude-plugin", "plugin.json")] = JSON.stringify({
       name: `xonovex-${group}`,
       skills: "./skills/",
     });
-    files[join(guide, "SKILL.md")] =
-      `---\nname: ${name}-guide\ndescription: Use for ${name}.\n---\n`;
-    files[join(guide, "eval-queries.json")] = JSON.stringify(queries);
+    files[join(skill, "SKILL.md")] =
+      `---\nname: using-${name}\ndescription: Use for ${name}.\n---\n`;
+    files[join(skill, "eval-queries.json")] = JSON.stringify(queries);
     for (const reference of references) {
-      files[join(guide, "references", `${reference}.md`)] = `# ${reference}\n`;
+      files[join(skill, "references", `${reference}.md`)] = `# ${reference}\n`;
     }
   }
   return memoryFileSystem({files});
@@ -65,13 +65,13 @@ describe("routing catalog", () => {
     );
 
     expect([...catalogQueryOwners(ROOT, fs)]).toEqual([
-      ["alpha request", "alpha-guide"],
-      ["beta request", "beta-guide"],
+      ["alpha request", "using-alpha"],
+      ["beta request", "using-beta"],
     ]);
     const scenarios = buildRoutingScenarios(ROOT, fs);
     expect(scenarios.map(({expectedSkill}) => expectedSkill)).toEqual([
-      "alpha-guide",
-      "beta-guide",
+      "using-alpha",
+      "using-beta",
     ]);
     expect(
       scenarios[0]?.candidates.map(({pluginDirectory}) => pluginDirectory),
@@ -99,14 +99,14 @@ describe("routing catalog", () => {
       {
         query: "shared request",
         split: "validation",
-        expectedSkill: "alpha-guide",
+        expectedSkill: "using-alpha",
         candidates: [
-          expect.objectContaining({shortName: "alpha-guide"}),
-          expect.objectContaining({shortName: "beta-guide"}),
+          expect.objectContaining({shortName: "using-alpha"}),
+          expect.objectContaining({shortName: "using-beta"}),
         ],
       },
     ]);
-    expect(missingValidationRoutingOwners(ROOT, fs)).toEqual(["beta-guide"]);
+    expect(missingValidationRoutingOwners(ROOT, fs)).toEqual(["using-beta"]);
   });
 
   it("reports a query two skills claim, ignoring case and closing punctuation", () => {
@@ -140,7 +140,7 @@ describe("routing catalog", () => {
     );
 
     expect(conflictingQueryOwners(ROOT, fs)).toEqual([
-      {owners: ["alpha-guide", "beta-guide"], query: "Record the decision."},
+      {owners: ["using-alpha", "using-beta"], query: "Record the decision."},
     ]);
   });
 
@@ -170,7 +170,7 @@ describe("routing catalog", () => {
       queries: [
         {
           query: "settle this",
-          rationale: "settling it is the alpha-decide operation",
+          rationale: "settling it is the `alpha-decide` operation",
           should_trigger: false,
           split: "train",
         },
@@ -186,8 +186,8 @@ describe("routing catalog", () => {
     expect(unresolvedOperationRationales(ROOT, fs)).toEqual([
       {
         operation: "alpha-decide",
-        rationale: "settling it is the alpha-decide operation",
-        skill: "alpha-guide",
+        rationale: "settling it is the `alpha-decide` operation",
+        skill: "using-alpha",
       },
     ]);
   });

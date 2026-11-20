@@ -1,30 +1,28 @@
 $schema: https://moonrepo.dev/schemas/v2/project.json
 language: unknown
-tags: [plugin, command]
+tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - command-validate
       - build
       - format-check
-      - skill-accessibility:ci-check
-      - skill-bdd:ci-check
-      - skill-code-quality:ci-check
-      - skill-code-review:ci-check
-      - skill-connascence:ci-check
-      - skill-credential-management:ci-check
-      - skill-ddd:ci-check
-      - skill-debugging:ci-check
-      - skill-fp:ci-check
-      - skill-git:ci-check
-      - skill-hexagonal-pattern:ci-check
-      - skill-microkernel-pattern:ci-check
-      - skill-oop:ci-check
-      - skill-orthogonal-pattern:ci-check
-      - skill-pull-request:ci-check
-      - skill-tdd:ci-check
-      - skill-testing:ci-check
-      - skill-user-stories:ci-check
-      - skill-versioning:ci-check
+      - skill-analyzing-connascence:ci-check
+      - skill-applying-bdd:ci-check
+      - skill-applying-ddd:ci-check
+      - skill-applying-fp:ci-check
+      - skill-applying-hexagonal-architecture:ci-check
+      - skill-applying-microkernel-architecture:ci-check
+      - skill-applying-oop:ci-check
+      - skill-applying-orthogonality:ci-check
+      - skill-applying-tdd:ci-check
+      - skill-assuring-accessibility:ci-check
+      - skill-auditing-code-quality:ci-check
+      - skill-authoring-pull-requests:ci-check
+      - skill-authoring-tests:ci-check
+      - skill-managing-credentials:ci-check
+      - skill-managing-versions:ci-check
+      - skill-reviewing-code:ci-check
+      - skill-using-git:ci-check
+      - skill-writing-user-stories:ci-check
     options:
       mergeDeps: append

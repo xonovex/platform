@@ -1,0 +1,2 @@
+npm test -- retry
+12 passed, including 'stops after the configured limit' (src/retry.test.js:41)

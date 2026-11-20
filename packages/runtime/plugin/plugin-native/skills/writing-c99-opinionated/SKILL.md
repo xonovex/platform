@@ -1,0 +1,62 @@
+---
+name: writing-c99-opinionated
+description: "Use when writing or editing systems or embedded C99 libraries with no hidden allocation, caller-provided buffers, and handle indices. Triggers on file naming that looks inconsistent, `.c`/`.h` files named `*_type.h`, `*_impl.h`, `*_soa.h` or `*_simde.h`, scalar/AoS/SoA/SIMD variants with parity tests, alignment macros, headers that include no headers, opaque handles, function-pointer plugin registries, hot-reloadable modules, and a C API for Lua, C#, Python or Rust FFI bindings, even when the user doesn't say 'opinionated'."
+---
+
+# C99 Opinionated Guidelines (Systems/Game/Embedded)
+
+Apply caller-owned memory, data-oriented layouts, and explicit builders to systems C99. Apply **writing-c99** for the shared language foundation.
+
+## Essentials
+
+- **Overlay on **writing-c99**** - This skill carries only the opinionated decisions. For the shared C99 idioms: `const`-correctness, designated initializers (ZII), `inline`-over-macros, compound literals, fixed-width types, value-oriented APIs, and baseline error/return patterns, follow **writing-c99**
+- **Memory management** - This style's defining choice is caller-owned storage with no hidden library allocation; apply **managing-memory**, then enforce the C99 buffer boundary in [references/safety-validations.md](references/safety-validations.md)
+- **Data-oriented design** - Layout/cache is a core choice of this style: apply **applying-data-oriented-design**
+- **Quality** - Pin strict C99, `-Werror` for correctness but relax the unused-symbol family for libraries, keep an ASan/UBSan debug build, run static analysis, see [references/build-warnings-policy.md](references/build-warnings-policy.md)
+
+## Architecture
+
+- **Implementation variants** - Ship scalar → AoS → SoA → SIMD with `_*` suffixes + parity tests; layout rationale in **applying-data-oriented-design**, see [references/implementation-variants.md](references/implementation-variants.md)
+- **Handles & indices** - Apply **applying-data-oriented-design** for stable-handle layout and iteration tradeoffs; enforce C99 check ordering and pointer lifetime in [references/safety-validations.md](references/safety-validations.md)
+- **Alignment** - Strict C99 has no portable over-alignment syntax; isolate a compiler-specific alignment macro and use an explicitly exposed platform allocator, see [references/alignment.md](references/alignment.md); the _why_ is in **applying-data-oriented-design** (SIMD) and **writing-lock-free-code** (false sharing)
+- **Composability** - Composable stages/primitives over a uniform currency, explicit caller-wired composition, see [references/composability.md](references/composability.md)
+- **Hot reload** - Reloadable native modules via API/function-pointer tables + host-owned state, see [references/hot-reload.md](references/hot-reload.md)
+- **Physical design** - Headers don't include headers; one header = one system's interface; opaque handles + forward declarations; acyclic deps and fast incremental builds, see [references/physical-design.md](references/physical-design.md)
+- **Plugin architecture** - Small plugins talking through a string-keyed registry of plain-C function-pointer interfaces; runtime discovery, lean core, see [references/plugin-architecture.md](references/plugin-architecture.md)
+- **Cross-language APIs** - Plain-C portable-subset surface, flat data over pointers, call-scoped pointers, spec-generated bindings, see [references/cross-language-api.md](references/cross-language-api.md)
+- **File naming** - `*_type.h`, `*_impl.h`, `*_aos.h`, `*_soa.h`, `*_simde.h`, see [references/file-naming.md](references/file-naming.md)
+
+## Safety
+
+- **Input validation** - Check capacity, bounds, NULL, division, overflow, see [references/safety-validations.md](references/safety-validations.md)
+- **Work buffers** - Complex functions use explicit caller-provided scratch buffers; ownership and lifetime come from **managing-memory**, C99 boundary checks from [references/safety-validations.md](references/safety-validations.md)
+- **Strings** - Apply **writing-c99** for length-carrying views and bounded builders; this overlay adds only the caller-owned storage requirement from **managing-memory**
+- **SIMD parity** - Test variants against scalar reference, see [references/testing-patterns.md](references/testing-patterns.md)
+
+## Gotchas
+
+- For a library, `-Werror` on the unused-symbol family is wrong: header reflection/mapping tables and interface-mandated parameters are surface a TU may not reference. Relax `-Wno-unused-{parameter,variable,but-set-variable,function}`, keep `-Wunused-value` and correctness warnings
+- CMake's `C_STANDARD 99` still selects the GNU dialect while `C_EXTENSIONS` is on: set `C_EXTENSIONS OFF`, then define `_XOPEN_SOURCE=700` or the required `_POSIX_C_SOURCE` value before headers when using POSIX APIs
+- `static inline` in a header gives each TU its own internal-linkage copy (safe, but bloats if the compiler never inlines it); a plain `inline` definition has external linkage and needs exactly one TU to emit the external definition: don't mix the two storage classes for the same function
+- Designated initializers leave unmentioned fields zero-initialized: relying on that for safety means a missing field is silent
+- `unsigned` overflow is defined; signed overflow is undefined behavior, never rely on signed wrap
+- `_Alignas`, `alignas`, `alignof`, and `aligned_alloc` are C11 facilities, not strict C99; use a guarded implementation extension and `posix_memalign` only after exposing its POSIX declaration
+- One header including another silently reintroduces the include cascade and recompilation storms: keep the no-header-includes rule machine-checked in CI
+- A cached plugin-interface or cross-module function pointer dangles after reload/unload: re-fetch from the registry, never stash it across that boundary
+- A C API that lets a caller keep a borrowed pointer past the call is a lifetime contract a GC language can't honor; default to call-scoped pointers and document the rare exceptions
+- A recycled slot makes a bare index alias a different object: add a generation counter to the handle so a stale reference fails its check instead of reading the wrong data
+- A loop around `strlen`/`strcmp`/`strtok` can repeatedly rescan the same terminator and become O(n²): apply the length-carrying views from **writing-c99**
+
+## Progressive disclosure
+
+- Read [references/build-warnings-policy.md](references/build-warnings-policy.md) - Load when configuring the C standard, feature-test macros, the library-vs-app warning policy, or sanitizers
+- Read [references/implementation-variants.md](references/implementation-variants.md) - Load when choosing between scalar, AoS, SoA, or SIMD implementations
+- Read [references/alignment.md](references/alignment.md) - Load when aligning data for SIMD or cache performance
+- Read [references/composability.md](references/composability.md) - Load when designing pipelines, multi-stage transforms, or reusable primitive APIs
+- Read [references/hot-reload.md](references/hot-reload.md) - Load when making native code reloadable at runtime or designing a plugin/module boundary
+- Read [references/physical-design.md](references/physical-design.md) - Load when organizing headers/translation units, cutting build times, or breaking include/dependency cycles
+- Read [references/plugin-architecture.md](references/plugin-architecture.md) - Load when designing a plugin system, an interface/API registry, or runtime discovery between decoupled components
+- Read [references/cross-language-api.md](references/cross-language-api.md) - Load when designing a C API to be bound from other languages (Lua/C#/Rust/Python) or generating bindings
+- Read [references/file-naming.md](references/file-naming.md) - Load when organizing headers by type, implementation, and variant
+- Read [references/testing-patterns.md](references/testing-patterns.md) - Load when writing tests with assertions, epsilon comparisons, or parity checks
+- Read [references/safety-validations.md](references/safety-validations.md) - Load when validating inputs for capacity, bounds, NULL, or overflow

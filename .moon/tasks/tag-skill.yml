@@ -129,7 +129,7 @@ tasks:
       - script-moon-skill-eval-triggers:build
     inputs:
       - /packages/runtime/plugin/AGENTS.md
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/**/*
+      - /packages/runtime/plugin/plugin-agentic/skills/evaluating-skills/scripts/**/*
     options:
       cache: false
       runInCI: false
@@ -150,7 +150,7 @@ tasks:
       - script-moon-skill-eval-outputs:build
     inputs:
       - /packages/runtime/plugin/AGENTS.md
-      - /packages/runtime/plugin/plugin-agentic/skills/skill-guide/scripts/**/*
+      - /packages/runtime/plugin/plugin-agentic/skills/evaluating-skills/scripts/**/*
     options:
       cache: false
       runInCI: false

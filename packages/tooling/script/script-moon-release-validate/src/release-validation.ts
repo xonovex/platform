@@ -302,8 +302,8 @@ const validateSkillPackaging = (
   codexManifest: PluginManifest,
   check: Check,
 ): void => {
-  const guides = pluginSkillDirectories(pluginPackage);
-  check(guides.length > 0, `${packageLabel} contains skills`);
+  const skillDirectories = pluginSkillDirectories(pluginPackage);
+  check(skillDirectories.length > 0, `${packageLabel} contains skills`);
   const expectedPaths = ["./skills/"];
   const claudePaths = skillPaths(claudeManifest);
   const codexPaths = skillPaths(codexManifest);

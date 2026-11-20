@@ -1,0 +1,82 @@
+---
+name: using-github
+description: "Use when doing the GitHub host mechanics of a task: issues, Projects boards, fetching a pull request, reading its review threads, posting review comments, or repository CI and enforcement. Triggers on github.com or GitHub Enterprise Server, `gh issue`, `gh pr`, `gh project`, `gh api`, Projects v2 Status, resolving review threads, issue context comments, reusable workflows, rulesets, protected environments, attestations, or GitHub permissions, even when the user doesn't say 'gh'."
+---
+
+# GitHub workflow delivery and enforcement: quick reference
+
+How to realize tickets, kanban, pull-request delivery, durable context projections, and provider-native external enforcement on GitHub. These operations do not teach ticket, review, or PR content craft; they map finished artifacts and workflow intent onto GitHub-native resources.
+
+- _Finding the defects in a pull request and what a good review comment says_ (Conventional Comments labels, blocking vs non-blocking, summary plus inline, cross-linking) belong to **reviewing-code**.
+- _What a good PR description says_ (sizing, how-tested, tradeoffs, self-review) belongs to **authoring-pull-requests**.
+- _The local-git push and rebase_ that get a clean branch onto the remote belong to **using-git**'s push reference.
+
+This skill fetches a pull request and its review threads for review, and takes those finished artifacts and posts them through `gh` / `gh api`.
+
+The one thing to internalize: **a repository issue, a ProjectV2 item, a project Status field, a pull-request review, and a top-level context comment are separate native objects. Preserve and mutate their exact IDs separately; never turn project status into issue state, context into approval, or an issue comment into an inline review.**
+
+When this skill fires:
+
+1. Confirm the host is GitHub and auth works: `gh auth status` then a real read call (`gh api user`), before any write.
+2. Resolve the exact issue, project item/field, pull request, review thread, or comment identity before writing.
+3. Reach for `gh api` when high-level verbs cannot express the exact native operation.
+4. Use an append-only top-level issue comment for durable context, not a review comment or verdict.
+5. Load the `references/*.md` file matching the task, not everything upfront.
+
+## Requirements
+
+- `gh` authenticated to the target host. First-time install + `gh auth login` + protocol + clone + verify are in [references/first-time-setup.md](references/first-time-setup.md); token families, per-operation least-privilege scopes, and storage are in [references/auth.md](references/auth.md).
+- The git remote points at GitHub: `gh repo view --json nameWithOwner,url` resolves it; a `github.com` host (or a GHES host) on `git remote get-url origin` is the detection signal. For GHES, set `GH_HOST` / `--hostname` and use `GH_ENTERPRISE_TOKEN` (see auth).
+- Projects operations require the `project` scope and explicit user or organization owner; refresh with `gh auth refresh -s project` when appropriate.
+
+## Essentials
+
+- **Manage workflow tickets**: create/reconcile repository issues; read and update assignees, labels, milestone, type, parent/sub-issue and blocking relationships; and preserve repository + number + node ID + URL + observed revision. See [references/issues.md](references/issues.md).
+- **Manage Projects kanban**: resolve project, item, field, and option IDs; add each issue/PR once; set typed fields; distinguish Project Status from issue state; and report weak concurrency boundaries. See [references/projects.md](references/projects.md).
+- **Open a PR**: `gh pr create --base <target> --head <source> --title ... --body-file -` auto-pushes the branch if it isn't on the remote and sets reviewers/labels/assignees in one call; the raw `POST /repos/{owner}/{repo}/pulls` does NOT push. See [references/create.md](references/create.md).
+- **Publish durable issue/PR context**: use an append-only top-level issue comment, give it a marker containing canonical ID/version/digest, reconcile exact retries, and return its `html_url` for later human or agent work. See [references/context-comments.md](references/context-comments.md).
+- **Push / rebase first**: the clean branch is **using-git**'s job; this skill assumes the source branch builds on the latest target. See **using-git**'s push reference.
+- **Fetch a pull request for review**: `gh pr view N --json title,body,baseRefName,headRefOid` and `gh pr diff N` (or `gh pr checkout N`) give **reviewing-code** the change; list existing threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
+- **Post a structured review**: `gh pr review` only carries the summary + verdict; batch the summary, every inline comment, and the verdict into one `gh api ... /pulls/{n}/reviews` object. See [references/review-post.md](references/review-post.md).
+- **Write the review content with **reviewing-code****: labels, severity, and blocking decoration are **reviewing-code**'s; this skill only anchors and submits them.
+- **Write the PR body with **authoring-pull-requests****: `gh pr create --body-file` takes a description authored per **authoring-pull-requests**.
+- **Resolve a thread**: GraphQL-only `resolveReviewThread` by thread node id (`PRRT_...`), matched by id never by line; list threads with `pullRequest.reviewThreads`. See [references/review-resolve.md](references/review-resolve.md).
+- **Scope the token per operation**: push needs Contents: write; open-PR / post-review need Pull requests: write; resolve also needs Contents: read & write on a fine-grained token. See [references/auth.md](references/auth.md).
+- **Enforce with native automation**: use SHA-pinned reusable workflows/actions, required checks and layered rulesets, protected environments, least-privilege tokens/OIDC, attestations, and provider-native evidence. See [references/automation-and-enforcement.md](references/automation-and-enforcement.md).
+- **Transact every setup**: discover, preview the exact native changes and authority, authorize, apply idempotently against observed revisions, re-read and probe both allow and deny, retain rollback, and own the drift. See [references/onboarding.md](references/onboarding.md).
+- **Preserve provider conformance**: map workflow tickets, kanban, changes, reviews, context, and evidence to their separate native identities and expose unsupported guarantees. See [references/provider-conformance.md](references/provider-conformance.md).
+
+## Gotchas
+
+- A fine-grained PAT must have **Contents: write** to push commits/refs (`POST/PATCH .../git/refs`, `PUT .../contents`). Contents: read is enough only to OPEN a PR and POST a review, never to push.
+- `gh pr edit --body` / `--body-file` **replaces** the whole description (never appends): fetch first (`gh pr view N --json body -q .body`), recombine, then set; metadata is incremental via paired `--add-*` / `--remove-*` flags.
+- `gh pr create` is **not** create-or-update. It aborts non-zero if an open PR already exists for the branch; guard with `|| gh pr view --json url -q .url`. Only `--web` proceeds anyway, and `--dry-run` "may still push git changes".
+- `gh issue create` is not create-or-update. Reconcile a stable body marker after an unknown result; GitHub does not enforce marker uniqueness, so concurrent creates still need one writer or an external lock.
+- `gh pr comment --edit-last` can overwrite the authenticated identity's unrelated latest comment. Context publication is append-only: exact ID/version/digest is a no-op, same-version divergence blocks, and changed semantics create a successor.
+- Project item identity and Project Status are separate from issue identity and open/closed state. `gh issue create --project` adds an item but does not replace explicit field discovery and update.
+- Project field edits have no general compare-and-swap. Re-read the item, field, and old value before apply and report the remaining race window.
+- `gh pr review` has **no inline support** (cli/cli#12396) and the standalone `.../pulls/{n}/comments` endpoint 422s on `line`/`side` payloads (cli/cli#13358): put inline comments inside one `.../reviews` object.
+- `line` in the reviews API is a **file line number** + `side`, NOT the deprecated diff `position` (never compute position); a multi-line range needs `start_line`/`start_side` preceding `line`/`side` in the same hunk. Anchor to the PR HEAD sha or comments go "outdated".
+- You **cannot** APPROVE or REQUEST_CHANGES your own PR (HTTP 422): self-reviews are COMMENT-only.
+- REQUEST_CHANGES blocks merge only under branch-protection / ruleset required reviews, and clears only via the **same** reviewer approving or a write-access **dismiss** (`PUT .../dismissals`): another person's approval does not override it.
+- Thread resolution is GraphQL-only; on a fine-grained PAT / App token it also silently needs **Contents: read & write** or returns "Resource not accessible by integration" (community #44650). Classic `repo` suffices.
+- `Closes #N` in the PR **body** auto-closes the issue only when the PR merges into the **default** branch; cross-repo needs `Closes owner/repo#N`. There is no `gh` flag for it.
+- GitHub Enterprise Server uses **GH_ENTERPRISE_TOKEN** / GITHUB_ENTERPRISE_TOKEN, not GH_TOKEN: mixing them is the classic "works on github.com, 401 on GHES".
+- Insufficient permission on a **private** repo returns 404 (not 403): GitHub hides existence; read the `X-Accepted-GitHub-Permissions` header (`gh api -i <endpoint>`) for the exact required permission.
+
+## Progressive Disclosure
+
+Read only the reference that matches the task.
+
+- Read [references/first-time-setup.md](references/first-time-setup.md): Load when setting up `gh` on a new machine or account.
+- Read [references/auth.md](references/auth.md): Load when auth fails or a token needs a type, a scope or a home.
+- Read [references/issues.md](references/issues.md): Load when working with issues as tickets.
+- Read [references/projects.md](references/projects.md): Load when working with Projects items, Status or fields.
+- Read [references/create.md](references/create.md): Load when opening a pull request.
+- Read [references/context-comments.md](references/context-comments.md): Load when publishing durable decision or rationale context as a comment.
+- Read [references/review-post.md](references/review-post.md): Load when publishing a review with inline comments.
+- Read [references/review-resolve.md](references/review-resolve.md): Load when replying to or resolving review threads.
+- Read [references/worked-example.md](references/worked-example.md): Load when one end-to-end run helps: open a pull request, post a blocking inline review, resolve a thread.
+- Read [references/automation-and-enforcement.md](references/automation-and-enforcement.md): Load when configuring workflows, required checks, rulesets, environments or attestations.
+- Read [references/onboarding.md](references/onboarding.md): Load when setting up, verifying, rolling back or checking drift of repository or organization governance.
+- Read [references/provider-conformance.md](references/provider-conformance.md): Load when composing GitHub objects into a provider-neutral handoff or testing an adapter.

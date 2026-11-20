@@ -1,0 +1,21 @@
+' Lead diagram template. Copy to plans/<change>/diagrams/<topic>-lead.puml, replace every <placeholder> and delete the comment lines that start with "' Fill in".
+' Fill in: the render command goes in the next two lines; keep the one that you ran, from the diagrams directory. Use --png in place of --svg only when the user asked for PNG.
+' Render:
+'   plantuml --svg -failfast2 -o "$PWD" <topic>-lead.puml
+@startuml
+title <The flow in its settled, future state>
+skinparam maxMessageSize 60
+
+' Fill in: only components and calls that decisions have settled. One participant for each component; the text label repeats the color.
+' Fill in: settled #C8E6C9 [settled], future target #BBDEFB [future], current and to be retired #E0E0E0 [current].
+participant "<Component A> [settled]" as A #C8E6C9
+participant "<Component B> [settled]" as B #C8E6C9
+participant "<Component C> [future]" as C #BBDEFB
+
+A -> B : <Settled call, in the active voice>
+B -> C : <Settled call>
+C --> B : <Settled response, only when it matters>
+
+' Fill in: include the note when a settled rule explains an arrow; delete it otherwise. Anchor it on a participant of this diagram.
+note over B #C8E6C9 : <One line stating the settled rule>
+@enduml

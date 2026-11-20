@@ -11,8 +11,8 @@ const harnessSection = (harness: Harness, selector: string): string => {
       : "codex plugin marketplace add ";
   const contents =
     harness === "Claude Code"
-      ? "Install this bundle in Claude Code. The harness discovers its bundled skills and commands."
-      : "Install this bundle in Codex. Codex loads the skills declared in its plugin manifest; Claude Code slash commands are separate components.";
+      ? "Install this bundle in Claude Code. The harness discovers its bundled skills."
+      : "Install this bundle in Codex. Codex loads the skills declared in its plugin manifest.";
   return (
     "### " +
     harness +
@@ -41,6 +41,12 @@ export const installation = (plugin: Plugin, marketplace: string): string => {
       : "\n\nPlugin dependencies: " +
         plugin.dependencies.map((name) => "`" + name + "`").join(", ") +
         ".";
+  const companions =
+    plugin.companions.length === 0
+      ? ""
+      : "\n\nOptional companions: " +
+        plugin.companions.map((name) => "`" + name + "`").join(", ") +
+        ".";
   return (
     "## Install\n\nAdd the Xonovex marketplace once, then install `" +
     plugin.name +
@@ -48,6 +54,7 @@ export const installation = (plugin: Plugin, marketplace: string): string => {
     plugin.version +
     "`.\n\n" +
     sections.join("\n\n") +
-    dependencies
+    dependencies +
+    companions
   );
 };

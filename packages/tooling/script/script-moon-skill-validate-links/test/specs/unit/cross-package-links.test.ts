@@ -81,29 +81,17 @@ const manifest = (
     skills: skill,
   });
 
-const commandNames = ["create", "review"] as const;
-
-const commandFiles = (
-  overrides: Readonly<Record<string, string>> = {},
-): Record<string, string> =>
-  Object.fromEntries(
-    commandNames.map((name) => [
-      `packages/runtime/plugin/plugin-test/commands/${name}.md`,
-      overrides[name] ?? `# ${name}\n`,
-    ]),
-  );
-
 describe("checkMarkdownFilesForCrossPackageLinks", () => {
   it("resolves a boundary-crossing link to an existing target", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-x/skills/x-guide/references/actors.md":
+      "packages/runtime/plugin/plugin-x/skills/using-x/references/actors.md":
         "# Actors\n",
-      "packages/runtime/plugin/plugin-test/commands/foo.md":
-        "See [actors](../../plugin-x/skills/x-guide/references/actors.md).",
+      "packages/runtime/plugin/plugin-test/docs/foo.md":
+        "See [actors](../../plugin-x/skills/using-x/references/actors.md).",
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
@@ -118,12 +106,12 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("fails a boundary-crossing link whose target is missing, naming the source and link", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-test/commands/foo.md":
-        "See [actors](../../plugin-x/skills/x-guide/references/actors.md).",
+      "packages/runtime/plugin/plugin-test/docs/foo.md":
+        "See [actors](../../plugin-x/skills/using-x/references/actors.md).",
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
     const counts = checkMarkdownFilesForCrossPackageLinks(
@@ -135,26 +123,26 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
     expect(counts.broken).toBe(1);
     expect(report.fails).toHaveLength(1);
     expect(report.fails[0]).toContain(
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     expect(report.fails[0]).toContain(
-      "../../plugin-x/skills/x-guide/references/actors.md",
+      "../../plugin-x/skills/using-x/references/actors.md",
     );
   });
 
   it("ignores link-shaped text inside a fenced block or an inline span", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-test/commands/foo.md": [
+      "packages/runtime/plugin/plugin-test/docs/foo.md": [
         "```c",
-        "  m->listeners[i](../../plugin-x/skills/x-guide/references/gone.md);",
+        "  m->listeners[i](../../plugin-x/skills/using-x/references/gone.md);",
         "```",
         "",
-        "A markdown hyperlink `[name](../../plugin-x/skills/x-guide/nope.md)`.",
+        "A markdown hyperlink `[name](../../plugin-x/skills/using-x/nope.md)`.",
       ].join("\n"),
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-test/commands/foo.md",
+      "packages/runtime/plugin/plugin-test/docs/foo.md",
     );
     const report = makeSink();
 
@@ -213,10 +201,10 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 
   it("resolves a boundary-crossing link that carries an in-page fragment", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-y/skills/y-guide/references/g.md":
+      "packages/runtime/plugin/plugin-y/skills/using-y/references/g.md":
         "# G\n",
       "packages/runtime/plugin/plugin-test/docs/a.md":
-        "See [g](../../plugin-y/skills/y-guide/references/g.md#section).",
+        "See [g](../../plugin-y/skills/using-y/references/g.md#section).",
     });
     const source = join(REPO, "packages/runtime/plugin/plugin-test/docs/a.md");
     const report = makeSink();
@@ -232,19 +220,18 @@ describe("checkMarkdownFilesForCrossPackageLinks", () => {
 });
 
 describe("checkCrossPackageLinks", () => {
-  it("scans command packages and retained planning references", () => {
+  it("scans plugin documents and skill references", () => {
     const fs = makeRepo({
-      ...commandFiles(),
       "packages/runtime/plugin/plugin-test/README.md":
-        "See the [command model](../../../asset/asset-diagrams/command-model.png).\n",
+        "See the [plugin model](../../../asset/asset-diagrams/plugin-model.png).\n",
       "packages/runtime/plugin/plugin-test/docs/invocation.md":
         "See the [submission boundary](../../../../sandbox/operator/agent-operator-go/README.md).\n",
-      "packages/asset/asset-diagrams/command-model.png": "image",
+      "packages/asset/asset-diagrams/plugin-model.png": "image",
       "packages/sandbox/operator/agent-operator-go/README.md": "# Operator\n",
-      "packages/runtime/plugin/plugin-workflow/skills/plan-guide/SKILL.md":
-        "# Plan\nSee [create](references/create.md).\n",
-      "packages/runtime/plugin/plugin-workflow/skills/plan-guide/references/create.md":
-        "# create\n",
+      "packages/runtime/plugin/plugin-workflow/skills/writing-plan/SKILL.md":
+        "# Plan\nSee [example](references/example.md).\n",
+      "packages/runtime/plugin/plugin-workflow/skills/writing-plan/references/example.md":
+        "# example\n",
       "packages/runtime/plugin/plugin-workflow/.claude-plugin/plugin.json":
         manifest("xonovex-workflow", [], "claude"),
       "packages/runtime/plugin/plugin-workflow/.codex-plugin/plugin.json":
@@ -258,8 +245,8 @@ describe("checkCrossPackageLinks", () => {
 
   it("fails when a discovered SKILL.md points at a moved contract", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-x/skills/x-guide/SKILL.md":
-        "# X\nSee [g](../../../plugin-y/skills/y-guide/references/g.md).\n",
+      "packages/runtime/plugin/plugin-x/skills/using-x/SKILL.md":
+        "# X\nSee [g](../../../plugin-y/skills/using-y/references/g.md).\n",
       "packages/runtime/plugin/plugin-x/.claude-plugin/plugin.json": manifest(
         "xonovex-x",
         [],
@@ -275,26 +262,26 @@ describe("checkCrossPackageLinks", () => {
     );
     expect(report.fails).toHaveLength(1);
     expect(report.fails[0]).toContain(
-      "packages/runtime/plugin/plugin-x/skills/x-guide/SKILL.md",
+      "packages/runtime/plugin/plugin-x/skills/using-x/SKILL.md",
     );
   });
 });
 
 describe("checkNamedSkillHandoffs", () => {
-  it("resolves catalog guide names and rejects missing handoffs", () => {
+  it("resolves catalog skill names and rejects missing handoffs", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-x/skills/x-guide/SKILL.md":
-        "Use **known-guide** and **missing-guide**.\n",
+      "packages/runtime/plugin/plugin-x/skills/using-x/SKILL.md":
+        "Use **using-known** and **using-missing**.\n",
     });
     const source = join(
       REPO,
-      "packages/runtime/plugin/plugin-x/skills/x-guide/SKILL.md",
+      "packages/runtime/plugin/plugin-x/skills/using-x/SKILL.md",
     );
     const report = makeSink();
 
     const counts = checkNamedSkillHandoffs(
       [source],
-      new Set(["known-guide"]),
+      new Set(["using-known"]),
       REPO,
       report,
       fs,
@@ -302,7 +289,7 @@ describe("checkNamedSkillHandoffs", () => {
 
     expect(counts).toEqual({resolved: 1, broken: 1});
     expect(report.fails).toContain(
-      "skill handoffs: packages/runtime/plugin/plugin-x/skills/x-guide/SKILL.md names missing **missing-guide**",
+      "skill handoffs: packages/runtime/plugin/plugin-x/skills/using-x/SKILL.md names missing **using-missing**",
     );
   });
 });
@@ -310,14 +297,14 @@ describe("checkNamedSkillHandoffs", () => {
 describe("checkSkillDependencies", () => {
   it("accepts matching acyclic manifest pairs", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-base", [], "claude"),
       "packages/runtime/plugin/plugin-base/.codex-plugin/plugin.json":
         manifest("xonovex-base"),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
-        "# Child\nUse **base-guide**.\n",
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
+        "# Child\nUse **using-base**.\n",
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", ["xonovex-base"], "claude"),
       "packages/runtime/plugin/plugin-child/.codex-plugin/plugin.json":
@@ -371,7 +358,7 @@ describe("checkSkillDependencies", () => {
 
   it("rejects a discovered skill that has neither manifest", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-unpackaged/skills/unpackaged-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-unpackaged/skills/using-unpackaged/SKILL.md":
         "# Unpackaged\n",
     });
     const report = makeSink();
@@ -385,13 +372,13 @@ describe("checkSkillDependencies", () => {
 
   it("requires package-derived plugin names", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-wrong", [], "claude"),
       "packages/runtime/plugin/plugin-base/.codex-plugin/plugin.json":
         manifest("xonovex-wrong"),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
         "# Child\n",
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", ["xonovex-wrong"], "claude"),
@@ -409,7 +396,7 @@ describe("checkSkillDependencies", () => {
 
   it("requires plugin hard dependencies in the npm and Moon graph", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-base", [], "claude"),
@@ -419,8 +406,8 @@ describe("checkSkillDependencies", () => {
         name: "@xonovex/plugin-child",
         version: "7.0.0",
       }),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
-        "# Child\nLoad **base-guide**.\n",
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
+        "# Child\nLoad **using-base**.\n",
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", ["xonovex-base"], "claude"),
       "packages/runtime/plugin/plugin-child/.codex-plugin/plugin.json":
@@ -437,7 +424,7 @@ describe("checkSkillDependencies", () => {
 
   it("requires exact bidirectional npm and plugin dependency parity", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-base", [], "claude"),
@@ -450,7 +437,7 @@ describe("checkSkillDependencies", () => {
           "@xonovex/plugin-base": "^7.0.0",
         },
       }),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
         "# Child\n",
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", [], "claude"),
@@ -466,7 +453,7 @@ describe("checkSkillDependencies", () => {
     );
 
     const pinnedRepo = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-base", [], "claude"),
@@ -479,8 +466,8 @@ describe("checkSkillDependencies", () => {
           "@xonovex/plugin-base": "^7.0.0",
         },
       }),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
-        "# Child\nLoad **base-guide**.\n",
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
+        "# Child\nLoad **using-base**.\n",
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", ["xonovex-base"], "claude"),
       "packages/runtime/plugin/plugin-child/.codex-plugin/plugin.json":
@@ -497,12 +484,12 @@ describe("checkSkillDependencies", () => {
 
   it("rejects stale and mismatched manifest skill paths", () => {
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-renamed/skills/renamed-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-renamed/skills/using-renamed/SKILL.md":
         "# Renamed\n",
       "packages/runtime/plugin/plugin-renamed/.claude-plugin/plugin.json":
-        manifest("xonovex-renamed", [], "claude", "./old-guide"),
+        manifest("xonovex-renamed", [], "claude", "./using-old"),
       "packages/runtime/plugin/plugin-renamed/.codex-plugin/plugin.json":
-        manifest("xonovex-renamed", [], "codex", "./renamed-guide"),
+        manifest("xonovex-renamed", [], "codex", "./using-renamed"),
     });
     const report = makeSink();
 
@@ -523,17 +510,17 @@ describe("checkSkillDependencies", () => {
         `shared concept phrase number ${String(index)} stays identical`,
     ).join(" ");
     const fs = makeRepo({
-      "packages/runtime/plugin/plugin-base/skills/base-guide/SKILL.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/SKILL.md":
         "# Base\n",
-      "packages/runtime/plugin/plugin-base/skills/base-guide/references/concept.md":
+      "packages/runtime/plugin/plugin-base/skills/using-base/references/concept.md":
         duplicated,
       "packages/runtime/plugin/plugin-base/.claude-plugin/plugin.json":
         manifest("xonovex-base", [], "claude"),
       "packages/runtime/plugin/plugin-base/.codex-plugin/plugin.json":
         manifest("xonovex-base"),
-      "packages/runtime/plugin/plugin-child/skills/child-guide/SKILL.md":
-        "# Child\nUse **base-guide**.\n",
-      "packages/runtime/plugin/plugin-child/skills/child-guide/references/concept-copy.md":
+      "packages/runtime/plugin/plugin-child/skills/using-child/SKILL.md":
+        "# Child\nUse **using-base**.\n",
+      "packages/runtime/plugin/plugin-child/skills/using-child/references/concept-copy.md":
         duplicated,
       "packages/runtime/plugin/plugin-child/.claude-plugin/plugin.json":
         manifest("xonovex-child", ["xonovex-base"], "claude"),
@@ -546,7 +533,7 @@ describe("checkSkillDependencies", () => {
 
     expect(report.fails).toContainEqual(
       expect.stringContaining(
-        "skill ownership: xonovex-child skills/child-guide/references/concept-copy.md duplicates xonovex-base skills/base-guide/references/concept.md",
+        "skill ownership: xonovex-child skills/using-child/references/concept-copy.md duplicates xonovex-base skills/using-base/references/concept.md",
       ),
     );
   });

@@ -1,0 +1,24 @@
+' Option diagram template. Copy to plans/<change>/diagrams/<topic>-option.puml, replace every <placeholder> and delete the comment lines that start with "' Fill in".
+' Fill in: the render command goes in the next two lines; keep the one that you ran, from the diagrams directory. Use --png in place of --svg only when the user asked for PNG.
+' Render:
+'   plantuml --svg -failfast2 -o "$PWD" <topic>-option.puml
+@startuml
+title <Decision title, without a number>
+skinparam maxMessageSize 60
+
+' Fill in: the participants are the same in every branch, so the arrows are the difference. Settled surroundings are green, the components that the options move are orange.
+participant "<Component A> [settled]" as A #C8E6C9
+participant "<Component B> [open]" as B #FFE0B2
+participant "<Component C> [open]" as C #FFE0B2
+
+' Fill in: one branch for each row of the decision's "Options considered" table, in the same order and with the same names. Add or remove branches to match. Mark the state of the decision in every branch name.
+alt Option 1: <name from the decision> [open]
+  A -> B : <Call in this option>
+  B -> C : <Call in this option>
+else Option 2: <name from the decision> [open]
+  A -> C : <Call in this option>
+end
+
+' Fill in: one line stating what the options change. Anchor it on a participant of this diagram.
+note over A #FFE0B2 : <What the options change, in one line>
+@enduml

@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "required": ["type", "schema", "kind", "team", "readiness"],
+  "properties": {
+    "type": {"const": "Workflow Work Item"},
+    "schema": {"const": "workflow/work-item/1"},
+    "kind": {"enum": ["work-package", "work-item"]},
+    "parent": {"$ref": "common.schema.json#/$defs/workId"},
+    "team": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "readiness": {"enum": ["ready", "waiting"]},
+    "waits_on": {"$ref": "common.schema.json#/$defs/decisionIds"},
+    "depends_on": {"$ref": "common.schema.json#/$defs/workIds"},
+    "decisions": {"$ref": "common.schema.json#/$defs/decisionIds"},
+    "criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "verification"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^c[0-9]+$"},
+          "text": {"type": "string", "minLength": 1},
+          "verification": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "skills_to_consult": {"$ref": "common.schema.json#/$defs/skillNames"}
+  },
+  "allOf": [
+    {"$ref": "common.schema.json#/$defs/header"},
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {"const": "work-package"}
+          }
+        },
+        {
+          "required": ["criteria"],
+          "properties": {
+            "kind": {"const": "work-item"},
+            "criteria": {"type": "array", "minItems": 1}
+          }
+        }
+      ]
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "readiness": {"const": "ready"}
+          }
+        },
+        {
+          "required": ["waits_on"],
+          "properties": {
+            "readiness": {"const": "waiting"},
+            "waits_on": {"type": "array", "minItems": 1}
+          }
+        }
+      ]
+    }
+  ]
+}

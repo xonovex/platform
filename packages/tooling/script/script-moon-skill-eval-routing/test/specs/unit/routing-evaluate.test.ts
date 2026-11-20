@@ -16,15 +16,15 @@ const catalogTree = (): FileSystem => {
     ["beta", false],
   ] as const) {
     const plugin = join(CATALOG, `plugin-${name}`);
-    const guide = join(plugin, "skills", `${name}-guide`);
+    const skill = join(plugin, "skills", `using-${name}`);
     files[join(plugin, ".claude-plugin", "plugin.json")] = JSON.stringify({
       name: `xonovex-${name}`,
       version: "0.0.0",
       skills: "./skills/",
     });
-    files[join(guide, "SKILL.md")] =
-      `---\nname: ${name}-guide\ndescription: Use for ${name}.\n---\n`;
-    files[join(guide, "eval-queries.json")] = JSON.stringify([
+    files[join(skill, "SKILL.md")] =
+      `---\nname: using-${name}\ndescription: Use for ${name}.\n---\n`;
+    files[join(skill, "eval-queries.json")] = JSON.stringify([
       {
         query: "shared request",
         should_trigger: shouldTrigger,
@@ -44,7 +44,7 @@ const SELECTED: TriggerOutcome = {
 const NOT_SELECTED: TriggerOutcome = {
   triggered: false,
   error: null,
-  selected: "competitor:beta-guide",
+  selected: "competitor:using-beta",
 };
 
 // Evidence is written into the same tree the catalog is read from, so a case
@@ -106,18 +106,18 @@ describe("catalog routing evaluator", () => {
     expect(exitCode).toBe(0);
     expect(JSON.parse(readWorkspace(workspace, "summary.json"))).toMatchObject({
       harness: "claude",
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-5-5",
       catalog_scenarios: 1,
       selected_scenarios: 1,
       passed: 1,
       failed: 0,
     });
     expect(readWorkspace(workspace, "results.jsonl")).toContain(
-      '"candidate_skills":["alpha-guide","beta-guide"]',
+      '"candidate_skills":["using-alpha","using-beta"]',
     );
   });
 
-  it("stages competing Codex guides and honors limit and offset", async () => {
+  it("stages competing Codex skills and honors limit and offset", async () => {
     const workspace = join("/evidence", "codex-evidence");
 
     const exitCode = await main(
@@ -145,17 +145,17 @@ describe("catalog routing evaluator", () => {
     const workspace = join("/evidence", "owner-evidence");
 
     const exitCode = await main(
-      [catalog, "--workspace", workspace, "--owners", "alpha-guide"],
+      [catalog, "--workspace", workspace, "--owners", "using-alpha"],
       dependencies(fs),
     );
 
     expect(exitCode).toBe(0);
     expect(JSON.parse(readWorkspace(workspace, "summary.json"))).toMatchObject({
-      selected_owners: ["alpha-guide"],
+      selected_owners: ["using-alpha"],
       selected_scenarios: 1,
     });
     await expect(
-      main([catalog, "--owners", "beta-guide"], dependencies(fs)),
+      main([catalog, "--owners", "using-beta"], dependencies(fs)),
     ).rejects.toThrow("no routing scenarios selected");
   });
 

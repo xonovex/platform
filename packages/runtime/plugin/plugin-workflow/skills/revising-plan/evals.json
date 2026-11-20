@@ -1,0 +1,96 @@
+{
+  "skill_name": "revising-plan",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "operator-note-settles-decision-and-releases-work",
+      "prompt": "The branch main is the one to work on and the files are valid. I am jdoe. The FIXME note in plans/retry-policy/plan.md records what Team Payments agreed, and I confirm it. Fold it into the plan and update what depended on the retry limit. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer shows or quotes the new decision file it wrote under plans/retry-policy/decisions: type Workflow Decision, state settled, supersedes decisions/retry-limit-a2b3, a verified entry for human:jdoe, and a name of the form <slug>-<suffix> with a four-character suffix from a-z and 2-7.",
+        "The answer states that the old decision plans/retry-policy/decisions/retry-limit-a2b3.md got only status: deprecated and superseded_by, and shows or quotes the two added lines; it does not claim a change to the old file's state or generated.at.",
+        "The answer shows the changed front matter of plans/retry-policy/work/retry-transient-failures-c4d5.md: readiness ready, no waits_on key, and the new decision listed under decisions.",
+        "The answer shows or quotes the log entry (named <date>-revising-plan-<suffix>.md) with a table row that quotes the note text 'three attempts with exponential backoff' and gives it a disposition with a rationale.",
+        "The answer states that the FIXME note is gone from plans/retry-policy/plan.md and that the generated block markers stayed.",
+        "The reply leads with the result, shows the disposition of the note, and neither implements the retry behavior, commits, nor starts another step."
+      ],
+      "files": [
+        "evals/files/operator-note-settles-decision-and-releases-work/plans/retry-policy/decisions/retry-limit-a2b3.md",
+        "evals/files/operator-note-settles-decision-and-releases-work/plans/retry-policy/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/operator-note-settles-decision-and-releases-work/plans/retry-policy/plan.md",
+        "evals/files/operator-note-settles-decision-and-releases-work/plans/retry-policy/work/retry-transient-failures-c4d5.md"
+      ]
+    },
+    {
+      "id": "fixme-notes-get-four-dispositions",
+      "prompt": "The branch main is the one to work on and the files are valid. I left three FIXME notes in plans/retry-policy/plan.md. Apply them and tell me what happened to each. The payment client is in payment-client. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer states that none of the three FIXME notes is left in plans/retry-policy/plan.md and that the generated block markers stayed.",
+        "The answer shows or quotes the run's log entry table with every note quoted: 'is the backoff capped', 'also cover the replay path' and 'do we retry on a 402'.",
+        "The answer shows a table with at least three rows, each with one of Applied, Partly applied, Not applied or Sent to settling-questions.",
+        "The row of the note 'do we retry on a 402' says Sent to settling-questions, and the answer states that no new decision file was written.",
+        "The answer shows or quotes the changed success criteria of plans/retry-policy/plan.md, and they mention the replay path.",
+        "The answer, or the rationale in the table, states that the backoff is capped at 2000 milliseconds, citing payment-client/src/backoff.go, and the plan changes only if that answer changes a decision, a scope line or a criterion."
+      ],
+      "files": [
+        "evals/files/fixme-notes-get-four-dispositions/payment-client/src/backoff.go",
+        "evals/files/fixme-notes-get-four-dispositions/plans/retry-policy/decisions/retry-limit-a2b3.md",
+        "evals/files/fixme-notes-get-four-dispositions/plans/retry-policy/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/fixme-notes-get-four-dispositions/plans/retry-policy/plan.md",
+        "evals/files/fixme-notes-get-four-dispositions/plans/retry-policy/work/retry-transient-failures-c4d5.md"
+      ]
+    },
+    {
+      "id": "open-and-new-questions-are-sent-on",
+      "prompt": "The branch main is the one to work on and the files are valid. The critique of plans/retry-policy is written and I left a note in the plan. Fold in what is waiting. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer states that no decision file was written and that plans/retry-policy/decisions/retry-limit-a2b3.md stays open with no status key added.",
+        "The answer states that the work file plans/retry-policy/work/retry-transient-failures-c4d5.md keeps readiness: waiting and still waits on decisions/retry-limit-a2b3.",
+        "The answer shows a table with at least two rows marked Sent to settling-questions: one quotes the note about a 'different gateway region', and one names finding 1 of critiques/retry-policy-review-m4k7 on the idempotency key.",
+        "The answer lists the two items as going to settling-questions, suggests settling them next, and does not recommend or choose an answer to either question."
+      ],
+      "files": [
+        "evals/files/open-and-new-questions-are-sent-on/plans/retry-policy/critiques/retry-policy-review-m4k7.md",
+        "evals/files/open-and-new-questions-are-sent-on/plans/retry-policy/decisions/retry-limit-a2b3.md",
+        "evals/files/open-and-new-questions-are-sent-on/plans/retry-policy/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/open-and-new-questions-are-sent-on/plans/retry-policy/plan.md",
+        "evals/files/open-and-new-questions-are-sent-on/plans/retry-policy/work/retry-transient-failures-c4d5.md"
+      ]
+    },
+    {
+      "id": "nothing-waiting-stops",
+      "prompt": "The branch main is the one to work on and the files are valid. Revise the plan in plans/retry-policy with whatever is waiting. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer states that it wrote no new log entry, no decision file, and no change to plans/retry-policy/plan.md.",
+        "The answer says plainly that no FIXME note, critique finding or research correction is waiting, and names the earlier log entry 2026-10-21-revising-plan-d3e2 as the record that finding 1 was processed.",
+        "The answer offers a next step, such as settling the question sent on, without starting it."
+      ],
+      "files": [
+        "evals/files/nothing-waiting-stops/plans/retry-policy/critiques/retry-policy-review-m4k7.md",
+        "evals/files/nothing-waiting-stops/plans/retry-policy/decisions/retry-limit-a2b3.md",
+        "evals/files/nothing-waiting-stops/plans/retry-policy/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/nothing-waiting-stops/plans/retry-policy/log/2026-10-21-revising-plan-d3e2.md",
+        "evals/files/nothing-waiting-stops/plans/retry-policy/plan.md",
+        "evals/files/nothing-waiting-stops/plans/retry-policy/work/retry-transient-failures-c4d5.md"
+      ]
+    },
+    {
+      "id": "research-correction-reopens-decision",
+      "prompt": "The branch main is the one to work on and the files are valid. The new research in plans/retry-policy corrects the earlier gateway research. Fold the correction into the plan and the work. Do not commit. Treat the directory that holds the input files as the repository root.",
+      "assertions": [
+        "The answer shows or quotes the new decision file: state open (or paused), supersedes listing decisions/retry-limit-a2b3, and a reason that cites research/gateway-limits-r6t3.",
+        "The answer states that the old decision plans/retry-policy/decisions/retry-limit-a2b3.md got only status: deprecated and superseded_by, and that its state stays settled.",
+        "The answer shows the changed front matter of plans/retry-policy/work/retry-transient-failures-c4d5.md: readiness waiting and a waits_on list that names the new decision and not decisions/retry-limit-a2b3.",
+        "The answer shows or quotes the changed objective of plans/retry-policy/plan.md: it no longer states three times, does not summarize or guess a new limit, and points to the open decision; the answer states that the generated block markers stayed.",
+        "The answer shows a table with a row for research/gateway-limits-r6t3, and sends the retry limit to settling-questions without choosing a new limit."
+      ],
+      "files": [
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/decisions/retry-limit-a2b3.md",
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/plan.md",
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/research/gateway-limits-q4w2.md",
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/research/gateway-limits-r6t3.md",
+        "evals/files/research-correction-reopens-decision/plans/retry-policy/work/retry-transient-failures-c4d5.md"
+      ]
+    }
+  ]
+}

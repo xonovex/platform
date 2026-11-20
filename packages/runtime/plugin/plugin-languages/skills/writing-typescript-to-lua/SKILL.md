@@ -1,0 +1,39 @@
+---
+name: writing-typescript-to-lua
+description: "Use when writing or editing TypeScript that compiles to Lua with TSTL 1.24+ for game scripting, Defold, or an embedded engine. Triggers on `.ts` files with a TSTL config, `LuaMultiReturn`, `@noSelf`, namespaces, decorators, or calls across the Lua boundary, even when the user doesn't say 'TSTL'."
+---
+
+# TypeScript-to-Lua Coding Guidelines
+
+The output is Lua. For Lua runtime semantics and idioms: module pattern, coroutines, metatables, error handling, string building. Apply **writing-lua**, which also covers hot-path tuning of the generated code. This skill covers only the TS→Lua transpiler boundary: what translates, how to shape TS source for clean Lua, and TSTL-specific features.
+
+## Requirements
+
+- TSTL ≥ 1.24; TS strict mode; Lua ≥ 5.3 / LuaJIT 2.1.
+
+## Essentials
+
+- **Code organization** - Favor namespaces/functions over classes for clean Lua output; Lua module idioms in **writing-lua**, see [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md)
+- **TSTL features** - Use LuaMultiReturn, decorators when beneficial, see [references/multi-return-functions.md](references/multi-return-functions.md), [references/tstl-decorators.md](references/tstl-decorators.md)
+- **Performance** - Keep tables stable, cache lookups, design for Lua GC and coroutines; the JIT "why" is in **writing-lua**, see [references/performance-tips.md](references/performance-tips.md), [references/coroutine-patterns.md](references/coroutine-patterns.md)
+- **Optimization** - Avoid heavy TypeScript features, see [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md)
+
+## Gotchas
+
+- Not all TypeScript features translate: generators, `for-await-of`, dynamic `import()`, and BigInt are unsupported or partially supported
+- Translation is source-to-source; runtime semantics follow Lua, not JS: `0` and `""` are truthy in Lua, falsy in JS
+- Lua's table indexing (1-based, no `length` for holes) replaces JS arrays: pass-through types abstract this but iteration order changes
+- Importing JS-only libraries silently fails at translation, only `@types` packages with Lua-runtime equivalents work
+- `tstlc` is the CLI; build configs are different from `tsc`: sharing a `tsconfig.json` with web projects requires careful `compilerOptions` split
+
+## Progressive disclosure
+
+- Read [references/namespaces-vs-classes.md](references/namespaces-vs-classes.md) - Load when choosing code organization, namespaces, or enums for clean Lua output
+- Read [references/multi-return-functions.md](references/multi-return-functions.md) - Load when implementing Lua-style multiple return values
+- Read [references/coroutine-patterns.md](references/coroutine-patterns.md) - Load when implementing cooperative multitasking
+- Read [references/lua-interop.md](references/lua-interop.md) - Load when calling Lua code from TypeScript
+- Read [references/tstl-decorators.md](references/tstl-decorators.md) - Load when using TSTL-specific decorators
+- Read [references/performance-tips.md](references/performance-tips.md) - Load when optimizing for Lua GC/JIT or generated code is slow or bloated
+- Read [references/type-safety.md](references/type-safety.md) - Load when maintaining types across TS/Lua boundary
+- Read [references/avoiding-heavy-features.md](references/avoiding-heavy-features.md) - Load when transpiled output is unexpectedly large
+- Read [references/tsconfig.md](references/tsconfig.md) - Load when configuring TSTL compiler options

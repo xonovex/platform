@@ -12,14 +12,14 @@ import {checkCatalogFiles} from "../../../src/catalog-files.js";
 
 const templateRoot = resolve(
   import.meta.dirname,
-  "../../../../../../runtime/plugin/plugin-agentic/skills/skill-guide/assets",
+  "../../../../../../runtime/plugin/plugin-agentic/skills/authoring-skills/assets",
 );
 const temporaryDirectories: string[] = [];
 
 const materializeCatalogEvidence = (templateName: string): string => {
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "skill-template-"));
   temporaryDirectories.push(temporaryDirectory);
-  const skillDirectory = join(temporaryDirectory, "example-guide");
+  const skillDirectory = join(temporaryDirectory, "using-example");
   cpSync(join(templateRoot, templateName), skillDirectory, {recursive: true});
 
   const evalsPath = join(skillDirectory, "evals.json");
@@ -29,7 +29,7 @@ const materializeCatalogEvidence = (templateName: string): string => {
   >;
   writeFileSync(
     evalsPath,
-    `${JSON.stringify({...evals, skill_name: "example-guide"}, undefined, 2)}\n`,
+    `${JSON.stringify({...evals, skill_name: "using-example"}, undefined, 2)}\n`,
   );
 
   const sourcesPath = join(skillDirectory, "SOURCES.md");
@@ -54,7 +54,7 @@ describe.each(["guideline-skill-template", "workflow-skill-template"])(
       const skillDirectory = materializeCatalogEvidence(templateName);
 
       const report = checkCatalogFiles(skillDirectory, {
-        name: "example-guide",
+        name: "using-example",
       });
 
       expect(report.errors).toEqual([]);

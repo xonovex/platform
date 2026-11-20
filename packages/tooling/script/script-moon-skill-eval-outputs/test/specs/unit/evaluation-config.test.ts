@@ -44,10 +44,10 @@ const normalizedEvaluation = (files: readonly string[]): NormalizedEval => ({
 
 const DIRECTORY = "/guide";
 
-// The guide a run resolves from: a SKILL.md naming the skill, plus the file the
+// The skill a run resolves from: a SKILL.md naming the skill, plus the file the
 // evaluations are read out of. A case that needs one of them absent builds the
 // tree without it rather than deleting it.
-const guideTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
+const skillTree = ({skill = true}: {skill?: boolean} = {}): FileSystem =>
   memoryFileSystem({
     files: {
       ...(skill
@@ -68,7 +68,7 @@ describe("evaluation configuration", () => {
 
   beforeEach(() => {
     directory = DIRECTORY;
-    fs = guideTree();
+    fs = skillTree();
   });
 
   const resolveConfig = (
@@ -178,8 +178,8 @@ describe("evaluation configuration", () => {
     const config = successfulConfig(resolveConfig());
 
     expect(config).toMatchObject({
-      model: "claude-haiku-4-5-20251001",
-      judgeModel: "claude-sonnet-5",
+      model: "claude-haiku-5-5",
+      judgeModel: "claude-sonnet-5-5",
     });
   });
 
@@ -198,7 +198,6 @@ describe("evaluation configuration", () => {
           skills: "./skills/",
           dependencies: ["xonovex-native"],
         }),
-        [join(plugin, "commands", "build.md")]: "Build the project.",
         [join(directory, "SKILL.md")]: "---\nname: test-skill\n---\n",
         [join(directory, "evals.json")]: JSON.stringify(
           evalFile([validEvaluation()]),
@@ -215,7 +214,7 @@ describe("evaluation configuration", () => {
       plugin,
     ]);
     expect(config.withoutArgs).not.toContain("--plugin-dir");
-    expect(config.guideDirectory).toBe(directory);
+    expect(config.skillDirectory).toBe(directory);
   });
 
   it("selects Codex for generation and judging", () => {
@@ -267,7 +266,7 @@ describe("evaluation configuration", () => {
       error: "'claude' CLI not found in PATH",
     });
 
-    fs = guideTree({skill: false});
+    fs = skillTree({skill: false});
     expect(failureMessage(resolveConfig())).toContain("no skill_name given");
   });
 

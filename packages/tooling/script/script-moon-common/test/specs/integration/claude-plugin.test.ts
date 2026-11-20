@@ -12,7 +12,7 @@ import {describe, expect, it} from "vitest";
 import {stageClaudePluginArguments} from "../../../src/claude-plugin.js";
 
 describe("Claude plugin staging", () => {
-  it("copies the selected skill and its resources without commands or other skills", () => {
+  it("copies the selected skill and its resources without the other skills", () => {
     const root = mkdtempSync(join(tmpdir(), "moon-common-claude-plugin-"));
     const plugin = join(root, "source");
     const write = (path: string, content: string): void => {
@@ -25,18 +25,17 @@ describe("Claude plugin staging", () => {
         ".claude-plugin/plugin.json",
         JSON.stringify({name: "xonovex-core", skills: "./skills/"}),
       );
-      write("commands/git-commit.md", "Commit the change.");
-      write("skills/git-guide/SKILL.md", "# Git");
+      write("skills/using-git/SKILL.md", "# Git");
       write(
-        "skills/git-guide/references/commits.md",
+        "skills/using-git/references/commits.md",
         "Use conventional commits.",
       );
-      write("skills/testing-guide/SKILL.md", "# Testing");
+      write("skills/authoring-tests/SKILL.md", "# Testing");
 
       const args = stageClaudePluginArguments(
         ["--plugin-dir", plugin],
         join(root, "staged"),
-        ["git-guide"],
+        ["using-git"],
       );
       const staged = args[1];
       if (staged === undefined)
@@ -44,17 +43,16 @@ describe("Claude plugin staging", () => {
 
       expect(
         readFileSync(
-          join(staged, "skills/git-guide/references/commits.md"),
+          join(staged, "skills/using-git/references/commits.md"),
           "utf8",
         ),
       ).toBe("Use conventional commits.");
-      expect(existsSync(join(staged, "commands"))).toBe(false);
-      expect(existsSync(join(staged, "skills/testing-guide"))).toBe(false);
+      expect(existsSync(join(staged, "skills/authoring-tests"))).toBe(false);
       expect(
         JSON.parse(
           readFileSync(join(staged, ".claude-plugin/plugin.json"), "utf8"),
         ),
-      ).toEqual({name: "xonovex-core", skills: ["./skills/git-guide"]});
+      ).toEqual({name: "xonovex-core", skills: ["./skills/using-git"]});
     } finally {
       rmSync(root, {recursive: true, force: true});
     }

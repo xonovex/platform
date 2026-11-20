@@ -1,20 +1,18 @@
 # Workflow diagrams
 
-Follow the full workflow from research through closeout, including review outcomes, failed checks, worktree delivery, and continuous learning. Use the overview or development cycle when only one part of the process is needed.
+Follow a change from intent through planning, the execution of each work item and the validation of the work package.
 
 | Diagram | Readable image | Editable source |
 | --- | --- | --- |
-| Main phases | [SVG](workflow-lifecycle.svg), [PNG](workflow-lifecycle.png) | [Graphviz](workflow-lifecycle.dot) |
-| Complete workflow | [SVG](workflow-diagram.svg), [PNG](workflow-diagram.png) | [Graphviz](workflow-diagram.dot) |
-| Implementation loop | [SVG](development-cycle.svg), [PNG](development-cycle.png) | [Graphviz](development-cycle.dot) |
+| Change flow | [SVG](change-flow.svg), [PNG](change-flow.png) | [Graphviz](change-flow.dot) |
 
 ## Read the flow
 
-Read the numbered phases from top to bottom. Dark gray arrows show the normal flow. Dashed blue arrows show retries. A dark box that starts with a number names a return to another phase; other dark boxes mark a selected stage or the completed feature. Blue diamonds mark decisions; a pale green box marks improved guidance. Continuous learning can run during any phase. Core, Agentic, and Integrations labels identify companion plugins; unqualified commands belong to the Workflow Plugin.
+Read the planning panel from left to right, then the execution panel, which repeats for each work item. Dark gray arrows show the normal flow, and the dashed blue arrow returns to the next work item. A box names the step and the skill that owns it; a `Core:` prefix names a skill of the Core Plugin. The dark box marks the validation of the work package.
 
 The palette, typography, shapes, and export rules follow the Xonovex design system in the `drodan-platform` repository (`packages/xonovex/xonovex-design-system`), as mirrored in `packages/asset/asset-brand/diagrams/style.gvpr`.
 
-The [workflow guide](../README.md) explains how to select commands and reconstruct context when resuming a task.
+The [workflow guide](../README.md) explains each step and the files it reads and writes.
 
 ## Render changes
 

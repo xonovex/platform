@@ -4,7 +4,7 @@ tags: [plugin]
 tasks:
   ci-check:
     deps:
-      - skill-github:ci-check
-      - skill-gitlab:ci-check
+      - skill-using-github:ci-check
+      - skill-using-gitlab:ci-check
     options:
       mergeDeps: append

@@ -8,17 +8,17 @@ import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
-import {collectGuideFiles} from "./drift-files.js";
+import {collectSkillFiles} from "./drift-files.js";
 
 export interface DriftLintReport {
   readonly findings: readonly string[];
   readonly manifestErrors: readonly string[];
 }
 
-// checkGuideDrift applies the per-file rules to one guide. Cross-file
+// checkSkillDrift applies the per-file rules to one skill. Cross-file
 // duplication spans the catalog and belongs to moon-skill-validate-drift instead.
-export const checkGuideDrift = (
-  guideDirectory: string,
+export const checkSkillDrift = (
+  skillDirectory: string,
   repositoryRoot: string,
   fs: FileSystem = nodeFileSystem,
 ): DriftLintReport => {
@@ -26,7 +26,7 @@ export const checkGuideDrift = (
     join(repositoryRoot, BUDGET_MANIFEST_FILE),
     fs,
   );
-  const files = collectGuideFiles(guideDirectory, repositoryRoot, fs);
+  const files = collectSkillFiles(skillDirectory, repositoryRoot, fs);
   return {
     findings: evaluateBudgets(files, budgets.manifest).map(
       ({message}) => message,

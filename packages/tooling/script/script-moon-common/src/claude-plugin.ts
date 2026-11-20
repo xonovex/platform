@@ -6,7 +6,7 @@ import {pluginSkillDirectories} from "./package-layout.js";
 export interface ClaudePluginStage {
   readonly directory: string;
   readonly name: string;
-  readonly guides: readonly string[];
+  readonly skillDirectories: readonly string[];
 }
 
 export const planClaudePluginStages = (
@@ -25,15 +25,15 @@ export const planClaudePluginStages = (
       fs.readText(join(argument, ".claude-plugin", "plugin.json")),
     ) as {readonly name: string; readonly skills: unknown};
     if (parsed.skills !== "./skills/") return argument;
-    const guides = pluginSkillDirectories(argument, fs);
-    const selected = guides.filter((guide) =>
-      selectedSkills.includes(basename(guide)),
+    const available = pluginSkillDirectories(argument, fs);
+    const selected = available.filter((skillDirectory) =>
+      selectedSkills.includes(basename(skillDirectory)),
     );
     const directory = join(workspace, `plugin-${String(index)}`);
     stages.push({
       directory,
       name: parsed.name,
-      guides: selected.length > 0 ? selected : guides,
+      skillDirectories: selected.length > 0 ? selected : available,
     });
     return directory;
   });
@@ -48,15 +48,19 @@ export const stageClaudePluginArguments = (
   const plan = planClaudePluginStages(args, workspace, selectedSkills);
   for (const stage of plan.stages) {
     mkdirSync(join(stage.directory, ".claude-plugin"), {recursive: true});
-    for (const guide of stage.guides)
-      cpSync(guide, join(stage.directory, "skills", basename(guide)), {
-        recursive: true,
-      });
+    for (const skillDirectory of stage.skillDirectories)
+      cpSync(
+        skillDirectory,
+        join(stage.directory, "skills", basename(skillDirectory)),
+        {recursive: true},
+      );
     writeFileSync(
       join(stage.directory, ".claude-plugin", "plugin.json"),
       JSON.stringify({
         name: stage.name,
-        skills: stage.guides.map((guide) => `./skills/${basename(guide)}`),
+        skills: stage.skillDirectories.map(
+          (skillDirectory) => `./skills/${basename(skillDirectory)}`,
+        ),
       }),
     );
   }

@@ -1,0 +1,37 @@
+---
+name: writing-shell-scripts
+description: "Use when writing or editing a POSIX shell or Bash script for CI tasks, build helpers, or automation. Triggers on `.sh` files, `#!/usr/bin/env bash` or `#!/bin/sh` shebangs, `set -euo pipefail`, quoting, exit codes, shellcheck, or shfmt, even when the user doesn't say 'shell'."
+---
+
+# Shell Scripting Coding Guidelines
+
+Write portable shell scripts with quoted arguments, explicit failure handling, and ShellCheck and shfmt validation.
+
+## Essentials
+
+- **POSIX compatibility** - Use POSIX sh, lint with shellcheck, format with shfmt, see [references/posix-compatibility.md](references/posix-compatibility.md)
+- **Strict mode** - Use strict mode and safe defaults, see [references/strict-mode.md](references/strict-mode.md)
+- **Quoting** - Quote all expansions to avoid word splitting, see [references/quoting.md](references/quoting.md)
+- **Functions** - Write small, focused functions, see [references/functions.md](references/functions.md)
+- **Parameter expansion** - Set default values and manipulate variables, see [references/parameter-expansion.md](references/parameter-expansion.md)
+- **Error handling** - Implement exit codes and error messages, see [references/error-handling.md](references/error-handling.md)
+- **Idempotency** - Make scripts safely re-runnable, see [references/idempotency.md](references/idempotency.md)
+
+## Gotchas
+
+- Unquoted variables word-split and glob-expand: `cp $file dest/` silently breaks on filenames with spaces; quote everything
+- `set -e` doesn't catch errors inside `if`, `&&`, `||`, or pipelines without `-o pipefail`: combine `set -euo pipefail` at the top
+
+## Progressive disclosure
+
+- Read [references/posix-compatibility.md](references/posix-compatibility.md) - Load when ensuring portability across shells
+- Read [references/strict-mode.md](references/strict-mode.md) - Load when setting up error handling and safety flags
+- Read [references/quoting.md](references/quoting.md) - Load when variables expand incorrectly or word splitting occurs
+- Read [references/functions.md](references/functions.md) - Load when organizing script logic or creating reusable code
+- Read [references/parameter-expansion.md](references/parameter-expansion.md) - Load when setting default values or manipulating variables
+- Read [references/error-handling.md](references/error-handling.md) - Load when implementing exit codes or error messages
+- Read [references/argument-parsing.md](references/argument-parsing.md) - Load when parsing command-line flags or arguments
+- Read [references/validation.md](references/validation.md) - Load when checking preconditions or input validity
+- Read [references/idempotency.md](references/idempotency.md) - Load when scripts should be safely re-runnable
+- Read [references/common-patterns.md](references/common-patterns.md) - Load when learning common shell idioms
+- Read [references/script-template.md](references/script-template.md) - Load when starting a new shell script

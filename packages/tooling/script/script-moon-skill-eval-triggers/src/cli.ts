@@ -2,7 +2,7 @@ const PROGRAM = "moon-skill-eval-triggers";
 
 const USAGE = `Usage: ${PROGRAM} [queries.json] [skill_name] [split] [options]
     queries.json = path to eval-queries.json (default: ./eval-queries.json)
-    skill_name   = bare ("git-commit") or plugin-namespaced ("plugin:git-commit")
+    skill_name   = bare ("using-git") or plugin-namespaced ("plugin:using-git")
                    (default: the "name" frontmatter from ./SKILL.md)
     split        = train | validation | all   (default: all)
 
@@ -10,7 +10,7 @@ Options (flag overrides env):
     --runs N             / RUNS=N             runs per query (default: 3)
     --threshold F        / THRESHOLD=F        trigger-rate cutoff for a pass (default: 0.5)
     --harness H          / SKILL_EVAL_HARNESS harness: claude | codex (default: claude)
-    --model M                                  harness model (defaults: Claude claude-haiku-4-5-20251001; Codex gpt-5.3-codex)
+    --model M                                  harness model (defaults: Claude claude-haiku-5-5; Codex gpt-5.3-codex)
     --split S                                  train | validation | all (default: all)
     --batch-size N                             queries per sequential batch
     --workspace PATH                           directory for JSONL and summary evidence

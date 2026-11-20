@@ -1,6 +1,6 @@
 # Xonovex Platform Monorepo
 
-Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills and commands.
+Run coding agents locally with the Agent CLI, run policy-governed Kubernetes Jobs with the Agent Operator, or install grouped plugins for reusable skills.
 
 ![License](https://img.shields.io/badge/license-MIT-blue) ![Node](https://img.shields.io/badge/node-22.18%2B-green) ![Go](https://img.shields.io/badge/go-1.27%2B-00ADD8)
 
@@ -12,8 +12,8 @@ Choose the component that matches the task. Skills provide instructions and supp
 | --- | --- |
 | Run Claude Code or OpenCode locally | [Agent CLI](packages/tooling/cli/agent-cli-go/README.md) |
 | Run agents as Kubernetes Jobs | [Agent Operator quick start](packages/sandbox/operator/agent-operator-go/docs/quick-start.md) |
-| Install skills and commands | [Plugin catalog](#agent-plugins) |
-| Follow the development workflow | [Workflow guide and diagrams](packages/runtime/plugin/plugin-workflow/README.md) |
+| Install skills | [Plugin catalog](#agent-plugins) |
+| Take a change from research to delivery | [Workflow guide and diagram](packages/runtime/plugin/plugin-workflow/README.md) |
 | Change or release the repository | [Contributing guide](CONTRIBUTING.md) |
 
 The CLI and operator support Claude Code and OpenCode, model-provider routing, Git and Jujutsu workspaces, and Nix provisioning. The CLI offers bubblewrap and Docker isolation. The operator uses cluster-provided gVisor, Kata, and Confidential Containers runtime classes. Each component documents its requirements and guarantees.
@@ -43,7 +43,7 @@ Follow the [operator quick start](packages/sandbox/operator/agent-operator-go/do
 
 ### Agent Plugins
 
-Install the grouped plugins your tasks need. Each plugin owns related skills and commands. A skill keeps its existing name, and a command uses the namespace of the plugin that owns it.
+Install the grouped plugins your tasks need. Each plugin owns related skills and ships no slash commands.
 
 | Plugin | Purpose |
 | --- | --- |
@@ -52,10 +52,10 @@ Install the grouped plugins your tasks need. Each plugin owns related skills and
 | [`xonovex-game-engine`](packages/runtime/plugin/plugin-game-engine/README.md) | Build game engines, renderers, audio systems, editors, asset pipelines, and multiplayer networking. |
 | [`xonovex-integrations`](packages/runtime/plugin/plugin-integrations/README.md) | Use GitHub and GitLab for issues, pull requests, delivery, and continuous integration. |
 | [`xonovex-languages`](packages/runtime/plugin/plugin-languages/README.md) | Write Python, shell, SQL, and Lua, including TypeScript compiled to Lua. |
-| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write C99 and build portable native systems with explicit memory, concurrency, and data layouts. |
+| [`xonovex-native`](packages/runtime/plugin/plugin-native/README.md) | Write, build, and debug portable native C99 systems with explicit memory, concurrency, and data layouts. |
 | [`xonovex-platform`](packages/runtime/plugin/plugin-platform/README.md) | Configure Moon tasks and build and operate Docker images, Kubernetes workloads, and Terraform infrastructure. |
 | [`xonovex-typescript`](packages/runtime/plugin/plugin-typescript/README.md) | Develop the TypeScript stack, its frameworks, package tooling, validation, and tests. |
-| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Research, plan, implement, validate, and close out work, then integrate lessons from the session. |
+| [`xonovex-workflow`](packages/runtime/plugin/plugin-workflow/README.md) | Take a change from research to validated delivery in one directory of files that every step reads and writes. |
 | [`xonovex-writing`](packages/runtime/plugin/plugin-writing/README.md) | Revise prose and write technical documents, articles, news, and travel guides. |
 
 #### Claude Code
@@ -79,10 +79,6 @@ codex plugin add xonovex-core@xonovex-marketplace
 codex plugin add xonovex-workflow@xonovex-marketplace
 codex plugin add xonovex-typescript@xonovex-marketplace
 ```
-
-#### Upgrade from individual plugins
-
-The grouped plugins replace the individual `xonovex-skill-*` plugins and `xonovex-utility`. Install the group that owns each skill, then uninstall its old individual plugin to prevent duplicate skill registration. The `xonovex-workflow` plugin now contains the planning and reflection skills and their commands. Git commands and the existing `plan-worktree-*` commands belong to `xonovex-core`; authoring commands belong to `xonovex-agentic`; content commands belong to `xonovex-writing`.
 
 ## Development
 

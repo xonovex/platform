@@ -1,0 +1,98 @@
+[
+  {
+    "query": "these two modules feel way too tightly coupled: tell me concretely what kind of coupling it is and how to loosen the worst part",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "direct: grade the seam (connascence + coupling ladder) and weaken it"
+  },
+  {
+    "query": "is a chained call like order.getCustomer().getAddress().getCity() a problem, and what do I do about it?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "Law of Demeter / train wreck = content coupling"
+  },
+  {
+    "query": "should this function take positional arguments or a named options object: which couples callers less?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "connascence of position vs name; rule of degree"
+  },
+  {
+    "query": "this helper module is just a grab-bag of unrelated init steps that run at startup: is that bad cohesion?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "temporal/coincidental cohesion vs functional"
+  },
+  {
+    "query": "I pass a boolean flag into this shared method that switches its behavior: code smell?",
+    "should_trigger": true,
+    "split": "train",
+    "rationale": "control coupling on the ladder"
+  },
+  {
+    "query": "design a plugin registry so new backends register themselves without editing the core",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: extensibility/registry -> applying-microkernel-architecture"
+  },
+  {
+    "query": "isolate my domain logic from Postgres behind an interface so I can swap the database",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: ports-and-adapters isolation -> applying-hexagonal-architecture"
+  },
+  {
+    "query": "which module should own the email-template rendering code. It feels misfiled",
+    "should_trigger": false,
+    "split": "train",
+    "rationale": "near-miss: where a boundary goes -> applying-orthogonality"
+  },
+  {
+    "query": "Review this Go function for coupling problems and tell me how to fix the worst one:\n\n```go\nfunc (r *Repo) Save(order Order, dryRun bool) error {\n    if dryRun {\n        return validate(order)\n    }\n    return r.persist(order)\n}\n```\n\nCallers do `repo.Save(order, true)` in some places and `repo.Save(order, false)` in others.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "Is a chained expression like `order.Customer().Address().City()` a problem in our codebase? Explain concretely what it costs and what to do instead. Also: we have a builder used as `NewQuery().Where(x).OrderBy(y).Build()`. Is that the same problem?",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "A billing function reads an Order's total by passing a magic number: `cache.Get(key, 0)` where `0` means \"no expiry\", and a far-away handler does `if ttl == 0 { /* unlimited */ }`. Grade this coupling precisely and give me the fix.",
+    "rationale": "output-eval task also exercises this skill's routing boundary",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "our notification code has grown into a mess: channel folders sit beside sendutil and template code is buried three levels deep; reorganize it so the independent choices are obvious",
+    "rationale": "near miss owned by applying-orthogonality",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "how do I get the business and developers speaking the same vocabulary that also shows up in the code?",
+    "rationale": "near miss owned by applying-ddd",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "harden the user-service module: it's full of `any` and swallowed errors, just tell me what to fix",
+    "rationale": "near miss owned by auditing-code-quality",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "what's the difference between a mock, a stub, a fake, and a spy?",
+    "rationale": "near miss owned by authoring-tests",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "a shared helpers package at the repo root has become a dumping ground: notification channels, templates, and delivery policies all put unrelated code there; how should I distribute it?",
+    "rationale": "near miss owned by applying-orthogonality",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

@@ -1,9 +1,12 @@
+import {basename} from "node:path";
 import {
   nodeFileSystem,
   type FileSystem,
 } from "@xonovex/script-moon-common/file-system";
+import {pluginSkillDirectories} from "@xonovex/script-moon-common/package-layout";
+import {pluginHandoffNames} from "@xonovex/script-moon-common/skill-handoffs";
 import {z} from "zod";
-import {exists, jsonFile} from "./files.js";
+import {exists, inside, jsonFile} from "./files.js";
 import type {Catalog, Harness, Plugin} from "./model.js";
 
 const manifestSchema = z.looseObject({
@@ -15,6 +18,39 @@ const marketplaceSchema = z.looseObject({
   name: z.string(),
   plugins: z.array(z.looseObject({name: z.string(), source: z.string()})),
 });
+
+// withCompanions adds to each plugin the other plugins that own a skill which
+// a skill of this plugin hands off to, without the declared dependencies.
+const withCompanions = (
+  root: string,
+  plugins: readonly Plugin[],
+  fs: FileSystem,
+): readonly Plugin[] => {
+  const owners = new Map(
+    plugins.flatMap((plugin) =>
+      pluginSkillDirectories(inside(root, plugin.directory), fs).map(
+        (directory) => [basename(directory), plugin.name] as const,
+      ),
+    ),
+  );
+  return plugins.map((plugin) => {
+    const handoffs = pluginHandoffNames(inside(root, plugin.directory), fs);
+    const companions = new Set(
+      [...handoffs].flatMap((skill) => {
+        const owner = owners.get(skill);
+        return owner === undefined ? [] : [owner];
+      }),
+    );
+    return {
+      ...plugin,
+      companions: [...companions]
+        .filter(
+          (name) => name !== plugin.name && !plugin.dependencies.includes(name),
+        )
+        .toSorted(),
+    };
+  });
+};
 
 export const loadPlugins = (
   root: string,
@@ -60,9 +96,13 @@ export const loadPlugins = (
         name: manifest.name,
         version: manifest.version,
         dependencies: manifest.dependencies.toSorted(),
+        companions: [],
         harnesses,
       };
     })
     .toSorted((a, b) => a.name.localeCompare(b.name));
-  return {marketplace: marketplace.name, plugins};
+  return {
+    marketplace: marketplace.name,
+    plugins: withCompanions(root, plugins, fs),
+  };
 };

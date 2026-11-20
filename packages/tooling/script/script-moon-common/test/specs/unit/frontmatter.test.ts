@@ -11,21 +11,21 @@ const nameIn = (contents: string): string | undefined =>
 describe("parseFrontmatterName", () => {
   it("reads the declared name", () => {
     expect(
-      nameIn("---\nname: git-guide\ndescription: Use git\n---\n\nBody"),
-    ).toBe("git-guide");
+      nameIn("---\nname: using-git\ndescription: Use git\n---\n\nBody"),
+    ).toBe("using-git");
   });
 
   it("strips surrounding quotes", () => {
-    expect(nameIn('---\nname: "git-guide"\n---\n')).toBe("git-guide");
-    expect(nameIn("---\nname: 'git-guide'\n---\n")).toBe("git-guide");
+    expect(nameIn('---\nname: "using-git"\n---\n')).toBe("using-git");
+    expect(nameIn("---\nname: 'using-git'\n---\n")).toBe("using-git");
   });
 
   it("trims surrounding whitespace", () => {
-    expect(nameIn("---\nname:   git-guide  \n---\n")).toBe("git-guide");
+    expect(nameIn("---\nname:   using-git  \n---\n")).toBe("using-git");
   });
 
   it("reads frontmatter written with CRLF line endings", () => {
-    expect(nameIn("---\r\nname: git-guide\r\n---\r\n")).toBe("git-guide");
+    expect(nameIn("---\r\nname: using-git\r\n---\r\n")).toBe("using-git");
   });
 
   it("returns the first name when the key repeats", () => {
@@ -37,7 +37,7 @@ describe("parseFrontmatterName", () => {
   });
 
   it("returns undefined when the document has no frontmatter block", () => {
-    expect(nameIn("name: git-guide\n")).toBeUndefined();
+    expect(nameIn("name: using-git\n")).toBeUndefined();
   });
 
   it("returns undefined when the frontmatter declares no name", () => {

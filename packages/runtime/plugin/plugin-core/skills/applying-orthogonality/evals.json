@@ -1,0 +1,42 @@
+{
+  "skill_name": "applying-orthogonality",
+  "tier": "aggressive",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "A notification platform supports email, SMS, and push; plain and rich templates; and normal or urgent delivery policy. The code is currently grouped into controllers/, services/, helpers/, and providers/. Propose a package structure that makes these independent choices obvious and explain how a new variant is placed.",
+      "assertions": [
+        "Identifies independent domain axes such as channel, template, and delivery policy instead of preserving technical layer directories",
+        "Uses one directory per axis with bare, symmetric variant leaves such as channel/email and channel/sms rather than tool or manager names",
+        "Explains that a new answer adds a leaf under its owning axis without editing unrelated axis variants"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A media-processing service has several decoders, storage destinations, and thumbnail strategies. Structured audit logging and a fail-closed content policy must run for every possible combination. Should logging and policy become more sibling variant directories?",
+      "assertions": [
+        "States that logging and the universal policy are cross-cutting concerns rather than selectable axes or sibling variants",
+        "Recommends applying them once around the composed operation rather than duplicating them inside every decoder, destination, or thumbnail leaf",
+        "Distinguishes the all-combination concern from a localized bridge between two specific variants"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "An importer has JSON, CSV, and XML parsers plus database, queue, and object-storage destinations. Every parser currently contains destination-specific branches. How should the module boundaries change so parser and destination choices can evolve independently?",
+      "assertions": [
+        "Separates parser/format and destination into independent axes rather than creating one module per parser-destination combination",
+        "Uses a neutral value or shared contract between the axes so neither axis names the other's concrete leaves",
+        "Places any genuine one-pair exception in the dependent variant as a localized bridge instead of a new top-level combined package"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "A web request path and a background worker both send the same notification types, but one calls the folders transports/templates while the other calls them senders/messages. Reorganize the naming without forcing their implementations to be identical.",
+      "assertions": [
+        "Uses the same stable axis vocabulary for both consumers, such as channel and template, while allowing their implementation details to differ",
+        "Names sibling variants with the same grammar and level of abstraction",
+        "Moves concepts shared by both consumers to an appropriate shared owner instead of silently duplicating divergent names"
+      ]
+    }
+  ]
+}

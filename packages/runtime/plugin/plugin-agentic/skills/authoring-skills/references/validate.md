@@ -1,0 +1,118 @@
+# validate: Validate Skill Against Spec and Best Practices
+
+Audit the skill metadata, instructions, references, and bundled resources; report each failure with its location.
+
+## Contents
+
+[Core Workflow](#core-workflow) · [Frontmatter Checks](#frontmatter-checks) · [Body Checks](#body-checks) · [Reference Checks](#reference-checks) · [Content Quality Checks](#content-quality-checks) · [Structural-Pattern Hints](#structural-pattern-hints-soft-signals) · [Harness Neutrality Checks](#harness-neutrality-checks) · [Composition Checks](#composition-checks) · [Output](#output) · [Error Handling](#error-handling) · [Safety](#safety)
+
+Read-only audit of a SKILL.md against the Agent Skills spec, project conventions, and authoring best practices. Reports pass/fail per check with line numbers.
+
+The catalog validator runs as `moon-skill-validate --strict <skill-dir>` and exits non-zero on errors or authoring warnings. A portable reference implementation lives at [scripts/validate.py](../scripts/validate.py) (PEP 723 self-contained Python).
+
+## Core Workflow
+
+1. Track checks in a task list
+2. Resolve target: SKILL.md path or skill directory
+3. Parse frontmatter (YAML) and body separately
+4. Run all checks (frontmatter, body, references, content quality, harness neutrality)
+5. When repository context is available, validate registration, paired manifests, exact hard dependencies, and named handoffs
+6. Report pass/fail with file:line evidence and remediation hints
+7. Read-only, never modify files
+
+## Frontmatter Checks
+
+- `name` present, 1-64 chars, matches `^[a-z0-9]+ing(-[a-z0-9]+)+$` (gerund, then object), does not use a reserved word (`anthropic`/`claude`) except the catalog's explicit `configuring-claude-code` product adapter, has no XML tags, and equals the parent directory name
+- `description` present, 1-820 chars (warns on `<...>` angle-bracket markup: fine for component/generic references)
+- `description` starts with imperative cue ("Use when...", "Use this skill when...")
+- `description` includes trigger contexts ("Triggers on...", "even when the user doesn't say...")
+- `description` positively distinguishes the relevant user intent or context where adjacent skills share trigger words; it does not use skip/out-of-scope clauses or name other skills
+- Optional fields obey their limits/types: `compatibility` ≤500 chars, `license` string, `metadata` string→string map, `allowed-tools` space-separated token string
+- No unknown top-level fields (outside `name`/`description`/`license`/`compatibility`/`metadata`/`allowed-tools`)
+
+## Body Checks
+
+- Body ≤500 lines and ~5000 tokens (warn at 80%)
+- Has at least one heading
+- No trailing whitespace, no Windows line endings
+- Code blocks have language markers
+- No empty sections
+
+## Reference Checks
+
+- Every `references/{file}.md` link resolves to an existing file
+- Each reference link has an explicit load-when trigger (e.g., "Load when X")
+- Reference files live one level deep under `references/`
+- Reference filenames are kebab-case
+
+## Content Quality Checks
+
+- Has a **Gotchas** or equivalent non-obvious-facts section
+- No menus of 3+ equal options (prefer a default + brief alternative)
+- No general-knowledge filler (warn on prose that explains what the technology is)
+
+## Structural-Pattern Hints (soft signals)
+
+These patterns are advisory during local exploration and fail the repository's strict CI mode until resolved. See [instruction-patterns.md](instruction-patterns.md).
+
+- Multi-step workflow (>3 ordered steps) without a checklist (`- [ ]`): consider adding one
+- Output-producing skill without an output template: consider adding one
+- Fragile edits / destructive operations without a validation loop or plan-validate-execute pattern: consider adding one
+
+## Harness Neutrality Checks
+
+- No proprietary tool / function names from any agent harness: describe the capability instead
+- No vendor model IDs or model names: describe the role (e.g. "exploration agent")
+- No hardcoded vendor-namespaced paths: use placeholders like `<skills-dir>/`, `<commands-dir>/`
+- No vendor-prefixed frontmatter keys
+- No vendor-specific instruction filenames: use `AGENTS.md` (the open standard)
+
+## Composition Checks
+
+The workspace-level composition check validates only durable, exact structure:
+
+- Every skill package and skill is registered in the supported marketplaces.
+- Paired plugin manifests use the package-derived name and direct skill path.
+- Exact hard dependencies match between supported manifests and package dependencies.
+- Every hard dependency and named ownership handoff resolves to an existing registered skill.
+- Hard dependencies are dependency-first and acyclic.
+- Optional selection remains in runtime prose and relies on installed skill names and routing descriptions, not a second metadata graph.
+- `SOURCES.md` records content provenance independently of package versions.
+
+## Output
+
+```
+Validation: <skills-dir>/{skill-name}/SKILL.md
+
+[PASS] name: gerund first, matches parent dir
+[PASS] description: 312 chars, imperative, includes triggers
+[PASS] body: 124 lines (~1240 tokens)
+[FAIL] references: 2 broken links
+  - SKILL.md:42 → references/missing-topic.md (file not found)
+  - SKILL.md:58 → references/old-name.md (file not found)
+[WARN] references: 3 links lack load-when triggers
+  - SKILL.md:42, SKILL.md:51, SKILL.md:60
+[PASS] composition: manifests, hard dependencies, and handoffs resolve
+[FAIL] harness neutrality: 1 vendor-specific reference
+  - SKILL.md:30 → proprietary tool name detected
+
+Result: FAIL (2 errors, 3 warnings)
+
+Remediation:
+1. Create missing reference files or fix paths
+2. Add "Load when X" to bare reference links
+3. Replace vendor-specific tool names with generic phrasing
+```
+
+## Error Handling
+
+- Target not found → error with suggested paths
+- Invalid YAML frontmatter → report line and parse error
+- Non-skill markdown (no frontmatter) → skip with info
+- Directory without SKILL.md → error
+
+## Safety
+
+- Read-only; never edits the skill
+- Recommend running before commit
+- Print full diff context (file:line) so remediation is unambiguous

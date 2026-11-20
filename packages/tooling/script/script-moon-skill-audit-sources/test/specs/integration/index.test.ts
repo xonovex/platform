@@ -46,7 +46,7 @@ describe("main", () => {
     };
     const portable = resolve(
       import.meta.dirname,
-      "../../../../../../runtime/plugin/plugin-agentic/skills/skill-guide/scripts/audit-sources.py",
+      "../../../../../../runtime/plugin/plugin-agentic/skills/authoring-skills/scripts/audit-sources.py",
     );
     // The script declares no dependencies and imports only the standard library,
     // so uv has nothing to fetch: --offline and a refused interpreter download

@@ -1,0 +1,67 @@
+{
+  "type": "object",
+  "required": [
+    "type",
+    "schema",
+    "work",
+    "worktree",
+    "branch",
+    "tasks",
+    "decision_notes",
+    "checks"
+  ],
+  "properties": {
+    "type": {"const": "Workflow Implementation Notes"},
+    "schema": {"const": "workflow/implementation-notes/1"},
+    "work": {
+      "allOf": [
+        {"$ref": "workflow/common#/$defs/conceptId"},
+        {"x-concept": "work/"}
+      ]
+    },
+    "worktree": {"type": "string", "minLength": 1},
+    "branch": {"type": "string", "minLength": 1},
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "concern", "summary"],
+        "properties": {
+          "id": {"$ref": "workflow/common#/$defs/kebabName"},
+          "concern": {"type": "string", "minLength": 1},
+          "summary": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "decision_notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["decision", "location", "note"],
+        "properties": {
+          "decision": {
+            "allOf": [
+              {"$ref": "workflow/common#/$defs/conceptId"},
+              {"x-concept": "decisions/"}
+            ]
+          },
+          "location": {"type": "string", "pattern": "^[^\\s:]+:[1-9][0-9]*$"},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "result"],
+        "properties": {
+          "command": {"type": "string", "minLength": 1},
+          "result": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "allOf": [{"$ref": "workflow/common#/$defs/header"}]
+}

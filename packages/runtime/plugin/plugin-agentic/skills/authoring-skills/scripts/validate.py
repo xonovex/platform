@@ -1,0 +1,580 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "pyyaml>=6.0",
+# ]
+# ///
+"""Validate a SKILL.md against the Agent Skills spec and authoring best practices.
+
+Usage:
+    validate.py [--strict] <skill-dir>
+    validate.py [--strict] <path-to-SKILL.md>
+
+Exit codes:
+    0 = PASS (no errors; warnings allowed unless --strict)
+    1 = FAIL (one or more errors, or warnings under --strict)
+    2 = usage error / file not found
+
+Read-only, never modifies files.
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import yaml  # pyright: ignore[reportMissingModuleSource]  # PEP723 dep, installed by uv at runtime
+
+NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+# A skill name is a gerund and then its object, as in using-git. The gerund is
+# what tells a skill name from another kebab-case token in prose.
+SKILL_NAME = r"[a-z0-9]+ing(?:-[a-z0-9]+)+"
+SKILL_NAME_RE = re.compile(rf"^{SKILL_NAME}$")
+RESERVED_VENDOR_ADAPTER_NAMES = frozenset({"configuring-claude-code"})
+# The routing run on the workflow skills kept descriptions of up to this length; the specification allows 1,024.
+DESCRIPTION_LIMIT = 820
+FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
+QUOTED_SCALAR_RE = re.compile(r"^[ \t]*[A-Za-z_][\w-]*:[ \t]*(?P<rest>.+?)[ \t]*$")
+REF_LINK_RE = re.compile(r"references/([a-zA-Z0-9_./<>{}-]+\.md)")
+PROGRESSIVE_DISCLOSURE_RE = re.compile(
+    r"^## *Progressive Disclosure\s*\n(.*?)(?=^## |\Z)",
+    re.MULTILINE | re.DOTALL | re.IGNORECASE,
+)
+HEADING_RE = re.compile(r"^#{1,6} ", re.MULTILINE)
+CODE_FENCE_OPEN_RE = re.compile(r"^```([a-zA-Z0-9_+-]+)?\s*$", re.MULTILINE)
+LOAD_WHEN_RE = re.compile(r"load when", re.IGNORECASE)
+NEGATIVE_ROUTING_CLAUSE_RE = re.compile(
+    r"(?:^|[.!?]\s+)(?:skip\b|do not use\b|don't use\b|out[- ]of[- ]scope\b)",
+    re.IGNORECASE,
+)
+NAMED_SKILL_RE = re.compile(
+    rf"(?<![a-z0-9-]){SKILL_NAME}(?![a-z0-9-])", re.IGNORECASE
+)
+
+HARNESS_PATTERNS = [
+    # Proprietary tool / function / mode names
+    (r"\bEnterPlanMode\b", "Claude Code tool name"),
+    (r"\bExitPlanMode\b", "Claude Code tool name"),
+    (r"\bAskUserQuestion\b", "Claude Code tool name"),
+    (r"\bTodoWrite\b", "Claude Code tool name"),
+    (r"\bsubagent_type\b", "Claude Code parameter"),
+    (r"\bmodel=haiku\b", "Vendor model id"),
+    (r"\bmodel=sonnet\b", "Vendor model id"),
+    (r"\bmodel=opus\b", "Vendor model id"),
+    # Vendor-namespaced paths
+    (r"\.claude/skills/", "Vendor-namespaced path"),
+    (r"\.claude/commands/", "Vendor-namespaced path"),
+    # Vendor-prefixed frontmatter keys
+    (r"\bclaude:", "Vendor-prefixed frontmatter key"),
+    # Vendor-specific instruction filenames
+    (r"\bCLAUDE\.md\b", "Vendor-specific filename (use AGENTS.md)"),
+]
+
+
+@dataclass
+class Report:
+    passes: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+
+    def add_pass(self, msg: str) -> None:
+        self.passes.append(msg)
+
+    def add_warn(self, msg: str) -> None:
+        self.warnings.append(msg)
+
+    def add_fail(self, msg: str) -> None:
+        self.errors.append(msg)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Validate a SKILL.md against the Agent Skills spec and authoring best practices.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("target", help="skill directory or path to a SKILL.md")
+    p.add_argument(
+        "--strict", action="store_true",
+        help="treat authoring warnings as validation failures",
+    )
+    return p
+
+
+def resolve_target(arg: str) -> tuple[Path, Path]:
+    """Return (skill_md_path, skill_dir)."""
+    target = Path(arg).resolve()
+    if target.is_dir():
+        if (target / "SKILL.md").is_file():
+            skill = target / "SKILL.md"
+        else:
+            nested = sorted(p for p in target.glob("*/SKILL.md") if p.is_file())
+            if len(nested) > 1:
+                sys.stderr.write(
+                    f"Error: multiple SKILL.md found under {target}; pass one explicitly\n"
+                )
+                sys.exit(2)
+            skill = nested[0] if nested else target / "SKILL.md"
+    elif target.is_file():
+        skill = target
+    else:
+        sys.stderr.write(f"Error: target not found: {target}\n")
+        sys.exit(2)
+    if not skill.is_file():
+        sys.stderr.write(f"Error: SKILL.md not found at {skill}\n")
+        sys.exit(2)
+    return skill, skill.parent
+
+
+def split_frontmatter(content: str) -> tuple[dict, str, str]:
+    match = FRONTMATTER_RE.match(content)
+    if not match:
+        return {}, content, ""
+    fm_raw, body = match.groups()
+    try:
+        fm = yaml.safe_load(fm_raw) or {}
+    except yaml.YAMLError as e:
+        raise ValueError(f"Invalid YAML frontmatter: {e}") from e
+    if not isinstance(fm, dict):
+        raise ValueError("Frontmatter is not a mapping")
+    return fm, body, fm_raw
+
+
+def check_loader_quoting(fm_raw: str, report: Report) -> None:
+    """Flag frontmatter quoting the skill loader's naive parser cannot read.
+
+    The loader does not understand single-quote `''` escaping or inner double
+    quotes; it stops at the first inner delimiter and reads the tail as an
+    unknown attribute. `yaml.safe_load` accepts these, so scan the raw text.
+    """
+    description_line = next(
+        (line for line in fm_raw.splitlines() if re.match(r"^description\s*:", line)),
+        None,
+    )
+    if description_line is not None:
+        raw_description = description_line.split(":", 1)[1].strip()
+        if (
+            len(raw_description) >= 2
+            and raw_description.startswith('"')
+            and raw_description.endswith('"')
+        ):
+            report.add_pass("frontmatter: description uses a double-quoted scalar")
+        else:
+            report.add_fail(
+                "frontmatter: 'description' must use one double-quoted scalar; "
+                "use single quotes for phrases inside it"
+            )
+
+    flagged = False
+    for raw_line in fm_raw.splitlines():
+        m = QUOTED_SCALAR_RE.match(raw_line)
+        if not m:
+            continue
+        rest = m.group("rest")
+        if len(rest) < 2 or rest[0] not in ("'", '"'):
+            continue  # unquoted or block scalar: the loader handles it
+        quote = rest[0]
+        if not rest.endswith(quote):
+            continue  # multiline / unterminated on this line: cannot judge naively
+        key = raw_line.split(":", 1)[0].strip()
+        if quote == "'" and "''" in rest:
+            report.add_fail(
+                f"frontmatter: '{key}' uses single-quote '' escaping, which the skill "
+                "loader's parser does not support (it reads the tail as an unknown "
+                "attribute). Use a double-quoted scalar with literal apostrophes, e.g. "
+                "\"... doesn't say 'TDD'.\""
+            )
+            flagged = True
+        elif rest.count(quote) != 2:
+            report.add_fail(
+                f"frontmatter: '{key}' has an inner {quote} inside a {quote}-quoted value; "
+                "the skill loader stops at the first inner quote. Use a double-quoted scalar "
+                "with single quotes for inner phrases (apostrophes stay literal)."
+            )
+            flagged = True
+    if not flagged:
+        report.add_pass(
+            "frontmatter: quoting is loader-safe (no '' escapes or inner delimiter quotes)"
+        )
+
+
+def description_routing_errors(
+    description: str, own_skill_name: str | None
+) -> list[str]:
+    errors: list[str] = []
+    if NEGATIVE_ROUTING_CLAUSE_RE.search(description):
+        errors.append(
+            "description: routing must use positive triggers only; "
+            "move skip/out-of-scope guidance to the body"
+        )
+    named_skills = sorted(
+        {
+            match.group(0).lower()
+            for match in NAMED_SKILL_RE.finditer(description)
+            if match.group(0).lower()
+            != (own_skill_name.lower() if own_skill_name is not None else None)
+        }
+    )
+    if named_skills:
+        errors.append(
+            f"description: names other skill(s) {', '.join(named_skills)}; "
+            "put by-name handoffs in the body"
+        )
+    return errors
+
+
+def check_frontmatter(fm: dict, parent_name: str, report: Report) -> None:
+    # name
+    name = fm.get("name")
+    if not name:
+        report.add_fail("frontmatter: missing 'name'")
+    elif not isinstance(name, str):
+        report.add_fail(f"frontmatter: name is {type(name).__name__}, expected string")
+    elif len(name) > 64:
+        report.add_fail(f"frontmatter: name '{name}' is {len(name)} chars (>64 spec limit)")
+    elif not NAME_RE.match(name):
+        report.add_fail(
+            f"frontmatter: name '{name}' is not kebab-case "
+            f"(regex ^[a-z0-9]+(-[a-z0-9]+)*$)"
+        )
+    elif not SKILL_NAME_RE.match(name):
+        report.add_fail(
+            f"frontmatter: name '{name}' is not a gerund and then its object "
+            f"(regex ^[a-z0-9]+ing(-[a-z0-9]+)+$)"
+        )
+    elif name != parent_name:
+        report.add_fail(f"frontmatter: name '{name}' != parent directory '{parent_name}'")
+    else:
+        report.add_pass(f"name: '{name}' ({len(name)} chars, gerund first, matches parent dir)")
+
+    # name: reserved words / XML tags (platform spec)
+    if isinstance(name, str):
+        if (
+            name not in RESERVED_VENDOR_ADAPTER_NAMES
+            and re.search(r"anthropic|claude", name, re.IGNORECASE)
+        ):
+            report.add_fail(f"frontmatter: name '{name}' uses a reserved word (anthropic/claude)")
+        if re.search(r"<[^>]+>", name):
+            report.add_fail(f"frontmatter: name '{name}' contains an XML tag")
+
+    # description
+    desc = fm.get("description")
+    if not desc:
+        report.add_fail("frontmatter: missing 'description'")
+    elif not isinstance(desc, str):
+        report.add_fail(f"frontmatter: description is {type(desc).__name__}, expected string")
+    else:
+        desc_len = len(desc)
+        if desc_len > DESCRIPTION_LIMIT:
+            report.add_fail(
+                f"description: {desc_len} chars (over the {DESCRIPTION_LIMIT}-character catalog limit)"
+            )
+        else:
+            report.add_pass(f"description: {desc_len} chars (within {DESCRIPTION_LIMIT})")
+
+        if re.match(r"^\s*use (this skill )?when", desc, re.IGNORECASE):
+            report.add_pass("description: imperative phrasing ('Use when...')")
+        else:
+            report.add_warn(
+                "description: does not start with 'Use when...' / 'Use this skill when...', "
+                "agents may not trigger reliably"
+            )
+
+        if re.search(r"triggers? on", desc, re.IGNORECASE):
+            report.add_pass("description: includes trigger contexts ('Triggers on...')")
+        else:
+            report.add_warn(
+                "description: missing 'Triggers on...': agents lose the trigger keyword list"
+            )
+
+        if re.search(r"even when the user doesn'?t", desc, re.IGNORECASE):
+            report.add_pass(
+                "description: includes non-obvious-trigger clause "
+                "('even when the user doesn't say...')"
+            )
+        else:
+            report.add_warn(
+                "description: no 'even when the user doesn't say...' clause, "
+                "may miss implicit triggers"
+            )
+
+        routing_errors = description_routing_errors(
+            desc, name if isinstance(name, str) else None
+        )
+        for error in routing_errors:
+            report.add_fail(error)
+        if not routing_errors:
+            report.add_pass(
+                "description: routing uses positive triggers without other skill names"
+            )
+
+    # description: XML tags (platform spec): warn, since descriptions legitimately
+    # reference component/generic syntax (e.g. `<motion.*>`, `<T>`) that regex can't
+    # distinguish from a real XML tag.
+    if isinstance(desc, str) and re.search(r"<[^>]+>", desc):
+        report.add_warn(
+            "description: contains angle-bracket markup (`<...>`): fine if it's a "
+            "component/generic reference, otherwise remove the XML tag"
+        )
+
+    # compatibility (optional)
+    compat = fm.get("compatibility")
+    if compat is not None:
+        if not isinstance(compat, str):
+            report.add_fail(
+                f"frontmatter: compatibility is {type(compat).__name__}, expected string"
+            )
+        elif len(compat) > 500:
+            report.add_fail(f"frontmatter: compatibility is {len(compat)} chars (>500)")
+        else:
+            report.add_pass(f"compatibility: {len(compat)} chars (under 500)")
+
+    # license (optional)
+    lic = fm.get("license")
+    if lic is not None and not isinstance(lic, str):
+        report.add_warn(f"frontmatter: license is {type(lic).__name__}, expected string")
+
+    # metadata (optional): string -> string map
+    meta = fm.get("metadata")
+    if meta is not None and not (
+        isinstance(meta, dict)
+        and all(isinstance(k, str) and isinstance(v, str) for k, v in meta.items())
+    ):
+        report.add_warn("frontmatter: metadata should be a string→string map")
+
+    # allowed-tools (optional, experimental): space-separated token string
+    allowed = fm.get("allowed-tools")
+    if allowed is not None:
+        if not isinstance(allowed, str):
+            report.add_warn(
+                f"frontmatter: allowed-tools is {type(allowed).__name__}, "
+                "expected a space-separated string"
+            )
+        elif not re.fullmatch(r"[\w():*,.\- ]+", allowed):
+            report.add_warn(
+                "frontmatter: allowed-tools has unexpected characters "
+                "(expected space-separated tokens like 'Bash(git:*) Read')"
+            )
+
+    # unknown top-level fields
+    known = {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
+    unknown = sorted(k for k in fm if k not in known)
+    if unknown:
+        report.add_warn("frontmatter: unknown top-level field(s): " + ", ".join(unknown))
+
+
+def check_body(body: str, report: Report) -> None:
+    line_count = body.count("\n")
+    if line_count > 500:
+        report.add_fail(f"body: {line_count} lines (>500 spec target)")
+    elif line_count > 400:
+        report.add_warn(f"body: {line_count} lines (>80% of 500-line target)")
+    else:
+        report.add_pass(f"body: {line_count} lines (under 500)")
+
+    if HEADING_RE.search(body):
+        report.add_pass("body: has at least one heading")
+    else:
+        report.add_fail("body: no headings found")
+
+    # Code blocks: count opening fences with and without language tag
+    fences = CODE_FENCE_OPEN_RE.findall(body)
+    if fences:
+        opens_no_lang = sum(1 for f in fences if not f)
+        opens_with_lang = len(fences) - opens_no_lang
+        # Each ``` is either an opening or a closing; the count of openings-with-lang
+        # tells us how many blocks have a language tag. The bare ``` are either
+        # openings-without-lang OR closings. Heuristic: there are usually pairs,
+        # so unmarked-openings ≈ (bare_count) - (with_lang_count).
+        unmarked = opens_no_lang - opens_with_lang
+        if unmarked > 0:
+            report.add_warn(
+                f"body: {unmarked} code block(s) appear to lack a language marker"
+            )
+        else:
+            report.add_pass(
+                f"body: all code block(s) have language markers "
+                f"({opens_with_lang} language-tagged opening fence(s) found)"
+            )
+
+    if re.search(r"^## *Gotchas", body, re.MULTILINE):
+        report.add_pass("content: '## Gotchas' section present")
+    else:
+        report.add_warn(
+            "content: no '## Gotchas' section: non-obvious env-specific facts have no home"
+        )
+
+
+def check_references(body: str, skill_dir: Path, report: Report) -> None:
+    # Find unique reference paths
+    refs = sorted({m for m in REF_LINK_RE.findall(body)})
+    if not refs:
+        return
+
+    broken = 0
+    deep = 0
+    bad_name = 0
+    placeholder = 0
+
+    for ref in refs:
+        # Skip placeholder paths (contain <...> or {...})
+        if "<" in ref or "{" in ref:
+            placeholder += 1
+            continue
+
+        target = skill_dir / "references" / ref
+        if not target.is_file():
+            report.add_fail(f"references: broken link → references/{ref}")
+            broken += 1
+
+        if "/" in ref:
+            report.add_warn(f"references: 'references/{ref}' is nested deeper than one level")
+            deep += 1
+
+        fname = ref.rsplit("/", 1)[-1].removesuffix(".md")
+        if not NAME_RE.match(fname):
+            report.add_warn(f"references: 'references/{ref}' filename is not kebab-case")
+            bad_name += 1
+
+    real_refs = len(refs) - placeholder
+    if real_refs > 0:
+        resolved = real_refs - broken
+        if broken == 0:
+            report.add_pass(f"references: {resolved}/{real_refs} link(s) resolve")
+
+    # @references prefix (defeats progressive disclosure)
+    if "@references/" in body:
+        report.add_fail(
+            "references: '@references/' prefix found: strips progressive disclosure "
+            "(use plain 'references/')"
+        )
+    else:
+        report.add_pass("references: no '@references/' prefix")
+
+    # Load-when triggers in Progressive Disclosure section only
+    pd_match = PROGRESSIVE_DISCLOSURE_RE.search(body)
+    if pd_match:
+        pd_block = pd_match.group(1)
+        # Count lines referencing references/X.md within the PD block
+        pd_lines = [
+            line for line in pd_block.splitlines()
+            if re.search(r"references/[a-zA-Z0-9_./<>{}-]+\.md", line)
+        ]
+        if pd_lines:
+            with_trigger = sum(1 for line in pd_lines if LOAD_WHEN_RE.search(line))
+            missing = len(pd_lines) - with_trigger
+            if missing > 0:
+                report.add_warn(
+                    f"references: {missing} of {len(pd_lines)} link(s) in Progressive "
+                    "Disclosure lack a 'Load when...' trigger"
+                )
+            else:
+                report.add_pass(
+                    f"references: all {len(pd_lines)} link(s) in Progressive Disclosure "
+                    "carry a 'Load when...' trigger"
+                )
+
+
+def check_reference_tocs(skill_dir: Path, report: Report) -> None:
+    """Soft check: reference files >200 lines should open with a '## Contents' TOC.
+
+    Long reference files that lack a table of contents get previewed with a
+    partial read, so the agent never sees their full scope. Warn, don't fail.
+    """
+    refs_dir = skill_dir / "references"
+    if not refs_dir.is_dir():
+        return
+    toc_re = re.compile(r"^## *(Contents|Table of Contents)\b", re.MULTILINE | re.IGNORECASE)
+    missing: list[str] = []
+    checked = 0
+    for ref in sorted(refs_dir.glob("*.md")):
+        lines = ref.read_text(encoding="utf-8").splitlines()
+        if len(lines) <= 200:
+            continue
+        checked += 1
+        if not toc_re.search("\n".join(lines[:15])):
+            missing.append(f"{ref.name} ({len(lines)} lines)")
+    if checked == 0:
+        return
+    if missing:
+        report.add_warn(
+            "references: file(s) >200 lines lack a '## Contents' table of contents, "
+            + ", ".join(missing)
+        )
+    else:
+        report.add_pass(
+            f"references: all {checked} reference file(s) >200 lines open with a "
+            "'## Contents' table of contents"
+        )
+
+
+def check_harness_neutrality(body: str, report: Report) -> None:
+    hits = 0
+    for pattern, label in HARNESS_PATTERNS:
+        for line_no, line in enumerate(body.splitlines(), start=1):
+            if re.search(pattern, line):
+                report.add_fail(
+                    f"harness-neutrality: {label}, line {line_no}: {line.strip()[:80]}"
+                )
+                hits += 1
+    if hits == 0:
+        report.add_pass("harness-neutrality: clean")
+
+
+def render_report(
+    report: Report, skill_path: Path, skill_dir: Path, strict: bool,
+) -> int:
+    print(f"Validation: {skill_path}")
+    print(f"Skill dir: {skill_dir}")
+    print()
+    for line in report.passes:
+        print(f"[PASS] {line}")
+    for line in report.warnings:
+        print(f"[WARN] {line}")
+    for line in report.errors:
+        print(f"[FAIL] {line}")
+    print()
+
+    n_err = len(report.errors)
+    n_warn = len(report.warnings)
+    if n_err > 0:
+        print(f"Result: FAIL ({n_err} error(s), {n_warn} warning(s))")
+        return 1
+    if n_warn > 0:
+        if strict:
+            print(f"Result: FAIL ({n_warn} warning(s) in strict mode)")
+            return 1
+        print(f"Result: PASS with {n_warn} warning(s)")
+        return 0
+    print("Result: PASS (no warnings)")
+    return 0
+
+
+def main(argv: list[str]) -> int:
+    args = build_parser().parse_args(argv)
+    skill_path, skill_dir = resolve_target(args.target)
+    parent_name = skill_dir.name
+    content = skill_path.read_text(encoding="utf-8")
+
+    try:
+        fm, body, fm_raw = split_frontmatter(content)
+    except ValueError as e:
+        sys.stderr.write(f"Error: {e}\n")
+        return 2
+
+    report = Report()
+    check_frontmatter(fm, parent_name, report)
+    check_loader_quoting(fm_raw, report)
+    check_body(body, report)
+    check_references(body, skill_dir, report)
+    check_reference_tocs(skill_dir, report)
+    check_harness_neutrality(body, report)
+
+    return render_report(report, skill_path, skill_dir, args.strict)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

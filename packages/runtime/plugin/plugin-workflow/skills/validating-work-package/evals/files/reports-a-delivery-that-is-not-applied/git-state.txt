@@ -1,0 +1,2 @@
+pricing-service: branch main, the capping rule is merged at commit 3f9c2e1.
+shop-app: branch main has no commit for app-total-c4d5. The worktree ../shop-app-wt on branch feature/app-total-c4d5 holds the change uncommitted; the branch was never pushed and no pull request exists.

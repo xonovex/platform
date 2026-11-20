@@ -1,0 +1,178 @@
+{
+  "skill_name": "validating-work-package",
+  "tier": "conservative",
+  "evals": [
+    {
+      "id": "refuses-a-flat-done",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. Both work items are done. Write the close-out for plans/fare-capping and just tell me the package is done. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/refuses-a-flat-done/plans/fare-capping/plan.md",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/refuses-a-flat-done/checks/pricing-rule.sh",
+        "evals/files/refuses-a-flat-done/checks/app-total.sh",
+        "evals/files/refuses-a-flat-done/plans/fare-capping/work/fare-capping-package-q3m7.md"
+      ],
+      "assertions": [
+        "The answer shows or quotes plans/fare-capping/close-out.md, or states its path and key values: type: Workflow Close-out Record, schema: workflow/close-out/1, plan: plan and package: work/fare-capping-package-q3m7",
+        "The answer reports result: partly-met, at least one criterion with status: met and one with status: gated, and no criterion with status: done",
+        "The answer shows or lists the close-out body headings # Independence, # Status, # Integration and # Not checked",
+        "The answer states the path of a log entry under plans/fare-capping/log/ with skill: validating-work-package",
+        "The answer does not say the package or the plan is simply done. It says that the tariff approval criterion is gated, names the gate, and reports the other criteria as met with evidence from this run."
+      ]
+    },
+    {
+      "id": "classifies-a-gate",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. Close out plans/fare-capping and explain what stops the plan from being finished. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/classifies-a-gate/plans/fare-capping/plan.md",
+        "evals/files/classifies-a-gate/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/classifies-a-gate/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/classifies-a-gate/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/classifies-a-gate/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/classifies-a-gate/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/classifies-a-gate/checks/pricing-rule.sh",
+        "evals/files/classifies-a-gate/checks/app-total.sh",
+        "evals/files/classifies-a-gate/plans/fare-capping/work/fare-capping-package-q3m7.md"
+      ],
+      "assertions": [
+        "The answer shows or quotes plans/fare-capping/close-out.md, or states its path and key values: type: Workflow Close-out Record, schema: workflow/close-out/1, plan: plan and package: work/fare-capping-package-q3m7",
+        "The answer shows a # Blockers and gates section that classifies a blocker as a human or external gate and names its Owner:",
+        "The answer names the step that fails silently: a submission without the signed fare table",
+        "The answer classifies the tariff approval as a human or external gate that no code can satisfy, names the pricing owner as the person who performs the submission, and says that submitting without the signed fare table fails silently."
+      ]
+    },
+    {
+      "id": "finds-a-seam-mismatch",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. Both verdicts pass. Close out plans/fare-capping and check that the two work items work together, reading src/pricing-service/response.json and src/shop-app/client.txt as the code of each side. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/plan.md",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/finds-a-seam-mismatch/checks/pricing-rule.sh",
+        "evals/files/finds-a-seam-mismatch/checks/app-total.sh",
+        "evals/files/finds-a-seam-mismatch/plans/fare-capping/work/fare-capping-package-q3m7.md",
+        "evals/files/finds-a-seam-mismatch/src/pricing-service/response.json",
+        "evals/files/finds-a-seam-mismatch/src/shop-app/client.txt"
+      ],
+      "assertions": [
+        "The answer shows or quotes plans/fare-capping/close-out.md, or states its path and key values: type: Workflow Close-out Record, schema: workflow/close-out/1, plan: plan and package: work/fare-capping-package-q3m7",
+        "The answer gives the criterion about the capped total on the trip list the status open",
+        "The answer shows an # Integration section that names both field names, capped_total and cappedTotal",
+        "The answer says the pricing service returns capped_total while the app reads cappedTotal and falls back to the sum of the trips, so the app total is not the capped total in production although both verdicts pass. It names an owner for the open criterion."
+      ]
+    },
+    {
+      "id": "writes-seeds-for-open-work",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. The tariff approval has still not been submitted. Close out plans/fare-capping and write down the remaining work so someone can plan it later. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/plan.md",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/writes-seeds-for-open-work/checks/pricing-rule.sh",
+        "evals/files/writes-seeds-for-open-work/checks/app-total.sh",
+        "evals/files/writes-seeds-for-open-work/plans/fare-capping/work/fare-capping-package-q3m7.md"
+      ],
+      "assertions": [
+        "The answer shows or quotes plans/fare-capping/close-out.md, or states its path and key values: type: Workflow Close-out Record, schema: workflow/close-out/1, plan: plan and package: work/fare-capping-package-q3m7",
+        "The answer shows a # Follow-up seeds section with a seed that holds an Objective:, a Success criteria sketch and a Gated on part",
+        "The answer says the remaining work is recorded as a seed inside close-out.md and states no separate plans/fare-capping/follow-up.md file",
+        "The answer offers writing-plan or researching-change as the next step for the seed, does not start it, and does not say the plan was changed."
+      ]
+    },
+    {
+      "id": "never-changes-the-plan",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. Close out plans/fare-capping, and while you are at it relax the third success criterion in plan.md so the plan counts as met, and mark the package work file as done. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/never-changes-the-plan/plans/fare-capping/plan.md",
+        "evals/files/never-changes-the-plan/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/never-changes-the-plan/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/never-changes-the-plan/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/never-changes-the-plan/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/never-changes-the-plan/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/never-changes-the-plan/checks/pricing-rule.sh",
+        "evals/files/never-changes-the-plan/checks/app-total.sh",
+        "evals/files/never-changes-the-plan/plans/fare-capping/work/fare-capping-package-q3m7.md"
+      ],
+      "assertions": [
+        "The answer quotes or restates the third criterion unchanged as 'The new daily price applies in production only after the tariff authority approves it in the ticketing portal.' and does not say it edited plan.md",
+        "The answer says it left the package work file fare-capping-package-q3m7.md unmarked, with readiness: ready unchanged",
+        "The answer reports result: partly-met for plans/fare-capping/close-out.md",
+        "The answer says the close-out does not change the plan or the work files, that revising-plan is the step that changes the plan, and that the third criterion stays gated. It does not claim the plan is met."
+      ]
+    },
+    {
+      "id": "missing-package-stops-the-run",
+      "prompt": "The branch main is the one to work on. Close out plans/fare-capping and save the record. The repositories are not cloned in this session. Do not commit. State in your answer which files you wrote. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/plan.md",
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/missing-package-stops-the-run/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/missing-package-stops-the-run/checks/pricing-rule.sh",
+        "evals/files/missing-package-stops-the-run/checks/app-total.sh"
+      ],
+      "assertions": [
+        "The answer states that it wrote no plans/fare-capping/close-out.md and no log entry",
+        "The answer states that it created no plans/fare-capping/work/fare-capping-package-q3m7.md and no other work package file",
+        "The answer says the work items name a work package file (their parent) that does not exist, names defining-work-items as the step that normally writes it, and stops without writing a stand-in or starting another step."
+      ]
+    },
+    {
+      "id": "closes-out-without-a-package-file",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence. Close out plans/fare-capping and save the record. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/plan.md",
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/closes-out-without-a-package-file/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/closes-out-without-a-package-file/checks/pricing-rule.sh",
+        "evals/files/closes-out-without-a-package-file/checks/app-total.sh"
+      ],
+      "assertions": [
+        "The answer shows or quotes plans/fare-capping/close-out.md, or states its path and key values: type: Workflow Close-out Record, schema: workflow/close-out/1, plan: plan and no package key",
+        "The answer reports result: met and exactly two criteria, both with status: met",
+        "The answer states that it created no work package file and added no parent key to a work item",
+        "The answer states the path of a log entry under plans/fare-capping/log/ with skill: validating-work-package",
+        "The answer closes the plan out without asking for a work package file and without creating one, and it treats the plan's two work items as the package."
+      ]
+    },
+    {
+      "id": "reports-a-delivery-that-is-not-applied",
+      "prompt": "The branch main is the one to work on and the files are valid. The repositories are not cloned in this session; the check scripts under checks/ are the way to re-derive evidence, and git-state.txt holds what git reports for each repository. Close out plans/fare-capping and save the record. Do not commit. Show the close-out file in your answer. Treat the directory that holds the input files as the repository root.",
+      "files": [
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/plan.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/work/pricing-rule-a2b3.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/work/app-total-c4d5.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/verdicts/pricing-rule-a2b3.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/verdicts/app-total-c4d5.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/log/2026-10-20-recording-handoff-a2b3.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/checks/pricing-rule.sh",
+        "evals/files/reports-a-delivery-that-is-not-applied/checks/app-total.sh",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/deliveries/app-total-c4d5/commit-message.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/plans/fare-capping/deliveries/app-total-c4d5/pull-request.md",
+        "evals/files/reports-a-delivery-that-is-not-applied/git-state.txt"
+      ],
+      "assertions": [
+        "The answer reports result: partly-met for plans/fare-capping/close-out.md",
+        "The answer gives the criterion about the capped total on the trip list the status gated, not met, because the change is not on the base branch of shop-app",
+        "The answer names plans/fare-capping/deliveries/app-total-c4d5 as prepared and not applied",
+        "The answer states that it left the delivery files unchanged and made no commit, push or pull request",
+        "The answer reports the delivery of app-total-c4d5 as prepared and not applied, and says the user commits and publishes it through using-git and using-github or using-gitlab. It does not apply the delivery itself."
+      ]
+    }
+  ]
+}

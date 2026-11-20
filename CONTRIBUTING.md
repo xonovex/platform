@@ -22,9 +22,8 @@ Every group directory carries an `AGENTS.md` describing the rules that hold acro
 packages/
   runtime/
     plugin/
-      plugin-*/               # Installable groups of related skills and commands
-        skills/*-guide/       # Skill instructions, references, scripts, and evals
-        commands/             # Commands that load skills from the owning plugin
+      plugin-*/               # Installable groups of related skills
+        skills/*/             # Skill instructions, references, scripts, and evals
   tooling/
     cli/                      # Agent CLI, platform binaries, and GitHub Action
     script/                   # Moon task binaries and shared script code
@@ -88,13 +87,13 @@ Changed-version packages are detected by comparing each `package.json` `version`
 
 ## Agent Skills
 
-Each plugin in `packages/runtime/plugin/` owns related skills under `skills/` and commands under `commands/`. Each skill keeps its harness-neutral `SKILL.md`, references, scripts, assets, and evaluations together. Skill Moon project identifiers remain `skill-<topic>`; plugin project identifiers are `plugin-<group>`.
+Each plugin in `packages/runtime/plugin/` owns related skills under `skills/` and holds no slash commands. Each skill keeps its harness-neutral `SKILL.md`, references, scripts, assets, and evaluations together. Skill Moon project identifiers are `skill-<name>`; plugin project identifiers are `plugin-<group>`.
 
 Run `npx moon run script-moon-plugin-sync-installation:plugin-installation-sync` after changing plugin versions, names, dependencies, or harness support. It writes the marked installation section in each plugin README. Run `npx moon run script-moon-plugin-sync-installation:plugin-installation-check` to report READMEs whose installation section has drifted.
 
 ## Code Style
 
-- **Paradigm**: Functional programming (see `packages/runtime/plugin/plugin-core/skills/fp-guide/SKILL.md`)
+- **Paradigm**: Functional programming (see `packages/runtime/plugin/plugin-core/skills/applying-fp/SKILL.md`)
 - **Imports**: Direct from source, no re-exports
 - **Design**: Modular functions, explicit context, small focused files
 - **Quality**: Strict types, clear naming, explicit error handling

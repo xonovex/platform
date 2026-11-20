@@ -1,0 +1,54 @@
+---
+name: applying-data-oriented-design
+description: "Use when making data layouts cache-friendly for performance-critical code, in any language. Triggers on SoA vs AoS or AoSoA, cache misses, hot/cold field splitting, component storage layout, batch processing, handles vs pointers, pointer chasing, even when the user doesn't say 'data-oriented' or 'cache'."
+---
+
+# Data-Oriented Design Guidelines
+
+Organize data around access patterns and measure cache traffic before changing performance-critical layouts.
+
+## Essentials
+
+- **The problem is data movement** - Optimize cache traffic, not instruction count, see [references/cache-behavior.md](references/cache-behavior.md)
+- **Design from the data** - Model bulk input→output transforms, not idealized objects, see [references/data-as-transforms.md](references/data-as-transforms.md)
+- **Measure first** - Profile cache misses before changing layout, see [references/measurement-and-profiling.md](references/measurement-and-profiling.md)
+- **Record cheaply, always on** - Per-frame accumulating counters recorded via a cached accumulator pointer (one store, no lookup/branch/lock), history allocated only for viewed counters, see [references/statistics-recording.md](references/statistics-recording.md)
+
+## Layout
+
+- **SoA / AoS / AoSoA** - Split structs into per-field arrays for hot loops, see [references/soa-aos-aosoa.md](references/soa-aos-aosoa.md)
+- **SIMD-friendly layout** - Contiguous columns, padding, alignment for vectorization, see [references/simd-friendly-layout.md](references/simd-friendly-layout.md)
+- **Nested / variable-length arrays** - Hold child lists in bulk arrays + cache-line chunks, not per-object heap pointers, see [references/nested-arrays.md](references/nested-arrays.md)
+
+## Processing
+
+- **Sequential access** - Stream linearly, never chase pointers, see [references/access-patterns.md](references/access-patterns.md)
+- **Existence-based processing** - Bucket by state so branches become loops, see [references/existence-based-processing.md](references/existence-based-processing.md)
+- **Batch over one-at-a-time** - Transform N items per call, amortize overhead, see [references/data-as-transforms.md](references/data-as-transforms.md)
+- **Default to zero** - Make all-zero a valid default; reserve 0 for none/neutral, not magic sentinels, see [references/zero-as-default.md](references/zero-as-default.md)
+
+## Memory
+
+- **Handles, not pointers** - Reference by index/handle into relocatable, stable arrays (swap-remove, free lists, indirection tables), see [references/handles-and-indices.md](references/handles-and-indices.md)
+- **Allocation** - Contiguous storage matters for cache, but the allocators themselves (arenas/pools/lifetimes) are general, see **managing-memory**
+
+## Gotchas
+
+- SoA only wins when loops touch a subset of fields; full-record access can favor AoS: measure both.
+- The hardware prefetcher tracks linear strides; randomizing your index order silently disables it.
+- Padding for alignment trades memory for throughput, on cache-bound loads, the smaller packed layout can still win.
+- A counter you cache as a raw pointer dangles if its backing array reallocates: hand out indices into a stable block, or pointers into a non-relocating pool.
+
+## Progressive Disclosure
+
+- Read [references/cache-behavior.md](references/cache-behavior.md) - Load when reasoning about cache lines, latency, or miss types
+- Read [references/data-as-transforms.md](references/data-as-transforms.md) - Load when modeling a system as bulk streams instead of objects
+- Read [references/soa-aos-aosoa.md](references/soa-aos-aosoa.md) - Load when choosing or converting between AoS, SoA, and AoSoA layouts
+- Read [references/access-patterns.md](references/access-patterns.md) - Load when iterating collections or replacing pointer-chasing structures
+- Read [references/handles-and-indices.md](references/handles-and-indices.md) - Load when designing entity references, stable arrays, or free lists
+- Read [references/existence-based-processing.md](references/existence-based-processing.md) - Load when removing per-item branches by sorting or bucketing
+- Read [references/simd-friendly-layout.md](references/simd-friendly-layout.md) - Load when laying out data for vectorization or alignment
+- Read [references/nested-arrays.md](references/nested-arrays.md) - Load when objects own variable-length child lists, or you're reaching for a per-object growable container
+- Read [references/zero-as-default.md](references/zero-as-default.md) - Load when choosing sentinels, nil values, or default-initialized state
+- Read [references/measurement-and-profiling.md](references/measurement-and-profiling.md) - Load when measuring before/after or reading hardware counters
+- Read [references/statistics-recording.md](references/statistics-recording.md) - Load when building always-on counters/telemetry that must add near-zero overhead on hot paths

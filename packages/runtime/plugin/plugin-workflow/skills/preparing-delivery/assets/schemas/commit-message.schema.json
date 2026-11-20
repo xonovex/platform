@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "required": ["type", "schema", "work", "branch"],
+  "properties": {
+    "type": {"const": "Workflow Commit Message"},
+    "schema": {"const": "workflow/commit-message/1"},
+    "work": {"$ref": "workflow/common#/$defs/workId"},
+    "branch": {"type": "string", "minLength": 1}
+  },
+  "allOf": [{"$ref": "workflow/common#/$defs/header"}]
+}

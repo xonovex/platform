@@ -1,15 +1,15 @@
 {
   "name": "xonovex-workflow",
-  "version": "5.3.0",
-  "description": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
+  "version": "6.0.0",
+  "description": "Take a change from research to validated delivery in one directory of files that every step reads and writes.",
   "author": {
     "name": "Xonovex"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Workflow",
-    "shortDescription": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
-    "longDescription": "Research, plan, implement, validate, and close out work, then integrate lessons from the session.",
+    "shortDescription": "Take a change from research to validated delivery in one directory of files that every step reads and writes.",
+    "longDescription": "Take a change from research to validated delivery in one directory of files that every step reads and writes.",
     "developerName": "Xonovex",
     "category": "Developer Tools",
     "capabilities": [],

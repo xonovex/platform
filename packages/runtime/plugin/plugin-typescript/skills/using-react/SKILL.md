@@ -1,0 +1,110 @@
+---
+name: using-react
+description: "Use when building or editing React 19+ components, hooks, or app routes. Triggers on `.tsx`/`.jsx` files with React imports, `'use client'` / `'use server'` directives, Server Components, form actions, useActionState, useOptimistic, use(), Suspense, or the React Compiler, even when the user doesn't say 'React'."
+---
+
+# React Coding Guidelines
+
+Build React interfaces with focused components, explicit state ownership, and predictable effects.
+
+## Requirements
+
+- React ≥ 19, Vite ≥ 6, Tailwind ≥ 4, Headless UI.
+
+## React 19 Essentials
+
+- **Server-first** - Components run on server by default; add `'use client'` only for interactivity
+- **Form Actions** - Use `useActionState` and `FormData` instead of controlled inputs
+- **Native metadata** - Use `<title>`, `<meta>`, `<link>` anywhere, auto-hoisted to `<head>`
+
+## Quick Reference
+
+| Feature | React 18 | React 19+ |
+| --- | --- | --- |
+| Memoization | Manual (`useMemo`, `useCallback`) | React Compiler (automatic) |
+| Forward refs | `forwardRef()` wrapper | `ref` as regular prop |
+| Context provider | `<Context.Provider value={}>` | `<Context value={}>` |
+| Form state | Custom `useState` | `useActionState` hook |
+| Optimistic updates | Manual state | `useOptimistic` hook |
+| Read promises | Not possible | `use()` hook |
+| Conditional context | Not possible | `use(Context)` after conditionals |
+| Form pending | Manual tracking | `useFormStatus` hook |
+
+## Example
+
+```tsx
+// React 19 Form with Actions
+"use client";
+
+import {useActionState} from "react";
+
+function ContactForm() {
+  const [state, formAction, isPending] = useActionState(
+    async (prev, formData) => {
+      const result = await submitForm(Object.fromEntries(formData));
+      if (result.error) return {error: result.error};
+      return {success: true};
+    },
+    null,
+  );
+
+  return (
+    <form action={formAction}>
+      <input name="email" type="email" disabled={isPending} />
+      <button disabled={isPending}>
+        {isPending ? "Submitting..." : "Submit"}
+      </button>
+      {state?.error && <p className="error">{state.error}</p>}
+    </form>
+  );
+}
+
+// ref as prop (no forwardRef needed)
+function Input({ref, ...props}: {ref?: React.Ref<HTMLInputElement>}) {
+  return <input ref={ref} {...props} />;
+}
+
+// Context as provider
+const ThemeContext = createContext("light");
+
+function App({children}) {
+  return <ThemeContext value="dark">{children}</ThemeContext>;
+}
+```
+
+## Essentials
+
+- **Component design** - Small, composable; lift/minimize state; derive when possible, see [references/component-design.md](references/component-design.md)
+- **Performance** - `memo()`, `lazy()` code-splitting, Server Components for FCP/SEO, see [references/performance-optimization.md](references/performance-optimization.md)
+- **Rendering** - Prefer Server Components; use Suspense for streaming, see [references/suspense-streaming.md](references/suspense-streaming.md)
+- **Accessibility** - Semantic HTML, ARIA, keyboard/focus management, see [references/accessibility.md](references/accessibility.md)
+- **Custom hooks** - Extract reusable logic, see [references/hooks.md](references/hooks.md)
+
+## Gotchas
+
+- Stale closures in `useEffect`: captured state from the render that scheduled the effect, not the current state; use refs or include in deps
+- List keys must be stable AND unique: index keys cause re-mounts on reorder, generated keys cause re-mounts every render
+- `useMemo`/`useCallback` aren't free. The comparison + bookkeeping costs more than re-running cheap computations
+- Controlled vs uncontrolled inputs: passing `value` without `onChange` warns; switching mid-lifetime is silently buggy
+- Server Components can't use state/effects/event handlers. The boundary is `'use client'`; mis-marking causes runtime errors only
+
+## Progressive Disclosure
+
+### Guidelines
+
+- Read [references/component-design.md](references/component-design.md) - Load when breaking down large components or managing state lifting
+- Read [references/state-management.md](references/state-management.md) - Load when choosing between useState, useReducer, or Context
+- Read [references/performance-optimization.md](references/performance-optimization.md) - Load when components re-render unnecessarily or performance lags
+- Read [references/hooks.md](references/hooks.md) - Load when extracting reusable logic or creating custom hooks
+- Read [references/accessibility.md](references/accessibility.md) - Load when adding keyboard navigation or screen reader support
+- Read [references/new-hooks.md](references/new-hooks.md) - Load when using useActionState, useOptimistic, use(), or useFormStatus
+- Read [references/server-components.md](references/server-components.md) - Load when building with RSC, Server Actions, or 'use server'/'use client' directives
+- Read [references/suspense-streaming.md](references/suspense-streaming.md) - Load when using Suspense boundaries, streaming, or error handling
+- Read [references/react-compiler.md](references/react-compiler.md) - Load when setting up or configuring the React Compiler
+- Read [references/activity-effect-event.md](references/activity-effect-event.md) - Load when using Activity component or useEffectEvent
+
+### Migration from React 18
+
+- Read [references/migration-anti-patterns.md](references/migration-anti-patterns.md) - Load when adapting the React 18→19 mental model or avoiding outdated patterns (useEffect for data, manual loading states)
+- Read [references/migration-deprecations.md](references/migration-deprecations.md) - Load when migrating from React 18 or handling removed APIs
+- Read [references/migration-typescript.md](references/migration-typescript.md) - Load when fixing TypeScript errors after React 19 upgrade

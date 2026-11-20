@@ -1,0 +1,1 @@
+reads field cappedTotal from the pricing response and falls back to the sum of the trips when it is absent

@@ -1,3 +1,3 @@
 # Runtime
 
-Keep harness-loaded skills and commands inside their owning runtime plugin.
+Keep harness-loaded skills inside their owning runtime plugin.

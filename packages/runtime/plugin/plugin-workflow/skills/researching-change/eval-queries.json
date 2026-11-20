@@ -1,0 +1,128 @@
+[
+  {
+    "query": "before we touch anything, find out how order-publisher sends notices today and what the new delivery-service actually accepts. we want to move all the notice traffic over",
+    "rationale": "migration of one system's traffic onto another",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "we're switching search from the old elastic cluster to the opensearch service next quarter. dig through search-api, the indexer and both apps and tell me what breaks",
+    "rationale": "migration of one system's behavior onto another across repositories and apps",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "checkout-web sometimes double charges and nobody knows why. look into it across checkout-web and payments-svc and write down what you find before we pick a fix",
+    "rationale": "investigation of a problem before a decision",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "we want saved carts in shop-app. what does the cart code do now and what would that touch? don't change anything yet",
+    "rationale": "new feature in existing software, facts first",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "docs/pricing.md says the cap runs after discounts but I don't trust it. check pricing-service and tell me which pages are wrong",
+    "rationale": "which pages disagree with the code",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "research the auth token refresh mess in mobile-app and gateway so we have facts before the team argues about it",
+    "rationale": "research before deciding, without the word plan",
+    "should_trigger": true,
+    "split": "train"
+  },
+  {
+    "query": "new project: a loyalty service, no code yet. gather what retail and finance need and what similar systems do, and save it with the open questions",
+    "rationale": "new project research",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "move webhook delivery off the legacy relay onto events-gateway. which consumers depend on the relay's payload and which of them are on old app versions?",
+    "rationale": "migration with consumers and versions",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "before I write a plan for cleaning up the billing module, map what the duplicated tax code paths do today and who calls them",
+    "rationale": "code-quality improvement that needs facts before planning",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "the research in plans/fare-capping got the discount order wrong, cap.kt shows otherwise. record the correction",
+    "rationale": "a correction to a saved research file is a new research file",
+    "should_trigger": true,
+    "split": "validation"
+  },
+  {
+    "query": "what does parseFare in src/cap.kt return when the zone is empty?",
+    "rationale": "near miss: a single-file lookup needs no research step",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "the research for saved-searches is done. walk me through its open questions one by one so we can settle them",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "research and decisions for invoice-feed are in. write plan.md and outline what can start now",
+    "rationale": "near miss owned by writing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "audit the billing module for duplication, dead code and magic numbers and grade what you find",
+    "rationale": "near miss owned by auditing-code-quality",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "renderer segfaults in release builds after the last merge, here's the dump, help me bisect it",
+    "rationale": "near miss owned by debugging-native-code",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "poke holes in the migration plan for order-notices before we sign it off",
+    "rationale": "near miss owned by critiquing-plan",
+    "should_trigger": false,
+    "split": "train"
+  },
+  {
+    "query": "review my diff on feature/cart-merge for bugs before I open the PR",
+    "rationale": "near miss owned by reviewing-code",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "turn what we learned in this session about checking repo commits into a new skill",
+    "rationale": "near miss owned by authoring-skills",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "add a rule to AGENTS.md from today's lesson: always read the design doc before the code",
+    "rationale": "near miss owned by authoring-instructions",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "write user stories with acceptance criteria for saved carts in shop-app",
+    "rationale": "near miss owned by writing-user-stories",
+    "should_trigger": false,
+    "split": "validation"
+  },
+  {
+    "query": "let's pick up where we stopped on the notifications questions yesterday, next one please",
+    "rationale": "near miss owned by settling-questions",
+    "should_trigger": false,
+    "split": "validation"
+  }
+]

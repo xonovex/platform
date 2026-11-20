@@ -1,0 +1,6 @@
+diff --git a/src/retry.ts b/src/retry.ts
+--- a/src/retry.ts
++++ b/src/retry.ts
+@@ -10,3 +10,5 @@
++const limit = settings.retryLimit;
++export const retry = () => attempts < limit;

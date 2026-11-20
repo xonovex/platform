@@ -1,0 +1,97 @@
+# create: Create Skill from Source
+
+Create a reusable skill with a focused SKILL.md, references for detail, and bundled resources only where the procedure needs them.
+
+## Inputs
+
+- **Source** (required): the URL or file path of the source document
+- **Skill name** (required): the name of the skill, a gerund and then its object, such as `using-react`
+- **Preview** (optional): show the generated structure without writing a file
+
+## Goal
+
+- Build any kind of skill: guideline, workflow, capability, processor, or task automation
+- Generate spec-compliant SKILL.md with essentials and progressive disclosure
+- Create reference files for detail-heavy topics; scripts for bundled executables; assets for templates
+- Make content project-independent and reusable
+
+## Spec Constraints
+
+Spec limits (name / description / body / optional-field rules) live in the parent SKILL.md: re-check after edits.
+
+## Skill Types
+
+- **Guideline**: coding conventions, style rules, framework patterns
+- **Workflow**: multi-step procedures with validation gates
+- **Capability**: task-specific automation with bundled scripts
+- **Processor**: transforms input to output
+
+These are authoring shapes, not metadata classifications. Choose the shape that best fits the skill's single concern.
+
+## Core Workflow
+
+1. **Identify Source & Type**: URL, file, conversation, or task description; classify the skill type (guideline skills: see [guideline-skills.md](guideline-skills.md))
+2. **Fetch Source**: Fetch URLs from the web; read local files; mine conversation/task context
+3. **Extract Content**: Requirements, procedures, rules, gotchas, examples, edge cases, whatever the type calls for
+4. **Draft evals first**: Write 2-3 trigger/output eval cases for the gap _before_ authoring extensive body content, with **evaluating-skills**
+5. **Categorize**: Group by topic (or by step, for workflows); decide what lives in SKILL.md vs `references/`
+6. **Generate SKILL.md**: Condensed quick reference with essentials (3-7 items) and a routing-first description (see [writing-descriptions.md](writing-descriptions.md)); include a Gotchas section for non-obvious env-specific facts
+7. **Create Supporting Files**: `references/*.md` for detail (pair each with a load-when trigger), `scripts/` for executables (see [using-scripts.md](using-scripts.md)), `assets/` for templates
+8. **Register and Depend**: Add package and marketplace entries; add an exact manifest dependency only when the core workflow cannot work without that specific skill
+9. **Validate Structure**: Frontmatter limits met, all reference paths resolve, body under spec ceiling, manifests match, and hard dependencies resolve without cycles
+10. **Write Files**: Save to `<skills-dir>/{name}/` (path depends on the agent harness) or preview without writing
+
+## Output Structure
+
+```markdown
+---
+name: {name}
+description: "Use when {task}. Triggers on {patterns}."
+---
+
+# {Title}
+
+## Requirements
+
+- {Optional: tooling/version requirements}
+
+## Essentials
+
+- {Core point 1}
+- {Core point 2-6}
+
+## Gotchas
+
+- {Non-obvious env-specific facts}
+
+<!-- Add a compact Example only when the default behavior or output format is non-obvious. -->
+
+## Progressive disclosure
+
+- [references/{topic}.md](references/{topic}.md) - Load when {specific trigger condition}
+```
+
+## Content Rules
+
+- SKILL.md: 3-7 essentials, a Gotchas section, and one representative example only when it materially clarifies a non-obvious default or format; workflow operation references may carry the example instead
+- Reference files: full explanations, multiple examples, rationale; one topic each. Don't restate when/why to read the file itself (its load-when trigger lives in the SKILL.md progressive-disclosure list); pointing to other references with a "read when" trigger is fine
+- Apply the parent SKILL.md Core Principles (add what the agent lacks, defaults over menus, procedures over declarations)
+- Match specificity to fragility: prescriptive only when consistency is required
+- Mine non-obvious facts/corrections into a **Gotchas** section
+- Keep discovery frontmatter harness-neutral; descriptions own routing and manifests contain only exact installation dependencies
+
+## Error Handling
+
+- URL unreachable: `Error: Could not fetch [url]`
+- File not found: `Error: File not found at [path]`
+- No usable content: `Warning: Could not extract content from source`
+- Skill exists: Ask to merge (see [merge.md](merge.md)) or overwrite
+- Name not kebab-case: `Error: Skill name must be kebab-case (matches ^[a-z0-9]+(-[a-z0-9]+)*$)`
+
+## Safety
+
+- Preview before writing
+- Check for existing skill directory
+- Preserve existing reference files when merging
+- Remove source-specific paths and project names
+- Preview package, manifest, and marketplace changes with the skill and reject duplicate names before writing
