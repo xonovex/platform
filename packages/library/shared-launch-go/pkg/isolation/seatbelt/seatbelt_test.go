@@ -251,3 +251,9 @@ func TestRenderProfileRejectsAnUnsafePath(t *testing.T) {
 		t.Error("an unknown network mode must fail")
 	}
 }
+
+func TestStopCommandHasNothingToStop(t *testing.T) {
+	if stop := NewIsolator(oshosttest.New(), testLog).StopCommand(isoshared.RunConfig{Name: "named"}); stop != nil {
+		t.Errorf("StopCommand = %v, want nil: the end of the process ends the sandbox", stop)
+	}
+}

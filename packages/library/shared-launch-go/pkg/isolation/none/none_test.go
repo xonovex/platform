@@ -206,3 +206,9 @@ func TestNone_DeclaresNoEgressTransport(t *testing.T) {
 		t.Errorf("EgressTransport() = %q, want none: host execution has no boundary to route traffic through", got)
 	}
 }
+
+func TestStopCommandHasNothingToStop(t *testing.T) {
+	if stop := NewIsolator(oshosttest.New(), testLog).StopCommand(isoshared.RunConfig{Name: "named"}); stop != nil {
+		t.Errorf("StopCommand = %v, want nil: the end of the process ends the sandbox", stop)
+	}
+}

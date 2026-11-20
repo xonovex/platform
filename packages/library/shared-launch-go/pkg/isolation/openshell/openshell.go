@@ -132,6 +132,10 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return append([]string{program}, p.exec...), nil
 }
 
+// StopCommand returns nil: only Run creates a sandbox, and Run deletes it on
+// every path that leaves it.
+func (i *Isolator) StopCommand(isoshared.RunConfig) []string { return nil }
+
 // TerminalCommand cannot place the sandbox lifecycle inside a terminal wrapper.
 func (i *Isolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
 	return nil, nil, fmt.Errorf("%w: a terminal wrapper cannot create and remove the sandbox", ErrUnsupported)

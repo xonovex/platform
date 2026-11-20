@@ -60,7 +60,8 @@ func (f fakeIsolator) Command(isoshared.RunConfig, provision.Contribution) ([]st
 func (f fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
 	return nil, nil, nil
 }
-func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error { return nil }
+func (f fakeIsolator) CheckAgent(isoshared.RunConfig) error     { return nil }
+func (f fakeIsolator) StopCommand(isoshared.RunConfig) []string { return nil }
 
 type fakeProvisioner struct{ pinned bool }
 

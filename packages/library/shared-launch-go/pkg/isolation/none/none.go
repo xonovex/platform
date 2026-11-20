@@ -81,6 +81,9 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return cmd, err
 }
 
+// StopCommand returns nil: the agent is the process of Command.
+func (i *Isolator) StopCommand(isoshared.RunConfig) []string { return nil }
+
 // TerminalCommand returns the host command AND its full resolved environment
 // (provider tokens, custom env, and the provisioner's PATH/env). Unlike
 // bwrap/docker, host execution bakes nothing into the command, so the wrapper

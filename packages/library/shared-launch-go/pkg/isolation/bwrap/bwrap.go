@@ -105,6 +105,10 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return append([]string{"bwrap"}, args...), nil
 }
 
+// StopCommand returns nil: bwrap runs with --die-with-parent, so the end of the
+// bwrap process ends the sandbox.
+func (i *Isolator) StopCommand(isoshared.RunConfig) []string { return nil }
+
 // TerminalCommand returns the bwrap command plus the environment used to launch it.
 func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	command, err := i.Command(cfg, c)

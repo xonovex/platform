@@ -142,6 +142,16 @@ func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribu
 	return command, env, err
 }
 
+// StopCommand removes the container cfg.Name names. The docker client of
+// Command can end without its container: a killed client takes no container
+// down with it. A removal of a container that is gone already succeeds.
+func (i *Isolator) StopCommand(cfg isoshared.RunConfig) []string {
+	if cfg.Name == "" {
+		return nil
+	}
+	return []string{"docker", "rm", "--force", cfg.Name}
+}
+
 func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) ([]string, error) {
 	homeDir, err := hostlaunch.ResolveDirectory(i.host, cfg.HomeDir, "home directory")
 	if err != nil {
@@ -162,6 +172,9 @@ func (i *Isolator) buildArgs(cfg isoshared.RunConfig, c provision.Contribution) 
 	args := []string{"run", "--rm"}
 	if cfg.Interactive {
 		args = append(args, "-it")
+	}
+	if cfg.Name != "" {
+		args = append(args, "--name", cfg.Name)
 	}
 
 	// Kernel-isolating runtime (e.g. runsc/gVisor); empty means default runc.

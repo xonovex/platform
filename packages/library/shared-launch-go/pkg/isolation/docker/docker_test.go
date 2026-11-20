@@ -436,3 +436,18 @@ func TestDocker_AttachesATerminalOnlyToAnInteractiveRun(t *testing.T) {
 		t.Errorf("an interactive run = %v, want docker run --rm -it", args[:4])
 	}
 }
+
+func TestDocker_NamesTheContainerItCanStop(t *testing.T) {
+	c := dockerCfg(network.NetworkHost)
+	isolator := NewIsolator(newHost(), testLog)
+	if args := dockerCommand(t, newHost(), c, provision.Contribution{}); argHas(args, "--name") || isolator.StopCommand(c) != nil {
+		t.Errorf("an unnamed run = %v, stop %v; want no --name and nothing to stop", args, isolator.StopCommand(c))
+	}
+	c.Name = "agent-eval-0123"
+	if args := dockerCommand(t, newHost(), c, provision.Contribution{}); !argHasPair(args, "--name", "agent-eval-0123") || !argHas(args, "--rm") {
+		t.Errorf("a named run = %v, want --rm and --name agent-eval-0123", args)
+	}
+	if stop := isolator.StopCommand(c); !slices.Equal(stop, []string{"docker", "rm", "--force", "agent-eval-0123"}) {
+		t.Errorf("StopCommand = %v, want the forced removal of the named container", stop)
+	}
+}

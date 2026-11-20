@@ -35,6 +35,10 @@ type RunConfig struct {
 	// without it gets no terminal and no standard input, so a caller that reads
 	// the output of the process can start it without one.
 	Interactive bool
+	// Name names the sandbox instance of an isolation that keeps one apart from
+	// the process that starts it, so StopCommand can end it. Empty leaves the
+	// instance unnamed.
+	Name string
 
 	// Network is the egress mode; the isolator emits its own network flags via its
 	// network.go bridge.
@@ -115,6 +119,10 @@ type Launcher interface {
 	// bakes nothing, returns the agent command with its full resolved environment
 	// (provider tokens, custom env, and the provisioner's PATH/env).
 	TerminalCommand(cfg RunConfig, c provision.Contribution) (command []string, env []string, err error)
+	// StopCommand returns the command that ends the sandbox instance cfg.Name
+	// names after the process of Command ended before the agent did, or nil when
+	// ending that process ends the sandbox.
+	StopCommand(cfg RunConfig) []string
 }
 
 // Isolator is an isolation that an executor both declares and launches on the

@@ -87,6 +87,10 @@ func (i *Isolator) Command(cfg isoshared.RunConfig, c provision.Contribution) ([
 	return cmd, err
 }
 
+// StopCommand returns nil: sandbox-exec replaces itself with the agent, so the
+// agent is the process of Command.
+func (i *Isolator) StopCommand(isoshared.RunConfig) []string { return nil }
+
 // TerminalCommand returns the command plus the environment used to launch it.
 func (i *Isolator) TerminalCommand(cfg isoshared.RunConfig, c provision.Contribution) ([]string, []string, error) {
 	return i.command(cfg, c)

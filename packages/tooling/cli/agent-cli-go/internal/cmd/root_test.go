@@ -47,6 +47,7 @@ func (r *recordingIsolator) Command(cfg isoshared.RunConfig, _ provision.Contrib
 func (r *recordingIsolator) TerminalCommand(isoshared.RunConfig, provision.Contribution) ([]string, []string, error) {
 	return nil, nil, nil
 }
+func (r *recordingIsolator) StopCommand(isoshared.RunConfig) []string { return nil }
 func (r *recordingIsolator) PinnedProvision(provision.ProvisionMethod, bool, string) bool {
 	return !r.unpinned
 }

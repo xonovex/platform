@@ -81,6 +81,8 @@ func (f *fakeIsolator) TerminalCommand(isoshared.RunConfig, provision.Contributi
 	return f.terminalCmd, f.terminalEnv, f.terminalErr
 }
 
+func (f *fakeIsolator) StopCommand(isoshared.RunConfig) []string { return nil }
+
 func (f *fakeIsolator) PinnedProvision(_ provision.ProvisionMethod, provisionerPinned bool, image string) bool {
 	return provisionerPinned || strings.Contains(image, "@sha256:")
 }
