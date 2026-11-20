@@ -94,5 +94,11 @@
     "rationale": "near miss owned by applying-data-oriented-design",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "our embedded logger has *_soa.h and *_simde.h variants of the ring buffer, add a parity test between them",
+    "rationale": "near miss owned by writing-c99-opinionated",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

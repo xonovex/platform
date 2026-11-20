@@ -112,5 +112,11 @@
     "rationale": "near miss owned by critiquing-plan",
     "should_trigger": false,
     "split": "validation"
+  },
+  {
+    "query": "my PR for the rate limiter is ready, write the description with how I tested it and what reviewers should look at first",
+    "rationale": "near miss owned by authoring-pull-requests",
+    "should_trigger": false,
+    "split": "train"
   }
 ]

@@ -112,5 +112,11 @@
     "should_trigger": true,
     "split": "train",
     "rationale": "shortening a README is concision"
+  },
+  {
+    "query": "restructure the incident report so the outcome and the action come first, then the evidence",
+    "rationale": "near miss owned by writing-technical-docs",
+    "should_trigger": false,
+    "split": "train"
   }
 ]
