@@ -30,6 +30,7 @@ describe("parseConventionalCommit", () => {
     expect(parseConventionalCommit("feat: add new feature")).toEqual({
       type: "feat",
       description: "add new feature",
+      breaking: false,
     });
   });
 
@@ -37,6 +38,7 @@ describe("parseConventionalCommit", () => {
     expect(parseConventionalCommit("fix(core): resolve bug")).toEqual({
       type: "fix",
       description: "resolve bug",
+      breaking: false,
     });
   });
 
@@ -48,6 +50,7 @@ describe("parseConventionalCommit", () => {
     expect(parseConventionalCommit("feat: support key: value pairs")).toEqual({
       type: "feat",
       description: "support key: value pairs",
+      breaking: false,
     });
   });
 });

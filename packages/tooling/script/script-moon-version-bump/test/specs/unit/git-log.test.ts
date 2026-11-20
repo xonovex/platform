@@ -36,10 +36,25 @@ describe("parseConventionalCommit", () => {
     expect(parseConventionalCommit("feat: add a thing")).toEqual({
       type: "feat",
       description: "add a thing",
+      breaking: false,
     });
     expect(parseConventionalCommit("fix(core): repair a thing")).toEqual({
       type: "fix",
       description: "repair a thing",
+      breaking: false,
+    });
+  });
+
+  it("marks a subject with the breaking-change marker, with and without a scope", () => {
+    expect(parseConventionalCommit("feat!: drop a flag")).toEqual({
+      type: "feat",
+      description: "drop a flag",
+      breaking: true,
+    });
+    expect(parseConventionalCommit("refactor(core)!: rename a port")).toEqual({
+      type: "refactor",
+      description: "rename a port",
+      breaking: true,
     });
   });
 
@@ -124,6 +139,22 @@ describe("getCommitsSince", () => {
         messages: ["feat: add a thing", "fix: and repair another"],
       },
       {hash: "bbb", author: "Grace", messages: ["refactor: tidy up"]},
+    ]);
+  });
+
+  it("keeps a breaking-change subject as a conventional line", () => {
+    const git = recordedGit({
+      commits: () => [
+        {
+          hash: "aaa",
+          author: "Ada",
+          message: "feat(core)!: drop a flag\n\nbody",
+        },
+      ],
+    });
+
+    expect(getCommitsSince(PKG, "c1", git)).toEqual([
+      {hash: "aaa", author: "Ada", messages: ["feat(core)!: drop a flag"]},
     ]);
   });
 

@@ -70,9 +70,10 @@ const generateChangelogEntry = (
     for (const msg of commit.messages) {
       const parsed = parseConventionalCommit(msg);
       if (!parsed || !isIncludedType(parsed.type, includedTypes)) continue;
-      lines.push(
-        formatCommitEntry(commit.hash, commit.author, parsed.description),
-      );
+      const description = parsed.breaking
+        ? `**Breaking:** ${parsed.description}`
+        : parsed.description;
+      lines.push(formatCommitEntry(commit.hash, commit.author, description));
       hasEntries = true;
     }
   }

@@ -44,7 +44,7 @@ For a single package, the command applies these changes in order:
 
 1. Bumps the version in `package.json`
 2. Updates all workspace packages that depend on this package
-3. Generates a `CHANGELOG.md` entry from conventional commits since the last version change
+3. Generates a `CHANGELOG.md` entry from conventional commits since the last version change, and marks each commit whose type carries the `!` breaking-change marker with a `**Breaking:**` prefix
 4. Skips changelog generation when the version was already bumped (idempotency)
 
 ## Lockstep mode

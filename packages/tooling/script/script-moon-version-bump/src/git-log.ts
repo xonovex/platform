@@ -10,6 +10,7 @@ interface Commit {
 interface ParsedCommit {
   readonly type: string;
   readonly description: string;
+  readonly breaking: boolean;
 }
 
 interface ChangelogRange {
@@ -23,9 +24,9 @@ const REPO_URL = "https://github.com/xonovex/platform";
 const INCLUDED_TYPES = new Set(["feat", "fix", "refactor", "perf", "docs"]);
 
 const parseConventionalCommit = (message: string): ParsedCommit | undefined => {
-  const match = /^(\w+)(?:\([^)]*\))?:\s*(.+)$/.exec(message);
-  if (!match?.[1] || !match[2]) return undefined;
-  return {type: match[1], description: match[2]};
+  const match = /^(\w+)(?:\([^)]*\))?(!)?:\s*(.+)$/.exec(message);
+  if (!match?.[1] || !match[3]) return undefined;
+  return {type: match[1], description: match[3], breaking: match[2] === "!"};
 };
 
 const isIncludedType = (
@@ -60,7 +61,7 @@ const findChangelogRange = (
   };
 };
 
-const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?:\s*.+$/;
+const CONVENTIONAL_COMMIT_RE = /^\w+(?:\([^)]*\))?!?:\s*.+$/;
 
 const getCommitsSince = (
   pkgDir: string,

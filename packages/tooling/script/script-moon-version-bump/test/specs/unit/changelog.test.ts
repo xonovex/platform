@@ -66,6 +66,21 @@ describe("generateChangelogEntry", () => {
     expect(entry).not.toContain("add unit tests");
   });
 
+  it("keeps a breaking-change commit and marks it", () => {
+    const entry = generateChangelogEntry(
+      "0.3.0",
+      [
+        {
+          hash: "mno7890123456",
+          author: "deorder",
+          messages: ["feat(cli)!: remove the config flag"],
+        },
+      ],
+      "minor",
+    );
+    expect(entry).toContain("**Breaking:** remove the config flag");
+  });
+
   it("should use correct section header for patch", () => {
     const entry = generateChangelogEntry("1.2.4", commits, "patch");
     expect(entry).toContain("### Patch Changes");
