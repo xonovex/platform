@@ -278,7 +278,7 @@ A Codex route through the same proxy, `codex-proxy.json`:
 - An overlay never carries hooks, MCP servers, language servers or settings of a plugin.
 - `kiro` keeps its login in the directory that its overlay replaces, so `--plugin` and `--overlay-dir` fail for `kiro`.
 - `--dry-run` loads and verifies the plugins and reports the placement. It writes nothing.
-- The overlay directory is removed when the run ends. A run with `--terminal` keeps it for the terminal session, and the CLI prints its path.
+- The overlay directory is removed when the run ends. A `herdr-core` run that waits for the agent removes it when the agent ends. A `tmux`, `herdr-tui` or detached run keeps it for the terminal session, because the agent runs on after the CLI returns, and the CLI prints its path.
 - The overlay changes none of the four `--require-*` guarantees: the mount holds only the files of the plugins.
 
 ### Terminals

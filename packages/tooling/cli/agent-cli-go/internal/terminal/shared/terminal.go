@@ -24,10 +24,21 @@ type TerminalConfig struct {
 	RunID string
 }
 
+// Outcome is what a terminal wrapper reports of a run.
+type Outcome struct {
+	// Code is the exit code of the program when the wrapper waited for it, and
+	// of the start of the session otherwise.
+	Code int
+	// Ended reports that the program does not run when Execute returns, because
+	// it ended or never started, so the files it reads may be removed. A wrapper
+	// whose program may run on in its session reports false.
+	Ended bool
+}
+
 // TerminalExecutor is the terminal axis port: a terminal wrapper that runs a
 // command inside a managed session.
 type TerminalExecutor interface {
 	IsAvailable() bool
 	IsInside() bool
-	Execute(config *TerminalConfig, command []string, env []string, workDir string) (int, error)
+	Execute(config *TerminalConfig, command []string, env []string, workDir string) (Outcome, error)
 }

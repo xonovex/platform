@@ -199,10 +199,9 @@ func TestExecutorExecuteCreatesADetachedSessionWithoutTheEnvironmentInItsArgumen
 	secret := "provider-secret-value"
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: true}
 
-	exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, []string{"PROVIDER_TOKEN=" + secret}, "/work")
-
-	if err != nil || exitCode != 0 {
-		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	outcome, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, []string{"PROVIDER_TOKEN=" + secret}, "/work")
+	if err != nil || outcome != (termshared.Outcome{}) {
+		t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 	}
 	if got := runCalls(host); !slices.Equal(got, []string{newSession}) {
 		t.Fatalf("tmux runs = %v, want %q", got, newSession)
@@ -224,10 +223,9 @@ func TestExecutorExecuteCreatesAnAttachedSession(t *testing.T) {
 	host.Outcomes[newSession] = oshosttest.Outcome{}
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window"}
 
-	exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
-
-	if err != nil || exitCode != 0 {
-		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	outcome, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
+	if err != nil || outcome != (termshared.Outcome{}) {
+		t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 	}
 	if got := runCalls(host); !slices.Equal(got, []string{newSession}) {
 		t.Fatalf("tmux runs = %v, want %q", got, newSession)
@@ -251,10 +249,9 @@ func TestExecutorExecuteAddsWindowToExistingSession(t *testing.T) {
 			}
 			config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window", Detach: tt.detach}
 
-			exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
-
-			if err != nil || exitCode != 0 {
-				t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+			outcome, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
+			if err != nil || outcome != (termshared.Outcome{}) {
+				t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 			}
 			if got := runCalls(host); !slices.Equal(got, tt.want) {
 				t.Fatalf("tmux runs = %v, want %v", got, tt.want)
@@ -278,10 +275,9 @@ func TestExecutorExecuteRemovesTheScriptWhenTmuxFails(t *testing.T) {
 			host.Outcomes["tmux new-session -s session -n window -c /work sh "+launchScript] = tt.outcome
 			config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window"}
 
-			exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
-
-			if exitCode != tt.wantCode || (err != nil) != (tt.outcome.Err != nil) {
-				t.Fatalf("Execute() = (%d, %v), want code %d", exitCode, err, tt.wantCode)
+			outcome, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
+			if outcome != (termshared.Outcome{Code: tt.wantCode}) || (err != nil) != (tt.outcome.Err != nil) {
+				t.Fatalf("Execute() = (%+v, %v), want code %d", outcome, err, tt.wantCode)
 			}
 			if host.Exists(launchScript) {
 				t.Error("launch script remains after tmux failed")
@@ -309,10 +305,9 @@ func TestExecutorExecuteReportsNonZeroWindowAndAttachCodes(t *testing.T) {
 			}
 			config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window"}
 
-			exitCode, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
-
-			if err != nil || exitCode != tt.wantCode {
-				t.Fatalf("Execute() = (%d, %v), want code %d", exitCode, err, tt.wantCode)
+			outcome, err := NewExecutor(host, testLog).Execute(config, []string{"claude"}, nil, "/work")
+			if err != nil || outcome != (termshared.Outcome{Code: tt.wantCode}) {
+				t.Fatalf("Execute() = (%+v, %v), want code %d", outcome, err, tt.wantCode)
 			}
 		})
 	}
@@ -324,10 +319,9 @@ func TestExecutorExecuteNamesTheSessionAndWindowFromGit(t *testing.T) {
 	newSession := "tmux new-session -s xonovex-platform/main -n main/c89010f -c /src/xonovex/platform sh " + launchScript
 	host.Outcomes[newSession] = oshosttest.Outcome{}
 
-	exitCode, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/src/xonovex/platform")
-
-	if err != nil || exitCode != 0 {
-		t.Fatalf("Execute() exitCode = %d, error = %v", exitCode, err)
+	outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/src/xonovex/platform")
+	if err != nil || outcome != (termshared.Outcome{}) {
+		t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 	}
 	if got := runCalls(host); !slices.Equal(got, []string{newSession}) {
 		t.Fatalf("tmux runs = %v, want %q", got, newSession)
@@ -338,9 +332,8 @@ func TestExecutorExecuteReportsALaunchScriptFailure(t *testing.T) {
 	host := tmuxHost(false)
 	config := &termshared.TerminalConfig{SessionName: "session", WindowName: "window"}
 
-	exitCode, err := NewExecutor(host, testLog).Execute(config, nil, nil, "/work")
-
-	if err == nil || exitCode != 1 {
-		t.Fatalf("Execute(no command) = (%d, %v), want code 1 and an error", exitCode, err)
+	outcome, err := NewExecutor(host, testLog).Execute(config, nil, nil, "/work")
+	if err == nil || outcome != (termshared.Outcome{Code: 1}) {
+		t.Fatalf("Execute(no command) = (%+v, %v), want code 1 and an error", outcome, err)
 	}
 }

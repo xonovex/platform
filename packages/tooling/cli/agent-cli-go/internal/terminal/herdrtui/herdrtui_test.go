@@ -56,10 +56,9 @@ func TestExecutorIsInsideOnlyWhenHerdrSaysSo(t *testing.T) {
 func TestExecuteRefusesOutsideHerdrWithoutTouchingAnySession(t *testing.T) {
 	host := oshosttest.New()
 
-	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
-
-	if !errors.Is(err, ErrOutside) || code != 1 {
-		t.Errorf("Execute() = (%d, %v), want the outside refusal", code, err)
+	outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
+	if !errors.Is(err, ErrOutside) || outcome != (termshared.Outcome{Code: 1}) {
+		t.Errorf("Execute() = (%+v, %v), want the outside refusal", outcome, err)
 	}
 	if len(host.Calls) != 0 {
 		t.Errorf("calls = %v, want none: never fall back to the focused session", calls(host))
@@ -70,10 +69,9 @@ func TestExecuteSplitsTheCurrentPaneAndRunsTheLaunchScript(t *testing.T) {
 	host := insideHost()
 	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{}
 
-	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude", "--model", "opus"}, []string{"TOKEN=s3cret"}, "/work")
-
-	if err != nil || code != 0 {
-		t.Fatalf("Execute() = (%d, %v)", code, err)
+	outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude", "--model", "opus"}, []string{"TOKEN=s3cret"}, "/work")
+	if err != nil || outcome != (termshared.Outcome{}) {
+		t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 	}
 	got := calls(host)
 	if len(got) != 2 || strings.Contains(strings.Join(got, "\n"), "s3cret") {
@@ -94,8 +92,8 @@ func TestExecuteKeepsTheFocusOfTheUserWhenDetached(t *testing.T) {
 	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work", "--no-focus")] = oshosttest.Outcome{Stdout: splitReply}
 	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{}
 
-	if code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{Detach: true}, []string{"claude"}, nil, "/work"); err != nil || code != 0 {
-		t.Fatalf("Execute() = (%d, %v)", code, err)
+	if outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{Detach: true}, []string{"claude"}, nil, "/work"); err != nil || outcome != (termshared.Outcome{}) {
+		t.Fatalf("Execute() = (%+v, %v), want a running program", outcome, err)
 	}
 }
 
@@ -114,10 +112,9 @@ func TestExecuteRemovesTheScriptWhenTheSplitFails(t *testing.T) {
 	host := insideHost()
 	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "split", "--current", "--direction", "right", "--cwd", "/work")] = oshosttest.Outcome{Err: errors.New("no server")}
 
-	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
-
-	if err == nil || code != 1 || !strings.Contains(err.Error(), "herdr pane split") {
-		t.Errorf("Execute() = (%d, %v), want the split failure", code, err)
+	outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
+	if err == nil || outcome != (termshared.Outcome{Code: 1}) || !strings.Contains(err.Error(), "herdr pane split") {
+		t.Errorf("Execute() = (%+v, %v), want the split failure", outcome, err)
 	}
 	if host.Exists("/tmp/xonovex-agent-terminal-1.sh") {
 		t.Error("the launch script remains after a failed split")
@@ -140,10 +137,9 @@ func TestExecuteClosesThePaneThatCannotRunTheCommand(t *testing.T) {
 	host := insideHost()
 	host.Outcomes[oshosttest.CommandLine("herdr", "pane", "run", "w1-3", "sh '/tmp/xonovex-agent-terminal-1.sh'")] = oshosttest.Outcome{Err: errors.New("pane gone")}
 
-	code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
-
-	if err == nil || code != 1 {
-		t.Fatalf("Execute() = (%d, %v), want the run failure", code, err)
+	outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "/work")
+	if err == nil || outcome != (termshared.Outcome{Code: 1}) {
+		t.Fatalf("Execute() = (%+v, %v), want the run failure", outcome, err)
 	}
 	if !slices.Contains(calls(host), "herdr pane close w1-3") {
 		t.Errorf("calls = %v, want the new pane closed", calls(host))
@@ -156,8 +152,8 @@ func TestExecuteClosesThePaneThatCannotRunTheCommand(t *testing.T) {
 func TestExecuteReportsALaunchScriptFailure(t *testing.T) {
 	host := insideHost()
 
-	if code, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, nil, nil, "/work"); err == nil || code != 1 {
-		t.Errorf("Execute() = (%d, %v), want the missing command refused", code, err)
+	if outcome, err := NewExecutor(host, testLog).Execute(&termshared.TerminalConfig{}, nil, nil, "/work"); err == nil || outcome.Code != 1 {
+		t.Errorf("Execute() = (%+v, %v), want the missing command refused", outcome, err)
 	}
 	if len(calls(host)) != 0 {
 		t.Errorf("calls = %v, want no herdr call without a script", calls(host))

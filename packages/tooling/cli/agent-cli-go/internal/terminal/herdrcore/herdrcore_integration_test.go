@@ -69,9 +69,9 @@ func TestExecuteRunsAProgramAndLeavesNoTerminal(t *testing.T) {
 	executor := NewExecutor(host, logging.New(os.Stderr, os.Stderr, true, false))
 	runID := "smoke-" + strconv.FormatInt(time.Now().UnixNano(), 36)
 
-	code, err := executor.Execute(&termshared.TerminalConfig{RunID: runID}, []string{"sh", "-c", "exit 7"}, []string{"AGENT_CLI_SMOKE=1"}, t.TempDir())
-	if err != nil || code != 7 {
-		t.Errorf("Execute() = (%d, %v), want the exit code 7 of the program", code, err)
+	outcome, err := executor.Execute(&termshared.TerminalConfig{RunID: runID}, []string{"sh", "-c", "exit 7"}, []string{"AGENT_CLI_SMOKE=1"}, t.TempDir())
+	if err != nil || outcome != (termshared.Outcome{Code: 7, Ended: true}) {
+		t.Errorf("Execute() = (%+v, %v), want the exit code 7 of the ended program", outcome, err)
 	}
 
 	stdout, stderr, status, err := host.Output(context.Background(), command, []string{"ls", "--all", "--json", "--label", runLabel + "=" + runID}, "")

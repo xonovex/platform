@@ -132,9 +132,9 @@ type goldenTerminal struct{ calls *[]string }
 func (goldenTerminal) IsAvailable() bool { return true }
 func (goldenTerminal) IsInside() bool    { return false }
 
-func (g goldenTerminal) Execute(_ *termshared.TerminalConfig, command, env []string, workDir string) (int, error) {
+func (g goldenTerminal) Execute(_ *termshared.TerminalConfig, command, env []string, workDir string) (termshared.Outcome, error) {
 	*g.calls = append(*g.calls, "terminal: "+strings.Join(command, " "), "terminal env: "+strings.Join(sorted(env), " "), "terminal dir: "+workDir)
-	return 0, nil
+	return termshared.Outcome{}, nil
 }
 
 func sorted(values []string) []string {

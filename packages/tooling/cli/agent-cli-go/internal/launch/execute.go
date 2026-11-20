@@ -181,7 +181,8 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 	if err != nil {
 		return result, err
 	}
-	// A terminal session outlives this process, so its overlay stays on disk.
+	// A terminal session whose program runs on after this process returns needs
+	// its overlay, so the overlay stays on disk.
 	keepOverlay := false
 	defer func() {
 		if !keepOverlay {
@@ -244,11 +245,13 @@ func carryOut(deps Dependencies, res resolution) (outcome, error) {
 		if plan.Verbose {
 			deps.Log.Info("Using terminal wrapper: " + string(plan.Terminal.Type))
 		}
-		if overlayResult.Root != "" {
+		ran, err := terminal.Execute(plan.Terminal, fullCommand, env, run.Process.Dir)
+		result.code = ran.Code
+		if !ran.Ended && overlayResult.Root != "" {
 			keepOverlay = true
 			deps.Log.Info("The overlay stays at " + overlayResult.Root + " while the terminal session runs; remove it afterwards")
 		}
-		if result.code, err = terminal.Execute(plan.Terminal, fullCommand, env, run.Process.Dir); err != nil {
+		if err != nil {
 			return result, err
 		}
 	} else if result.code, err = plan.Isolator.Run(run, contribution); err != nil {

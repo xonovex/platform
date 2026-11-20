@@ -64,29 +64,30 @@ func (e *Executor) IsInside() bool { return e.host.Getenv(insideVariable) == "1"
 
 // Execute opens a pane beside the current one and starts the command in it. The
 // command runs on in that pane, so Execute reports success once herdr has
-// accepted the command and does not wait for the agent. A pane that cannot be
+// accepted the command, does not wait for the agent and never reports it ended. A pane that cannot be
 // given its command is closed again, so a failure leaves no empty pane behind.
 // The session and window names of the configuration apply to tmux only.
-func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (int, error) {
+func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (termshared.Outcome, error) {
+	failed := termshared.Outcome{Code: 1}
 	if !e.IsInside() {
-		return 1, ErrOutside
+		return failed, ErrOutside
 	}
 	script, err := termshared.LaunchScript(e.host, command, env)
 	if err != nil {
-		return 1, err
+		return failed, err
 	}
 	pane, err := e.split(config, workDir)
 	if err != nil {
 		_ = e.host.Remove(script)
-		return 1, err
+		return failed, err
 	}
 	if _, err := e.herdr("pane", "run", pane, "sh "+shell.Quote(script)); err != nil {
 		_ = e.host.Remove(script)
 		_, _ = e.herdr("pane", "close", pane)
-		return 1, err
+		return failed, err
 	}
 	e.log.Info("Started the agent in herdr-tui pane " + pane)
-	return 0, nil
+	return termshared.Outcome{}, nil
 }
 
 // split opens a pane beside the current one without taking the focus of the user

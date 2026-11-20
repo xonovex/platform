@@ -90,28 +90,52 @@ func TestExecuteAppliesTheOverlayBeforeTheUserArguments(t *testing.T) {
 	}
 }
 
-func TestExecuteKeepsTheOverlayOfATerminalSession(t *testing.T) {
+func TestExecuteCleansAnEmptyOverlayOfATerminalSession(t *testing.T) {
 	f := newExecuteFixture()
-	overlays := &fakeOverlays{result: OverlayResult{Root: "/tmp/o"}}
+	empty := &fakeOverlays{}
 	deps := f.deps()
-	deps.Overlays = overlays
+	deps.Overlays = empty
 	options := overlayOptions()
 	options.Terminal = "tmux"
 
-	if err := Execute(deps, options); err != nil {
-		t.Fatalf("Execute() error = %v", err)
-	}
-	if overlays.cleaned || !strings.Contains(f.log.String(), "/tmp/o") {
-		t.Errorf("cleaned = %v, log = %q", overlays.cleaned, f.log.String())
-	}
-
 	// A terminal run whose overlay placed nothing has nothing to keep.
-	g := newExecuteFixture()
-	empty := &fakeOverlays{}
-	deps = g.deps()
-	deps.Overlays = empty
 	if err := Execute(deps, options); err != nil || !empty.cleaned {
 		t.Errorf("Execute() = %v, cleaned = %v", err, empty.cleaned)
+	}
+}
+
+func TestExecuteCleansTheOverlayOnlyWhenTheTerminalReportsTheProgramEnded(t *testing.T) {
+	cases := []struct {
+		name        string
+		waits       bool
+		detach      bool
+		err         error
+		wantCleaned bool
+	}{
+		{name: "ended", waits: true, wantCleaned: true},
+		{name: "ended with a failure", waits: true, err: errors.New("wait failed"), wantCleaned: true},
+		{name: "runs on", waits: false},
+		{name: "runs on after a failure", waits: false, err: errors.New("attach failed")},
+		{name: "detached", waits: true, detach: true},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			f := newExecuteFixture()
+			f.terminal.waits, f.terminal.err = test.waits, test.err
+			overlays := &fakeOverlays{result: OverlayResult{Root: "/tmp/o"}}
+			deps := f.deps()
+			deps.Overlays = overlays
+			options := overlayOptions()
+			options.Terminal = "tmux"
+			options.TerminalDetach = test.detach
+
+			if err := Execute(deps, options); (err != nil) != (test.err != nil) {
+				t.Fatalf("Execute() error = %v, want %v", err, test.err)
+			}
+			if overlays.cleaned != test.wantCleaned || strings.Contains(f.log.String(), "The overlay stays at /tmp/o") == test.wantCleaned {
+				t.Errorf("cleaned = %v, log = %q, want cleaned %v", overlays.cleaned, f.log.String(), test.wantCleaned)
+			}
+		})
 	}
 }
 

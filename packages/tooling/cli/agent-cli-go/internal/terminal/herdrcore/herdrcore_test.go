@@ -81,10 +81,10 @@ func runLine(name string, extra ...string) string {
 
 func attached() *termshared.TerminalConfig { return &termshared.TerminalConfig{RunID: runID} }
 
-func execute(h *scriptedHost, config *termshared.TerminalConfig) (int, string, error) {
+func execute(h *scriptedHost, config *termshared.TerminalConfig) (termshared.Outcome, string, error) {
 	var log bytes.Buffer
-	code, err := NewExecutor(h, logging.New(&log, &log, true, false)).Execute(config, []string{"claude", "--model", "opus"}, []string{"TOKEN=s3cret"}, "/work")
-	return code, log.String(), err
+	outcome, err := NewExecutor(h, logging.New(&log, &log, true, false)).Execute(config, []string{"claude", "--model", "opus"}, []string{"TOKEN=s3cret"}, "/work")
+	return outcome, log.String(), err
 }
 
 func TestExecutorIsAvailableWhenHcResolves(t *testing.T) {
@@ -115,10 +115,10 @@ func TestExecuteRefusesOutsideWithoutTouchingTheRuntime(t *testing.T) {
 	h := newHost()
 	delete(h.Env, "HC_TERMINAL_ID")
 
-	code, _, err := execute(h, attached())
+	outcome, _, err := execute(h, attached())
 
-	if !errors.Is(err, ErrOutside) || code != 1 || len(h.Calls) != 0 || h.Exists(script) {
-		t.Errorf("Execute() = (%d, %v) with calls %v, want the refusal and nothing started", code, err, h.calls())
+	if !errors.Is(err, ErrOutside) || outcome != (termshared.Outcome{Code: 1, Ended: true}) || len(h.Calls) != 0 || h.Exists(script) {
+		t.Errorf("Execute() = (%+v, %v) with calls %v, want the refusal and nothing started", outcome, err, h.calls())
 	}
 }
 
@@ -129,10 +129,10 @@ func TestExecuteWaitsForTheProgramAndReturnsItsExitCode(t *testing.T) {
 	h.answer("hc wait --json t7", oshosttest.Outcome{Stdout: checkIn}, oshosttest.Outcome{Stdout: exited3, ExitCode: 3})
 	h.answer("hc rm --json t7", oshosttest.Outcome{Stdout: `{"removed":"t7"}`})
 
-	code, log, err := execute(h, attached())
+	outcome, log, err := execute(h, attached())
 
-	if err != nil || code != 3 {
-		t.Fatalf("Execute() = (%d, %v), want the exit code of the program", code, err)
+	if err != nil || outcome != (termshared.Outcome{Code: 3, Ended: true}) {
+		t.Fatalf("Execute() = (%+v, %v), want the exit code of the ended program", outcome, err)
 	}
 	want := []string{runLine(name, "--no-notify"), "hc wait --json t7", "hc wait --json t7", "hc rm --json t7"}
 	if !slices.Equal(h.calls(), want) {
@@ -155,10 +155,10 @@ func TestExecuteReturnsAtTheStartWhenDetached(t *testing.T) {
 	name := firstName(h)
 	h.answer(runLine(name, "--rm", "--outlive-parent"), oshosttest.Outcome{Stdout: started})
 
-	code, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true})
+	outcome, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true})
 
-	if err != nil || code != 0 || len(h.Calls) != 1 {
-		t.Errorf("Execute() = (%d, %v) with calls %v, want one start and no wait", code, err, h.calls())
+	if err != nil || outcome != (termshared.Outcome{}) || len(h.Calls) != 1 {
+		t.Errorf("Execute() = (%+v, %v) with calls %v, want one start, no wait and a program that runs on", outcome, err, h.calls())
 	}
 }
 
@@ -169,10 +169,10 @@ func TestExecuteOmitsTheDirectoryAndTheLabelWhenThereAreNone(t *testing.T) {
 	h.answer("hc wait --json t7", oshosttest.Outcome{Stdout: exited3})
 	h.answer("hc rm --json t7", oshosttest.Outcome{})
 
-	code, err := NewExecutor(h, quiet).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "")
+	outcome, err := NewExecutor(h, quiet).Execute(&termshared.TerminalConfig{}, []string{"claude"}, nil, "")
 
-	if err != nil || code != 3 {
-		t.Errorf("Execute() = (%d, %v) with calls %v", code, err, h.calls())
+	if err != nil || outcome.Code != 3 {
+		t.Errorf("Execute() = (%+v, %v) with calls %v", outcome, err, h.calls())
 	}
 }
 
@@ -188,10 +188,10 @@ func TestExecuteWaitsOnAProgramThatStoppedWorkingWithAGrowingPause(t *testing.T)
 	h.answer("hc get --json t7", oshosttest.Outcome{Stdout: live})
 	h.answer("hc rm --json t7", oshosttest.Outcome{})
 
-	code, _, err := execute(h, attached())
+	outcome, _, err := execute(h, attached())
 
-	if err != nil || code != 3 {
-		t.Fatalf("Execute() = (%d, %v)", code, err)
+	if err != nil || outcome.Code != 3 {
+		t.Fatalf("Execute() = (%+v, %v)", outcome, err)
 	}
 	want := []time.Duration{0, firstPause, 2 * firstPause, 0, 0, firstPause}
 	if !slices.Equal(h.Sleeps, want) {
@@ -212,8 +212,8 @@ func TestExecuteTakesTheExitCodeOfATerminalThatFinishedBetweenWaits(t *testing.T
 	h.answer("hc get --json t7", oshosttest.Outcome{Stdout: `{"address":"t7","state":"finished","exit_code":null,"signal":15}`})
 	h.answer("hc rm --json t7", oshosttest.Outcome{})
 
-	if code, _, err := execute(h, attached()); err != nil || code != 143 {
-		t.Errorf("Execute() = (%d, %v), want 128 plus the signal", code, err)
+	if outcome, _, err := execute(h, attached()); err != nil || outcome.Code != 143 {
+		t.Errorf("Execute() = (%+v, %v), want 128 plus the signal", outcome, err)
 	}
 }
 
@@ -225,10 +225,10 @@ func TestExecuteEndsAProgramThatExitedWithoutACode(t *testing.T) {
 	h.answer("hc wait --json --timeout 10 t7", oshosttest.Outcome{})
 	h.answer("hc rm --json t7", oshosttest.Outcome{})
 
-	code, _, err := execute(h, attached())
+	outcome, _, err := execute(h, attached())
 
-	if err == nil || code != 1 || !strings.Contains(err.Error(), "ended without an exit code") {
-		t.Errorf("Execute() = (%d, %v), want the missing code reported", code, err)
+	if err == nil || outcome.Code != 1 || !strings.Contains(err.Error(), "ended without an exit code") {
+		t.Errorf("Execute() = (%+v, %v), want the missing code reported", outcome, err)
 	}
 	if !slices.Contains(h.calls(), "hc rm --json t7") || h.Exists(script) {
 		t.Errorf("calls = %v, want the terminal removed and the script gone", h.calls())
@@ -242,16 +242,16 @@ func TestExecuteRetriesATakenNameOnce(t *testing.T) {
 	h.answer(runLine(name, "--rm", "--outlive-parent"), taken)
 	h.answer(runLine(name+"-2", "--rm", "--outlive-parent"), oshosttest.Outcome{Stdout: started})
 
-	if code, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true}); err != nil || code != 0 {
-		t.Fatalf("Execute() = (%d, %v), want the second name to start", code, err)
+	if outcome, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true}); err != nil || outcome.Code != 0 {
+		t.Fatalf("Execute() = (%+v, %v), want the second name to start", outcome, err)
 	}
 
 	h = newHost()
 	h.answer(runLine(name, "--rm", "--outlive-parent"), taken)
 	h.answer(runLine(name+"-2", "--rm", "--outlive-parent"), taken)
-	code, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true})
-	if err == nil || code != 1 || !strings.Contains(err.Error(), "name taken") || len(h.Calls) != 2 || h.Exists(script) {
-		t.Errorf("Execute() = (%d, %v) with calls %v, want one retry then the failure", code, err, h.calls())
+	outcome, _, err := execute(h, &termshared.TerminalConfig{RunID: runID, Detach: true})
+	if err == nil || outcome.Code != 1 || !strings.Contains(err.Error(), "name taken") || len(h.Calls) != 2 || h.Exists(script) {
+		t.Errorf("Execute() = (%+v, %v) with calls %v, want one retry then the failure", outcome, err, h.calls())
 	}
 }
 
@@ -262,14 +262,14 @@ func TestExecuteReportsAStartFailureAndRemovesTheScript(t *testing.T) {
 		"api error":    {Stdout: `{"error":{"message":"","data":{"kind":"blocked"}}}`, ExitCode: 3},
 		"silent error": {ExitCode: 4},
 	}
-	for name, outcome := range cases {
+	for name, reply := range cases {
 		h := newHost()
-		h.answer(runLine(firstName(h), "--no-notify"), outcome)
+		h.answer(runLine(firstName(h), "--no-notify"), reply)
 
-		code, _, err := execute(h, attached())
+		outcome, _, err := execute(h, attached())
 
-		if err == nil || code != 1 || !strings.HasPrefix(err.Error(), "hc run: ") || h.Exists(script) {
-			t.Errorf("%s: Execute() = (%d, %v), want the start failure and no script", name, code, err)
+		if err == nil || outcome != (termshared.Outcome{Code: 1, Ended: true}) || !strings.HasPrefix(err.Error(), "hc run: ") || h.Exists(script) {
+			t.Errorf("%s: Execute() = (%+v, %v), want the start failure and no script", name, outcome, err)
 		}
 	}
 }
@@ -299,10 +299,10 @@ func TestExecuteEndsAStartedTerminalWhoseAddressIsUnreadable(t *testing.T) {
 	h.answer("hc wait --json --timeout 10 "+name, oshosttest.Outcome{})
 	h.answer("hc rm --json "+name, oshosttest.Outcome{})
 
-	code, _, err := execute(h, attached())
+	outcome, _, err := execute(h, attached())
 
-	if err == nil || code != 1 || !strings.Contains(err.Error(), "named no terminal") {
-		t.Errorf("Execute() = (%d, %v), want the unreadable reply", code, err)
+	if err == nil || outcome != (termshared.Outcome{Code: 1}) || !strings.Contains(err.Error(), "named no terminal") {
+		t.Errorf("Execute() = (%+v, %v), want the unreadable reply", outcome, err)
 	}
 	if !slices.Contains(h.calls(), "hc kill --json "+name) || !slices.Contains(h.calls(), "hc rm --json "+name) || h.Exists(script) {
 		t.Errorf("calls = %v, want the terminal ended by its name", h.calls())
@@ -315,10 +315,10 @@ func TestExecuteEndsTheTerminalOnAnInterruptDuringTheStart(t *testing.T) {
 	h.answer(runLine(name, "--no-notify"), oshosttest.Outcome{Stdout: started})
 	h.InterruptOn = runLine(name, "--no-notify")
 
-	code, log, err := execute(h, attached())
+	outcome, log, err := execute(h, attached())
 
-	if err == nil || code != 1 || h.Exists(script) {
-		t.Errorf("Execute() = (%d, %v), want the interrupted start reported", code, err)
+	if err == nil || outcome != (termshared.Outcome{Code: 1}) || h.Exists(script) {
+		t.Errorf("Execute() = (%+v, %v), want the interrupted start reported and no end confirmed", outcome, err)
 	}
 	if !slices.Contains(h.calls(), "hc kill --json "+name) || !strings.Contains(log, "Could not remove herdr-core terminal "+name) {
 		t.Errorf("calls = %v, log = %q, want the terminal ended by its name and the failed removal reported", h.calls(), log)
@@ -334,10 +334,10 @@ func TestExecuteEndsTheProgramOnAnInterruptDuringTheWait(t *testing.T) {
 	h.answer("hc rm --json t7", oshosttest.Outcome{})
 	h.InterruptOn = "hc wait --json t7"
 
-	code, log, err := execute(h, attached())
+	outcome, log, err := execute(h, attached())
 
-	if err != nil || code != 130 {
-		t.Fatalf("Execute() = (%d, %v), want the interrupted code", code, err)
+	if err != nil || outcome != (termshared.Outcome{Code: 130, Ended: true}) {
+		t.Fatalf("Execute() = (%+v, %v), want the interrupted code and the confirmed end", outcome, err)
 	}
 	tail := h.calls()[2:]
 	if !slices.Equal(tail, []string{"hc kill --json t7", "hc wait --json --timeout 10 t7", "hc rm --json t7"}) {
@@ -382,10 +382,10 @@ func TestExecuteEndsTheProgramWhenTheWaitFails(t *testing.T) {
 		h.answer("hc wait --json --timeout 10 t7", oshosttest.Outcome{})
 		h.answer("hc rm --json t7", oshosttest.Outcome{})
 
-		code, _, err := execute(h, attached())
+		outcome, _, err := execute(h, attached())
 
-		if err == nil || code != 1 || !slices.Contains(h.calls(), "hc kill --json t7") || h.Exists(script) {
-			t.Errorf("%s: Execute() = (%d, %v) with calls %v, want the failure and the program ended", name, code, err, h.calls())
+		if err == nil || outcome != (termshared.Outcome{Code: 1}) || !slices.Contains(h.calls(), "hc kill --json t7") || h.Exists(script) {
+			t.Errorf("%s: Execute() = (%+v, %v) with calls %v, want the failure, the program ended and no end confirmed", name, outcome, err, h.calls())
 		}
 	}
 }
@@ -396,19 +396,19 @@ func TestExecuteWarnsWhenTheFinishedTerminalCannotBeRemoved(t *testing.T) {
 	h.answer("hc wait --json t7", oshosttest.Outcome{Stdout: exited3})
 	h.answer("hc rm --json t7", oshosttest.Outcome{Stderr: `{"error":{"kind":"busy","message":"still live"}}`, ExitCode: 3})
 
-	code, log, err := execute(h, attached())
+	outcome, log, err := execute(h, attached())
 
-	if err != nil || code != 3 || !strings.Contains(log, "Could not remove herdr-core terminal t7 (still live); remove it with hc kill t7 and hc rm t7") {
-		t.Errorf("Execute() = (%d, %v), log = %q, want the code and a warning", code, err, log)
+	if err != nil || outcome.Code != 3 || !strings.Contains(log, "Could not remove herdr-core terminal t7 (still live); remove it with hc kill t7 and hc rm t7") {
+		t.Errorf("Execute() = (%+v, %v), log = %q, want the code and a warning", outcome, err, log)
 	}
 }
 
 func TestExecuteReportsALaunchScriptFailure(t *testing.T) {
 	h := newHost()
 
-	code, err := NewExecutor(h, quiet).Execute(attached(), nil, nil, "/work")
+	outcome, err := NewExecutor(h, quiet).Execute(attached(), nil, nil, "/work")
 
-	if err == nil || code != 1 || len(h.Calls) != 0 {
-		t.Errorf("Execute() = (%d, %v) with calls %v, want the missing command refused", code, err, h.calls())
+	if err == nil || outcome != (termshared.Outcome{Code: 1, Ended: true}) || len(h.Calls) != 0 {
+		t.Errorf("Execute() = (%+v, %v) with calls %v, want the missing command refused", outcome, err, h.calls())
 	}
 }

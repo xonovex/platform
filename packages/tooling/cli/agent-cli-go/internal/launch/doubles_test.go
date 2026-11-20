@@ -139,8 +139,11 @@ func (f *fakeVCS) Setup(config wsshared.Config, repoDir string, _ bool) (string,
 func (f *fakeVCS) Available() bool { return true }
 
 type fakeTerminal struct {
-	missing  bool
-	inside   bool
+	missing bool
+	inside  bool
+	// waits makes the double wait for the program unless the run is detached,
+	// so it reports the program ended; otherwise the program runs on.
+	waits    bool
 	code     int
 	err      error
 	config   *termshared.TerminalConfig
@@ -153,10 +156,10 @@ type fakeTerminal struct {
 func (f *fakeTerminal) IsAvailable() bool { return !f.missing }
 func (f *fakeTerminal) IsInside() bool    { return f.inside }
 
-func (f *fakeTerminal) Execute(config *termshared.TerminalConfig, command, env []string, workDir string) (int, error) {
+func (f *fakeTerminal) Execute(config *termshared.TerminalConfig, command, env []string, workDir string) (termshared.Outcome, error) {
 	f.executed = true
 	f.config, f.command, f.env, f.workDir = config, command, env, workDir
-	return f.code, f.err
+	return termshared.Outcome{Code: f.code, Ended: f.waits && !config.Detach}, f.err
 }
 
 // testSandbox is a registry whose every method resolves to the same doubles.

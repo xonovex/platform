@@ -58,8 +58,9 @@ func (e *Executor) IsInside() bool {
 	return e.host.Getenv("TMUX") != ""
 }
 
-// Execute runs the command in a tmux session
-func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (int, error) {
+// Execute runs the command in a tmux session. The command runs on in the
+// session after the client detaches, so the outcome never reports it ended.
+func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (termshared.Outcome, error) {
 	// Generate session and window names if not provided
 	sessionName := config.SessionName
 	if sessionName == "" {
@@ -73,7 +74,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 
 	launchScript, err := termshared.LaunchScript(e.host, command, env)
 	if err != nil {
-		return 1, err
+		return termshared.Outcome{Code: 1}, err
 	}
 
 	run := e.createSession
@@ -84,7 +85,7 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 	if err != nil || exitCode != 0 {
 		_ = e.host.Remove(launchScript)
 	}
-	return exitCode, err
+	return termshared.Outcome{Code: exitCode}, err
 }
 
 // sessionExists checks if a tmux session with the given name exists

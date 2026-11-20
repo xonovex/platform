@@ -100,26 +100,28 @@ func (e *Executor) IsInside() bool { return e.host.Getenv(insideVariable) != "" 
 // run waits for the program, removes its terminal and returns its exit code; an
 // interrupt of the CLI ends the program and removes its terminal. Every failure
 // removes the launch script, and ends the terminal when it may have started. The
-// session and window names of the configuration apply to tmux only.
-func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (int, error) {
+// outcome reports the program ended only when hc confirmed it, so a detached run
+// and a program that did not end in time report that it runs on. The session
+// and window names of the configuration apply to tmux only.
+func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, env []string, workDir string) (termshared.Outcome, error) {
 	if !e.IsInside() {
-		return 1, ErrOutside
+		return termshared.Outcome{Code: 1, Ended: true}, ErrOutside
 	}
 	script, err := termshared.LaunchScript(e.host, command, env)
 	if err != nil {
-		return 1, err
+		return termshared.Outcome{Code: 1, Ended: true}, err
 	}
 	ctx, stop := e.host.NotifyInterrupt(context.Background())
 	defer stop()
 
-	address, err := e.start(ctx, config, script, workDir)
+	address, ended, err := e.start(ctx, config, script, workDir)
 	if err != nil {
 		_ = e.host.Remove(script)
-		return 1, err
+		return termshared.Outcome{Code: 1, Ended: ended}, err
 	}
 	if config.Detach {
 		e.log.Info("Started the agent in herdr-core terminal " + address)
-		return 0, nil
+		return termshared.Outcome{}, nil
 	}
 	e.log.Info("Running the agent in herdr-core terminal " + address)
 	code, err := e.wait(ctx, address)
@@ -127,30 +129,26 @@ func (e *Executor) Execute(config *termshared.TerminalConfig, command []string, 
 	case ctx.Err() != nil:
 		_ = e.host.Remove(script)
 		e.log.Warning("Interrupted: ending herdr-core terminal " + address)
-		e.end(address)
-		return interruptedCode, nil
+		return termshared.Outcome{Code: interruptedCode, Ended: e.end(address)}, nil
 	case err != nil:
 		_ = e.host.Remove(script)
-		e.end(address)
-		return 1, err
+		return termshared.Outcome{Code: 1, Ended: e.end(address)}, err
 	}
 	e.remove(address)
-	return code, nil
+	return termshared.Outcome{Code: code, Ended: true}, nil
 }
 
 // start runs hc run in the background and returns the address of the new
 // terminal. A name that a live terminal holds is replaced once by a new name.
 // An interrupt during the start ends the terminal by its name, because it may
-// have started.
-func (e *Executor) start(ctx context.Context, config *termshared.TerminalConfig, script, workDir string) (string, error) {
+// have started. On a failure, the flag reports that no program of the start
+// runs.
+func (e *Executor) start(ctx context.Context, config *termshared.TerminalConfig, script, workDir string) (string, bool, error) {
 	for attempt := 1; ; attempt++ {
 		name := e.name(attempt)
 		stdout, stderr, code, err := e.hc(ctx, runArgs(config, name, script, workDir)...)
 		if err != nil {
-			if ctx.Err() != nil {
-				e.end(name)
-			}
-			return "", fmt.Errorf("hc run: %w", err)
+			return "", ctx.Err() == nil || e.end(name), fmt.Errorf("hc run: %w", err)
 		}
 		if code != 0 {
 			failure := parseFailure(stdout, stderr, code)
@@ -158,14 +156,13 @@ func (e *Executor) start(ctx context.Context, config *termshared.TerminalConfig,
 				e.log.Debug("The herdr-core terminal name " + name + " is taken; starting under a new name")
 				continue
 			}
-			return "", fmt.Errorf("hc run: %s", failure.text)
+			return "", true, fmt.Errorf("hc run: %s", failure.text)
 		}
 		address, err := parseAddress(stdout)
 		if err != nil {
-			e.end(name)
-			return "", err
+			return "", e.end(name), err
 		}
-		return address, nil
+		return address, false, nil
 	}
 }
 
@@ -261,17 +258,22 @@ func (e *Executor) get(ctx context.Context, address string) (terminalState, erro
 }
 
 // end ends the program of the terminal, waits a bounded time for it to finish
-// and removes the terminal. It runs after the interrupt, so it does not use the
-// context the interrupt ended.
-func (e *Executor) end(target string) {
+// and removes the terminal. It reports whether hc confirmed that the program
+// exited. It runs after the interrupt, so it does not use the context the
+// interrupt ended.
+func (e *Executor) end(target string) bool {
 	ctx := context.Background()
 	if _, stderr, code, err := e.hc(ctx, "kill", "--json", target); err != nil || code != 0 {
 		e.log.Debug(fmt.Sprintf("hc kill %s: %v %s", target, err, stderr))
 	}
-	if _, stderr, code, err := e.hc(ctx, "wait", "--json", "--timeout", endWaitSeconds, target); err != nil || code != 0 {
+	stdout, stderr, _, err := e.hc(ctx, "wait", "--json", "--timeout", endWaitSeconds, target)
+	result, parseErr := parseWait(stdout)
+	exited := err == nil && parseErr == nil && result.Reason == "exit"
+	if !exited {
 		e.log.Debug(fmt.Sprintf("hc wait %s: %v %s", target, err, stderr))
 	}
 	e.remove(target)
+	return exited
 }
 
 // remove removes the finished terminal, and tells the user how to remove it
