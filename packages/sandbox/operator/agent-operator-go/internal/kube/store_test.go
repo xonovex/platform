@@ -186,8 +186,8 @@ func TestStore_WritesTheStatusOntoTheLatestObject(t *testing.T) {
 	if run.Status.Phase != agentv1alpha1.AgentRunPhaseRunning || run.Spec.Prompt != "latest" {
 		t.Errorf("stored run = %q/%q, want the new status on the latest spec", run.Status.Phase, run.Spec.Prompt)
 	}
-	if stale.Spec.Prompt != "latest" || stale.ResourceVersion != run.ResourceVersion {
-		t.Errorf("caller copy = %q at %q, want the stored run", stale.Spec.Prompt, stale.ResourceVersion)
+	if stale.Spec.Prompt != "stale" || stale.ResourceVersion != run.ResourceVersion {
+		t.Errorf("caller copy = %q at %q, want its own spec at the stored version", stale.Spec.Prompt, stale.ResourceVersion)
 	}
 	if workspace.Status.Phase != agentv1alpha1.AgentWorkspacePhaseReady || workspace.ResourceVersion == "" {
 		t.Errorf("workspace = %+v, want the stored workspace", workspace)

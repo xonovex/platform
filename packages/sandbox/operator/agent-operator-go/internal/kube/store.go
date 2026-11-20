@@ -131,13 +131,19 @@ func (s Store) CreateJob(ctx context.Context, job *batchv1.Job) error {
 }
 
 // UpdateAgentRunStatus writes the status of run onto the latest stored run and
-// copies the result back into run. An absent run is not an error.
+// copies the stored status and resource version back into run. The spec of run
+// stays as the caller resolved it, because the controller applies the harness
+// defaults to it in memory and builds the Job from it after this write. An
+// absent run is not an error.
 func (s Store) UpdateAgentRunStatus(ctx context.Context, run *agentv1alpha1.AgentRun) error {
 	desired := run.Status.DeepCopy()
-	return updateStatus(ctx, s.client, client.ObjectKeyFromObject(run), run, func(current *agentv1alpha1.AgentRun) bool {
+	resolved := run.Spec.DeepCopy()
+	err := updateStatus(ctx, s.client, client.ObjectKeyFromObject(run), run, func(current *agentv1alpha1.AgentRun) bool {
 		current.Status = *desired.DeepCopy()
 		return true
 	})
+	run.Spec = *resolved
+	return err
 }
 
 // UpdateAgentWorkspaceStatus writes the status of workspace onto the latest
