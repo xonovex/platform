@@ -7,7 +7,7 @@ import type {ParsedArgs} from "@xonovex/script-moon-common/cli-args";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {resolveSkillDirectory} from "@xonovex/script-moon-common/skill-directory";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
-import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/validation";
+import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
 import {
   buildGenerationClaudeArgs,
   evalEntries,
@@ -50,7 +50,7 @@ type EvaluationLoadResult =
 
 export interface EvaluationConfigOptions {
   readonly environment?: Readonly<Record<string, string | undefined>>;
-  readonly executableAvailable?: (command: string) => boolean;
+  readonly locateExecutable?: (command: string) => string | undefined;
   readonly workingDirectory?: string;
   readonly fs?: FileSystem;
 }
@@ -60,6 +60,7 @@ export interface EvaluationConfig {
   readonly budget: number;
   readonly skillDirectory: string;
   readonly harness: "claude" | "codex";
+  readonly harnessExecutable: string;
   readonly concurrency: number;
   readonly cwd: string | undefined;
   readonly evaluations: readonly NormalizedEval[];
@@ -158,12 +159,11 @@ export const cliDefinition = {
   },
 } as const;
 
-const defaultExecutableAvailable = (command: string): boolean => {
+const defaultLocateExecutable = (command: string): string | undefined => {
   try {
-    resolveExecutable(command);
-    return true;
+    return resolveExecutable(command);
   } catch {
-    return false;
+    return undefined;
   }
 };
 
@@ -276,8 +276,7 @@ export const resolveEvaluationConfig = (
   options: EvaluationConfigOptions = {},
 ): EvaluationConfigResult => {
   const environment = options.environment ?? process.env;
-  const executableAvailable =
-    options.executableAvailable ?? defaultExecutableAvailable;
+  const locateExecutable = options.locateExecutable ?? defaultLocateExecutable;
   const workingDirectory = options.workingDirectory ?? resolve(".");
   const fs = options.fs ?? nodeFileSystem;
   const {values, positionals} = args;
@@ -299,7 +298,8 @@ export const resolveEvaluationConfig = (
     );
   }
   const harness = harnessInput;
-  if (!executableAvailable(harness)) {
+  const harnessExecutable = locateExecutable(harness);
+  if (harnessExecutable === undefined) {
     return failure(`'${harness}' CLI not found in PATH`);
   }
 
@@ -433,6 +433,7 @@ export const resolveEvaluationConfig = (
       budget,
       skillDirectory,
       harness,
+      harnessExecutable,
       concurrency,
       cwd: evaluationWorkingDirectory || undefined,
       evaluations: loaded.data.evaluations,

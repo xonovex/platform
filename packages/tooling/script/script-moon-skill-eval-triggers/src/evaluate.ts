@@ -1,12 +1,10 @@
-import {rmSync} from "node:fs";
 import {join} from "node:path";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {
-  checkCodexTriggered,
-  checkTriggered,
-} from "@xonovex/script-moon-skill-eval-common/trigger-process";
-import {TRIGGER_OUTPUT_LIMIT} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
+import {nodeProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-node";
+import {nodeScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-node";
+import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {TRIGGER_OUTPUT_LIMIT} from "@xonovex/script-moon-skill-eval-common/trigger";
+import {checkTrigger} from "@xonovex/script-moon-skill-eval-common/trigger-check";
 import {
   MAX_TRIGGER_MODEL_RUNS,
   triggerModelRunCount,
@@ -18,29 +16,17 @@ import {
 } from "./trigger-config.js";
 import {runTriggerEvaluation} from "./trigger-evaluation.js";
 
-/**
- * The effects the trigger evaluator reaches a harness through. A run supplies the
- * spawning implementations; a test supplies decisions directly, so a whole sweep is
- * scored without a process.
- */
-export interface TriggerDependencies {
-  readonly checkTriggered: typeof checkTriggered;
-  readonly checkCodexTriggered: typeof checkCodexTriggered;
+export interface TriggerDependencies extends HarnessPorts {
   // How the configuration step probes that the harness binary exists and runs.
   readonly configOptions: TriggerConfigOptions;
-  readonly fs: FileSystem;
-  // Removes a previous run's evidence so a rerun cannot be read as this run's.
-  readonly discard: (path: string) => void;
 }
 
 export const defaultDependencies: TriggerDependencies = {
-  checkTriggered,
-  checkCodexTriggered,
-  configOptions: {},
   fs: nodeFileSystem,
-  discard: (path) => {
-    rmSync(path, {force: true});
-  },
+  scratch: nodeScratch,
+  runProcess: nodeProcessRunner,
+  environment: process.env,
+  configOptions: {},
 };
 
 export const main = async (
@@ -62,9 +48,9 @@ export const main = async (
 
   if (config.workspace !== undefined) {
     dependencies.fs.makeDirectory(config.workspace);
-    dependencies.discard(join(config.workspace, "results.jsonl"));
-    dependencies.discard(join(config.workspace, "summary.json"));
-    dependencies.discard(join(config.workspace, "invalid-run.json"));
+    dependencies.scratch.remove(join(config.workspace, "results.jsonl"));
+    dependencies.scratch.remove(join(config.workspace, "summary.json"));
+    dependencies.scratch.remove(join(config.workspace, "invalid-run.json"));
   }
 
   const evaluation = await runTriggerEvaluation({
@@ -74,24 +60,24 @@ export const main = async (
     skillName: config.skillName,
     workspace: config.workspace,
     fs: dependencies.fs,
-    check:
-      config.harness === "claude"
-        ? (query) =>
-            dependencies.checkTriggered(
-              query,
-              config.harnessArgs,
-              config.skillName,
-              config.shortName,
-              config.harnessExecutable,
-            )
-        : (query) =>
-            dependencies.checkCodexTriggered({
-              args: config.harnessArgs,
-              executable: config.harnessExecutable,
+    check: (query) =>
+      checkTrigger(
+        config.harness,
+        {
+          executable: config.harnessExecutable,
+          args: config.harnessArgs,
+          query,
+          target: config.skillName,
+          shortName: config.shortName,
+          candidates: [
+            {
               skillDirectory: config.skillDirectory,
-              query,
               shortName: config.shortName,
-            }),
+            },
+          ],
+        },
+        dependencies,
+      ),
   });
   if (!evaluation.success) {
     return 2;

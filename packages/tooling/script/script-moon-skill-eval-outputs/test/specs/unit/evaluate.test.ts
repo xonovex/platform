@@ -1,9 +1,11 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {memoryProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
+import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type EvaluatorDependencies} from "../../../src/evaluate.js";
-import type {HarnessRequest} from "../../../src/output-harness.js";
 import type {NormalizedEval} from "../../../src/validation.js";
 
 const evaluation = (prompt: string): NormalizedEval => ({
@@ -14,14 +16,17 @@ const evaluation = (prompt: string): NormalizedEval => ({
   files: [],
 });
 
-const isJudgeRequest = (request: HarnessRequest): boolean =>
-  request.finalArgument.includes("ASSISTANT RESPONSE:");
+const finalArgument = (request: ProcessInvocation): string =>
+  request.args.at(-1) ?? "";
+
+const isJudgeRequest = (request: ProcessInvocation): boolean =>
+  finalArgument(request).includes("ASSISTANT RESPONSE:");
 
 // The with_skill arm prefixes the prompt with the skill's slash command, which is
 // how a recorded harness tells the two arms apart and answers only the one that
 // was given the skill.
-const usedSkill = (request: HarnessRequest): boolean =>
-  request.finalArgument.startsWith("/test-skill ");
+const usedSkill = (request: ProcessInvocation): boolean =>
+  finalArgument(request).startsWith("/test-skill ");
 
 const generationOutput = (result: string): string =>
   [
@@ -43,8 +48,8 @@ const generationOutput = (result: string): string =>
 
 // Grades an assertion as passed when the response the judge was handed is the
 // answer, which is what separates the two arms in the aggregate.
-const judgementOutput = (request: HarnessRequest, count: number): string => {
-  const passed = request.finalArgument.includes(
+const judgementOutput = (request: ProcessInvocation, count: number): string => {
+  const passed = finalArgument(request).includes(
     "ASSISTANT RESPONSE:\nthe answer",
   );
   return JSON.stringify({
@@ -59,7 +64,7 @@ const judgementOutput = (request: HarnessRequest, count: number): string => {
 
 // The arm that was given the skill answers correctly; the arm without it does not,
 // which is the delta every case below reads.
-const armGeneration = (request: HarnessRequest): string =>
+const armGeneration = (request: ProcessInvocation): string =>
   generationOutput(usedSkill(request) ? "the answer" : "wrong");
 
 // A tree the evaluator reads its inputs from and writes its evidence into, so a
@@ -70,33 +75,23 @@ const dependencies = (
   failGeneration = false,
 ): EvaluatorDependencies => ({
   fs,
+  scratch: memoryScratch(fs),
+  environment: {},
   workingDirectory: ROOT,
   now: () => 0,
-  // The harness is answered from this tree, so its availability must not be
-  // read from the host's PATH.
-  executableAvailable: () => true,
-  environment: {},
-  discard: () => {
-    // Nothing to discard: each case builds its own tree.
-  },
-  runHarness: (request) => {
+  // The harness is answered from this tree, so its location must not be read
+  // from the host's PATH.
+  locateExecutable: (command) => `/usr/bin/${command}`,
+  runProcess: memoryProcessRunner((request) => {
     if (failGeneration && !isJudgeRequest(request)) {
-      return Promise.resolve({
-        stdout: "",
-        timedOut: false,
-        outputLimitExceeded: false,
-        error: "claude exited 3: generation failed",
-      });
+      return {code: 3, stderr: "generation failed"};
     }
-    return Promise.resolve({
+    return {
       stdout: isJudgeRequest(request)
         ? judgementOutput(request, assertionCount)
         : armGeneration(request),
-      timedOut: false,
-      outputLimitExceeded: false,
-      error: null,
-    });
-  },
+    };
+  }).run,
 });
 
 const ROOT = "/workspace";
@@ -194,37 +189,26 @@ describe("the output evaluator", () => {
       // One of four assertions passes, which clears the delta check and fails the
       // tier's absolute floor.
       (fs) => ({
-        fs,
-        workingDirectory: ROOT,
-        now: () => 0,
-        executableAvailable: () => true,
-        environment: {},
-        discard: () => {
-          // Nothing to discard: each case builds its own tree.
-        },
-        runHarness: (request) =>
-          Promise.resolve({
-            stdout: isJudgeRequest(request)
-              ? JSON.stringify({
-                  structured_output: {
-                    assertion_results: [
-                      {
-                        passed: request.finalArgument.includes(
-                          "ASSISTANT RESPONSE:\nthe answer",
-                        ),
-                        evidence: "first only",
-                      },
-                      {passed: false, evidence: "no"},
-                      {passed: false, evidence: "no"},
-                      {passed: false, evidence: "no"},
-                    ],
-                  },
-                })
-              : armGeneration(request),
-            timedOut: false,
-            outputLimitExceeded: false,
-            error: null,
-          }),
+        ...dependencies(fs),
+        runProcess: memoryProcessRunner((request) => ({
+          stdout: isJudgeRequest(request)
+            ? JSON.stringify({
+                structured_output: {
+                  assertion_results: [
+                    {
+                      passed: finalArgument(request).includes(
+                        "ASSISTANT RESPONSE:\nthe answer",
+                      ),
+                      evidence: "first only",
+                    },
+                    {passed: false, evidence: "no"},
+                    {passed: false, evidence: "no"},
+                    {passed: false, evidence: "no"},
+                  ],
+                },
+              })
+            : armGeneration(request),
+        })).run,
       }),
     );
 

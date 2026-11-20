@@ -1,5 +1,5 @@
 import {isAbsolute} from "node:path";
-import {buildIsolatedClaudeArgs} from "@xonovex/script-moon-skill-eval-common/validation";
+import {buildIsolatedClaudeArgs} from "@xonovex/script-moon-skill-eval-common/claude/args";
 import {z} from "zod";
 
 const SafePathSegmentSchema = z

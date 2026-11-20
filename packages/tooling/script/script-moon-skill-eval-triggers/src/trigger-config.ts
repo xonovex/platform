@@ -11,10 +11,10 @@ import {
   resolveSkillDirectory,
 } from "@xonovex/script-moon-common/skill-directory";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
+import {buildTriggerClaudeArgs} from "@xonovex/script-moon-skill-eval-common/claude/args";
+import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
 import {catalogQueryOwners} from "@xonovex/script-moon-skill-eval-common/routing-catalog";
 import {
-  buildIsolatedCodexArgs,
-  buildTriggerClaudeArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQueries,
   parseQuerySplit,

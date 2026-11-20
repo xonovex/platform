@@ -88,7 +88,7 @@ describe("evaluation configuration", () => {
   ) =>
     resolveEvaluationConfig(parsedArguments(argv), {
       environment,
-      executableAvailable: () => true,
+      locateExecutable: (command) => `/usr/bin/${command}`,
       workingDirectory: directory,
       fs,
     });
@@ -268,7 +268,7 @@ describe("evaluation configuration", () => {
     expect(
       resolveEvaluationConfig(parsedArguments([]), {
         environment: {},
-        executableAvailable: () => false,
+        locateExecutable: () => void 0,
         workingDirectory: directory,
         fs,
       }),

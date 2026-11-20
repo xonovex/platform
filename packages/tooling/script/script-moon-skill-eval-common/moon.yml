@@ -30,13 +30,11 @@ tasks:
       - /packages/runtime/plugin/**/SKILL.md
       - /packages/runtime/plugin/**/eval-queries.json
       - /packages/runtime/plugin/**/references/*.md
-  # These floors cover the unit tier alone, and src/trigger-process.ts is spawn
-  # plumbing only test/specs/integration reaches, so the project totals sit lower
-  # than the logic modules do. vitest.config.ts holds the per-file floors that keep
-  # src/trigger-scan.ts and src/validation.ts near full coverage.
+  # These floors cover the unit tier alone; vitest.config.ts excludes the node
+  # adapters, which only test/specs/integration drives.
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "70"
-      TS_COVERAGE_MIN_FUNCTIONS: "70"
-      TS_COVERAGE_MIN_BRANCHES: "75"
-      TS_COVERAGE_MIN_STATEMENTS: "70"
+      TS_COVERAGE_MIN_LINES: "97"
+      TS_COVERAGE_MIN_FUNCTIONS: "97"
+      TS_COVERAGE_MIN_BRANCHES: "87"
+      TS_COVERAGE_MIN_STATEMENTS: "95"

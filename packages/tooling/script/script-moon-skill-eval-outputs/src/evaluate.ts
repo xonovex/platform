@@ -1,13 +1,13 @@
-import {rmSync} from "node:fs";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {nodeProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-node";
+import {nodeScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-node";
+import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
 import {
   buildEvaluationPrompt,
   cliDefinition,
   resolveEvaluationConfig,
 } from "./evaluation-config.js";
-import {spawnHarness, type HarnessRunner} from "./output-harness.js";
 import {GENERATION_OUTPUT_LIMIT} from "./output-parse.js";
 import {runJob, type RunContext} from "./output-process.js";
 import {aggregateArm, fmean, round, type JobRecord} from "./output-results.js";
@@ -158,30 +158,22 @@ const writeEvaluationLines = (
  * real ones; a test supplies recorded harness output and a fixed clock, so the
  * whole sweep can be scored without a process.
  */
-export interface EvaluatorDependencies {
-  readonly runHarness: HarnessRunner;
+export interface EvaluatorDependencies extends HarnessPorts {
   readonly now: () => number;
-  readonly fs: FileSystem;
-  // Removes a previous run's verdicts so a rerun cannot be read as this run's.
-  readonly discard: (path: string) => void;
   // Where relative paths and the skill are resolved from. A run uses the process
   // directory; a test names a directory in its own tree.
   readonly workingDirectory?: string;
-  // Whether the harness CLI can be run. A run probes PATH; a test answers from
-  // its own tree, so the verdict does not depend on what the host has installed.
-  readonly executableAvailable?: (command: string) => boolean;
-  // The variables the harness and budget defaults are read from. A run uses the
-  // process environment; a test names its own.
-  readonly environment?: Readonly<Record<string, string | undefined>>;
+  // Where the harness CLI is. A run looks it up on PATH; a test answers from its
+  // own tree, so the verdict does not depend on what the host has installed.
+  readonly locateExecutable?: (command: string) => string | undefined;
 }
 
 export const defaultDependencies: EvaluatorDependencies = {
-  runHarness: spawnHarness,
-  now: () => Date.now(),
   fs: nodeFileSystem,
-  discard: (path) => {
-    rmSync(path, {force: true});
-  },
+  scratch: nodeScratch,
+  runProcess: nodeProcessRunner,
+  environment: process.env,
+  now: () => Date.now(),
 };
 
 export const main = async (
@@ -196,7 +188,7 @@ export const main = async (
   const configResult = resolveEvaluationConfig(args, {
     fs: dependencies.fs,
     workingDirectory: dependencies.workingDirectory,
-    executableAvailable: dependencies.executableAvailable,
+    locateExecutable: dependencies.locateExecutable,
     environment: dependencies.environment,
   });
   for (const warning of configResult.warnings) {
@@ -209,10 +201,12 @@ export const main = async (
   const config = configResult.data;
 
   dependencies.fs.makeDirectory(config.iterationDirectory);
-  dependencies.discard(config.benchmarkPath);
-  dependencies.discard(config.invalidRunPath);
+  dependencies.scratch.remove(config.benchmarkPath);
+  dependencies.scratch.remove(config.invalidRunPath);
 
   const ctx: RunContext = {
+    ...dependencies,
+    executable: config.harnessExecutable,
     withArgs: config.withArgs,
     withoutArgs: config.withoutArgs,
     cwd: config.cwd,
@@ -227,9 +221,6 @@ export const main = async (
     runs: config.runs,
     buildPrompt: (evaluation) =>
       buildEvaluationPrompt(config.evaluationsDirectory, evaluation),
-    runHarness: dependencies.runHarness,
-    now: dependencies.now,
-    fs: dependencies.fs,
   };
 
   const harnessCaps =

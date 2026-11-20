@@ -1,14 +1,9 @@
 import {describe, expect, it} from "vitest";
 import {
-  buildIsolatedClaudeArgs,
-  buildIsolatedCodexArgs,
-  buildTriggerClaudeArgs,
   parseQueries,
   parseQuerySplit,
   parseTriggerOptions,
   selectQueries,
-  streamTextDeltaLength,
-  TRIGGER_MAX_TURNS,
   triggerModelRunCount,
 } from "../../../src/validation.js";
 
@@ -106,98 +101,5 @@ describe("trigger numeric options", () => {
   it("counts every query repetition as one model run", () => {
     expect(triggerModelRunCount(8, 3)).toBe(24);
     expect(triggerModelRunCount(9, 3)).toBe(27);
-  });
-});
-
-// Every Claude and Codex eval invocation across the trigger, routing, and output
-// harnesses is built from these two argument sets. A flag dropped here silently
-// lets a run read the machine's real settings, so the whole set is pinned.
-describe("shared harness isolation", () => {
-  it("denies a Claude run the machine's settings, MCP servers, and session", () => {
-    const args = buildIsolatedClaudeArgs("stream-json");
-
-    expect(args).toEqual([
-      "-p",
-      "--output-format",
-      "stream-json",
-      "--setting-sources",
-      "",
-      "--strict-mcp-config",
-      "--mcp-config",
-      '{"mcpServers":{}}',
-      "--no-session-persistence",
-      "--no-chrome",
-    ]);
-  });
-
-  it("carries the requested output format", () => {
-    const args = buildIsolatedClaudeArgs("json");
-
-    expect(args.slice(0, 3)).toEqual(["-p", "--output-format", "json"]);
-  });
-
-  it("denies a Codex run user config, rules, and write access", () => {
-    expect(buildIsolatedCodexArgs({model: ""})).toEqual([
-      "exec",
-      "--json",
-      "--ephemeral",
-      "--sandbox",
-      "read-only",
-      "--ignore-user-config",
-      "--ignore-rules",
-      "--skip-git-repo-check",
-    ]);
-  });
-
-  it("appends only a non-empty Codex model", () => {
-    expect(buildIsolatedCodexArgs({model: "gpt-5"}).slice(-2)).toEqual([
-      "--model",
-      "gpt-5",
-    ]);
-  });
-});
-
-describe("trigger process isolation", () => {
-  it("exposes only Skill with bounded isolated execution", () => {
-    const args = buildTriggerClaudeArgs({
-      model: "haiku",
-      budget: 0.05,
-      pluginDirectories: ["dependency-directory", "plugin-directory"],
-    });
-    const toolIndex = args.indexOf("--tools");
-    const settingIndex = args.indexOf("--setting-sources");
-
-    expect(args.slice(toolIndex, toolIndex + 2)).toEqual(["--tools", "Skill"]);
-    expect(args.slice(settingIndex, settingIndex + 2)).toEqual([
-      "--setting-sources",
-      "",
-    ]);
-    expect(args).toContain("--strict-mcp-config");
-    expect(args).toContain("--no-session-persistence");
-    expect(args).toContain("--max-budget-usd");
-    expect(args).toContain("0.05");
-    const turnsIndex = args.indexOf("--max-turns");
-    expect(args.slice(turnsIndex, turnsIndex + 2)).toEqual([
-      "--max-turns",
-      String(TRIGGER_MAX_TURNS),
-    ]);
-    expect(args).not.toContain("Read");
-    expect(args).not.toContain("Bash");
-    expect(args.filter((argument) => argument === "--plugin-dir")).toHaveLength(
-      2,
-    );
-  });
-
-  it("counts only streamed response text", () => {
-    expect(
-      streamTextDeltaLength({
-        type: "stream_event",
-        event: {
-          type: "content_block_delta",
-          delta: {type: "text_delta", text: "no skill"},
-        },
-      }),
-    ).toBe(8);
-    expect(streamTextDeltaLength({type: "result"})).toBe(0);
   });
 });

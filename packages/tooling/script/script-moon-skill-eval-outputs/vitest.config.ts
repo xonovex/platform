@@ -3,23 +3,17 @@ import {defineConfig} from "vitest/config";
 export default defineConfig({
   test: {
     coverage: {
-      // src/output-harness.ts is the one module without a floor here: it is the
-      // spawn plumbing behind the HarnessRunner port, which the unit tier cannot
-      // reach. test/specs/integration/evaluate.test.ts drives it through a real
-      // binary, and the project floors in moon.yml sit below the total it leaves.
       thresholds: {
-        // The uncovered functions here are defaultDependencies: the spawning
-        // harness runner, the clock, and the discard that reaches a real disk.
+        // The uncovered function here is the clock in defaultDependencies.
         "src/evaluate.ts": {
           statements: 95,
           branches: 85,
           functions: 90,
           lines: 95,
         },
-        // The uncovered function here is defaultExecutableAvailable, which
-        // probes the real PATH for the harness CLI. A unit case answers that
-        // through the executableAvailable port instead, so the probe itself is
-        // reached only by the integration tier.
+        // The uncovered function here is defaultLocateExecutable, which looks
+        // up the harness CLI on the real PATH. A unit case answers that through
+        // the locateExecutable option instead.
         "src/evaluation-config.ts": {
           statements: 95,
           branches: 90,

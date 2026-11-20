@@ -1,32 +1,11 @@
 import {isRecord} from "@xonovex/script-moon-common/records";
-import {streamTextDeltaLength} from "./validation.js";
-
-// A run that never invokes the skill would otherwise answer the whole query, which
-// dominates trigger-eval spend. Once this many answer characters have streamed with
-// no invocation, the routing outcome is settled — the response was written without
-// the skill — so the run ends early and scores as a non-trigger. It is conclusive
-// evidence, not an infrastructure failure: a query whose plain answer is long (any
-// "write this code" negative) would otherwise invalidate its skill's whole sweep on
-// every attempt, since the length is a property of the query rather than a flake.
-export const TRIGGER_OUTPUT_LIMIT = 2000;
-
-export const CODEX_TRIGGER_SIGNAL = "XONOVEX_SKILL_TRIGGERED";
-
-export interface TriggerOutcome {
-  readonly triggered: boolean;
-  readonly error: string | null;
-  // How the run ended, recorded per run so a later triage reads the evidence instead
-  // of re-probing the model to recover which skill answered.
-  readonly selected?: string;
-}
-
-/** How a harness process ended, as the outcome resolvers read it. */
-export interface TriggerExit {
-  readonly code: number | null;
-  readonly stderr: string;
-  readonly timedOut: boolean;
-  readonly spawnError: string | null;
-}
+import {
+  processFailure,
+  TRIGGER_OUTPUT_LIMIT,
+  type TriggerExit,
+  type TriggerOutcome,
+} from "../trigger.js";
+import {streamTextDeltaLength} from "./stream-events.js";
 
 const matchSkill = (
   skillField: unknown,
@@ -150,7 +129,7 @@ export const toolResultOutcome = (line: string): ToolResultOutcome | null => {
 };
 
 /** What a Claude run has established so far, carried line to line. */
-export interface TriggerScan {
+export interface ClaudeTriggerScan {
   readonly matched: boolean;
   readonly targetAvailable: boolean;
   // A skill some other name invoked, held until a later line says whether the
@@ -162,7 +141,7 @@ export interface TriggerScan {
   readonly outputCharacters: number;
 }
 
-export const initialTriggerScan: TriggerScan = {
+export const initialClaudeTriggerScan: ClaudeTriggerScan = {
   matched: false,
   targetAvailable: false,
   pendingSkill: null,
@@ -175,17 +154,17 @@ export const initialTriggerScan: TriggerScan = {
  * Whether the scan has decided the routing outcome. A settled run needs no further
  * turns, so the caller stops reading and ends the process.
  */
-export const isTriggerScanSettled = (scan: TriggerScan): boolean =>
+export const isClaudeTriggerScanSettled = (scan: ClaudeTriggerScan): boolean =>
   scan.matched || scan.competingSkill !== null || scan.outputLimitExceeded;
 
 /** Folds one stdout line into the scan, leaving a settled scan untouched. */
-export const scanTriggerLine = (
-  scan: TriggerScan,
+export const scanClaudeTriggerLine = (
+  scan: ClaudeTriggerScan,
   raw: string,
   target: string,
   short: string,
-): TriggerScan => {
-  if (isTriggerScanSettled(scan)) {
+): ClaudeTriggerScan => {
+  if (isClaudeTriggerScanSettled(scan)) {
     return scan;
   }
   const line = raw.trim();
@@ -228,8 +207,8 @@ export const scanTriggerLine = (
 };
 
 /** Scores a finished Claude run from what it streamed and how it exited. */
-export const resolveTriggerOutcome = (
-  scan: TriggerScan,
+export const resolveClaudeTriggerOutcome = (
+  scan: ClaudeTriggerScan,
   exit: TriggerExit,
 ): TriggerOutcome => {
   if (scan.matched) {
@@ -247,104 +226,12 @@ export const resolveTriggerOutcome = (
       ? {triggered: false, error: null, selected}
       : {triggered: false, error: "target skill unavailable"};
   }
-  if (exit.spawnError !== null) {
-    return {triggered: false, error: exit.spawnError};
-  }
-  if (exit.code !== 0) {
-    const detail = exit.stderr.trim();
-    const detailSuffix = detail.length > 0 ? `: ${detail}` : "";
-    return {
-      triggered: false,
-      error: `claude exited ${String(exit.code)}${detailSuffix}`,
-    };
+  const failure = processFailure("claude", exit);
+  if (failure !== null) {
+    return {triggered: false, error: failure};
   }
   if (!scan.targetAvailable) {
     return {triggered: false, error: "target skill unavailable"};
-  }
-  return {triggered: false, error: null, selected: "none"};
-};
-
-const codexAgentMessage = (line: string): string => {
-  try {
-    const event: unknown = JSON.parse(line);
-    if (!isRecord(event) || event.type !== "item.completed") return "";
-    const item = event.item;
-    return isRecord(item) &&
-      item.type === "agent_message" &&
-      typeof item.text === "string"
-      ? item.text
-      : "";
-  } catch {
-    return "";
-  }
-};
-
-/**
- * What a Codex run has established so far. Codex signals applicability in its agent
- * message rather than by invoking a skill, so it has no competing-skill state.
- */
-export interface CodexTriggerScan {
-  readonly matched: boolean;
-  readonly outputLimitExceeded: boolean;
-  readonly outputCharacters: number;
-}
-
-export const initialCodexTriggerScan: CodexTriggerScan = {
-  matched: false,
-  outputLimitExceeded: false,
-  outputCharacters: 0,
-};
-
-export const isCodexTriggerScanSettled = (scan: CodexTriggerScan): boolean =>
-  scan.matched || scan.outputLimitExceeded;
-
-/** Folds one Codex JSONL line into the scan, leaving a settled scan untouched. */
-export const scanCodexTriggerLine = (
-  scan: CodexTriggerScan,
-  raw: string,
-): CodexTriggerScan => {
-  if (isCodexTriggerScanSettled(scan)) {
-    return scan;
-  }
-  const message = codexAgentMessage(raw.trim());
-  const outputCharacters = scan.outputCharacters + message.length;
-  if (message.includes(CODEX_TRIGGER_SIGNAL)) {
-    return {...scan, outputCharacters, matched: true};
-  }
-  return {
-    ...scan,
-    outputCharacters,
-    outputLimitExceeded: outputCharacters > TRIGGER_OUTPUT_LIMIT,
-  };
-};
-
-// The outcomes carry the same `selected` evidence the Claude path records, so a
-// triage reads how a Codex run ended from its result rather than re-probing the
-// model. Codex has no competitor outcome: it signals applicability in the agent
-// message instead of invoking a skill, so no other skill can win the request.
-export const resolveCodexTriggerOutcome = (
-  scan: CodexTriggerScan,
-  exit: TriggerExit,
-): TriggerOutcome => {
-  if (scan.matched) {
-    return {triggered: true, error: null, selected: "target"};
-  }
-  if (exit.timedOut) {
-    return {triggered: false, error: "timeout"};
-  }
-  if (scan.outputLimitExceeded) {
-    return {triggered: false, error: null, selected: "output-limit"};
-  }
-  if (exit.spawnError !== null) {
-    return {triggered: false, error: exit.spawnError};
-  }
-  if (exit.code !== 0) {
-    const detail = exit.stderr.trim();
-    const suffix = detail.length > 0 ? `: ${detail}` : "";
-    return {
-      triggered: false,
-      error: `codex exited ${String(exit.code)}${suffix}`,
-    };
   }
   return {triggered: false, error: null, selected: "none"};
 };

@@ -1,24 +1,21 @@
-import {rmSync} from "node:fs";
 import {join, resolve} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
 import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
 import {boundedBatches} from "@xonovex/script-moon-common/batches";
 import {resolveClaudePluginDirectories} from "@xonovex/script-moon-common/claude-plugin";
 import {parseCliArgs} from "@xonovex/script-moon-common/cli-args";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
 import {skillEvalModelDefaults} from "@xonovex/script-moon-common/skill-eval-models";
+import {nodeProcessRunner} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-node";
+import {nodeScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-node";
+import {buildTriggerClaudeArgs} from "@xonovex/script-moon-skill-eval-common/claude/args";
+import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
+import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
 import {
   buildRoutingScenarios,
   type RoutingScenario,
 } from "@xonovex/script-moon-skill-eval-common/routing-catalog";
+import {checkTrigger} from "@xonovex/script-moon-skill-eval-common/trigger-check";
 import {
-  checkCodexTriggered,
-  checkTriggered,
-} from "@xonovex/script-moon-skill-eval-common/trigger-process";
-import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
-import {
-  buildIsolatedCodexArgs,
-  buildTriggerClaudeArgs,
   MAX_TRIGGER_MODEL_RUNS,
   parseQuerySplit,
   parseTriggerOptions,
@@ -71,28 +68,16 @@ interface RoutingRecord {
   readonly pass: boolean;
 }
 
-/**
- * The effects the routing evaluator reaches a harness through. A run supplies the
- * spawning implementations; a test supplies decisions directly, so a whole catalog
- * sweep is scored without a process.
- */
-export interface RoutingDependencies {
-  readonly checkTriggered: typeof checkTriggered;
-  readonly checkCodexTriggered: typeof checkCodexTriggered;
+export interface RoutingDependencies extends HarnessPorts {
   readonly resolveExecutable: (command: string) => string;
-  readonly fs: FileSystem;
-  // Removes a previous run's evidence so a rerun cannot be read as this run's.
-  readonly discard: (path: string) => void;
 }
 
 export const defaultDependencies: RoutingDependencies = {
-  checkTriggered,
-  checkCodexTriggered,
-  resolveExecutable,
   fs: nodeFileSystem,
-  discard: (path) => {
-    rmSync(path, {force: true});
-  },
+  scratch: nodeScratch,
+  runProcess: nodeProcessRunner,
+  environment: process.env,
+  resolveExecutable,
 };
 
 interface RoutingContext {
@@ -115,11 +100,6 @@ const evaluateScenario = async (
 ): Promise<RoutingRecord | RoutingFailure> => {
   const candidateNames = scenario.candidates.map(({shortName}) => shortName);
   const target = scenario.expectedSkill;
-  const targetSkill = scenario.candidates.find(
-    ({shortName}) => shortName === target,
-  );
-  if (targetSkill === undefined) throw new Error(`owner missing: ${target}`);
-
   const args =
     context.harness === "claude"
       ? buildTriggerClaudeArgs({
@@ -137,24 +117,18 @@ const evaluateScenario = async (
       : buildIsolatedCodexArgs({model: context.model});
   let ownerSelections = 0;
   for (let runIndex = 0; runIndex < context.runs; runIndex += 1) {
-    const outcome: TriggerOutcome =
-      context.harness === "claude"
-        ? await context.dependencies.checkTriggered(
-            scenario.query,
-            args,
-            target,
-            target,
-            context.executable,
-            candidateNames,
-          )
-        : await context.dependencies.checkCodexTriggered({
-            args,
-            executable: context.executable,
-            skillDirectory: targetSkill.skillDirectory,
-            query: scenario.query,
-            shortName: target,
-            skillCandidates: scenario.candidates,
-          });
+    const outcome = await checkTrigger(
+      context.harness,
+      {
+        executable: context.executable,
+        args,
+        query: scenario.query,
+        target,
+        shortName: target,
+        candidates: scenario.candidates,
+      },
+      context.dependencies,
+    );
     if (outcome.error !== null) return {error: outcome.error};
     if (outcome.triggered) ownerSelections += 1;
   }
@@ -265,9 +239,9 @@ export const main = async (
   const resultsPath = join(workspace, "results.jsonl");
   const summaryPath = join(workspace, "summary.json");
   const invalidRunPath = join(workspace, "invalid-run.json");
-  dependencies.discard(resultsPath);
-  dependencies.discard(summaryPath);
-  dependencies.discard(invalidRunPath);
+  dependencies.scratch.remove(resultsPath);
+  dependencies.scratch.remove(summaryPath);
+  dependencies.scratch.remove(invalidRunPath);
 
   const context: RoutingContext = {
     budget,

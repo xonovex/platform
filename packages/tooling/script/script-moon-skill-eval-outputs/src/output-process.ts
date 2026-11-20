@@ -1,7 +1,7 @@
 import {join} from "node:path";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/validation";
-import type {HarnessRunner} from "./output-harness.js";
+import {buildIsolatedCodexArgs} from "@xonovex/script-moon-skill-eval-common/codex/args";
+import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import {runHarness} from "./output-harness.js";
 import {
   GENERATION_OUTPUT_LIMIT,
   parseClaudeGeneration,
@@ -32,7 +32,8 @@ interface GenerationResult {
   readonly error: string | null;
 }
 
-export interface RunContext {
+export interface RunContext extends HarnessPorts {
+  readonly executable: string;
   readonly withArgs: readonly string[];
   readonly withoutArgs: readonly string[];
   readonly cwd: string | undefined;
@@ -46,11 +47,6 @@ export interface RunContext {
   readonly iterationDirectory: string;
   readonly runs: number;
   readonly buildPrompt: (evaluation: NormalizedEval) => string;
-  // How a harness invocation is carried out. The composition root supplies the
-  // spawning implementation; a test supplies recorded output instead.
-  readonly runHarness: HarnessRunner;
-  // Where the run's evidence is written. A test supplies an in-memory tree.
-  readonly fs: FileSystem;
   // When the clock is read, so a recorded run reports a fixed duration.
   readonly now: () => number;
 }
@@ -73,20 +69,24 @@ const generate = async (
   context: RunContext,
 ): Promise<GenerationResult> => {
   const startedAt = context.now();
-  const proc = await context.runHarness({
-    harness: context.harness,
-    args: harnessArgs,
-    finalArgument: prompt,
-    cwd: context.cwd,
-    timeoutMs: context.timeout * 1000,
-    // Codex bounds a generation by wall clock alone, so a character ceiling is what
-    // stops a runaway answer there. Claude already carries a per-run spend cap and a
-    // turn cap, which bound it sooner; applying the ceiling as well only discards an
-    // answer for being long, and length is what a thorough skill produces.
-    maxOutputCharacters:
-      context.harness === "codex" ? GENERATION_OUTPUT_LIMIT : null,
-    skillSource: expectSkill ? context.skillDirectory : undefined,
-  });
+  const proc = await runHarness(
+    {
+      harness: context.harness,
+      executable: context.executable,
+      args: harnessArgs,
+      finalArgument: prompt,
+      cwd: context.cwd,
+      timeoutMs: context.timeout * 1000,
+      // Codex bounds a generation by wall clock alone, so a character ceiling is what
+      // stops a runaway answer there. Claude already carries a per-run spend cap and a
+      // turn cap, which bound it sooner; applying the ceiling as well only discards an
+      // answer for being long, and length is what a thorough skill produces.
+      maxOutputCharacters:
+        context.harness === "codex" ? GENERATION_OUTPUT_LIMIT : null,
+      skillSource: expectSkill ? context.skillDirectory : undefined,
+    },
+    context,
+  );
   if (proc.outputLimitExceeded) return generationFailure("output-limit");
   if (proc.timedOut)
     return generationFailure("timeout", context.timeout * 1000);
@@ -167,15 +167,19 @@ const grade = async (
           assertionCount: assertions.length,
         })
       : buildIsolatedCodexArgs({model: context.judgeModel});
-  const proc = await context.runHarness({
-    harness: context.harness,
-    args,
-    finalArgument: rubric,
-    cwd: undefined,
-    timeoutMs: 300_000,
-    maxOutputCharacters: null,
-    skillSource: undefined,
-  });
+  const proc = await runHarness(
+    {
+      harness: context.harness,
+      executable: context.executable,
+      args,
+      finalArgument: rubric,
+      cwd: undefined,
+      timeoutMs: 300_000,
+      maxOutputCharacters: null,
+      skillSource: undefined,
+    },
+    context,
+  );
   if (proc.error) return allFail(`judge process error: ${proc.error}`);
   if (proc.timedOut) return allFail("judge timeout");
 

@@ -1,10 +1,13 @@
-import {spawn} from "node:child_process";
-import {appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync} from "node:fs";
-import {tmpdir} from "node:os";
-import {basename, join} from "node:path";
-import {terminateProcess} from "@xonovex/script-moon-common/adapters/child-process";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
+import {basename} from "node:path";
 import {stageClaudePluginArguments} from "@xonovex/script-moon-common/claude-plugin";
+import type {SkillEvalHarness} from "@xonovex/script-moon-common/skill-eval-models";
+import {stageCodexWorkspace} from "@xonovex/script-moon-skill-eval-common/codex/workspace";
+import type {Environment} from "@xonovex/script-moon-skill-eval-common/environment";
+import type {HarnessPorts} from "@xonovex/script-moon-skill-eval-common/harness-ports";
+import type {
+  LineFold,
+  ProcessResult,
+} from "@xonovex/script-moon-skill-eval-common/process-runner";
 import {CODEX_SKILL_SIGNAL, streamedAnswerLength} from "./output-parse.js";
 import {claudeFailureDetail} from "./output-results.js";
 
@@ -17,7 +20,8 @@ export interface ProcessOutput {
 }
 
 export interface HarnessRequest {
-  readonly harness: "claude" | "codex";
+  readonly harness: SkillEvalHarness;
+  readonly executable: string;
   readonly args: readonly string[];
   readonly finalArgument: string;
   readonly cwd: string | undefined;
@@ -29,143 +33,127 @@ export interface HarnessRequest {
   readonly skillSource: string | undefined;
 }
 
-/**
- * Runs one harness invocation. The evaluator takes this as a port so its scoring
- * can be driven from recorded output without spawning anything.
- */
-export type HarnessRunner = (request: HarnessRequest) => Promise<ProcessOutput>;
+interface AnswerLength {
+  readonly characters: number;
+  readonly exceeded: boolean;
+}
 
-// Creates the throwaway HOME and CODEX_HOME a Codex run needs, plus the staged
-// skill it is asked to use, and returns how the child should be started.
-const isolateCodexWorkspace = (
-  workspace: string,
-  skillSource: string | undefined,
-): {readonly cwd: string; readonly env: NodeJS.ProcessEnv} => {
-  const isolatedHome = join(workspace, "home");
-  const isolatedCodexHome = join(workspace, ".codex");
-  mkdirSync(isolatedHome, {recursive: true});
-  mkdirSync(isolatedCodexHome, {recursive: true});
-  if (skillSource !== undefined) {
-    const skillsRoot = join(isolatedHome, ".agents", "skills");
-    const skillDirectory = join(skillsRoot, "target-skill");
-    mkdirSync(skillsRoot, {recursive: true});
-    cpSync(skillSource, skillDirectory, {recursive: true});
-    appendFileSync(
-      join(skillDirectory, "SKILL.md"),
-      `\n## Evaluation signal\n\nBegin the final response with ${CODEX_SKILL_SIGNAL} on its own line, then fulfill the request.\n`,
+const NO_ANSWER: AnswerLength = {characters: 0, exceeded: false};
+
+const answerLength = (
+  harness: SkillEvalHarness,
+  maxOutputCharacters: number | null,
+): LineFold<AnswerLength> => ({
+  initial: NO_ANSWER,
+  step: (state, line) => {
+    if (maxOutputCharacters === null) return state;
+    let event: unknown;
+    try {
+      event = JSON.parse(line);
+    } catch {
+      return state;
+    }
+    const characters = state.characters + streamedAnswerLength(harness, event);
+    return {characters, exceeded: characters > maxOutputCharacters};
+  },
+  settled: (state) => state.exceeded,
+});
+
+const SIGNAL_APPENDIX = `\n## Evaluation signal\n\nBegin the final response with ${CODEX_SKILL_SIGNAL} on its own line, then fulfill the request.\n`;
+
+// A Codex run always gets an isolated home; a Claude run gets a private directory
+// only when it loads a local plugin, whose skills are staged there.
+const workspacePrefix = (request: HarnessRequest): string | undefined => {
+  if (request.harness === "codex") return "xonovex-codex-output-";
+  return request.args.includes("--plugin-dir")
+    ? "xonovex-claude-output-"
+    : undefined;
+};
+
+interface StagedRun {
+  readonly args: readonly string[];
+  readonly cwd: string | undefined;
+  readonly env: Environment;
+}
+
+const stageRun = (
+  request: HarnessRequest,
+  workspace: string | undefined,
+  ports: HarnessPorts,
+): StagedRun => {
+  if (workspace === undefined) {
+    return {args: request.args, cwd: request.cwd, env: ports.environment};
+  }
+  if (request.harness === "codex") {
+    const staged = stageCodexWorkspace(
+      workspace,
+      "home",
+      request.skillSource === undefined
+        ? []
+        : [
+            {
+              source: request.skillSource,
+              name: "target-skill",
+              appendix: SIGNAL_APPENDIX,
+            },
+          ],
+      ports.environment,
+      ports.fs,
     );
+    return {args: request.args, cwd: staged.cwd, env: staged.env};
   }
   return {
-    cwd: workspace,
-    env: {
-      ...process.env,
-      CODEX_HOME: isolatedCodexHome,
-      HOME: isolatedHome,
-    },
+    args: stageClaudePluginArguments(
+      request.args,
+      workspace,
+      request.skillSource === undefined ? [] : [basename(request.skillSource)],
+      ports.fs,
+    ),
+    cwd: request.cwd,
+    env: ports.environment,
   };
 };
 
-/** The HarnessRunner that drives a real harness binary. */
-export const spawnHarness: HarnessRunner = (request) =>
-  new Promise((resolvePromise) => {
-    const isolatedWorkspace =
-      request.harness === "codex"
-        ? mkdtempSync(join(tmpdir(), "xonovex-codex-output-"))
-        : undefined;
-    const isolation =
-      isolatedWorkspace === undefined
-        ? undefined
-        : isolateCodexWorkspace(isolatedWorkspace, request.skillSource);
-    const claudeWorkspace =
-      request.harness === "claude" && request.args.includes("--plugin-dir")
-        ? mkdtempSync(join(tmpdir(), "xonovex-claude-output-"))
-        : undefined;
-    const selectedSkills =
-      request.skillSource === undefined ? [] : [basename(request.skillSource)];
-    const childArgs =
-      claudeWorkspace === undefined
-        ? request.args
-        : stageClaudePluginArguments(
-            request.args,
-            claudeWorkspace,
-            selectedSkills,
-          );
-    const childCwd = isolation?.cwd ?? request.cwd;
-    const child = spawn(
-      resolveExecutable(request.harness),
-      [...childArgs, request.finalArgument],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        ...(childCwd ? {cwd: childCwd} : {}),
-        env: isolation?.env ?? process.env,
-      },
-    );
-    let stdout = "";
-    let stderr = "";
-    let timedOut = false;
-    let outputLimitExceeded = false;
-    let partialLine = "";
-    let outputCharacters = 0;
-    let settled = false;
-    let killTimer: NodeJS.Timeout | undefined;
-    const finish = (error: string | null): void => {
-      if (settled) return;
-      settled = true;
-      if (claudeWorkspace !== undefined)
-        rmSync(claudeWorkspace, {recursive: true, force: true});
-      clearTimeout(timer);
-      clearTimeout(killTimer);
-      if (isolatedWorkspace !== undefined) {
-        rmSync(isolatedWorkspace, {recursive: true, force: true});
-      }
-      resolvePromise({stdout, timedOut, outputLimitExceeded, error});
+const harnessError = (
+  harness: SkillEvalHarness,
+  result: ProcessResult<AnswerLength>,
+): string | null => {
+  if (result.spawnError !== null) return result.spawnError;
+  if (result.timedOut || result.code === 0) return null;
+  const detail =
+    result.stderr.trim() ||
+    (harness === "claude" ? claudeFailureDetail(result.stdout) : "");
+  const suffix = detail.length > 0 ? `: ${detail}` : "";
+  return `${harness} exited ${String(result.code)}${suffix}`;
+};
+
+/** Runs one generation or judge invocation in its staged workspace. */
+export const runHarness = async (
+  request: HarnessRequest,
+  ports: HarnessPorts,
+): Promise<ProcessOutput> => {
+  const prefix = workspacePrefix(request);
+  const workspace =
+    prefix === undefined
+      ? undefined
+      : ports.scratch.makeTemporaryDirectory(prefix);
+  try {
+    const staged = stageRun(request, workspace, ports);
+    const result = await ports.runProcess({
+      executable: request.executable,
+      args: [...staged.args, request.finalArgument],
+      cwd: staged.cwd,
+      env: staged.env,
+      timeoutMs: request.timeoutMs,
+      lines: answerLength(request.harness, request.maxOutputCharacters),
+    });
+    return {
+      stdout: result.stdout,
+      timedOut: result.timedOut,
+      outputLimitExceeded: result.state.exceeded,
+      error: harnessError(request.harness, result),
     };
-    const killChild = (): void => {
-      clearTimeout(killTimer);
-      killTimer = terminateProcess(child);
-    };
-    const timer = setTimeout(() => {
-      timedOut = true;
-      killChild();
-    }, request.timeoutMs);
-    child.stdout.setEncoding("utf8");
-    child.stdout.on("data", (chunk: string) => {
-      stdout += chunk;
-      if (outputLimitExceeded || request.maxOutputCharacters === null) return;
-      partialLine += chunk;
-      const lines = partialLine.split(/\r?\n/);
-      partialLine = lines.pop() ?? "";
-      for (const line of lines) {
-        let event: unknown;
-        try {
-          event = JSON.parse(line);
-        } catch {
-          continue;
-        }
-        outputCharacters += streamedAnswerLength(request.harness, event);
-        if (outputCharacters > request.maxOutputCharacters) {
-          outputLimitExceeded = true;
-          killChild();
-          break;
-        }
-      }
-    });
-    child.stderr.setEncoding("utf8");
-    child.stderr.on("data", (chunk: string) => {
-      stderr += chunk;
-    });
-    child.on("error", (error) => {
-      finish(error.message);
-    });
-    child.on("close", (code) => {
-      if (timedOut || code === 0) {
-        finish(null);
-        return;
-      }
-      const detail =
-        stderr.trim() ||
-        (request.harness === "claude" ? claudeFailureDetail(stdout) : "");
-      const suffix = detail.length > 0 ? `: ${detail}` : "";
-      finish(`${request.harness} exited ${String(code)}${suffix}`);
-    });
-  });
+  } finally {
+    if (workspace !== undefined) ports.scratch.remove(workspace);
+  }
+};

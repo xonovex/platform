@@ -1,18 +1,16 @@
 import {describe, expect, it} from "vitest";
 import {
-  initialCodexTriggerScan,
-  initialTriggerScan,
+  initialClaudeTriggerScan,
   invokedSkillNames,
-  isCodexTriggerScanSettled,
-  isTriggerScanSettled,
-  resolveCodexTriggerOutcome,
-  resolveTriggerOutcome,
-  scanCodexTriggerLine,
-  scanTriggerLine,
+  isClaudeTriggerScanSettled,
+  resolveClaudeTriggerOutcome,
+  scanClaudeTriggerLine,
   toolResultOutcome,
+} from "../../../../src/claude/trigger-scan.js";
+import {
   TRIGGER_OUTPUT_LIMIT,
   type TriggerExit,
-} from "../../../src/trigger-scan.js";
+} from "../../../../src/trigger.js";
 
 const TARGET = "plugin:test-skill";
 const SHORT = "test-skill";
@@ -61,55 +59,64 @@ const textDelta = (characters: number): string =>
   });
 
 const score = (lines: readonly string[], exit: TriggerExit = CLEAN_EXIT) =>
-  resolveTriggerOutcome(
+  resolveClaudeTriggerOutcome(
     lines.reduce(
-      (scan, line) => scanTriggerLine(scan, line, TARGET, SHORT),
-      initialTriggerScan,
+      (scan, line) => scanClaudeTriggerLine(scan, line, TARGET, SHORT),
+      initialClaudeTriggerScan,
     ),
     exit,
   );
 
-describe("scanTriggerLine", () => {
+describe("scanClaudeTriggerLine", () => {
   it("settles as soon as the target is invoked, so the caller can end the run", () => {
     const scan = [init(TARGET), toolUse(SHORT)].reduce(
-      (state, line) => scanTriggerLine(state, line, TARGET, SHORT),
-      initialTriggerScan,
+      (state, line) => scanClaudeTriggerLine(state, line, TARGET, SHORT),
+      initialClaudeTriggerScan,
     );
 
-    expect(isTriggerScanSettled(scan)).toBe(true);
+    expect(isClaudeTriggerScanSettled(scan)).toBe(true);
     expect(scan.matched).toBe(true);
   });
 
   it("leaves a settled scan untouched when further lines arrive", () => {
-    const settled = scanTriggerLine(
-      initialTriggerScan,
+    const settled = scanClaudeTriggerLine(
+      initialClaudeTriggerScan,
       toolUse(SHORT),
       TARGET,
       SHORT,
     );
 
     expect(
-      scanTriggerLine(settled, toolUse("other-skill"), TARGET, SHORT),
+      scanClaudeTriggerLine(settled, toolUse("other-skill"), TARGET, SHORT),
     ).toBe(settled);
   });
 
   it("ignores blank lines", () => {
     expect(
-      scanTriggerLine(initialTriggerScan, " ".repeat(3), TARGET, SHORT),
-    ).toBe(initialTriggerScan);
+      scanClaudeTriggerLine(
+        initialClaudeTriggerScan,
+        " ".repeat(3),
+        TARGET,
+        SHORT,
+      ),
+    ).toBe(initialClaudeTriggerScan);
   });
 
   it("matches the target by full name, short name, and plugin suffix", () => {
     for (const name of [TARGET, SHORT, `other-plugin:${SHORT}`]) {
       expect(
-        scanTriggerLine(initialTriggerScan, toolUse(name), TARGET, SHORT)
-          .matched,
+        scanClaudeTriggerLine(
+          initialClaudeTriggerScan,
+          toolUse(name),
+          TARGET,
+          SHORT,
+        ).matched,
       ).toBe(true);
     }
   });
 });
 
-describe("resolveTriggerOutcome", () => {
+describe("resolveClaudeTriggerOutcome", () => {
   it("detects a matching Skill tool invocation", () => {
     expect(score([init(TARGET), toolUse(SHORT)])).toEqual({
       triggered: true,
@@ -298,107 +305,5 @@ describe("toolResultOutcome", () => {
     );
     expect(toolResultOutcome(toolUseError("denied"))).toBe("rejected");
     expect(toolResultOutcome(toolResult("<tool_use_error>x"))).toBe("rejected");
-  });
-});
-
-const codexMessage = (text: string): string =>
-  JSON.stringify({type: "item.completed", item: {type: "agent_message", text}});
-
-const scoreCodex = (lines: readonly string[], exit: TriggerExit = CLEAN_EXIT) =>
-  resolveCodexTriggerOutcome(
-    lines.reduce(scanCodexTriggerLine, initialCodexTriggerScan),
-    exit,
-  );
-
-describe("scanCodexTriggerLine", () => {
-  it("settles on the isolated skill signal", () => {
-    const scan = scanCodexTriggerLine(
-      initialCodexTriggerScan,
-      codexMessage("XONOVEX_SKILL_TRIGGERED"),
-    );
-
-    expect(isCodexTriggerScanSettled(scan)).toBe(true);
-  });
-
-  it("leaves a settled scan untouched when further lines arrive", () => {
-    const settled = scanCodexTriggerLine(
-      initialCodexTriggerScan,
-      codexMessage("XONOVEX_SKILL_TRIGGERED"),
-    );
-
-    expect(scanCodexTriggerLine(settled, codexMessage("more"))).toBe(settled);
-  });
-
-  it("counts only completed agent messages toward the output limit", () => {
-    const scan = [
-      "not json",
-      JSON.stringify({type: "item.started"}),
-      JSON.stringify({type: "item.completed", item: {type: "reasoning"}}),
-    ].reduce(scanCodexTriggerLine, initialCodexTriggerScan);
-
-    expect(scan.outputCharacters).toBe(0);
-  });
-});
-
-describe("resolveCodexTriggerOutcome", () => {
-  it("detects the isolated skill signal in a Codex JSONL agent message", () => {
-    expect(scoreCodex([codexMessage("XONOVEX_SKILL_TRIGGERED")])).toEqual({
-      triggered: true,
-      error: null,
-      selected: "target",
-    });
-  });
-
-  it("returns a clean negative result for malformed and nonmatching output", () => {
-    expect(scoreCodex(["not json", codexMessage("NOT_APPLICABLE")])).toEqual({
-      triggered: false,
-      error: null,
-      selected: "none",
-    });
-  });
-
-  it("includes process stderr in nonzero-exit failures", () => {
-    expect(
-      scoreCodex([], {
-        code: 3,
-        stderr: "authentication failed",
-        timedOut: false,
-        spawnError: null,
-      }),
-    ).toEqual({
-      triggered: false,
-      error: "codex exited 3: authentication failed",
-    });
-  });
-
-  it("omits the detail suffix when a nonzero exit wrote no stderr", () => {
-    expect(
-      scoreCodex([], {code: 3, stderr: "", timedOut: false, spawnError: null}),
-    ).toEqual({triggered: false, error: "codex exited 3"});
-  });
-
-  it("reports a timeout and a spawn failure", () => {
-    expect(
-      scoreCodex([], {
-        code: null,
-        stderr: "",
-        timedOut: true,
-        spawnError: null,
-      }),
-    ).toEqual({triggered: false, error: "timeout"});
-    expect(
-      scoreCodex([], {
-        code: null,
-        stderr: "",
-        timedOut: false,
-        spawnError: "spawn codex ENOENT",
-      }),
-    ).toEqual({triggered: false, error: "spawn codex ENOENT"});
-  });
-
-  it("scores a response that exceeds the output limit as a non-trigger", () => {
-    expect(
-      scoreCodex([codexMessage("x".repeat(TRIGGER_OUTPUT_LIMIT + 1))]),
-    ).toEqual({triggered: false, error: null, selected: "output-limit"});
   });
 });

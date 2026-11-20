@@ -1,6 +1,6 @@
 import {join} from "node:path";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
+import {type TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger";
 import {type Query} from "@xonovex/script-moon-skill-eval-common/validation";
 
 interface ResultRecord {

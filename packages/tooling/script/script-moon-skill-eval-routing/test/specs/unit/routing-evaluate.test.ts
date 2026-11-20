@@ -1,7 +1,12 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import type {TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
+import {
+  memoryProcessRunner,
+  type ScriptedProcess,
+} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
+import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type RoutingDependencies} from "../../../src/routing-evaluate.js";
 
@@ -35,37 +40,63 @@ const catalogTree = (): FileSystem => {
   return memoryFileSystem({files});
 };
 
-const SELECTED: TriggerOutcome = {
-  triggered: true,
-  error: null,
-  selected: "target",
+const line = (event: unknown): string => JSON.stringify(event);
+
+const init = (...skills: readonly string[]): string =>
+  line({type: "system", subtype: "init", skills});
+
+const invoke = (skill: string): string =>
+  line({
+    message: {content: [{type: "tool_use", name: "Skill", input: {skill}}]},
+  });
+
+const codexMessage = (text: string): string =>
+  line({type: "item.completed", item: {type: "agent_message", text}});
+
+type Harness = "claude" | "codex";
+
+// How each harness reports a run: the owner chosen, a competitor chosen, or an
+// owner the harness could not load, which is an infrastructure failure.
+const SELECTED: Readonly<Record<Harness, string>> = {
+  claude: [init("using-alpha", "using-beta"), invoke("using-alpha")].join("\n"),
+  codex: codexMessage("XONOVEX_SKILL_TRIGGERED"),
 };
 
-const NOT_SELECTED: TriggerOutcome = {
-  triggered: false,
-  error: null,
-  selected: "competitor:using-beta",
+const NOT_SELECTED: Readonly<Record<Harness, string>> = {
+  claude: [
+    init("using-alpha", "using-beta"),
+    invoke("using-beta"),
+    line({message: {content: [{type: "tool_result", content: "loaded"}]}}),
+  ].join("\n"),
+  codex: codexMessage("NOT_APPLICABLE"),
 };
+
+const UNAVAILABLE: Readonly<Record<Harness, string>> = {
+  claude: init(),
+  codex: "",
+};
+
+const answering =
+  (stdout: Readonly<Record<Harness, string>>) =>
+  (invocation: ProcessInvocation): ScriptedProcess => ({
+    stdout:
+      stdout[invocation.executable.endsWith("codex") ? "codex" : "claude"],
+  });
 
 // Evidence is written into the same tree the catalog is read from, so a case
 // asserts on what a run produced without a disk.
 const dependencies = (
   fs: FileSystem,
-  outcome: TriggerOutcome | (() => TriggerOutcome) = SELECTED,
-): RoutingDependencies => {
-  const decide = typeof outcome === "function" ? outcome : () => outcome;
-  return {
-    fs,
-    checkTriggered: () => Promise.resolve(decide()),
-    checkCodexTriggered: () => Promise.resolve(decide()),
-    // The harness binary is never spawned here, so resolution only has to hand
-    // back a path the evaluator passes through.
-    resolveExecutable: (command) => `/usr/bin/${command}`,
-    discard: () => {
-      // Nothing to discard: each case builds its own tree.
-    },
-  };
-};
+  stdout: Readonly<Record<Harness, string>> = SELECTED,
+): RoutingDependencies => ({
+  fs,
+  scratch: memoryScratch(fs),
+  runProcess: memoryProcessRunner(answering(stdout)).run,
+  environment: {},
+  // The harness binary is never spawned here, so resolution only has to hand
+  // back a path the evaluator passes through.
+  resolveExecutable: (command) => `/usr/bin/${command}`,
+});
 
 describe("catalog routing evaluator", () => {
   const originalHarness = process.env.SKILL_EVAL_HARNESS;
@@ -172,10 +203,7 @@ describe("catalog routing evaluator", () => {
     const workspace = join("/evidence", "invalid-evidence");
 
     await expect(
-      main(
-        [catalog, "--workspace", workspace],
-        dependencies(fs, {triggered: false, error: "target skill unavailable"}),
-      ),
+      main([catalog, "--workspace", workspace], dependencies(fs, UNAVAILABLE)),
     ).resolves.toBe(2);
     expect(readWorkspace(workspace, "invalid-run.json")).toContain(
       "target skill unavailable",

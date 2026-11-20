@@ -4,21 +4,69 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./trigger-process": {
-      "types": "./src/trigger-process.ts",
-      "default": "./dist/src/trigger-process.js"
+    "./adapters/process-runner-memory": {
+      "types": "./src/adapters/process-runner-memory.ts",
+      "default": "./dist/src/adapters/process-runner-memory.js"
     },
-    "./trigger-scan": {
-      "types": "./src/trigger-scan.ts",
-      "default": "./dist/src/trigger-scan.js"
+    "./adapters/process-runner-node": {
+      "types": "./src/adapters/process-runner-node.ts",
+      "default": "./dist/src/adapters/process-runner-node.js"
     },
-    "./validation": {
-      "types": "./src/validation.ts",
-      "default": "./dist/src/validation.js"
+    "./adapters/scratch-memory": {
+      "types": "./src/adapters/scratch-memory.ts",
+      "default": "./dist/src/adapters/scratch-memory.js"
+    },
+    "./adapters/scratch-node": {
+      "types": "./src/adapters/scratch-node.ts",
+      "default": "./dist/src/adapters/scratch-node.js"
+    },
+    "./claude/args": {
+      "types": "./src/claude/args.ts",
+      "default": "./dist/src/claude/args.js"
+    },
+    "./claude/stream-events": {
+      "types": "./src/claude/stream-events.ts",
+      "default": "./dist/src/claude/stream-events.js"
+    },
+    "./codex/args": {
+      "types": "./src/codex/args.ts",
+      "default": "./dist/src/codex/args.js"
+    },
+    "./codex/workspace": {
+      "types": "./src/codex/workspace.ts",
+      "default": "./dist/src/codex/workspace.js"
+    },
+    "./environment": {
+      "types": "./src/environment.ts",
+      "default": "./dist/src/environment.js"
+    },
+    "./harness-ports": {
+      "types": "./src/harness-ports.ts",
+      "default": "./dist/src/harness-ports.js"
+    },
+    "./process-runner": {
+      "types": "./src/process-runner.ts",
+      "default": "./dist/src/process-runner.js"
     },
     "./routing-catalog": {
       "types": "./src/routing-catalog.ts",
       "default": "./dist/src/routing-catalog.js"
+    },
+    "./scratch": {
+      "types": "./src/scratch.ts",
+      "default": "./dist/src/scratch.js"
+    },
+    "./trigger": {
+      "types": "./src/trigger.ts",
+      "default": "./dist/src/trigger.js"
+    },
+    "./trigger-check": {
+      "types": "./src/trigger-check.ts",
+      "default": "./dist/src/trigger-check.js"
+    },
+    "./validation": {
+      "types": "./src/validation.ts",
+      "default": "./dist/src/validation.js"
     }
   },
   "dependencies": {

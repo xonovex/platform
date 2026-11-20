@@ -1,7 +1,12 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import type {TriggerOutcome} from "@xonovex/script-moon-skill-eval-common/trigger-scan";
+import {
+  memoryProcessRunner,
+  type ScriptedProcess,
+} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
+import {memoryScratch} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {main, type TriggerDependencies} from "../../../src/evaluate.js";
 
@@ -20,13 +25,42 @@ const QUERIES = [
   },
 ];
 
+const claudeStream = (triggered: boolean): string =>
+  [
+    JSON.stringify({type: "system", subtype: "init", skills: ["test-skill"]}),
+    ...(triggered
+      ? [
+          JSON.stringify({
+            message: {
+              content: [
+                {type: "tool_use", name: "Skill", input: {skill: "test-skill"}},
+              ],
+            },
+          }),
+        ]
+      : []),
+  ].join("\n");
+
+const codexStream = (triggered: boolean): string =>
+  JSON.stringify({
+    type: "item.completed",
+    item: {
+      type: "agent_message",
+      text: triggered ? "XONOVEX_SKILL_TRIGGERED" : "NOT_APPLICABLE",
+    },
+  });
+
 // A harness that fires the skill on the positive query and nothing else, which is
-// the decision the evaluator scores. The query is the last thing a Codex prompt
-// carries, so both harnesses recognize it the same way.
-const triggeredOn = (text: string): TriggerOutcome =>
-  text.startsWith("positive")
-    ? {triggered: true, error: null, selected: "target"}
-    : {triggered: false, error: null, selected: "none"};
+// the decision the evaluator scores. The query opens the final argument of both
+// harnesses, so both recognize it the same way.
+const triggeredOn = (invocation: ProcessInvocation): ScriptedProcess => {
+  const triggered = (invocation.args.at(-1) ?? "").startsWith("positive");
+  return {
+    stdout: invocation.executable.endsWith("codex")
+      ? codexStream(triggered)
+      : claudeStream(triggered),
+  };
+};
 
 const DIRECTORY = "/skill";
 
@@ -44,11 +78,12 @@ const skillTree = (extra: Readonly<Record<string, string>> = {}): FileSystem =>
 
 const dependencies = (
   fs: FileSystem,
-  overrides: Partial<TriggerDependencies> = {},
+  answer: (invocation: ProcessInvocation) => ScriptedProcess = triggeredOn,
 ): TriggerDependencies => ({
   fs,
-  checkTriggered: (query) => Promise.resolve(triggeredOn(query)),
-  checkCodexTriggered: (options) => Promise.resolve(triggeredOn(options.query)),
+  scratch: memoryScratch(fs),
+  runProcess: memoryProcessRunner(answer).run,
+  environment: {},
   // The harness binary is never spawned here, so the probe reports it as present
   // and the resolver hands back a path that is only ever passed through.
   configOptions: {
@@ -56,10 +91,6 @@ const dependencies = (
     resolveExecutablePath: (command) => `/usr/bin/${command}`,
     workingDirectory: DIRECTORY,
   },
-  discard: () => {
-    // Nothing to discard: each case builds its own tree.
-  },
-  ...overrides,
 });
 
 describe("main", () => {
@@ -187,10 +218,7 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs, {
-        checkTriggered: () =>
-          Promise.resolve({triggered: false, error: null, selected: "none"}),
-      }),
+      dependencies(fs, () => ({stdout: claudeStream(false)})),
     );
 
     expect(exitCode).toBe(1);
@@ -213,10 +241,7 @@ describe("the trigger evaluator", () => {
         QUERIES_FILE,
         "test-skill",
       ],
-      dependencies(fs, {
-        checkTriggered: () =>
-          Promise.resolve({triggered: false, error: "claude exited 3"}),
-      }),
+      dependencies(fs, () => ({code: 3})),
     );
 
     expect(exitCode).toBe(2);

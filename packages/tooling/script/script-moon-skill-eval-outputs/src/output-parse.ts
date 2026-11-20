@@ -1,5 +1,5 @@
 import {isRecord} from "@xonovex/script-moon-common/records";
-import {streamTextDeltaLength} from "@xonovex/script-moon-skill-eval-common/validation";
+import {streamTextDeltaLength} from "@xonovex/script-moon-skill-eval-common/claude/stream-events";
 import {extractJson} from "./output-results.js";
 
 // Codex bounds a generation by wall clock alone, so a character ceiling is what

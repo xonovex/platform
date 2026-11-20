@@ -1,12 +1,17 @@
 import {join} from "node:path";
 import {memoryFileSystem} from "@xonovex/script-moon-common/adapters/file-system-memory";
 import {type FileSystem} from "@xonovex/script-moon-common/file-system";
+import {
+  memoryProcessRunner,
+  type MemoryProcessRunner,
+  type ScriptedProcess,
+} from "@xonovex/script-moon-skill-eval-common/adapters/process-runner-memory";
+import {
+  memoryScratch,
+  type MemoryScratch,
+} from "@xonovex/script-moon-skill-eval-common/adapters/scratch-memory";
+import type {ProcessInvocation} from "@xonovex/script-moon-skill-eval-common/process-runner";
 import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import type {
-  HarnessRequest,
-  HarnessRunner,
-  ProcessOutput,
-} from "../../../src/output-harness.js";
 import {CODEX_SKILL_SIGNAL} from "../../../src/output-parse.js";
 import {runJob, type RunContext} from "../../../src/output-process.js";
 import type {NormalizedEval} from "../../../src/validation.js";
@@ -17,14 +22,6 @@ const evaluation = (prompt: string): NormalizedEval => ({
   expected_output: "the answer",
   assertions: ["response contains the answer"],
   files: [],
-});
-
-const output = (overrides: Partial<ProcessOutput> = {}): ProcessOutput => ({
-  stdout: "",
-  timedOut: false,
-  outputLimitExceeded: false,
-  error: null,
-  ...overrides,
 });
 
 const claudeGeneration = (result: string): string =>
@@ -54,31 +51,46 @@ const claudeJudgement = (passed: boolean): string =>
     },
   });
 
-// A runner that answers from recorded output and records what it was asked to run,
-// which is what lets these cases score a job without a harness process.
-const recordingRunner = (
-  reply: (request: HarnessRequest) => ProcessOutput,
-): {runner: HarnessRunner; requests: HarnessRequest[]} => {
-  const requests: HarnessRequest[] = [];
-  return {
-    requests,
-    runner: (request) => {
-      requests.push(request);
-      return Promise.resolve(reply(request));
-    },
-  };
-};
+const finalArgument = (invocation: ProcessInvocation): string =>
+  invocation.args.at(-1) ?? "";
 
-const isJudgeRequest = (request: HarnessRequest): boolean =>
-  request.finalArgument.includes("ASSISTANT RESPONSE:");
+const isJudgeRequest = (invocation: ProcessInvocation): boolean =>
+  finalArgument(invocation).includes("ASSISTANT RESPONSE:");
+
+const codexMessage = (text: string): string =>
+  JSON.stringify({type: "item.completed", item: {type: "agent_message", text}});
 
 const ITERATION_DIRECTORY = "/workspace/iteration-1";
 
+// A Claude run whose judge passes and whose generation answers correctly.
+const healthyClaude = (invocation: ProcessInvocation): ScriptedProcess => ({
+  stdout: isJudgeRequest(invocation)
+    ? claudeJudgement(true)
+    : claudeGeneration("the answer"),
+});
+
+const SKILL_DIRECTORY = join(ITERATION_DIRECTORY, "guide");
+
 describe("runJob", () => {
   let tree: FileSystem;
+  let scratch: MemoryScratch;
+  let runner: MemoryProcessRunner;
+
+  // Answers every harness invocation from a script and records what it was asked
+  // to run, which is what lets these cases score a job without a harness process.
+  const answer = (
+    reply: (invocation: ProcessInvocation) => ScriptedProcess,
+  ): MemoryProcessRunner => {
+    runner = memoryProcessRunner(reply);
+    return runner;
+  };
 
   beforeEach(() => {
-    tree = memoryFileSystem();
+    tree = memoryFileSystem({
+      files: {[join(SKILL_DIRECTORY, "SKILL.md")]: "# Guide\n"},
+    });
+    scratch = memoryScratch(tree);
+    answer(() => ({}));
     vi.spyOn(process.stderr, "write").mockImplementation(() => true);
   });
 
@@ -90,8 +102,9 @@ describe("runJob", () => {
     withArgs: ["--with"],
     withoutArgs: ["--without"],
     cwd: undefined,
-    skillDirectory: join(ITERATION_DIRECTORY, "guide"),
+    skillDirectory: SKILL_DIRECTORY,
     harness: "claude",
+    executable: "/bin/harness",
     timeout: 2,
     target: "test-skill",
     shortName: "test-skill",
@@ -99,9 +112,11 @@ describe("runJob", () => {
     judgeBudget: 0.01,
     iterationDirectory: ITERATION_DIRECTORY,
     fs: tree,
+    scratch,
+    runProcess: runner.run,
+    environment: {},
     runs: 1,
     buildPrompt: (value) => value.prompt,
-    runHarness: () => Promise.resolve(output()),
     now: () => 0,
     ...overrides,
   });
@@ -118,19 +133,13 @@ describe("runJob", () => {
     );
 
   it("generates, grades, and persists a healthy run", async () => {
-    const {runner} = recordingRunner((request) =>
-      output({
-        stdout: isJudgeRequest(request)
-          ? claudeJudgement(true)
-          : claudeGeneration("the answer"),
-      }),
-    );
+    const {run} = answer(healthyClaude);
 
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      context({runHarness: runner}),
+      context({runProcess: run}),
     );
 
     expect(record).toEqual({
@@ -151,24 +160,24 @@ describe("runJob", () => {
     });
   });
 
-  it("sends the arm's own harness arguments", async () => {
-    const {runner, requests} = recordingRunner((request) =>
-      output({
-        stdout: isJudgeRequest(request)
-          ? claudeJudgement(true)
-          : claudeGeneration("the answer"),
-      }),
-    );
+  it("sends the arm's own harness arguments with the prompt last", async () => {
+    const {run, invocations} = answer(healthyClaude);
 
     await runJob(
       evaluation("answer the question"),
       "without_skill",
       0,
-      context({runHarness: runner}),
+      context({runProcess: run}),
     );
 
-    expect(requests[0]?.args).toEqual(["--without"]);
-    expect(requests[0]?.skillSource).toBeUndefined();
+    expect(invocations()[0]).toEqual({
+      executable: "/bin/harness",
+      args: ["--without", "answer the question"],
+      cwd: undefined,
+      env: {},
+      timeoutMs: 2000,
+    });
+    expect(scratch.removed()).toEqual([]);
   });
 
   it.each([
@@ -176,21 +185,19 @@ describe("runJob", () => {
     {answer: "", error: "no-result"},
   ])(
     "fails an activated run with $error without calling the judge",
-    async ({answer, error}) => {
-      const {runner, requests} = recordingRunner(() =>
-        output({stdout: claudeGeneration(answer)}),
-      );
-      const runContext = context({runHarness: runner});
+    async ({answer: text, error}) => {
+      const {run, invocations} = answer(() => ({
+        stdout: claudeGeneration(text),
+      }));
 
       const record = await runJob(
         evaluation("answer the question"),
         "with_skill",
         0,
-        runContext,
+        context({runProcess: run}),
       );
 
-      expect(requests).toHaveLength(1);
-      expect(requests[0]?.skillSource).toBe(runContext.skillDirectory);
+      expect(invocations()).toHaveLength(1);
       expect(record).toMatchObject({
         pass_rate: 0,
         error,
@@ -200,42 +207,51 @@ describe("runJob", () => {
   );
 
   it("stages the skill for a Codex run that is expected to use the skill", async () => {
-    const skillDirectory = join(ITERATION_DIRECTORY, "guide");
-    const {runner, requests} = recordingRunner((request) =>
-      output({
-        stdout: isJudgeRequest(request)
-          ? JSON.stringify({
-              type: "item.completed",
-              item: {
-                type: "agent_message",
-                text: '{"assertion_results":[{"passed":true,"evidence":"present"}]}',
-              },
-            })
-          : [
-              JSON.stringify({
-                type: "item.completed",
-                item: {
-                  type: "agent_message",
-                  text: `${CODEX_SKILL_SIGNAL}\nthe answer`,
-                },
-              }),
-              JSON.stringify({
-                type: "turn.completed",
-                usage: {input_tokens: 4, output_tokens: 2},
-              }),
-            ].join("\n"),
-      }),
-    );
+    const {run, invocations} = answer((invocation) => ({
+      stdout: isJudgeRequest(invocation)
+        ? codexMessage(
+            '{"assertion_results":[{"passed":true,"evidence":"present"}]}',
+          )
+        : [
+            codexMessage(`${CODEX_SKILL_SIGNAL}\nthe answer`),
+            JSON.stringify({
+              type: "turn.completed",
+              usage: {input_tokens: 4, output_tokens: 2},
+            }),
+          ].join("\n"),
+    }));
 
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      context({harness: "codex", skillDirectory, runHarness: runner}),
+      context({harness: "codex", runProcess: run}),
     );
 
-    expect(requests[0]?.skillSource).toBe(skillDirectory);
-    expect(requests[0]?.maxOutputCharacters).toBe(10_000);
+    const workspace = "/scratch/xonovex-codex-output-1";
+    expect(
+      tree.readText(
+        join(
+          workspace,
+          "home",
+          ".agents",
+          "skills",
+          "target-skill",
+          "SKILL.md",
+        ),
+      ),
+    ).toContain(CODEX_SKILL_SIGNAL);
+    expect(invocations()[0]).toMatchObject({
+      cwd: workspace,
+      env: {
+        HOME: join(workspace, "home"),
+        CODEX_HOME: join(workspace, ".codex"),
+      },
+    });
+    expect(scratch.removed()).toEqual([
+      workspace,
+      "/scratch/xonovex-codex-output-2",
+    ]);
     expect(record).toMatchObject({
       pass_rate: 1,
       tokens: 6,
@@ -245,15 +261,16 @@ describe("runJob", () => {
   });
 
   it("records a generation process failure without grading it", async () => {
-    const {runner, requests} = recordingRunner(() =>
-      output({error: "claude exited 3: generation failed"}),
-    );
+    const {run, invocations} = answer(() => ({
+      code: 3,
+      stderr: "generation failed",
+    }));
 
     const record = await runJob(
       evaluation("answer the question"),
       "without_skill",
       0,
-      context({runHarness: runner}),
+      context({runProcess: run}),
     );
 
     expect(record).toMatchObject({
@@ -261,22 +278,39 @@ describe("runJob", () => {
       skill_triggered: false,
       error: "claude exited 3: generation failed",
     });
-    expect(requests).toHaveLength(1);
+    expect(invocations()).toHaveLength(1);
     expect(readArm("without_skill", "grading.json")).toContain(
       "not graded because generation evidence is invalid",
     );
   });
 
+  it("reads a failed Claude exit's detail from its result when stderr is empty", async () => {
+    const {run} = answer(() => ({
+      code: 1,
+      stdout: JSON.stringify({subtype: "error_max_turns"}),
+    }));
+
+    const record = await runJob(
+      evaluation("answer the question"),
+      "without_skill",
+      0,
+      context({runProcess: run}),
+    );
+
+    expect(record.error).toBe("claude exited 1: error_max_turns");
+  });
+
   it("reports a generation that hit the output ceiling or the clock", async () => {
-    for (const [reply, error, durationMs] of [
-      [output({outputLimitExceeded: true}), "output-limit", 0],
-      [output({timedOut: true}), "timeout", 2000],
+    for (const [harness, reply, error, durationMs] of [
+      ["codex", {stdout: codexMessage("x".repeat(10_001))}, "output-limit", 0],
+      ["claude", {timedOut: true, code: null}, "timeout", 2000],
     ] as const) {
+      const {run} = answer(() => reply);
       const record = await runJob(
         evaluation("answer the question"),
         "without_skill",
         0,
-        context({runHarness: () => Promise.resolve(reply)}),
+        context({harness, runProcess: run}),
       );
 
       expect(record).toMatchObject({error, duration_ms: durationMs});
@@ -284,43 +318,38 @@ describe("runJob", () => {
   });
 
   it("treats a with_skill run that never used the skill as invalid evidence", async () => {
-    const {runner, requests} = recordingRunner(() =>
-      output({
-        stdout: JSON.stringify({
-          type: "result",
-          result: "the answer",
-          usage: {},
-          duration_ms: 1,
-        }),
+    const {run, invocations} = answer(() => ({
+      stdout: JSON.stringify({
+        type: "result",
+        result: "the answer",
+        usage: {},
+        duration_ms: 1,
       }),
-    );
+    }));
 
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      context({runHarness: runner}),
+      context({runProcess: run}),
     );
 
     expect(record).toMatchObject({skill_triggered: false, pass_rate: 0});
-    expect(requests).toHaveLength(1);
+    expect(invocations()).toHaveLength(1);
   });
 
   it("fails every assertion when the judge output cannot be read", async () => {
+    const {run} = answer((invocation) => ({
+      stdout: isJudgeRequest(invocation)
+        ? "not json"
+        : claudeGeneration("the answer"),
+    }));
+
     const record = await runJob(
       evaluation("answer the question"),
       "with_skill",
       0,
-      context({
-        runHarness: (request) =>
-          Promise.resolve(
-            output({
-              stdout: isJudgeRequest(request)
-                ? "not json"
-                : claudeGeneration("the answer"),
-            }),
-          ),
-      }),
+      context({runProcess: run}),
     );
 
     expect(record).toMatchObject({
@@ -331,21 +360,19 @@ describe("runJob", () => {
 
   it("fails every assertion when the judge process fails or times out", async () => {
     for (const [reply, error] of [
-      [output({error: "boom"}), "judge process error: boom"],
-      [output({timedOut: true}), "judge timeout"],
+      [{spawnError: "boom", code: null}, "judge process error: boom"],
+      [{timedOut: true, code: null}, "judge timeout"],
     ] as const) {
+      const {run} = answer((invocation) =>
+        isJudgeRequest(invocation)
+          ? reply
+          : {stdout: claudeGeneration("the answer")},
+      );
       const record = await runJob(
         evaluation("answer the question"),
         "with_skill",
         0,
-        context({
-          runHarness: (request) =>
-            Promise.resolve(
-              isJudgeRequest(request)
-                ? reply
-                : output({stdout: claudeGeneration("the answer")}),
-            ),
-        }),
+        context({runProcess: run}),
       );
 
       expect(record).toMatchObject({pass_rate: 0, error});
@@ -353,25 +380,42 @@ describe("runJob", () => {
   });
 
   it("keeps each run of a multi-run sweep in its own directory", async () => {
+    const {run} = answer(healthyClaude);
+
     await runJob(
       evaluation("answer the question"),
       "with_skill",
       1,
-      context({
-        runs: 2,
-        runHarness: (request) =>
-          Promise.resolve(
-            output({
-              stdout: isJudgeRequest(request)
-                ? claudeJudgement(true)
-                : claudeGeneration("the answer"),
-            }),
-          ),
-      }),
+      context({runs: 2, runProcess: run}),
     );
 
     expect(readArm("with_skill", join("outputs", "response.md"), "run-2")).toBe(
       "the answer",
     );
+  });
+
+  it("stages the local plugin of a Claude run in its own workspace", async () => {
+    const plugin = "/plugins/plugin-guide";
+    tree.writeFile(
+      join(plugin, ".claude-plugin", "plugin.json"),
+      JSON.stringify({name: "xonovex-guide", skills: "./skills/"}),
+    );
+    tree.writeFile(join(plugin, "skills", "guide", "SKILL.md"), "# Guide\n");
+    const {run, invocations} = answer(healthyClaude);
+
+    await runJob(
+      evaluation("answer the question"),
+      "with_skill",
+      0,
+      context({withArgs: ["--plugin-dir", plugin], runProcess: run}),
+    );
+
+    const workspace = "/scratch/xonovex-claude-output-1";
+    expect(invocations()[0]?.args).toEqual([
+      "--plugin-dir",
+      join(workspace, "plugin-1"),
+      "/test-skill answer the question",
+    ]);
+    expect(scratch.removed()).toContain(workspace);
   });
 });

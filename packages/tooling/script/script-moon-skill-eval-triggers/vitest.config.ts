@@ -4,13 +4,11 @@ export default defineConfig({
   test: {
     coverage: {
       thresholds: {
-        // The uncovered functions are defaultDependencies: the spawning trigger
-        // checks and the discard that reaches a real disk.
         "src/evaluate.ts": {
-          statements: 96,
-          branches: 85,
-          functions: 80,
-          lines: 96,
+          statements: 100,
+          branches: 88,
+          functions: 100,
+          lines: 100,
         },
         // The two functions below the floor here are the defaults behind the
         // executableRuns and resolveExecutablePath ports: one spawns the harness

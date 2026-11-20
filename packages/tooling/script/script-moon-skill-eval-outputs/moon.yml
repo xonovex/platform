@@ -17,10 +17,8 @@ fileGroups:
     - /packages/tooling/script/script-moon-common/src/**/*
     - /packages/tooling/script/script-moon-skill-eval-common/src/**/*
 tasks:
-  # These floors cover the unit tier alone, and src/output-harness.ts is spawn
-  # plumbing only test/specs/integration reaches, so the project totals sit lower
-  # than every logic module does. vitest.config.ts holds the per-file floors that
-  # keep those modules near full coverage.
+  # These floors cover the unit tier alone. vitest.config.ts holds the per-file
+  # floors that keep each logic module near full coverage.
   ts-coverage:
     env:
       TS_COVERAGE_MIN_LINES: "85"
