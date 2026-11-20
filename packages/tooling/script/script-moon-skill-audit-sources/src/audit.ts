@@ -1,72 +1,14 @@
-import {execFileSync} from "node:child_process";
-import {createHash} from "node:crypto";
-import {basename, join, resolve, sep} from "node:path";
-import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
-import {type FileSystem} from "@xonovex/script-moon-common/file-system";
-import {resolveSkillDirectory} from "@xonovex/script-moon-common/skill-directory";
+import {resolve} from "node:path";
+import type {FileSystem} from "@xonovex/script-moon-common/file-system";
+import type {Output} from "@xonovex/script-moon-common/output";
 import {parseArgs, type ParsedArgs} from "./args.js";
-import {
-  hasReferenceMapping,
-  parseSources,
-  type Source,
-} from "./source-parser.js";
-
-const REVIEWED_RE = /\*\*Last reviewed:\*\*\s*(\d{4}-\d{2}-\d{2})/;
-const HEADER_RE = /^##\s+(.*\S)\s*$/;
-
-interface FetchReport {
-  status: string;
-  detail: string;
-  content_sha256?: string;
-}
-
-interface DriftReport {
-  checkout: string;
-  resolved: boolean;
-  pull_failed: boolean;
-  pinned_version: string | null;
-  latest_version: string | null;
-  behind: boolean;
-  commit_count: number;
-  commits: readonly string[];
-  review_refs: readonly string[];
-  note?: string;
-}
-
-interface SourceReport {
-  title: string;
-  url: string | undefined;
-  urls: readonly string[];
-  provenance: string | undefined;
-  last_reviewed: string | null;
-  age_days: number | null;
-  review_max_age_days: number;
-  stale: boolean;
-  refs: readonly string[];
-  covers_all_references: boolean;
-  reference_mapping_missing: boolean;
-  dangling_refs: readonly string[];
-  version: string | null;
-  commit: string | null;
-  watch_count: number;
-  content_sha256: string | null;
-  fetched_content_sha256: string | null;
-  content_changed: boolean;
-  drift_anchor_missing: boolean;
-  fetch?: FetchReport;
-  fetches?: readonly FetchReport[];
-  drift?: DriftReport;
-}
-
-interface SkillReport {
-  skill: string;
-  sources_file: string;
-  source_count: number;
-  sources: readonly SourceReport[];
-  uncovered_refs: readonly string[];
-  problems: number;
-}
+import {toIsoDate} from "./dates.js";
+import type {HttpClient} from "./http.js";
+import {stampReviewed} from "./mark-reviewed.js";
+import {findSourcesFiles, resolveSourcesFile} from "./skill-sources.js";
+import {auditSkill, type SkillReport} from "./source-audit.js";
+import {renderJsonReport, renderTextReport} from "./text-report.js";
+import type {UpstreamRepository} from "./upstream.js";
 
 const HELP = `Audit a skill's upstream sources (SOURCES.md) for drift.
 
@@ -97,703 +39,143 @@ A source block may add upstream-drift fields:
 When present, the audit also reports the latest released tag vs the pinned
 version and the commits since the pinned commit on watched paths.`;
 
-// ensureAscii escapes every non-ASCII UTF-16 code unit as \uXXXX.
-const ensureAscii = (text: string): string =>
-  text.replaceAll(/[\u0080-\uFFFF]/g, (ch) => {
-    // The non-Unicode regex visits each half of a surrogate pair separately.
-    const codePoint = ch.codePointAt(0);
-    if (codePoint === undefined) return ch;
-    const code = codePoint.toString(16).padStart(4, "0");
-    return String.raw`\u${code}`;
-  });
-
-const toIsoDate = (date: Date): string => {
-  const year = date.getFullYear().toString().padStart(4, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const daysBetween = (today: Date, reviewed: Date): number => {
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const a = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
-  const b = Date.UTC(
-    reviewed.getFullYear(),
-    reviewed.getMonth(),
-    reviewed.getDate(),
-  );
-  return Math.round((a - b) / msPerDay);
-};
-
-const resolveSourcesFile = (
-  target: string,
-  fs: FileSystem,
-): string | undefined => {
-  if (fs.isFile(target) && basename(target) === "SOURCES.md") {
-    return target;
-  }
-  if (fs.isDirectory(target)) {
-    if (fs.isFile(join(target, "SOURCES.md"))) {
-      return join(target, "SOURCES.md");
-    }
-    const skillDir = resolveSkillDirectory(target);
-    if (fs.isFile(join(skillDir, "SOURCES.md"))) {
-      return join(skillDir, "SOURCES.md");
-    }
-  }
-  return undefined;
-};
-
-const fetchStatusOnce = async (
-  url: string,
-  timeout: number,
-): Promise<FetchReport> => {
-  const controller = new AbortController();
-  const timer = setTimeout(() => {
-    controller.abort();
-  }, timeout * 1000);
-  try {
-    const resp = await fetch(url, {
-      headers: {"User-Agent": "skill-source-audit/1"},
-      signal: controller.signal,
-    });
-    const code = resp.status;
-    const lm = resp.headers.get("Last-Modified") ?? "";
-    const detail =
-      `HTTP ${String(code)}` + (lm ? `, Last-Modified: ${lm}` : "");
-    if (code === 404) {
-      return {status: "missing", detail: `HTTP ${String(code)}`};
-    }
-    if ([401, 403, 429].includes(code)) {
-      return {status: "restricted", detail};
-    }
-    if (!code || code >= 400) return {status: "error", detail};
-    const body = Buffer.from(await resp.arrayBuffer());
-    return {
-      status: "ok",
-      detail,
-      content_sha256: createHash("sha256").update(body).digest("hex"),
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return {status: "error", detail: `unreachable: ${message}`};
-  } finally {
-    clearTimeout(timer);
-  }
-};
-
-const fetchStatus = async (url: string, timeout = 15): Promise<FetchReport> => {
-  let report = await fetchStatusOnce(url, timeout);
-  if (report.status === "error") {
-    report = await fetchStatusOnce(url, timeout);
-  }
-  return report;
-};
-
-const aggregateContentSha256 = (
-  urls: readonly string[],
-  fetches: readonly FetchReport[],
-): string | null => {
-  if (
-    urls.length !== fetches.length ||
-    fetches.some(
-      (fetch) => fetch.status !== "ok" || fetch.content_sha256 === undefined,
-    )
-  ) {
-    return null;
-  }
-  const digest = createHash("sha256");
-  for (const [index, url] of urls.entries()) {
-    digest.update(url);
-    digest.update("\0");
-    digest.update(fetches[index]?.content_sha256 ?? "");
-    digest.update("\n");
-  }
-  return digest.digest("hex");
-};
-
-const listExistingRefs = (skillDir: string, fs: FileSystem): Set<string> => {
-  const refsDir = join(skillDir, "references");
-  if (!fs.isDirectory(refsDir)) return new Set<string>();
-  const refs = new Set<string>();
-  for (const entry of fs.readDirectory(refsDir)) {
-    if (entry.endsWith(".md") && fs.isFile(join(refsDir, entry))) {
-      refs.add(entry);
-    }
-  }
-  return refs;
-};
-
-// findWorkspaceRoot resolves checkout paths from the nearest Moon workspace.
-const findWorkspaceRoot = (start: string, fs: FileSystem): string => {
-  let dir = resolve(start);
-  for (;;) {
-    if (fs.isDirectory(join(dir, ".moon"))) return dir;
-    const parent = resolve(dir, "..");
-    if (parent === dir) return resolve(start);
-    dir = parent;
-  }
-};
-
-const git = (cwd: string, args: readonly string[]): string | undefined => {
-  try {
-    return execFileSync(resolveExecutable("git"), [...args], {
-      cwd,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      maxBuffer: 10 * 1024 * 1024,
-    });
-  } catch {
-    return undefined;
-  }
-};
-
-type Semver = readonly [number, number, number];
-
-const parseSemver = (text: string): Semver | undefined => {
-  const m = /(\d+)\.(\d+)\.(\d+)/.exec(text);
-  return m?.[1] === undefined || m[2] === undefined || m[3] === undefined
-    ? undefined
-    : [Number(m[1]), Number(m[2]), Number(m[3])];
-};
-
-const cmpSemver = (a: Semver, b: Semver): number =>
-  a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
-
-const latestSemverTag = (
-  checkout: string,
-): {version: Semver; raw: string} | undefined => {
-  const out = git(checkout, ["tag", "--list"]);
-  if (out === undefined) return undefined;
-  let best: {version: Semver; raw: string} | undefined;
-  for (const line of out.split("\n")) {
-    const raw = line.trim();
-    if (!/^v?\d+\.\d+\.\d+$/.test(raw)) continue;
-    const version = parseSemver(raw);
-    if (version && (!best || cmpSemver(version, best.version) > 0)) {
-      best = {version, raw};
-    }
-  }
-  return best;
-};
-
-const computeDrift = (
-  workspaceRoot: string,
-  source: Source,
-  pull: boolean,
-  fs: FileSystem,
-): DriftReport => {
-  const checkout = resolve(workspaceRoot, source.checkout ?? "");
-  const report: DriftReport = {
-    checkout,
-    resolved: false,
-    pull_failed: false,
-    pinned_version: source.version ?? null,
-    latest_version: null,
-    behind: false,
-    commit_count: 0,
-    commits: [],
-    review_refs: [],
-  };
-  if (!fs.isDirectory(checkout) || !fs.isDirectory(join(checkout, ".git"))) {
-    return {...report, note: "checkout not found or not a git repo"};
-  }
-  report.resolved = true;
-  if (pull && git(checkout, ["fetch", "--tags", "--quiet"]) === undefined) {
-    return {
-      ...report,
-      pull_failed: true,
-      note: "failed to fetch upstream tags",
-    };
-  }
-
-  const latest = latestSemverTag(checkout);
-  const pinnedV = source.version ? parseSemver(source.version) : undefined;
-  if (latest) {
-    report.latest_version = latest.raw;
-    if (pinnedV) report.behind = cmpSemver(latest.version, pinnedV) > 0;
-  }
-
-  // Diff base: the pinned commit (exact) else the pinned version tag.
-  const ref = source.commit ?? source.version;
-  if (ref === undefined) {
-    return {...report, note: "no **Commit:** or **Version:** to diff from"};
-  }
-  if (
-    git(checkout, ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`]) ===
-    undefined
-  ) {
-    return {...report, note: `pinned ref '${ref}' not found in checkout`};
-  }
-
-  // Upper bound: the latest released tag (deterministic after --pull) else HEAD.
-  const upper = latest ? latest.raw : "HEAD";
-  const paths = source.watches.map((w) => w.path);
-  const range = `${ref}..${upper}`;
-
-  const logOut =
-    git(checkout, [
-      "log",
-      "--oneline",
-      range,
-      ...(paths.length > 0 ? ["--", ...paths] : []),
-    ]) ?? "";
-  const commits = logOut.split("\n").filter((l) => l.trim());
-  report.commit_count = commits.length;
-  report.commits = commits.slice(0, 20);
-
-  const diffOut =
-    git(checkout, [
-      "diff",
-      "--name-only",
-      range,
-      ...(paths.length > 0 ? ["--", ...paths] : []),
-    ]) ?? "";
-  const reviewRefs = new Set<string>();
-  for (const file of diffOut.split("\n")) {
-    const f = file.trim();
-    if (!f) continue;
-    for (const w of source.watches) {
-      if (f.startsWith(w.path)) for (const r of w.refs) reviewRefs.add(r);
-    }
-  }
-  report.review_refs = [...reviewRefs].toSorted();
-  return report;
-};
-
-// AuditContext carries the settings every source of one skill is audited against.
-interface AuditContext {
-  readonly existingRefs: ReadonlySet<string>;
-  readonly workspaceRoot: string;
-  readonly maxAge: number;
-  readonly versionMaxAge: number;
-  readonly doFetch: boolean;
-  readonly pull: boolean;
+export interface AuditSourcesDependencies {
+  readonly fs: FileSystem;
+  readonly output: Output;
+  readonly http: HttpClient;
+  readonly openUpstream: (directory: string) => UpstreamRepository;
   readonly today: Date;
 }
 
-// auditSource reports one source entry and counts the problems it carries.
-const auditSource = async (
-  s: Source,
-  context: AuditContext,
+type Targets =
+  | {readonly kind: "found"; readonly files: readonly string[]}
+  | {readonly kind: "missing"; readonly message: string};
+
+// Without a target the audit reads the working directory.
+const collectTargets = (
+  args: ParsedArgs,
+  cwd: string,
   fs: FileSystem,
-): Promise<{readonly report: SourceReport; readonly problems: number}> => {
-  const {
-    existingRefs,
-    workspaceRoot,
-    maxAge,
-    versionMaxAge,
-    doFetch,
-    pull,
-    today,
-  } = context;
-  let problems = 0;
-  const age = s.reviewed ? daysBetween(today, s.reviewed) : null;
-  const reviewMaxAge = s.version === undefined ? maxAge : versionMaxAge;
-  const stale = age !== null && age > reviewMaxAge;
-  const referenceMappingMissing = !hasReferenceMapping(s);
-  const driftAnchorMissing =
-    s.version !== undefined &&
-    s.urls.length > 0 &&
-    s.contentSha256 === undefined &&
-    !(
-      s.checkout !== undefined &&
-      s.commit !== undefined &&
-      s.watches.length > 0
-    );
-  const dangling = [...s.refs].filter((r) => !existingRefs.has(r)).toSorted();
-  const report: SourceReport = {
-    title: s.title,
-    url: s.url,
-    urls: s.urls,
-    provenance: s.provenance,
-    last_reviewed: s.reviewedRaw ?? null,
-    age_days: age,
-    review_max_age_days: reviewMaxAge,
-    stale,
-    refs: [...s.refs].toSorted(),
-    covers_all_references: s.coversAllReferences,
-    reference_mapping_missing: referenceMappingMissing,
-    dangling_refs: dangling,
-    version: s.version ?? null,
-    commit: s.commit ?? null,
-    watch_count: s.watches.length,
-    content_sha256: s.contentSha256 ?? null,
-    fetched_content_sha256: null,
-    content_changed: false,
-    drift_anchor_missing: driftAnchorMissing,
-  };
-  if (age === null || stale || dangling.length > 0) {
-    problems += 1;
-  }
-  if (referenceMappingMissing) problems += 1;
-  if (driftAnchorMissing) problems += 1;
-  if (doFetch && s.urls.length > 0) {
-    const fetches = await Promise.all(s.urls.map((url) => fetchStatus(url)));
-    report.fetch = fetches[0];
-    report.fetches = fetches;
-    problems += fetches.filter(
-      (fetch) => fetch.status !== "ok" && fetch.status !== "restricted",
-    ).length;
-    report.fetched_content_sha256 = aggregateContentSha256(s.urls, fetches);
-    if (s.contentSha256 !== undefined) {
-      if (report.fetched_content_sha256 === null) {
-        problems += 1;
-      } else if (report.fetched_content_sha256 !== s.contentSha256) {
-        report.content_changed = true;
-        problems += 1;
-      }
-    }
-  }
-  if (s.checkout !== undefined) {
-    const drift = computeDrift(workspaceRoot, s, pull, fs);
-    report.drift = drift;
-    if (drift.pull_failed || drift.behind || drift.commit_count > 0) {
-      problems += 1;
-    }
-  }
-  return {problems, report};
-};
-
-const auditSkill = async (
-  sourcesFile: string,
-  maxAge: number,
-  versionMaxAge: number,
-  doFetch: boolean,
-  pull: boolean,
-  today: Date,
-  fs: FileSystem,
-): Promise<SkillReport> => {
-  const skillDir = resolve(sourcesFile, "..");
-  const workspaceRoot = findWorkspaceRoot(skillDir, fs);
-  const text = fs.readText(sourcesFile);
-  const sources = parseSources(text);
-
-  const existingRefs = listExistingRefs(skillDir, fs);
-  const context: AuditContext = {
-    doFetch,
-    existingRefs,
-    maxAge,
-    pull,
-    today,
-    versionMaxAge,
-    workspaceRoot,
-  };
-
-  const covered = new Set<string>();
-  const srcReports: SourceReport[] = [];
-  let problems = 0;
-  for (const s of sources) {
-    const audited = await auditSource(s, context, fs);
-    problems += audited.problems;
-    for (const r of s.refs) covered.add(r);
-    if (s.coversAllReferences) {
-      for (const reference of existingRefs) covered.add(reference);
-    }
-    srcReports.push(audited.report);
-  }
-
-  const uncovered = [...existingRefs].filter((r) => !covered.has(r)).toSorted();
-  problems += uncovered.length;
-  if (sources.length === 0) problems += 1;
-  return {
-    skill: basename(resolve(skillDir)),
-    sources_file: sourcesFile,
-    source_count: sources.length,
-    sources: srcReports,
-    uncovered_refs: uncovered,
-    problems,
-  };
-};
-
-const markReviewed = (
-  sourcesFile: string,
-  titleFilter: string | undefined,
-  today: Date,
-  fs: FileSystem,
-): string[] => {
-  const text = fs.readText(sourcesFile);
-  const lines = text.split(/(?<=\n)/);
-  const needle = titleFilter ? titleFilter.toLowerCase() : undefined;
-  const edited: string[] = [];
-  let currentTitle = "";
-  let matched = false;
-  for (const [i, line] of lines.entries()) {
-    const header = HEADER_RE.exec(line.replace(/\n$/, ""));
-    if (header) {
-      currentTitle = header[1] ?? "";
-      matched =
-        needle === undefined || currentTitle.toLowerCase().includes(needle);
-      continue;
-    }
-    if (matched && REVIEWED_RE.test(line)) {
-      lines[i] = line.replace(
-        REVIEWED_RE,
-        `**Last reviewed:** ${toIsoDate(today)}`,
-      );
-      if (currentTitle && !edited.includes(currentTitle)) {
-        edited.push(currentTitle);
-      }
-    }
-  }
-  if (edited.length > 0) {
-    fs.writeFile(sourcesFile, lines.join(""));
-  }
-  return edited;
-};
-
-const sourceFlags = (source: SourceReport): readonly string[] => {
-  const flags: string[] = [];
-  if (source.drift?.pull_failed) flags.push("PULL FAILED");
-  if (source.stale) flags.push(`STALE (${String(source.age_days)}d)`);
-  if (source.last_reviewed === null) flags.push("MISSING REVIEW DATE");
-  if (source.reference_mapping_missing) {
-    flags.push("MISSING REFERENCE MAPPING");
-  }
-  if (source.drift_anchor_missing) flags.push("MISSING DRIFT ANCHOR");
-  if (source.content_changed) flags.push("CONTENT CHANGED");
-  if (source.dangling_refs.length > 0) {
-    flags.push(`DANGLING: ${source.dangling_refs.join(", ")}`);
-  }
-  const failedFetch = (
-    source.fetches ?? (source.fetch ? [source.fetch] : [])
-  ).find((fetch) => fetch.status !== "ok");
-  if (failedFetch !== undefined) flags.push(`URL ${failedFetch.status}`);
-  if (source.drift?.behind) {
-    flags.push(
-      `BEHIND ${source.drift.pinned_version ?? "?"} -> ${source.drift.latest_version ?? "?"}`,
-    );
-  } else if (source.drift !== undefined && source.drift.commit_count > 0) {
-    flags.push(`DRIFT (${String(source.drift.commit_count)} commit(s))`);
-  }
-  return flags;
-};
-
-const printDrift = (source: SourceReport): void => {
-  const drift = source.drift;
-  if (drift === undefined) return;
-  if (!drift.resolved) {
-    console.log(`    upstream      : ${drift.note ?? "unresolved"}`);
-    return;
-  }
-
-  const latest = drift.latest_version ?? "(no tags)";
-  const state = drift.behind
-    ? `behind — latest released ${latest}`
-    : `up to date with latest released ${latest}`;
-  console.log(
-    `    upstream      : pinned ${drift.pinned_version ?? "?"}, ${state}`,
-  );
-  if (drift.note) console.log(`                    note: ${drift.note}`);
-  if (drift.commit_count === 0) return;
-
-  console.log(
-    `    commits since : ${String(drift.commit_count)} on watched paths`,
-  );
-  for (const commit of drift.commits)
-    console.log(`                    ${commit}`);
-  const review = drift.review_refs.length > 0 ? drift.review_refs : source.refs;
-  if (review.length > 0) {
-    const paths = review.map((ref) => "references/" + ref).join(", ");
-    console.log(`    review        : ${paths}`);
-  }
-};
-
-const sourceFeeds = (source: SourceReport): string => {
-  if (source.covers_all_references) return "all references";
-  if (source.refs.length === 0) return "(missing)";
-  return source.refs.map((ref) => `references/${ref}`).join(", ");
-};
-
-const printSource = (source: SourceReport): void => {
-  const flags = sourceFlags(source);
-  const marker = flags.length > 0 ? flags.join("  ") : "ok";
-  const fetches = source.fetches ?? (source.fetch ? [source.fetch] : []);
-  console.log(`\n  [${marker}] ${source.title}`);
-  console.log(
-    `    urls          : ${source.urls.length > 0 ? source.urls.join(", ") : "(none)"}`,
-  );
-  if (source.provenance) {
-    console.log(`    provenance    : ${source.provenance}`);
-  }
-  const age =
-    source.age_days === null ? "" : `  (${String(source.age_days)}d ago)`;
-  console.log(`    last reviewed : ${source.last_reviewed ?? "(none)"}${age}`);
-  for (const [index, fetch] of fetches.entries()) {
-    console.log(`    fetch ${String(index + 1).padEnd(7)}: ${fetch.detail}`);
-  }
-  if (source.content_sha256 !== null) {
-    console.log(`    content pin    : ${source.content_sha256}`);
-    console.log(
-      `    fetched hash   : ${source.fetched_content_sha256 ?? "(unavailable)"}`,
-    );
-  }
-  console.log(`    feeds         : ${sourceFeeds(source)}`);
-  printDrift(source);
-};
-
-const printTextReport = (
-  report: SkillReport,
-  maxAge: number,
-  versionMaxAge: number,
-): void => {
-  console.log(`skill: ${report.skill}  (${report.sources_file})`);
-  console.log(
-    `sources: ${String(report.source_count)}  max-age: ${String(maxAge)}d  ` +
-      `version-max-age: ${String(versionMaxAge)}d`,
-  );
-  for (const source of report.sources) printSource(source);
-  if (report.uncovered_refs.length > 0) {
-    console.log(
-      "\n  reference files with no declared source or repository-original provenance:",
-    );
-    for (const ref of report.uncovered_refs) {
-      console.log(`    references/${ref}`);
-    }
-  }
-  console.log(
-    "\nNote: distilled prose is not auto-rewritten. Review the reference files a " +
-      "stale/changed source feeds, then re-run with --mark-reviewed to stamp the date.",
-  );
-};
-
-const collectTargets = (args: ParsedArgs, fs: FileSystem): string[] => {
+): Targets => {
   if (args.all !== undefined) {
     const root = args.all;
-    if (!fs.isDirectory(root)) {
-      process.stderr.write(`error: --all root not a directory: ${root}\n`);
-      process.exit(2);
+    if (!fs.isDirectory(resolve(cwd, root))) {
+      return {kind: "missing", message: `--all root not a directory: ${root}`};
     }
-    const found = walkSourcesFiles(root, fs).toSorted(comparePaths);
-    if (found.length === 0) {
-      process.stderr.write(`error: no SOURCES.md found under ${root}\n`);
-      process.exit(2);
-    }
-    return found;
+    const files = findSourcesFiles(root, cwd, fs);
+    return files.length === 0
+      ? {kind: "missing", message: `no SOURCES.md found under ${root}`}
+      : {kind: "found", files};
   }
-  // collectTargets uses the current directory when no target is supplied.
-  const target = args.target ?? process.cwd();
-  const sf = resolveSourcesFile(target, fs);
-  if (sf === undefined) {
-    process.stderr.write(`error: no SOURCES.md at ${target}\n`);
-    process.exit(2);
-  }
-  return [sf];
+  const target = args.target ?? cwd;
+  const file = resolveSourcesFile(target, cwd, fs);
+  return file === undefined
+    ? {kind: "missing", message: `no SOURCES.md at ${target}`}
+    : {kind: "found", files: [file]};
 };
 
-// comparePaths orders path components before comparing path depth.
-const comparePaths = (a: string, b: string): number => {
-  const partsA = a.split(sep);
-  const partsB = b.split(sep);
-  const len = Math.min(partsA.length, partsB.length);
-  for (let i = 0; i < len; i++) {
-    const ca = partsA[i] ?? "";
-    const cb = partsB[i] ?? "";
-    if (ca < cb) return -1;
-    if (ca > cb) return 1;
+// --mark-reviewed is a single-skill write action, refused for --all.
+const markReviewed = (
+  targets: readonly string[],
+  titleFilter: string,
+  cwd: string,
+  dependencies: AuditSourcesDependencies,
+): number => {
+  const {fs, output, today} = dependencies;
+  const single = targets[0];
+  if (single === undefined || targets.length !== 1) {
+    output.stderr("error: --mark-reviewed operates on a single skill");
+    return 2;
   }
-  return partsA.length - partsB.length;
+  const path = resolve(cwd, single);
+  const stamped = stampReviewed(
+    fs.readText(path),
+    titleFilter || undefined,
+    today,
+  );
+  if (stamped.edited.length === 0) {
+    output.stderr("no matching source blocks to stamp");
+    return 0;
+  }
+  fs.writeFile(path, stamped.text);
+  output.stderr(
+    `stamped 'Last reviewed' = ${toIsoDate(today)} for: ` +
+      stamped.edited.join(", "),
+  );
+  return 0;
 };
 
-const walkSourcesFiles = (root: string, fs: FileSystem): string[] => {
-  const found: string[] = [];
-  const walk = (dir: string): void => {
-    let entries: string[];
-    try {
-      entries = [...fs.readDirectory(dir)];
-    } catch {
-      return;
+const renderReports = (
+  reports: readonly SkillReport[],
+  args: ParsedArgs,
+  output: Output,
+): void => {
+  if (args.json) {
+    output.stdout(renderJsonReport(reports));
+    return;
+  }
+  for (const [i, report] of reports.entries()) {
+    if (i) output.stdout("\n" + "=".repeat(60));
+    for (const line of renderTextReport(
+      report,
+      args.maxAge,
+      args.versionMaxAge,
+    )) {
+      output.stdout(line);
     }
-    for (const entry of entries) {
-      const full = join(dir, entry);
-      if (fs.isDirectory(full)) {
-        if (entry === "node_modules") continue;
-        walk(full);
-      } else if (entry === "SOURCES.md" && fs.isFile(join(dir, "SKILL.md"))) {
-        found.push(full);
-      }
-    }
-  };
-  walk(root);
-  return found;
+  }
+  if (reports.length > 1) {
+    const problems = reports.reduce((sum, r) => sum + r.problems, 0);
+    const stale = reports.reduce(
+      (sum, r) => sum + r.sources.filter((s) => s.stale).length,
+      0,
+    );
+    output.stderr(
+      `\n--- ${String(reports.length)} skills, ${String(problems)} problem(s), ` +
+        `${String(stale)} stale source(s) ---`,
+    );
+  }
 };
 
+/** Audits the sources of one skill or of every skill below a root and returns the exit code. */
 export const main = async (
   argv: readonly string[],
-  fs: FileSystem = nodeFileSystem,
+  cwd: string,
+  dependencies: AuditSourcesDependencies,
 ): Promise<number> => {
-  const args = parseArgs(argv);
+  const {fs, output} = dependencies;
+  let args: ParsedArgs;
+  try {
+    args = parseArgs(argv);
+  } catch (error) {
+    output.stderr(
+      `error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return 2;
+  }
   if (args.help) {
-    console.log(HELP);
+    output.stdout(HELP);
     return 0;
   }
-  const today = new Date();
-  const targets = collectTargets(args, fs);
-
-  // --mark-reviewed is a single-skill write action; refuse it for --all.
+  const targets = collectTargets(args, cwd, fs);
+  if (targets.kind === "missing") {
+    output.stderr(`error: ${targets.message}`);
+    return 2;
+  }
   if (args.markReviewed !== undefined) {
-    const single = targets[0];
-    if (single === undefined || targets.length !== 1) {
-      process.stderr.write(
-        "error: --mark-reviewed operates on a single skill\n",
-      );
-      return 2;
-    }
-    const edited = markReviewed(
-      single,
-      args.markReviewed || undefined,
-      today,
-      fs,
-    );
-    if (edited.length > 0) {
-      process.stderr.write(
-        `stamped 'Last reviewed' = ${toIsoDate(today)} for: ` +
-          edited.join(", ") +
-          "\n",
-      );
-    } else {
-      process.stderr.write("no matching source blocks to stamp\n");
-    }
-    return 0;
+    return markReviewed(targets.files, args.markReviewed, cwd, dependencies);
   }
 
+  const options = {
+    maxAge: args.maxAge,
+    versionMaxAge: args.versionMaxAge,
+    fetch: args.fetch,
+    pull: args.pull,
+  };
   const reports: SkillReport[] = [];
-  for (const sf of targets) {
-    reports.push(
-      await auditSkill(
-        sf,
-        args.maxAge,
-        args.versionMaxAge,
-        args.fetch,
-        args.pull,
-        today,
-        fs,
-      ),
-    );
+  for (const file of targets.files) {
+    reports.push(await auditSkill(file, cwd, options, dependencies));
   }
-  const totalProblems = reports.reduce((sum, r) => sum + r.problems, 0);
-
-  if (args.json) {
-    const out = reports.length === 1 ? reports[0] : reports;
-    console.log(ensureAscii(JSON.stringify(out, null, 2)));
-  } else {
-    for (const [i, rep] of reports.entries()) {
-      if (i) {
-        console.log("\n" + "=".repeat(60));
-      }
-      printTextReport(rep, args.maxAge, args.versionMaxAge);
-    }
-    if (reports.length > 1) {
-      const stale = reports.reduce(
-        (sum, r) => sum + r.sources.filter((s) => s.stale).length,
-        0,
-      );
-      process.stderr.write(
-        `\n--- ${String(reports.length)} skills, ${String(totalProblems)} problem(s), ` +
-          `${String(stale)} stale source(s) ---\n`,
-      );
-    }
-  }
-
-  return totalProblems ? 1 : 0;
+  renderReports(reports, args, output);
+  return reports.some((report) => report.problems > 0) ? 1 : 0;
 };

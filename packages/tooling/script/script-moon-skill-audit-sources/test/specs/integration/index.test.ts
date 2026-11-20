@@ -2,17 +2,30 @@ import {execFileSync, spawnSync} from "node:child_process";
 import {mkdirSync, writeFileSync} from "node:fs";
 import {join, resolve} from "node:path";
 import {resolveExecutable} from "@xonovex/script-moon-common/adapters/executable-node";
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {nodeFileSystem} from "@xonovex/script-moon-common/adapters/file-system-node";
+import {memoryOutput} from "@xonovex/script-moon-common/adapters/output-memory";
+import {describe, expect, it} from "vitest";
+import {fetchHttpClient} from "../../../src/adapters/http-fetch.js";
+import {gitUpstreamRepository} from "../../../src/adapters/upstream-git.js";
 import {main} from "../../../src/audit.js";
 import {skillDirectories} from "../../util/skill-directory.js";
 
+// Audits on the real disk with the Node adapters and returns the exit code
+// with the standard output.
+const audit = async (argv: readonly string[]) => {
+  const output = memoryOutput();
+  const code = await main(argv, process.cwd(), {
+    fs: nodeFileSystem,
+    output,
+    http: fetchHttpClient,
+    openUpstream: gitUpstreamRepository,
+    today: new Date(),
+  });
+  return {code, stdout: output.stdoutLines().join("\n")};
+};
+
 describe("main", () => {
   const skillDirectory = skillDirectories();
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-    vi.unstubAllGlobals();
-  });
 
   it("keeps the shipped portable auditor aligned with the canonical schema", async () => {
     const skill = skillDirectory(
@@ -35,10 +48,9 @@ describe("main", () => {
 `,
     );
     writeFileSync(join(skill, "references", "details.md"), "# Details\n");
-    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
-
-    const canonicalResult = await main([skill, "--json"]);
-    const canonical = JSON.parse(String(log.mock.calls[0]?.[0])) as {
+    const canonicalRun = await audit([skill, "--json"]);
+    const canonicalResult = canonicalRun.code;
+    const canonical = JSON.parse(canonicalRun.stdout) as {
       problems: number;
       source_count: number;
       sources: readonly Record<string, unknown>[];
@@ -109,12 +121,10 @@ describe("main", () => {
       ["remote", "add", "origin", "file:///definitely/missing-upstream"],
       {cwd: checkout},
     );
-    const log = vi.spyOn(console, "log").mockImplementation(vi.fn());
+    const result = await audit([skill, "--pull", "--json"]);
 
-    const result = await main([skill, "--pull", "--json"]);
-
-    expect(result).toBe(1);
-    expect(JSON.parse(String(log.mock.calls[0]?.[0]))).toMatchObject({
+    expect(result.code).toBe(1);
+    expect(JSON.parse(result.stdout)).toMatchObject({
       problems: 1,
       sources: [{drift: {pull_failed: true}}],
     });

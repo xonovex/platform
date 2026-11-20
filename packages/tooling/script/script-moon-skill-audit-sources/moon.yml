@@ -15,14 +15,13 @@ fileGroups:
     - /packages/config/ts-config-node/src/**/*
     - /packages/tooling/script/script-moon-common/src/**/*
 tasks:
-  # The parity test runs the shipped auditor through uv, which the Nix shell
-  # supplies; resolving it from the caller's PATH is what let CI run without it.
   ts-coverage:
     env:
-      TS_COVERAGE_MIN_LINES: "78"
-      TS_COVERAGE_MIN_FUNCTIONS: "74"
-      TS_COVERAGE_MIN_BRANCHES: "60"
-      TS_COVERAGE_MIN_STATEMENTS: "75"
-  ts-test:
+      TS_COVERAGE_MIN_LINES: "98"
+      TS_COVERAGE_MIN_FUNCTIONS: "98"
+      TS_COVERAGE_MIN_BRANCHES: "89"
+      TS_COVERAGE_MIN_STATEMENTS: "97"
+  # The integration parity test runs this shipped Python auditor through uv.
+  ts-test-integration:
     inputs:
       - /packages/runtime/plugin/plugin-agentic/skills/authoring-skills/scripts/audit-sources.py
