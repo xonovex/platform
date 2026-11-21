@@ -1,30 +1,33 @@
 digraph Overview {
   rankdir=TB;
   splines=false;
-  nodesep=0.4;
+  nodesep=0.1;
   ranksep=0.4;
   margin=0.3;
 
-  node [shape=box, style="rounded,filled", fontsize=11, width=1.4, height=0.4];
+  node [shape=box, style="rounded,filled", fontsize=10, width=1.3, height=0.4];
   edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
   label="AI Agent Sandbox: Isolation Axis (1 of 3 orthogonal axes)";
   labelloc=t;
   fontsize=14;
 
-  // Column headers — the ISOLATION axis. Provision {none,nix,command} and
-  // Network {host,none,proxy} are ORTHOGONAL axes, not points on this spectrum.
+  // Column headers: the ISOLATION axis. Provision {none,nix,command} and
+  // Network {host,none,managed} are ORTHOGONAL axes, not points on this
+  // spectrum. The rows below the agent show what each isolation declares.
   subgraph {
     rank=same;
-    h1 [label=<<b>None</b>>, shape=plaintext, fontsize=10, group=c1];
-    h2 [label=<<b>Bubblewrap</b>>, shape=plaintext, fontsize=10, group=c2];
-    h3 [label=<<b>Docker<br/>(runc)</b>>, shape=plaintext, fontsize=10, group=c3];
-    h4 [label=<<b>bwrap<br/>+ nix (provisioned)</b>>, shape=plaintext, fontsize=10, group=c4];
-    h5 [label=<<b>gVisor</b>>, shape=plaintext, fontsize=10, group=c5];
-    h6 [label=<<b>Kata / CoCo</b>>, shape=plaintext, fontsize=10, group=c6];
+    h1 [label=<<b>None</b><br/>isolation=none>, shape=plaintext, fontsize=9, group=c1];
+    h2 [label=<<b>Seatbelt</b><br/>isolation=seatbelt<br/>(macOS)>, shape=plaintext, fontsize=9, group=c2];
+    h3 [label=<<b>Bubblewrap</b><br/>isolation=bwrap>, shape=plaintext, fontsize=9, group=c3];
+    h4 [label=<<b>Docker (runc)</b><br/>isolation=docker>, shape=plaintext, fontsize=9, group=c4];
+    h5 [label=<<b>OpenShell</b><br/>isolation=openshell>, shape=plaintext, fontsize=9, group=c5];
+    h6 [label=<<b>Docker Sandboxes</b><br/>isolation=docker-sandboxes>, shape=plaintext, fontsize=9, group=c6];
+    h7 [label=<<b>gVisor</b><br/>docker --runtime runsc<br/>or pod runtimeClass>, shape=plaintext, fontsize=9, group=c7];
+    h8 [label=<<b>Kata</b><br/>pod runtimeClass<br/>kata>, shape=plaintext, fontsize=9, group=c8];
+    h9 [label=<<b>CoCo</b><br/>pod runtimeClass<br/>kata-cc, kata-tdx>, shape=plaintext, fontsize=9, group=c9];
   }
 
-  // Application layer
   subgraph {
     rank=same;
     a1 [label="AI Agent", role="actor", group=c1];
@@ -33,31 +36,37 @@ digraph Overview {
     a4 [label="AI Agent", role="actor", group=c4];
     a5 [label="AI Agent", role="actor", group=c5];
     a6 [label="AI Agent", role="actor", group=c6];
+    a7 [label="AI Agent", role="actor", group=c7];
+    a8 [label="AI Agent", role="actor", group=c8];
+    a9 [label="AI Agent", role="actor", group=c9];
   }
 
-  // Sandbox / isolation layer
   subgraph {
     rank=same;
     s1 [label="(no sandbox)", role="risk", style="rounded,filled,dashed", group=c1];
-    s2 [label="Namespaces\n+ bind mounts", group=c2];
-    s3 [label="Namespaces\ncgroups, seccomp", group=c3];
-    s4 [label="Namespaces\n+ /nix/store (ro)", group=c4];
-    s5 [label="Sentry\n(user-space kernel)", group=c5];
-    s6 [label="Guest Kernel\n(separate VM)", group=c6];
+    s2 [label="Seatbelt profile\nlimits writes, HOME", group=c2];
+    s3 [label="Namespaces\n+ bind mounts", group=c3];
+    s4 [label="Namespaces, cgroups\ncap-drop ALL\nseccomp, AppArmor", group=c4];
+    s5 [label="Gateway sandbox\nLandlock + policy", group=c5];
+    s6 [label="sbx sandbox\n(own agent image)", group=c6];
+    s7 [label="Sentry\n(user-space kernel)", group=c7];
+    s8 [label="Guest Kernel\n(separate VM)", group=c8];
+    s9 [label="Attested guest\nkernel (TEE)", group=c9];
   }
 
-  // Kernel layer
   subgraph {
     rank=same;
     k1 [label="Host Kernel", role="strong", group=c1];
     k2 [label="Host Kernel", role="strong", group=c2];
     k3 [label="Host Kernel", role="strong", group=c3];
     k4 [label="Host Kernel", role="strong", group=c4];
-    k5 [label="Host Kernel\n(~60 syscalls)", role="strong", group=c5];
-    k6 [label="Hypervisor\n+ Host Kernel", role="strong", group=c6];
+    k5 [label="Gateway host\n(kernel unverified)", role="strong", group=c5];
+    k6 [label="sbx runtime\n(kernel unverified)", role="strong", group=c6];
+    k7 [label="Host Kernel\n(small syscall set)", role="strong", group=c7];
+    k8 [label="Hypervisor\n+ Host Kernel", role="strong", group=c8];
+    k9 [label="Hypervisor\n+ Host Kernel", role="strong", group=c9];
   }
 
-  // Hardware
   subgraph {
     rank=same;
     hw1 [label="Hardware", role="panel", group=c1];
@@ -65,60 +74,101 @@ digraph Overview {
     hw3 [label="Hardware", role="panel", group=c3];
     hw4 [label="Hardware", role="panel", group=c4];
     hw5 [label="Hardware", role="panel", group=c5];
-    hw6 [label="Hardware\n(VT-x / TEE)", role="panel", group=c6];
+    hw6 [label="Hardware", role="panel", group=c6];
+    hw7 [label="Hardware", role="panel", group=c7];
+    hw8 [label="Hardware\n(VT-x / AMD-V)", role="panel", group=c8];
+    hw9 [label="Hardware\n(TDX / SEV-SNP)", role="panel", group=c9];
   }
 
-  // Vertical flows
+  subgraph {
+    rank=same;
+    n1 [label="none: refused\nmanaged: refused", role="note", fontsize=8, group=c1];
+    n2 [label="none: deny network*\nmanaged: loopback", role="note", fontsize=8, group=c2];
+    n3 [label="none: --unshare-net\nmanaged: unix socket", role="note", fontsize=8, group=c3];
+    n4 [label="none: --network none\nmanaged: unix socket", role="note", fontsize=8, group=c4];
+    n5 [label="none: empty policy\nmanaged: policy", role="note", fontsize=8, group=c5];
+    n6 [label="none: refused\nmanaged: refused", role="note", fontsize=8, group=c6];
+    n7 [label="Docker rules, or pod:\nNetworkPolicy only", role="note", fontsize=8, group=c7];
+    n8 [label="none: NetworkPolicy\nmanaged: refused", role="note", fontsize=8, group=c8];
+    n9 [label="none: NetworkPolicy\nmanaged: refused", role="note", fontsize=8, group=c9];
+  }
+
   h1 -> a1 [style=invis];
   a1 -> s1 [role="risk", style=dashed, label="  no\n  barrier"];
   s1 -> k1;
   k1 -> hw1;
+  hw1 -> n1 [style=invis];
 
   h2 -> a2 [style=invis];
   a2 -> s2;
-  s2 -> k2 [label="  all\n  syscalls"];
+  s2 -> k2 [label="  profile-checked\n  operations"];
   k2 -> hw2;
+  hw2 -> n2 [style=invis];
 
   h3 -> a3 [style=invis];
   a3 -> s3;
-  s3 -> k3 [label="  filtered\n  syscalls"];
+  s3 -> k3 [label="  all\n  syscalls"];
   k3 -> hw3;
+  hw3 -> n3 [style=invis];
 
   h4 -> a4 [style=invis];
   a4 -> s4;
-  s4 -> k4 [label="  all\n  syscalls"];
+  s4 -> k4 [label="  filtered\n  syscalls"];
   k4 -> hw4;
+  hw4 -> n4 [style=invis];
 
   h5 -> a5 [style=invis];
   a5 -> s5;
-  s5 -> k5 [label="  minimal\n  surface", style=dashed];
+  s5 -> k5 [label="  not\n  verified", style=dashed];
   k5 -> hw5;
+  hw5 -> n5 [style=invis];
 
   h6 -> a6 [style=invis];
   a6 -> s6;
-  s6 -> k6 [label="  KVM", style=dashed];
+  s6 -> k6 [label="  not\n  verified", style=dashed];
   k6 -> hw6;
+  hw6 -> n6 [style=invis];
 
-  // Invisible horizontal ordering
-  h1 -> h2 -> h3 -> h4 -> h5 -> h6 [style=invis];
-  a1 -> a2 -> a3 -> a4 -> a5 -> a6 [style=invis];
-  s1 -> s2 -> s3 -> s4 -> s5 -> s6 [style=invis];
-  k1 -> k2 -> k3 -> k4 -> k5 -> k6 [style=invis];
-  hw1 -> hw2 -> hw3 -> hw4 -> hw5 -> hw6 [style=invis];
+  h7 -> a7 [style=invis];
+  a7 -> s7;
+  s7 -> k7 [label="  minimal\n  surface", style=dashed];
+  k7 -> hw7;
+  hw7 -> n7 [style=invis];
 
-  // Isolation arrow
-  arrow_label [label="Isolation strength →", role="caption", fontsize=10];
-  hw1 -> arrow_label [style=invis];
+  h8 -> a8 [style=invis];
+  a8 -> s8;
+  s8 -> k8 [label="  KVM", style=dashed];
+  k8 -> hw8;
+  hw8 -> n8 [style=invis];
 
-  // Three-axis model + policy footnote.
+  h9 -> a9 [style=invis];
+  a9 -> s9;
+  s9 -> k9 [label="  KVM\n  (limited)", style=dashed];
+  k9 -> hw9;
+  hw9 -> n9 [style=invis];
+
+  h1 -> h2 -> h3 -> h4 -> h5 -> h6 -> h7 -> h8 -> h9 [style=invis];
+  a1 -> a2 -> a3 -> a4 -> a5 -> a6 -> a7 -> a8 -> a9 [style=invis];
+  s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9 [style=invis];
+  k1 -> k2 -> k3 -> k4 -> k5 -> k6 -> k7 -> k8 -> k9 [style=invis];
+  hw1 -> hw2 -> hw3 -> hw4 -> hw5 -> hw6 -> hw7 -> hw8 -> hw9 [style=invis];
+  n1 -> n2 -> n3 -> n4 -> n5 -> n6 -> n7 -> n8 -> n9 [style=invis];
+
+  // Grouping of the columns by the kernel boundary each declares.
+  arrow_label [label="Left of gVisor: no kernel boundary declared (RequireKernelIsolation fails). gVisor, Kata and CoCo: kernel boundary.", role="caption", fontsize=10];
+  n5 -> arrow_label [style=invis];
+
   caption [role="note", fontsize=9, label=<
-    <b>Three orthogonal axes:</b> Isolation {none, bwrap, docker} (above) ×<br/>
-    Provision {none, nix, command} × Network {host, none, proxy}, + hostPassthrough.<br/>
-    <b>Four guarantees (fail closed):</b> RequirePinnedProvision, RequireHostToolsUnreachable,<br/>
-    RequireEgressRestricted (Network is none or proxy), RequireKernelIsolation (gVisor/Kata, NOT bwrap/runc).<br/>
-    <b>Threat model:</b> untrusted model-generated code. bwrap/runc = attack-surface reduction, not a<br/>
-    kernel boundary; "host tools unreachable" ≠ "host unreachable". CLI binds the resolved closure;<br/>
-    operator bakes the SAME content-addressed closure into a streamLayeredImage OCI image.
+    <b>Three orthogonal axes:</b> Isolation {none, bwrap, docker, seatbelt, docker-sandboxes, openshell} (above;<br/>
+    gVisor, Kata and CoCo are pod runtime classes of the operator, gVisor also docker --runtime runsc) ×<br/>
+    Provision {none, nix, command} × Network {host, none, managed}, + hostPassthrough.<br/>
+    <b>Four guarantees (fail closed):</b> RequirePinnedProvision (nix, or a digest-pinned image),<br/>
+    RequireHostToolsUnreachable (no host tools on PATH or in binds, no host HOME, no custom binds),<br/>
+    RequireEgressRestricted (network none, or managed on an isolation that forces the proxy),<br/>
+    RequireKernelIsolation (docker runsc, or a pod runtimeClass that the AgentPolicy approves; NOT bwrap or runc).<br/>
+    <b>Threat model:</b> untrusted model-generated code. bwrap and runc reduce attack surface and are not a<br/>
+    kernel boundary; "host tools unreachable" is not "host unreachable". The CLI binds the resolved nix<br/>
+    closure; the operator bakes the SAME closure into a streamLayeredImage OCI image.
   >];
   arrow_label -> caption [style=invis];
 }

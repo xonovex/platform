@@ -1,0 +1,33 @@
+digraph Seatbelt {
+  rankdir=TB;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
+  margin=0.3;
+
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
+
+  label="Seatbelt — macOS Profile on the Host";
+  labelloc=t;
+  fontsize=14;
+
+  agent [label="AI Agent", role="actor"];
+  run [label="sandbox-exec -p <profile> <agent>  (macOS only)", fontsize=10];
+  writes [label="(allow default), then (deny file-write*)\nwrites allowed: workdir, binds, agent config paths, system temp", fontsize=10];
+  reads [label="(deny file-read-data) under HOME\nreads allowed back: workdir, repo, config paths, binds", fontsize=10];
+  net [label="network none: (deny network*)\nmanaged: deny, then allow only the loopback port of the proxy", fontsize=10];
+  sb [label="sandbox boundary (a profile on a host process)", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="Host Kernel (shared)", role="strong"];
+  hw [label="Hardware", role="panel"];
+  host [label="Host tools stay on PATH: no RequireHostToolsUnreachable, no kernel boundary", role="note", fontsize=10];
+
+  agent -> run;
+  run -> writes;
+  writes -> reads;
+  reads -> net;
+  net -> sb [label="  all syscalls (profile-checked)"];
+  sb -> kernel [role="risk", style=dashed];
+  kernel -> hw;
+  hw -> host [style=invis];
+}

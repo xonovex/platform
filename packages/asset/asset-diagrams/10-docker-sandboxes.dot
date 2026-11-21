@@ -1,0 +1,36 @@
+digraph DockerSandboxes {
+  rankdir=TB;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
+  margin=0.3;
+
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
+
+  label="Docker Sandboxes — sbx Sandbox with Its Own Image";
+  labelloc=t;
+  fontsize=14;
+
+  agent [label="AI Agent", role="actor"];
+  create [label="sbx create --name agent-cli-N <agent type> <workdir> <binds>\nread-write binds, read-only binds with :ro", fontsize=10];
+  exec [label="sbx exec -w <workdir> -e <names>: values pass by name in the environment", fontsize=10];
+  image [label="Separate sandbox with its own agent image\nno host tools, no host home directory", fontsize=10];
+  sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="sbx runtime (kernel boundary not verified)", role="strong"];
+  hw [label="Hardware", role="panel"];
+  refused [label="Refused, fail closed: network none or managed (deny rules only, no allowlist),\ninit commands, provisioned PATH entries, a terminal wrapper", role="note", fontsize=10];
+  removed [label="Removed after the run: sbx stop, then sbx rm --force", role="note", fontsize=10];
+
+  agent -> create;
+  create -> exec;
+  exec -> image;
+  image -> sb;
+  sb -> kernel [role="risk", style=dashed, label="  not verified"];
+  kernel -> hw;
+
+  { rank=same; create; refused; }
+  { rank=same; image; removed; }
+  create -> refused [style=invis];
+  image -> removed [style=invis];
+}

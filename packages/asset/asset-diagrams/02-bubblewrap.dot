@@ -13,15 +13,21 @@ digraph Bubblewrap {
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
-  ns [label="PID | IPC | UTS | cgroup namespaces"];
-  mounts [label="Bind mounts: /usr,/lib (ro) | workdir (rw) | /tmp (tmpfs)", fontsize=10];
+  env [label="Environment reduced to an allowlist (--unsetenv)", fontsize=10];
+  ns [label="PID | IPC | UTS | cgroup namespaces\nnet namespace unless network is host", fontsize=10];
+  mounts [label="Deny-default mounts: workdir (rw), repo and config paths (ro)\nminimal /dev, /proc, tmpfs /tmp and HOME", fontsize=10];
+  pass [label="hostPassthrough only: /usr /lib /lib64 /bin /etc (ro)", role="note", fontsize=10];
   sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
   kernel [label="Host Kernel (shared)", role="strong"];
   hw [label="Hardware", role="panel"];
 
-  agent -> ns;
+  agent -> env;
+  env -> ns;
   ns -> mounts;
   mounts -> sb [label="  all syscalls (shared kernel)"];
   sb -> kernel [role="risk", style=dashed];
   kernel -> hw;
+
+  { rank=same; mounts; pass; }
+  mounts -> pass [style=invis];
 }

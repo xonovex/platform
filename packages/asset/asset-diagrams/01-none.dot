@@ -13,12 +13,16 @@ digraph None {
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
+  prompts [label="Keeps its own permission prompts (Bounded = false)", fontsize=10];
   kernel [label="Host Kernel", role="strong"];
   hw [label="Hardware", role="panel"];
 
-  agent -> kernel [label="  all syscalls (unrestricted)"];
+  agent -> prompts;
+  prompts -> kernel [label="  all syscalls (unrestricted)"];
   kernel -> hw;
 
-  note [label="No isolation boundary — full host access", role="risk", style="rounded,filled,dashed", fontsize=10];
+  note [label="No isolation boundary — full host access, host tools stay on PATH", role="risk", style="rounded,filled,dashed", fontsize=10];
+  refused [label="Network none and managed are refused: no boundary can enforce them", role="note", fontsize=10];
   hw -> note [style=invis];
+  note -> refused [style=invis];
 }

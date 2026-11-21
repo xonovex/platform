@@ -8,15 +8,16 @@ digraph Nix {
   node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
   edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
 
-  label="bwrap × nix — flake.lock-pinned closure, mounted read-only";
+  label="nix provision (shown under bwrap) — pinned closure, mounted read-only";
   labelloc=t;
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
   env [label="closure PATH entries (the pinned tools)"];
-  store [label="closure requisites ONLY (nix path-info -r), read-only\nNOT the whole /nix/store, no nix daemon socket", fontsize=10];
-  ns [label="PID | IPC | UTS | cgroup | net namespaces", fontsize=10];
-  sb [label="sandbox boundary (deny-default: --clearenv, sandbox-local HOME)", role="risk", style="rounded,filled,dashed", fontsize=10];
+  store [label="closure requisites ONLY (nix path-info -r), read-only\nbwrap --ro-bind or docker -v :ro; NOT the whole /nix/store, no nix daemon socket", fontsize=10];
+  resolve [label="Host nix resolves and GC-roots the closure\n--no-write-lock-file: a dirty lock fails; the sandbox never runs nix", role="note", fontsize=10];
+  ns [label="PID | IPC | UTS | cgroup namespaces\nnet namespace unless network is host", fontsize=10];
+  sb [label="sandbox boundary (deny-default: environment allowlist, sandbox-local HOME)", role="risk", style="rounded,filled,dashed", fontsize=10];
   kernel [label="Host Kernel (shared)", role="strong"];
   hw [label="Hardware", role="panel"];
 
@@ -26,4 +27,7 @@ digraph Nix {
   ns -> sb [label="  all syscalls (shared kernel)"];
   sb -> kernel [role="risk", style=dashed];
   kernel -> hw;
+
+  { rank=same; store; resolve; }
+  resolve -> store;
 }

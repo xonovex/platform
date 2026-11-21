@@ -13,17 +13,19 @@ digraph GVisor {
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
+  entry [label="Reached by docker --runtime runsc,\nor a pod runtimeClass whose handler is runsc", role="note", fontsize=10];
   sentry [label="Sentry (user-space kernel)"];
 
   subgraph {
     rank=same;
-    gofer [label="Gofer\n(file proxy, 9P)", width=1.4];
+    gofer [label="Gofer\n(file proxy)", width=1.4];
     netstack [label="Netstack\n(user-space TCP/IP)", width=1.4];
   }
 
   sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
-  kernel [label="Host Kernel (~60 syscalls)", role="strong"];
+  kernel [label="Host Kernel (small syscall set)", role="strong"];
   hw [label="Hardware", role="panel"];
+  guarantee [label="RequireKernelIsolation holds for runsc/gvisor, or a runtimeClass that the AgentPolicy approves", role="note", fontsize=10];
 
   agent -> sentry [label="  syscalls (intercepted)"];
   sentry -> gofer;
@@ -32,4 +34,7 @@ digraph GVisor {
   netstack -> sb [style=invis];
   sb -> kernel [role="risk", style=dashed, label="  minimal surface"];
   kernel -> hw;
+  hw -> guarantee [style=invis];
+  { rank=same; sentry; entry; }
+  sentry -> entry [style=invis];
 }

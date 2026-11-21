@@ -104,6 +104,8 @@ Options:
 
 Each isolation declares what it can guarantee, and `--require-*` stops a run that needs more.
 
+The [sandbox diagrams](../../../asset/asset-diagrams/README.md) show how each isolation confines the agent and which network modes it supports.
+
 | Isolation | Confines | Network `none` | Network `managed` | Notes |
 | --- | --- | --- | --- | --- |
 | `none` | nothing | no | no | Runs on the host. |

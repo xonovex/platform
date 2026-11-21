@@ -13,17 +13,21 @@ digraph Kata {
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
-  guest [label="Guest Kernel (separate)"];
+  guest [label="Guest Kernel (separate from the host kernel)"];
   sb [label="sandbox (VM boundary)", role="risk", style="rounded,filled,dashed", fontsize=10];
-  vmm [label="QEMU / Cloud-Hypervisor (VMM)"];
+  vmm [label="Virtual machine monitor (QEMU, cloud-hypervisor)"];
   kvm [label="KVM"];
   kernel [label="Host Kernel", role="strong"];
   hw [label="Hardware (VT-x / AMD-V)", role="panel"];
+  pod [label="Pod runtimeClass kata (needs /dev/kvm on the node)\ncounts for RequireKernelIsolation once the AgentPolicy approves it", role="note", fontsize=10];
 
   agent -> guest [label="  syscalls (guest only)"];
-  guest -> sb [label="  virtio-blk, virtio-net"];
+  guest -> sb [label="  virtio devices"];
   sb -> vmm [role="risk", style=dashed];
   vmm -> kvm;
   kvm -> kernel;
   kernel -> hw;
+
+  { rank=same; guest; pod; }
+  guest -> pod [style=invis];
 }

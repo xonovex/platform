@@ -7,7 +7,7 @@ digraph change_flow {
     graph [label="Planning, once for each change", style=rounded, role=panel, margin=16];
 
     intent [label="Intent\nYou describe the change", role=actor];
-    research [label="Research\nresearching"];
+    research [label="Research\nresearching-change"];
     decide [label="Decide\nsettling-questions"];
     plan [label="Plan\nwriting-plan\nillustrating-plan draws the diagrams"];
     critique [label="Critique (optional)\ncritiquing-plan", role=note];
@@ -19,7 +19,7 @@ digraph change_flow {
   }
 
   subgraph cluster_execution {
-    graph [label="Execution, for each work item in dependency order", style=rounded, role=panel, margin=16];
+    graph [label="Execution, for each work item in dependency order", labelloc=b, style=rounded, role=panel, margin=16];
 
     implement [label="Implement\nimplementing-work-item"];
     validate_item [label="Validate the work item\nvalidating-work-item"];
@@ -33,12 +33,14 @@ digraph change_flow {
 
   intent -> research -> decide -> plan;
   plan -> critique;
-  revise -> critique [dir=back];
-  plan -> revise [style=dashed, label="skip the critique"];
-  define -> revise [dir=back];
+  critique -> revise [label="findings"];
+  plan -> define [style=dashed, label="nothing to revise"];
+  revise -> define;
+  revise -> decide [style=dashed, constraint=false, label="new question"];
   define -> implement;
   implement -> validate_item -> deliver;
-  deliver:n -> implement:ne [style=dashed, constraint=false, label="next work item", role=retry];
+  validate_item:nw -> implement:ne [style=dashed, constraint=false, label="a criterion fails", role=retry];
+  deliver:n -> implement:nw [style=dashed, constraint=false, xlabel="next work item", role=retry];
   deliver -> validate_package [label="after the last work item"];
   validate_package -> entry [style=invis];
 }

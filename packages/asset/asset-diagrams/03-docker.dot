@@ -13,17 +13,25 @@ digraph Docker {
   fontsize=14;
 
   agent [label="AI Agent", role="actor"];
-  ns [label="All 6 namespaces (PID, Mount, UTS, IPC, Net, User)", fontsize=10];
-  cgroups [label="cgroups (CPU, memory, I/O limits)"];
-  seccomp [label="seccomp (syscall filter)"];
+  image [label="Starts from an image (required); only a digest-pinned image counts as pinned", fontsize=10];
+  ns [label="Container namespaces; net namespace unless network is host\nruns as the caller uid:gid", fontsize=10];
+  hardening [label="no-new-privileges | cap-drop ALL | apparmor docker-default | default seccomp", fontsize=10];
+  fs [label="Read-only root | tmpfs /tmp (noexec) and HOME | workdir (rw)\nrepo, config and nix closure paths (ro)", fontsize=10];
+  limits [label="--pids-limit 4096 | --memory 8g | --cpus = host CPU count", fontsize=10];
+  runtime [label="--runtime runsc swaps runc for gVisor (see 05-gvisor)", role="note", fontsize=10];
   sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
   kernel [label="Host Kernel (shared)", role="strong"];
   hw [label="Hardware", role="panel"];
 
-  agent -> ns;
-  ns -> cgroups;
-  cgroups -> seccomp;
-  seccomp -> sb [label="  filtered syscalls"];
+  agent -> image;
+  image -> ns;
+  ns -> hardening;
+  hardening -> fs;
+  fs -> limits;
+  limits -> sb [label="  filtered syscalls"];
   sb -> kernel [role="risk", style=dashed];
   kernel -> hw;
+
+  { rank=same; limits; runtime; }
+  limits -> runtime [style=invis];
 }

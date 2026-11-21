@@ -18,10 +18,12 @@ digraph CoCo {
   vmm [label="Hypervisor (cannot read TEE memory)"];
   kernel [label="Host Kernel (cannot read TEE memory)", role="strong"];
   hw [label="CPU + Memory Encryption HW\n(Intel TDX / AMD SEV-SNP)", role="panel"];
+  pod [label="Operator side: runtimeClassName kata-cc or kata-tdx + nodeSelector for TEE nodes.\nThe CoCo stack of the cluster supplies the TEE and the attestation;\nthe e2e tests simulate the classes with runc and exercise no TEE.", role="note", fontsize=10];
 
   agent -> guest [label="  syscalls"];
   guest -> sb [label="  encrypted VM"];
   sb -> vmm [role="risk", style=dashed];
   vmm -> kernel [label="  KVM (limited)"];
   kernel -> hw [label="  remote attestation\n  (root of trust)"];
+  hw -> pod [style=invis];
 }

@@ -1,0 +1,39 @@
+digraph OpenShell {
+  rankdir=TB;
+  splines=false;
+  nodesep=0.3;
+  ranksep=0.5;
+  margin=0.3;
+
+  node [shape=box, style="rounded,filled", fontsize=12, width=3, height=0.5];
+  edge [fontsize=9, penwidth=1.5, arrowsize=0.7];
+
+  label="OpenShell — Gateway Sandbox under a Policy";
+  labelloc=t;
+  fontsize=14;
+
+  agent [label="AI Agent", role="actor"];
+  create [label="openshell sandbox create --from <image> --policy policy.json\n(image required; no automatic providers)", fontsize=10];
+  upload [label="Upload the work directory to /sandbox (no host bind)", fontsize=10];
+  policy [label="Policy: Landlock hard_requirement; filesystem: workdir, /dev/null\nnetwork none: empty policy (deny all)\nmanaged: each allowlist rule is an endpoint, enforcement enforce", role="note", fontsize=10];
+  exec [label="openshell sandbox exec: the agent runs on the gateway", fontsize=10];
+  download [label="After the agent: download the work directory, even when the agent fails,\nthen delete the sandbox", role="note", fontsize=10];
+  sb [label="sandbox boundary", role="risk", style="rounded,filled,dashed", fontsize=10];
+  kernel [label="Gateway runtime (kernel boundary not verified)", role="strong"];
+  hw [label="Hardware", role="panel"];
+  refused [label="Refused: credentials and provider tokens (they would reach an argument),\nhost binds, provisioned PATH entries, a terminal wrapper", role="note", fontsize=10];
+
+  agent -> create;
+  create -> upload;
+  upload -> exec;
+  exec -> sb;
+  sb -> kernel [role="risk", style=dashed, label="  not verified"];
+  kernel -> hw;
+
+  { rank=same; create; policy; }
+  { rank=same; exec; refused; }
+  { rank=same; sb; download; }
+  sb -> download [style=invis];
+  create -> policy [style=invis];
+  exec -> refused [style=invis];
+}
