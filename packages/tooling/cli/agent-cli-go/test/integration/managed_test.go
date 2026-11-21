@@ -59,8 +59,25 @@ func TestManagedDryRunNamesTheTransportWhenBwrapIsAvailable(t *testing.T) {
 	if _, err := exec.LookPath("bwrap"); err != nil {
 		t.Skip("bwrap is not installed")
 	}
-	cmd := testCommand(t, "run", "--dry-run", "--isolation", "bwrap", "--isolation-bwrap-passthrough", "--network", "managed",
-		"--allow-host", "api.example.com", "--credential", "API_KEY=env:HOME")
+	// The agent is a file of the test, bound read-only, so the dry run does not
+	// depend on where the host installs a real agent: passthrough refuses an
+	// agent that resolves outside the paths it binds.
+	home := t.TempDir()
+	agentDir := t.TempDir()
+	agent := filepath.Join(agentDir, "agent")
+	if err := os.WriteFile(agent, []byte("not a script"), 0o755); err != nil {
+		t.Fatalf("write the agent: %v", err)
+	}
+	overrides := filepath.Join(home, "agentic", "harnesses.d")
+	if err := os.MkdirAll(overrides, 0o755); err != nil {
+		t.Fatalf("create the harness overrides: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(overrides, "claude.json"), []byte(`{"binary":"`+agent+`"}`), 0o644); err != nil {
+		t.Fatalf("write the harness override: %v", err)
+	}
+	cmd := exec.Command(testBinary(t), "run", "--dry-run", "--isolation", "bwrap", "--isolation-bwrap-passthrough", "--network", "managed",
+		"--ro-bind", agentDir, "--allow-host", "api.example.com", "--credential", "API_KEY=env:HOME")
+	cmd.Env = isolatedEnv(home)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("dry run: %v\n%s", err, output)
