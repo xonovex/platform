@@ -19,6 +19,11 @@ dependsOn:
   - id: vitest-config-node
     scope: development
 fileGroups:
+  # The launch golden test embeds its golden, so a change to it invalidates the
+  # test and coverage runs.
+  tests:
+    - "**/*_test.go"
+    - internal/sandbox/plugins/testdata/*.golden.txt
   # The src of every internal package this project reads: what dependsOn
   # reaches, plus the config packages its own config files name.
   dependencySources:
