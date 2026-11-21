@@ -3,9 +3,19 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"strings"
 )
+
+// summaryFiles is the file access run needs: it reads the test log and appends
+// to the summary, so a unit test drives run with an in-memory double and only
+// osFiles reaches the disk.
+type summaryFiles interface {
+	ReadFile(name string) ([]byte, error)
+	OpenAppend(name string) (io.WriteCloser, error)
+}
 
 func countLines(lines []string, marker string) int {
 	count := 0
@@ -53,14 +63,14 @@ func renderMissingSummary(suite string) string {
 	return fmt.Sprintf("### %s\n\nNo test log produced (suite failed before running tests).\n", suite)
 }
 
-func run(args []string) error {
+func run(args []string, files summaryFiles) error {
 	if len(args) != 3 {
 		return errors.New("usage: e2e-summary SUITE LOG OUTPUT")
 	}
 
-	log, err := os.ReadFile(args[1])
+	log, err := files.ReadFile(args[1])
 	summary := ""
-	if errors.Is(err, os.ErrNotExist) {
+	if errors.Is(err, fs.ErrNotExist) {
 		summary = renderMissingSummary(args[0])
 	} else if err != nil {
 		return fmt.Errorf("read test log: %w", err)
@@ -68,11 +78,11 @@ func run(args []string) error {
 		summary = renderSummary(args[0], string(log))
 	}
 
-	output, err := os.OpenFile(args[2], os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	output, err := files.OpenAppend(args[2])
 	if err != nil {
 		return fmt.Errorf("open summary: %w", err)
 	}
-	_, writeErr := output.WriteString(summary)
+	_, writeErr := io.WriteString(output, summary)
 	closeErr := output.Close()
 	if writeErr != nil {
 		return fmt.Errorf("write summary: %w", writeErr)
@@ -84,7 +94,7 @@ func run(args []string) error {
 }
 
 func main() {
-	if err := run(os.Args[1:]); err != nil {
+	if err := run(os.Args[1:], osFiles{}); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(2)
 	}

@@ -833,6 +833,10 @@ Run the smallest suite that proves the changed behavior, then run the required i
 # Unit tests
 go test ./...
 
+# Regenerate the pod-spec goldens after an intended change; a unit run reads
+# them from the test binary and writes nothing
+go test -run TestBuildJobGolden -update-golden ./internal/isolation/shared/
+
 # Integration tests (envtest, real API server, no kubelet)
 # Requires: setup-envtest, provided by the nix devshell (nix/k8s.nix)
 # The Moon task downloads the control plane binaries to .cache/envtest in the

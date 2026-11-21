@@ -9,6 +9,15 @@ dependsOn:
   - shared-agent-go
   - shared-contract-go
   - shared-launch-go
+fileGroups:
+  # The config and golden tests embed these manifests and goldens, so a change
+  # to one invalidates the test and coverage runs.
+  tests:
+    - "**/*_test.go"
+    - config/crd/bases/*.yaml
+    - config/manager/*.yaml
+    - config/samples/*.yaml
+    - internal/isolation/shared/testdata/*.golden.yaml
 tasks:
   go-test-coverage:
     env:
@@ -150,12 +159,13 @@ tasks:
   # envtest starts the control plane of the Kubernetes minor that k8s.io/api
   # names in go.mod. setup-envtest keeps those binaries in the ignored .cache
   # directory of the workspace, so the task writes nothing to a home directory.
+  # cmd/e2e-summary carries the integration test of its disk adapter.
   go-test-integration:
     script: |
       set -euo pipefail
       minor="$(go list -m -f '{{.Version}}' k8s.io/api | cut -d. -f2)"
       assets="$(setup-envtest use "1.${minor}.x" -p path --bin-dir "$workspaceRoot/.cache/envtest")"
-      KUBEBUILDER_ASSETS="$assets" go test -tags=integration -v -timeout=300s ./test/integration/
+      KUBEBUILDER_ASSETS="$assets" go test -tags=integration -v -timeout=300s ./cmd/e2e-summary/ ./test/integration/
     deps:
       - go-build
     inputs:

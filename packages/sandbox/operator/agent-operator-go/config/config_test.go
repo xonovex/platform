@@ -2,8 +2,8 @@ package config_test
 
 import (
 	"context"
-	"os"
-	"path/filepath"
+	"io/fs"
+	"path"
 	"strings"
 	"testing"
 
@@ -29,7 +29,7 @@ func TestSamplesStrictlyDecodeAgainstAgentAPI(t *testing.T) {
 		t.Fatalf("add agent API to scheme: %v", err)
 	}
 	decoder := serializer.NewCodecFactory(scheme, serializer.EnableStrict).UniversalDeserializer()
-	paths, err := filepath.Glob(filepath.Join("samples", "*.yaml"))
+	paths, err := fs.Glob(manifests, "samples/*.yaml")
 	if err != nil {
 		t.Fatalf("list samples: %v", err)
 	}
@@ -37,9 +37,9 @@ func TestSamplesStrictlyDecodeAgainstAgentAPI(t *testing.T) {
 		t.Fatal("no sample manifests found")
 	}
 
-	for _, path := range paths {
-		t.Run(filepath.Base(path), func(t *testing.T) {
-			data, err := os.ReadFile(path)
+	for _, name := range paths {
+		t.Run(path.Base(name), func(t *testing.T) {
+			data, err := manifests.ReadFile(name)
 			if err != nil {
 				t.Fatalf("read sample: %v", err)
 			}
@@ -51,7 +51,7 @@ func TestSamplesStrictlyDecodeAgainstAgentAPI(t *testing.T) {
 }
 
 func TestWorkspaceSampleMountsConfigurationInRuntimeHome(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("samples", "agentworkspace_sample.yaml"))
+	data, err := manifests.ReadFile("samples/agentworkspace_sample.yaml")
 	if err != nil {
 		t.Fatalf("read workspace sample: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestSampleAgentHarnessPassesAdmission(t *testing.T) {
 
 func decodeSample[T any](t testing.TB, name string, replacements map[string]string) *T {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join("samples", name))
+	data, err := manifests.ReadFile("samples/" + name)
 	if err != nil {
 		t.Fatalf("read sample %q: %v", name, err)
 	}
@@ -141,7 +141,7 @@ func decodeSample[T any](t testing.TB, name string, replacements map[string]stri
 }
 
 func TestManagerImageUsesImmutableDigest(t *testing.T) {
-	data, err := os.ReadFile(filepath.Join("manager", "manager.yaml"))
+	data, err := manifests.ReadFile("manager/manager.yaml")
 	if err != nil {
 		t.Fatalf("read manager manifest: %v", err)
 	}

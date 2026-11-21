@@ -1,8 +1,9 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
+	"errors"
+	"io"
+	"io/fs"
 	"strings"
 	"testing"
 )
@@ -58,7 +59,7 @@ func TestRunRejectsWrongArgumentCount(t *testing.T) {
 		{"e2e", "log"},
 		{"e2e", "log", "out", "extra"},
 	} {
-		err := run(args)
+		err := run(args, newMemoryFiles(nil))
 		if err == nil {
 			t.Errorf("run(%q) must return an error", args)
 			continue
@@ -70,25 +71,17 @@ func TestRunRejectsWrongArgumentCount(t *testing.T) {
 }
 
 func TestRunWritesSummaryForAnExistingLog(t *testing.T) {
-	dir := t.TempDir()
-	logPath := filepath.Join(dir, "test.log")
-	outputPath := filepath.Join(dir, "summary.md")
-	if err := os.WriteFile(logPath, []byte("--- PASS: TestReady\n--- SKIP: TestNeedsKvm\n"), 0o644); err != nil {
-		t.Fatalf("write test log: %v", err)
-	}
+	files := newMemoryFiles(map[string]string{"test.log": "--- PASS: TestReady\n--- SKIP: TestNeedsKvm\n"})
 
-	if err := run([]string{"e2e-kata", logPath, outputPath}); err != nil {
+	if err := run([]string{"e2e-kata", "test.log", "summary.md"}, files); err != nil {
 		t.Fatalf("run returned error %v", err)
 	}
 
-	summary, err := os.ReadFile(outputPath)
-	if err != nil {
-		t.Fatalf("read summary: %v", err)
-	}
-	if !strings.Contains(string(summary), "| 1 | 0 | 1 |") {
+	summary := files.contents["summary.md"]
+	if !strings.Contains(summary, "| 1 | 0 | 1 |") {
 		t.Errorf("summary %q must report the log's counts", summary)
 	}
-	if !strings.Contains(string(summary), "### e2e-kata") {
+	if !strings.Contains(summary, "### e2e-kata") {
 		t.Errorf("summary %q must name the suite", summary)
 	}
 }
@@ -96,55 +89,42 @@ func TestRunWritesSummaryForAnExistingLog(t *testing.T) {
 // A suite that dies before running tests leaves no log, which is reported rather
 // than treated as a failure to read.
 func TestRunWritesMissingSummaryWhenLogIsAbsent(t *testing.T) {
-	dir := t.TempDir()
-	outputPath := filepath.Join(dir, "summary.md")
+	files := newMemoryFiles(nil)
 
-	if err := run([]string{"e2e", filepath.Join(dir, "absent.log"), outputPath}); err != nil {
+	if err := run([]string{"e2e", "absent.log", "summary.md"}, files); err != nil {
 		t.Fatalf("run returned error %v", err)
 	}
 
-	summary, err := os.ReadFile(outputPath)
-	if err != nil {
-		t.Fatalf("read summary: %v", err)
-	}
-	if !strings.Contains(string(summary), "No test log produced") {
+	summary := files.contents["summary.md"]
+	if !strings.Contains(summary, "No test log produced") {
 		t.Errorf("summary %q must explain the absent log", summary)
 	}
 }
 
 func TestRunAppendsToAnExistingSummary(t *testing.T) {
-	dir := t.TempDir()
-	logPath := filepath.Join(dir, "test.log")
-	outputPath := filepath.Join(dir, "summary.md")
-	if err := os.WriteFile(logPath, []byte("--- PASS: TestReady\n"), 0o644); err != nil {
-		t.Fatalf("write test log: %v", err)
-	}
+	files := newMemoryFiles(map[string]string{"test.log": "--- PASS: TestReady\n"})
 
-	if err := run([]string{"e2e", logPath, outputPath}); err != nil {
+	if err := run([]string{"e2e", "test.log", "summary.md"}, files); err != nil {
 		t.Fatalf("first run returned error %v", err)
 	}
-	if err := run([]string{"e2e-gvisor", logPath, outputPath}); err != nil {
+	if err := run([]string{"e2e-gvisor", "test.log", "summary.md"}, files); err != nil {
 		t.Fatalf("second run returned error %v", err)
 	}
 
-	summary, err := os.ReadFile(outputPath)
-	if err != nil {
-		t.Fatalf("read summary: %v", err)
-	}
-	if !strings.Contains(string(summary), "### e2e\n") {
+	summary := files.contents["summary.md"]
+	if !strings.Contains(summary, "### e2e\n") {
 		t.Errorf("summary %q must retain the first suite", summary)
 	}
-	if !strings.Contains(string(summary), "### e2e-gvisor\n") {
+	if !strings.Contains(summary, "### e2e-gvisor\n") {
 		t.Errorf("summary %q must contain the second suite", summary)
 	}
 }
 
 func TestRunReportsAnUnreadableLog(t *testing.T) {
-	dir := t.TempDir()
+	files := newMemoryFiles(nil)
+	files.readErr = errors.New("is a directory")
 
-	// A directory is readable as a path but not as a file, so ReadFile fails
-	// with something other than os.ErrNotExist.
-	err := run([]string{"e2e", dir, filepath.Join(dir, "summary.md")})
+	err := run([]string{"e2e", "test.log", "summary.md"}, files)
 
 	if err == nil {
 		t.Fatal("run must return an error when the log cannot be read")
@@ -155,13 +135,10 @@ func TestRunReportsAnUnreadableLog(t *testing.T) {
 }
 
 func TestRunReportsAnUnwritableSummary(t *testing.T) {
-	dir := t.TempDir()
-	logPath := filepath.Join(dir, "test.log")
-	if err := os.WriteFile(logPath, []byte("--- PASS: TestReady\n"), 0o644); err != nil {
-		t.Fatalf("write test log: %v", err)
-	}
+	files := newMemoryFiles(map[string]string{"test.log": "--- PASS: TestReady\n"})
+	files.openErr = fs.ErrNotExist
 
-	err := run([]string{"e2e", logPath, filepath.Join(dir, "absent-dir", "summary.md")})
+	err := run([]string{"e2e", "test.log", "summary.md"}, files)
 
 	if err == nil {
 		t.Fatal("run must return an error when the summary cannot be opened")
@@ -169,4 +146,88 @@ func TestRunReportsAnUnwritableSummary(t *testing.T) {
 	if !strings.Contains(err.Error(), "open summary") {
 		t.Errorf("error %q must identify the open failure", err)
 	}
+}
+
+func TestRunReportsAFailedSummaryWrite(t *testing.T) {
+	files := newMemoryFiles(map[string]string{"test.log": "--- PASS: TestReady\n"})
+	files.writeErr = errors.New("no space left on device")
+
+	err := run([]string{"e2e", "test.log", "summary.md"}, files)
+
+	if err == nil {
+		t.Fatal("run must return an error when the summary cannot be written")
+	}
+	if !strings.Contains(err.Error(), "write summary") {
+		t.Errorf("error %q must identify the write failure", err)
+	}
+	if !files.closed {
+		t.Error("run must close the summary after a failed write")
+	}
+}
+
+func TestRunReportsAFailedSummaryClose(t *testing.T) {
+	files := newMemoryFiles(map[string]string{"test.log": "--- PASS: TestReady\n"})
+	files.closeErr = errors.New("input/output error")
+
+	err := run([]string{"e2e", "test.log", "summary.md"}, files)
+
+	if err == nil {
+		t.Fatal("run must return an error when the summary cannot be closed")
+	}
+	if !strings.Contains(err.Error(), "close summary") {
+		t.Errorf("error %q must identify the close failure", err)
+	}
+}
+
+// memoryFiles is the in-memory summaryFiles double: contents holds every file
+// by name, and each error field makes the matching operation fail.
+type memoryFiles struct {
+	contents           map[string]string
+	readErr, openErr   error
+	writeErr, closeErr error
+	closed             bool
+}
+
+func newMemoryFiles(contents map[string]string) *memoryFiles {
+	files := &memoryFiles{contents: map[string]string{}}
+	for name, data := range contents {
+		files.contents[name] = data
+	}
+	return files
+}
+
+func (m *memoryFiles) ReadFile(name string) ([]byte, error) {
+	if m.readErr != nil {
+		return nil, m.readErr
+	}
+	data, ok := m.contents[name]
+	if !ok {
+		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrNotExist}
+	}
+	return []byte(data), nil
+}
+
+func (m *memoryFiles) OpenAppend(name string) (io.WriteCloser, error) {
+	if m.openErr != nil {
+		return nil, &fs.PathError{Op: "open", Path: name, Err: m.openErr}
+	}
+	return &memoryAppender{files: m, name: name}, nil
+}
+
+type memoryAppender struct {
+	files *memoryFiles
+	name  string
+}
+
+func (a *memoryAppender) Write(data []byte) (int, error) {
+	if a.files.writeErr != nil {
+		return 0, a.files.writeErr
+	}
+	a.files.contents[a.name] += string(data)
+	return len(data), nil
+}
+
+func (a *memoryAppender) Close() error {
+	a.files.closed = true
+	return a.files.closeErr
 }

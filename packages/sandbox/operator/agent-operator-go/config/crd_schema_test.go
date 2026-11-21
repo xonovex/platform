@@ -2,8 +2,8 @@ package config_test
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
+	"io/fs"
+	"path"
 	"reflect"
 	"sort"
 	"strings"
@@ -48,7 +48,7 @@ func TestCRDSchemasMatchAgentAPITypes(t *testing.T) {
 	if err := agentv1alpha1.AddToScheme(scheme); err != nil {
 		t.Fatalf("add agent API to scheme: %v", err)
 	}
-	paths, err := filepath.Glob(filepath.Join("crd", "bases", "*.yaml"))
+	paths, err := fs.Glob(manifests, "crd/bases/*.yaml")
 	if err != nil {
 		t.Fatalf("list CRDs: %v", err)
 	}
@@ -56,15 +56,15 @@ func TestCRDSchemasMatchAgentAPITypes(t *testing.T) {
 		t.Fatal("no CRD manifests found")
 	}
 
-	for _, path := range paths {
-		t.Run(filepath.Base(path), func(t *testing.T) {
-			data, err := os.ReadFile(path)
+	for _, name := range paths {
+		t.Run(path.Base(name), func(t *testing.T) {
+			data, err := manifests.ReadFile(name)
 			if err != nil {
-				t.Fatalf("read %s: %v", path, err)
+				t.Fatalf("read %s: %v", name, err)
 			}
 			var definition crdDefinition
 			if err := yaml.Unmarshal(data, &definition); err != nil {
-				t.Fatalf("parse %s: %v", path, err)
+				t.Fatalf("parse %s: %v", name, err)
 			}
 			for _, version := range definition.Spec.Versions {
 				t.Run(version.Name, func(t *testing.T) {
