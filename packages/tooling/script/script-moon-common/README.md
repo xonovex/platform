@@ -11,7 +11,6 @@ Import the module that owns the required script concern.
 - `git` - the `GitRepository` port and the log parsers; `adapters/git-node` runs git in a repository
 - `output` - the `Output` port, one line at a time to stdout or stderr; `adapters/output-node` writes to the process streams, `adapters/output-memory` keeps the lines
 - `executable` - the `ExecutableResolver` port and `findExecutable`; `adapters/executable-node` - `processExecutableResolver` finds a command on the PATH of the current process, and the composition root passes it to the git, moon and npm adapters
-- `adapters/child-process` - `terminateProcess` ends a child process
 - `cli-args` - `parseCliArgs` returns the parsed arguments or the help text
 - `logging` - `logError`, `logInfo`, `logSuccess`, `logWarning`
 - `package-json` - `readPkg`, `writePkg`

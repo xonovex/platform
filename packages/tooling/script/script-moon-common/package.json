@@ -4,10 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./adapters/child-process": {
-      "types": "./src/adapters/child-process.ts",
-      "default": "./dist/src/adapters/child-process.js"
-    },
     "./adapters/executable-node": {
       "types": "./src/adapters/executable-node.ts",
       "default": "./dist/src/adapters/executable-node.js"
