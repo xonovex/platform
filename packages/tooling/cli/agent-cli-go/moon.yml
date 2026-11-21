@@ -42,7 +42,6 @@ tasks:
         ./cmd/agent-cli=exempt
         ./internal/cmd=97
         ./internal/launch=99
-        ./internal/origin=exempt
         ./internal/origin/directory=100
         ./internal/origin/git=100
         ./internal/origin/plugins=100
@@ -120,6 +119,7 @@ tasks:
     inputs:
       - "@globs(sources)"
       - "@globs(tests)"
+      - /packages/library/shared-core-go/pkg/archtest/**/*.go
     outputs: []
     options:
       cache: true

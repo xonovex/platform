@@ -30,22 +30,23 @@
 //   - TestCommandLayerReachesNoPort: the cobra adapter selects no port of the
 //     dependencies it hands to the core; it prints to their Out only.
 //
-// The origin axis (internal/origin) has its own fitness tests beside it, and
-// shared-launch-go holds the tests of its isolation, provision, egress and
-// credential leaves, the selection layer, the ports and the run spec.
+// origin_test.go locks the origin axis (internal/origin), and shared-launch-go
+// holds the tests of its isolation, provision, egress and credential leaves,
+// the selection layer, the ports and the run spec.
 package arch
 
 import (
 	"go/ast"
-	"go/parser"
-	"go/token"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"slices"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/xonovex/platform/packages/library/shared-core-go/pkg/archtest"
 )
 
 const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
@@ -53,55 +54,68 @@ const modPath = "github.com/xonovex/platform/packages/tooling/cli/agent-cli-go"
 // axisNames are the orthogonal axes, each a directory of a shared core and leaves.
 var axisNames = []string{"workspace", "terminal"}
 
-// internalRoot returns the absolute path of the internal/ directory.
-func internalRoot(t *testing.T) string {
-	_, file, _, ok := runtime.Caller(0)
+func moduleRoot(t *testing.T) string {
+	t.Helper()
+	_, here, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("runtime.Caller failed")
 	}
-	// file = .../internal/arch/architecture_test.go
-	return filepath.Dir(filepath.Dir(file))
+	return filepath.Dir(filepath.Dir(filepath.Dir(here)))
 }
 
-// leafDirs returns the immediate subdirectories of an axis dir, keyed by name.
-func leafDirs(t *testing.T, axisDir string) map[string]string {
-	entries, err := os.ReadDir(axisDir)
+// moduleFiles parses the non-test source of cmd and internal, the packages the
+// module builds.
+func moduleFiles(t *testing.T) []archtest.File {
+	t.Helper()
+	files, err := archtest.Load(os.DirFS(moduleRoot(t)), "cmd", "internal")
 	if err != nil {
-		t.Fatalf("read %s: %v", axisDir, err)
+		t.Fatal(err)
 	}
-	out := map[string]string{}
-	for _, e := range entries {
-		if e.IsDir() {
-			out[e.Name()] = filepath.Join(axisDir, e.Name())
+	return archtest.Production(files)
+}
+
+// filesIn returns the files of the package at dir, without its subpackages.
+func filesIn(files []archtest.File, dir string) []archtest.File {
+	var out []archtest.File
+	for _, f := range files {
+		if f.Dir == dir {
+			out = append(out, f)
 		}
 	}
 	return out
 }
 
-// dirImports returns the import paths of all non-test Go files in dir.
-func dirImports(t *testing.T, dir string) []string {
-	entries, err := os.ReadDir(dir)
-	if err != nil {
-		t.Fatalf("read %s: %v", dir, err)
-	}
-	fset := token.NewFileSet()
-	var imps []string
-	for _, e := range entries {
-		name := e.Name()
-		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
-			continue
-		}
-		f, err := parser.ParseFile(fset, filepath.Join(dir, name), nil, parser.ImportsOnly)
-		if err != nil {
-			t.Fatalf("parse %s: %v", name, err)
-		}
-		for _, im := range f.Imports {
-			if path, err := strconv.Unquote(im.Path.Value); err == nil {
-				imps = append(imps, path)
-			}
+// filesUnder returns the files of the package at dir and of every package
+// below it.
+func filesUnder(files []archtest.File, dir string) []archtest.File {
+	var out []archtest.File
+	for _, f := range files {
+		if f.Dir == dir || strings.HasPrefix(f.Dir, dir+"/") {
+			out = append(out, f)
 		}
 	}
-	return imps
+	return out
+}
+
+// dirImports returns the import paths of the package at dir.
+func dirImports(files []archtest.File, dir string) []string {
+	var imports []string
+	for _, f := range filesIn(files, dir) {
+		imports = append(imports, f.Imports...)
+	}
+	return imports
+}
+
+// leafDirs returns the directories of the leaves of an axis, keyed by name.
+func leafDirs(files []archtest.File, axisDir string) map[string]string {
+	out := map[string]string{}
+	for _, f := range filesUnder(files, axisDir) {
+		if rest, ok := strings.CutPrefix(f.Dir, axisDir+"/"); ok {
+			leaf := topSegment(rest)
+			out[leaf] = axisDir + "/" + leaf
+		}
+	}
+	return out
 }
 
 // topSegment returns the first path segment of s (before any '/').
@@ -113,11 +127,11 @@ func topSegment(s string) string {
 }
 
 func TestLeavesDoNotImportCompositionRoot(t *testing.T) {
-	root := internalRoot(t)
+	files := moduleFiles(t)
 	sandboxPath := modPath + "/internal/sandbox"
 	for _, axis := range axisNames {
-		for _, dir := range leafDirs(t, filepath.Join(root, axis)) {
-			for _, imp := range dirImports(t, dir) {
+		for _, dir := range leafDirs(files, "internal/"+axis) {
+			for _, imp := range dirImports(files, dir) {
 				if imp == sandboxPath || strings.HasPrefix(imp, sandboxPath+"/") {
 					t.Errorf("%s imports the registry package %s", dir, imp)
 				}
@@ -162,28 +176,9 @@ var concrete = map[string][]string{
 // keyed by the directory of the package relative to the module root.
 func packageImports(t *testing.T) map[string][]string {
 	t.Helper()
-	moduleDir := filepath.Dir(internalRoot(t))
 	out := map[string][]string{}
-	for _, top := range []string{"cmd", "internal"} {
-		for _, file := range productionFiles(t, filepath.Join(moduleDir, top)) {
-			rel, err := filepath.Rel(moduleDir, filepath.Dir(file))
-			if err != nil {
-				t.Fatal(err)
-			}
-			f, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ImportsOnly)
-			if err != nil {
-				t.Fatalf("parse %s: %v", file, err)
-			}
-			dir := filepath.ToSlash(rel)
-			if _, seen := out[dir]; !seen {
-				out[dir] = nil
-			}
-			for _, im := range f.Imports {
-				if path, err := strconv.Unquote(im.Path.Value); err == nil {
-					out[dir] = append(out[dir], path)
-				}
-			}
-		}
+	for _, f := range moduleFiles(t) {
+		out[f.Dir] = append(out[f.Dir], f.Imports...)
 	}
 	return out
 }
@@ -259,11 +254,11 @@ func TestLaunchLibraryImportsFollowTheTable(t *testing.T) {
 }
 
 func TestLeavesDoNotImportSiblings(t *testing.T) {
-	root := internalRoot(t)
+	files := moduleFiles(t)
 	for _, axis := range axisNames {
 		base := modPath + "/internal/" + axis + "/"
-		for leaf, dir := range leafDirs(t, filepath.Join(root, axis)) {
-			for _, imp := range dirImports(t, dir) {
+		for leaf, dir := range leafDirs(files, "internal/"+axis) {
+			for _, imp := range dirImports(files, dir) {
 				sib, ok := strings.CutPrefix(imp, base)
 				if !ok {
 					continue
@@ -278,13 +273,10 @@ func TestLeavesDoNotImportSiblings(t *testing.T) {
 }
 
 func TestSharedCoresImportNoLeaf(t *testing.T) {
-	root := internalRoot(t)
+	files := moduleFiles(t)
 	for _, axis := range axisNames {
-		dir := filepath.Join(root, axis, "shared")
-		if _, err := os.Stat(dir); err != nil {
-			continue
-		}
-		for _, imp := range dirImports(t, dir) {
+		dir := "internal/" + axis + "/shared"
+		for _, imp := range dirImports(files, dir) {
 			for _, other := range axisNames {
 				base := modPath + "/internal/" + other + "/"
 				if leaf, ok := strings.CutPrefix(imp, base); ok && topSegment(leaf) != "shared" {
@@ -295,66 +287,27 @@ func TestSharedCoresImportNoLeaf(t *testing.T) {
 	}
 }
 
-// productionFiles returns every non-test Go file under root.
-func productionFiles(t *testing.T, root string) []string {
-	var files []string
-	if err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if !d.IsDir() && strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go") {
-			files = append(files, path)
-		}
-		return nil
-	}); err != nil {
-		t.Fatalf("walk: %v", err)
-	}
-	return files
-}
-
 func TestNoInternalPackageTouchesTheOperatingSystem(t *testing.T) {
-	root := internalRoot(t)
 	banned := map[string]bool{"os": true, "os/exec": true, "runtime": true, "syscall": true}
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, root) {
-		f, err := parser.ParseFile(fset, file, nil, parser.ImportsOnly)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
-		}
-		for _, im := range f.Imports {
-			if path, _ := strconv.Unquote(im.Path.Value); banned[path] {
-				t.Errorf("%s imports %s; reach the machine through a port", file, path)
+	for _, f := range filesUnder(moduleFiles(t), "internal") {
+		for _, imp := range f.Imports {
+			if banned[imp] {
+				t.Errorf("%s imports %s; reach the machine through a port", f.Path, imp)
 			}
 		}
 	}
 }
 
 func TestInternalPackagesDoNotPrint(t *testing.T) {
-	root := internalRoot(t)
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, root) {
-		f, err := parser.ParseFile(fset, file, nil, 0)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
+	for _, f := range filesUnder(moduleFiles(t), "internal") {
+		for _, use := range archtest.Prints(f.Syntax) {
+			t.Errorf("%s calls %s", f.Path, use)
 		}
-		ast.Inspect(f, func(n ast.Node) bool {
-			switch node := n.(type) {
-			case *ast.SelectorExpr:
-				if x, ok := node.X.(*ast.Ident); ok && x.Name == "fmt" && strings.HasPrefix(node.Sel.Name, "Print") {
-					t.Errorf("%s calls fmt.%s", file, node.Sel.Name)
-				}
-			case *ast.CallExpr:
-				if id, ok := node.Fun.(*ast.Ident); ok && (id.Name == "print" || id.Name == "println") {
-					t.Errorf("%s calls %s", file, id.Name)
-				}
-			}
-			return true
-		})
 	}
 }
 
 func TestApplicationCoreNamesNoAdapter(t *testing.T) {
-	root := internalRoot(t)
+	files := moduleFiles(t)
 	adapters := []string{
 		launchLibrary + "/pkg/oshost",
 		launchLibrary + "/pkg/hostlaunch",
@@ -387,7 +340,7 @@ func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 		"cmd":    nil,
 	} {
 		banned := append(append([]string{}, adapters...), extra...)
-		for _, imp := range dirImports(t, filepath.Join(root, pkg)) {
+		for _, imp := range dirImports(files, "internal/"+pkg) {
 			for _, b := range banned {
 				if imp == b || strings.HasPrefix(imp, b+"/") {
 					t.Errorf("internal/%s imports adapter %s", pkg, imp)
@@ -402,28 +355,18 @@ func TestApplicationCoreNamesNoAdapter(t *testing.T) {
 var agentTypeSurface = map[string]bool{"AgentType": true, "AgentConfig": true, "AgentExecOptions": true}
 
 func TestNoHarnessIsNamedOutsideTheAgentRegistry(t *testing.T) {
-	root := internalRoot(t)
-	roots := []string{root, filepath.Join(filepath.Dir(root), "cmd")}
-
-	fset := token.NewFileSet()
-	for _, dir := range roots {
-		for _, file := range productionFiles(t, dir) {
-			f, err := parser.ParseFile(fset, file, nil, 0)
-			if err != nil {
-				t.Fatalf("parse %s: %v", file, err)
-			}
-			ast.Inspect(f, func(n ast.Node) bool {
-				sel, ok := n.(*ast.SelectorExpr)
-				if !ok {
-					return true
-				}
-				pkg, ok := sel.X.(*ast.Ident)
-				if ok && pkg.Name == "types" && strings.HasPrefix(sel.Sel.Name, "Agent") && !agentTypeSurface[sel.Sel.Name] {
-					t.Errorf("%s names the concrete agent %s; compare the declared facts instead", file, sel.Sel.Name)
-				}
+	for _, f := range moduleFiles(t) {
+		ast.Inspect(f.Syntax, func(n ast.Node) bool {
+			sel, ok := n.(*ast.SelectorExpr)
+			if !ok {
 				return true
-			})
-		}
+			}
+			pkg, ok := sel.X.(*ast.Ident)
+			if ok && pkg.Name == "types" && strings.HasPrefix(sel.Sel.Name, "Agent") && !agentTypeSurface[sel.Sel.Name] {
+				t.Errorf("%s names the concrete agent %s; compare the declared facts instead", f.Path, sel.Sel.Name)
+			}
+			return true
+		})
 	}
 }
 
@@ -451,37 +394,25 @@ var commandImports = map[string]map[string]bool{
 	"github.com/xonovex/platform/packages/library/shared-contract-go/pkg/schemas": nil,
 }
 
-// isStandard reports whether path names a package of the standard library,
-// whose first element has no dot.
-func isStandard(path string) bool {
-	return !strings.Contains(topSegment(path), ".")
-}
-
 func TestCommandLayerUsesOnlyItsEntryPoints(t *testing.T) {
-	dir := filepath.Join(internalRoot(t), "cmd")
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, dir) {
-		f, err := parser.ParseFile(fset, file, nil, 0)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
-		}
+	for _, f := range filesUnder(moduleFiles(t), "internal/cmd") {
 		names := map[string]string{}
-		for _, im := range f.Imports {
-			path, _ := strconv.Unquote(im.Path.Value)
-			if isStandard(path) {
+		for _, spec := range f.Syntax.Imports {
+			imported, _ := strconv.Unquote(spec.Path.Value)
+			if archtest.IsStandard(imported) {
 				continue
 			}
-			if _, ok := commandImports[path]; !ok {
-				t.Errorf("%s imports %s; reach the application through launch or plugin", file, path)
+			if _, ok := commandImports[imported]; !ok {
+				t.Errorf("%s imports %s; reach the application through launch or plugin", f.Path, imported)
 				continue
 			}
-			name := filepath.Base(path)
-			if im.Name != nil {
-				name = im.Name.Name
+			name := path.Base(imported)
+			if spec.Name != nil {
+				name = spec.Name.Name
 			}
-			names[name] = path
+			names[name] = imported
 		}
-		ast.Inspect(f, func(n ast.Node) bool {
+		ast.Inspect(f.Syntax, func(n ast.Node) bool {
 			sel, ok := n.(*ast.SelectorExpr)
 			if !ok {
 				return true
@@ -490,9 +421,9 @@ func TestCommandLayerUsesOnlyItsEntryPoints(t *testing.T) {
 			if !ok {
 				return true
 			}
-			path, imported := names[pkg.Name]
-			if allowed := commandImports[path]; imported && allowed != nil && !allowed[sel.Sel.Name] {
-				t.Errorf("%s names %s.%s; that rule belongs to the application core", file, pkg.Name, sel.Sel.Name)
+			imported, named := names[pkg.Name]
+			if allowed := commandImports[imported]; named && allowed != nil && !allowed[sel.Sel.Name] {
+				t.Errorf("%s names %s.%s; that rule belongs to the application core", f.Path, pkg.Name, sel.Sel.Name)
 			}
 			return true
 		})
@@ -537,18 +468,13 @@ func dependencyNames(f *ast.File) map[string]bool {
 
 // portFields returns the fields of every type of commandDependencies except
 // Out, read from the source of its package.
-func portFields(t *testing.T) map[string]bool {
+func portFields(t *testing.T, files []archtest.File) map[string]bool {
 	t.Helper()
 	fields := map[string]bool{}
-	fset := token.NewFileSet()
 	for pkg, typeName := range commandDependencies {
 		found := false
-		for _, file := range productionFiles(t, filepath.Join(internalRoot(t), pkg)) {
-			f, err := parser.ParseFile(fset, file, nil, 0)
-			if err != nil {
-				t.Fatalf("parse %s: %v", file, err)
-			}
-			ast.Inspect(f, func(n ast.Node) bool {
+		for _, f := range filesUnder(files, "internal/"+pkg) {
+			ast.Inspect(f.Syntax, func(n ast.Node) bool {
 				spec, ok := n.(*ast.TypeSpec)
 				if !ok || spec.Name.Name != typeName {
 					return true
@@ -574,21 +500,17 @@ func portFields(t *testing.T) map[string]bool {
 // command that selects a port, such as the host, a registry or a store, reads
 // the machine or a plugin set itself and so decides what the core decides.
 func TestCommandLayerReachesNoPort(t *testing.T) {
-	ports := portFields(t)
-	fset := token.NewFileSet()
-	for _, file := range productionFiles(t, filepath.Join(internalRoot(t), "cmd")) {
-		f, err := parser.ParseFile(fset, file, nil, 0)
-		if err != nil {
-			t.Fatalf("parse %s: %v", file, err)
-		}
-		carriers := dependencyNames(f)
-		ast.Inspect(f, func(n ast.Node) bool {
+	files := moduleFiles(t)
+	ports := portFields(t, files)
+	for _, f := range filesUnder(files, "internal/cmd") {
+		carriers := dependencyNames(f.Syntax)
+		ast.Inspect(f.Syntax, func(n ast.Node) bool {
 			sel, ok := n.(*ast.SelectorExpr)
 			if !ok {
 				return true
 			}
 			if x, ok := sel.X.(*ast.Ident); ok && carriers[x.Name] && ports[sel.Sel.Name] {
-				t.Errorf("%s selects %s.%s; pass the dependencies to the core", file, x.Name, sel.Sel.Name)
+				t.Errorf("%s selects %s.%s; pass the dependencies to the core", f.Path, x.Name, sel.Sel.Name)
 			}
 			return true
 		})
