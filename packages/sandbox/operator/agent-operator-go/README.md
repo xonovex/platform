@@ -894,6 +894,8 @@ Observed 2026-07-16 with docker 29.1.3 / runc 1.4.0 on kernel 7.0.6-gentoo (cgro
 
 Each `AgentRun` follows either a standalone reconciliation path or a shared-workspace reconciliation path.
 
+The [architecture diagram](../../../asset/asset-diagrams/08-operator-architecture.png) shows the resources, admission webhooks, reconcilers, created Kubernetes objects, and the phase lifecycles of an `AgentRun` and an `AgentWorkspace`.
+
 **Standalone path** (no `workspaceRef`):
 
 1. **Workspace PVC** (RWO) is created for persistent git storage

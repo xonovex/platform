@@ -1,0 +1,438 @@
+digraph AgentOperatorArchitecture {
+  rankdir=TB;
+  compound=true;
+  newrank=true;
+  splines=true;
+  nodesep=0.4;
+  ranksep=0.6;
+  pad=0.3;
+  label=<<TABLE BORDER="0" CELLBORDER="0"><TR><TD><B><FONT POINT-SIZE="20">Agent Operator Architecture</FONT></B></TD></TR><TR><TD><FONT POINT-SIZE="13">agent.xonovex.com/v1alpha1</FONT></TD></TR><TR><TD><FONT POINT-SIZE="11">Solid edges show the main flow. Dashed edges show optional or secondary links: mounts, status feedback and references.</FONT></TD></TR></TABLE>>;
+  labelloc=t;
+
+  node [shape=box, style="rounded,filled", fontsize=12, margin="0.18,0.1"];
+  edge [fontsize=10, penwidth=1.3, arrowsize=0.7];
+
+  // External callers
+  caller [label="External caller\nmanual | CI/CD | webhook | scheduler", role=actor];
+
+  // Custom resources
+  subgraph cluster_crds {
+    graph [label=<<B>Custom Resources (CRDs)</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    agentrun [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentRun</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">harnessRef | harness (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">providerRef | provider (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">workspaceRef | workspace (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">toolchainRef | toolchain (inline)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">prompt, timeout, image, resources</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">runtimeClassName, network, networkPolicy</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">nodeSelector, tolerations, env</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    agentworkspace [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentWorkspace</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">type: git | jj</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">repository: {url, branch, commit}</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">storageClass, storageSize, runtimeClassName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">sharedVolumes: [{name, mountPath, size}]</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">status: Pending → Initializing → Ready</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    agentharness [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentHarness</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">type: claude | codex | copilot | kiro | opencode | pi</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">defaultProvider, defaultImage</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">defaultTimeout, defaultRuntimeClassName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">defaultResources, env</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    agentprovider [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentProvider</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">presetRef, agentType, displayName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">authTokenSecretRef, authTokenEnv</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">environment, cliArgs</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">status.ready: bool</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    agenttoolchain [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentToolchain</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">type: nix</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">nix: {nixpkgsRev, packages | flakeRef, image@sha256}</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    agentpolicy [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentPolicy</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">one for each execution namespace</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">enforced: runtimeClassName, allowedImages,</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">requireEgressRestricted, maxTimeout, maxResources,</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">allowedSecretNames, allowedRuntimeClassNames</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">defaults: image, timeout, runtimeClassName</FONT></TD></TR>
+      </TABLE>>,
+      role=risk
+    ];
+  }
+
+  // Webhooks and controller manager side by side
+  subgraph cluster_webhooks {
+    graph [label=<<B>Admission Webhooks</B>>, labeljust=l, labelloc=b, style=rounded, role=risk, fontsize=14, margin=14];
+
+    wh_run [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentRun Webhook</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Default: policy defaults, refs snapshotted inline, timeout=1h</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Validate: ref/inline exclusivity, policy, guarantees</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">spec is immutable after creation</FONT></TD></TR>
+      </TABLE>>
+    ];
+    wh_workspace [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>AgentWorkspace Webhook</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Default: storageSize=10Gi, shared=1Gi, runtimeClassName</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Validate: URL, shared volume names, policy</FONT></TD></TR>
+      </TABLE>>
+    ];
+    wh_harness [label="AgentHarness\nWebhook"];
+    wh_provider [label="AgentProvider\nWebhook"];
+    wh_toolchain [label="AgentToolchain\nWebhook"];
+  }
+
+  subgraph cluster_manager {
+    graph [label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0"><TR><TD WIDTH="90"></TD><TD><B>Controller Manager</B></TD></TR><TR><TD></TD><TD><FONT POINT-SIZE="10">:8081 health/ready</FONT></TD></TR></TABLE>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    ctrl_run [label=<<B>AgentRun Reconciler</B>>, role=strong];
+    ctrl_workspace [label=<<B>AgentWorkspace Reconciler</B>>, role=strong];
+    ctrl_provider [label="AgentProvider\nReconciler"];
+  }
+
+  // Standalone reconciliation steps
+  subgraph cluster_reconcile {
+    graph [label=<<B>AgentRun Standalone Reconciliation</B>>, labeljust=r, style=rounded, role=panel, fontsize=14, margin=14];
+
+    subgraph cluster_resolver {
+      graph [label=<<B>resolver</B>>, labeljust=r, style=rounded, role=default, fontsize=12, margin=10];
+
+      resolve_harness [label="1. ResolveHarness\n(harnessRef or inline)"];
+      resolve_provider [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>2. ResolveProvider</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">inline → providerRef → harness default → empty</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">checks the auth token Secret, passes a SecretKeyRef</FONT></TD></TR>
+        </TABLE>>
+      ];
+      resolve_toolchain [label="3. ResolveToolchain\n(toolchainRef or inline)"];
+    }
+
+    plan_run [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>4. Plan the run</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">shared planner through the kube confinement</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">agent argv from the shared agent facts</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    subgraph cluster_builder {
+      graph [label=<<B>builder</B>>, labeljust=r, style=rounded, role=default, fontsize=12, margin=10];
+
+      build_pvc [label="5. BuildPVC\n(RWO, ownerRef → AgentRun)"];
+      build_job [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>6. BuildJob</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">buildInitContainers (git-clone script)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">buildMainContainers (planned argv)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">buildEnvVars (provider + spec merge)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">BuildNetworkPolicy (default-deny egress)</FONT></TD></TR>
+        </TABLE>>
+      ];
+    }
+
+    watch_status [label="7. Watch Job Status\n→ update AgentRun phase"];
+  }
+
+  // Workspace-aware AgentRun
+  subgraph cluster_ws_run {
+    graph [label=<<B>AgentRun with workspaceRef</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    ws_resolve [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>1. ResolveWorkspace</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">check phase == Ready (requeue if not)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">then the same resolve and plan steps</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    ws_build_job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>2. BuildJob (workspace binding)</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">buildWorktreeInitContainers (git worktree add | jj workspace add)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">buildWorkspaceMainContainers (agent + shared mounts)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Volumes: workspace PVC + shared volume PVCs</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    ws_watch_run [label="3. Watch Job Status\n→ update AgentRun phase"];
+  }
+
+  // Workspace reconciliation
+  subgraph cluster_ws_reconcile {
+    graph [label=<<B>AgentWorkspace Reconciliation</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    ws_create_pvcs [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>1. Create PVCs</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">BuildWorkspacePVC (RWX, ownerRef → Workspace)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">BuildSharedVolumePVC per sharedVolume entry</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    ws_init_job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>2. BuildWorkspaceInitJob</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">git clone into workspace PVC</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">init NetworkPolicy: DNS and repository port only</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    ws_watch_status [label="3. Watch Init Job\n→ set Ready | Failed"];
+  }
+
+  // Kubernetes resources
+  subgraph cluster_k8s {
+    graph [label=<<B>Created Kubernetes Resources</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    pvc [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>PersistentVolumeClaim</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">Standalone: {name}-workspace, RWO, 10Gi</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    ws_pvc [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>Workspace PVCs (RWX)</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">{ws}-ws: shared git checkout</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">{ws}-{vol}: shared config/state dirs</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    job [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>Kubernetes Job</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">controllerRef → AgentRun | AgentWorkspace (init)</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">backoffLimit: 0, activeDeadlineSeconds</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">ServiceAccount agent-runner, no API token</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    netpol [
+      label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+        <TR><TD><B>NetworkPolicy</B></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">default-deny egress for each run</FONT></TD></TR>
+        <TR><TD><FONT POINT-SIZE="10">none: DNS only, host: allow all</FONT></TD></TR>
+      </TABLE>>
+    ];
+
+    subgraph cluster_pod_standalone {
+      graph [label=<<B>Pod (Standalone)</B><BR/><FONT POINT-SIZE="10">restartPolicy: Never</FONT><BR/><FONT POINT-SIZE="10">sandboxed runtimeClassName</FONT>>, labeljust=l, style=rounded, role=risk, fontsize=12, margin=10];
+
+      init_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Init: git-clone</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">git clone --depth 1 --single-branch</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">opt: fetch+checkout commit</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">opt: jj git init --colocate</FONT></TD></TR>
+        </TABLE>>
+      ];
+
+      main_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Main: agent</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">argv of the shared plan (agent facts)</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">claude --permission-mode bypassPermissions</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">  [-p "task..."]</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">workingDir: /workspace</FONT></TD></TR>
+        </TABLE>>
+      ];
+    }
+
+    subgraph cluster_pod_workspace {
+      graph [label=<<B>Pod (Workspace)</B><BR/><FONT POINT-SIZE="10">restartPolicy: Never</FONT><BR/><FONT POINT-SIZE="10">sandboxed runtimeClassName</FONT>>, labeljust=l, style=rounded, role=risk, fontsize=12, margin=10];
+
+      ws_init_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Init: git-worktree</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">git worktree add /workspace-wt/{run}</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">-b {branch} {sourceBranch}</FONT></TD></TR>
+        </TABLE>>
+      ];
+
+      ws_main_ctr [
+        label=<<TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1">
+          <TR><TD><B>Main: agent</B></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">workingDir: /workspace-wt/{run}</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">mounts: workspace PVC + shared vols</FONT></TD></TR>
+          <TR><TD><FONT POINT-SIZE="10">e.g. /home/agent/.claude, /home/agent/.config/opencode</FONT></TD></TR>
+        </TABLE>>
+      ];
+    }
+  }
+
+  // External systems
+  k8s_secret [label="K8s Secrets\n(auth tokens, git creds)", shape=cylinder];
+  git_repo [label="Git Repository", shape=cylinder];
+  ai_api [label="AI Provider API\n(Anthropic, etc.)", shape=cylinder];
+
+  // AgentRun phase lifecycle
+  subgraph cluster_phases {
+    graph [label=<<B>AgentRun Phase Lifecycle</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    p_pending [label="Pending", role=terminal];
+    p_init [label="Initializing", role=terminal];
+    p_running [label="Running", role=terminal];
+    p_succeeded [label="Succeeded", role=positive];
+    p_failed [label="Failed", role=risk];
+    p_timedout [label="TimedOut", role=risk, style="rounded,filled,dashed"];
+
+    p_pending -> p_init [label="PVC created or\nworkspace Ready"];
+    p_pending -> p_failed [label="resolution or\nplan failed", style=dashed];
+    p_init -> p_running [label="pod active"];
+    p_init -> p_failed [label="job build failed", style=dashed];
+    p_running -> p_succeeded [label="job complete"];
+    p_running -> p_failed [label="job failed"];
+    p_running -> p_timedout [label="elapsed > timeout"];
+  }
+
+  // AgentWorkspace phase lifecycle
+  subgraph cluster_ws_phases {
+    graph [label=<<B>AgentWorkspace Phase Lifecycle</B>>, labeljust=l, style=rounded, role=panel, fontsize=14, margin=14];
+
+    wp_pending [label="Pending", role=terminal];
+    wp_init [label="Initializing", role=terminal];
+    wp_ready [label="Ready", role=positive];
+    wp_failed [label="Failed", role=risk];
+
+    wp_pending -> wp_init [label="PVCs created,\ninit Job running"];
+    wp_init -> wp_ready [label="clone succeeded"];
+    wp_init -> wp_failed [label="clone failed"];
+  }
+
+  // Main flow edges
+
+  // External callers submit resources through the Kubernetes API
+  caller -> agentrun [label="create via\nKubernetes API", role=actor];
+  caller -> agentworkspace [label="create via\nKubernetes API", role=actor];
+  caller -> agentharness [style=dashed, role=actor];
+  caller -> agentprovider [style=dashed, role=actor];
+  caller -> agenttoolchain [style=dashed, role=actor];
+  caller -> agentpolicy [style=dashed, role=actor];
+
+  // Webhooks default and validate
+  agentrun -> wh_run [label="admit", role=risk];
+  agentworkspace -> wh_workspace [label="admit", role=risk];
+  agentharness -> wh_harness [style=dashed, role=risk];
+  agentprovider -> wh_provider [style=dashed, role=risk];
+  agenttoolchain -> wh_toolchain [style=dashed, role=risk];
+  agentpolicy -> wh_run [label="constrains", style=dashed, role=risk];
+  agentpolicy -> wh_workspace [style=dashed, role=risk];
+
+  // Controllers watch the resources they reconcile
+  agentrun -> ctrl_run [label="watch"];
+  agentworkspace -> ctrl_workspace [label="watch"];
+  agentprovider -> ctrl_provider [style=dashed];
+
+  // AgentRun reconciler: standalone path
+  ctrl_run -> resolve_harness [label="standalone\npath"];
+  ctrl_run -> resolve_provider;
+  ctrl_run -> resolve_toolchain;
+  ctrl_run -> plan_run;
+  ctrl_run -> build_pvc;
+  ctrl_run -> build_job;
+  ctrl_run -> watch_status;
+
+  // AgentRun reconciler: workspace path
+  ctrl_run -> ws_resolve [label="workspace\npath"];
+  ws_resolve -> ws_build_job;
+  ws_build_job -> ws_watch_run;
+
+  // AgentWorkspace reconciler
+  ctrl_workspace -> ws_create_pvcs;
+  ctrl_workspace -> ws_init_job;
+  ctrl_workspace -> ws_watch_status;
+
+  // Resolver and provider reconciler read Secrets
+  resolve_provider -> k8s_secret [label="read auth token"];
+  ctrl_provider -> k8s_secret [label="validate exists", style=dashed];
+
+  // Standalone builder creates resources
+  build_pvc -> pvc [label="create"];
+  build_job -> job [label="create"];
+  build_job -> netpol [label="create"];
+
+  // Workspace builder creates resources
+  ws_create_pvcs -> ws_pvc [label="create RWX"];
+  ws_init_job -> job [label="create init job"];
+  ws_init_job -> netpol [label="create"];
+  ws_build_job -> job [label="create run job"];
+
+  // Standalone Job to Pod
+  job -> init_ctr;
+  init_ctr -> main_ctr [label="then"];
+
+  // Workspace Job to Pod
+  job -> ws_init_ctr;
+  ws_init_ctr -> ws_main_ctr [label="then"];
+
+  // PVC mounts: standalone
+  pvc -> init_ctr [label="/workspace", style=dashed];
+  pvc -> main_ctr [style=dashed];
+
+  // PVC mounts: workspace
+  ws_pvc -> ws_init_ctr [label="/workspace\n+ shared vols", style=dashed];
+  ws_pvc -> ws_main_ctr [style=dashed];
+
+  // Pods reach external systems
+  init_ctr -> git_repo [label="git clone"];
+  main_ctr -> ai_api [label="API calls\n(provider auth token)"];
+  ws_main_ctr -> ai_api;
+
+  // Job status feedback
+  job -> watch_status [label="job conditions", style=dashed];
+  job -> ws_watch_status [style=dashed];
+  job -> ws_watch_run [style=dashed];
+
+  // AgentRun references AgentWorkspace
+  agentrun -> agentworkspace [label="workspaceRef", style=dashed, constraint=false];
+
+  // Layout hints
+  {rank=same; agentharness; agenttoolchain; agentpolicy; agentrun; agentworkspace; agentprovider;}
+  {rank=same; wh_harness; wh_toolchain; wh_run; wh_workspace; wh_provider; ctrl_run; ctrl_workspace; ctrl_provider;}
+  {rank=same; resolve_harness; ws_resolve; ws_create_pvcs;}
+  {rank=same; pvc; job; ws_pvc; netpol;}
+  {rank=same; init_ctr; ws_init_ctr;}
+  {rank=same; git_repo; ai_api;}
+  {rank=same; p_pending; p_init; p_running; p_succeeded;}
+  {rank=same; wp_pending; wp_init; wp_ready;}
+
+  edge [style=invis];
+  agentharness -> agenttoolchain -> agentpolicy -> agentrun -> agentworkspace -> agentprovider;
+  wh_harness -> wh_toolchain -> wh_run -> wh_workspace -> wh_provider -> ctrl_run -> ctrl_workspace -> ctrl_provider;
+  resolve_harness -> ws_resolve -> ws_create_pvcs;
+  pvc -> job -> ws_pvc -> netpol;
+  init_ctr -> ws_init_ctr;
+  git_repo -> ai_api;
+  resolve_harness -> resolve_provider -> resolve_toolchain -> plan_run -> build_pvc -> build_job -> watch_status;
+  ws_create_pvcs -> ws_init_job -> ws_watch_status;
+  wh_harness -> p_pending;
+  p_failed -> wp_pending;
+}
