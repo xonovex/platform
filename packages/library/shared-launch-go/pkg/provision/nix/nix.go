@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path/filepath"
+	"strings"
 
 	"github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision"
 	sharednix "github.com/xonovex/platform/packages/library/shared-agent-go/pkg/provision/nix"
@@ -67,16 +68,56 @@ func (p *Provisioner) Contribute(in provshared.Input) (provision.Contribution, e
 	}, nil
 }
 
-// CheckAgent requires the agent executable in one of the PATH entries of the
-// closure, because a nix sandbox binds no other tool.
+// CheckAgent requires the agent executable in the closure, because a nix
+// sandbox binds no other tool. A bare name resolves through the PATH entries of
+// the closure. A name with a slash is one file, as execvp treats it, and counts
+// only when it lies inside a requisite of the closure, so an override that
+// names a host binary fails closed instead of starting a program the sandbox
+// does not bind.
 func (p *Provisioner) CheckAgent(c provision.Contribution, agent *types.AgentConfig) (bool, error) {
+	if strings.Contains(agent.Binary, "/") {
+		return p.checkAgentPath(c, agent)
+	}
 	for _, directory := range c.PathEntries {
-		info, err := p.host.Stat(filepath.Join(directory, agent.Binary))
-		if err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0 {
+		if p.executable(filepath.Join(directory, agent.Binary)) {
 			return true, nil
 		}
 	}
-	return false, fmt.Errorf("nix provision did not supply agent executable %q; include package %q or select a flake shell that provides it", agent.Binary, agent.NixPackage)
+	return false, missingAgent(agent)
+}
+
+// checkAgentPath checks an agent binary that names a path. A relative path
+// resolves against the work directory, which is never part of the closure.
+func (p *Provisioner) checkAgentPath(c provision.Contribution, agent *types.AgentConfig) (bool, error) {
+	binary := filepath.Clean(agent.Binary)
+	if !filepath.IsAbs(binary) || !insideAny(binary, c.RoBindPaths) {
+		return false, fmt.Errorf("nix provision did not supply agent executable %q: the path is not inside the nix closure, the only tree the sandbox binds; include package %q and name its binary, or select a flake shell that provides it", agent.Binary, agent.NixPackage)
+	}
+	if p.executable(binary) {
+		return true, nil
+	}
+	return false, missingAgent(agent)
+}
+
+// executable reports whether the host has a regular executable file at path.
+func (p *Provisioner) executable(path string) bool {
+	info, err := p.host.Stat(path)
+	return err == nil && info.Mode().IsRegular() && info.Mode().Perm()&0o111 != 0
+}
+
+// insideAny reports whether path is one of roots or lies below one of them.
+func insideAny(path string, roots []string) bool {
+	for _, root := range roots {
+		root = filepath.Clean(root)
+		if path == root || strings.HasPrefix(path, root+string(filepath.Separator)) {
+			return true
+		}
+	}
+	return false
+}
+
+func missingAgent(agent *types.AgentConfig) error {
+	return fmt.Errorf("nix provision did not supply agent executable %q; include package %q or select a flake shell that provides it", agent.Binary, agent.NixPackage)
 }
 
 // gcRootDir is the per-source GC-root directory, keyed by the content hash so the

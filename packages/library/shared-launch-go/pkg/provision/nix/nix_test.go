@@ -170,6 +170,53 @@ func TestCheckAgent(t *testing.T) {
 	}
 }
 
+// TestCheckAgentResolvesAPathAsItself covers a harness override whose binary
+// is a path: it names one file, which the closure must hold.
+func TestCheckAgentResolvesAPathAsItself(t *testing.T) {
+	host := oshosttest.New().
+		AddExecutable("/nix/store/aaa-claude/bin/claude").
+		AddFile("/nix/store/bbb-data/bin/claude", "data", 0o644).
+		AddExecutable("/usr/local/bin/claude").
+		AddExecutable("/nix/store/zzz-other/bin/claude")
+	p := New(host)
+	closure := provision.Contribution{
+		RoBindPaths: []string{"/nix/store/bbb-data", "/nix/store/aaa-claude"},
+		PathEntries: []string{"/nix/store/aaa-claude/bin"},
+	}
+
+	tests := []struct {
+		name    string
+		binary  string
+		handled bool
+		phrase  string
+	}{
+		{"absolute inside the closure", "/nix/store/aaa-claude/bin/claude", true, ""},
+		{"absolute inside the closure, not clean", "/nix/store/aaa-claude/bin/../bin/claude", true, ""},
+		{"absolute not present", "/nix/store/aaa-claude/bin/codex", false, `include package "claude-code" or select`},
+		{"absolute not executable", "/nix/store/bbb-data/bin/claude", false, `include package "claude-code" or select`},
+		{"absolute outside the closure on the host", "/usr/local/bin/claude", false, "not inside the nix closure"},
+		{"absolute store path outside the closure", "/nix/store/zzz-other/bin/claude", false, "not inside the nix closure"},
+		{"absolute sharing a requisite prefix", "/nix/store/aaa-claude-evil/bin/claude", false, "not inside the nix closure"},
+		{"relative path", "bin/claude", false, "not inside the nix closure"},
+		{"bare name", "claude", true, ""},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			agent := &types.AgentConfig{Binary: test.binary, NixPackage: "claude-code"}
+			handled, err := p.CheckAgent(closure, agent)
+			if handled != test.handled {
+				t.Errorf("CheckAgent(%q) handled = %v, want %v", test.binary, handled, test.handled)
+			}
+			if test.handled && err != nil {
+				t.Errorf("CheckAgent(%q) error = %v, want nil", test.binary, err)
+			}
+			if !test.handled && (err == nil || !strings.Contains(err.Error(), test.phrase) || !strings.Contains(err.Error(), `include package "claude-code"`)) {
+				t.Errorf("CheckAgent(%q) error = %v, want phrase %q", test.binary, err, test.phrase)
+			}
+		})
+	}
+}
+
 func TestGCRootDir_KeyedByEnvID(t *testing.T) {
 	host := oshosttest.New()
 	got, err := New(host).gcRootDir(helloSource)
